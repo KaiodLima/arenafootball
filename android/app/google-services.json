@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "168000497644",
+    "project_id": "arenasoccerflutter",
+    "storage_bucket": "arenasoccerflutter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:168000497644:android:fb54eecd8d0890547682c9",
+        "android_client_info": {
+          "package_name": "com.cdevel.arena_football"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "168000497644-d6dfnm6cs29a05gs61dv0nt34jtj631b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDuFtmDR_xPPcRblfej97figtXufY1i-3w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "168000497644-d6dfnm6cs29a05gs61dv0nt34jtj631b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:168000497644:android:21ae0c77122f22c07682c9",
+        "android_client_info": {
+          "package_name": "com.example.arena_soccer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "168000497644-d6dfnm6cs29a05gs61dv0nt34jtj631b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDuFtmDR_xPPcRblfej97figtXufY1i-3w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "168000497644-d6dfnm6cs29a05gs61dv0nt34jtj631b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

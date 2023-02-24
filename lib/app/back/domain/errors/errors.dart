@@ -1,0 +1,1 @@
+abstract class FailureListNews implements Exception {}
