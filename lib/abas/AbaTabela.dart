@@ -23,24 +23,24 @@ class AbaTabela extends StatefulWidget {
 
 class _AbaTabelaState extends State<AbaTabela> {
 
-  chamaTelaVotacao(String timeC, String timeF, String tituloVotacao){
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MelhorDaPartida(timeC: timeC, timeF: timeF, tituloVotacao: tituloVotacao), //passo os dois times por parâmetro
-      ) //o outro parâmetro é a rota
-    );
-    //Navigator.pop(context); //fecha a tela atual e abre uma nova
-  }  
+  // chamaTelaVotacao(String timeC, String timeF, String tituloVotacao){
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => MelhorDaPartida(timeC: timeC, timeF: timeF, tituloVotacao: tituloVotacao), //passo os dois times por parâmetro
+  //     ) //o outro parâmetro é a rota
+  //   );
+  //   //Navigator.pop(context); //fecha a tela atual e abre uma nova
+  // }  
 
-  chamaTelaEleitoMelhor(String jogadorEleito, String quantidadeVotos){
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TelaJogadorEleito(jogadorEleito, quantidadeVotos), //passo os dois times por parâmetro
-      ) //o outro parâmetro é a rota
-    );
-  }
+  // chamaTelaEleitoMelhor(String jogadorEleito, String quantidadeVotos){
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => TelaJogadorEleito(nomeJogador: jogadorEleito, quantidadeVotos: quantidadeVotos, timeC: "", timeF: "",), //passo os dois times por parâmetro
+  //     ) //o outro parâmetro é a rota
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {

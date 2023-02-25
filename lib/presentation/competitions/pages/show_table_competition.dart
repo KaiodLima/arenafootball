@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:arena_soccer/ExibirGrupos.dart';
 import 'package:arena_soccer/MelhorDaPartida.dart';
 import 'package:arena_soccer/TelaJogadorEleito.dart';
@@ -45,8 +43,11 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => TelaJogadorEleito(jogadorEleito, quantidadeVotos), //passo os dois times por parâmetro
-      ) //o outro parâmetro é a rota
+        builder: (context) => TelaJogadorEleito(
+          nomeJogador: jogadorEleito, 
+          quantidadeVotos: quantidadeVotos,
+        ), //passo os dois times por parâmetro
+      )
     );
   }
   
@@ -182,7 +183,7 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
                                           // color: Colors.blue,
                                           width: widget.usuario?.getIsAdmin == true 
                                             ? MediaQuery.of(context).size.width * .7
-                                            : MediaQuery.of(context).size.width * .8,
+                                            : MediaQuery.of(context).size.width * .7,
                                           child: Column(
                                             children: [
                                               // const CircleAvatar(
@@ -306,7 +307,14 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
                                                 // color: Colors.amber,
                                                 child: GestureDetector(
                                                   onTap: () {
-                                                    print("HABILITA VOTACAO!");
+                                                    
+                                                    if(partida[index].get("votacao") == "true"){
+                                                      criarPartida(partida, index, "false");
+                                                    }else {
+                                                      print("HABILITA VOTACAO!");
+                                                      criarPartida(partida, index, "true");
+                                                    }
+                                                    
                                                   },
                                                   child: Padding(
                                                     padding: EdgeInsets.only(right: 12.0),
@@ -331,7 +339,7 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
                                               width: MediaQuery.of(context).size.width * 0.13,
                                               height: MediaQuery.of(context).size.height * 0.06,
                                               child: GestureDetector(
-                                                onTap: () {
+                                                onTap: () async {
                                                   print("CARD PARTIDA CLICADO!");
                                                   if(partida[index].get("votacao") == "true"){
                                                     //quando uma partida é clicada:
@@ -341,9 +349,10 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
                                                       partida[index].get("tituloVotacao").toString(),
                                                     );
                                                   }else{
+                                                    await _calcularVotos(partida[index].get("timeC").toString(), partida[index].get("timeF").toString());
                                                     chamaTelaEleitoMelhor(
-                                                      partida[index].get("melhorJogador").toString(), 
-                                                      partida[index].get("quantidadeVotos").toString(),
+                                                      jogadorMaisVotado.toString(), 
+                                                      nVotos.toString(),
                                                     );
                                                   } 
                                                 },
@@ -502,7 +511,7 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
                       child: Text("Salvar", style: TextStyle(fontSize: 20,  color: Colors.white),),
                       onPressed: (){
                         print("Dados Atualizados!");
-                        criarPartida(partida, index);
+                        criarPartida(partida, index, "");
                         Navigator.pop(context);
                       },
                     ),
@@ -522,21 +531,26 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
   }
 
   //capturar dados da partida
-  criarPartida(List<DocumentSnapshot> partida, int index) {
+  criarPartida(List<DocumentSnapshot> partida, int index, String votacao) {
     String idPartida = partida[index].get("id_partida");
     int idCampeonato = partida[index].get("id_campeonato");
     String data = partida[index].get("data");
     String horario = partida[index].get("horario");
     String melhorJogador = partida[index].get("melhorJogador");
     String quantidadeVotos = partida[index].get("quantidadeVotos");
-    String votacao = partida[index].get("votacao");
+    // String votacao = partida[index].get("votacao");
 
-    int golCasa = int.parse(_placarTimeAController.text);
-    int golFora = int.parse(_placarTimeBController.text);
+    int? golCasa = _placarTimeAController.text.isNotEmpty 
+      ? int.parse(_placarTimeAController.text) 
+      : partida[index].get("golTimeCasa");
+    int? golFora = _placarTimeBController.text.isNotEmpty
+      ? int.parse(_placarTimeBController.text)
+      : partida[index].get("golTimeFora");
     String timeCasa = partida[index].get("timeC");
     String timeFora = partida[index].get("timeF");
 
-    print(idPartida.toString()+" TESTE KAIO::: "+golCasa.toString()+" "+golFora.toString()+" "+timeCasa+" "+timeFora);
+    String habilitaVotacao = votacao;
+    // print(idPartida.toString()+" TESTE KAIO::: "+golCasa.toString()+" "+golFora.toString()+" "+timeCasa+" "+timeFora);
     
     //criar partida
     Partida partidaModel = Partida(
@@ -550,6 +564,7 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
       golTimeFora: golFora,
       timeC: timeCasa,
       timeF: timeFora,
+      votacao: habilitaVotacao,
     );
 
     //salvar informações da partida no banco de dados
@@ -579,7 +594,7 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
       "golTimeFora": partida.golTimeFora,
     });
 
-    _chamarSnackBar("Placar registrado com Sucesso!!!");
+    // _chamarSnackBar("Placar registrado com Sucesso!!!");
   }
 
   //cria a snackBar com a mensagem de alerta
@@ -592,6 +607,39 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
       //limpa snackbar
       _snackBar = "";
     }
+  }
+
+  //recuperar votos
+  String? jogadorMaisVotado;
+  String? nVotos;
+  _calcularVotos(String timeC, String timeF) async {
+    var collection = FirebaseFirestore.instance.collection("melhorjogador${timeC}${timeF}"); //cria instancia
+
+    var resultado = await collection.get(); //busca os dados uma vez    
+
+    var fieldValueMap = Map<String, int>();
+    for (var value in resultado.docs) {
+      var fieldValue = value["nome"] as String;
+      if (fieldValueMap.containsKey(fieldValue)) {
+        fieldValueMap[fieldValue] = fieldValueMap[fieldValue]! + 1;
+      } else {
+        fieldValueMap[fieldValue] = 1;
+      }
+    }
+
+    var mostFrequentValue = '';
+    var frequency = 0;
+    fieldValueMap.forEach((key, value) {
+      if (value > frequency) {
+        frequency = value;
+        mostFrequentValue = key;
+      }
+    });
+
+    print("MAIS VOTADO: "+mostFrequentValue.toString()+" Votos: "+frequency.toString());
+    jogadorMaisVotado = mostFrequentValue.toString();
+    nVotos = frequency.toString();
+    
   }
 
 }

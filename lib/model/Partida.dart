@@ -29,7 +29,8 @@ class Partida {
     this.fkPartida,
     this.idCampeonato,
     this.golTimeCasa,
-    this.golTimeFora,    
+    this.golTimeFora,
+    this.votacao,
     });
 
   String get getIdPartida => idPartida ?? "";

@@ -67,8 +67,8 @@ class _MelhorDaPartidaState extends State<MelhorDaPartida> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    
     _recuperarJogadores(widget.timeC.toString());
     _recuperarJogadores(widget.timeF.toString());
   }
