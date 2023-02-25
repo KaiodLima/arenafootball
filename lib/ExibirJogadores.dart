@@ -72,7 +72,7 @@ class _ExibirJogadoresState extends State<ExibirJogadores> {
           ),
           content: SingleChildScrollView(
             child: Container(
-              margin: const EdgeInsets.all(16),
+              margin: const EdgeInsets.all(4),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -211,7 +211,7 @@ class _ExibirJogadoresState extends State<ExibirJogadores> {
                       }),
                       if (widget.usuario?.getIsAdmin == true)
                         Container(
-                          margin: EdgeInsets.only(left: 8),
+                          margin: const EdgeInsets.only(left: 8),
                           child: IconButton(
                             onPressed: () {
                               player.addGol();
@@ -237,7 +237,7 @@ class _ExibirJogadoresState extends State<ExibirJogadores> {
                     children: [
                       if (widget.usuario?.getIsAdmin == true)
                         Container(
-                          margin: EdgeInsets.only(right: 8),
+                          margin: const EdgeInsets.only(right: 8),
                           child: IconButton(
                             onPressed: () {
                               player.removeAssistencia();

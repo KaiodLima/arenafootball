@@ -89,10 +89,10 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              // const Text("Configurações:", style: TextStyle(fontSize: 24, color: Colors.white,),),
+              const Text("Cadastrar Card de Publicidade:", style: TextStyle(fontSize: 24, color: Colors.white,),),
               const SizedBox(height: 8,),
               SizedBox(
-                width: width*0.2,
+                // width: width*0.2,
                 // height: height*.2,
                 child: Text(
                   "ID #"+idAtual.toString(),
