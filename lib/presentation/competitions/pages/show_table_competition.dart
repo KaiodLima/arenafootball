@@ -1,6 +1,7 @@
 import 'package:arena_soccer/ExibirGrupos.dart';
 import 'package:arena_soccer/MelhorDaPartida.dart';
 import 'package:arena_soccer/TelaJogadorEleito.dart';
+import 'package:arena_soccer/model/Jogador.dart';
 import 'package:arena_soccer/model/Partida.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 
 import '../../../ExibirArtilheiros.dart';
 import '../../../ExibirAssistencias.dart';
+import '../../../model/Time.dart';
 import '../../../model/Usuario.dart';
 
 
@@ -39,13 +41,15 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
     //Navigator.pop(context); //fecha a tela atual e abre uma nova
   }  
 
-  chamaTelaEleitoMelhor(String jogadorEleito, String quantidadeVotos){
+  chamaTelaEleitoMelhor(String jogadorEleito, String quantidadeVotos, Time timeDados, Jogador jogadorDados){
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => TelaJogadorEleito(
           nomeJogador: jogadorEleito, 
           quantidadeVotos: quantidadeVotos,
+          timeDados: timeDados,
+          jogadorDados: jogadorDados,
         ), //passo os dois times por parâmetro
       )
     );
@@ -350,9 +354,13 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
                                                     );
                                                   }else{
                                                     await _calcularVotos(partida[index].get("timeC").toString(), partida[index].get("timeF").toString());
+                                                    Time timeDados = await _buscarTime(jogadorMaisVotado.toString());
+                                                    Jogador jogadorDados = await _buscarDadosJogador(jogadorMaisVotado.toString(), timeDados.nome.toString());
                                                     chamaTelaEleitoMelhor(
                                                       jogadorMaisVotado.toString(), 
                                                       nVotos.toString(),
+                                                      timeDados,
+                                                      jogadorDados,
                                                     );
                                                   } 
                                                 },
@@ -642,4 +650,59 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
     
   }
 
+  //recuperar time no firebase  
+  Future<Time> _buscarTime(String jogador) async {
+    String nomeJogador = jogador;
+    String? nomeTime;
+
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    QuerySnapshot querySnapshot = await db.collection("jogadores")
+      .where("nome", isEqualTo: nomeJogador).get(); //recupera time pelo nome do jogador
+
+    for(var item in querySnapshot.docs){
+      nomeTime = item.get("time") ?? "";
+      
+      print("TESTE TIME: "+nomeTime.toString());
+
+    }
+
+    QuerySnapshot querySnapshotTime = await db.collection("times")
+      .where("nome", isEqualTo: nomeTime).get(); //recupera dados do time
+
+    Time time = Time();
+    for(var item in querySnapshotTime.docs){
+      time.nome = item.get("nome");
+      time.urlImagem = item.get("urlImagem");      
+      time.fkCompeticao = item.get("fk_competicao");
+
+    }
+
+    return time;
+    
+  }
+
+  //recuperar jogador no firebase  
+  Future<Jogador> _buscarDadosJogador(String nome, String time) async {
+    print("ENTROU!!!");
+    String nomeJogador = nome;
+    String timeJogador = time;
+    print(""+nomeJogador+" "+timeJogador);
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    QuerySnapshot querySnapshot = await db.collection("jogadores")
+      .where("nome", isEqualTo: nomeJogador)
+      .where("time", isEqualTo: timeJogador).get(); //recupera todos os jogadores
+    
+    Jogador jogador = Jogador();
+    for(var item in querySnapshot.docs){
+      jogador.nome = item.get("nome");
+      jogador.time = item.get("time");
+      jogador.urlImagem = item.get("urlImagem");
+      jogador.nGols = item.get("nGols");
+      jogador.nAssistencias = item.get("nAssistencias");
+      
+    }
+
+    return jogador;
+
+  }
 }

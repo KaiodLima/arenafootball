@@ -45,6 +45,7 @@ dependencies:
   auto_size_text: ^3.0.0 #texto que se adequa a tela
   beautiful_soup_dart: ^0.3.0 #para realizar web scraping
   shared_preferences: ^2.0.17 #guardar dados em cache
+  transparent_image: ^2.0.1 #remover fundo de imagem
   
 
   mobx: ^2.0.0
