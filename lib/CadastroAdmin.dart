@@ -290,16 +290,16 @@ class _CadastroAdminState extends State<CadastroAdmin> {
           ),
         ),
         const SizedBox(height: 2,),
-        ElevatedButton(
-          onPressed: () {
-            _editarJogadorFirebase();
-          },
-          child: Text("ATUALIZAR"),
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(
-                Colors.green), //essa merda toda pra mudar a cor do botão oporra
-          ),
-        ),
+        // ElevatedButton(
+        //   onPressed: () {
+        //     _editarJogadorFirebase();
+        //   },
+        //   child: const Text("ATUALIZAR"),
+        //   style: ButtonStyle(
+        //     backgroundColor: MaterialStateProperty.all<Color>(
+        //         Colors.green), //essa merda toda pra mudar a cor do botão oporra
+        //   ),
+        // ),
         /*TextButton(
           onPressed: () {
             //_chamarTelaLogin();
@@ -360,18 +360,18 @@ class _CadastroAdminState extends State<CadastroAdmin> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // widgetSearch(),
-              Padding(
-                padding: const EdgeInsets.only(left: 12, right: 12),
-                child: _chamarDropDownCity(false),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 12, right: 12),
-                child: _chamarDropDownTimesSearch(),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 12, right: 12),
-                child: _chamarDropDownPlayers(),
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.only(left: 12, right: 12),
+              //   child: _chamarDropDownCity(false),
+              // ),
+              // Padding(
+              //   padding: const EdgeInsets.only(left: 12, right: 12),
+              //   child: _chamarDropDownTimesSearch(),
+              // ),
+              // Padding(
+              //   padding: const EdgeInsets.only(left: 12, right: 12),
+              //   child: _chamarDropDownPlayers(),
+              // ),
               // const SizedBox(height: 2,),
               // Padding(
               //   padding: EdgeInsets.all(6),

@@ -35,8 +35,8 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MelhorDaPartida(timeC: timeC, timeF: timeF, tituloVotacao: tituloVotacao), //passo os dois times por parâmetro
-      ) //o outro parâmetro é a rota
+        builder: (context) => MelhorDaPartida(timeC: timeC, timeF: timeF, tituloVotacao: tituloVotacao),
+      ) 
     );
     //Navigator.pop(context); //fecha a tela atual e abre uma nova
   }  
@@ -72,7 +72,6 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
             color: Colors.white,
             icon: const Icon(Icons.sports_soccer),
             onPressed: (){
-              //print("Minha Conta Clicado!");
               //chamar lista de artilheiros:
               Navigator.push(
                 context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
@@ -87,13 +86,12 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
             color: Colors.white,
             icon: const Icon(Icons.star_border),
             onPressed: (){
-              //print("Minha Conta Clicado!");
               //chamar lista de assistencias:
               Navigator.push(
-                context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
+                context, 
                 MaterialPageRoute(
                   builder: (context) => ExibirAssistencias(regiao: widget.regiao,),
-                ) //o outro parâmetro é a rota
+                ) 
               );
             },
           ),
@@ -255,7 +253,7 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
                                               ),
                                               const SizedBox(height: 16,),
                                               AutoSizeText(
-                                                "${partida[index].get("data")} às ${partida[index].get("horario")} horas",
+                                                "${partida[index].get("data")} às ${partida[index].get("horario")} horas\n${partida[index].get("local")}",
                                                 textAlign: TextAlign.center,
                                                 style: const TextStyle(
                                                   color: Colors.black,
@@ -523,9 +521,8 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
     );
   }
 
-  //capturar dados da noticia
+  //capturar dados da partida
   criarPartida(List<DocumentSnapshot> partida, int index) {
-    // int id_noticia = int.parse(_controllerId.text);
     String idPartida = partida[index].get("id_partida");
     int idCampeonato = partida[index].get("id_campeonato");
     String data = partida[index].get("data");
@@ -555,7 +552,7 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
       timeF: timeFora,
     );
 
-    //salvar informações do jogador no banco de dados
+    //salvar informações da partida no banco de dados
     _cadastrarFirebase(partidaModel);
     
   }
@@ -563,7 +560,7 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
   //cadastrar informações no banco de dados
   Future<void> _cadastrarFirebase(Partida partida) async {
     FirebaseFirestore db = await FirebaseFirestore.instance;
-    //aqui estou usando o uid do usuário logado pra salvar como  id na colection de dados
+    
     db.collection("partidas").doc(partida.idPartida.toString()).set({
       "id_partida": partida.idPartida,
       "id_campeonato": partida.idCampeonato,

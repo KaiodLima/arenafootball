@@ -1,5 +1,6 @@
 import 'package:arena_soccer/CadastrarNoticia.dart';
 import 'package:arena_soccer/CadastrarPartida.dart';
+import 'package:arena_soccer/CadastrarTime.dart';
 import 'package:arena_soccer/CadastroAdmin.dart';
 import 'package:arena_soccer/CalcularVotos.dart';
 import 'package:arena_soccer/Login.dart';
@@ -7,6 +8,7 @@ import 'package:arena_soccer/abas/AbaCampeonatos.dart';
 import 'package:arena_soccer/abas/AbaNoticias.dart';
 import 'package:arena_soccer/abas/AbaTabela.dart';
 import 'package:arena_soccer/abas/AbaTimes.dart';
+import 'package:arena_soccer/model/Time.dart';
 import 'package:arena_soccer/model/Usuario.dart';
 import 'package:arena_soccer/presentation/home/components/destaque.dart';
 import 'package:arena_soccer/presentation/home/pages/destaque_detalhes_screen.dart';
@@ -98,17 +100,17 @@ class _InicioState extends State<Inicio> {
     _recuperarCidades();
   }
 
-  List<String> listaMenu = ["Cadastrar Jogador", "Cadastrar Nova Partida", "Cadastrar Noticia"];
+  List<String> listaMenu = ["Cadastrar Jogador", "Cadastrar Nova Partida", "Cadastrar Noticia", "Cadastrar Time"];
   // List<String> listaMenu = ["Calcular Votos", "Cadastrar Jogador", "Cadastrar Nova Partida", "Cadastrar Noticia"];
   chamarMenuPop(String selecionado){
     //print("Item clicado: ${selecionado}");
     switch (selecionado) {
       // case "Calcular Votos":
       //   Navigator.push(
-      //     context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
+      //     context, 
       //     MaterialPageRoute(
       //       builder: (context) => const CalcularVotos(),
-      //     ) //o outro parâmetro é a rota
+      //     ) 
       //   );
       //   break;
       case "Cadastrar Jogador":
@@ -121,18 +123,26 @@ class _InicioState extends State<Inicio> {
         break;
       case "Cadastrar Nova Partida":
         Navigator.push(
-          context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
+          context,
           MaterialPageRoute(
             builder: (context) => const CadastrarPartida(),
-          ) //o outro parâmetro é a rota
+          ) 
         );
         break;
       case "Cadastrar Noticia":
         Navigator.push(
-          context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
+          context, 
           MaterialPageRoute(
             builder: (context) => const CadastrarNoticia(),
-          ) //o outro parâmetro é a rota
+          ) 
+        );
+        break;
+      case "Cadastrar Time":
+        Navigator.push(
+          context, 
+          MaterialPageRoute(
+            builder: (context) => const CadastrarTime(),
+          ) 
         );
         break;
       default:

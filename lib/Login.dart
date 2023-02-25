@@ -137,37 +137,37 @@ class _LoginState extends State<Login> {
   //   }
 
   // }
-  void addNewFieldInFirebasePartida() async {
-    var collection = FirebaseFirestore.instance.collection("partidas"); //cria instancia
-    var resultado = await collection.get(); //busca os dados uma vez
+  // void addNewFieldInFirebasePartida() async {
+  //   var collection = FirebaseFirestore.instance.collection("partidas"); //cria instancia
+  //   var resultado = await collection.get(); //busca os dados uma vez
 
-    for(var doc in resultado.docs){
-      // print("USER -> "+doc.id);
-      // print("USER -> "+doc["nome"]);
-      FirebaseFirestore db = await FirebaseFirestore.instance;
+  //   for(var doc in resultado.docs){
+  //     // print("USER -> "+doc.id);
+  //     // print("USER -> "+doc["nome"]);
+  //     FirebaseFirestore db = await FirebaseFirestore.instance;
       
-      db.collection("partidas").doc(doc.id.toString()).set(
-        {
-          "id_partida": doc.id.toString(),
-          "id_campeonato": doc["id_campeonato"] ?? 1,
-          "fk_competicao": doc["fk_competicao"],
+  //     db.collection("partidas").doc(doc.id.toString()).set(
+  //       {
+  //         "id_partida": doc.id.toString(),
+  //         "id_campeonato": doc["id_campeonato"] ?? 1,
+  //         "fk_competicao": doc["fk_competicao"],
 
-          "data": doc["data"],
-          "horario": doc["horario"],
-          "local": doc["local"],
-          "melhorJogador": doc["melhorJogador"],
-          "quantidadeVotos": doc["quantidadeVotos"],
-          "timeC": doc["timeC"],
-          "timeF": doc["timeF"],
-          "votacao": doc["votacao"],
-          "tituloVotacao": doc["tituloVotacao"],
-          "golTimeCasa": doc["golTimeCasa"] ?? 0,
-          "golTimeFora": doc["golTimeFora"] ?? 0,
-        }
-      );
-    }
+  //         "data": doc["data"],
+  //         "horario": doc["horario"],
+  //         "local": doc["local"],
+  //         "melhorJogador": doc["melhorJogador"],
+  //         "quantidadeVotos": doc["quantidadeVotos"],
+  //         "timeC": doc["timeC"],
+  //         "timeF": doc["timeF"],
+  //         "votacao": doc["votacao"],
+  //         "tituloVotacao": doc["tituloVotacao"],
+  //         "golTimeCasa": doc["golTimeCasa"] ?? 0,
+  //         "golTimeFora": doc["golTimeFora"] ?? 0,
+  //       }
+  //     );
+  //   }
 
-  }
+  // }
   // void addNewFieldInFirebaseJogador() async {
   //   var collection = FirebaseFirestore.instance.collection("jogadores"); //cria instancia
   //   var resultado = await collection.get(); //busca os dados uma vez
@@ -185,6 +185,28 @@ class _LoginState extends State<Login> {
   //         "urlImagem":  doc["urlImagem"],
   //         "nGols":  doc["nGols"],
   //         "nAssistencias":  doc["nAssistencias"],
+  //       }
+  //     );
+  //   }
+
+  // }
+  // void addNewFieldInFirebaseTime() async {
+  //   var collection = FirebaseFirestore.instance.collection("times"); //cria instancia
+  //   var resultado = await collection.get(); //busca os dados uma vez
+
+  //   for(var doc in resultado.docs){
+  //     // print("USER -> "+doc.id);
+  //     // print("USER -> "+doc["nome"]);
+  //     FirebaseFirestore db = await FirebaseFirestore.instance;
+      
+  //     db.collection("times").doc(doc.id.toString()).set(
+  //       {
+  //         "idTime":  doc.id.toString(),
+
+  //         "nome":  doc["nome"],
+  //         "descricao":  doc["descricao"],
+  //         "urlImagem":  doc["urlImagem"],
+  //         "fk_competicao":  doc["fk_competicao"],
   //       }
   //     );
   //   }
@@ -224,7 +246,7 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
-    addNewFieldInFirebasePartida();
+    // addNewFieldInFirebaseTime();
     _verificaUsuarioLogado();
 
   }

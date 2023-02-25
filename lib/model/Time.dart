@@ -1,6 +1,7 @@
 
 class Time {
   //atributos
+  String? idTime;
   String? nome;
   String? descricao;
   String? urlImagem;
@@ -8,6 +9,7 @@ class Time {
 
   //construtor
   Time({
+    this.idTime,
     this.nome, 
     this.descricao, 
     this.urlImagem,
@@ -15,6 +17,12 @@ class Time {
   });
 
   //métodos acessores
+  String get getIdTime => idTime ?? "";
+
+  set setIdTime(String value) {
+    idTime = value;
+  }
+
   String get getNome => nome ?? "";
 
   set setNome(String value) {

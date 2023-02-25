@@ -51,7 +51,7 @@ class _ExibirJogadoresState extends State<ExibirJogadores> {
               criarJogador(value);
               _jogadorSelecionado?.nome = value;
             },
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -319,10 +319,11 @@ class _ExibirJogadoresState extends State<ExibirJogadores> {
 
     //print("TESTE -> ${resultado.get("nome")}");
     Jogador jogador = Jogador(
-        idJogador: resultado.get("idJogador"),
-        nome: resultado.get("nome"),
-        time: resultado.get("time"),
-        urlImagem: resultado.get("urlImagem"));
+      idJogador: resultado.get("idJogador"),
+      nome: resultado.get("nome"),
+      time: resultado.get("time"),
+      urlImagem: resultado.get("urlImagem"),
+    );
     jogador.nGols = resultado.get("nGols");
     jogador.nAssistencias = resultado.get("nAssistencias");
 
@@ -364,7 +365,7 @@ class _ExibirJogadoresState extends State<ExibirJogadores> {
                 return ListView.builder(
                   itemCount: jogador.length,
                   itemBuilder: (context, index) {
-                    //monta interface da noticia
+                    //monta interface
                     return GestureDetector(
                       onTap: () {
                         //quando um jogador é clicado:
