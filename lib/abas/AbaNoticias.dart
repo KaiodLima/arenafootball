@@ -1,3 +1,5 @@
+import 'package:arena_soccer/model/Usuario.dart';
+import 'package:arena_soccer/presentation/news/pages/news_edit_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -9,10 +11,12 @@ import '../presentation/news/widget/news_card.dart';
 
 class AbaNoticias extends StatefulWidget {
   final String? regiao;
+  final Usuario? usuario;
 
-  const AbaNoticias({
+  AbaNoticias({
     Key? key,
-    this.regiao
+    this.regiao,
+    this.usuario,
   }) : super(key: key);
 
   @override
@@ -155,10 +159,50 @@ class _AbaNoticiasState extends State<AbaNoticias> {
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: NewsCard(
-                              urlImage: noticia[index].get("urlImagem").toString(),
-                              title: noticia[index].get("titulo").toString(),
-                              description: noticia[index].get("descricao").toString(),
+                            child: Stack(
+                              children: [
+                                NewsCard(
+                                  urlImage: noticia[index].get("urlImagem").toString(),
+                                  title: noticia[index].get("titulo").toString(),
+                                  description: noticia[index].get("descricao").toString(),
+                                ),
+                                Visibility(
+                                  visible: widget.usuario?.getIsAdmin == true,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Align(
+                                      alignment: Alignment.topRight,
+                                      child: Container(
+                                        alignment: Alignment.centerRight,
+                                        width: MediaQuery.of(context).size.width * 0.13,
+                                        height: MediaQuery.of(context).size.height * 0.06,
+                                        // color: Colors.amber,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            print("EDIT NOTICIA CLICADO!");
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => NewsEditScreen(dataNews: noticia, index: index,),
+                                              ),
+                                            );
+                                          },
+                                          child: const Padding(
+                                            padding: EdgeInsets.only(right: 12.0),
+                                            child: Icon(Icons.edit, color: Colors.black,),
+                                          ),
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          border: Border.all(color: Colors.black),
+                                          borderRadius: const BorderRadius.all(Radius.circular(25)),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                
+                              ],
                             ),
                           ),
                           // child: Column(

@@ -50,15 +50,16 @@ class _PublicidadeCardState extends State<PublicidadeCard> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      "PUBLICIDADE",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        // backgroundColor: Colors.green,
-                        fontWeight: FontWeight.bold,
+                    if(widget.noticia[widget.index].get("urlImagem").toString().isEmpty)
+                      Text(
+                        "PUBLICIDADE",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          // backgroundColor: Colors.green,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),

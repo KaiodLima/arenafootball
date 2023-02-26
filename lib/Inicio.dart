@@ -157,7 +157,7 @@ class _InicioState extends State<Inicio> {
     //lista de telas
     List<Widget> telas = [
       //Inicio(_resultado),
-      AbaNoticias(regiao: cidadeSelecionada??"Floresta",),
+      AbaNoticias(regiao: cidadeSelecionada??"Floresta", usuario: widget.usuario,),
       AbaCampeonatos(regiao: cidadeSelecionada??"Floresta",),
       AbaTimes(regiao: cidadeSelecionada??"Floresta", usuario: widget.usuario,),
       AbaTabela(regiao: cidadeSelecionada??"Floresta", usuario: widget.usuario,),

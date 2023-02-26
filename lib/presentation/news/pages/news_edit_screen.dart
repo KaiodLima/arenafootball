@@ -1,21 +1,29 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:arena_soccer/model/Noticia.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart' as storage;
 import 'package:firebase_core/firebase_core.dart' as core;
-import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:math';
 
-class CadastrarNoticia extends StatefulWidget {
-  const CadastrarNoticia({ Key? key }) : super(key: key);
+class NewsEditScreen extends StatefulWidget {
+  final List<DocumentSnapshot>? dataNews;
+  final int? index;
+
+  NewsEditScreen({
+    Key? key,
+    this.dataNews,
+    this.index,
+  }) : super(key: key);
 
   @override
-  State<CadastrarNoticia> createState() => _CadastrarNoticiaState();
+  State<NewsEditScreen> createState() => _NewsEditScreenState();
 }
 
-class _CadastrarNoticiaState extends State<CadastrarNoticia> {
+class _NewsEditScreenState extends State<NewsEditScreen> {
+
   TextEditingController _controllerIdNoticia = TextEditingController();
   TextEditingController _controllerTitulo = TextEditingController();
   TextEditingController _controllerDescricao = TextEditingController();
@@ -24,18 +32,37 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
   TextEditingController _controllerExibir = TextEditingController();
   TextEditingController _controllerTag = TextEditingController();
 
-  int idAtual = 0;
+  //cadastrar informações do usuário no banco de dados
+  Future<void> _salvarFirebase(Noticia noticia) async {
+    FirebaseFirestore db = await FirebaseFirestore.instance;
+    //aqui estou usando o uid do usuário logado pra salvar como  id na colection de dados
+    db.collection("noticias").doc(noticia.idNoticia.toString()).set({
+      "id": noticia.idNoticia,
 
-  String? urlDownloadImage;
-  //capturar dados da notícia
-  criarNoticia() {
-    int idNoticia = idAtual;
-    // int id_noticia = int.parse(_controllerIdNoticia.text);
+      "titulo": noticia.titulo,
+      "descricao": noticia.descricao,
+      "urlImagem": noticia.urlImagem,
+      "link": noticia.link,
+      "exibir": noticia.exibir,
+
+      "fk_competicao": noticia.fkCompeticao,
+      "time_casa": noticia.timeCasa,
+      "time_fora": noticia.timeFora,
+      "gol_time_casa": noticia.golTimeCasa,
+      "gol_time_fora": noticia.golTimeFora,
+      "tag": noticia.tag
+
+    });
+
+    _chamarSnackBar("Noticia Atualizada com Sucesso!!!");
+  }
+
+  //capturar dados da partida
+  atualizarNoticia() {
+    int idNoticia = int.parse(_controllerIdNoticia.text);
     String titulo = _controllerTitulo.text;
     String descricao = _controllerDescricao.text;
-    //String urlImagem = _controllerUrlImagem.text;
-    String urlImagem = urlDownloadImage!.toString();
-    // String urlImagem = "";
+    String urlImagem = imageFile != null ? urlDownloadImage!.toString() : _controllerUrlImagem.text;
     String link = _controllerLink.text;
     String exibir = _controllerExibir.text;
     String fkCompeticao = cidadeSelecionada;
@@ -64,39 +91,32 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
         );        
 
       //salvar informações do jogador no banco de dados
-      _cadastrarFirebase(noticia);
+      _salvarFirebase(noticia);
     } else {      
       _chamarSnackBar("Preencha todos os campos!!!");
     }
   }
 
-  //cadastrar informações do usuário no banco de dados
-  Future<void> _cadastrarFirebase(Noticia noticia) async {
-    FirebaseFirestore db = await FirebaseFirestore.instance;
-    //aqui estou usando o uid do usuário logado pra salvar como  id na colection de dados
-    db.collection("noticias").doc(noticia.idNoticia.toString()).set({
-      "id": noticia.idNoticia,
+  _iniciarDados(){
+    int index = widget.index ?? 0;
+    _controllerIdNoticia.text = widget.dataNews![index].id.toString();
+    _controllerTitulo.text = widget.dataNews![index].get("titulo");
+    _controllerDescricao.text = widget.dataNews![index].get("descricao");
+    _controllerUrlImagem.text = widget.dataNews![index].get("urlImagem");
+    _controllerLink.text = widget.dataNews![index].get("link");
+    _controllerExibir.text = widget.dataNews![index].get("exibir");
+    _controllerTag.text = widget.dataNews![index].get("tag");
 
-      "titulo": noticia.titulo,
-      "descricao": noticia.descricao,
-      "urlImagem": noticia.urlImagem,
-      "link": noticia.link,
-      "exibir": noticia.exibir,
-
-      "fk_competicao": noticia.fkCompeticao,
-      "time_casa": noticia.timeCasa,
-      "time_fora": noticia.timeFora,
-      "gol_time_casa": noticia.golTimeCasa,
-      "gol_time_fora": noticia.golTimeFora,
-      "tag": noticia.tag
-
-    });
-
-    _chamarSnackBar("Noticia Cadastrada com Sucesso!!!");
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _recuperarCidades();
+    _iniciarDados();
+  }
 
-//cria a snackBar com a mensagem de alerta
+  //cria a snackBar com a mensagem de alerta
   var _snackBar;
   _chamarSnackBar(texto){
     _snackBar = SnackBar(content: Text(texto),);
@@ -122,24 +142,11 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
             ),
             const SizedBox(width: 16,),
             Text(
-              idAtual.toString(), 
+              widget.dataNews![widget.index ?? 0].id.toString(), 
               style: const TextStyle(fontSize: 18),
             ),
           ],
         ),
-        // TextField(
-        //   controller: _controllerIdNoticia,
-        //   //autofocus: true,
-        //   decoration: const InputDecoration(
-        //     border: OutlineInputBorder(),
-        //     labelText: "ID",
-        //     icon: Icon(
-        //       Icons.numbers,
-        //       color: Colors.green,
-        //       size: 24.0,              
-        //     ),
-        //   ),
-        // ),
         const SizedBox(height: 8,),
         TextField(
           controller: _controllerTitulo,
@@ -173,7 +180,6 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
                   icon: const Icon(Icons.camera_alt),
                   onPressed: () {                    
                     //Tirar foto:
-                    // getImageCamera();
                     _recoveryImage(true);
                                 
                   },
@@ -182,7 +188,7 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
                     backgroundColor: MaterialStateProperty.all<Color>(Colors.green), //essa merda toda pra mudar a cor do botão oporra
                   ),
                 ),
-              ),              
+              ),
               Container(                
                 width: 150,
                 height: 50,
@@ -190,7 +196,6 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
                   icon: const Icon(Icons.attach_file, color: Colors.green,),
                   onPressed: () {
                     //buscar na galeria
-                    // getImageGalery();
                     _recoveryImage(false);
                                 
                   },
@@ -222,19 +227,6 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
         const SizedBox(
           height: 8,
         ), 
-        // TextField(
-        //   controller: _controllerUrlImagem,
-        //   //autofocus: true,
-        //   decoration: const InputDecoration(
-        //     border: OutlineInputBorder(),
-        //     labelText: "Caminho da imagem",
-        //     icon: Icon(
-        //       Icons.image,
-        //       color: Colors.green,
-        //       size: 24.0,              
-        //     ),
-        //   ),
-        // ),
         const SizedBox(height: 16,),
         TextField(
           controller: _controllerTag,
@@ -284,14 +276,17 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
             int randomNumber = random.nextInt(100000);
 
             if(_controllerTitulo.text.isNotEmpty){
-              await uploadPhoto(imageFile!, "noticias${_controllerTitulo.text+randomNumber.toString()}");
-              criarNoticia();
+              if(imageFile != null){
+                await uploadPhoto(imageFile!, "noticias${_controllerTitulo.text+randomNumber.toString()}");
+              }
+              
+              atualizarNoticia();
             }else{
               _chamarSnackBar("A noticia precisa de um titulo!!!");
             }
             
           },
-          child: Text("CADASTRAR"),
+          child: Text("ATUALIZAR"),
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all<Color>(Colors.green), //essa merda toda pra mudar a cor do botão oporra
           ),
@@ -302,17 +297,10 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _recuperarIdAtual();
-    _recuperarCidades();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("CADASTRAR NOTICIA"),
+        title: const Text("EDITAR NOTÍCIA"),
         backgroundColor: Colors.green,
       ),
       body: Padding(
@@ -324,10 +312,17 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
             children: [
               _chamarDropDownCity(),
               const SizedBox(height: 12,),
-              Image.asset(
-                "lib/assets/images/ic_arena.png",
-                height: 100,
-              ), //height mexe com o tamanho da imagem
+              if(imageFile == null)
+                Image.network(
+                  _controllerUrlImagem.text,
+                  height: MediaQuery.of(context).size.height * 0.5,
+                  width: MediaQuery.of(context).size.width * 1,
+                )
+              else
+                Image.asset(
+                  "lib/assets/images/ic_arena.png",
+                  height: 100,
+                ), //height mexe com o tamanho da imagem
               const SizedBox(
                 height: 16,
               ),
@@ -340,65 +335,6 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
     );
   }
 
-  // ImagePicker imagePicker = ImagePicker();
-  // File? selectedImage;
-  // getImageCamera() async {
-  //   final PickedFile? temporaryImage = await imagePicker.getImage(source: ImageSource.camera);
-  //   if(temporaryImage != null){
-  //     setState(() {
-  //       selectedImage = File(temporaryImage.path);
-  //     });
-  //     upLoadFile();
-  //   }
-  // }
-
-  // getImageGalery() async {
-  //   final PickedFile? temporaryImage = await imagePicker.getImage(source: ImageSource.gallery);
-  //   if(temporaryImage != null){
-  //     setState(() {
-  //       selectedImage = File(temporaryImage.path);
-  //     });
-  //     upLoadFile();
-  //   }
-  // }
-
-  // // UploadTask? uploadTask;
-  // upLoadFile() async {
-  //   final path = 'gs://arenasoccerflutter.appspot.com/noticias${_controllerTitulo.text}';
-  //   final file = File(selectedImage!.path);
-
-  //   final ref = FirebaseStorage.instance.ref().child(path);
-  //   uploadTask = ref.putFile(file);
-
-  //   final snapshot = await uploadTask!.whenComplete(() => null);
-
-  //   final urlDownload = await snapshot.ref.getDownloadURL();
-  //   setState(() {
-  //     urlDownloadImage = urlDownload;
-  //   });
-  // }
-
-
-  _recuperarIdAtual() async {
-    var collection = FirebaseFirestore.instance.collection("noticias"); //cria instancia
-
-    var resultado = await collection.get(); //busca os dados uma vez    
-
-    // for(var doc in resultado.docs){
-    //   print("TESTE REGIAO -> "+doc["nome"]);
-    //   setState(() {
-
-    //   });
-      
-    // }
-    //print("TESTE -> "+listaTimesFirebase.toString());
-    // print("TESTE -> "+resultado.docs.length.toString());
-
-    setState(() {
-      idAtual = resultado.docs.length+1;  
-    });
-    
-  }
 
   String cidadeSelecionada = 'Floresta';
   _chamarDropDownCity(){
@@ -479,6 +415,7 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
  
   }
 
+  String? urlDownloadImage;
   Future<void> uploadPhoto(File Image, String fileName) async {
     try {
       var result = await storage.FirebaseStorage.instance.ref("noticias/$fileName").putFile(Image);
@@ -493,5 +430,4 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
  
     }
   }
-
 }

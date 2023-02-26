@@ -53,7 +53,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const [
+        children: [
           AbaNoticias(), //chama minha aba de notícias
           AbaCampeonatos(), //chama minha aba de campeonatos
         ],

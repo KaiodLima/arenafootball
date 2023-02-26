@@ -79,44 +79,47 @@ class _NewsCardState extends State<NewsCard> {
             ),
             borderRadius: BorderRadius.all(Radius.circular(25)),
           ),
-          child: Container(
-            margin: const EdgeInsets.only(top: 180),
-            child: Column(            
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  alignment: Alignment.centerLeft,
-                  child: AutoSizeText(
-                    //"CAMPEÃO NA ARENA BERNALDINO DE NOVO O NOVO...", //max 40 caracteres
-                    //(widget.title != null && widget.title!.isNotEmpty)?widget.title.toString():"SEM TÍTULO",
-                    (newTitle.isNotEmpty)?newTitle.toString():"",
-                    style: const TextStyle(
-                      fontSize: 24,
-                      color: Color.fromARGB(255, 255, 255, 255),
-                      fontWeight: FontWeight.bold,
-                      fontFamily: "Arial",
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Column( 
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    alignment: Alignment.centerLeft,
+                    child: AutoSizeText(
+                      //"CAMPEÃO NA ARENA BERNALDINO DE NOVO O NOVO...", //max 40 caracteres
+                      //(widget.title != null && widget.title!.isNotEmpty)?widget.title.toString():"SEM TÍTULO",
+                      (newTitle.isNotEmpty)?newTitle.toString():"",
+                      style: const TextStyle(
+                        fontSize: 24,
+                        color: Color.fromARGB(255, 255, 255, 255),
+                        fontWeight: FontWeight.bold,
+                        fontFamily: "Arial",
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  alignment: Alignment.centerLeft,
-                  child: AutoSizeText(
-                    //"X-9 Caiçara finalmente quebra seu jejum de títulos e sai campeã pela primeira vez na história do clube! Parabéns a todos. hahaha", //max 120 caracteres
-                    //(widget.description != null && widget.description!.isNotEmpty)?widget.description.toString():"SEM DESCRIÇÃO",
-                    (newDescription.isNotEmpty)?newDescription.toString():"",
-                    style: const TextStyle(
-                      fontSize: 18,
-                      color: Color.fromARGB(255, 255, 255, 255),
-                      fontFamily: "Arial",
-                    ),              
+                  const SizedBox(
+                    height: 5,
                   ),
-                ),
-              ],
-            ),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    alignment: Alignment.centerLeft,
+                    child: AutoSizeText(
+                      //"X-9 Caiçara finalmente quebra seu jejum de títulos e sai campeã pela primeira vez na história do clube! Parabéns a todos. hahaha", //max 120 caracteres
+                      //(widget.description != null && widget.description!.isNotEmpty)?widget.description.toString():"SEM DESCRIÇÃO",
+                      (newDescription.isNotEmpty)?newDescription.toString():"",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: Color.fromARGB(255, 255, 255, 255),
+                        fontFamily: "Arial",
+                      ),              
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
         //CURTIR E COMENTAR:
