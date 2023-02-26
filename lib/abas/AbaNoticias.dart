@@ -138,12 +138,22 @@ class _AbaNoticiasState extends State<AbaNoticias> {
                       if(noticia[index].get("exibir").toString() == "true" && noticia[index].get("tag").toString() == "gol")
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: GolCard(noticia: noticia, index: index),
+                          child: Stack(
+                            children: [
+                              GolCard(noticia: noticia, index: index),
+                              _actionCard(noticia, index, "delete"),                              
+                            ],
+                          ),
                         )
                       else if(noticia[index].get("exibir").toString() == "true" && noticia[index].get("tag").toString() == "publicidade")
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: PublicidadeCard(noticia: noticia, index: index,),
+                          child: Stack(
+                            children: [
+                              PublicidadeCard(noticia: noticia, index: index,),
+                              _actionCard(noticia, index, "delete"),
+                            ],
+                          ),
                         )
                       else if(noticia[index].get("tag").toString() != "gol" && noticia[index].get("tag").toString() != "publicidade")
                         //monta interface da noticia
@@ -153,7 +163,7 @@ class _AbaNoticiasState extends State<AbaNoticias> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context)=>NewsDatailsScreen(dataNews: noticia, index: index,),
+                                builder: (context) => NewsDatailsScreen(dataNews: noticia, index: index,),
                               ),
                             );
                           },
@@ -166,40 +176,11 @@ class _AbaNoticiasState extends State<AbaNoticias> {
                                   title: noticia[index].get("titulo").toString(),
                                   description: noticia[index].get("descricao").toString(),
                                 ),
-                                Visibility(
-                                  visible: widget.usuario?.getIsAdmin == true,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Align(
-                                      alignment: Alignment.topRight,
-                                      child: Container(
-                                        alignment: Alignment.centerRight,
-                                        width: MediaQuery.of(context).size.width * 0.13,
-                                        height: MediaQuery.of(context).size.height * 0.06,
-                                        // color: Colors.amber,
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            print("EDIT NOTICIA CLICADO!");
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => NewsEditScreen(dataNews: noticia, index: index,),
-                                              ),
-                                            );
-                                          },
-                                          child: const Padding(
-                                            padding: EdgeInsets.only(right: 12.0),
-                                            child: Icon(Icons.edit, color: Colors.black,),
-                                          ),
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          border: Border.all(color: Colors.black),
-                                          borderRadius: const BorderRadius.all(Radius.circular(25)),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                                Column(
+                                  children: [
+                                    _actionCard(noticia, index, "edit"),
+                                    _actionCard(noticia, index, "delete"),
+                                  ],
                                 ),
                                 
                               ],
@@ -327,5 +308,144 @@ class _AbaNoticiasState extends State<AbaNoticias> {
 
       },
     );*/
+  }
+
+  //cria a snackBar com a mensagem de alerta
+  var _snackBar;
+  _chamarSnackBar(texto){
+    _snackBar = SnackBar(content: Text(texto),);
+
+    if(_snackBar != null){
+      ScaffoldMessenger.of(context).showSnackBar(_snackBar); //chama o snackBar 
+      //limpa snackbar
+      _snackBar = "";
+    }
+  }
+
+  _actionCard(List<DocumentSnapshot> noticia, int index, String action){
+    return Visibility(
+      visible: widget.usuario?.getIsAdmin == true,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Align(
+          alignment: Alignment.topRight,
+          child: Container(
+            alignment: Alignment.centerRight,
+            width: MediaQuery.of(context).size.width * 0.13,
+            height: MediaQuery.of(context).size.height * 0.06,
+            // color: Colors.amber,
+            child: GestureDetector(
+              onTap: () async {
+                switch (action) {
+                  case "edit":
+                    print("EDIT NOTICIA CLICADO!");
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NewsEditScreen(dataNews: noticia, index: index,),
+                      ),
+                    );
+                    
+                    break;
+                  case "delete":
+                    return showDialog(
+                      context: context, 
+                      builder: (context) {
+                        return AlertDialog(
+                          actions: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    width: 150,
+                                    height: 50,
+                                    child: ElevatedButton.icon(
+                                      icon: const Icon(
+                                        Icons.arrow_back,
+                                        color: Colors.white,
+                                      ),
+                                      onPressed: () {
+                                        //buscar na galeria
+                                        print("Cancelar!");
+                                        Navigator.pop(context);
+                                      },
+                                      label: const Text(
+                                        "Cancelar",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      style: ButtonStyle(
+                                        backgroundColor: MaterialStateProperty.all<Color>(Colors.red), //essa merda toda pra mudar a cor do botão oporra
+                                      ),
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green,
+                                      // border: Border.all(color: Colors.blue),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 8,
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    width: 150,
+                                    height: 50,
+                                    child: ElevatedButton.icon(
+                                      icon: const Icon(
+                                        Icons.delete,
+                                        color: Colors.white,
+                                      ),
+                                      onPressed: () async {
+                                        print("Excluir");
+                                        final collection = FirebaseFirestore.instance.collection('noticias');
+                                        final idDoRegistro = noticia[index].id; // ID do registro que você deseja excluir
+
+                                        await collection.doc(idDoRegistro).delete();
+                                        Navigator.pop(context);
+                                      },
+                                      label: const Text(
+                                        "Excluir",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      style: ButtonStyle(
+                                        backgroundColor: MaterialStateProperty.all<Color>(Colors.green), //essa merda toda pra mudar a cor do botão oporra
+                                      ),
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green,
+                                      // border: Border.all(color: Colors.blue),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                        
+                      },
+                    );
+                  default:
+                }
+                
+              },
+              child: Padding(
+                padding: EdgeInsets.only(right: 12.0),
+                child: action == "edit" 
+                ? Icon(Icons.edit, color: Colors.black,)
+                : Icon(Icons.delete, color: Colors.black,)
+              ),
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.black),
+              borderRadius: const BorderRadius.all(Radius.circular(25)),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
