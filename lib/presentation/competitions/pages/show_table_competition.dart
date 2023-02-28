@@ -177,125 +177,206 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(30),
                                   ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                  child: Column(
                                     children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Container(
-                                          // color: Colors.blue,
-                                          width: widget.usuario?.getIsAdmin == true 
-                                            ? MediaQuery.of(context).size.width * .7
-                                            : MediaQuery.of(context).size.width * .7,
-                                          child: Column(
-                                            children: [
-                                              // const CircleAvatar(
-                                              //   maxRadius: 25,
-                                              //   backgroundColor: Color.fromARGB(255, 45, 94, 45),
-                                              //   backgroundImage: NetworkImage(partida[index].get("timeC").toString()),
-                                              // ),
-                                              AutoSizeText(
-                                                partida[index].get("timeC"),
-                                                textAlign: TextAlign.center,
-                                                style: const TextStyle(
-                                                  color: Color.fromARGB(255, 4, 110, 7),
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 18,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 4,),
-                                              Row(
-                                                mainAxisAlignment: MainAxisAlignment.center,
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Container(
+                                              // color: Colors.blue,
+                                              width: widget.usuario?.getIsAdmin == true 
+                                                ? MediaQuery.of(context).size.width * .7
+                                                : MediaQuery.of(context).size.width * .7,
+                                              child: Column(
                                                 children: [
-                                                  Container(
-                                                    alignment: Alignment.center,
-                                                    width: MediaQuery.of(context).size.width*0.08,
-                                                    height: MediaQuery.of(context).size.height*0.05,
-                                                    child: Text(partida[index].get("golTimeCasa").toString(), style: TextStyle(fontSize: 20),),
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(color: Colors.green),
-                                                      borderRadius: BorderRadius.circular(4),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 8,),
-                                                  const Text(
-                                                    "X",
+                                                  // const CircleAvatar(
+                                                  //   maxRadius: 25,
+                                                  //   backgroundColor: Color.fromARGB(255, 45, 94, 45),
+                                                  //   backgroundImage: NetworkImage(partida[index].get("timeC").toString()),
+                                                  // ),
+                                                  AutoSizeText(
+                                                    partida[index].get("timeC"),
                                                     textAlign: TextAlign.center,
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                       color: Color.fromARGB(255, 4, 110, 7),
                                                       fontWeight: FontWeight.bold,
                                                       fontSize: 18,
                                                     ),
                                                   ),
-                                                  const SizedBox(width: 8,),
-                                                  Container(
-                                                    alignment: Alignment.center,
-                                                    width: MediaQuery.of(context).size.width*0.08,
-                                                    height: MediaQuery.of(context).size.height*0.05,
-                                                    child: Text(partida[index].get("golTimeFora").toString(), style: TextStyle(fontSize: 20),),
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(color: Colors.green),
-                                                      borderRadius: BorderRadius.circular(4),
+                                                  const SizedBox(height: 4,),
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      Container(
+                                                        alignment: Alignment.center,
+                                                        width: MediaQuery.of(context).size.width*0.08,
+                                                        height: MediaQuery.of(context).size.height*0.05,
+                                                        child: Text(partida[index].get("golTimeCasa").toString(), style: TextStyle(fontSize: 20),),
+                                                        decoration: BoxDecoration(
+                                                          border: Border.all(color: Colors.green),
+                                                          borderRadius: BorderRadius.circular(4),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 8,),
+                                                      const Text(
+                                                        "X",
+                                                        textAlign: TextAlign.center,
+                                                        style: TextStyle(
+                                                          color: Color.fromARGB(255, 4, 110, 7),
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 18,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 8,),
+                                                      Container(
+                                                        alignment: Alignment.center,
+                                                        width: MediaQuery.of(context).size.width*0.08,
+                                                        height: MediaQuery.of(context).size.height*0.05,
+                                                        child: Text(partida[index].get("golTimeFora").toString(), style: TextStyle(fontSize: 20),),
+                                                        decoration: BoxDecoration(
+                                                          border: Border.all(color: Colors.green),
+                                                          borderRadius: BorderRadius.circular(4),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 4,),
+                                                  // const CircleAvatar(
+                                                  //   maxRadius: 25,
+                                                  //   backgroundColor: Color.fromARGB(255, 45, 94, 45),
+                                                  //   backgroundImage: NetworkImage(partida[index].get("timeF").toString()),
+                                                  // ),
+                                                  AutoSizeText(
+                                                    partida[index].get("timeF"),
+                                                    textAlign: TextAlign.center,
+                                                    style: const TextStyle(
+                                                      color: Color.fromARGB(255, 4, 110, 7),
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 18,
                                                     ),
                                                   ),
+                                                  const SizedBox(height: 16,),
+                                                  AutoSizeText(
+                                                    "${partida[index].get("data")} às ${partida[index].get("horario")} horas\n${partida[index].get("local")}",
+                                                    textAlign: TextAlign.center,
+                                                    style: const TextStyle(
+                                                      color: Colors.black,
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 16,
+                                                    ),
+                                                  ),
+                                          
                                                 ],
                                               ),
-                                              const SizedBox(height: 4,),
-                                              // const CircleAvatar(
-                                              //   maxRadius: 25,
-                                              //   backgroundColor: Color.fromARGB(255, 45, 94, 45),
-                                              //   backgroundImage: NetworkImage(partida[index].get("timeF").toString()),
-                                              // ),
-                                              AutoSizeText(
-                                                partida[index].get("timeF"),
-                                                textAlign: TextAlign.center,
-                                                style: const TextStyle(
-                                                  color: Color.fromARGB(255, 4, 110, 7),
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 18,
+                                            ),
+                                          ),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(top: 8.0,),
+                                                child: Container(
+                                                  alignment: Alignment.centerRight,
+                                                  width: MediaQuery.of(context).size.width * 0.13,
+                                                  height: MediaQuery.of(context).size.height * 0.06,
+                                                  child: GestureDetector(
+                                                    onTap: () async {
+                                                      print("CARD PARTIDA CLICADO!");
+                                                      if(partida[index].get("votacao") == "true"){
+                                                        //quando uma partida é clicada:
+                                                        chamaTelaVotacao(
+                                                          partida[index].get("timeC").toString(), 
+                                                          partida[index].get("timeF").toString(), 
+                                                          partida[index].get("tituloVotacao").toString(),
+                                                        );
+                                                      }else{
+                                                        await _calcularVotos(partida[index].get("timeC").toString(), partida[index].get("timeF").toString());
+                                                        Time timeDados = await _buscarTime(jogadorMaisVotado.toString());
+                                                        Jogador jogadorDados = await _buscarDadosJogador(jogadorMaisVotado.toString(), timeDados.nome.toString());
+                                                        chamaTelaEleitoMelhor(
+                                                          jogadorMaisVotado.toString(), 
+                                                          nVotos.toString(),
+                                                          timeDados,
+                                                          jogadorDados,
+                                                        );
+                                                      } 
+                                                    },
+                                                    child: Padding(
+                                                      padding: EdgeInsets.only(right: 12.0),
+                                                      child: Icon(Icons.more_vert) 
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
-                                              const SizedBox(height: 16,),
-                                              AutoSizeText(
-                                                "${partida[index].get("data")} às ${partida[index].get("horario")} horas\n${partida[index].get("local")}",
-                                                textAlign: TextAlign.center,
-                                                style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 16,
+                                              Visibility(
+                                            visible: widget.usuario?.getIsAdmin == true,
+                                            child: Container(
+                                              alignment: Alignment.center,
+                                              width: MediaQuery.of(context).size.width * 0.13,
+                                              height: MediaQuery.of(context).size.height * 0.05,
+                                              // color: Colors.amber,
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  
+                                                  if(partida[index].get("votacao") == "true"){
+                                                    criarPartida(partida, index, "false");
+                                                  }else {
+                                                    print("HABILITA VOTACAO!");
+                                                    criarPartida(partida, index, "true");
+                                                  }
+                                                  
+                                                },
+                                                child: Icon(
+                                                  Icons.done_all, 
+                                                  color: partida[index].get("votacao") == "true" ? Colors.white : Colors.black,
                                                 ),
                                               ),
-                                      
+                                              decoration: BoxDecoration(
+                                                color: partida[index].get("votacao") == "true" ? Colors.green : Colors.white,
+                                                border: const Border(
+                                                  top: BorderSide(width: 2.0, color: Colors.black),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                              const SizedBox(height: 8,),
                                             ],
                                           ),
-                                        ),
+                                          
+                                        ],
                                       ),
                                       Column(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Visibility(
                                             visible: widget.usuario?.getIsAdmin == true,
                                             child: Padding(
-                                              padding: const EdgeInsets.only(top: 8.0,),
+                                              padding: const EdgeInsets.only(top: 8,),
                                               child: Container(
-                                                alignment: Alignment.centerRight,
-                                                width: MediaQuery.of(context).size.width * 0.13,
-                                                height: MediaQuery.of(context).size.height * 0.06,
+                                                alignment: Alignment.center,
+                                                width: MediaQuery.of(context).size.width * 0.8,
+                                                height: MediaQuery.of(context).size.height * 0.05,
                                                 // color: Colors.amber,
                                                 child: GestureDetector(
                                                   onTap: () {
                                                     print("EDIT PARTIDA CLICADA!");
                                                     _exibirTelaCadastro(partida, index);
                                                   },
-                                                  child: const Padding(
-                                                    padding: EdgeInsets.only(right: 12.0),
-                                                    child: Icon(Icons.edit),
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      const Icon(Icons.edit, ),
+                                                      const SizedBox(width: 8,),
+                                                      AutoSizeText("Editar Placar", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+                                                    ],
                                                   ),
                                                 ),
-                                                decoration: BoxDecoration(
-                                                  // color: Colors.red,
-                                                  border: Border.all(),
-                                                  borderRadius: const BorderRadius.all(Radius.circular(25)),
+                                                decoration: const BoxDecoration(
+                                                  border: Border(
+                                                    top: BorderSide(width: 2.0, color: Colors.black),
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -303,83 +384,37 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
                                           Visibility(
                                             visible: widget.usuario?.getIsAdmin == true,
                                             child: Padding(
-                                              padding: const EdgeInsets.only(top: 8.0,),
+                                              padding: const EdgeInsets.only(top: 8, bottom: 8),
                                               child: Container(
-                                                alignment: Alignment.centerRight,
-                                                width: MediaQuery.of(context).size.width * 0.13,
+                                                alignment: Alignment.center,
+                                                width: MediaQuery.of(context).size.width * 0.8,
                                                 height: MediaQuery.of(context).size.height * 0.06,
                                                 // color: Colors.amber,
                                                 child: GestureDetector(
-                                                  onTap: () {
-                                                    
-                                                    if(partida[index].get("votacao") == "true"){
-                                                      criarPartida(partida, index, "false");
-                                                    }else {
-                                                      print("HABILITA VOTACAO!");
-                                                      criarPartida(partida, index, "true");
-                                                    }
-                                                    
+                                                  onTap: () async {
+                                                    print("DELETE PARTIDA CLICADA!");
+                                                    await _actionCard(partida, index, "delete");
                                                   },
-                                                  child: Padding(
-                                                    padding: EdgeInsets.only(right: 12.0),
-                                                    child: Icon(
-                                                      Icons.done_all, 
-                                                      color: partida[index].get("votacao") == "true" ? Colors.white : Colors.black,
-                                                    ),
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      const Icon(Icons.delete, ),
+                                                      const SizedBox(width: 8,),
+                                                      AutoSizeText("Excluir Partida", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+                                                    ],
                                                   ),
                                                 ),
-                                                decoration: BoxDecoration(
-                                                  color: partida[index].get("votacao") == "true" ? Colors.green : Colors.white,
-                                                  border: Border.all(),
-                                                  borderRadius: const BorderRadius.all(Radius.circular(25)),
+                                                decoration: const BoxDecoration(
+                                                  border: Border(
+                                                    top: BorderSide(width: 2.0, color: Colors.black),
+                                                  ),
                                                 ),
                                               ),
                                             ),
                                           ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 8.0,),
-                                            child: Container(
-                                              alignment: Alignment.centerRight,
-                                              width: MediaQuery.of(context).size.width * 0.13,
-                                              height: MediaQuery.of(context).size.height * 0.06,
-                                              child: GestureDetector(
-                                                onTap: () async {
-                                                  print("CARD PARTIDA CLICADO!");
-                                                  if(partida[index].get("votacao") == "true"){
-                                                    //quando uma partida é clicada:
-                                                    chamaTelaVotacao(
-                                                      partida[index].get("timeC").toString(), 
-                                                      partida[index].get("timeF").toString(), 
-                                                      partida[index].get("tituloVotacao").toString(),
-                                                    );
-                                                  }else{
-                                                    await _calcularVotos(partida[index].get("timeC").toString(), partida[index].get("timeF").toString());
-                                                    Time timeDados = await _buscarTime(jogadorMaisVotado.toString());
-                                                    Jogador jogadorDados = await _buscarDadosJogador(jogadorMaisVotado.toString(), timeDados.nome.toString());
-                                                    chamaTelaEleitoMelhor(
-                                                      jogadorMaisVotado.toString(), 
-                                                      nVotos.toString(),
-                                                      timeDados,
-                                                      jogadorDados,
-                                                    );
-                                                  } 
-                                                },
-                                                child: const Padding(
-                                                  padding: EdgeInsets.only(right: 12.0),
-                                                  child: Icon(Icons.more_vert),
-                                                ),
-                                              ),
-                                              decoration: BoxDecoration(
-                                                // color: Colors.red,
-                                                border: Border.all(),
-                                                borderRadius: const BorderRadius.all(Radius.circular(25)),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(height: 8,),
+                                          
                                         ],
-                                      ),
-                                      
+                                      )
                                     ],
                                   ),
                                 ),
@@ -704,5 +739,108 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
 
     return jogador;
 
+  }
+
+  _actionCard(List<DocumentSnapshot> partida, int index, String action){
+    switch (action) {
+      case "edit":
+        print("EDIT NOTICIA CLICADO!");
+        
+        break;
+      case "delete":
+        return showDialog(
+          context: context, 
+          builder: (context) {
+            return AlertDialog(
+              actions: [
+                const Padding(
+                  padding: EdgeInsets.only(top: 8, bottom: 12),
+                  child: Center(
+                    child: Text(
+                      "DESEJA REALMENTE EXCLUIR ESSA PARTIDA ?",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        width: 150,
+                        height: 50,
+                        child: ElevatedButton.icon(
+                          icon: const Icon(
+                            Icons.cancel,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            //buscar na galeria
+                            print("Cancelar!");
+                            Navigator.pop(context);
+                          },
+                          label: const Text(
+                            "Cancelar",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all<Color>(Colors.red), //essa merda toda pra mudar a cor do botão oporra
+                          ),
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          // border: Border.all(color: Colors.blue),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 8,
+                    ),
+                    Expanded(
+                      child: Container(
+                        width: 150,
+                        height: 50,
+                        child: ElevatedButton.icon(
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Colors.white,
+                          ),
+                          onPressed: () async {
+                            print("Excluir");
+                            final collection = FirebaseFirestore.instance.collection('partidas');
+                            final idDoRegistro = partida[index].id; // ID do registro que você deseja excluir
+
+                            await collection.doc(idDoRegistro).delete();
+                            Navigator.pop(context);
+                          },
+                          label: const Text(
+                            "Excluir",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all<Color>(Colors.green), //essa merda toda pra mudar a cor do botão oporra
+                          ),
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          // border: Border.all(color: Colors.blue),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+            
+          },
+        );
+      default:
+    }
   }
 }

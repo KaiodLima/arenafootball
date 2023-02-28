@@ -49,7 +49,7 @@ class _NewsDatailsScreenState extends State<NewsDatailsScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 8, bottom: 8),
                 child: Container(
-                  height: MediaQuery.of(context).size.height * 0.65,
+                  height: MediaQuery.of(context).size.height * 0.75,
                   width: MediaQuery.of(context).size.width * 1, // retorna o tamanho da largura da tela
                   decoration: BoxDecoration(
                     image: DecorationImage(

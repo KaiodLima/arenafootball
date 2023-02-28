@@ -353,6 +353,19 @@ class _AbaNoticiasState extends State<AbaNoticias> {
                       builder: (context) {
                         return AlertDialog(
                           actions: [
+                            const Padding(
+                              padding: EdgeInsets.only(top: 8, bottom: 12),
+                              child: Center(
+                                child: Text(
+                                  "DESEJA REALMENTE EXCLUIR ESSA NOTÍCIA ?",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
@@ -362,7 +375,7 @@ class _AbaNoticiasState extends State<AbaNoticias> {
                                     height: 50,
                                     child: ElevatedButton.icon(
                                       icon: const Icon(
-                                        Icons.arrow_back,
+                                        Icons.cancel,
                                         color: Colors.white,
                                       ),
                                       onPressed: () {

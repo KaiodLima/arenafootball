@@ -34,7 +34,7 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
     String titulo = _controllerTitulo.text;
     String descricao = _controllerDescricao.text;
     //String urlImagem = _controllerUrlImagem.text;
-    String urlImagem = urlDownloadImage!.toString();
+    String urlImagem = urlDownloadImage?.toString() ?? "";
     // String urlImagem = "";
     String link = _controllerLink.text;
     String exibir = _controllerExibir.text;
@@ -76,6 +76,7 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
     //aqui estou usando o uid do usuário logado pra salvar como  id na colection de dados
     db.collection("noticias").doc(noticia.idNoticia.toString()).set({
       "id": noticia.idNoticia,
+      "data": FieldValue.serverTimestamp(),
 
       "titulo": noticia.titulo,
       "descricao": noticia.descricao,
@@ -284,7 +285,9 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
             int randomNumber = random.nextInt(100000);
 
             if(_controllerTitulo.text.isNotEmpty){
-              await uploadPhoto(imageFile!, "noticias${_controllerTitulo.text+randomNumber.toString()}");
+              if(imageFile != null){
+                await uploadPhoto(imageFile!, "noticias${_controllerTitulo.text+randomNumber.toString()}");
+              }
               criarNoticia();
             }else{
               _chamarSnackBar("A noticia precisa de um titulo!!!");

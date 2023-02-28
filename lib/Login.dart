@@ -212,6 +212,37 @@ class _LoginState extends State<Login> {
   //   }
 
   // }
+  // void addNewFieldInFirebaseNoticia() async {
+  //   var collection = FirebaseFirestore.instance.collection("noticias"); //cria instancia
+  //   var resultado = await collection.get(); //busca os dados uma vez
+
+  //   for(var doc in resultado.docs){
+  //     // print("USER -> "+doc.id);
+  //     // print("USER -> "+doc["nome"]);
+  //     FirebaseFirestore db = await FirebaseFirestore.instance;
+
+  //     db.collection("noticias").doc(doc.id.toString()).set(
+  //       {
+  //         "id":  int.parse(doc.id),
+  //         "data": FieldValue.serverTimestamp(),
+
+  //         "titulo": doc["titulo"] ?? "",
+  //         "descricao": doc["descricao"] ?? "",
+  //         "urlImagem": doc["urlImagem"] ?? "",
+  //         "link": doc["link"] ?? "",
+  //         "exibir": doc["exibir"] ?? "",
+
+  //         "fk_competicao": "",
+  //         "time_casa": "",
+  //         "time_fora": "",
+  //         "gol_time_casa": "",
+  //         "gol_time_fora": "",
+  //         "tag": doc["tag"] ?? "",
+  //       }
+  //     );
+  //   }
+
+  // }
 
   //buscar dado do usuário logado:
   Future<Usuario> searchUser(String idUser) async {
@@ -246,7 +277,7 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
-    // addNewFieldInFirebaseTime();
+    // addNewFieldInFirebaseNoticia();
     _verificaUsuarioLogado();
 
   }
