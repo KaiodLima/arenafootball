@@ -73,9 +73,29 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
   //cadastrar informações do usuário no banco de dados
   Future<void> _cadastrarFirebase(Noticia noticia) async {
     FirebaseFirestore db = await FirebaseFirestore.instance;
+    
     //aqui estou usando o uid do usuário logado pra salvar como  id na colection de dados
-    db.collection("noticias").doc(noticia.idNoticia.toString()).set({
-      "id": noticia.idNoticia,
+    var addedDocRef = await db.collection("noticias").add({
+      "id": "",
+      "data": FieldValue.serverTimestamp(),
+
+      "titulo": noticia.titulo,
+      "descricao": noticia.descricao,
+      "urlImagem": noticia.urlImagem,
+      "link": noticia.link,
+      "exibir": noticia.exibir,
+
+      "fk_competicao": noticia.fkCompeticao,
+      "time_casa": noticia.timeCasa,
+      "time_fora": noticia.timeFora,
+      "gol_time_casa": noticia.golTimeCasa,
+      "gol_time_fora": noticia.golTimeFora,
+      "tag": noticia.tag
+
+    });
+    
+    db.collection("noticias").doc(addedDocRef.id).set({
+      "id": addedDocRef.id,
       "data": FieldValue.serverTimestamp(),
 
       "titulo": noticia.titulo,

@@ -103,9 +103,9 @@ class _AbaNoticiasState extends State<AbaNoticias> {
     var aux;
     // print("TESTE ::: "+widget.regiao.toString());
     if(widget.regiao != null){
-      aux = FirebaseFirestore.instance.collection("noticias").where("fk_competicao", isEqualTo: widget.regiao).orderBy("id", descending: true).snapshots(); //passa uma stream de dados
+      aux = FirebaseFirestore.instance.collection("noticias").where("fk_competicao", isEqualTo: widget.regiao).orderBy("data", descending: true).snapshots(); //passa uma stream de dados
     }else{
-      aux = FirebaseFirestore.instance.collection("noticias").orderBy("id", descending: true).snapshots(); //passa uma stream de dados
+      aux = FirebaseFirestore.instance.collection("noticias").orderBy("data", descending: true).snapshots(); //passa uma stream de dados
     }
 
     return StreamBuilder<QuerySnapshot>(
