@@ -1,6 +1,9 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Noticia {
-  int? idNoticia;
+  String? idNoticia;
+  Timestamp? data;
   //atributos
   String? titulo;
   String? descricao;
@@ -19,6 +22,7 @@ class Noticia {
   //construtor
   Noticia({
     this.idNoticia,
+    this.data,
     this.titulo,
     this.descricao, 
     this.urlImagem, 
@@ -33,9 +37,9 @@ class Noticia {
   });
 
   //métodos acessores
-  int get getIdNoticia => idNoticia ?? 0;
+  String get getIdNoticia => idNoticia ?? "";
 
-  set setIdNoticia(int value) {
+  set setIdNoticia(String value) {
     idNoticia = value;
   }
 

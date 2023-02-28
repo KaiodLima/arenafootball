@@ -13,7 +13,7 @@ class PublicarAnuncioScreen extends StatefulWidget {
 class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
 
   String cidadeSelecionada = 'Floresta';
-  int idAtual = 0;
+  // int idAtual = 0;
 
   TextEditingController _controllerLink = TextEditingController();
   TextEditingController _controllerDescricao = TextEditingController();
@@ -62,7 +62,6 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
     super.initState();
 
     _recuperarCidades();
-    _recuperarIdAtual();
   }
 
   @override
@@ -91,17 +90,17 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
             children: [
               const Text("Cadastrar Card de Publicidade:", style: TextStyle(fontSize: 24, color: Colors.white,),),
               const SizedBox(height: 8,),
-              SizedBox(
-                // width: width*0.2,
-                // height: height*.2,
-                child: Text(
-                  "ID #"+idAtual.toString(),
-                  style: const TextStyle(
-                    fontSize: 24,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+              // SizedBox(
+              //   // width: width*0.2,
+              //   // height: height*.2,
+              //   child: Text(
+              //     "ID #"+idAtual.toString(),
+              //     style: const TextStyle(
+              //       fontSize: 24,
+              //       color: Colors.white,
+              //     ),
+              //   ),
+              // ),
               const SizedBox(height: 16,),
               const Text("Região:", style: TextStyle(fontSize: 24, color: Colors.white,),),
               const SizedBox(height: 8,),
@@ -291,7 +290,7 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
 
   //capturar dados da noticia
   criarNoticia() {
-    int idNoticia = idAtual;
+    // int idNoticia = idAtual;
     String titulo = _controllerTitulo.text;
     String descricao = _controllerDescricao.text;
     String urlImagem = "";
@@ -307,10 +306,9 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
     String tag = "publicidade";
 
     //validar campos:
-    if ((idNoticia != 0) && (exibir.isNotEmpty)) {
+    if (exibir.isNotEmpty) {
       //criar partida
       Noticia noticia = Noticia(
-        idNoticia: idNoticia,
         titulo: titulo, 
         descricao: descricao, 
         urlImagem: urlImagem, 
@@ -335,8 +333,28 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
   Future<void> _cadastrarFirebase(Noticia noticia) async {
     FirebaseFirestore db = await FirebaseFirestore.instance;
     //aqui estou usando o uid do usuário logado pra salvar como  id na colection de dados
-    db.collection("noticias").doc(noticia.idNoticia.toString()).set({
-      "id": noticia.idNoticia,
+    var addedDocRef = await db.collection("noticias").add({
+      "id": "",
+      "data": FieldValue.serverTimestamp(),
+
+      "titulo": noticia.titulo,
+      "descricao": noticia.descricao,
+      "urlImagem": noticia.urlImagem,
+      "link": noticia.link,
+      "exibir": noticia.exibir,
+
+      "fk_competicao": noticia.fkCompeticao,
+      "time_casa": noticia.timeCasa,
+      "time_fora": noticia.timeFora,
+      "gol_time_casa": noticia.golTimeCasa,
+      "gol_time_fora": noticia.golTimeFora,
+      "tag": noticia.tag
+
+    });
+
+    db.collection("noticias").doc(addedDocRef.id).set({
+      "id": addedDocRef.id,
+      "data": FieldValue.serverTimestamp(),
 
       "titulo": noticia.titulo,
       "descricao": noticia.descricao,
@@ -366,28 +384,6 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
       //limpa snackbar
       _snackBar = "";
     }
-  }
-
-
-  _recuperarIdAtual() async {
-    var collection = FirebaseFirestore.instance.collection("noticias"); //cria instancia
-
-    var resultado = await collection.get(); //busca os dados uma vez    
-
-    // for(var doc in resultado.docs){
-    //   print("TESTE REGIAO -> "+doc["nome"]);
-    //   setState(() {
-
-    //   });
-      
-    // }
-    //print("TESTE -> "+listaTimesFirebase.toString());
-    //print("TESTE -> "+resultado.docs.length.toString());
-
-    setState(() {
-      idAtual = resultado.docs.length+1;  
-    });
-
   }
 
 }

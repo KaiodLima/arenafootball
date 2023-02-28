@@ -18,7 +18,7 @@ class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
   TextEditingController controllerGolCasa = TextEditingController();
   TextEditingController controllerGolFora = TextEditingController();
 
-  int idAtual = 0;
+  // int idAtual = 0;
 
   _chamarDropDownCity(){
 
@@ -137,7 +137,6 @@ class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
     super.initState();
     _recuperarCidades();
     _recuperarTimes();
-    _recuperarIdAtual();
   }
 
   @override
@@ -165,18 +164,18 @@ class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
           child: Column(
             children: [
               const Text("Cadastrar Card de Gol:", style: TextStyle(fontSize: 24, color: Colors.white,),),
-              const SizedBox(height: 8,),
-              SizedBox(
-                // width: width*0.2,
-                // height: height*.2,
-                child: Text(
-                  "ID #"+idAtual.toString(),
-                  style: const TextStyle(
-                    fontSize: 24,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+              // const SizedBox(height: 8,),
+              // SizedBox(
+              //   // width: width*0.2,
+              //   // height: height*.2,
+              //   child: Text(
+              //     "ID #"+idAtual.toString(),
+              //     style: const TextStyle(
+              //       fontSize: 24,
+              //       color: Colors.white,
+              //     ),
+              //   ),
+              // ),
               const SizedBox(height: 8,),
               Container(
                 // height: height*0.12,
@@ -406,7 +405,7 @@ class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
   //capturar dados da noticia
   criarNoticia() {
     // int id_noticia = int.parse(_controllerId.text);
-    int idNoticia = idAtual;
+    // int idNoticia = idAtual;
     String titulo = "";
     String descricao = "";
     String urlImagem = "";
@@ -421,13 +420,12 @@ class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
     String timeFora = timeSelecionadoFora;
     String tag = "gol";
 
-    print(idNoticia.toString()+" TESTE KAIO::: "+fkCompeticao+" "+golCasa+" "+golFora+" "+timeCasa+" "+timeFora+" "+tag);
+    print(" TESTE KAIO::: "+fkCompeticao+" "+golCasa+" "+golFora+" "+timeCasa+" "+timeFora+" "+tag);
     
     //validar campos:
-    if ((idNoticia != 0) && (exibir.isNotEmpty)) {
+    if (exibir.isNotEmpty) {
       //criar partida
       Noticia noticia = Noticia(
-        idNoticia: idNoticia,
         titulo: titulo, 
         descricao: descricao, 
         urlImagem: urlImagem, 
@@ -452,8 +450,28 @@ class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
   Future<void> _cadastrarFirebase(Noticia noticia) async {
     FirebaseFirestore db = await FirebaseFirestore.instance;
     //aqui estou usando o uid do usuário logado pra salvar como  id na colection de dados
-    db.collection("noticias").doc(noticia.idNoticia.toString()).set({
-      "id": noticia.idNoticia,
+    var addedDocRef = await  db.collection("noticias").add({
+      "id": "",
+      "data": FieldValue.serverTimestamp(),
+
+      "titulo": noticia.titulo,
+      "descricao": noticia.descricao,
+      "urlImagem": noticia.urlImagem,
+      "link": noticia.link,
+      "exibir": noticia.exibir,
+
+      "fk_competicao": noticia.fkCompeticao,
+      "time_casa": noticia.timeCasa,
+      "time_fora": noticia.timeFora,
+      "gol_time_casa": noticia.golTimeCasa,
+      "gol_time_fora": noticia.golTimeFora,
+      "tag": noticia.tag
+
+    });
+
+    db.collection("noticias").doc(addedDocRef.id).set({
+      "id": addedDocRef.id,
+      "data": FieldValue.serverTimestamp(),
 
       "titulo": noticia.titulo,
       "descricao": noticia.descricao,
@@ -483,28 +501,6 @@ class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
       //limpa snackbar
       _snackBar = "";
     }
-  }
-
-
-  _recuperarIdAtual() async {
-    var collection = FirebaseFirestore.instance.collection("noticias"); //cria instancia
-
-    var resultado = await collection.get(); //busca os dados uma vez    
-
-    // for(var doc in resultado.docs){
-    //   print("TESTE REGIAO -> "+doc["nome"]);
-    //   setState(() {
-
-    //   });
-      
-    // }
-    //print("TESTE -> "+listaTimesFirebase.toString());
-    //print("TESTE -> "+resultado.docs.length.toString());
-
-    setState(() {
-      idAtual = resultado.docs.length+1;  
-    });
-
   }
 
 }

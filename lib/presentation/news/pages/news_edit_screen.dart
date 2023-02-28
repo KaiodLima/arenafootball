@@ -25,6 +25,7 @@ class NewsEditScreen extends StatefulWidget {
 class _NewsEditScreenState extends State<NewsEditScreen> {
 
   TextEditingController _controllerIdNoticia = TextEditingController();
+  Timestamp? _controllerData;
   TextEditingController _controllerTitulo = TextEditingController();
   TextEditingController _controllerDescricao = TextEditingController();
   TextEditingController _controllerUrlImagem = TextEditingController();
@@ -38,6 +39,7 @@ class _NewsEditScreenState extends State<NewsEditScreen> {
     //aqui estou usando o uid do usuário logado pra salvar como  id na colection de dados
     db.collection("noticias").doc(noticia.idNoticia.toString()).set({
       "id": noticia.idNoticia,
+      "data": noticia.data,
 
       "titulo": noticia.titulo,
       "descricao": noticia.descricao,
@@ -59,7 +61,8 @@ class _NewsEditScreenState extends State<NewsEditScreen> {
 
   //capturar dados da partida
   atualizarNoticia() {
-    int idNoticia = int.parse(_controllerIdNoticia.text);
+    String idNoticia = _controllerIdNoticia.text;
+    Timestamp? data = _controllerData;
     String titulo = _controllerTitulo.text;
     String descricao = _controllerDescricao.text;
     String urlImagem = imageFile != null ? urlDownloadImage!.toString() : _controllerUrlImagem.text;
@@ -69,7 +72,7 @@ class _NewsEditScreenState extends State<NewsEditScreen> {
     String tag = _controllerTag.text;
     
     //validar campos:
-    if ((idNoticia != 0) && 
+    if (
     // (titulo.isNotEmpty && titulo.length >= 3) && 
     // (descricao.isNotEmpty && descricao.length >= 3) &&
     // (urlImagem.isNotEmpty && urlImagem.length >= 3) &&
@@ -77,6 +80,7 @@ class _NewsEditScreenState extends State<NewsEditScreen> {
       //criar partida
       Noticia noticia = Noticia(
         idNoticia: idNoticia, 
+        data: data,
         titulo: titulo,
         descricao: descricao,
         urlImagem: urlImagem,
@@ -100,6 +104,7 @@ class _NewsEditScreenState extends State<NewsEditScreen> {
   _iniciarDados(){
     int index = widget.index ?? 0;
     _controllerIdNoticia.text = widget.dataNews![index].id.toString();
+    _controllerData = widget.dataNews![index].get("data");
     _controllerTitulo.text = widget.dataNews![index].get("titulo");
     _controllerDescricao.text = widget.dataNews![index].get("descricao");
     _controllerUrlImagem.text = widget.dataNews![index].get("urlImagem");
