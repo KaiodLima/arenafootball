@@ -24,12 +24,12 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
   TextEditingController _controllerExibir = TextEditingController();
   TextEditingController _controllerTag = TextEditingController();
 
-  int idAtual = 0;
+  // int idAtual = 0;
 
   String? urlDownloadImage;
   //capturar dados da notícia
   criarNoticia() {
-    int idNoticia = idAtual;
+    // int idNoticia = idAtual;
     // int id_noticia = int.parse(_controllerIdNoticia.text);
     String titulo = _controllerTitulo.text;
     String descricao = _controllerDescricao.text;
@@ -42,14 +42,14 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
     String tag = _controllerTag.text;
     
     //validar campos:
-    if ((idNoticia != 0) && 
+    if (
     // (titulo.isNotEmpty && titulo.length >= 3) && 
     // (descricao.isNotEmpty && descricao.length >= 3) &&
     // (urlImagem.isNotEmpty && urlImagem.length >= 3) &&
     (exibir.isNotEmpty)) {
       //criar partida
       Noticia noticia = Noticia(
-        idNoticia: idNoticia, 
+        // idNoticia: idNoticia,
         titulo: titulo,
         descricao: descricao,
         urlImagem: urlImagem,
@@ -133,20 +133,20 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          children: [
-            const Icon(
-              Icons.numbers,
-              color: Colors.green,
-              size: 24.0,              
-            ),
-            const SizedBox(width: 16,),
-            Text(
-              idAtual.toString(), 
-              style: const TextStyle(fontSize: 18),
-            ),
-          ],
-        ),
+        // Row(
+        //   children: [
+        //     const Icon(
+        //       Icons.numbers,
+        //       color: Colors.green,
+        //       size: 24.0,              
+        //     ),
+        //     const SizedBox(width: 16,),
+        //     Text(
+        //       idAtual.toString(), 
+        //       style: const TextStyle(fontSize: 18),
+        //     ),
+        //   ],
+        // ),
         // TextField(
         //   controller: _controllerIdNoticia,
         //   //autofocus: true,
@@ -326,7 +326,6 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
   @override
   void initState() {
     super.initState();
-    _recuperarIdAtual();
     _recuperarCidades();
   }
 
@@ -400,27 +399,6 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
   //   });
   // }
 
-
-  _recuperarIdAtual() async {
-    var collection = FirebaseFirestore.instance.collection("noticias"); //cria instancia
-
-    var resultado = await collection.get(); //busca os dados uma vez    
-
-    // for(var doc in resultado.docs){
-    //   print("TESTE REGIAO -> "+doc["nome"]);
-    //   setState(() {
-
-    //   });
-      
-    // }
-    //print("TESTE -> "+listaTimesFirebase.toString());
-    // print("TESTE -> "+resultado.docs.length.toString());
-
-    setState(() {
-      idAtual = resultado.docs.length+1;  
-    });
-    
-  }
 
   String cidadeSelecionada = 'Floresta';
   _chamarDropDownCity(){
