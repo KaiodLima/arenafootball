@@ -104,7 +104,7 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
       ),
       body: StreamBuilder<QuerySnapshot>(
         //recupera os dados toda vez que o banco é modificado
-        stream: FirebaseFirestore.instance.collection("partidas").orderBy("id_partida", descending: true).snapshots(), //passa uma stream de dados
+        stream: FirebaseFirestore.instance.collection("partidas2023").orderBy("dataRegistro", descending: true).snapshots(), //passa uma stream de dados
         builder: (context, snapshot) {
           // if(snapshot.data == null){
           //   return Center(
@@ -122,7 +122,7 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
               List<DocumentSnapshot> partida = snapshot.data!.docs;
 
               if (partida.isEmpty) {
-                return const Text("Vazio");
+                return const Center(child: Text("Nenhuma partida cadastrada", style: TextStyle(fontSize: 20, color: Colors.white),));
               } else {
                 return Column(
                   children: [
@@ -619,10 +619,12 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
   Future<void> _cadastrarFirebase(Partida partida) async {
     FirebaseFirestore db = await FirebaseFirestore.instance;
     
-    db.collection("partidas").doc(partida.idPartida.toString()).set({
+    db.collection("partidas2023").doc(partida.idPartida.toString()).set({
       "id_partida": partida.idPartida,
       "id_campeonato": partida.idCampeonato,
       "fk_competicao": partida.fkPartida,
+
+      "dataRegistro": FieldValue.serverTimestamp(),
 
       "data": partida.data,
       "horario": partida.horario,
@@ -812,7 +814,7 @@ class _ShowTableCompetitionState extends State<ShowTableCompetition> {
                           ),
                           onPressed: () async {
                             print("Excluir");
-                            final collection = FirebaseFirestore.instance.collection('partidas');
+                            final collection = FirebaseFirestore.instance.collection('partidas2023');
                             final idDoRegistro = partida[index].id; // ID do registro que você deseja excluir
 
                             await collection.doc(idDoRegistro).delete();

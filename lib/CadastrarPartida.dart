@@ -17,7 +17,7 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
   TextEditingController _controllerLocal = TextEditingController();
   TextEditingController _controllerData = TextEditingController();
 
-  int idAtual = 0;
+  // int idAtual = 0;
 
   int buscarIdCampeonato(String regiao){
     switch (regiao) {
@@ -32,7 +32,7 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
 
   //capturar dados da partida
   criarPartida() {
-    String id_partida = idAtual.toString();
+    // String id_partida = idAtual.toString();
     // String id_partida = _controllerIdPartida.text;
     String timeC = timeSelecionadoCasa;
     String timeF = timeSelecionadoFora;
@@ -47,7 +47,7 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
     if ((timeC.isNotEmpty && timeC.length >= 3) && (timeF.isNotEmpty && timeF.length >= 3)) {
       //criar partida
       Partida partida = Partida(
-        idPartida: id_partida, 
+        // idPartida: id_partida, 
         timeC: timeC, 
         timeF: timeF, 
         horario: horario, 
@@ -67,9 +67,33 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
   //cadastrar informações do usuário no banco de dados
   Future<void> _cadastrarFirebase(Partida partida) async {
     FirebaseFirestore db = await FirebaseFirestore.instance;
-    //aqui estou usando o uid do usuário logado pra salvar como  id na colection de dados
-    db.collection("partidas").doc(partida.idPartida).set({
-      "id_partida": partida.idPartida,
+    
+    var addedDocRef = await db.collection("partidas2023").add({
+      "id_partida": "",
+      "dataRegistro": FieldValue.serverTimestamp(),
+
+      "timeC": partida.timeC,
+      "timeF": partida.timeF,
+      "horario": partida.horario,
+      "id_campeonato":partida.getIdCampeonato,
+      "local": partida.local,
+      "data": partida.data,
+
+      "golTimeCasa": 0,
+      "golTimeFora": 0,
+
+      "quantidadeVotos": "",
+      "tituloVotacao": "",
+      "votacao": "false",
+      "melhorJogador": "",
+
+      "fk_competicao":partida.fkPartida,
+
+    });
+    
+    db.collection("partidas2023").doc(addedDocRef.id).set({
+      "id_partida": addedDocRef.id,
+      "dataRegistro": FieldValue.serverTimestamp(),
 
       "timeC": partida.timeC,
       "timeF": partida.timeF,
@@ -111,19 +135,19 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          children: [
-            const Icon(
-              Icons.numbers,
-              color: Colors.green,
-              size: 24.0,              
-            ),
-            Text(
-              idAtual.toString(), 
-              style: const TextStyle(fontSize: 18),
-            ),
-          ],
-        ),
+        // Row(
+        //   children: [
+        //     const Icon(
+        //       Icons.numbers,
+        //       color: Colors.green,
+        //       size: 24.0,              
+        //     ),
+        //     Text(
+        //       idAtual.toString(), 
+        //       style: const TextStyle(fontSize: 18),
+        //     ),
+        //   ],
+        // ),
         const SizedBox(height: 16,),
         const Text(
           "Região:", 
@@ -264,7 +288,8 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
   void initState() {
     super.initState();
     _recuperarCidades();
-    _recuperarIdAtual();
+    _recuperarTimesCasa();
+    _recuperarTimesFora();
   }
 
   @override
@@ -479,31 +504,9 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
       });
       
     }
-    timeSelecionadoFora = listaTimesFirebaseFora.first; //a primeira opção do dropdown deve ser iniciada sempre com o primeiro registro da lista
+    timeSelecionadoFora = listaTimesFirebaseFora.last; //a primeira opção do dropdown deve ser iniciada sempre com o primeiro registro da lista
     //print("TESTE -> "+listaTimesFirebase.toString());    
 
   }
-
-  _recuperarIdAtual() async {
-    var collection = FirebaseFirestore.instance.collection("partidas"); //cria instancia
-
-    var resultado = await collection.get(); //busca os dados uma vez    
-
-    // for(var doc in resultado.docs){
-    //   print("TESTE REGIAO -> "+doc["nome"]);
-    //   setState(() {
-
-    //   });
-      
-    // }
-    //print("TESTE -> "+listaTimesFirebase.toString());
-    // print("TESTE -> "+resultado.docs.length.toString());
-
-    setState(() {
-      idAtual = resultado.docs.length+1;  
-    });
-
-  }
-
 
 }
