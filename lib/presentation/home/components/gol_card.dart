@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 
 class GolCard extends StatefulWidget {
   var noticia;
-  int? index;
 
   GolCard({
     Key? key,
     this.noticia,
-    this.index
   }) : super(key: key);
 
   @override
@@ -49,7 +47,7 @@ class _GolCardState extends State<GolCard> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          widget.noticia[widget.index].get("time_casa").toString()+" "+widget.noticia[widget.index].get("gol_time_casa").toString()+" x "+widget.noticia[widget.index].get("gol_time_fora").toString()+" "+widget.noticia[widget.index].get("time_fora").toString(),
+                          widget.noticia.get("time_casa").toString()+" "+widget.noticia.get("gol_time_casa").toString()+" x "+widget.noticia.get("gol_time_fora").toString()+" "+widget.noticia.get("time_fora").toString(),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20,

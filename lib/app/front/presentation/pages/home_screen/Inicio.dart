@@ -1,7 +1,7 @@
 import 'package:arena_soccer/app/front/presentation/pages/register_news/CadastrarNoticia.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_match/CadastrarPartida.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_team/CadastrarTime.dart';
-import 'package:arena_soccer/app/front/presentation/pages/register_new_player/CadastroAdmin.dart';
+import 'package:arena_soccer/app/front/presentation/pages/register_new_player/register_player_screen.dart';
 import 'package:arena_soccer/app/front/presentation/pages/calculate_votes_best_player/CalcularVotos.dart';
 import 'package:arena_soccer/app/front/presentation/pages/login/Login.dart';
 import 'package:arena_soccer/abas/AbaCampeonatos.dart';
@@ -117,7 +117,7 @@ class _InicioState extends State<Inicio> {
         Navigator.push(
           context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
           MaterialPageRoute(
-            builder: (context) => const CadastroAdmin(),
+            builder: (context) => const RegisterPlayer(),
           ) //o outro parâmetro é a rota
         );
         break;
@@ -216,23 +216,21 @@ class _InicioState extends State<Inicio> {
           ),*/
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            destaquesConfig(width, height),
-            const SizedBox(height: 10,),
-            Padding(
-              padding: const EdgeInsets.only(left: 12, right: 12),
-              child: _chamarDropDownCity(),
-            ),
-            Container(
-              width: width,
-              height: height*0.65,
-              padding: const EdgeInsets.only(right: 16, left: 16, top: 14, bottom: 4),
-              child: telas[_selecionado],
-            ),
-          ],
-        ),
+      body: Column(
+        children: [
+          destaquesConfig(width, height),
+          const SizedBox(height: 10,),
+          Padding(
+            padding: const EdgeInsets.only(left: 12, right: 12),
+            child: _chamarDropDownCity(),
+          ),
+          Container(
+            width: width,
+            height: height*0.55,
+            padding: const EdgeInsets.only(right: 16, left: 16, top: 14, bottom: 4),
+            child: telas[_selecionado],
+          ),
+        ],
       ),
       bottomNavigationBar: MyBottomNavBar(context),
       // bottomNavigationBar: BottomNavigationBar(

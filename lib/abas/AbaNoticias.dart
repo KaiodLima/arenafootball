@@ -123,191 +123,149 @@ class _AbaNoticiasState extends State<AbaNoticias> {
             List<DocumentSnapshot> noticia = snapshot.data!.docs;
             // print("TESTE::: "+noticia.first.data().toString());
 
-            if (noticia.isEmpty) {
-              return const Center(
-                child: Text("Nenhuma notícia registrada", style: TextStyle(color: Colors.white, fontSize: 20),),
-              );
-            } else {
-              return ListView.builder(
-                //reverse: true,
-                itemCount: noticia.length,
-                itemBuilder: (context, index) {   
-
-                  return Column(
-                    children: [
-                      if(noticia[index].get("exibir").toString() == "true" && noticia[index].get("tag").toString() == "gol")
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Stack(
-                            children: [
-                              GolCard(noticia: noticia, index: index),
-                              _actionCard(noticia, index, "delete"),                              
-                            ],
-                          ),
-                        )
-                      else if(noticia[index].get("exibir").toString() == "true" && noticia[index].get("tag").toString() == "publicidade")
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Stack(
-                            children: [
-                              PublicidadeCard(noticia: noticia, index: index,),
-                              _actionCard(noticia, index, "delete"),
-                            ],
-                          ),
-                        )
-                      else if(noticia[index].get("tag").toString() != "gol" && noticia[index].get("tag").toString() != "publicidade")
-                        //monta interface da noticia
-                        GestureDetector(
-                          onTap: () {
-                            //quando clicado
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => NewsDatailsScreen(dataNews: noticia, index: index,),
-                              ),
-                            );
-                          },
-                          child: Padding(
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
+              ),
+              child: Column(
+                children: [
+                  ...noticia.map(
+                    (e) => Column(
+                      children: [
+                        if(e.get("exibir").toString() == "true" && e.get("tag").toString() == "gol")
+                          Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Stack(
                               children: [
-                                NewsCard(
-                                  urlImage: noticia[index].get("urlImagem").toString(),
-                                  title: noticia[index].get("titulo").toString(),
-                                  description: noticia[index].get("descricao").toString(),
-                                ),
-                                Column(
-                                  children: [
-                                    _actionCard(noticia, index, "edit"),
-                                    _actionCard(noticia, index, "delete"),
-                                  ],
-                                ),
-                                
+                                GolCard(noticia: e,),
+                                _actionCard(e, "delete"),                              
                               ],
                             ),
+                          )
+                        else if(e.get("exibir").toString() == "true" && e.get("tag").toString() == "publicidade")
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Stack(
+                              children: [
+                                PublicidadeCard(noticia: e,),
+                                _actionCard(e, "delete"),
+                              ],
+                            ),
+                          )
+                        else if(e.get("tag").toString() != "gol" && e.get("tag").toString() != "publicidade")
+                          //monta interface da noticia
+                          GestureDetector(
+                            onTap: () {
+                              //quando clicado
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => NewsDatailsScreen(dataNews: e,),
+                                ),
+                              );
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Stack(
+                                children: [
+                                  NewsCard(
+                                    urlImage: e.get("urlImagem").toString(),
+                                    title: e.get("titulo").toString(),
+                                    description: e.get("descricao").toString(),
+                                  ),
+                                  Column(
+                                    children: [
+                                      _actionCard(e, "edit"),
+                                      _actionCard(e, "delete"),
+                                    ],
+                                  ),
+                                  
+                                ],
+                              ),
+                            ),
                           ),
-                          // child: Column(
-                          //   children: [
-                          //     ClipRRect(                                                        
-                          //       //height: 200, 
-                          //       //padding: EdgeInsets.only(left: 10, right: 10),
-                          //       borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-                          //       child: CachedNetworkImage(
-                          //         imageUrl: noticia[index].get("urlImagem").toString(),
-                          //         fit: BoxFit.scaleDown,
-                          //         placeholder: (context, url) => CircularProgressIndicator(),
-                          //         errorWidget: (context, url, error) => Icon(Icons.error),
-                          //       ),
-                          //     ),
-                          //     /*Container(
-                          //       height: 200,
-                          //       decoration: BoxDecoration(
-                          //         //border: Border.all(color: Colors.green),
-                          //         image: DecorationImage(
-                          //           fit: BoxFit.scaleDown,
-                          //           image: NetworkImage(noticia[index].get("urlImagem").toString()),
-                          //         ),
-                          //       ),
-                          //     ),*/
-                          //     Container(                          
-                          //       padding: EdgeInsets.all(10),
-                          //       decoration: BoxDecoration(
-                          //         color: Colors.white,
-                          //         border: Border.all(
-                          //           color: Color.fromARGB(255, 4, 110, 7),
-                          //           width: 2,
-                          //           style: BorderStyle.solid
-                          //         ),
-                          //         borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),                                                           
-                          //       ),
-                          //       child: Column(
-                          //         children: [
-                          //           ListTile(
-                          //             title: Text(
-                          //               noticia[index].get("titulo"), //recuperar título da noticia
-                          //               textAlign: TextAlign.start,
-                          //               style: const TextStyle(
-                          //                   color: Color.fromARGB(255, 4, 110, 7),
-                          //                   fontWeight: FontWeight.bold,
-                          //                   fontSize: 20),
-                          //             ),
-                          //             subtitle: Text(noticia[index].get("descricao")), //recuperar descrição da noticia
-                          //           ),
-                          //           Center(
-                          //             child: chamarLink(noticia[index].get("link")),
-                          //           ),
-                          //         ],
-                          //       ),
-                          //     ),
-                          //     SizedBox(height: 16,),
-                          //   ],
-                          // ),
-                        ),
-                    ],
-                  );
-                  
-                },
-              );
+                      ],
+                    )
+                  ),
+                  // SizedBox(height: MediaQuery.of(context).size.height*0.12,)
+                ],
+              ),
+            );
 
-              /*return ListView.builder(
-                    itemCount: noticia.length,
-                    itemBuilder: (context, index) {
-                      //monta interface da noticia
-                      return ListTile(
-                        title: Text(
-                          noticia[index].get("titulo"), //recuperar título da noticia
-                          textAlign: TextAlign.start,
-                          style: const TextStyle(
-                              color: Color.fromARGB(255, 4, 110, 7),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20),
-                        ),
-                        subtitle: Text(noticia[index].get("descricao")), //recuperar descrição da noticia
-                      );
-                    },
-                  );*/
-            }
+            // if (noticia.isEmpty) {
+            //   return const Center(
+            //     child: Text("Nenhuma notícia registrada", style: TextStyle(color: Colors.white, fontSize: 20),),
+            //   );
+            // } else {
+            //   return ListView.builder(
+            //     //reverse: true,
+            //     itemCount: noticia.length,
+            //     itemBuilder: (context, index) {   
+
+            //       return Column(
+            //         children: [
+            //           if(noticia[index].get("exibir").toString() == "true" && noticia[index].get("tag").toString() == "gol")
+            //             Padding(
+            //               padding: const EdgeInsets.all(8.0),
+            //               child: Stack(
+            //                 children: [
+            //                   GolCard(noticia: noticia, index: index),
+            //                   _actionCard(noticia, index, "delete"),                              
+            //                 ],
+            //               ),
+            //             )
+            //           else if(noticia[index].get("exibir").toString() == "true" && noticia[index].get("tag").toString() == "publicidade")
+            //             Padding(
+            //               padding: const EdgeInsets.all(8.0),
+            //               child: Stack(
+            //                 children: [
+            //                   PublicidadeCard(noticia: noticia, index: index,),
+            //                   _actionCard(noticia, index, "delete"),
+            //                 ],
+            //               ),
+            //             )
+            //           else if(noticia[index].get("tag").toString() != "gol" && noticia[index].get("tag").toString() != "publicidade")
+            //             //monta interface da noticia
+            //             GestureDetector(
+            //               onTap: () {
+            //                 //quando clicado
+            //                 Navigator.push(
+            //                   context,
+            //                   MaterialPageRoute(
+            //                     builder: (context) => NewsDatailsScreen(dataNews: noticia, index: index,),
+            //                   ),
+            //                 );
+            //               },
+            //               child: Padding(
+            //                 padding: const EdgeInsets.all(8.0),
+            //                 child: Stack(
+            //                   children: [
+            //                     NewsCard(
+            //                       urlImage: noticia[index].get("urlImagem").toString(),
+            //                       title: noticia[index].get("titulo").toString(),
+            //                       description: noticia[index].get("descricao").toString(),
+            //                     ),
+            //                     Column(
+            //                       children: [
+            //                         _actionCard(noticia, index, "edit"),
+            //                         _actionCard(noticia, index, "delete"),
+            //                       ],
+            //                     ),
+                                
+            //                   ],
+            //                 ),
+            //               ),
+            //             ),
+            //         ],
+            //       );
+                  
+            //     },
+            //   );
+            // }
         }
       },
     );
 
-    /*return ListView.builder(
-      itemCount: listaNoticias.length,
-      itemBuilder: (context, index) {
-        Noticia noticia = listaNoticias[index]; //recupera notíca da lista
-
-        //monta interface da noticia
-        return GestureDetector(
-          onTap: () {
-            //quando clicado
-
-          },
-          child: Column(
-            children: [
-              Container(
-                height: 200,
-                decoration: BoxDecoration(
-                  //border: Border.all(color: Colors.green),
-                  image: DecorationImage(                                        
-                    fit: BoxFit.scaleDown,
-                    image: NetworkImage(noticia.urlImagem),
-                  ),
-                ),
-              ),
-              ListTile(
-                title: Text(
-                  noticia.titulo,
-                  textAlign: TextAlign.start,
-                  style: TextStyle(color: Color.fromARGB(255, 4, 110, 7), fontWeight: FontWeight.bold, fontSize: 20),
-                ),
-                subtitle: Text(noticia.descricao),
-              ),
-            ],
-          ),
-        );
-
-      },
-    );*/
   }
 
   //cria a snackBar com a mensagem de alerta
@@ -322,7 +280,7 @@ class _AbaNoticiasState extends State<AbaNoticias> {
     }
   }
 
-  _actionCard(List<DocumentSnapshot> noticia, int index, String action){
+  _actionCard(DocumentSnapshot<Object?> noticia, String action){
     return Visibility(
       visible: widget.usuario?.getIsAdmin == true,
       child: Padding(
@@ -342,7 +300,7 @@ class _AbaNoticiasState extends State<AbaNoticias> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => NewsEditScreen(dataNews: noticia, index: index,),
+                        builder: (context) => NewsEditScreen(dataNews: noticia,),
                       ),
                     );
                     
@@ -413,7 +371,7 @@ class _AbaNoticiasState extends State<AbaNoticias> {
                                       onPressed: () async {
                                         print("Excluir");
                                         final collection = FirebaseFirestore.instance.collection('noticias');
-                                        final idDoRegistro = noticia[index].id; // ID do registro que você deseja excluir
+                                        final idDoRegistro = noticia.id; // ID do registro que você deseja excluir
 
                                         await collection.doc(idDoRegistro).delete();
                                         Navigator.pop(context);

@@ -5,13 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class NewsDatailsScreen extends StatefulWidget {
-  final List<DocumentSnapshot>? dataNews;
-  final int? index;
+  final DocumentSnapshot<Object?>? dataNews;
   
   const NewsDatailsScreen({ 
     Key? key,
     this.dataNews,
-    this.index,
   }) : super(key: key);
 
   @override
@@ -55,7 +53,7 @@ class _NewsDatailsScreenState extends State<NewsDatailsScreen> {
                     image: DecorationImage(
                       repeat: ImageRepeat.noRepeat,                
                       image: CachedNetworkImageProvider(
-                        (widget.dataNews![widget.index!].get("urlImagem") != null)?widget.dataNews![widget.index!].get("urlImagem").toString():"https://firebasestorage.googleapis.com/v0/b/arenasoccerflutter.appspot.com/o/noticias%2F65c92ebe3eec4b2ebcdfbf5a298e558c.jpg?alt=media&token=eacbf582-f4d6-4fec-8388-f7c236fad4b9",
+                        (widget.dataNews!.get("urlImagem") != null)?widget.dataNews!.get("urlImagem").toString():"https://firebasestorage.googleapis.com/v0/b/arenasoccerflutter.appspot.com/o/noticias%2F65c92ebe3eec4b2ebcdfbf5a298e558c.jpg?alt=media&token=eacbf582-f4d6-4fec-8388-f7c236fad4b9",
                       ),
                       fit: BoxFit.cover,
                     ),
@@ -73,7 +71,7 @@ class _NewsDatailsScreenState extends State<NewsDatailsScreen> {
                 child: AutoSizeText(
                   //"CAMPEÃO NA ARENA BERNALDINO DE NOVO O NOVO...", //max 40 caracteres
                   //(widget.title != null && widget.title!.isNotEmpty)?widget.title.toString():"SEM TÍTULO",
-                  (widget.dataNews![widget.index!].get("titulo") != null)? widget.dataNews![widget.index!].get("titulo").toString().toUpperCase():"",
+                  (widget.dataNews!.get("titulo") != null)? widget.dataNews!.get("titulo").toString().toUpperCase():"",
                   style: const TextStyle(
                     fontSize: 24,
                     color: Colors.green,
@@ -88,7 +86,7 @@ class _NewsDatailsScreenState extends State<NewsDatailsScreen> {
                 child: AutoSizeText(
                   //"CAMPEÃO NA ARENA BERNALDINO DE NOVO O NOVO...", //max 40 caracteres
                   //(widget.title != null && widget.title!.isNotEmpty)?widget.title.toString():"SEM TÍTULO",
-                  (widget.dataNews![widget.index!].get("descricao") != null)? widget.dataNews![widget.index!].get("descricao").toString():"",
+                  (widget.dataNews!.get("descricao") != null)? widget.dataNews!.get("descricao").toString():"",
                   style: const TextStyle(
                     fontSize: 18,
                     color: Colors.white,
@@ -98,7 +96,7 @@ class _NewsDatailsScreenState extends State<NewsDatailsScreen> {
               ),
               const SizedBox(height: 20,),
               Visibility(
-                visible: widget.dataNews![widget.index!].get("link").toString() != "",
+                visible: widget.dataNews!.get("link").toString() != "",
                 child: Container(
                   height: 50,
                   decoration: const BoxDecoration(
@@ -119,7 +117,7 @@ class _NewsDatailsScreenState extends State<NewsDatailsScreen> {
                       ),
                       const SizedBox(width: 5,),
                       Center(
-                        child: _chamarLink(widget.dataNews![widget.index!].get("link")),
+                        child: _chamarLink(widget.dataNews!.get("link")),
                       ),
                     ],
                   ),

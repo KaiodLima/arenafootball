@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 
 class PublicidadeCard extends StatefulWidget {
   var noticia;
-  int? index;
 
   PublicidadeCard({
     Key? key,
     this.noticia,
-    this.index
   }) : super(key: key);
 
   @override
@@ -29,7 +27,7 @@ class _PublicidadeCardState extends State<PublicidadeCard> {
                 image: DecorationImage(
                   repeat: ImageRepeat.noRepeat,
                   image: CachedNetworkImageProvider(
-                    (widget.noticia[widget.index].get("urlImagem") != null && widget.noticia[widget.index].get("urlImagem").toString().isNotEmpty) ? widget.noticia[widget.index].get("urlImagem").toString() : "",
+                    (widget.noticia.get("urlImagem") != null && widget.noticia.get("urlImagem").toString().isNotEmpty) ? widget.noticia.get("urlImagem").toString() : "",
                   ),
                   // image: ExactAssetImage("lib/assets/images/celebrate_cr7_1500.png"),
                   fit: BoxFit.cover,
@@ -50,7 +48,7 @@ class _PublicidadeCardState extends State<PublicidadeCard> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    if(widget.noticia[widget.index].get("urlImagem").toString().isEmpty)
+                    if(widget.noticia.get("urlImagem").toString().isEmpty)
                       Text(
                         "PUBLICIDADE",
                         style: TextStyle(

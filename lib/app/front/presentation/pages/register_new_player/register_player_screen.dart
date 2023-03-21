@@ -2,14 +2,14 @@ import 'package:arena_soccer/model/Jogador.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class CadastroAdmin extends StatefulWidget {
-  const CadastroAdmin({Key? key}) : super(key: key);
+class RegisterPlayer extends StatefulWidget {
+  const RegisterPlayer({Key? key}) : super(key: key);
 
   @override
-  State<CadastroAdmin> createState() => _CadastroAdminState();
+  State<RegisterPlayer> createState() => _RegisterPlayerState();
 }
 
-class _CadastroAdminState extends State<CadastroAdmin> {
+class _RegisterPlayerState extends State<RegisterPlayer> {
   TextEditingController _controllerNome = TextEditingController();
   TextEditingController _controllerTime = TextEditingController();
   TextEditingController _controllerUrlImagem = TextEditingController();

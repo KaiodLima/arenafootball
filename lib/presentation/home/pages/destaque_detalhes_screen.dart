@@ -192,12 +192,12 @@ class _DetalhesDestaqueScreenState extends State<DetalhesDestaqueScreen> with Si
                         GestureDetector(
                           onTap: () {
                             //quando clicado
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context)=>NewsDatailsScreen(dataNews: noticia_destaque, index: index,),
-                              ),
-                            );
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (context)=>NewsDatailsScreen(dataNews: noticia_destaque, index: index,),
+                            //   ),
+                            // );
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),

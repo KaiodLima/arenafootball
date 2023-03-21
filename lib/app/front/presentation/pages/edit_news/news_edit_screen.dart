@@ -9,13 +9,11 @@ import 'package:firebase_core/firebase_core.dart' as core;
 import 'package:image_picker/image_picker.dart';
 
 class NewsEditScreen extends StatefulWidget {
-  final List<DocumentSnapshot>? dataNews;
-  final int? index;
+  final DocumentSnapshot<Object?>? dataNews;
 
   NewsEditScreen({
     Key? key,
     this.dataNews,
-    this.index,
   }) : super(key: key);
 
   @override
@@ -102,15 +100,15 @@ class _NewsEditScreenState extends State<NewsEditScreen> {
   }
 
   _iniciarDados(){
-    int index = widget.index ?? 0;
-    _controllerIdNoticia.text = widget.dataNews![index].id.toString();
-    _controllerData = widget.dataNews![index].get("data");
-    _controllerTitulo.text = widget.dataNews![index].get("titulo");
-    _controllerDescricao.text = widget.dataNews![index].get("descricao");
-    _controllerUrlImagem.text = widget.dataNews![index].get("urlImagem");
-    _controllerLink.text = widget.dataNews![index].get("link");
-    _controllerExibir.text = widget.dataNews![index].get("exibir");
-    _controllerTag.text = widget.dataNews![index].get("tag");
+    // int index = widget.index ?? 0;
+    _controllerIdNoticia.text = widget.dataNews!.id.toString();
+    _controllerData = widget.dataNews!.get("data");
+    _controllerTitulo.text = widget.dataNews!.get("titulo");
+    _controllerDescricao.text = widget.dataNews!.get("descricao");
+    _controllerUrlImagem.text = widget.dataNews!.get("urlImagem");
+    _controllerLink.text = widget.dataNews!.get("link");
+    _controllerExibir.text = widget.dataNews!.get("exibir");
+    _controllerTag.text = widget.dataNews!.get("tag");
 
   }
 
@@ -147,7 +145,7 @@ class _NewsEditScreenState extends State<NewsEditScreen> {
             ),
             const SizedBox(width: 16,),
             Text(
-              widget.dataNews![widget.index ?? 0].id.toString(), 
+              widget.dataNews!.id.toString(), 
               style: const TextStyle(fontSize: 18),
             ),
           ],
