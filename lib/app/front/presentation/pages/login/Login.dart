@@ -1,12 +1,12 @@
 import 'package:arena_soccer/presentation/cadastro/Cadastro.dart';
-import 'package:arena_soccer/Inicio.dart';
-import 'package:arena_soccer/my_widgets/arena_button.dart';
+import 'package:arena_soccer/app/front/presentation/pages/home_screen/Inicio.dart';
+import 'package:arena_soccer/app/front/presentation/components/arena_button.dart';
 import 'package:arena_soccer/web_scraping_resultados/pages/all_match_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'model/Usuario.dart';
+import '../../../../../model/Usuario.dart';
 
 class Login extends StatefulWidget {
   const Login({ Key? key }) : super(key: key);

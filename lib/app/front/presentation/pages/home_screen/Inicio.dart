@@ -1,9 +1,9 @@
-import 'package:arena_soccer/CadastrarNoticia.dart';
-import 'package:arena_soccer/CadastrarPartida.dart';
-import 'package:arena_soccer/CadastrarTime.dart';
-import 'package:arena_soccer/CadastroAdmin.dart';
-import 'package:arena_soccer/CalcularVotos.dart';
-import 'package:arena_soccer/Login.dart';
+import 'package:arena_soccer/app/front/presentation/pages/register_news/CadastrarNoticia.dart';
+import 'package:arena_soccer/app/front/presentation/pages/register_match/CadastrarPartida.dart';
+import 'package:arena_soccer/app/front/presentation/pages/register_team/CadastrarTime.dart';
+import 'package:arena_soccer/app/front/presentation/pages/register_new_player/CadastroAdmin.dart';
+import 'package:arena_soccer/app/front/presentation/pages/calculate_votes_best_player/CalcularVotos.dart';
+import 'package:arena_soccer/app/front/presentation/pages/login/Login.dart';
 import 'package:arena_soccer/abas/AbaCampeonatos.dart';
 import 'package:arena_soccer/abas/AbaNoticias.dart';
 import 'package:arena_soccer/abas/AbaTabela.dart';

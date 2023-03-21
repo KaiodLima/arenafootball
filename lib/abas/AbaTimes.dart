@@ -2,7 +2,7 @@ import 'package:arena_soccer/model/Usuario.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import '../ExibirJogadores.dart';
+import '../app/front/presentation/pages/show_players/ExibirJogadores.dart';
 
 class AbaTimes extends StatefulWidget {
   final String? regiao;

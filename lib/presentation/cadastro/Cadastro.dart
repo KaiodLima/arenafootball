@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:arena_soccer/Login.dart';
+import 'package:arena_soccer/app/front/presentation/pages/login/Login.dart';
 import 'package:arena_soccer/model/Time.dart';
 import 'package:arena_soccer/model/Usuario.dart';
-import 'package:arena_soccer/my_widgets/arena_button.dart';
+import 'package:arena_soccer/app/front/presentation/components/arena_button.dart';
 import 'package:arena_soccer/presentation/cadastro/controller_cadastro.dart';
 import 'package:arena_soccer/presentation/cadastro/widgets/arena_textfield.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

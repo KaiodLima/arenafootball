@@ -1,24 +1,24 @@
-import 'package:arena_soccer/ExibirGrupos.dart';
-import 'package:arena_soccer/MelhorDaPartida.dart';
-import 'package:arena_soccer/TelaJogadorEleito.dart';
+import 'package:arena_soccer/app/front/presentation/pages/show_groups/ExibirGrupos.dart';
+import 'package:arena_soccer/app/front/presentation/pages/register_vote_best_player/MelhorDaPartida.dart';
+import 'package:arena_soccer/app/front/presentation/pages/show_best_player/TelaJogadorEleito.dart';
 import 'package:arena_soccer/model/Jogador.dart';
 import 'package:arena_soccer/model/Partida.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import '../../../ExibirArtilheiros.dart';
-import '../../../ExibirAssistencias.dart';
-import '../../../model/Time.dart';
-import '../../../model/Usuario.dart';
+import '../show_soccer_scorers/ExibirArtilheiros.dart';
+import '../show_assistance_leader/ExibirAssistencias.dart';
+import '../../../../../model/Time.dart';
+import '../../../../../model/Usuario.dart';
 
 
-class ShowTableCompetition extends StatefulWidget {
+class ShowTableMatches extends StatefulWidget {
   final int? idCompetition; //recebe a variável enviada da outra tela
   final String? regiao;
   Usuario? usuario;
 
-  ShowTableCompetition({ 
+  ShowTableMatches({ 
     Key? key,
     this.idCompetition,
     this.regiao,
@@ -26,10 +26,10 @@ class ShowTableCompetition extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<ShowTableCompetition> createState() => _ShowTableCompetitionState();
+  State<ShowTableMatches> createState() => _ShowTableMatchesState();
 }
 
-class _ShowTableCompetitionState extends State<ShowTableCompetition> {
+class _ShowTableMatchesState extends State<ShowTableMatches> {
 
   chamaTelaVotacao(String timeC, String timeF, String tituloVotacao){
     Navigator.push(

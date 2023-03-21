@@ -1,6 +1,6 @@
-import 'package:arena_soccer/ExibirArtilheiros.dart';
-import 'package:arena_soccer/ExibirAssistencias.dart';
-import 'package:arena_soccer/presentation/groups/widget/groups_card.dart';
+import 'package:arena_soccer/app/front/presentation/pages/show_soccer_scorers/ExibirArtilheiros.dart';
+import 'package:arena_soccer/app/front/presentation/pages/show_assistance_leader/ExibirAssistencias.dart';
+import 'package:arena_soccer/app/front/presentation/pages/show_groups/components/groups_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 

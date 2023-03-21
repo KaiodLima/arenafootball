@@ -1,4 +1,4 @@
-import 'package:arena_soccer/Login.dart';
+import 'package:arena_soccer/app/front/presentation/pages/login/Login.dart';
 import 'package:arena_soccer/abas/AbaCampeonatos.dart';
 import 'package:arena_soccer/abas/AbaNoticias.dart';
 import 'package:firebase_auth/firebase_auth.dart';

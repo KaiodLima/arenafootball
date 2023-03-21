@@ -1,5 +1,5 @@
 import 'package:arena_soccer/model/Noticia.dart';
-import 'package:arena_soccer/my_widgets/arena_button.dart';
+import 'package:arena_soccer/app/front/presentation/components/arena_button.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 

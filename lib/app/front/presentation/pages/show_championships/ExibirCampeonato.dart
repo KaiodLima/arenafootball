@@ -1,4 +1,4 @@
-import 'package:arena_soccer/ExibirGrupos.dart';
+import 'package:arena_soccer/app/front/presentation/pages/show_groups/ExibirGrupos.dart';
 import 'package:arena_soccer/model/Campeonato.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';

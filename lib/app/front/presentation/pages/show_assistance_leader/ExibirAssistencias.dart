@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import 'model/Jogador.dart';
-import 'model/Time.dart';
+import '../../../../../model/Jogador.dart';
+import '../../../../../model/Time.dart';
 
 class ExibirAssistencias extends StatefulWidget {
   final String? regiao;

@@ -1,11 +1,11 @@
-import 'package:arena_soccer/presentation/news/widget/news_card.dart';
+import 'package:arena_soccer/app/front/presentation/components/news_card.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../news/pages/news_details_screen.dart';
+import '../../../app/front/presentation/pages/show_news_details/news_details_screen.dart';
 
 // A ideia é filtrar toda as noticias do time em destaque. 
 //Vou adicionar um campo tag nos registro da tabela noticias pra poder fazer o filtro.

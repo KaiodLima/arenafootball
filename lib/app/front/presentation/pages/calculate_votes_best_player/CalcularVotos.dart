@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import 'model/Jogador.dart';
+import '../../../../../model/Jogador.dart';
 
 class CalcularVotos extends StatefulWidget {
   const CalcularVotos({ Key? key }) : super(key: key);

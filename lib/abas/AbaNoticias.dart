@@ -1,13 +1,13 @@
 import 'package:arena_soccer/model/Usuario.dart';
-import 'package:arena_soccer/presentation/news/pages/news_edit_screen.dart';
+import 'package:arena_soccer/app/front/presentation/pages/edit_news/news_edit_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../presentation/home/components/gol_card.dart';
 import '../presentation/home/components/publicidade_card.dart';
-import '../presentation/news/pages/news_details_screen.dart';
-import '../presentation/news/widget/news_card.dart';
+import '../app/front/presentation/pages/show_news_details/news_details_screen.dart';
+import '../app/front/presentation/components/news_card.dart';
 
 class AbaNoticias extends StatefulWidget {
   final String? regiao;

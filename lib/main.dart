@@ -1,4 +1,4 @@
-import 'package:arena_soccer/Login.dart';
+import 'package:arena_soccer/app/front/presentation/pages/login/Login.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 

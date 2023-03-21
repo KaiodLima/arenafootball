@@ -1,11 +1,10 @@
+import 'package:arena_soccer/app/front/presentation/pages/show_matches/show_table_matches.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
-import '../MelhorDaPartida.dart';
-import '../TelaJogadorEleito.dart';
+import '../app/front/presentation/pages/register_vote_best_player/MelhorDaPartida.dart';
+import '../app/front/presentation/pages/show_best_player/TelaJogadorEleito.dart';
 import '../model/Usuario.dart';
-import '../presentation/competitions/pages/show_table_competition.dart';
-import '../presentation/competitions/widget/competitions_card.dart';
+import '../app/front/presentation/pages/show_matches/components/competitions_card.dart';
 
 class AbaTabela extends StatefulWidget {
   final String? regiao;
@@ -77,7 +76,7 @@ class _AbaTabelaState extends State<AbaTabela> {
               
               for (var element in campeonatos) {
                 if(element.get("fk_competicao").toString() == widget.regiao.toString()){
-                  return ShowTableCompetition(idCompetition: element.get("id_campeonato"), regiao: widget.regiao, usuario: widget.usuario,);
+                  return ShowTableMatches(idCompetition: element.get("id_campeonato"), regiao: widget.regiao, usuario: widget.usuario,);
                 }
               }
               return const SizedBox();

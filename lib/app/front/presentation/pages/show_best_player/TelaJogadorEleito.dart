@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
 
-import 'model/Jogador.dart';
+import '../../../../../model/Jogador.dart';
 
 class TelaJogadorEleito extends StatefulWidget {
   String? nomeJogador; //recebe a variável enviada da outra tela
