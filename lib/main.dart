@@ -10,12 +10,15 @@ void main() async {
   
   //iniciar app
   runApp(
-    const MaterialApp(
+    MaterialApp(
       //home: CalcularVotos(),
       //home: CadastroAdmin(),
-      home: Login(),
+      home: const Login(),
       //home: NewsCard(title: "", description: "", urlImage: "",),
       //home: GroupCards(groupCompetition: [], index: 1, title: "",),
+      theme: ThemeData(
+        fontFamily: "Roboto",
+      ),
       debugShowCheckedModeBanner: false,
     )
   );

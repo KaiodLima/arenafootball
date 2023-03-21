@@ -89,6 +89,23 @@ flutter:
     - lib/assets/images/ic_logo.png
     - lib/assets/images/celebrate_cr7_1500.png
     - lib/assets/images/bola_na_rede.png
+  
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: lib/assets/fonts/roboto/Roboto-Regular.ttf
+    - family: Alkatra
+      fonts:
+        - asset: lib/assets/fonts/alkatra/Alkatra-Regular.ttf
+    - family: PTSans
+      fonts:
+        - asset: lib/assets/fonts/ptsans/PTSans-Regular.ttf
+    - family: OpenSans
+      fonts:
+        - asset: lib/assets/fonts/open_sans/OpenSans-VariableFont_wdth,wght.ttf
+    - family: Montserrat
+      fonts:
+        - asset: lib/assets/fonts/montserrat/Montserrat-VariableFont_wght.ttf
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

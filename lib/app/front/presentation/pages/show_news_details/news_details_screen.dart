@@ -69,14 +69,15 @@ class _NewsDatailsScreenState extends State<NewsDatailsScreen> {
               Padding(
                 padding: const EdgeInsets.only(left: 12, right: 12),
                 child: AutoSizeText(
-                  //"CAMPEÃO NA ARENA BERNALDINO DE NOVO O NOVO...", //max 40 caracteres
+                  //max 40 caracteres
                   //(widget.title != null && widget.title!.isNotEmpty)?widget.title.toString():"SEM TÍTULO",
                   (widget.dataNews!.get("titulo") != null)? widget.dataNews!.get("titulo").toString().toUpperCase():"",
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 24,
                     color: Colors.green,
                     fontWeight: FontWeight.bold,
-                    fontFamily: "Arial",
+                    fontFamily: "PTSans"
                   ),
                 ),
               ),
@@ -84,13 +85,13 @@ class _NewsDatailsScreenState extends State<NewsDatailsScreen> {
               Padding(
                 padding: const EdgeInsets.only(left: 12, right: 12),
                 child: AutoSizeText(
-                  //"CAMPEÃO NA ARENA BERNALDINO DE NOVO O NOVO...", //max 40 caracteres
                   //(widget.title != null && widget.title!.isNotEmpty)?widget.title.toString():"SEM TÍTULO",
                   (widget.dataNews!.get("descricao") != null)? widget.dataNews!.get("descricao").toString():"",
+                  textAlign: TextAlign.justify,
                   style: const TextStyle(
                     fontSize: 18,
                     color: Colors.white,
-                    fontFamily: "Arial",
+                    fontFamily: "PTSans"
                   ),
                 ),
               ),
