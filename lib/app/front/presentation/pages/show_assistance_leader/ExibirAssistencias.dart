@@ -28,7 +28,7 @@ class _ExibirAssistenciasState extends State<ExibirAssistencias> {
   
   @override
   Widget build(BuildContext context) {
-    print("TESTE REGIAO ARTILHARIA -> "+widget.regiao.toString());
+    print("TESTE REGIAO ASSISTENCIAS -> "+widget.regiao.toString());
 
     return Scaffold(
       appBar: AppBar(
@@ -64,12 +64,17 @@ class _ExibirAssistenciasState extends State<ExibirAssistencias> {
                                 size: 30,
                               ), //adiciona ícone no final
                               //add imagem de contato
-                              leading: CircleAvatar(
-                                maxRadius: 30,
-                                backgroundColor:
-                                    const Color.fromARGB(255, 134, 143, 134),
-                                backgroundImage: NetworkImage(listaJogadoresFirebase[index].getNome.toString()),
-                              ),
+                              leading: listaJogadoresFirebase[index].getUrlImagem.isNotEmpty
+                              ? CircleAvatar(
+                                  maxRadius: 30,
+                                  backgroundColor:const Color.fromARGB(255, 134, 143, 134),
+                                  backgroundImage: NetworkImage(listaJogadoresFirebase[index].getUrlImagem.toString())
+                                )
+                              : const CircleAvatar(
+                                  maxRadius: 30,
+                                  backgroundColor: Color.fromARGB(255, 134, 143, 134),
+                                  backgroundImage: AssetImage("lib/assets/images/avatar.png",),
+                                ),
                               title: Text(
                                 listaJogadoresFirebase[index].getNome, //recuperar nome jogador
                                 textAlign: TextAlign.start,

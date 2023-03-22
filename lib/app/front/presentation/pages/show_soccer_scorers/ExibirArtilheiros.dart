@@ -60,12 +60,17 @@ class _ExibirArtilheirosState extends State<ExibirArtilheiros> {
                                 size: 30,
                               ), //adiciona ícone no final
                               //add imagem de contato
-                              leading: CircleAvatar(
-                                maxRadius: 30,
-                                backgroundColor:
-                                    const Color.fromARGB(255, 134, 143, 134),
-                                backgroundImage: NetworkImage(listaJogadoresFirebase[index].getNome.toString()),
-                              ),
+                              leading: listaJogadoresFirebase[index].getUrlImagem.isNotEmpty
+                              ? CircleAvatar(
+                                  maxRadius: 30,
+                                  backgroundColor:const Color.fromARGB(255, 134, 143, 134),
+                                  backgroundImage: NetworkImage(listaJogadoresFirebase[index].getUrlImagem.toString())
+                                )
+                              : const CircleAvatar(
+                                  maxRadius: 30,
+                                  backgroundColor: Color.fromARGB(255, 134, 143, 134),
+                                  backgroundImage: AssetImage("lib/assets/images/avatar.png"),
+                                ),
                               title: Text(
                                 listaJogadoresFirebase[index].getNome, //recuperar título da noticia
                                 textAlign: TextAlign.start,

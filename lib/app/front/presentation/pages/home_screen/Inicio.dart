@@ -8,6 +8,8 @@ import 'package:arena_soccer/abas/AbaCampeonatos.dart';
 import 'package:arena_soccer/abas/AbaNoticias.dart';
 import 'package:arena_soccer/abas/AbaTabela.dart';
 import 'package:arena_soccer/abas/AbaTimes.dart';
+import 'package:arena_soccer/app/front/presentation/pages/show_assistance_leader/ExibirAssistencias.dart';
+import 'package:arena_soccer/app/front/presentation/pages/show_soccer_scorers/ExibirArtilheiros.dart';
 import 'package:arena_soccer/model/Time.dart';
 import 'package:arena_soccer/model/Usuario.dart';
 import 'package:arena_soccer/presentation/home/components/destaque.dart';
@@ -266,12 +268,12 @@ class _InicioState extends State<Inicio> {
       //     )
       //   ],
       // ),
-      floatingActionButton: Visibility(
-        visible: widget.usuario?.getIsAdmin == true,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            FloatingActionButton.small(
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Visibility(
+            visible: widget.usuario?.getIsAdmin == true,
+            child: FloatingActionButton.small(
               heroTag: "btnAnuncio",
               onPressed: (){
                 Navigator.push(
@@ -286,8 +288,11 @@ class _InicioState extends State<Inicio> {
                 Icons.stacked_line_chart,
               ),
             ),
-            const SizedBox(height: 4,),
-            FloatingActionButton.small(
+          ),
+          const SizedBox(height: 4,),
+          Visibility(
+            visible: widget.usuario?.getIsAdmin == true,
+            child: FloatingActionButton.small(
               heroTag: "btnGol",
               onPressed: (){
                 Navigator.push(
@@ -302,8 +307,46 @@ class _InicioState extends State<Inicio> {
                 Icons.sports_soccer,
               ),
             ),
-          ],
-        ),
+          ),
+          Visibility(
+            visible: _selecionado == 3,
+            child: FloatingActionButton.small(
+              heroTag: "btnArtilharia",
+              onPressed: (){
+                Navigator.push(
+                context, 
+                MaterialPageRoute(
+                  builder: (context) => ExibirArtilheiros(regiao: cidadeSelecionada??"Floresta",),
+                )
+              );
+              },
+              backgroundColor: Colors.white,
+              child: const Icon(
+                Icons.sports_soccer,
+                color: Colors.green,
+              ),
+            ),
+          ),
+          Visibility(
+            visible: _selecionado == 3,
+            child: FloatingActionButton.small(
+              heroTag: "btnAssistencias",
+              onPressed: (){
+                Navigator.push(
+                context, 
+                MaterialPageRoute(
+                  builder: (context) => ExibirAssistencias(regiao: cidadeSelecionada??"Floresta",),
+                )
+              );
+              },
+              backgroundColor: Colors.white,
+              child: const Icon(
+                Icons.star_border,
+                color: Colors.green,
+              ),
+            ),
+          ),
+        ],
       ),
     );
 

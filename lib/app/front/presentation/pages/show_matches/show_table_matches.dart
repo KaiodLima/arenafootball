@@ -61,47 +61,47 @@ class _ShowTableMatchesState extends State<ShowTableMatches> {
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 27, 67, 28),
-      appBar: AppBar(        
-        //backgroundColor: Colors.green,
-        backgroundColor: const Color.fromARGB(255, 27, 67, 28),
-        elevation: 0,
-        title: Image.asset(
-          //"lib/assets/images/ic_logo.png",
-          "lib/assets/images/ic_arena.png",
-          width: 110,
-          height: 40,
-        ),
-        centerTitle: true,        
-        actions: [
-          IconButton(
-            color: Colors.white,
-            icon: const Icon(Icons.sports_soccer),
-            onPressed: (){
-              //chamar lista de artilheiros:
-              Navigator.push(
-                context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
-                MaterialPageRoute(
-                  builder: (context) => ExibirArtilheiros(regiao: widget.regiao,),
-                ) //o outro parâmetro é a rota
-              );
+      // appBar: AppBar(        
+      //   //backgroundColor: Colors.green,
+      //   backgroundColor: const Color.fromARGB(255, 27, 67, 28),
+      //   elevation: 0,
+      //   title: Image.asset(
+      //     //"lib/assets/images/ic_logo.png",
+      //     "lib/assets/images/ic_arena.png",
+      //     width: 110,
+      //     height: 40,
+      //   ),
+      //   centerTitle: true,        
+      //   actions: [
+      //     IconButton(
+      //       color: Colors.white,
+      //       icon: const Icon(Icons.sports_soccer),
+      //       onPressed: (){
+      //         //chamar lista de artilheiros:
+      //         Navigator.push(
+      //           context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
+      //           MaterialPageRoute(
+      //             builder: (context) => ExibirArtilheiros(regiao: widget.regiao,),
+      //           ) //o outro parâmetro é a rota
+      //         );
               
-            },
-          ),
-          IconButton(
-            color: Colors.white,
-            icon: const Icon(Icons.star_border),
-            onPressed: (){
-              //chamar lista de assistencias:
-              Navigator.push(
-                context, 
-                MaterialPageRoute(
-                  builder: (context) => ExibirAssistencias(regiao: widget.regiao,),
-                ) 
-              );
-            },
-          ),
-        ],
-      ),
+      //       },
+      //     ),
+      //     IconButton(
+      //       color: Colors.white,
+      //       icon: const Icon(Icons.star_border),
+      //       onPressed: (){
+      //         //chamar lista de assistencias:
+      //         Navigator.push(
+      //           context, 
+      //           MaterialPageRoute(
+      //             builder: (context) => ExibirAssistencias(regiao: widget.regiao,),
+      //           ) 
+      //         );
+      //       },
+      //     ),
+      //   ],
+      // ),
       body: StreamBuilder<QuerySnapshot>(
         //recupera os dados toda vez que o banco é modificado
         stream: FirebaseFirestore.instance.collection("partidas2023").orderBy("dataRegistro", descending: true).snapshots(), //passa uma stream de dados
