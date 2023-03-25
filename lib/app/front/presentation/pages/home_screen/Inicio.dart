@@ -218,21 +218,23 @@ class _InicioState extends State<Inicio> {
           ),*/
         ],
       ),
-      body: Column(
-        children: [
-          destaquesConfig(width, height),
-          const SizedBox(height: 10,),
-          Padding(
-            padding: const EdgeInsets.only(left: 12, right: 12),
-            child: _chamarDropDownCity(),
-          ),
-          Container(
-            width: width,
-            height: height*0.55,
-            padding: const EdgeInsets.only(right: 16, left: 16, top: 14, bottom: 4),
-            child: telas[_selecionado],
-          ),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            destaquesConfig(width, height),
+            const SizedBox(height: 10,),
+            Padding(
+              padding: const EdgeInsets.only(left: 12, right: 12),
+              child: _chamarDropDownCity(),
+            ),
+            Container(
+              width: width,
+              height: height*0.55,
+              padding: const EdgeInsets.only(right: 16, left: 16, top: 14, bottom: 4),
+              child: telas[_selecionado],
+            ),
+          ],
+        ),
       ),
       bottomNavigationBar: MyBottomNavBar(context),
       // bottomNavigationBar: BottomNavigationBar(
@@ -308,44 +310,44 @@ class _InicioState extends State<Inicio> {
               ),
             ),
           ),
-          Visibility(
-            visible: _selecionado == 3,
-            child: FloatingActionButton.small(
-              heroTag: "btnArtilharia",
-              onPressed: (){
-                Navigator.push(
-                context, 
-                MaterialPageRoute(
-                  builder: (context) => ExibirArtilheiros(regiao: cidadeSelecionada??"Floresta",),
-                )
-              );
-              },
-              backgroundColor: Colors.white,
-              child: const Icon(
-                Icons.sports_soccer,
-                color: Colors.green,
-              ),
-            ),
-          ),
-          Visibility(
-            visible: _selecionado == 3,
-            child: FloatingActionButton.small(
-              heroTag: "btnAssistencias",
-              onPressed: (){
-                Navigator.push(
-                context, 
-                MaterialPageRoute(
-                  builder: (context) => ExibirAssistencias(regiao: cidadeSelecionada??"Floresta",),
-                )
-              );
-              },
-              backgroundColor: Colors.white,
-              child: const Icon(
-                Icons.star_border,
-                color: Colors.green,
-              ),
-            ),
-          ),
+          // Visibility(
+          //   visible: _selecionado == 3,
+          //   child: FloatingActionButton.small(
+          //     heroTag: "btnArtilharia",
+          //     onPressed: (){
+          //       Navigator.push(
+          //       context, 
+          //       MaterialPageRoute(
+          //         builder: (context) => ExibirArtilheiros(regiao: cidadeSelecionada??"Floresta",),
+          //       )
+          //     );
+          //     },
+          //     backgroundColor: Colors.white,
+          //     child: const Icon(
+          //       Icons.sports_soccer,
+          //       color: Colors.green,
+          //     ),
+          //   ),
+          // ),
+          // Visibility(
+          //   visible: _selecionado == 3,
+          //   child: FloatingActionButton.small(
+          //     heroTag: "btnAssistencias",
+          //     onPressed: (){
+          //       Navigator.push(
+          //       context, 
+          //       MaterialPageRoute(
+          //         builder: (context) => ExibirAssistencias(regiao: cidadeSelecionada??"Floresta",),
+          //       )
+          //     );
+          //     },
+          //     backgroundColor: Colors.white,
+          //     child: const Icon(
+          //       Icons.star_border,
+          //       color: Colors.green,
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );
