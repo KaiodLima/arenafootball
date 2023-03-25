@@ -106,6 +106,9 @@ flutter:
     - family: Montserrat
       fonts:
         - asset: lib/assets/fonts/montserrat/Montserrat-VariableFont_wght.ttf
+    - family: PassionOne
+      fonts:
+        - asset: lib/assets/fonts/passion_one/PassionOne-Regular.ttf
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
