@@ -2,14 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class GroupCards extends StatefulWidget {
-  final List<DocumentSnapshot>? groupCompetition;
-  final int? index;
+  final DocumentSnapshot<Object?>? groupCompetition;
   final String? title;
 
   const GroupCards({ 
     Key? key,
     this.groupCompetition,
-    this.index,
     this.title,
 
   }) : super(key: key);
@@ -68,7 +66,7 @@ class _GroupCardsState extends State<GroupCards> {
                 padding: const EdgeInsets.all(5),
                 child: Text(
                   //"TIME A",
-                  (widget.groupCompetition![widget.index!].get("time1").toString().isNotEmpty)?widget.groupCompetition![widget.index!].get("time1").toString():"",
+                  (widget.groupCompetition!.get("time1").toString().isNotEmpty)?widget.groupCompetition!.get("time1").toString():"",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: fontSizeTeam,
@@ -79,7 +77,7 @@ class _GroupCardsState extends State<GroupCards> {
                 padding: const EdgeInsets.all(5),
                 child: Text(
                   //"TIME B",
-                  (widget.groupCompetition![widget.index!].get("time1").toString().isNotEmpty)?widget.groupCompetition![widget.index!].get("time2").toString():"",
+                  (widget.groupCompetition!.get("time1").toString().isNotEmpty)?widget.groupCompetition!.get("time2").toString():"",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: fontSizeTeam,
@@ -90,7 +88,7 @@ class _GroupCardsState extends State<GroupCards> {
                 padding: const EdgeInsets.all(5),
                 child: Text(
                   //"TIME C",
-                  (widget.groupCompetition![widget.index!].get("time1").toString().isNotEmpty)?widget.groupCompetition![widget.index!].get("time3").toString():"",
+                  (widget.groupCompetition!.get("time1").toString().isNotEmpty)?widget.groupCompetition!.get("time3").toString():"",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: fontSizeTeam,
@@ -101,7 +99,7 @@ class _GroupCardsState extends State<GroupCards> {
                 padding: const EdgeInsets.all(5),
                 child: Text(
                   //"TIME D",
-                  (widget.groupCompetition![widget.index!].get("time1").toString().isNotEmpty)?widget.groupCompetition![widget.index!].get("time4").toString():"",
+                  (widget.groupCompetition!.get("time1").toString().isNotEmpty)?widget.groupCompetition!.get("time4").toString():"",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: fontSizeTeam,

@@ -84,28 +84,51 @@ class _ExibirGruposState extends State<ExibirGrupos> {
                 );
               } else {
 
-                return GridView.builder(
+                return GridView(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    childAspectRatio: 0.65,
+                    childAspectRatio: 0.8,
                   ),
-                  itemCount: grupo.length,
-                  itemBuilder: (context, index){                    
-                    return GestureDetector(
-                      onTap: (){
-                        //quando um grupo é clicado:
-                        // print("GRUPO CLICADO::: "+index.toString());
-                      },
-                      child: GridTile(
-                        child: GroupCards(
-                              groupCompetition: grupo,
-                              index: index,
-                              title: grupo[index].get("descricao"),
-                            ),
+                  children: [
+                    ...grupo.map((e) => 
+                      GestureDetector(
+                        onTap: (){
+                          //quando um grupo é clicado:
+                          // print("GRUPO CLICADO::: "+index.toString());
+                        },
+                        child: GridTile(
+                          child: GroupCards(
+                            groupCompetition: e,
+                            title: e.get("descricao"),
+                          ),
+                        ),
                       ),
-                    );
-                  }
+                    ),
+                  ],
                 );
+
+                // return GridView.builder(
+                //   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                //     crossAxisCount: 2,
+                //     childAspectRatio: 0.65,
+                //   ),
+                //   itemCount: grupo.length,
+                //   itemBuilder: (context, index){                    
+                //     return GestureDetector(
+                //       onTap: (){
+                //         //quando um grupo é clicado:
+                //         // print("GRUPO CLICADO::: "+index.toString());
+                //       },
+                //       child: GridTile(
+                //         child: GroupCards(
+                //               groupCompetition: grupo,
+                //               index: index,
+                //               title: grupo[index].get("descricao"),
+                //             ),
+                //       ),
+                //     );
+                //   }
+                // );
 
                 // return ListView.builder(
                 //   itemCount: grupo.length,
