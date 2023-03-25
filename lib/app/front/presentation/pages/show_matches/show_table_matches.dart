@@ -16,12 +16,14 @@ import '../../../../../model/Usuario.dart';
 class ShowTableMatches extends StatefulWidget {
   final int? idCompetition; //recebe a variável enviada da outra tela
   final String? regiao;
+  final String? ano;
   Usuario? usuario;
 
   ShowTableMatches({ 
     Key? key,
     this.idCompetition,
     this.regiao,
+    this.ano,
     this.usuario
   }) : super(key: key);
 
@@ -54,10 +56,25 @@ class _ShowTableMatchesState extends State<ShowTableMatches> {
       )
     );
   }
+
+  int? anoAtual;
+  getAnoAtual(){
+    anoAtual = DateTime.now().year;
+    print('Ano atual: $anoAtual');
+
+  }
+
+  @override
+  void initState() {
+    getAnoAtual();
+    super.initState();
+  }
   
   @override
   Widget build(BuildContext context) {
     print("TESTE REGIAO TABELA DE JOGOS -> "+widget.regiao.toString());
+    print("ANO ATUAL -> "+anoAtual.toString());
+    print("ANO -> "+widget.ano.toString());
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 27, 67, 28),
@@ -130,7 +147,9 @@ class _ShowTableMatchesState extends State<ShowTableMatches> {
       ),
       body: StreamBuilder<QuerySnapshot>(
         //recupera os dados toda vez que o banco é modificado
-        stream: FirebaseFirestore.instance.collection("partidas2023").orderBy("dataRegistro", descending: true).snapshots(), //passa uma stream de dados
+        stream: (widget.ano.toString() != anoAtual.toString())
+        ? FirebaseFirestore.instance.collection("partidas${widget.ano}").orderBy("dataRegistro", descending: true).snapshots()
+        : FirebaseFirestore.instance.collection("partidas").orderBy("dataRegistro", descending: true).snapshots(), //passa uma stream de dados
         builder: (context, snapshot) {
           // if(snapshot.data == null){
           //   return Center(
@@ -623,7 +642,7 @@ class _ShowTableMatchesState extends State<ShowTableMatches> {
   Future<void> _cadastrarFirebase(Partida partida) async {
     FirebaseFirestore db = await FirebaseFirestore.instance;
     
-    db.collection("partidas2023").doc(partida.idPartida.toString()).set({
+    db.collection("partidas").doc(partida.idPartida.toString()).set({
       "id_partida": partida.idPartida,
       "id_campeonato": partida.idCampeonato,
       "fk_competicao": partida.fkPartida,

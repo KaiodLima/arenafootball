@@ -68,7 +68,7 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
   Future<void> _cadastrarFirebase(Partida partida) async {
     FirebaseFirestore db = await FirebaseFirestore.instance;
     
-    var addedDocRef = await db.collection("partidas2023").add({
+    var addedDocRef = await db.collection("partidas").add({
       "id_partida": "",
       "dataRegistro": FieldValue.serverTimestamp(),
 
@@ -91,7 +91,7 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
 
     });
     
-    db.collection("partidas2023").doc(addedDocRef.id).set({
+    db.collection("partidas").doc(addedDocRef.id).set({
       "id_partida": addedDocRef.id,
       "dataRegistro": FieldValue.serverTimestamp(),
 

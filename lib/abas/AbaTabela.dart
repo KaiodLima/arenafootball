@@ -8,11 +8,13 @@ import '../app/front/presentation/pages/show_matches/components/competitions_car
 
 class AbaTabela extends StatefulWidget {
   final String? regiao;
+  final String? ano;
   Usuario? usuario;
 
   AbaTabela({
     Key? key,
     this.regiao,
+    this.ano,
     this.usuario
   }) : super(key: key);
 
@@ -51,7 +53,6 @@ class _AbaTabelaState extends State<AbaTabela> {
       aux = FirebaseFirestore.instance.collection("campeonatos").snapshots();
     }
 
-
     // return ShowTableCompetition(idCompetition: 1,);
 
     return StreamBuilder<QuerySnapshot>(
@@ -76,7 +77,7 @@ class _AbaTabelaState extends State<AbaTabela> {
               
               for (var element in campeonatos) {
                 if(element.get("fk_competicao").toString() == widget.regiao.toString()){
-                  return ShowTableMatches(idCompetition: element.get("id_campeonato"), regiao: widget.regiao, usuario: widget.usuario,);
+                  return ShowTableMatches(idCompetition: element.get("id_campeonato"), regiao: widget.regiao, ano: widget.ano, usuario: widget.usuario,);
                 }
               }
               return const SizedBox();

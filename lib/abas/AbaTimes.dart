@@ -6,11 +6,13 @@ import '../app/front/presentation/pages/show_players/ExibirJogadores.dart';
 
 class AbaTimes extends StatefulWidget {
   final String? regiao;
+  final String? ano;
   final Usuario? usuario;
   
   AbaTimes({
     Key? key,
     this.regiao,
+    this.ano,
     this.usuario,
   }) : super(key: key);
 
@@ -19,16 +21,57 @@ class AbaTimes extends StatefulWidget {
 }
 
 class _AbaTimesState extends State<AbaTimes> {
+  int? anoAtual;
+  getAnoAtual(){
+    anoAtual = DateTime.now().year;
+    print('Ano atual: $anoAtual');
+
+  }
+
+  @override
+  void initState() {
+    getAnoAtual();
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     var aux;
     // print("TESTE ::: "+widget.regiao.toString());
-    if(widget.regiao != null){
-      aux = FirebaseFirestore.instance.collection("times").where("fk_competicao", isEqualTo: widget.regiao).snapshots(); //passa uma stream de dados.where("fk_competicao", isEqualTo: widget.regiao).snapshots(); //passa uma stream de dados
+    // print("TESTE ::: "+widget.ano.toString());
+    // print("TESTE ::: "+anoAtual.toString());
+    if(widget.ano != null && widget.ano!.isNotEmpty){
+      if(widget.ano.toString() == anoAtual.toString()){
+        if(widget.regiao != null){
+          aux = FirebaseFirestore.instance.collection("times")
+          .where("fk_competicao", isEqualTo: widget.regiao).snapshots(); //passa uma stream de dados.where("fk_competicao", isEqualTo: widget.regiao).snapshots(); //passa uma stream de dados
+        }else{
+          aux = FirebaseFirestore.instance.collection("times").snapshots();
+        }
+      }else{
+        if(widget.regiao != null){
+          aux = FirebaseFirestore.instance.collection("times${widget.ano}")
+          .where("fk_competicao", isEqualTo: widget.regiao).snapshots(); //passa uma stream de dados.where("fk_competicao", isEqualTo: widget.regiao).snapshots(); //passa uma stream de dados
+        }else{
+          aux = FirebaseFirestore.instance.collection("times${widget.ano}").snapshots();
+        }
+      }
+      
     }else{
-      aux = FirebaseFirestore.instance.collection("times").snapshots();
+      if(widget.regiao != null){
+        aux = FirebaseFirestore.instance.collection("times")
+        .where("fk_competicao", isEqualTo: widget.regiao).snapshots(); //passa uma stream de dados.where("fk_competicao", isEqualTo: widget.regiao).snapshots(); //passa uma stream de dados
+      }else{
+        aux = FirebaseFirestore.instance.collection("times").snapshots();
+      }
     }
+    // if(widget.regiao != null){
+    //   aux = FirebaseFirestore.instance.collection("times")
+    //   .where("fk_competicao", isEqualTo: widget.regiao).snapshots(); //passa uma stream de dados.where("fk_competicao", isEqualTo: widget.regiao).snapshots(); //passa uma stream de dados
+    // }else{
+    //   aux = FirebaseFirestore.instance.collection("times").snapshots();
+    // }
 
     return StreamBuilder<QuerySnapshot>(
       //recupera os dados toda vez que o banco é modificado

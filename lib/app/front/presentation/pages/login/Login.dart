@@ -244,6 +244,25 @@ class _LoginState extends State<Login> {
 
   // }
 
+  duplicarCollection() async {
+    final origem = FirebaseFirestore.instance.collection('jogadores');
+    final destino = FirebaseFirestore.instance.collection('jogadores2022');
+
+    origem.get().then((QuerySnapshot snapshot) {
+      snapshot.docs.forEach((DocumentSnapshot doc) {
+        final Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        destino.doc(doc.id).set(data).then((value) {
+          print('Documento copiado com sucesso!');
+        }).catchError((error) {
+          print('Erro ao copiar documento: $error');
+        });
+      });
+    }).catchError((error) {
+      print('Erro ao obter documentos: $error');
+    });
+
+  }
+
   //buscar dado do usuário logado:
   Future<Usuario> searchUser(String idUser) async {
     var collection = FirebaseFirestore.instance.collection("usuarios").where("idUsuario", isEqualTo: idUser); //cria instancia
@@ -276,6 +295,7 @@ class _LoginState extends State<Login> {
 
   @override
   void initState() {
+    // duplicarCollection();
     super.initState();
     // addNewFieldInFirebaseNoticia();
     _verificaUsuarioLogado();

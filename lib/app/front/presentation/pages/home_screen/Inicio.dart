@@ -1,3 +1,4 @@
+import 'package:arena_soccer/app/front/presentation/components/highlights/arena_highlights.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_news/CadastrarNoticia.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_match/CadastrarPartida.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_team/CadastrarTime.dart';
@@ -45,21 +46,25 @@ class _InicioState extends State<Inicio> {
     // Obter shared preferences.
     final prefs = await SharedPreferences.getInstance();
     final String? regiaoPadrao = prefs.getString('regiaoPadrao');
+    final String? anoEscolhido = prefs.getString('anoEscolhido');
 
     switch (regiaoPadrao.toString()) {
       case "Floresta":
         setState(() {
           cidadeSelecionada = "Floresta";
+          anoSelecionado = anoEscolhido;
         });
         break;
       case "Santo inacio":
         setState(() {
           cidadeSelecionada = "Santo inacio";
+          anoSelecionado = anoEscolhido;
         });
         break;
       default:
         setState(() {
           cidadeSelecionada = "Floresta";
+          anoSelecionado = anoEscolhido;
         });
         break;
     }
@@ -161,8 +166,8 @@ class _InicioState extends State<Inicio> {
       //Inicio(_resultado),
       AbaNoticias(regiao: cidadeSelecionada??"Floresta", usuario: widget.usuario,),
       AbaCampeonatos(regiao: cidadeSelecionada??"Floresta",),
-      AbaTimes(regiao: cidadeSelecionada??"Floresta", usuario: widget.usuario,),
-      AbaTabela(regiao: cidadeSelecionada??"Floresta", usuario: widget.usuario,),
+      AbaTimes(regiao: cidadeSelecionada??"Floresta", ano: anoSelecionado, usuario: widget.usuario,),
+      AbaTabela(regiao: cidadeSelecionada??"Floresta", ano: anoSelecionado, usuario: widget.usuario,),
     ];
 
     return Scaffold(
@@ -221,12 +226,19 @@ class _InicioState extends State<Inicio> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            destaquesConfig(width, height),
+            ARENAHighlights(height: height, width: width,), //destaques exibidos na parte superior da tela com os times
             const SizedBox(height: 10,),
-            Padding(
-              padding: const EdgeInsets.only(left: 12, right: 12),
-              child: _chamarDropDownCity(),
-            ),
+            if(_selecionado == 0 || _selecionado == 1)
+              Padding(
+                padding: const EdgeInsets.only(left: 12, right: 12),
+                child: _chamarDropDownCity(),
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.only(left: 12, right: 12),
+                child: _chamarDropDownAno(),
+              ),
+
             Container(
               width: width,
               height: height*0.55,
@@ -526,63 +538,6 @@ class _InicioState extends State<Inicio> {
     );
   }
 
-  destaquesConfig(double width, double height){
-
-    return StreamBuilder<QuerySnapshot>(
-      //recupera os dados toda vez que o banco é modificado
-      stream: FirebaseFirestore.instance.collection("destaques").orderBy("id", descending: true).snapshots(), //passa uma stream de dados
-      builder: (context, snapshot) {
-        //verificação de estado
-        switch (snapshot.connectionState) {
-          case ConnectionState.none:
-          case ConnectionState.waiting:
-            return const CircularProgressIndicator();
-          default:
-            List<DocumentSnapshot> destaque = snapshot.data!.docs;
-
-            if (destaque.isEmpty) {
-              return Container(
-                // child: const Center(
-                //   child: Text("Nenhuma notícia registrada!"),
-                // ),
-              );
-            } else {
-
-              return Container(
-                        width: width,
-                        height: height*0.12,
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 16.0, left: 16.0,),
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: destaque.map((e){ //percorre o documento como um list
-                                return GestureDetector(
-                                  onTap: () {
-                                    //quando clicado
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context)=>DetalhesDestaqueScreen(destaque_selecionado: e,),
-                                      ),
-                                    );
-                                    // print("DESTAQUE CLICADO!!! "+e.id.toString());
-                                  },
-                                  child: Destaque(
-                                      urlImage: e.get("urlImagem").toString(),
-                                      title: e.get("title").toString(),
-                                    ),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ),
-                      );
-            }
-        }
-      },
-    );
-  }
 
   String? cidadeSelecionada;
   _chamarDropDownCity(){
@@ -643,4 +598,46 @@ class _InicioState extends State<Inicio> {
 
   }
   
+
+  final List<String> listaAno = ["2022", "2023"];
+  String? anoSelecionado;
+  _chamarDropDownAno(){
+
+    return Container(
+      margin: const EdgeInsets.all(4),
+      height: MediaQuery.of(context).size.height * 0.06,
+      decoration: BoxDecoration(        
+        border: Border.all(color: Colors.green),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      padding: const EdgeInsets.all(10),
+      child: DropdownButton<String>(
+              value: anoSelecionado??"2023",
+              icon: const Icon(Icons.change_circle_outlined, color: Colors.white,),
+              isExpanded: true,
+              borderRadius: BorderRadius.circular(16),
+              //elevation: 16,
+              style: const TextStyle(color: Colors.white, fontSize: 18,),
+              // underline: Container(height: 2, color: Colors.green,),
+              underline: Container(),
+              alignment: AlignmentDirectional.center,
+              dropdownColor: Colors.green,
+              onChanged: (String? newValue) async {
+                setState(() {
+                  anoSelecionado = newValue!;
+                });
+
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.setString('anoEscolhido', anoSelecionado.toString());
+              },
+
+              items: listaAno.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+              }).toList(),
+            ),
+    );
+  }
 }
