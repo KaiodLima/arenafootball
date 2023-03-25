@@ -6,10 +6,12 @@ import '../app/front/presentation/pages/show_championships/ExibirCampeonato.dart
 
 class AbaCampeonatos extends StatefulWidget {
   final String? regiao;
+  final String? ano;
 
   const AbaCampeonatos({
     Key? key,
-    this.regiao
+    this.regiao,
+    this.ano
   }) : super(key: key);
 
   @override
@@ -75,7 +77,7 @@ class _AbaCampeonatosState extends State<AbaCampeonatos> {
                       Navigator.push(
                           context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
                           MaterialPageRoute(
-                            builder: (context) => ExibirCampeonato(campeonatos[index].id.toString(), regiao: widget.regiao.toString(),), //passando por parâmetro o nome do time selecionado
+                            builder: (context) => ExibirCampeonato(campeonatos[index].id.toString(), regiao: widget.regiao.toString(), ano: widget.ano,), //passando por parâmetro o nome do time selecionado
                           ) //o outro parâmetro é a rota
                           );
                       //Navigator.pop(context); //fecha a tela atual e abre uma nova

@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 
 class ExibirGrupos extends StatefulWidget {
   final String? regiao;
+  final String? ano;
   
   ExibirGrupos({
     Key? key,
     this.regiao,
+    this.ano
   }) : super(key: key);
 
   @override
@@ -42,7 +44,7 @@ class _ExibirGruposState extends State<ExibirGrupos> {
               Navigator.push(
                 context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
                 MaterialPageRoute(
-                  builder: (context) => ExibirArtilheiros(regiao: widget.regiao,),
+                  builder: (context) => ExibirArtilheiros(regiao: widget.regiao, ano: widget.ano,),
                 ) //o outro parâmetro é a rota
               );
               
@@ -57,7 +59,7 @@ class _ExibirGruposState extends State<ExibirGrupos> {
               Navigator.push(
                 context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
                 MaterialPageRoute(
-                  builder: (context) => ExibirAssistencias(regiao: widget.regiao,),
+                  builder: (context) => ExibirAssistencias(regiao: widget.regiao, ano: widget.ano,),
                 ) //o outro parâmetro é a rota
               );
             },

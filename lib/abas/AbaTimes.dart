@@ -105,7 +105,7 @@ class _AbaTimesState extends State<AbaTimes> {
                         Navigator.push(
                           context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
                           MaterialPageRoute(
-                            builder: (context) => ExibirJogadores(nomeTime: e.get("nome").toString(), usuario: widget.usuario,), //passando por parâmetro o nome do time selecionado
+                            builder: (context) => ExibirJogadores(nomeTime: e.get("nome").toString(), ano: widget.ano, usuario: widget.usuario,), //passando por parâmetro o nome do time selecionado
                           ) //o outro parâmetro é a rota
                         );
                       },

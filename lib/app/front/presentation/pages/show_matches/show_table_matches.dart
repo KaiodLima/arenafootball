@@ -103,7 +103,7 @@ class _ShowTableMatchesState extends State<ShowTableMatches> {
                 //chamar tela de grupos
                 Navigator.push( context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
                   MaterialPageRoute(
-                    builder: (context) => ExibirGrupos(regiao: widget.regiao.toString(),), 
+                    builder: (context) => ExibirGrupos(regiao: widget.regiao.toString(), ano: widget.ano,), 
                   ) //o outro parâmetro é a rota
                 );
               },
@@ -116,7 +116,7 @@ class _ShowTableMatchesState extends State<ShowTableMatches> {
               Navigator.push(
               context, 
               MaterialPageRoute(
-                builder: (context) => ExibirArtilheiros(regiao: widget.regiao??"Floresta",),
+                builder: (context) => ExibirArtilheiros(regiao: widget.regiao??"Floresta", ano: widget.ano),
               )
             );
             },
@@ -133,7 +133,7 @@ class _ShowTableMatchesState extends State<ShowTableMatches> {
               Navigator.push(
               context, 
               MaterialPageRoute(
-                builder: (context) => ExibirAssistencias(regiao: widget.regiao??"Floresta",),
+                builder: (context) => ExibirAssistencias(regiao: widget.regiao??"Floresta", ano: widget.ano,),
               )
             );
             },

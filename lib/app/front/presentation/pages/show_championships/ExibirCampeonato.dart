@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 class ExibirCampeonato extends StatefulWidget {
   String? idCampeonato; //recebe a variável enviada da outra tela
   final String? regiao;
+  final String? ano;
 
   ExibirCampeonato(this.idCampeonato, {
     Key? key,
-    this.regiao
+    this.regiao,
+    this.ano
   }) : super(key: key); //construtor
 
   @override
@@ -107,7 +109,7 @@ class _ExibirCampeonatoState extends State<ExibirCampeonato> {
                 //chamar tela de grupos
                 Navigator.push( context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
                   MaterialPageRoute(
-                    builder: (context) => ExibirGrupos(regiao: widget.regiao,), 
+                    builder: (context) => ExibirGrupos(regiao: widget.regiao, ano: widget.ano,), 
                   ) //o outro parâmetro é a rota
                 );
               },

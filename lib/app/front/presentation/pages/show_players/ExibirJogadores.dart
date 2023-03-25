@@ -14,11 +14,13 @@ import 'package:image_picker/image_picker.dart';
 
 class ExibirJogadores extends StatefulWidget {
   String? nomeTime; //recebe a variável enviada da outra tela
+  String? ano;
   Usuario? usuario;
 
   ExibirJogadores({
     Key? key,
     this.nomeTime,
+    this.ano,
     this.usuario,
   }) : super(key: key); //construtor
 
@@ -182,7 +184,7 @@ class _ExibirJogadoresState extends State<ExibirJogadores> {
                     children: [
                       if (widget.usuario?.getIsAdmin == true)
                         Container(
-                          margin: EdgeInsets.only(right: 8),
+                          margin: const EdgeInsets.only(right: 8),
                           child: IconButton(
                             onPressed: () {
                               player.removeGol();
@@ -330,6 +332,20 @@ class _ExibirJogadoresState extends State<ExibirJogadores> {
     return jogador;
   }
 
+  int? anoAtual;
+  getAnoAtual(){
+    anoAtual = DateTime.now().year;
+    print('Ano atual: $anoAtual');
+
+  }
+
+  @override
+  void initState() {
+    getAnoAtual();
+    super.initState();
+  }
+  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -339,10 +355,13 @@ class _ExibirJogadoresState extends State<ExibirJogadores> {
       ),
       body: StreamBuilder<QuerySnapshot>(
         //recupera os dados toda vez que o banco é modificado
-        stream: FirebaseFirestore.instance
-            .collection("jogadores")
-            .where("time", isEqualTo: widget.nomeTime.toString())
-            .snapshots(), //passa uma stream de dados
+        // stream: FirebaseFirestore.instance
+        //     .collection("jogadores")
+        //     .where("time", isEqualTo: widget.nomeTime.toString())
+        //     .snapshots(), //passa uma stream de dados
+        stream: (widget.ano.toString() != anoAtual.toString())
+        ? FirebaseFirestore.instance.collection("jogadores${widget.ano}").where("time", isEqualTo: widget.nomeTime.toString()).snapshots()
+        : FirebaseFirestore.instance.collection("jogadores").where("time", isEqualTo: widget.nomeTime.toString()).snapshots(), //passa uma stream de dados
         builder: (context, snapshot) {
           //verificação de estado
           switch (snapshot.connectionState) {
