@@ -19,6 +19,20 @@ class ExibirGrupos extends StatefulWidget {
 }
 
 class _ExibirGruposState extends State<ExibirGrupos> {
+
+  int? anoAtual;
+  getAnoAtual(){
+    anoAtual = DateTime.now().year;
+    print('Ano atual: $anoAtual');
+
+  }
+
+  @override
+  void initState() {
+    getAnoAtual();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,7 +82,10 @@ class _ExibirGruposState extends State<ExibirGrupos> {
       ),
       body: StreamBuilder<QuerySnapshot>(
         //recupera os dados toda vez que o banco é modificado
-        stream: FirebaseFirestore.instance.collection("grupos").where("fk_competicao", isEqualTo: widget.regiao).snapshots(), //passa uma stream de dados
+        // stream: FirebaseFirestore.instance.collection("grupos").where("fk_competicao", isEqualTo: widget.regiao).snapshots(), //passa uma stream de dados
+        stream: (widget.ano.toString() != anoAtual.toString())
+        ? FirebaseFirestore.instance.collection("grupos${widget.ano}").where("fk_competicao", isEqualTo: widget.regiao).snapshots()
+        : FirebaseFirestore.instance.collection("grupos").where("fk_competicao", isEqualTo: widget.regiao).snapshots(), //passa uma stream de dados
         builder: (context, snapshot) {
           //verificação de estado
           switch (snapshot.connectionState) {

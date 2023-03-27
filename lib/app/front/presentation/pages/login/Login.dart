@@ -245,8 +245,8 @@ class _LoginState extends State<Login> {
   // }
 
   duplicarCollection() async {
-    final origem = FirebaseFirestore.instance.collection('jogadores');
-    final destino = FirebaseFirestore.instance.collection('jogadores2022');
+    final origem = FirebaseFirestore.instance.collection('grupos');
+    final destino = FirebaseFirestore.instance.collection('grupos2022');
 
     origem.get().then((QuerySnapshot snapshot) {
       snapshot.docs.forEach((DocumentSnapshot doc) {

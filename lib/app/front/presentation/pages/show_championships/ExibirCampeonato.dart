@@ -34,6 +34,7 @@ class _ExibirCampeonatoState extends State<ExibirCampeonato> {
     campeonato.premioArtilheiro = resultado.get("premioArtilheiro");
     campeonato.premioGoleiro = resultado.get("premioGoleiro");
     campeonato.regras = resultado.get("regras");
+    campeonato.ano = resultado.get("ano");
 
     return campeonato;
   }
@@ -56,8 +57,16 @@ class _ExibirCampeonatoState extends State<ExibirCampeonato> {
 
   }
 
+  int? anoAtual;
+  getAnoAtual(){
+    anoAtual = DateTime.now().year;
+    print('Ano atual: $anoAtual');
+
+  }
+
   @override
   void initState() {
+    getAnoAtual();
     super.initState();
 
     _chamarStatusCampeonato();
@@ -109,7 +118,7 @@ class _ExibirCampeonatoState extends State<ExibirCampeonato> {
                 //chamar tela de grupos
                 Navigator.push( context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
                   MaterialPageRoute(
-                    builder: (context) => ExibirGrupos(regiao: widget.regiao, ano: widget.ano,), 
+                    builder: (context) => ExibirGrupos(regiao: widget.regiao, ano: _campeonatoSelecionado == null ? "${anoAtual}" :  _campeonatoSelecionado!.ano,), 
                   ) //o outro parâmetro é a rota
                 );
               },

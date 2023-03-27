@@ -11,6 +11,7 @@ class Campeonato {
   String _premioGoleiro = "";  
   
   String _regras = "";
+  String _ano = "";
 
   //construtor
   Campeonato(this._titulo, this._descricao, this._urlImagem);
@@ -68,6 +69,12 @@ class Campeonato {
 
   set regras(String value) {
     _regras = value;
+  }
+
+  String get ano => _ano;
+
+  set ano(String value) {
+    _ano = value;
   }
 
 }
