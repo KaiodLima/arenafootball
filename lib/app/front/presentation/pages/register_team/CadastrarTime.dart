@@ -64,6 +64,25 @@ class _CadastrarTimeState extends State<CadastrarTime> {
 
     });
 
+    db.collection("classificacao").doc(time.idTime).set({
+      "id_partida": time.idTime,
+
+      "nome": time.nome,
+      "descricao": time.descricao,
+      "fk_competicao": time.fkCompeticao,
+      "urlImagem": time.urlImagem,
+
+      "vitorias": 0,
+      "derrotas": 0,
+      "empates": 0,
+      "gols_feitos": 0,
+      "gols_sofridos": 0,
+      "pontos": 0,
+
+      "fk_grupo": "",
+
+    });
+
     _chamarSnackBar("Time registrado com Sucesso!!!");
   }
 
@@ -230,8 +249,9 @@ class _CadastrarTimeState extends State<CadastrarTime> {
             Random random = Random();
             int randomNumber = random.nextInt(100000);
 
-            await uploadPhoto(imageFile!,
-              "time_${_controllerTimeNome.text + randomNumber.toString()}");
+            if(imageFile != null){
+              await uploadPhoto(imageFile!, "time_${_controllerTimeNome.text + randomNumber.toString()}");
+            }
             
             criarTime();            
           },
