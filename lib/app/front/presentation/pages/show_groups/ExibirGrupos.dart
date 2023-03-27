@@ -106,6 +106,7 @@ class _ExibirGruposState extends State<ExibirGrupos> {
                 return GridView(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
+                    mainAxisSpacing: 10,
                     childAspectRatio: 0.8,
                   ),
                   children: [

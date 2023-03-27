@@ -26,8 +26,8 @@ class _GroupCardsState extends State<GroupCards> {
       alignment: Alignment.bottomCenter,
       children: [
         Container(
-          height: MediaQuery.of(context).size.height * 0.34,
-          width: MediaQuery.of(context).size.width * 0.45, // retorna o tamanho da largura da tela
+          height: 450,
+          width: 180, // retorna o tamanho da largura da tela
           decoration: const BoxDecoration(
             color: Colors.green,              
             borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -48,8 +48,8 @@ class _GroupCardsState extends State<GroupCards> {
               ),
         ),
         Container(
-          height: MediaQuery.of(context).size.height * 0.28,
-          width: MediaQuery.of(context).size.width * 0.45, // retorna o tamanho da largura da tela
+          height: 200,
+          width: 175, // retorna o tamanho da largura da tela
           decoration: const BoxDecoration(
             color: Color.fromARGB(255, 4, 110, 7),
             // border: Border.all(
