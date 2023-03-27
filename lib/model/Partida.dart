@@ -1,4 +1,6 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Partida {
   String? idPartida;
   //atributos
@@ -17,6 +19,7 @@ class Partida {
 
   String? fkPartida;
   int? idCampeonato;
+  Timestamp? dataRegistro;
 
   //construtor
   Partida({
@@ -31,6 +34,7 @@ class Partida {
     this.golTimeCasa,
     this.golTimeFora,
     this.votacao,
+    this.dataRegistro
     });
 
   String get getIdPartida => idPartida ?? "";

@@ -123,8 +123,8 @@ class _RegisterPlayerState extends State<RegisterPlayer> {
       "nome": jogador.nome,
       "time": jogador.time,
       "urlImagem": jogador.urlImagem,
-      "nGols": 0,
-      "nAssistencias": 0,
+      "nGols": int.parse(_controllerGols.text),
+      "nAssistencias": int.parse(_controllerPasses.text),
     });
 
     _chamarSnackBar("Jogador Cadastrado!!!");

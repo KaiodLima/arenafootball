@@ -631,6 +631,7 @@ class _ShowTableMatchesState extends State<ShowTableMatches> {
       timeC: timeCasa,
       timeF: timeFora,
       votacao: habilitaVotacao,
+      dataRegistro: partida.get("dataRegistro"),
     );
 
     //salvar informações da partida no banco de dados
@@ -647,7 +648,7 @@ class _ShowTableMatchesState extends State<ShowTableMatches> {
       "id_campeonato": partida.idCampeonato,
       "fk_competicao": partida.fkPartida,
 
-      "dataRegistro": FieldValue.serverTimestamp(),
+      "dataRegistro": partida.dataRegistro,
 
       "data": partida.data,
       "horario": partida.horario,
@@ -660,6 +661,7 @@ class _ShowTableMatchesState extends State<ShowTableMatches> {
       "tituloVotacao": "",
       "golTimeCasa": partida.golTimeCasa,
       "golTimeFora": partida.golTimeFora,
+      
     });
 
     // _chamarSnackBar("Placar registrado com Sucesso!!!");
@@ -837,7 +839,7 @@ class _ShowTableMatchesState extends State<ShowTableMatches> {
                           ),
                           onPressed: () async {
                             print("Excluir");
-                            final collection = FirebaseFirestore.instance.collection('partidas2023');
+                            final collection = FirebaseFirestore.instance.collection('partidas');
                             final idDoRegistro = partida.id; // ID do registro que você deseja excluir
 
                             await collection.doc(idDoRegistro).delete();
