@@ -1,4 +1,5 @@
 import 'package:arena_soccer/app/front/presentation/components/highlights/arena_highlights.dart';
+import 'package:arena_soccer/app/front/presentation/pages/register_new_destaque/register_new_destaque.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_news/CadastrarNoticia.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_match/CadastrarPartida.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_team/CadastrarTime.dart';
@@ -107,7 +108,7 @@ class _InicioState extends State<Inicio> {
     _recuperarCidades();
   }
 
-  List<String> listaMenu = ["Cadastrar Jogador", "Cadastrar Nova Partida", "Cadastrar Noticia", "Cadastrar Time"];
+  List<String> listaMenu = ["Cadastrar Destaques", "Cadastrar Jogador", "Cadastrar Nova Partida", "Cadastrar Noticia", "Cadastrar Time"];
   // List<String> listaMenu = ["Calcular Votos", "Cadastrar Jogador", "Cadastrar Nova Partida", "Cadastrar Noticia"];
   chamarMenuPop(String selecionado){
     //print("Item clicado: ${selecionado}");
@@ -120,6 +121,14 @@ class _InicioState extends State<Inicio> {
       //     ) 
       //   );
       //   break;
+      case "Cadastrar Destaques":
+        Navigator.push(
+          context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
+          MaterialPageRoute(
+            builder: (context) => const RegisterDestaque(),
+          ) //o outro parâmetro é a rota
+        );
+        break;
       case "Cadastrar Jogador":
         Navigator.push(
           context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
