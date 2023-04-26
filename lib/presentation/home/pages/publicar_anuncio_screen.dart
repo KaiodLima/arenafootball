@@ -1,7 +1,13 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:arena_soccer/model/Noticia.dart';
 import 'package:arena_soccer/app/front/presentation/components/arena_button.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart' as storage;
+import 'package:firebase_core/firebase_core.dart' as core;
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class PublicarAnuncioScreen extends StatefulWidget {
   const PublicarAnuncioScreen({Key? key}) : super(key: key);
@@ -145,6 +151,55 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
                 ),
               ),
               const SizedBox(height: 16,),
+              imageFile != null? Container(          
+                margin: const EdgeInsets.all(10),
+                height: MediaQuery.of(context).size.height * 0.3,
+                width: MediaQuery.of(context).size.width * 1,
+                child: Image.file(imageFile!),
+              ): Container(),
+              Padding(
+                padding: const EdgeInsets.only(left: 40),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,          
+                  children: [              
+                    Container(
+                      width: 150,
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.camera_alt),
+                        onPressed: () {                    
+                          //Tirar foto:
+                          // getImageCamera();
+                          _recoveryImage(true);
+                                      
+                        },
+                        label: const Text("Tirar foto"),
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(Colors.green), //essa merda toda pra mudar a cor do botão oporra
+                        ),
+                      ),
+                    ),              
+                    Container(                
+                      width: 150,
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.attach_file, color: Colors.green,),
+                        onPressed: () {
+                          //buscar na galeria
+                          // getImageGalery();
+                          _recoveryImage(false);
+                                      
+                        },
+                        label: const Text("Galeria", style: TextStyle(color: Colors.green),),
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(Colors.white), //essa merda toda pra mudar a cor do botão oporra                
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8,),
               SizedBox(
                 width: width*1,
                 child: TextField(
@@ -261,7 +316,15 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
                 textColor: Colors.white,
                 buttonColor: Colors.green,                      
                 radius: 8,
-                function: criarAnuncio,
+                function: () async {
+                  Random random = Random();
+                  int randomNumber = random.nextInt(100000);
+                  
+                  if(imageFile != null){
+                    await uploadPhoto(imageFile!, "noticias${_controllerTitulo.text+randomNumber.toString()}");
+                  }
+                  criarAnuncio();
+                },
               ),
 
             ],
@@ -288,12 +351,13 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
     //print("TESTE -> "+listaTimesFirebase.toString());    
   }
 
+  String? urlDownloadImage;
   //noticia e anuncio usam o mesmo model
   criarAnuncio() {
     // int idNoticia = idAtual;
     String titulo = _controllerTitulo.text;
     String descricao = _controllerDescricao.text;
-    String urlImagem = "";
+    String urlImagem = urlDownloadImage?.toString() ?? "";
     String link = _controllerLink.text;
     // String exibir = _controllerExibir.text;
     String exibir = _controllerExibir.text;
@@ -385,5 +449,45 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
       _snackBar = "";
     }
   }
+
+  //Teste camera:
+  PickedFile? _image;
+  File? imageFile;
+ 
+  Future _recoveryImage(bool isCamera) async{
+    PickedFile? imageSelected;
+    var imageTemporary;
+    if(isCamera) {
+      _image = await ImagePicker.platform.pickImage(source: ImageSource.camera);
+      imageTemporary = File(_image!.path);
+    } else {
+      print("GALERY!!!");
+      _image = await ImagePicker.platform.pickImage(source: ImageSource.gallery);
+      imageTemporary = File(_image!.path);
+    }
+ 
+    setState(() {
+      imageFile = imageTemporary;
+      _image = imageSelected;
+    });
+ 
+  }
+
+  Future<void> uploadPhoto(File Image, String fileName) async {
+    print("ENTROU!!! "+Image.uri.toString());
+    try {
+      var result = await storage.FirebaseStorage.instance.ref("noticias/$fileName").putFile(Image);
+      print("RESULT!!! "+result.toString());
+      final urlDownload = await result.ref.getDownloadURL();
+      setState(() {
+        urlDownloadImage = urlDownload;
+        print("TESTE CAMERA URL: "+urlDownloadImage.toString());
+      });
+    } on core.FirebaseException catch(e) {
+      print("Error: ${e.code}");
+ 
+    }
+  }
+
 
 }
