@@ -1,3 +1,4 @@
+import 'package:arena_soccer/app/front/presentation/pages/show_groups_classification/show_groups_classification_page.dart';
 import 'package:arena_soccer/app/front/presentation/pages/show_soccer_scorers/ExibirArtilheiros.dart';
 import 'package:arena_soccer/app/front/presentation/pages/show_assistance_leader/ExibirAssistencias.dart';
 import 'package:arena_soccer/app/front/presentation/pages/show_groups/components/groups_card.dart';
@@ -114,12 +115,18 @@ class _ExibirGruposState extends State<ExibirGrupos> {
                       GestureDetector(
                         onTap: (){
                           //quando um grupo é clicado:
-                          // print("GRUPO CLICADO::: "+index.toString());
+                          print("GRUPO CLICADO::: "+e.get("descricao").toString());
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ShowGroupsClassificationPage(regiao: widget.regiao, ano: widget.ano, grupo: e.get("descricao"),)
+                            )
+                          );
                         },
                         child: GridTile(
                           child: GroupCards(
                             groupCompetition: e,
-                            title: e.get("descricao"),
+                            title: "Grupo "+e.get("descricao"),
                           ),
                         ),
                       ),

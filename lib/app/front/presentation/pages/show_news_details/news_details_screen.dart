@@ -132,7 +132,6 @@ class _NewsDatailsScreenState extends State<NewsDatailsScreen> {
     );
   }
 
-  //cria a snackBar com a mensagem de alerta  
   _chamarLink(String link){
     return InkWell(
       child: const Text('Mais Informações', style: TextStyle(decoration: TextDecoration.underline, color: Colors.white,), textAlign: TextAlign.center,),

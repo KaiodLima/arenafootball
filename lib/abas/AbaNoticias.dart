@@ -3,6 +3,7 @@ import 'package:arena_soccer/app/front/presentation/pages/edit_news/news_edit_sc
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../presentation/home/components/gol_card.dart';
 import '../presentation/home/components/publicidade_card.dart';
@@ -147,7 +148,12 @@ class _AbaNoticiasState extends State<AbaNoticias> {
                             padding: const EdgeInsets.all(8.0),
                             child: Stack(
                               children: [
-                                PublicidadeCard(noticia: e,),
+                                InkWell(
+                                  onTap: (e.get("link").toString().isNotEmpty)
+                                  ? () => launchUrlString(e.get("link").toString())
+                                  : () {},
+                                  child: PublicidadeCard(noticia: e,)
+                                ),
                                 _actionCard(e, "delete"),
                               ],
                             ),

@@ -118,13 +118,15 @@ class _RegisterPlayerState extends State<RegisterPlayer> {
       "nAssistencias": 0,
     });
 
+    // print("TESTE ID::: "+addedDocRef.id.toString());
+
     db.collection("jogadores").doc(addedDocRef.id).set({
       "idJogador": addedDocRef.id,
       "nome": jogador.nome,
       "time": jogador.time,
       "urlImagem": jogador.urlImagem,
-      "nGols": int.parse(_controllerGols.text),
-      "nAssistencias": int.parse(_controllerPasses.text),
+      "nGols": 0,
+      "nAssistencias": 0,
     });
 
     _chamarSnackBar("Jogador Cadastrado!!!");

@@ -261,7 +261,7 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
                 textColor: Colors.white,
                 buttonColor: Colors.green,                      
                 radius: 8,
-                function: criarNoticia,
+                function: criarAnuncio,
               ),
 
             ],
@@ -288,13 +288,13 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
     //print("TESTE -> "+listaTimesFirebase.toString());    
   }
 
-  //capturar dados da noticia
-  criarNoticia() {
+  //noticia e anuncio usam o mesmo model
+  criarAnuncio() {
     // int idNoticia = idAtual;
     String titulo = _controllerTitulo.text;
     String descricao = _controllerDescricao.text;
     String urlImagem = "";
-    String link = "";
+    String link = _controllerLink.text;
     // String exibir = _controllerExibir.text;
     String exibir = _controllerExibir.text;
 

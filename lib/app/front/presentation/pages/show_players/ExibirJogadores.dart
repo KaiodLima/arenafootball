@@ -520,9 +520,7 @@ class _ExibirJogadoresState extends State<ExibirJogadores> {
                                     style: TextStyle(color: Colors.white),
                                   ),
                                   style: ButtonStyle(
-                                    backgroundColor:
-                                        MaterialStateProperty.all<Color>(Colors
-                                            .green), //essa merda toda pra mudar a cor do botão oporra
+                                    backgroundColor: MaterialStateProperty.all<Color>(Colors.green), //essa merda toda pra mudar a cor do botão oporra
                                   ),
                                 ),
                                 decoration: BoxDecoration(
@@ -624,8 +622,10 @@ class _ExibirJogadoresState extends State<ExibirJogadores> {
                                     Random random = Random();
                                     int randomNumber = random.nextInt(100000);
 
-                                    await uploadPhoto(imageFile!,
-                                        "jogadores${_jogadorSelecionado!.nome.toString() + randomNumber.toString()}");
+                                    if(imageFile != null){
+                                      await uploadPhoto(imageFile!, "jogadores${_jogadorSelecionado!.nome.toString() + randomNumber.toString()}");
+                                    }
+
                                     criarJogador(null);
                                     Navigator.pop(context);
                                   },
@@ -670,8 +670,7 @@ class _ExibirJogadoresState extends State<ExibirJogadores> {
       imageTemporary = File(_image!.path);
     } else {
       // print("GALERY!!!");
-      _image =
-          await ImagePicker.platform.pickImage(source: ImageSource.gallery);
+      _image = await ImagePicker.platform.pickImage(source: ImageSource.gallery);
       imageTemporary = File(_image!.path);
     }
 
@@ -747,7 +746,7 @@ class _ExibirJogadoresState extends State<ExibirJogadores> {
       "nAssistencias": jogador.getNAssistencias,
     });
 
-    //_chamarSnackBar("Sucesso!!!");
+    // _chamarSnackBar("Sucesso!!!");
   }
 
   var _snackBar;
