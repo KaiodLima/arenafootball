@@ -80,6 +80,7 @@ class _ShowTableMatchesState extends State<ShowTableMatches> {
       backgroundColor: const Color.fromARGB(255, 27, 67, 28),
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 27, 67, 28),
+        title: const Text("TODOS OS JOGOS"),
         actions: [
           Padding(
             padding: const EdgeInsets.all(6.0),
@@ -109,40 +110,40 @@ class _ShowTableMatchesState extends State<ShowTableMatches> {
               },
             ),
           ),
-          const SizedBox(width: 6,),
-          FloatingActionButton.small(
-            heroTag: "btnArtilharia",
-            onPressed: (){
-              Navigator.push(
-              context, 
-              MaterialPageRoute(
-                builder: (context) => ExibirArtilheiros(regiao: widget.regiao??"Floresta", ano: widget.ano),
-              )
-            );
-            },
-            backgroundColor: Colors.white,
-            child: const Icon(
-              Icons.sports_soccer,
-              color: Colors.green,
-            ),
-          ),
-          const SizedBox(width: 6,),
-          FloatingActionButton.small(
-            heroTag: "btnAssistencias",
-            onPressed: (){
-              Navigator.push(
-              context, 
-              MaterialPageRoute(
-                builder: (context) => ExibirAssistencias(regiao: widget.regiao??"Floresta", ano: widget.ano,),
-              )
-            );
-            },
-            backgroundColor: Colors.white,
-            child: const Icon(
-              Icons.star_border,
-              color: Colors.green,
-            ),
-          ),
+          // const SizedBox(width: 6,),
+          // FloatingActionButton.small(
+          //   heroTag: "btnArtilharia",
+          //   onPressed: (){
+          //     Navigator.push(
+          //     context, 
+          //     MaterialPageRoute(
+          //       builder: (context) => ExibirArtilheiros(regiao: widget.regiao??"Floresta", ano: widget.ano),
+          //     )
+          //   );
+          //   },
+          //   backgroundColor: Colors.white,
+          //   child: const Icon(
+          //     Icons.sports_soccer,
+          //     color: Colors.green,
+          //   ),
+          // ),
+          // const SizedBox(width: 6,),
+          // FloatingActionButton.small(
+          //   heroTag: "btnAssistencias",
+          //   onPressed: (){
+          //     Navigator.push(
+          //     context, 
+          //     MaterialPageRoute(
+          //       builder: (context) => ExibirAssistencias(regiao: widget.regiao??"Floresta", ano: widget.ano,),
+          //     )
+          //   );
+          //   },
+          //   backgroundColor: Colors.white,
+          //   child: const Icon(
+          //     Icons.star_border,
+          //     color: Colors.green,
+          //   ),
+          // ),
         ],
       ),
       body: StreamBuilder<QuerySnapshot>(
