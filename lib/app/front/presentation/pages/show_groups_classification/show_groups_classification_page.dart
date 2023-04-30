@@ -1,5 +1,6 @@
 import 'package:arena_soccer/app/front/presentation/pages/show_assistance_leader/ExibirAssistencias.dart';
 import 'package:arena_soccer/app/front/presentation/pages/show_soccer_scorers/ExibirArtilheiros.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
@@ -145,8 +146,9 @@ class _ShowGroupsClassificationPageState extends State<ShowGroupsClassificationP
                                         )
                                       ),
                                       const SizedBox(width: 10,),
-                                      IntrinsicHeight(
-                                        child: Text(
+                                      SizedBox(
+                                        width: 150,
+                                        child: AutoSizeText(
                                           classificacao[index].get("nome"), 
                                           style: const TextStyle(color: Colors.white, fontSize: 22),
                                         ),
