@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -36,7 +37,7 @@ class _GroupCardsState extends State<GroupCards> {
                 padding: const EdgeInsets.all(8),
                 child: Container(
                   alignment: Alignment.topCenter,
-                  child: Text(
+                  child: AutoSizeText(
                     //"GRUPO A",
                     (widget.title!.isNotEmpty)?widget.title.toString():"",
                     style: TextStyle(
@@ -64,7 +65,7 @@ class _GroupCardsState extends State<GroupCards> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(5),
-                child: Text(
+                child: AutoSizeText(
                   //"TIME A",
                   (widget.groupCompetition!.get("time1").toString().isNotEmpty)?widget.groupCompetition!.get("time1").toString():"",
                   style: TextStyle(
@@ -75,7 +76,7 @@ class _GroupCardsState extends State<GroupCards> {
               ),
               Padding(
                 padding: const EdgeInsets.all(5),
-                child: Text(
+                child: AutoSizeText(
                   //"TIME B",
                   (widget.groupCompetition!.get("time1").toString().isNotEmpty)?widget.groupCompetition!.get("time2").toString():"",
                   style: TextStyle(
@@ -86,7 +87,7 @@ class _GroupCardsState extends State<GroupCards> {
               ),
               Padding(
                 padding: const EdgeInsets.all(5),
-                child: Text(
+                child: AutoSizeText(
                   //"TIME C",
                   (widget.groupCompetition!.get("time1").toString().isNotEmpty)?widget.groupCompetition!.get("time3").toString():"",
                   style: TextStyle(
@@ -97,7 +98,7 @@ class _GroupCardsState extends State<GroupCards> {
               ),
               Padding(
                 padding: const EdgeInsets.all(5),
-                child: Text(
+                child: AutoSizeText(
                   //"TIME D",
                   (widget.groupCompetition!.get("time1").toString().isNotEmpty)?widget.groupCompetition!.get("time4").toString():"",
                   style: TextStyle(

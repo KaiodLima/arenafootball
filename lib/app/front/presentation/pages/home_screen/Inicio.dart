@@ -378,170 +378,173 @@ class _InicioState extends State<Inicio> {
   Container MyBottomNavBar(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(15),
-      //height: 60,
-      height: MediaQuery.of(context).size.height * 0.08,
-      width: MediaQuery.of(context).size.width * 1, 
+      height: 60,
+      // height: MediaQuery.of(context).size.height * 0.08,
+      // width: MediaQuery.of(context).size.width * 1, 
       decoration: const BoxDecoration(
         color: Colors.green,
         borderRadius: BorderRadius.all(Radius.circular(30),),
       ),
       child: Padding(
         padding: const EdgeInsets.all(10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            // IconButton(
-            //   enableFeedback: false,
-            //   onPressed: () {
-            //     setState(() {
-            //       _selecionado = 0;
-            //     });
-            //   },
-            //   icon: _selecionado == 0
-            //       ? const Icon(
-            //           Icons.home_filled,
-            //           color: Colors.white,
-            //           size: 35,
-            //         )
-            //       : const Icon(
-            //           Icons.home_outlined,
-            //           color: Colors.white,
-            //           size: 35,
-            //         ),
-            // ),
-            TextButton(
-              onPressed: (() {
-                setState(() {
-                  _selecionado = 0;
-                });
-              }),
-              child: _selecionado == 0
-                  ? Row(
-                    children: [
-                      const Icon(
-                        Icons.circle,
-                        color: Color.fromARGB(255, 27, 67, 28),
-                        size: 10,
-                      ),
-                      const SizedBox(width: 3,),
-                      Text(
-                          "HOME",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: sizeText,
-                            fontWeight: FontWeight.bold,
-                          ),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              // IconButton(
+              //   enableFeedback: false,
+              //   onPressed: () {
+              //     setState(() {
+              //       _selecionado = 0;
+              //     });
+              //   },
+              //   icon: _selecionado == 0
+              //       ? const Icon(
+              //           Icons.home_filled,
+              //           color: Colors.white,
+              //           size: 35,
+              //         )
+              //       : const Icon(
+              //           Icons.home_outlined,
+              //           color: Colors.white,
+              //           size: 35,
+              //         ),
+              // ),
+              TextButton(
+                onPressed: (() {
+                  setState(() {
+                    _selecionado = 0;
+                  });
+                }),
+                child: _selecionado == 0
+                    ? Row(
+                      children: [
+                        const Icon(
+                          Icons.circle,
+                          color: Color.fromARGB(255, 27, 67, 28),
+                          size: 10,
                         ),
-                    ],
-                  )
-                  : Text(
-                      "HOME",
-                      style: TextStyle(
-                        color: Colors.white24,
-                        fontSize: sizeText,
-                      ),
-                    ),
-            ),
-            TextButton(
-              onPressed: (() {
-                setState(() {
-                  _selecionado = 1;
-                });
-              }),
-              child: _selecionado == 1
-                  ? Row(
-                    children: [
-                      const Icon(
-                        Icons.circle,
-                        color: Color.fromARGB(255, 27, 67, 28),
-                        size: 10,
-                      ),
-                      const SizedBox(width: 3,),
-                      Text(
-                          "CAMPEONATOS",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: sizeText,
-                            fontWeight: FontWeight.bold,
+                        const SizedBox(width: 3,),
+                        Text(
+                            "HOME",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: sizeText,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
+                      ],
+                    )
+                    : Text(
+                        "HOME",
+                        style: TextStyle(
+                          color: Colors.white24,
+                          fontSize: sizeText,
                         ),
-                    ],
-                  )
-                  : Text(
-                      "CAMPEONATOS",
-                      style: TextStyle(
-                        color: Colors.white24,
-                        fontSize: sizeText,
                       ),
-                    ),
-            ),
-            TextButton(
-              onPressed: (() {
-                setState(() {
-                  _selecionado = 2;
-                });
-              }),
-              child: _selecionado == 2
-                  ? Row(
-                    children: [
-                      const Icon(
-                        Icons.circle,
-                        color: Color.fromARGB(255, 27, 67, 28),
-                        size: 10,
-                      ),
-                      const SizedBox(width: 3,),
-                      Text(
-                          "TIMES",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: sizeText,
-                            fontWeight: FontWeight.bold,
+              ),
+              TextButton(
+                onPressed: (() {
+                  setState(() {
+                    _selecionado = 1;
+                  });
+                }),
+                child: _selecionado == 1
+                    ? Row(
+                      children: [
+                        const Icon(
+                          Icons.circle,
+                          color: Color.fromARGB(255, 27, 67, 28),
+                          size: 10,
+                        ),
+                        const SizedBox(width: 3,),
+                        Text(
+                            "CAMPEONATOS",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: sizeText,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
+                      ],
+                    )
+                    : Text(
+                        "CAMPEONATOS",
+                        style: TextStyle(
+                          color: Colors.white24,
+                          fontSize: sizeText,
                         ),
-                    ],
-                  )
-                  : Text(
-                      "TIMES",
-                      style: TextStyle(
-                        color: Colors.white24,
-                        fontSize: sizeText,
                       ),
-                    ),
-            ),
-            TextButton(
-              onPressed: (() {
-                setState(() {
-                  _selecionado = 3;
-                });
-              }),
-              child: _selecionado == 3
-                  ? Row(
-                    children: [
-                      const Icon(
-                        Icons.circle,
-                        color: Color.fromARGB(255, 27, 67, 28),
-                        size: 10,
-                      ),
-                      const SizedBox(width: 3,),
-                      Text(
-                          "TABELAS",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: sizeText,
-                            fontWeight: FontWeight.bold,
+              ),
+              TextButton(
+                onPressed: (() {
+                  setState(() {
+                    _selecionado = 2;
+                  });
+                }),
+                child: _selecionado == 2
+                    ? Row(
+                      children: [
+                        const Icon(
+                          Icons.circle,
+                          color: Color.fromARGB(255, 27, 67, 28),
+                          size: 10,
+                        ),
+                        const SizedBox(width: 3,),
+                        Text(
+                            "TIMES",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: sizeText,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
+                      ],
+                    )
+                    : Text(
+                        "TIMES",
+                        style: TextStyle(
+                          color: Colors.white24,
+                          fontSize: sizeText,
                         ),
-                    ],
-                  )
-                  : Text(
-                      "TABELAS",
-                      style: TextStyle(
-                        color: Colors.white24,
-                        fontSize: sizeText,
                       ),
-                    ),
-            ),
-          ],
+              ),
+              TextButton(
+                onPressed: (() {
+                  setState(() {
+                    _selecionado = 3;
+                  });
+                }),
+                child: _selecionado == 3
+                    ? Row(
+                      children: [
+                        const Icon(
+                          Icons.circle,
+                          color: Color.fromARGB(255, 27, 67, 28),
+                          size: 10,
+                        ),
+                        const SizedBox(width: 3,),
+                        Text(
+                            "TABELAS",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: sizeText,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                      ],
+                    )
+                    : Text(
+                        "TABELAS",
+                        style: TextStyle(
+                          color: Colors.white24,
+                          fontSize: sizeText,
+                        ),
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
     );

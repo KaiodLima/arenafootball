@@ -289,264 +289,267 @@ class _ShowMatcheDayState extends State<ShowMatcheDay> {
                                   builder: (context) {
                                       if(e.get("id_campeonato") == widget.idCompetition && e.get("data") == nextMatch){
                                         //monta interface da tabela
-                                        return Column(
-                                          children: [
-                                            /*Container(
-                                              height: 100,
-                                              decoration: BoxDecoration(
-                                                //border: Border.all(color: Colors.green),
-                                                image: DecorationImage(
-                                                  fit: BoxFit.scaleDown,
-                                                  image: NetworkImage(time[index].get("urlImagem").toString()),
-                                                ),
-                                              ),
-                                            ),*/
-                                            Card(
-                                              color: Colors.white,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(30),
-                                              ),
-                                              child: Column(
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Padding(
-                                                        padding: const EdgeInsets.all(8.0),
-                                                        child: Container(
-                                                          // color: Colors.blue,
-                                                          width: widget.usuario?.getIsAdmin == true 
-                                                            ? MediaQuery.of(context).size.width * .7
-                                                            : MediaQuery.of(context).size.width * .7,
-                                                          child: Column(
-                                                            children: [
-                                                              // const CircleAvatar(
-                                                              //   maxRadius: 25,
-                                                              //   backgroundColor: Color.fromARGB(255, 45, 94, 45),
-                                                              //   backgroundImage: NetworkImage(partida[index].get("timeC").toString()),
-                                                              // ),
-                                                              AutoSizeText(
-                                                                e.get("timeC"),
-                                                                textAlign: TextAlign.center,
-                                                                style: const TextStyle(
-                                                                  color: Color.fromARGB(255, 4, 110, 7),
-                                                                  fontWeight: FontWeight.bold,
-                                                                  fontSize: 18,
-                                                                ),
-                                                              ),
-                                                              const SizedBox(height: 4,),
-                                                              Row(
-                                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                                children: [
-                                                                  Container(
-                                                                    alignment: Alignment.center,
-                                                                    width: MediaQuery.of(context).size.width*0.08,
-                                                                    height: MediaQuery.of(context).size.height*0.05,
-                                                                    child: Text(e.get("golTimeCasa").toString(), style: TextStyle(fontSize: 20),),
-                                                                    decoration: BoxDecoration(
-                                                                      border: Border.all(color: Colors.green),
-                                                                      borderRadius: BorderRadius.circular(4),
-                                                                    ),
-                                                                  ),
-                                                                  const SizedBox(width: 8,),
-                                                                  const Text(
-                                                                    "X",
-                                                                    textAlign: TextAlign.center,
-                                                                    style: TextStyle(
-                                                                      color: Color.fromARGB(255, 4, 110, 7),
-                                                                      fontWeight: FontWeight.bold,
-                                                                      fontSize: 18,
-                                                                    ),
-                                                                  ),
-                                                                  const SizedBox(width: 8,),
-                                                                  Container(
-                                                                    alignment: Alignment.center,
-                                                                    width: MediaQuery.of(context).size.width*0.08,
-                                                                    height: MediaQuery.of(context).size.height*0.05,
-                                                                    child: Text(e.get("golTimeFora").toString(), style: TextStyle(fontSize: 20),),
-                                                                    decoration: BoxDecoration(
-                                                                      border: Border.all(color: Colors.green),
-                                                                      borderRadius: BorderRadius.circular(4),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              const SizedBox(height: 4,),
-                                                              // const CircleAvatar(
-                                                              //   maxRadius: 25,
-                                                              //   backgroundColor: Color.fromARGB(255, 45, 94, 45),
-                                                              //   backgroundImage: NetworkImage(partida[index].get("timeF").toString()),
-                                                              // ),
-                                                              AutoSizeText(
-                                                                e.get("timeF"),
-                                                                textAlign: TextAlign.center,
-                                                                style: const TextStyle(
-                                                                  color: Color.fromARGB(255, 4, 110, 7),
-                                                                  fontWeight: FontWeight.bold,
-                                                                  fontSize: 18,
-                                                                ),
-                                                              ),
-                                                              const SizedBox(height: 16,),
-                                                              AutoSizeText(
-                                                                "${e.get("data")} às ${e.get("horario")} horas\n${e.get("local")}",
-                                                                textAlign: TextAlign.center,
-                                                                style: const TextStyle(
-                                                                  color: Colors.black,
-                                                                  fontWeight: FontWeight.bold,
-                                                                  fontSize: 16,
-                                                                ),
-                                                              ),
-                                                      
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      Column(
-                                                        children: [
-                                                          Padding(
-                                                            padding: const EdgeInsets.only(top: 8.0,),
-                                                            child: Container(
-                                                              alignment: Alignment.centerRight,
-                                                              width: MediaQuery.of(context).size.width * 0.13,
-                                                              height: MediaQuery.of(context).size.height * 0.06,
-                                                              child: GestureDetector(
-                                                                onTap: () async {
-                                                                  print("CARD PARTIDA CLICADO!");
-                                                                  if(e.get("votacao") == "true"){
-                                                                    //quando uma partida é clicada:
-                                                                    chamaTelaVotacao(
-                                                                      e.get("timeC").toString(), 
-                                                                      e.get("timeF").toString(), 
-                                                                      e.get("tituloVotacao").toString(),
-                                                                    );
-                                                                  }else{
-                                                                    await _calcularVotos(e.get("timeC").toString(), e.get("timeF").toString());
-                                                                    Time timeDados = await _buscarTime(jogadorMaisVotado.toString());
-                                                                    Jogador jogadorDados = await _buscarDadosJogador(jogadorMaisVotado.toString(), timeDados.nome.toString());
-                                                                    chamaTelaEleitoMelhor(
-                                                                      jogadorMaisVotado.toString(), 
-                                                                      nVotos.toString(),
-                                                                      timeDados,
-                                                                      jogadorDados,
-                                                                    );
-                                                                  } 
-                                                                },
-                                                                child: const Padding(
-                                                                  padding: EdgeInsets.only(right: 12.0),
-                                                                  child: Icon(Icons.more_vert) 
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          Visibility(
-                                                        visible: widget.usuario?.getIsAdmin == true,
-                                                        child: Container(
-                                                          alignment: Alignment.center,
-                                                          width: MediaQuery.of(context).size.width * 0.13,
-                                                          height: MediaQuery.of(context).size.height * 0.05,
-                                                          // color: Colors.amber,
-                                                          child: GestureDetector(
-                                                            onTap: () {
-                                                              if(e.get("votacao") == "true"){
-                                                                criarPartida(e, "false");
-                                                              }else {
-                                                                print("HABILITA VOTACAO!");
-                                                                criarPartida(e, "true");
-                                                              }
-                                                              
-                                                            },
-                                                            child: Icon(
-                                                              Icons.done_all, 
-                                                              color: e.get("votacao") == "true" ? Colors.white : Colors.black,
-                                                            ),
-                                                          ),
-                                                          decoration: BoxDecoration(
-                                                            color: e.get("votacao") == "true" ? Colors.green : Colors.white,
-                                                            border: const Border(
-                                                              top: BorderSide(width: 2.0, color: Colors.black),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                          const SizedBox(height: 8,),
-                                                        ],
-                                                      ),
-                                                      
-                                                    ],
+                                        return SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Column(
+                                            children: [
+                                              /*Container(
+                                                height: 100,
+                                                decoration: BoxDecoration(
+                                                  //border: Border.all(color: Colors.green),
+                                                  image: DecorationImage(
+                                                    fit: BoxFit.scaleDown,
+                                                    image: NetworkImage(time[index].get("urlImagem").toString()),
                                                   ),
-                                                  Column(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      Visibility(
-                                                        visible: widget.usuario?.getIsAdmin == true,
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.only(top: 8,),
+                                                ),
+                                              ),*/
+                                              Card(
+                                                color: Colors.white,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(30),
+                                                ),
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Padding(
+                                                          padding: const EdgeInsets.all(8.0),
+                                                          child: Container(
+                                                            // color: Colors.blue,
+                                                            width: widget.usuario?.getIsAdmin == true 
+                                                              ? MediaQuery.of(context).size.width * .7
+                                                              : MediaQuery.of(context).size.width * .7,
+                                                            child: Column(
+                                                              children: [
+                                                                // const CircleAvatar(
+                                                                //   maxRadius: 25,
+                                                                //   backgroundColor: Color.fromARGB(255, 45, 94, 45),
+                                                                //   backgroundImage: NetworkImage(partida[index].get("timeC").toString()),
+                                                                // ),
+                                                                AutoSizeText(
+                                                                  e.get("timeC"),
+                                                                  textAlign: TextAlign.center,
+                                                                  style: const TextStyle(
+                                                                    color: Color.fromARGB(255, 4, 110, 7),
+                                                                    fontWeight: FontWeight.bold,
+                                                                    fontSize: 18,
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(height: 4,),
+                                                                Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                  children: [
+                                                                    Container(
+                                                                      alignment: Alignment.center,
+                                                                      width: MediaQuery.of(context).size.width*0.08,
+                                                                      height: MediaQuery.of(context).size.height*0.05,
+                                                                      child: Text(e.get("golTimeCasa").toString(), style: TextStyle(fontSize: 20),),
+                                                                      decoration: BoxDecoration(
+                                                                        border: Border.all(color: Colors.green),
+                                                                        borderRadius: BorderRadius.circular(4),
+                                                                      ),
+                                                                    ),
+                                                                    const SizedBox(width: 8,),
+                                                                    const Text(
+                                                                      "X",
+                                                                      textAlign: TextAlign.center,
+                                                                      style: TextStyle(
+                                                                        color: Color.fromARGB(255, 4, 110, 7),
+                                                                        fontWeight: FontWeight.bold,
+                                                                        fontSize: 18,
+                                                                      ),
+                                                                    ),
+                                                                    const SizedBox(width: 8,),
+                                                                    Container(
+                                                                      alignment: Alignment.center,
+                                                                      width: MediaQuery.of(context).size.width*0.08,
+                                                                      height: MediaQuery.of(context).size.height*0.05,
+                                                                      child: Text(e.get("golTimeFora").toString(), style: TextStyle(fontSize: 20),),
+                                                                      decoration: BoxDecoration(
+                                                                        border: Border.all(color: Colors.green),
+                                                                        borderRadius: BorderRadius.circular(4),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                const SizedBox(height: 4,),
+                                                                // const CircleAvatar(
+                                                                //   maxRadius: 25,
+                                                                //   backgroundColor: Color.fromARGB(255, 45, 94, 45),
+                                                                //   backgroundImage: NetworkImage(partida[index].get("timeF").toString()),
+                                                                // ),
+                                                                AutoSizeText(
+                                                                  e.get("timeF"),
+                                                                  textAlign: TextAlign.center,
+                                                                  style: const TextStyle(
+                                                                    color: Color.fromARGB(255, 4, 110, 7),
+                                                                    fontWeight: FontWeight.bold,
+                                                                    fontSize: 18,
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(height: 16,),
+                                                                AutoSizeText(
+                                                                  "${e.get("data")} às ${e.get("horario")} horas\n${e.get("local")}",
+                                                                  textAlign: TextAlign.center,
+                                                                  style: const TextStyle(
+                                                                    color: Colors.black,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    fontSize: 16,
+                                                                  ),
+                                                                ),
+                                                        
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Column(
+                                                          children: [
+                                                            Padding(
+                                                              padding: const EdgeInsets.only(top: 8.0,),
+                                                              child: Container(
+                                                                alignment: Alignment.centerRight,
+                                                                width: MediaQuery.of(context).size.width * 0.13,
+                                                                height: MediaQuery.of(context).size.height * 0.06,
+                                                                child: GestureDetector(
+                                                                  onTap: () async {
+                                                                    print("CARD PARTIDA CLICADO!");
+                                                                    if(e.get("votacao") == "true"){
+                                                                      //quando uma partida é clicada:
+                                                                      chamaTelaVotacao(
+                                                                        e.get("timeC").toString(), 
+                                                                        e.get("timeF").toString(), 
+                                                                        e.get("tituloVotacao").toString(),
+                                                                      );
+                                                                    }else{
+                                                                      await _calcularVotos(e.get("timeC").toString(), e.get("timeF").toString());
+                                                                      Time timeDados = await _buscarTime(jogadorMaisVotado.toString());
+                                                                      Jogador jogadorDados = await _buscarDadosJogador(jogadorMaisVotado.toString(), timeDados.nome.toString());
+                                                                      chamaTelaEleitoMelhor(
+                                                                        jogadorMaisVotado.toString(), 
+                                                                        nVotos.toString(),
+                                                                        timeDados,
+                                                                        jogadorDados,
+                                                                      );
+                                                                    } 
+                                                                  },
+                                                                  child: const Padding(
+                                                                    padding: EdgeInsets.only(right: 12.0),
+                                                                    child: Icon(Icons.more_vert) 
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Visibility(
+                                                          visible: widget.usuario?.getIsAdmin == true,
                                                           child: Container(
                                                             alignment: Alignment.center,
-                                                            width: MediaQuery.of(context).size.width * 0.8,
+                                                            width: MediaQuery.of(context).size.width * 0.13,
                                                             height: MediaQuery.of(context).size.height * 0.05,
                                                             // color: Colors.amber,
                                                             child: GestureDetector(
                                                               onTap: () {
-                                                                print("EDIT PARTIDA CLICADA!");
-                                                                _exibirTelaCadastro(e,);
+                                                                if(e.get("votacao") == "true"){
+                                                                  criarPartida(e, "false");
+                                                                }else {
+                                                                  print("HABILITA VOTACAO!");
+                                                                  criarPartida(e, "true");
+                                                                }
+                                                                
                                                               },
-                                                              child: Row(
-                                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                                children: [
-                                                                  const Icon(Icons.edit, ),
-                                                                  const SizedBox(width: 8,),
-                                                                  AutoSizeText("Editar Placar", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
-                                                                ],
+                                                              child: Icon(
+                                                                Icons.done_all, 
+                                                                color: e.get("votacao") == "true" ? Colors.white : Colors.black,
                                                               ),
                                                             ),
-                                                            decoration: const BoxDecoration(
-                                                              border: Border(
+                                                            decoration: BoxDecoration(
+                                                              color: e.get("votacao") == "true" ? Colors.green : Colors.white,
+                                                              border: const Border(
                                                                 top: BorderSide(width: 2.0, color: Colors.black),
                                                               ),
                                                             ),
                                                           ),
                                                         ),
-                                                      ),
-                                                      Visibility(
-                                                        visible: widget.usuario?.getIsAdmin == true,
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.only(top: 8, bottom: 8),
-                                                          child: Container(
-                                                            alignment: Alignment.center,
-                                                            width: MediaQuery.of(context).size.width * 0.8,
-                                                            height: MediaQuery.of(context).size.height * 0.06,
-                                                            // color: Colors.amber,
-                                                            child: GestureDetector(
-                                                              onTap: () async {
-                                                                print("DELETE PARTIDA CLICADA!");
-                                                                await _actionCard(e, "delete");
-                                                              },
-                                                              child: Row(
-                                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                                children: [
-                                                                  const Icon(Icons.delete, ),
-                                                                  const SizedBox(width: 8,),
-                                                                  AutoSizeText("Excluir Partida", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
-                                                                ],
+                                                            const SizedBox(height: 8,),
+                                                          ],
+                                                        ),
+                                                        
+                                                      ],
+                                                    ),
+                                                    Column(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        Visibility(
+                                                          visible: widget.usuario?.getIsAdmin == true,
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(top: 8,),
+                                                            child: Container(
+                                                              alignment: Alignment.center,
+                                                              width: MediaQuery.of(context).size.width * 0.8,
+                                                              height: MediaQuery.of(context).size.height * 0.05,
+                                                              // color: Colors.amber,
+                                                              child: GestureDetector(
+                                                                onTap: () {
+                                                                  print("EDIT PARTIDA CLICADA!");
+                                                                  _exibirTelaCadastro(e,);
+                                                                },
+                                                                child: Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                  children: [
+                                                                    const Icon(Icons.edit, ),
+                                                                    const SizedBox(width: 8,),
+                                                                    AutoSizeText("Editar Placar", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+                                                                  ],
+                                                                ),
                                                               ),
-                                                            ),
-                                                            decoration: const BoxDecoration(
-                                                              border: Border(
-                                                                top: BorderSide(width: 2.0, color: Colors.black),
+                                                              decoration: const BoxDecoration(
+                                                                border: Border(
+                                                                  top: BorderSide(width: 2.0, color: Colors.black),
+                                                                ),
                                                               ),
                                                             ),
                                                           ),
                                                         ),
-                                                      ),
-                                                      
-                                                    ],
-                                                  )
-                                                ],
+                                                        Visibility(
+                                                          visible: widget.usuario?.getIsAdmin == true,
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(top: 8, bottom: 8),
+                                                            child: Container(
+                                                              alignment: Alignment.center,
+                                                              width: MediaQuery.of(context).size.width * 0.8,
+                                                              height: MediaQuery.of(context).size.height * 0.06,
+                                                              // color: Colors.amber,
+                                                              child: GestureDetector(
+                                                                onTap: () async {
+                                                                  print("DELETE PARTIDA CLICADA!");
+                                                                  await _actionCard(e, "delete");
+                                                                },
+                                                                child: Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                  children: [
+                                                                    const Icon(Icons.delete, ),
+                                                                    const SizedBox(width: 8,),
+                                                                    AutoSizeText("Excluir Partida", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                              decoration: const BoxDecoration(
+                                                                border: Border(
+                                                                  top: BorderSide(width: 2.0, color: Colors.black),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         );
                                       }else{
                                         return Container();

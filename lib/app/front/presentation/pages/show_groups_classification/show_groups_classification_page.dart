@@ -119,38 +119,42 @@ class _ShowGroupsClassificationPageState extends State<ShowGroupsClassificationP
                               width: MediaQuery.of(context).size.width*1,
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    IntrinsicHeight(
-                                      child: Container(
-                                        height: 140,
-                                        color: Colors.green,
-                                        child: Align(
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            "#${index+1}",
-                                            style: const TextStyle(
-                                              color: Colors.white, 
-                                              fontSize: 24,
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      IntrinsicHeight(
+                                        child: Container(
+                                          height: 140,
+                                          width: 50,
+                                          decoration: const BoxDecoration(
+                                            color: Colors.green,
+                                            borderRadius: BorderRadius.all(Radius.circular(4)),
+                                          ),
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              "#${index+1}",
+                                              style: const TextStyle(
+                                                color: Colors.white, 
+                                                fontSize: 24,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      )
-                                    ),
-                                    const SizedBox(width: 10,),
-                                    IntrinsicHeight(
-                                      child: Text(
-                                        classificacao[index].get("nome"), 
-                                        style: const TextStyle(color: Colors.white, fontSize: 22),
+                                        )
                                       ),
-                                    ),
-                                    const SizedBox(width: 10,),
-                                    Column(
-                                      children: [
-                                        SizedBox(
-                                          width: MediaQuery.of(context).size.width*0.35,
-                                          child: Row(
+                                      const SizedBox(width: 10,),
+                                      IntrinsicHeight(
+                                        child: Text(
+                                          classificacao[index].get("nome"), 
+                                          style: const TextStyle(color: Colors.white, fontSize: 22),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10,),
+                                      Column(
+                                        children: [
+                                          Row(
                                             mainAxisAlignment: MainAxisAlignment.end,
                                             children: [
                                               Column(
@@ -158,12 +162,19 @@ class _ShowGroupsClassificationPageState extends State<ShowGroupsClassificationP
                                                   const Text(
                                                     "V",
                                                     textAlign: TextAlign.center,
-                                                    style: TextStyle(color: Colors.green, fontSize: 24,),
+                                                    style: TextStyle(color: Colors.white, fontSize: 24,),
                                                   ),
-                                                  Text(
-                                                    classificacao[index].get("vitorias").toString(), 
-                                                    textAlign: TextAlign.center,
-                                                    style: const TextStyle(color: Colors.green, fontSize: 24),
+                                                  Container(
+                                                    width: 30,
+                                                    decoration: const BoxDecoration(
+                                                      color: Colors.green,
+                                                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                                                    ),
+                                                    child: Text(
+                                                      classificacao[index].get("vitorias").toString(), 
+                                                      textAlign: TextAlign.center,
+                                                      style: const TextStyle(color: Colors.white, fontSize: 24),
+                                                    ),
                                                   ),
                                                 ],
                                               ),
@@ -173,12 +184,19 @@ class _ShowGroupsClassificationPageState extends State<ShowGroupsClassificationP
                                                   const Text(
                                                     "D",
                                                     textAlign: TextAlign.center,
-                                                    style: TextStyle(color: Colors.red, fontSize: 24,),
+                                                    style: TextStyle(color: Colors.white, fontSize: 24,),
                                                   ),
-                                                  Text(
-                                                    classificacao[index].get("derrotas").toString(), 
-                                                    textAlign: TextAlign.center,
-                                                    style: const TextStyle(color: Colors.red, fontSize: 24),
+                                                  Container(
+                                                    width: 30,
+                                                    decoration: const BoxDecoration(
+                                                      color: Colors.green,
+                                                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                                                    ),
+                                                    child: Text(
+                                                      classificacao[index].get("derrotas").toString(), 
+                                                      textAlign: TextAlign.center,
+                                                      style: const TextStyle(color: Colors.white, fontSize: 24),
+                                                    ),
                                                   ),
                                                 ],
                                               ),
@@ -188,12 +206,19 @@ class _ShowGroupsClassificationPageState extends State<ShowGroupsClassificationP
                                                   const Text(
                                                     "E",
                                                     textAlign: TextAlign.center,
-                                                    style: TextStyle(color: Colors.blue, fontSize: 24,),
+                                                    style: TextStyle(color: Colors.white, fontSize: 24,),
                                                   ),
-                                                  Text(
-                                                    classificacao[index].get("empates").toString(), 
-                                                    textAlign: TextAlign.center,
-                                                    style: const TextStyle(color: Colors.blue, fontSize: 24),
+                                                  Container(
+                                                    width: 30,
+                                                    decoration: const BoxDecoration(
+                                                      color: Colors.green,
+                                                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                                                    ),
+                                                    child: Text(
+                                                      classificacao[index].get("empates").toString(), 
+                                                      textAlign: TextAlign.center,
+                                                      style: const TextStyle(color: Colors.white, fontSize: 24),
+                                                    ),
                                                   ),
                                                 ],
                                               ),
@@ -205,72 +230,100 @@ class _ShowGroupsClassificationPageState extends State<ShowGroupsClassificationP
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(color: Colors.white, fontSize: 24,),
                                                   ),
-                                                  Text(
-                                                    classificacao[index].get("pontos").toString(), 
-                                                    textAlign: TextAlign.center,
-                                                    style: const TextStyle(color: Colors.white, fontSize: 24),
+                                                  Container(
+                                                    width: 30,
+                                                    decoration: const BoxDecoration(
+                                                      color: Colors.green,
+                                                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                                                    ),
+                                                    child: Text(
+                                                      classificacao[index].get("pontos").toString(), 
+                                                      textAlign: TextAlign.center,
+                                                      style: const TextStyle(color: Colors.white, fontSize: 24),
+                                                    ),
                                                   ),
                                                 ],
                                               ),
                                             ],
                                           ),
-                                        ),
-                                        const SizedBox(height: 10,),
-                                        SizedBox(
-                                          width: MediaQuery.of(context).size.width*0.35,
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.end,
-                                            children: [
-                                              Column(
-                                                children: [
-                                                  const Text(
-                                                    "GF",
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(color: Colors.green, fontSize: 24,),
-                                                  ),
-                                                  Text(
-                                                    classificacao[index].get("gols_feitos").toString(), 
-                                                    textAlign: TextAlign.center,
-                                                    style: const TextStyle(color: Colors.green, fontSize: 24),
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(width: 10,),
-                                              Column(
-                                                children: [
-                                                  const Text(
-                                                    "GS",
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(color: Colors.red, fontSize: 24,),
-                                                  ),
-                                                  Text(
-                                                    classificacao[index].get("gols_sofridos").toString(), 
-                                                    textAlign: TextAlign.center,
-                                                    style: const TextStyle(color: Colors.red, fontSize: 24),
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(width: 10,),
-                                              Column(
-                                                children: [
-                                                  const Text(
-                                                    "SG",
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(color: Colors.white, fontSize: 24,),
-                                                  ),
-                                                  Text(
-                                                    (classificacao[index].get("gols_feitos")-classificacao[index].get("gols_sofridos")).toString(),
-                                                    textAlign: TextAlign.center,
-                                                    style: const TextStyle(color: Colors.white, fontSize: 24),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
+                                          const SizedBox(height: 10,),
+                                          SizedBox(
+                                            width: MediaQuery.of(context).size.width*0.35,
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.end,
+                                              children: [
+                                                Column(
+                                                  children: [
+                                                    const Text(
+                                                      "GF",
+                                                      textAlign: TextAlign.center,
+                                                      style: TextStyle(color: Colors.white, fontSize: 24,),
+                                                    ),
+                                                    Container(
+                                                      width: 30,
+                                                      decoration: const BoxDecoration(
+                                                        color: Colors.green,
+                                                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                                                      ),
+                                                      child: Text(
+                                                        classificacao[index].get("gols_feitos").toString(), 
+                                                        textAlign: TextAlign.center,
+                                                        style: const TextStyle(color: Colors.white, fontSize: 24),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(width: 10,),
+                                                Column(
+                                                  children: [
+                                                    const Text(
+                                                      "GS",
+                                                      textAlign: TextAlign.center,
+                                                      style: TextStyle(color: Colors.white, fontSize: 24,),
+                                                    ),
+                                                    Container(
+                                                      width: 30,
+                                                      decoration: const BoxDecoration(
+                                                        color: Colors.green,
+                                                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                                                      ),
+                                                      child: Text(
+                                                        classificacao[index].get("gols_sofridos").toString(), 
+                                                        textAlign: TextAlign.center,
+                                                        style: const TextStyle(color: Colors.white, fontSize: 24),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(width: 10,),
+                                                Column(
+                                                  children: [
+                                                    const Text(
+                                                      "SG",
+                                                      textAlign: TextAlign.center,
+                                                      style: TextStyle(color: Colors.white, fontSize: 24,),
+                                                    ),
+                                                    Container(
+                                                      width: 30,
+                                                      decoration: const BoxDecoration(
+                                                        color: Colors.green,
+                                                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                                                      ),
+                                                      child: Text(
+                                                        (classificacao[index].get("gols_feitos")-classificacao[index].get("gols_sofridos")).toString(),
+                                                        textAlign: TextAlign.center,
+                                                        style: const TextStyle(color: Colors.white, fontSize: 24),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
