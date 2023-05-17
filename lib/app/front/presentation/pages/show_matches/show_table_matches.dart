@@ -32,6 +32,7 @@ class ShowTableMatches extends StatefulWidget {
 }
 
 class _ShowTableMatchesState extends State<ShowTableMatches> {
+  int counterColor = 0;
 
   chamaTelaVotacao(String timeC, String timeF, String tituloVotacao){
     Navigator.push(
@@ -182,6 +183,7 @@ class _ShowTableMatchesState extends State<ShowTableMatches> {
                           ...partida.map((e) => Builder(
                               builder: (context) {
                                   if(e.get("id_campeonato") == widget.idCompetition){
+                                    counterColor += 1;
                                     //monta interface da tabela
                                     return Column(
                                       children: [
@@ -196,7 +198,7 @@ class _ShowTableMatchesState extends State<ShowTableMatches> {
                                           ),
                                         ),*/
                                         Card(
-                                          color: Colors.white,
+                                          color: (counterColor%2==0) ? Colors.white : Colors.blueGrey[200],
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(30),
                                           ),
@@ -223,8 +225,8 @@ class _ShowTableMatchesState extends State<ShowTableMatches> {
                                                           AutoSizeText(
                                                             e.get("timeC"),
                                                             textAlign: TextAlign.center,
-                                                            style: const TextStyle(
-                                                              color: Color.fromARGB(255, 4, 110, 7),
+                                                            style: TextStyle(
+                                                              color: (counterColor%2==0) ?  Color.fromARGB(255, 4, 110, 7): Colors.white,
                                                               fontWeight: FontWeight.bold,
                                                               fontSize: 18,
                                                             ),
@@ -239,16 +241,17 @@ class _ShowTableMatchesState extends State<ShowTableMatches> {
                                                                 height: MediaQuery.of(context).size.height*0.05,
                                                                 child: Text(e.get("golTimeCasa").toString(), style: TextStyle(fontSize: 20),),
                                                                 decoration: BoxDecoration(
-                                                                  border: Border.all(color: Colors.green),
+                                                                  border: (counterColor%2==0) ? Border.all(color: Colors.green): Border.all(color: Colors.white),
                                                                   borderRadius: BorderRadius.circular(4),
+                                                                  color: Colors.white,
                                                                 ),
                                                               ),
                                                               const SizedBox(width: 8,),
-                                                              const Text(
+                                                              Text(
                                                                 "X",
                                                                 textAlign: TextAlign.center,
                                                                 style: TextStyle(
-                                                                  color: Color.fromARGB(255, 4, 110, 7),
+                                                                  color: (counterColor%2==0) ?  Color.fromARGB(255, 4, 110, 7): Colors.white,
                                                                   fontWeight: FontWeight.bold,
                                                                   fontSize: 18,
                                                                 ),
@@ -260,8 +263,9 @@ class _ShowTableMatchesState extends State<ShowTableMatches> {
                                                                 height: MediaQuery.of(context).size.height*0.05,
                                                                 child: Text(e.get("golTimeFora").toString(), style: TextStyle(fontSize: 20),),
                                                                 decoration: BoxDecoration(
-                                                                  border: Border.all(color: Colors.green),
+                                                                  border: (counterColor%2==0) ? Border.all(color: Colors.green): Border.all(color: Colors.white),
                                                                   borderRadius: BorderRadius.circular(4),
+                                                                  color: Colors.white,
                                                                 ),
                                                               ),
                                                             ],
@@ -275,8 +279,8 @@ class _ShowTableMatchesState extends State<ShowTableMatches> {
                                                           AutoSizeText(
                                                             e.get("timeF"),
                                                             textAlign: TextAlign.center,
-                                                            style: const TextStyle(
-                                                              color: Color.fromARGB(255, 4, 110, 7),
+                                                            style: TextStyle(
+                                                              color: (counterColor%2==0) ?  Color.fromARGB(255, 4, 110, 7): Colors.white,
                                                               fontWeight: FontWeight.bold,
                                                               fontSize: 18,
                                                             ),
@@ -326,9 +330,9 @@ class _ShowTableMatchesState extends State<ShowTableMatches> {
                                                                 );
                                                               } 
                                                             },
-                                                            child: const Padding(
+                                                            child: Padding(
                                                               padding: EdgeInsets.only(right: 12.0),
-                                                              child: Icon(Icons.more_vert) 
+                                                              child: e.get("votacao") == "true" ? Icon(Icons.how_to_vote): Icon(Icons.more_vert_outlined),
                                                             ),
                                                           ),
                                                         ),

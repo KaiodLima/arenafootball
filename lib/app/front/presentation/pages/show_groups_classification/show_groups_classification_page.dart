@@ -85,8 +85,8 @@ class _ShowGroupsClassificationPageState extends State<ShowGroupsClassificationP
         //recupera os dados toda vez que o banco é modificado
         // stream: FirebaseFirestore.instance.collection("grupos").where("fk_competicao", isEqualTo: widget.regiao).snapshots(), //passa uma stream de dados
         stream: (widget.ano.toString() != anoAtual.toString())
-        ? FirebaseFirestore.instance.collection("classificacao${widget.ano}").where("fk_competicao", isEqualTo: widget.regiao).where("fk_grupo", isEqualTo: widget.grupo).orderBy("pontos", descending: true).snapshots()
-        : FirebaseFirestore.instance.collection("classificacao").where("fk_competicao", isEqualTo: widget.regiao).where("fk_grupo", isEqualTo: widget.grupo).orderBy("pontos", descending: true).snapshots(), //passa uma stream de dados
+        ? FirebaseFirestore.instance.collection("classificacao${widget.ano}").where("fk_competicao", isEqualTo: widget.regiao).where("fk_grupo", isEqualTo: widget.grupo).orderBy("pontos", descending: true).orderBy("saldo_gols", descending: true).snapshots()
+        : FirebaseFirestore.instance.collection("classificacao").where("fk_competicao", isEqualTo: widget.regiao).where("fk_grupo", isEqualTo: widget.grupo).orderBy("pontos", descending: true).orderBy("saldo_gols", descending: true).snapshots(), //passa uma stream de dados
         builder: (context, snapshot) {
           //verificação de estado
           switch (snapshot.connectionState) {
@@ -107,12 +107,12 @@ class _ShowGroupsClassificationPageState extends State<ShowGroupsClassificationP
                   padding: const EdgeInsets.all(8.0),
                   child: ListView.builder(
                     itemCount: classificacao.length,
-                    itemBuilder: (context, index){                    
+                    itemBuilder: (context, index){
                       return Column(
                         children: [
                           Container(
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.white),
+                              border: (index == 0 || index == 1) ? Border.all(color: Colors.white) : Border.all(color: Colors.red),
                               borderRadius: const BorderRadius.all(Radius.circular(8))
                             ),
                             child: SizedBox(
@@ -149,7 +149,7 @@ class _ShowGroupsClassificationPageState extends State<ShowGroupsClassificationP
                                       SizedBox(
                                         width: 150,
                                         child: AutoSizeText(
-                                          classificacao[index].get("nome"), 
+                                          classificacao[index].get("nome"),
                                           style: const TextStyle(color: Colors.white, fontSize: 22),
                                         ),
                                       ),

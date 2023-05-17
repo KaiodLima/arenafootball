@@ -68,9 +68,18 @@ class _ShowMatcheDayState extends State<ShowMatcheDay> {
   String? nextMatch;
   getDataCurrent(){
     if(DateTime.now().month < 10){
-      nextMatch = DateTime.now().day.toString()+"/0"+DateTime.now().month.toString();
+      if(DateTime.now().day < 10){
+        nextMatch = "0"+DateTime.now().day.toString()+"/0"+DateTime.now().month.toString();
+      }else{
+        nextMatch = DateTime.now().day.toString()+"/0"+DateTime.now().month.toString();
+      }
     }else{
-      nextMatch = DateTime.now().day.toString()+"/"+DateTime.now().month.toString();
+      if(DateTime.now().day < 10){
+        nextMatch = "0"+DateTime.now().day.toString()+"/"+DateTime.now().month.toString();
+      }else{
+        nextMatch = DateTime.now().day.toString()+"/"+DateTime.now().month.toString();
+      }
+      
     }
     
     print('Data: $nextMatch');
@@ -434,9 +443,9 @@ class _ShowMatcheDayState extends State<ShowMatcheDay> {
                                                                       );
                                                                     } 
                                                                   },
-                                                                  child: const Padding(
+                                                                  child: Padding(
                                                                     padding: EdgeInsets.only(right: 12.0),
-                                                                    child: Icon(Icons.more_vert) 
+                                                                    child: e.get("votacao") == "true" ? Icon(Icons.how_to_vote): Icon(Icons.more_vert_outlined),
                                                                   ),
                                                                 ),
                                                               ),

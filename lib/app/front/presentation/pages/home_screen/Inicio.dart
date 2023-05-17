@@ -1,3 +1,5 @@
+import 'package:arena_soccer/app/front/presentation/components/arena_dropdown/arena_dropdown.dart';
+import 'package:arena_soccer/app/front/presentation/components/arena_dropdown/arena_dropdown_controller.dart';
 import 'package:arena_soccer/app/front/presentation/components/highlights/arena_highlights.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_new_destaque/register_new_destaque.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_news/CadastrarNoticia.dart';
@@ -21,24 +23,22 @@ import 'package:arena_soccer/presentation/home/pages/publicar_anuncio_screen.dar
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 class Inicio extends StatefulWidget {
   bool? isAuthenticated;
   Usuario? usuario;
-  
-  Inicio({
-    Key? key,
-    this.isAuthenticated,
-    this.usuario
-  }) : super(key: key);
+
+  Inicio({Key? key, this.isAuthenticated, this.usuario}) : super(key: key);
 
   @override
   State<Inicio> createState() => _InicioState();
 }
 
 class _InicioState extends State<Inicio> {
+  final ControllerArenaDropdownButton _controller = ControllerArenaDropdownButton(); //utilizo mobX
+
   //marcador da janela selecionada
   int _selecionado = 0;
   // String _resultado = "";
@@ -52,25 +52,24 @@ class _InicioState extends State<Inicio> {
     switch (regiaoPadrao.toString()) {
       case "Floresta":
         setState(() {
-          cidadeSelecionada = "Floresta";
+          _controller.selectedItem = "Floresta";
           anoSelecionado = anoEscolhido;
         });
         break;
       case "Santo inacio":
         setState(() {
-          cidadeSelecionada = "Santo inacio";
+          _controller.selectedItem = "Santo inacio";
           anoSelecionado = anoEscolhido;
         });
         break;
       default:
         setState(() {
-          cidadeSelecionada = "Floresta";
+          _controller.selectedItem = "Floresta";
           anoSelecionado = anoEscolhido;
         });
         break;
     }
     // print("REGIAO PADRAO:: "+cidadeSelecionada.toString());
-    
   }
 
   //deslogar usuário
@@ -78,22 +77,23 @@ class _InicioState extends State<Inicio> {
     await FirebaseAuth.instance.signOut();
     _chamarTelaLogin();
   }
+
   //chamar tela de login
-  _chamarTelaLogin(){
+  _chamarTelaLogin() {
     //o pushReplacement substitui a rota atual pela próxima, ou seja, não vai haver botão volta no appbar
     Navigator.pushReplacement(
-      context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
-      MaterialPageRoute(
-        builder: (context) => const Login(),
-      ) //o outro parâmetro é a rota
-    );
+        context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
+        MaterialPageRoute(
+          builder: (context) => const Login(),
+        ) //o outro parâmetro é a rota
+        );
     //Navigator.pop(context); //fecha a tela atual e abre uma nova
   }
 
   _verificarUsuarioAutenticado() async {
     User? usuarioAutenticado = await FirebaseAuth.instance.currentUser;
     // print("Entrou na função: "+usuarioAutenticado!.email.toString());
-    if(usuarioAutenticado == null){
+    if (usuarioAutenticado == null) {
       _logout();
     }
   }
@@ -101,65 +101,67 @@ class _InicioState extends State<Inicio> {
   @override
   void initState() {
     super.initState();
-    if(widget.isAuthenticated == true){
+    if (widget.isAuthenticated == true) {
       _verificarUsuarioAutenticado();
     }
     _chamarPreferences();
-    _recuperarCidades();
   }
 
-  List<String> listaMenu = ["Cadastrar Destaques", "Cadastrar Jogador", "Cadastrar Nova Partida", "Cadastrar Noticia", "Cadastrar Time"];
+  List<String> listaMenu = [
+    "Cadastrar Destaques",
+    "Cadastrar Jogador",
+    "Cadastrar Nova Partida",
+    "Cadastrar Noticia",
+    "Cadastrar Time"
+  ];
   // List<String> listaMenu = ["Calcular Votos", "Cadastrar Jogador", "Cadastrar Nova Partida", "Cadastrar Noticia"];
-  chamarMenuPop(String selecionado){
+  chamarMenuPop(String selecionado) {
     //print("Item clicado: ${selecionado}");
     switch (selecionado) {
       // case "Calcular Votos":
       //   Navigator.push(
-      //     context, 
+      //     context,
       //     MaterialPageRoute(
       //       builder: (context) => const CalcularVotos(),
-      //     ) 
+      //     )
       //   );
       //   break;
       case "Cadastrar Destaques":
         Navigator.push(
-          context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
-          MaterialPageRoute(
-            builder: (context) => const RegisterDestaque(),
-          ) //o outro parâmetro é a rota
-        );
+            context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
+            MaterialPageRoute(
+              builder: (context) => const RegisterDestaque(),
+            ) //o outro parâmetro é a rota
+            );
         break;
       case "Cadastrar Jogador":
         Navigator.push(
-          context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
-          MaterialPageRoute(
-            builder: (context) => const RegisterPlayer(),
-          ) //o outro parâmetro é a rota
-        );
+            context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
+            MaterialPageRoute(
+              builder: (context) => const RegisterPlayer(),
+            ) //o outro parâmetro é a rota
+            );
         break;
       case "Cadastrar Nova Partida":
         Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const CadastrarPartida(),
-          ) 
-        );
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CadastrarPartida(),
+            ));
         break;
       case "Cadastrar Noticia":
         Navigator.push(
-          context, 
-          MaterialPageRoute(
-            builder: (context) => const CadastrarNoticia(),
-          ) 
-        );
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CadastrarNoticia(),
+            ));
         break;
       case "Cadastrar Time":
         Navigator.push(
-          context, 
-          MaterialPageRoute(
-            builder: (context) => const CadastrarTime(),
-          ) 
-        );
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CadastrarTime(),
+            ));
         break;
       default:
     }
@@ -173,10 +175,32 @@ class _InicioState extends State<Inicio> {
     //lista de telas
     List<Widget> telas = [
       //Inicio(_resultado),
-      AbaNoticias(regiao: cidadeSelecionada??"Floresta", usuario: widget.usuario,),
-      AbaCampeonatos(regiao: cidadeSelecionada??"Floresta", ano: anoSelecionado,),
-      AbaTimes(regiao: cidadeSelecionada??"Floresta", ano: anoSelecionado, usuario: widget.usuario,),
-      AbaTabela(regiao: cidadeSelecionada??"Floresta", ano: anoSelecionado, usuario: widget.usuario,),
+      Observer(builder: (_) {
+        return AbaNoticias(
+          regiao: _controller.selectedItem ?? "Floresta",
+          usuario: widget.usuario,
+        );
+      }),
+      Observer(builder: (_) {
+        return AbaCampeonatos(
+          regiao: _controller.selectedItem ?? "Floresta",
+          ano: anoSelecionado,
+        );
+      }),
+      Observer(builder: (_) {
+        return AbaTimes(
+          regiao: _controller.selectedItem ?? "Floresta",
+          ano: anoSelecionado,
+          usuario: widget.usuario,
+        );
+      }),
+      Observer(builder: (_) {
+        return AbaTabela(
+          regiao: _controller.selectedItem ?? "Floresta",
+          ano: anoSelecionado,
+          usuario: widget.usuario,
+        );
+      }),
     ];
 
     return Scaffold(
@@ -194,30 +218,34 @@ class _InicioState extends State<Inicio> {
         centerTitle: true,
         leading: Visibility(
           visible: widget.usuario?.getIsAdmin == true,
-          child: PopupMenuButton<String>(  //MENU DO ADMIN
-              icon: const Icon(Icons.menu, color: Colors.white,), 
-              iconSize: 30,         
-              onSelected: chamarMenuPop,
-              itemBuilder: (context){
-                return listaMenu.map((String item){
-                  return PopupMenuItem<String>(
-                    value: item,
-                    child: Text(item),
-                  );
-                }).toList();
-              },
+          child: PopupMenuButton<String>(
+            //MENU DO ADMIN
+            icon: const Icon(
+              Icons.menu,
+              color: Colors.white,
             ),
+            iconSize: 30,
+            onSelected: chamarMenuPop,
+            itemBuilder: (context) {
+              return listaMenu.map((String item) {
+                return PopupMenuItem<String>(
+                  value: item,
+                  child: Text(item),
+                );
+              }).toList();
+            },
+          ),
         ),
         actions: [
           IconButton(
             color: Colors.white,
             iconSize: 25,
             icon: const Icon(Icons.logout),
-            onPressed: (){
+            onPressed: () {
               //print("Minha Conta Clicado!");
               _logout();
             },
-          ),          
+          ),
           /*IconButton(
             icon: Icon(Icons.video_call),
             onPressed: (){
@@ -235,12 +263,21 @@ class _InicioState extends State<Inicio> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            ARENAHighlights(height: height, width: width,), //destaques exibidos na parte superior da tela com os times
-            const SizedBox(height: 10,),
-            if(_selecionado == 0 || _selecionado == 1)
+            ARENAHighlights(
+              height: height,
+              width: width,
+            ), //destaques exibidos na parte superior da tela com os times
+            const SizedBox(
+              height: 10,
+            ),
+            if (_selecionado == 0 || _selecionado == 1)
               Padding(
                 padding: const EdgeInsets.only(left: 12, right: 12),
-                child: _chamarDropDownCity(),
+                child: ArenaDropdownButton(
+                  height: 50,
+                  width: width,
+                  controller: _controller,
+                ),
               )
             else
               Padding(
@@ -250,8 +287,9 @@ class _InicioState extends State<Inicio> {
 
             Container(
               width: width,
-              height: height*0.55,
-              padding: const EdgeInsets.only(right: 16, left: 16, top: 14, bottom: 4),
+              height: height * 0.55,
+              padding: const EdgeInsets.only(
+                  right: 16, left: 16, top: 14, bottom: 4),
               child: telas[_selecionado],
             ),
           ],
@@ -298,13 +336,13 @@ class _InicioState extends State<Inicio> {
             visible: widget.usuario?.getIsAdmin == true,
             child: FloatingActionButton.small(
               heroTag: "btnAnuncio",
-              onPressed: (){
+              onPressed: () {
                 Navigator.push(
-                  context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
-                  MaterialPageRoute(
-                    builder: (context) => const PublicarAnuncioScreen(),
-                  ) //o outro parâmetro é a rota
-                );
+                    context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
+                    MaterialPageRoute(
+                      builder: (context) => const PublicarAnuncioScreen(),
+                    ) //o outro parâmetro é a rota
+                    );
               },
               backgroundColor: Colors.green,
               child: const Icon(
@@ -312,18 +350,20 @@ class _InicioState extends State<Inicio> {
               ),
             ),
           ),
-          const SizedBox(height: 4,),
+          const SizedBox(
+            height: 4,
+          ),
           Visibility(
             visible: widget.usuario?.getIsAdmin == true,
             child: FloatingActionButton.small(
               heroTag: "btnGol",
-              onPressed: (){
+              onPressed: () {
                 Navigator.push(
-                context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
-                MaterialPageRoute(
-                  builder: (context) => const NotificarGolsScreen(),
-                ) //o outro parâmetro é a rota
-              );
+                    context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
+                    MaterialPageRoute(
+                      builder: (context) => const NotificarGolsScreen(),
+                    ) //o outro parâmetro é a rota
+                    );
               },
               backgroundColor: Colors.green,
               child: const Icon(
@@ -337,7 +377,7 @@ class _InicioState extends State<Inicio> {
           //     heroTag: "btnArtilharia",
           //     onPressed: (){
           //       Navigator.push(
-          //       context, 
+          //       context,
           //       MaterialPageRoute(
           //         builder: (context) => ExibirArtilheiros(regiao: cidadeSelecionada??"Floresta",),
           //       )
@@ -356,7 +396,7 @@ class _InicioState extends State<Inicio> {
           //     heroTag: "btnAssistencias",
           //     onPressed: (){
           //       Navigator.push(
-          //       context, 
+          //       context,
           //       MaterialPageRoute(
           //         builder: (context) => ExibirAssistencias(regiao: cidadeSelecionada??"Floresta",),
           //       )
@@ -372,18 +412,20 @@ class _InicioState extends State<Inicio> {
         ],
       ),
     );
-
   }
+
   double sizeText = 14;
   Container MyBottomNavBar(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(15),
       height: 60,
       // height: MediaQuery.of(context).size.height * 0.08,
-      // width: MediaQuery.of(context).size.width * 1, 
+      // width: MediaQuery.of(context).size.width * 1,
       decoration: const BoxDecoration(
         color: Colors.green,
-        borderRadius: BorderRadius.all(Radius.circular(30),),
+        borderRadius: BorderRadius.all(
+          Radius.circular(30),
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(10),
@@ -419,14 +461,16 @@ class _InicioState extends State<Inicio> {
                 }),
                 child: _selecionado == 0
                     ? Row(
-                      children: [
-                        const Icon(
-                          Icons.circle,
-                          color: Color.fromARGB(255, 27, 67, 28),
-                          size: 10,
-                        ),
-                        const SizedBox(width: 3,),
-                        Text(
+                        children: [
+                          const Icon(
+                            Icons.circle,
+                            color: Color.fromARGB(255, 27, 67, 28),
+                            size: 10,
+                          ),
+                          const SizedBox(
+                            width: 3,
+                          ),
+                          Text(
                             "HOME",
                             style: TextStyle(
                               color: Colors.white,
@@ -434,8 +478,8 @@ class _InicioState extends State<Inicio> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                      ],
-                    )
+                        ],
+                      )
                     : Text(
                         "HOME",
                         style: TextStyle(
@@ -452,14 +496,16 @@ class _InicioState extends State<Inicio> {
                 }),
                 child: _selecionado == 1
                     ? Row(
-                      children: [
-                        const Icon(
-                          Icons.circle,
-                          color: Color.fromARGB(255, 27, 67, 28),
-                          size: 10,
-                        ),
-                        const SizedBox(width: 3,),
-                        Text(
+                        children: [
+                          const Icon(
+                            Icons.circle,
+                            color: Color.fromARGB(255, 27, 67, 28),
+                            size: 10,
+                          ),
+                          const SizedBox(
+                            width: 3,
+                          ),
+                          Text(
                             "CAMPEONATOS",
                             style: TextStyle(
                               color: Colors.white,
@@ -467,8 +513,8 @@ class _InicioState extends State<Inicio> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                      ],
-                    )
+                        ],
+                      )
                     : Text(
                         "CAMPEONATOS",
                         style: TextStyle(
@@ -485,14 +531,16 @@ class _InicioState extends State<Inicio> {
                 }),
                 child: _selecionado == 2
                     ? Row(
-                      children: [
-                        const Icon(
-                          Icons.circle,
-                          color: Color.fromARGB(255, 27, 67, 28),
-                          size: 10,
-                        ),
-                        const SizedBox(width: 3,),
-                        Text(
+                        children: [
+                          const Icon(
+                            Icons.circle,
+                            color: Color.fromARGB(255, 27, 67, 28),
+                            size: 10,
+                          ),
+                          const SizedBox(
+                            width: 3,
+                          ),
+                          Text(
                             "TIMES",
                             style: TextStyle(
                               color: Colors.white,
@@ -500,8 +548,8 @@ class _InicioState extends State<Inicio> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                      ],
-                    )
+                        ],
+                      )
                     : Text(
                         "TIMES",
                         style: TextStyle(
@@ -518,14 +566,16 @@ class _InicioState extends State<Inicio> {
                 }),
                 child: _selecionado == 3
                     ? Row(
-                      children: [
-                        const Icon(
-                          Icons.circle,
-                          color: Color.fromARGB(255, 27, 67, 28),
-                          size: 10,
-                        ),
-                        const SizedBox(width: 3,),
-                        Text(
+                        children: [
+                          const Icon(
+                            Icons.circle,
+                            color: Color.fromARGB(255, 27, 67, 28),
+                            size: 10,
+                          ),
+                          const SizedBox(
+                            width: 3,
+                          ),
+                          Text(
                             "TABELAS",
                             style: TextStyle(
                               color: Colors.white,
@@ -533,8 +583,8 @@ class _InicioState extends State<Inicio> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                      ],
-                    )
+                        ],
+                      )
                     : Text(
                         "TABELAS",
                         style: TextStyle(
@@ -549,107 +599,51 @@ class _InicioState extends State<Inicio> {
       ),
     );
   }
-
-
-  String? cidadeSelecionada;
-  _chamarDropDownCity(){
-
-    return Container(
-      margin: const EdgeInsets.all(4),
-      height: MediaQuery.of(context).size.height * 0.06,
-      decoration: BoxDecoration(        
-        border: Border.all(color: Colors.green),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      padding: const EdgeInsets.all(10),
-      child: DropdownButton<String>(
-              value: cidadeSelecionada??"Floresta",
-              icon: const Icon(Icons.change_circle_outlined, color: Colors.white,),
-              isExpanded: true,
-              borderRadius: BorderRadius.circular(16),
-              //elevation: 16,
-              style: const TextStyle(color: Colors.white, fontSize: 18,),
-              // underline: Container(height: 2, color: Colors.green,),
-              underline: Container(),
-              alignment: AlignmentDirectional.center,
-              dropdownColor: Colors.green,
-              onChanged: (String? newValue) async {
-                setState(() {
-                  cidadeSelecionada = newValue!;
-                });
-
-                final prefs = await SharedPreferences.getInstance();
-                await prefs.setString('regiaoPadrao', cidadeSelecionada.toString());
-              },
-
-              items: listaCidadesFirebase.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-              }).toList(),
-            ),
-    );
-  }
-
-  //recuperar nomes das cidades no firebase
-  final List<String> listaCidadesFirebase = []; //precisa estar assinalada com o final pra os valores persistirem
-  _recuperarCidades() async {
-    var collection = FirebaseFirestore.instance.collection("competicao"); //cria instancia
-
-    var resultado = await collection.get(); //busca os dados uma vez    
-
-    for(var doc in resultado.docs){
-      // print("TESTE REGIAO -> "+doc["nome"]);
-      setState(() {
-        listaCidadesFirebase.add(doc["nome"]); //adiciona em uma list
-      });
-      
-    }
-    //print("TESTE -> "+listaTimesFirebase.toString());    
-
-  }
   
-
   final List<String> listaAno = ["2022", "2023"];
   String? anoSelecionado;
-  _chamarDropDownAno(){
-
+  _chamarDropDownAno() {
     return Container(
       margin: const EdgeInsets.all(4),
       height: MediaQuery.of(context).size.height * 0.06,
-      decoration: BoxDecoration(        
+      decoration: BoxDecoration(
         border: Border.all(color: Colors.green),
         borderRadius: BorderRadius.circular(4),
       ),
       padding: const EdgeInsets.all(10),
       child: DropdownButton<String>(
-              value: anoSelecionado??"2023",
-              icon: const Icon(Icons.change_circle_outlined, color: Colors.white,),
-              isExpanded: true,
-              borderRadius: BorderRadius.circular(16),
-              //elevation: 16,
-              style: const TextStyle(color: Colors.white, fontSize: 18,),
-              // underline: Container(height: 2, color: Colors.green,),
-              underline: Container(),
-              alignment: AlignmentDirectional.center,
-              dropdownColor: Colors.green,
-              onChanged: (String? newValue) async {
-                setState(() {
-                  anoSelecionado = newValue!;
-                });
+        value: anoSelecionado ?? "2023",
+        icon: const Icon(
+          Icons.change_circle_outlined,
+          color: Colors.white,
+        ),
+        isExpanded: true,
+        borderRadius: BorderRadius.circular(16),
+        //elevation: 16,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 18,
+        ),
+        // underline: Container(height: 2, color: Colors.green,),
+        underline: Container(),
+        alignment: AlignmentDirectional.center,
+        dropdownColor: Colors.green,
+        onChanged: (String? newValue) async {
+          setState(() {
+            anoSelecionado = newValue!;
+          });
 
-                final prefs = await SharedPreferences.getInstance();
-                await prefs.setString('anoEscolhido', anoSelecionado.toString());
-              },
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('anoEscolhido', anoSelecionado.toString());
+        },
 
-              items: listaAno.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-              }).toList(),
-            ),
+        items: listaAno.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+      ),
     );
   }
 }
