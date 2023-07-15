@@ -8,7 +8,8 @@ class ArenaButton extends StatefulWidget {
   final Color? textColor;
   final Color? buttonColor;
   final Color? buttonBorderColor;
-  final double? radius;
+  final double? borderRadius;
+  final bool? isLoading;
 
   final void Function()? function;
   
@@ -21,8 +22,9 @@ class ArenaButton extends StatefulWidget {
     this.textColor,
     this.buttonColor,
     this.buttonBorderColor,
-    this.radius,
+    this.borderRadius,
     required this.function,
+    this.isLoading,
   }) : super(key: key);
 
   @override
@@ -37,11 +39,13 @@ class _ArenaButtonState extends State<ArenaButton> {
 
     return ElevatedButton(
       onPressed: widget.function,
-      child: Text(
+      child: (widget.isLoading??false) == false ? Text(
         "" + widget.title.toString(),
         style: TextStyle(color: widget.textColor ?? Colors.white,
         fontSize: widget.fontSize ?? 14,
         ),
+      ) : CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
       ),
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all<Color>(widget.buttonColor ?? Colors.blue), //essa merda toda pra mudar a cor do botão oporra
@@ -51,7 +55,7 @@ class _ArenaButtonState extends State<ArenaButton> {
               color: widget.buttonBorderColor ?? widget.buttonColor ?? Colors.white,
             ),
             borderRadius: BorderRadius.all(
-              Radius.circular(widget.radius ?? 0),
+              Radius.circular(widget.borderRadius ?? 0),
             ),
           ),
         ),

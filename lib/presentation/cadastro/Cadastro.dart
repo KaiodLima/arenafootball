@@ -554,7 +554,7 @@ class _CadastroState extends State<Cadastro> with SingleTickerProviderStateMixin
                               textColor: Colors.white,
                               fontSize: 18,
                               buttonColor: controleCadastro.enableButton ? Colors.green : Colors.grey,
-                              radius: 8,
+                              borderRadius: 8,
                             );
                           },
                         ),

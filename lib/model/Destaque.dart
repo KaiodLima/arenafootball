@@ -6,6 +6,7 @@ class Destaque {
   String? link;
   String? urlImagem;
   String? exibir;
+  String? priority;
   
   //construtor
   Destaque({
@@ -13,7 +14,8 @@ class Destaque {
     this.titulo, 
     this.link, 
     this.urlImagem,
-    this.exibir
+    this.exibir,
+    this.priority,
   });
 
   //métodos acessores

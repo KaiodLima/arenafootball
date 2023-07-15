@@ -1,13 +1,15 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:arena_soccer/app/front/presentation/components/arena_button.dart';
+import 'package:arena_soccer/app/front/presentation/components/dropdown_field/dropdown_field.dart';
+import 'package:arena_soccer/app/front/presentation/pages/register_new_destaque/register_new_destaque_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as storage;
 import 'package:firebase_core/firebase_core.dart' as core;
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:image_picker/image_picker.dart';
-
-import '../../../../../model/Destaque.dart';
 
 class RegisterDestaque extends StatefulWidget {
   const RegisterDestaque({Key? key}) : super(key: key);
@@ -17,75 +19,17 @@ class RegisterDestaque extends StatefulWidget {
 }
 
 class _RegisterDestaqueState extends State<RegisterDestaque> {
-  TextEditingController _controllerTitle = TextEditingController();
-  TextEditingController _controllerLink = TextEditingController();
-  TextEditingController _controllerExibir = TextEditingController();
+  // TextEditingController _controllerTitle = TextEditingController();
+  // TextEditingController _controllerLink = TextEditingController();
+  // TextEditingController _controllerExibir = TextEditingController();
 
-
-  String? urlDownloadImage;
-  //capturar dados do novo jogador
-  criarDestaque() {
-    String titulo = _controllerTitle.text;
-    String urlImagem = urlDownloadImage?.toString() ?? "";
-    String link = _controllerLink.text;
-    String exibir= _controllerExibir.text;
-    //validar campos:
-    if (titulo.isNotEmpty && titulo.length >= 3) {
-      //criar destaque
-      Destaque destaque = Destaque(
-        titulo: titulo,
-        urlImagem: urlImagem,
-        link: link,
-        exibir: exibir,
-      );
-
-      _cadastrarFirebase(destaque);
-    
-    } else {
-      //print("Preencha o campo NOME!!!");
-      _chamarSnackBar("Preencha o campo TÍTULO!!!");
-    }
-  }
-
-  Future<void> _cadastrarFirebase(Destaque destaque) async {
-    FirebaseFirestore db = await FirebaseFirestore.instance;
-    
-    var addedDocRef = await db.collection("destaques").add({
-      "id": "",
-      "title": destaque.titulo,
-      "link": destaque.link,
-      "urlImagem": destaque.urlImagem,
-      "exibir": destaque.exibir
-    });
-
-    db.collection("destaques").doc(addedDocRef.id).set({
-      "id": addedDocRef.id,
-      "title": destaque.titulo,
-      "link": destaque.link,
-      "urlImagem": destaque.urlImagem,
-      "exibir": destaque.exibir
-    });
-
-    _chamarSnackBar("Destaque Cadastrado!!!");
-  }
-
-
-//cria a snackBar com a mensagem de alerta
-  var _snackBar;
-  _chamarSnackBar(texto){
-    _snackBar = SnackBar(content: Text(texto),);
-
-    if(_snackBar != null){
-      ScaffoldMessenger.of(context).showSnackBar(_snackBar); //chama o snackBar 
-      //limpa snackbar
-      _snackBar = "";
-    }
-  }
+  final _controller = RegisterNewDestaqueController(); //utilizo mobX
 
   @override
   void initState() {
     super.initState();
     // _recuperarCidades();
+    _controller.recuperarDestaquesPriority();
   }
 
   pageFormularioDestaque() {
@@ -94,7 +38,7 @@ class _RegisterDestaqueState extends State<RegisterDestaque> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         TextField(
-          controller: _controllerTitle,
+          controller: _controller.controllerTitle,
           //autofocus: true,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
@@ -154,9 +98,9 @@ class _RegisterDestaqueState extends State<RegisterDestaque> {
             ],
           ),
         ),
-        const SizedBox(height: 8,),
+        const SizedBox(height: 16,),
         TextField(
-          controller: _controllerLink,
+          controller: _controller.controllerLink,
           //autofocus: true,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
@@ -170,37 +114,47 @@ class _RegisterDestaqueState extends State<RegisterDestaque> {
           ),
         ),
         const SizedBox(height: 8,),
-        TextField(
-          controller: _controllerExibir,
-          //autofocus: true,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: "Exibir Destaque (true ou false)",
+        Observer(builder: (_) {
+          return ArenaDropdownField(
+            controllerDestaque: _controller,
             icon: Icon(
-              Icons.account_box_outlined,
-              color: Colors.green,
+              Icons.visibility,
+              color: _controller.validateExibition() == null
+                  ? Colors.green
+                  : Colors.red,
               size: 24.0,
-              semanticLabel: 'Text to announce in accessibility modes',
             ),
-          ),
-        ),
+          );
+        }),
         const SizedBox(height: 16,),
-        ElevatedButton(
-          onPressed: () async {
-            Random random = Random();
-            int randomNumber = random.nextInt(100000);
-            
-            if(imageFile != null){
-              await uploadPhoto(imageFile!, "destaques${_controllerTitle.text+randomNumber.toString()}");
-            }
-            criarDestaque();
-          },
-          child: Text("CADASTRAR"),
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(
-                Colors.green), //essa merda toda pra mudar a cor do botão oporra
-          ),
-        ),
+        Observer(builder: (_) {
+          final width = MediaQuery.of(context).size.width;
+
+          return ArenaButton(
+            height: 47,
+            width: width,
+            title: "CADASTRAR",
+            isLoading: _controller.isLoading,
+            function: () async {
+              await _controller.changeLoading(true);
+              Random random = Random();
+              int randomNumber = random.nextInt(100000);
+
+              if(imageFile != null){
+                await uploadPhoto(imageFile!, "destaques${_controller.controllerTitle.text+randomNumber.toString()}");
+              }
+              _controller.createNewDestaque(context);
+              _controller.chamarSnackBar("Destaque Cadastrado!!!", context);
+
+              // Simulando uma operação assíncrona com o Future.delayed
+              // await Future.delayed(Duration(seconds: 2));
+              await _controller.changeLoading(false);
+            },
+            buttonColor: Colors.green,
+            fontSize: 16,
+            borderRadius: 8,
+          );
+        }),
         const SizedBox(height: 2,),
       ],
     );
@@ -215,23 +169,32 @@ class _RegisterDestaqueState extends State<RegisterDestaque> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 12,),
-              Image.asset(
-                "lib/assets/images/ic_arena.png",
-                height: 100,
-              ), //height mexe com o tamanho da imagem
-              const SizedBox(
-                height: 16,
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics(),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 12,),
+                    Image.asset(
+                      "lib/assets/images/ic_arena.png",
+                      height: 100,
+                    ), //height mexe com o tamanho da imagem
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    pageFormularioDestaque(),
+                    
+                  ],
+                ),
               ),
-              pageFormularioDestaque(),
-              
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -323,8 +286,8 @@ class _RegisterDestaqueState extends State<RegisterDestaque> {
       print("RESULT!!! "+result.toString());
       final urlDownload = await result.ref.getDownloadURL();
       setState(() {
-        urlDownloadImage = urlDownload;
-        print("TESTE CAMERA URL: "+urlDownloadImage.toString());
+        _controller.urlDownloadImage = urlDownload;
+        print("TESTE CAMERA URL: "+_controller.urlDownloadImage.toString());
       });
     } on core.FirebaseException catch(e) {
       print("Error: ${e.code}");

@@ -370,7 +370,7 @@ class _LoginState extends State<Login> {
                       textColor: Colors.white,
                       buttonColor: Colors.green,                      
                       function: fazerLogin,
-                      radius: 8,
+                      borderRadius: 8,
                     ),
                     const SizedBox(height: 8,),
                     ArenaButton(
@@ -382,7 +382,7 @@ class _LoginState extends State<Login> {
                       buttonColor: Colors.white,
                       buttonBorderColor: Colors.green,
                       function: _chamarTelaCadastro,
-                      radius: 8,
+                      borderRadius: 8,
                     ),
                     const SizedBox(height: 8,),
                     TextButton(

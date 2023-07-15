@@ -315,7 +315,7 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
                 fontSize: 16,
                 textColor: Colors.white,
                 buttonColor: Colors.green,                      
-                radius: 8,
+                borderRadius: 8,
                 function: () async {
                   Random random = Random();
                   int randomNumber = random.nextInt(100000);

@@ -263,9 +263,14 @@ class _InicioState extends State<Inicio> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            ARENAHighlights(
-              height: height,
-              width: width,
+            SingleChildScrollView(
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
+              ),
+              child: ARENAHighlights(
+                height: height,
+                width: width,
+              ),
             ), //destaques exibidos na parte superior da tela com os times
             const SizedBox(
               height: 10,

@@ -351,7 +351,7 @@ class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
                 fontSize: 16,
                 textColor: Colors.white,
                 buttonColor: Colors.green,                      
-                radius: 8,
+                borderRadius: 8,
                 function: criarNoticia,
               ),
 

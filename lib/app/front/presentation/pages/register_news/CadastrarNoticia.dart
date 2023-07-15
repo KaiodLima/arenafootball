@@ -1,10 +1,9 @@
 import 'dart:io';
 
+import 'package:arena_soccer/app/front/presentation/components/arena_button.dart';
 import 'package:arena_soccer/app/front/presentation/components/dropdown_field/dropdown_field.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_news/register_new_controller.dart';
-import 'package:arena_soccer/model/Noticia.dart';
 import 'package:arena_soccer/presentation/cadastro/widgets/arena_textfield.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as storage;
 import 'package:firebase_core/firebase_core.dart' as core;
 import 'package:flutter/material.dart';
@@ -20,150 +19,13 @@ class CadastrarNoticia extends StatefulWidget {
 }
 
 class _CadastrarNoticiaState extends State<CadastrarNoticia> {
-  TextEditingController _controllerIdNoticia = TextEditingController();
-  TextEditingController _controllerTitulo = TextEditingController();
-  TextEditingController _controllerDescricao = TextEditingController();
-  TextEditingController _controllerUrlImagem = TextEditingController();
-  TextEditingController _controllerLink = TextEditingController();
-  TextEditingController _controllerExibir = TextEditingController();
-  TextEditingController _controllerTag = TextEditingController();
-
   final _controller = RegisterNewController(); //utilizo mobX
-
-  // int idAtual = 0;
-
-  String? urlDownloadImage;
-  //capturar dados da notícia
-  criarNoticia() {
-    // int idNoticia = idAtual;
-    // int id_noticia = int.parse(_controllerIdNoticia.text);
-    // String titulo = _controllerTitulo.text;
-    String titulo = _controller.title!;
-    String descricao = _controllerDescricao.text;
-    //String urlImagem = _controllerUrlImagem.text;
-    String urlImagem = urlDownloadImage?.toString() ?? "";
-    // String urlImagem = "";
-    String link = _controllerLink.text;
-    // String exibir = _controllerExibir.text;
-    String? exibir = _controller.isShow;
-    print("TESTE::: "+_controller.isShow.toString());
-    String fkCompeticao = cidadeSelecionada;
-    String tag = _controllerTag.text;
-
-    //validar campos:
-    if (
-      // (titulo.isNotEmpty && titulo.length >= 3) &&
-      // (descricao.isNotEmpty && descricao.length >= 3) &&
-      // (urlImagem.isNotEmpty && urlImagem.length >= 3) &&
-      (exibir != null && exibir.isNotEmpty)) {
-        //criar partida
-        Noticia noticia = Noticia(
-          // idNoticia: idNoticia,
-          titulo: titulo,
-          descricao: descricao,
-          urlImagem: urlImagem,
-          link: link,
-          exibir: exibir,
-          timeCasa: "",
-          timeFora: "",
-          golTimeCasa: "",
-          golTimeFora: "",
-          tag: tag,
-          fkCompeticao: fkCompeticao,
-        );
-
-        //salvar informações do jogador no banco de dados
-        _cadastrarFirebase(noticia);
-      } else {
-        _chamarSnackBar("Preencha todos os campos obrigatórios!!!");
-      }
-  }
-
-  //cadastrar informações do usuário no banco de dados
-  Future<void> _cadastrarFirebase(Noticia noticia) async {
-    FirebaseFirestore db = await FirebaseFirestore.instance;
-
-    var addedDocRef = await db.collection("noticias").add({
-      "id": "",
-      "data": FieldValue.serverTimestamp(),
-      "titulo": noticia.titulo,
-      "descricao": noticia.descricao,
-      "urlImagem": noticia.urlImagem,
-      "link": noticia.link,
-      "exibir": noticia.exibir,
-      "fk_competicao": noticia.fkCompeticao,
-      "time_casa": noticia.timeCasa,
-      "time_fora": noticia.timeFora,
-      "gol_time_casa": noticia.golTimeCasa,
-      "gol_time_fora": noticia.golTimeFora,
-      "tag": noticia.tag
-    });
-
-    db.collection("noticias").doc(addedDocRef.id).set({
-      "id": addedDocRef.id,
-      "data": FieldValue.serverTimestamp(),
-      "titulo": noticia.titulo,
-      "descricao": noticia.descricao,
-      "urlImagem": noticia.urlImagem,
-      "link": noticia.link,
-      "exibir": noticia.exibir,
-      "fk_competicao": noticia.fkCompeticao,
-      "time_casa": noticia.timeCasa,
-      "time_fora": noticia.timeFora,
-      "gol_time_casa": noticia.golTimeCasa,
-      "gol_time_fora": noticia.golTimeFora,
-      "tag": noticia.tag
-    });
-
-    _chamarSnackBar("Notícia Cadastrada com Sucesso!!!");
-  }
-
-//cria a snackBar com a mensagem de alerta
-  var _snackBar;
-  _chamarSnackBar(texto) {
-    _snackBar = SnackBar(
-      content: Text(texto),
-    );
-
-    if (_snackBar != null) {
-      ScaffoldMessenger.of(context).showSnackBar(_snackBar); //chama o snackBar
-      //limpa snackbar
-      _snackBar = "";
-    }
-  }
 
   pageNoticia() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Row(
-        //   children: [
-        //     const Icon(
-        //       Icons.numbers,
-        //       color: Colors.green,
-        //       size: 24.0,
-        //     ),
-        //     const SizedBox(width: 16,),
-        //     Text(
-        //       idAtual.toString(),
-        //       style: const TextStyle(fontSize: 18),
-        //     ),
-        //   ],
-        // ),
-        // TextField(
-        //   controller: _controllerIdNoticia,
-        //   //autofocus: true,
-        //   decoration: const InputDecoration(
-        //     border: OutlineInputBorder(),
-        //     labelText: "ID",
-        //     icon: Icon(
-        //       Icons.numbers,
-        //       color: Colors.green,
-        //       size: 24.0,
-        //     ),
-        //   ),
-        // ),
         const SizedBox(
           height: 8,
         ),
@@ -182,19 +44,6 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
             ),
           );
         }),
-        // TextField(
-        //   controller: _controllerTitulo,
-        //   //autofocus: true,
-        //   decoration: const InputDecoration(
-        //     border: OutlineInputBorder(),
-        //     labelText: "Título",
-        //     icon: Icon(
-        //       Icons.text_fields_outlined,
-        //       color: Colors.green,
-        //       size: 24.0,
-        //     ),
-        //   ),
-        // ),
         const SizedBox(
           height: 8,
         ),
@@ -258,7 +107,7 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
           height: 8,
         ),
         TextField(
-          controller: _controllerDescricao,
+          controller: _controller.controllerDescricao,
           maxLines: 5,
           //autofocus: true,
           decoration: const InputDecoration(
@@ -271,24 +120,11 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
             ),
           ),
         ),
-        // TextField(
-        //   controller: _controllerUrlImagem,
-        //   //autofocus: true,
-        //   decoration: const InputDecoration(
-        //     border: OutlineInputBorder(),
-        //     labelText: "Caminho da imagem",
-        //     icon: Icon(
-        //       Icons.image,
-        //       color: Colors.green,
-        //       size: 24.0,
-        //     ),
-        //   ),
-        // ),
         const SizedBox(
           height: 16,
         ),
         TextField(
-          controller: _controllerTag,
+          controller: _controller.controllerTag,
           //autofocus: true,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
@@ -304,7 +140,7 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
           height: 16,
         ),
         TextField(
-          controller: _controllerLink,
+          controller: _controller.controllerLink,
           //autofocus: true,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
@@ -335,36 +171,35 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
           height: 16,
         ),
         Observer(builder: (_) {
-          return ElevatedButton(
-            onPressed: () async {
-              // await _controller.changeLoading(true);
+          final width = MediaQuery.of(context).size.width;
+
+          return ArenaButton(
+            height: 47,
+            width: width,
+            title: "CADASTRAR",
+            isLoading: _controller.isLoading,
+            function: () async {
+              await _controller.changeLoading(true);
               Random random = Random();
               int randomNumber = random.nextInt(100000);
 
               if (_controller.title != null && _controller.title!.isNotEmpty) {
                 if (imageFile != null) {
                   await uploadPhoto(imageFile!,
-                      "noticias${_controllerTitulo.text + randomNumber.toString()}");
+                      "noticias${_controller.controllerTitulo.text + randomNumber.toString()}");
                 }
-                criarNoticia();
+                _controller.criarNoticia(context);
               } else {
-                _chamarSnackBar("A notícia precisa de um título!!!");
+                _controller.chamarSnackBar("A notícia precisa de um título!!!", context);
               }
-              
+
+              // Simulando uma operação assíncrona com o Future.delayed
+              // await Future.delayed(Duration(seconds: 2));
+              await _controller.changeLoading(false);
             },
-            child: _controller.isLoading != true 
-            ? Text("CADASTRAR") 
-            : Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: CircularProgressIndicator(
-                color: Colors.white,
-                strokeWidth: 1.5,
-              ),
-            ),
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(Colors
-                  .green), //essa merda toda pra mudar a cor do botão oporra
-            ),
+            buttonColor: Colors.green,
+            fontSize: 16,
+            borderRadius: 8,
           );
         }),
         const SizedBox(
@@ -377,7 +212,7 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
   @override
   void initState() {
     super.initState();
-    _recuperarCidades();
+    _controller.recuperarCidades();
   }
 
   @override
@@ -390,11 +225,16 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics(),
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _chamarDropDownCity(),
+              Observer(builder: (_){
+                return _controller.chamarDropDownCity(context);
+              }),
               const SizedBox(
                 height: 12,
               ),
@@ -451,68 +291,6 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
   //   });
   // }
 
-  String cidadeSelecionada = 'Floresta';
-  _chamarDropDownCity() {
-    return Container(
-      margin: const EdgeInsets.all(4),
-      height: MediaQuery.of(context).size.height * 0.06,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.green),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      padding: const EdgeInsets.all(10),
-      child: DropdownButton<String>(
-        value: cidadeSelecionada,
-        icon: const Icon(
-          Icons.change_circle_outlined,
-          color: Colors.green,
-        ),
-        isExpanded: true,
-        borderRadius: BorderRadius.circular(16),
-        //elevation: 16,
-        style: const TextStyle(
-          color: Colors.black,
-          fontSize: 18,
-        ),
-        // underline: Container(height: 2, color: Colors.green,),
-        underline: Container(),
-        alignment: AlignmentDirectional.center,
-        dropdownColor: Colors.green,
-        onChanged: (String? newValue) {
-          setState(() {
-            cidadeSelecionada = newValue!;
-          });
-        },
-
-        items:
-            listaCidadesFirebase.map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(value),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  //recuperar nomes das cidades no firebase
-  final List<String> listaCidadesFirebase =
-      []; //precisa estar assinalada com o final pra os valores persistirem
-  _recuperarCidades() async {
-    var collection =
-        FirebaseFirestore.instance.collection("competicao"); //cria instancia
-
-    var resultado = await collection.get(); //busca os dados uma vez
-
-    for (var doc in resultado.docs) {
-      // print("TESTE REGIAO -> "+doc["nome"]);
-      setState(() {
-        listaCidadesFirebase.add(doc["nome"]); //adiciona em uma list
-      });
-    }
-    //print("TESTE -> "+listaTimesFirebase.toString());
-  }
-
   //Teste camera:
   PickedFile? _image;
   File? imageFile;
@@ -544,8 +322,8 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
 
       final urlDownload = await result.ref.getDownloadURL();
       setState(() {
-        urlDownloadImage = urlDownload;
-        print("TESTE CAMERA URL: " + urlDownloadImage.toString());
+        _controller.urlDownloadImage = urlDownload;
+        print("TESTE CAMERA URL: " + _controller.urlDownloadImage.toString());
       });
     } on core.FirebaseException catch (e) {
       print("Error: ${e.code}");
