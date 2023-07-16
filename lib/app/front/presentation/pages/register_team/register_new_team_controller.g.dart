@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'register_new_match_controller.dart';
+part of 'register_new_team_controller.dart';
 
 // **************************************************************************
 // StoreGenerator
@@ -8,7 +8,7 @@ part of 'register_new_match_controller.dart';
 
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
-mixin _$RegisterNewMatchController on _ControleBase, Store {
+mixin _$RegisterNewTeamController on _ControleBase, Store {
   late final _$titleAtom = Atom(name: '_ControleBase.title', context: context);
 
   @override
@@ -56,99 +56,67 @@ mixin _$RegisterNewMatchController on _ControleBase, Store {
     });
   }
 
-  late final _$controllerIdPartidaAtom =
-      Atom(name: '_ControleBase.controllerIdPartida', context: context);
+  late final _$controllerTimeNomeAtom =
+      Atom(name: '_ControleBase.controllerTimeNome', context: context);
 
   @override
-  TextEditingController get controllerIdPartida {
-    _$controllerIdPartidaAtom.reportRead();
-    return super.controllerIdPartida;
+  TextEditingController get controllerTimeNome {
+    _$controllerTimeNomeAtom.reportRead();
+    return super.controllerTimeNome;
   }
 
   @override
-  set controllerIdPartida(TextEditingController value) {
-    _$controllerIdPartidaAtom.reportWrite(value, super.controllerIdPartida, () {
-      super.controllerIdPartida = value;
+  set controllerTimeNome(TextEditingController value) {
+    _$controllerTimeNomeAtom.reportWrite(value, super.controllerTimeNome, () {
+      super.controllerTimeNome = value;
     });
   }
 
-  late final _$controllerTimeCAtom =
-      Atom(name: '_ControleBase.controllerTimeC', context: context);
+  late final _$controllerDescricaoAtom =
+      Atom(name: '_ControleBase.controllerDescricao', context: context);
 
   @override
-  TextEditingController get controllerTimeC {
-    _$controllerTimeCAtom.reportRead();
-    return super.controllerTimeC;
+  TextEditingController get controllerDescricao {
+    _$controllerDescricaoAtom.reportRead();
+    return super.controllerDescricao;
   }
 
   @override
-  set controllerTimeC(TextEditingController value) {
-    _$controllerTimeCAtom.reportWrite(value, super.controllerTimeC, () {
-      super.controllerTimeC = value;
+  set controllerDescricao(TextEditingController value) {
+    _$controllerDescricaoAtom.reportWrite(value, super.controllerDescricao, () {
+      super.controllerDescricao = value;
     });
   }
 
-  late final _$controllerTimeFAtom =
-      Atom(name: '_ControleBase.controllerTimeF', context: context);
+  late final _$urlDownloadImageAtom =
+      Atom(name: '_ControleBase.urlDownloadImage', context: context);
 
   @override
-  TextEditingController get controllerTimeF {
-    _$controllerTimeFAtom.reportRead();
-    return super.controllerTimeF;
+  String? get urlDownloadImage {
+    _$urlDownloadImageAtom.reportRead();
+    return super.urlDownloadImage;
   }
 
   @override
-  set controllerTimeF(TextEditingController value) {
-    _$controllerTimeFAtom.reportWrite(value, super.controllerTimeF, () {
-      super.controllerTimeF = value;
+  set urlDownloadImage(String? value) {
+    _$urlDownloadImageAtom.reportWrite(value, super.urlDownloadImage, () {
+      super.urlDownloadImage = value;
     });
   }
 
-  late final _$controllerHorarioAtom =
-      Atom(name: '_ControleBase.controllerHorario', context: context);
+  late final _$idAtualAtom =
+      Atom(name: '_ControleBase.idAtual', context: context);
 
   @override
-  TextEditingController get controllerHorario {
-    _$controllerHorarioAtom.reportRead();
-    return super.controllerHorario;
+  int get idAtual {
+    _$idAtualAtom.reportRead();
+    return super.idAtual;
   }
 
   @override
-  set controllerHorario(TextEditingController value) {
-    _$controllerHorarioAtom.reportWrite(value, super.controllerHorario, () {
-      super.controllerHorario = value;
-    });
-  }
-
-  late final _$controllerLocalAtom =
-      Atom(name: '_ControleBase.controllerLocal', context: context);
-
-  @override
-  TextEditingController get controllerLocal {
-    _$controllerLocalAtom.reportRead();
-    return super.controllerLocal;
-  }
-
-  @override
-  set controllerLocal(TextEditingController value) {
-    _$controllerLocalAtom.reportWrite(value, super.controllerLocal, () {
-      super.controllerLocal = value;
-    });
-  }
-
-  late final _$controllerDataAtom =
-      Atom(name: '_ControleBase.controllerData', context: context);
-
-  @override
-  TextEditingController get controllerData {
-    _$controllerDataAtom.reportRead();
-    return super.controllerData;
-  }
-
-  @override
-  set controllerData(TextEditingController value) {
-    _$controllerDataAtom.reportWrite(value, super.controllerData, () {
-      super.controllerData = value;
+  set idAtual(int value) {
+    _$idAtualAtom.reportWrite(value, super.idAtual, () {
+      super.idAtual = value;
     });
   }
 
@@ -242,12 +210,10 @@ mixin _$RegisterNewMatchController on _ControleBase, Store {
 title: ${title},
 isShow: ${isShow},
 isLoading: ${isLoading},
-controllerIdPartida: ${controllerIdPartida},
-controllerTimeC: ${controllerTimeC},
-controllerTimeF: ${controllerTimeF},
-controllerHorario: ${controllerHorario},
-controllerLocal: ${controllerLocal},
-controllerData: ${controllerData},
+controllerTimeNome: ${controllerTimeNome},
+controllerDescricao: ${controllerDescricao},
+urlDownloadImage: ${urlDownloadImage},
+idAtual: ${idAtual},
 timeSelecionadoCasa: ${timeSelecionadoCasa},
 timeSelecionadoFora: ${timeSelecionadoFora},
 cidadeSelecionada: ${cidadeSelecionada}

@@ -1,9 +1,10 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:arena_soccer/model/Time.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:arena_soccer/app/front/presentation/components/arena_button.dart';
+import 'package:arena_soccer/app/front/presentation/pages/register_team/register_new_team_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as storage;
 import 'package:firebase_core/firebase_core.dart' as core;
@@ -16,89 +17,9 @@ class CadastrarTime extends StatefulWidget {
 }
 
 class _CadastrarTimeState extends State<CadastrarTime> {
-  TextEditingController _controllerIdPartida = TextEditingController();
+  // TextEditingController _controllerIdPartida = TextEditingController();
+  final _controller = RegisterNewTeamController(); //utilizo mobX
   
-  TextEditingController _controllerTimeNome = TextEditingController();
-  TextEditingController _controllerDescricao = TextEditingController();
-
-
-  int idAtual = 0;
-
-  //capturar dados do time
-  criarTime() {
-    String id_time = idAtual.toString();
-
-    String nomeTime = _controllerTimeNome.text;
-    String? descricaoTime = _controllerDescricao.text;
-    String idCampeonato = cidadeSelecionada;
-    String? urlImagem = urlDownloadImage?.toString() ?? "";
-    
-    //validar campos:
-    if ((nomeTime.isNotEmpty && nomeTime.length >= 3)) {
-      //criar time:
-      Time timeNovo = Time(
-        idTime: id_time+"_"+nomeTime.replaceAll(" ", "_"),
-        nome: nomeTime,
-        descricao: descricaoTime,
-        fkCompeticao: idCampeonato,
-        urlImagem: urlImagem,
-      );
-
-      _cadastrarFirebase(timeNovo);
-    } else {      
-      _chamarSnackBar("Preencha os campos obrigatórios!!!");
-    }
-  }
-
-  //cadastrar informações no fireabase
-  Future<void> _cadastrarFirebase(Time time) async {
-    FirebaseFirestore db = await FirebaseFirestore.instance;
-    
-    db.collection("times").doc(time.idTime).set({
-      "id_partida": time.idTime,
-
-      "nome": time.nome,
-      "descricao": time.descricao,
-      "fk_competicao": time.fkCompeticao,
-      "urlImagem": time.urlImagem,
-
-    });
-
-    db.collection("classificacao").doc(time.idTime).set({
-      "id_partida": time.idTime,
-
-      "nome": time.nome,
-      "descricao": time.descricao,
-      "fk_competicao": time.fkCompeticao,
-      "urlImagem": time.urlImagem,
-
-      "vitorias": 0,
-      "derrotas": 0,
-      "empates": 0,
-      "gols_feitos": 0,
-      "gols_sofridos": 0,
-      "pontos": 0,
-
-      "fk_grupo": "",
-
-    });
-
-    _chamarSnackBar("Time registrado com Sucesso!!!");
-  }
-
-
-  //cria a snackBar com a mensagem de alerta
-  var _snackBar;
-  _chamarSnackBar(texto){
-    _snackBar = SnackBar(content: Text(texto),);
-
-    if(_snackBar != null){
-      ScaffoldMessenger.of(context).showSnackBar(_snackBar); //chama o snackBar 
-      //limpa snackbar
-      _snackBar = "";
-    }
-  }
-
   pageTeamForm() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -111,10 +32,12 @@ class _CadastrarTimeState extends State<CadastrarTime> {
               color: Colors.green,
               size: 24.0,              
             ),
-            Text(
-              idAtual.toString(), 
-              style: const TextStyle(fontSize: 18),
-            ),
+            Observer(builder: (_){
+              return Text(
+                _controller.idAtual.toString(), 
+                style: const TextStyle(fontSize: 18),
+              );
+            }),
           ],
         ),
         const SizedBox(height: 16,),
@@ -122,10 +45,12 @@ class _CadastrarTimeState extends State<CadastrarTime> {
           "Região:", 
           style: TextStyle(fontSize: 18),
         ),
-        _chamarDropDownCity(false),
+        Observer(builder: (_){
+          return _chamarDropDownCity(false);
+        }),
         const SizedBox(height: 16,),  
         TextField(
-          controller: _controllerTimeNome,
+          controller: _controller.controllerTimeNome,
           keyboardType: TextInputType.name,
           //autofocus: true,
           decoration: const InputDecoration(
@@ -140,7 +65,7 @@ class _CadastrarTimeState extends State<CadastrarTime> {
         ),
         const SizedBox(height: 16,),      
         TextField(
-          controller: _controllerDescricao,
+          controller: _controller.controllerDescricao,
           keyboardType: TextInputType.name,
           //autofocus: true,
           decoration: const InputDecoration(
@@ -242,24 +167,36 @@ class _CadastrarTimeState extends State<CadastrarTime> {
             ),
           ],
         ),
-        const SizedBox(height: 32,),      
-        ElevatedButton(
-          onPressed: () async {
-            print("Salvar!");
-            Random random = Random();
-            int randomNumber = random.nextInt(100000);
+        const SizedBox(height: 32,),
+        Observer(builder: (_) {
+          final width = MediaQuery.of(context).size.width;
 
-            if(imageFile != null){
-              await uploadPhoto(imageFile!, "time_${_controllerTimeNome.text + randomNumber.toString()}");
-            }
-            
-            criarTime();            
-          },
-          child: const Text("CADASTRAR"),
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(Colors.green), //essa merda toda pra mudar a cor do botão oporra
-          ),
-        ),
+          return ArenaButton(
+            height: 47,
+            width: width,
+            title: "CADASTRAR",
+            isLoading: _controller.isLoading,
+            function: () async {
+              await _controller.changeLoading(true);
+              print("Salvar!");
+              Random random = Random();
+              int randomNumber = random.nextInt(100000);
+
+              if(imageFile != null){
+                await uploadPhoto(imageFile!, "time_${_controller.controllerTimeNome.text + randomNumber.toString()}");
+              }
+              
+              _controller.criarTime(context);
+              _controller.chamarSnackBar("Time registrado com Sucesso!!!", context);
+
+              // Simulando uma operação assíncrona com o Future.delayed
+              await _controller.changeLoading(false);
+            },
+            buttonColor: Colors.green,
+            fontSize: 16,
+            borderRadius: 8,
+          );
+        }),
         const SizedBox(height: 2,),       
       ],
     );
@@ -268,8 +205,8 @@ class _CadastrarTimeState extends State<CadastrarTime> {
   @override
   void initState() {
     super.initState();
-    _recuperarCidades();
-    _recuperarIdAtual();
+    _controller.recuperarCidades();
+    _controller.recuperarIdAtual();
   }
 
   @override
@@ -303,7 +240,7 @@ class _CadastrarTimeState extends State<CadastrarTime> {
     );
   }
 
-  String cidadeSelecionada = 'Floresta';
+  
   _chamarDropDownCity(bool isRegister){
 
     return Container(
@@ -315,7 +252,7 @@ class _CadastrarTimeState extends State<CadastrarTime> {
       ),
       padding: const EdgeInsets.all(10),
       child: DropdownButton<String>(
-              value: cidadeSelecionada,
+              value: _controller.cidadeSelecionada,
               icon: const Icon(Icons.change_circle_outlined, color: Colors.green,),
               isExpanded: true,
               borderRadius: BorderRadius.circular(16),
@@ -326,12 +263,10 @@ class _CadastrarTimeState extends State<CadastrarTime> {
               alignment: AlignmentDirectional.center,
               dropdownColor: Colors.green,
               onChanged: (String? newValue) {
-                setState(() {
-                  cidadeSelecionada = newValue!;
-                });
+                _controller.cidadeSelecionada = newValue!;
               },
 
-              items: listaCidadesFirebase.map<DropdownMenuItem<String>>((String value) {
+              items: _controller.listaCidadesFirebase.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
@@ -340,27 +275,7 @@ class _CadastrarTimeState extends State<CadastrarTime> {
             ),
     );
   }
-
-  //recuperar nomes das cidades no firebase
-  final List<String> listaCidadesFirebase = []; //precisa estar assinalada com o final pra os valores persistirem
-  _recuperarCidades() async {
-    var collection = FirebaseFirestore.instance.collection("competicao"); //cria instancia
-
-    var resultado = await collection.get(); //busca os dados uma vez    
-
-    for(var doc in resultado.docs){
-      // print("TESTE REGIAO -> "+doc["nome"]);
-      setState(() {
-        listaCidadesFirebase.add(doc["nome"]); //adiciona em uma list
-      });
-      
-    }
-    //print("TESTE -> "+listaTimesFirebase.toString());
-
-  }
-
-
-  String timeSelecionadoCasa = 'Lava Jato';
+  
   _chamarDropDownTimesCasa(){
     
     return Container(    
@@ -372,7 +287,7 @@ class _CadastrarTimeState extends State<CadastrarTime> {
       ),
       padding: const EdgeInsets.all(10),
       child: DropdownButton<String>(
-              value: timeSelecionadoCasa,
+              value: _controller.timeSelecionadoCasa,
               icon: const Icon(Icons.change_circle_outlined, color: Colors.green,),
               isExpanded: true,
               borderRadius: BorderRadius.circular(16),
@@ -383,12 +298,10 @@ class _CadastrarTimeState extends State<CadastrarTime> {
               alignment: AlignmentDirectional.center,
               //dropdownColor: Colors.green,                            
               onChanged: (String? newValue) {
-                setState(() {
-                  timeSelecionadoCasa = newValue!;
-                });
+                _controller.timeSelecionadoCasa = newValue!;
               },
 
-              items: listaTimesFirebaseCasa.map<DropdownMenuItem<String>>((String value) {
+              items: _controller.listaTimesFirebaseCasa.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
@@ -398,27 +311,6 @@ class _CadastrarTimeState extends State<CadastrarTime> {
     );
   }
 
-  //recuperar nomes dos times no firebase
-  List<String> listaTimesFirebaseCasa = []; //precisa estar assinalada com o final pra os valores persistirem
-  _recuperarTimesCasa() async {
-    var collection = FirebaseFirestore.instance.collection("times").where("fk_competicao", isEqualTo: cidadeSelecionada); //cria instancia
-
-    var resultado = await collection.get(); //busca os dados uma vez
-    
-    for(var doc in resultado.docs){
-      print("TESTE TIME -> "+doc["nome"]);
-      setState(() {
-        listaTimesFirebaseCasa.add(doc["nome"]); //adiciona em uma list
-      });
-      
-    }
-    timeSelecionadoCasa = listaTimesFirebaseCasa.first; //a primeira opção do dropdown deve ser iniciada sempre com o primeiro registro da lista
-    //print("TESTE -> "+listaTimesFirebase.toString());    
-
-  }
-
-
-  String timeSelecionadoFora = 'Lava Jato';
   _chamarDropDownTimesFora(){
     
     return Container(    
@@ -430,7 +322,7 @@ class _CadastrarTimeState extends State<CadastrarTime> {
       ),
       padding: const EdgeInsets.all(10),
       child: DropdownButton<String>(
-              value: timeSelecionadoFora,
+              value: _controller.timeSelecionadoFora,
               icon: const Icon(Icons.change_circle_outlined, color: Colors.green,),
               isExpanded: true,
               borderRadius: BorderRadius.circular(16),
@@ -442,11 +334,11 @@ class _CadastrarTimeState extends State<CadastrarTime> {
               //dropdownColor: Colors.green,                            
               onChanged: (String? newValue) {
                 setState(() {
-                  timeSelecionadoFora = newValue!;
+                  _controller.timeSelecionadoFora = newValue!;
                 });
               },
 
-              items: listaTimesFirebaseFora.map<DropdownMenuItem<String>>((String value) {
+              items: _controller.listaTimesFirebaseFora.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
@@ -455,47 +347,6 @@ class _CadastrarTimeState extends State<CadastrarTime> {
             ),
     );
   }
-
-  //recuperar nomes dos times no firebase
-  List<String> listaTimesFirebaseFora = []; //precisa estar assinalada com o final pra os valores persistirem
-  _recuperarTimesFora() async {
-    var collection = FirebaseFirestore.instance.collection("times").where("fk_competicao", isEqualTo: cidadeSelecionada); //cria instancia
-
-    var resultado = await collection.get(); //busca os dados uma vez
-    
-    for(var doc in resultado.docs){
-      print("TESTE TIME -> "+doc["nome"]);
-      setState(() {
-        listaTimesFirebaseFora.add(doc["nome"]); //adiciona em uma list
-      });
-      
-    }
-    timeSelecionadoFora = listaTimesFirebaseFora.first; //a primeira opção do dropdown deve ser iniciada sempre com o primeiro registro da lista
-    //print("TESTE -> "+listaTimesFirebase.toString());    
-
-  }
-
-  _recuperarIdAtual() async {
-    var collection = FirebaseFirestore.instance.collection("times"); //cria instancia
-
-    var resultado = await collection.get(); //busca os dados uma vez    
-
-    // for(var doc in resultado.docs){
-    //   print("TESTE REGIAO -> "+doc["nome"]);
-    //   setState(() {
-
-    //   });
-      
-    // }
-    //print("TESTE -> "+listaTimesFirebase.toString());
-    // print("TESTE -> "+resultado.docs.length.toString());
-
-    setState(() {
-      idAtual = resultado.docs.length+1;  
-    });
-
-  }
-
 
   //Teste camera:
   PickedFile? _image;
@@ -521,7 +372,7 @@ class _CadastrarTimeState extends State<CadastrarTime> {
     });
   }
 
-  String? urlDownloadImage;
+  
   Future<void> uploadPhoto(File Image, String fileName) async {
     try {
       var result = await storage.FirebaseStorage.instance
@@ -530,8 +381,8 @@ class _CadastrarTimeState extends State<CadastrarTime> {
 
       final urlDownload = await result.ref.getDownloadURL();
       setState(() {
-        urlDownloadImage = urlDownload;
-        print("TESTE CAMERA URL: " + urlDownloadImage.toString());
+        _controller.urlDownloadImage = urlDownload;
+        print("TESTE CAMERA URL: " + _controller.urlDownloadImage.toString());
       });
     } on core.FirebaseException catch (e) {
       print("Error: ${e.code}");
