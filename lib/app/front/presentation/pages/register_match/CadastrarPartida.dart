@@ -1,6 +1,7 @@
-import 'package:arena_soccer/model/Partida.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:arena_soccer/app/front/presentation/components/arena_button.dart';
+import 'package:arena_soccer/app/front/presentation/pages/register_match/register_new_match_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 
 class CadastrarPartida extends StatefulWidget {
   const CadastrarPartida({ Key? key }) : super(key: key);
@@ -10,125 +11,9 @@ class CadastrarPartida extends StatefulWidget {
 }
 
 class _CadastrarPartidaState extends State<CadastrarPartida> {
-  TextEditingController _controllerIdPartida = TextEditingController();
-  TextEditingController _controllerTimeC = TextEditingController();
-  TextEditingController _controllerTimeF = TextEditingController();
-  TextEditingController _controllerHorario = TextEditingController();
-  TextEditingController _controllerLocal = TextEditingController();
-  TextEditingController _controllerData = TextEditingController();
+  final _controller = RegisterNewMatchController(); //utilizo mobX
 
   // int idAtual = 0;
-
-  int buscarIdCampeonato(String regiao){
-    switch (regiao) {
-      case "Floresta":
-        return 1;
-      case "Santo inacio":
-        return 2;
-      default:
-        return 0;
-    }
-  }
-
-  //capturar dados da partida
-  criarPartida() {
-    // String id_partida = idAtual.toString();
-    // String id_partida = _controllerIdPartida.text;
-    String timeC = timeSelecionadoCasa;
-    String timeF = timeSelecionadoFora;
-    // String timeC = _controllerTimeC.text;
-    // String timeF = _controllerTimeF.text;
-    String horario = _controllerHorario.text;
-    String local = _controllerLocal.text;
-    String data = _controllerData.text;
-    int idCampeonato = buscarIdCampeonato(cidadeSelecionada);
-    
-    //validar campos:
-    if ((timeC.isNotEmpty && timeC.length >= 3) && (timeF.isNotEmpty && timeF.length >= 3)) {
-      //criar partida
-      Partida partida = Partida(
-        // idPartida: id_partida, 
-        timeC: timeC, 
-        timeF: timeF, 
-        horario: horario, 
-        local: local, 
-        data: data,
-        fkPartida: cidadeSelecionada,
-        idCampeonato: idCampeonato,
-      );
-
-      //salvar informações do jogador no banco de dados
-      _cadastrarFirebase(partida);
-    } else {      
-      _chamarSnackBar("Preencha todos os campos!!!");
-    }
-  }
-
-  //cadastrar informações do usuário no banco de dados
-  Future<void> _cadastrarFirebase(Partida partida) async {
-    FirebaseFirestore db = await FirebaseFirestore.instance;
-    
-    var addedDocRef = await db.collection("partidas").add({
-      "id_partida": "",
-      "dataRegistro": FieldValue.serverTimestamp(),
-
-      "timeC": partida.timeC,
-      "timeF": partida.timeF,
-      "horario": partida.horario,
-      "id_campeonato":partida.getIdCampeonato,
-      "local": partida.local,
-      "data": partida.data,
-
-      "golTimeCasa": 0,
-      "golTimeFora": 0,
-
-      "quantidadeVotos": "",
-      "tituloVotacao": "",
-      "votacao": "false",
-      "melhorJogador": "",
-
-      "fk_competicao":partida.fkPartida,
-
-    });
-    
-    db.collection("partidas").doc(addedDocRef.id).set({
-      "id_partida": addedDocRef.id,
-      "dataRegistro": FieldValue.serverTimestamp(),
-
-      "timeC": partida.timeC,
-      "timeF": partida.timeF,
-      "horario": partida.horario,
-      "id_campeonato":partida.getIdCampeonato,
-      "local": partida.local,
-      "data": partida.data,
-
-      "golTimeCasa": 0,
-      "golTimeFora": 0,
-
-      "quantidadeVotos": "",
-      "tituloVotacao": "",
-      "votacao": "false",
-      "melhorJogador": "",
-
-      "fk_competicao":partida.fkPartida,
-
-    });
-
-    _chamarSnackBar("Partida Cadastrada com Sucesso!!!");
-  }
-
-
-//cria a snackBar com a mensagem de alerta
-  var _snackBar;
-  _chamarSnackBar(texto){
-    _snackBar = SnackBar(content: Text(texto),);
-
-    if(_snackBar != null){
-      ScaffoldMessenger.of(context).showSnackBar(_snackBar); //chama o snackBar 
-      //limpa snackbar
-      _snackBar = "";
-    }
-  }
 
   pageJogador() {
     return Column(
@@ -153,7 +38,9 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
           "Região:", 
           style: TextStyle(fontSize: 18),
         ),
-        _chamarDropDownCity(false),
+        Observer(builder: (_){
+          return _chamarDropDownCity(false);
+        }),
         // TextField(
         //   controller: _controllerIdPartida,
         //   //autofocus: true,
@@ -195,7 +82,9 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
             ),
           ],
         ),
-        _chamarDropDownTimesCasa(),
+        Observer(builder: (_){
+          return _chamarDropDownTimesCasa();
+        }),
         const SizedBox(height: 16,),
         // TextField(
         //   controller: _controllerTimeF,
@@ -224,10 +113,12 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
             ),
           ],
         ),
-        _chamarDropDownTimesFora(),
+        Observer(builder: (_){
+          return _chamarDropDownTimesFora();
+        }),
         const SizedBox(height: 16,),      
         TextField(
-          controller: _controllerData,
+          controller: _controller.controllerData,
           keyboardType: TextInputType.datetime,
           //autofocus: true,
           decoration: const InputDecoration(
@@ -242,7 +133,7 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
         ),
         const SizedBox(height: 16,),      
         TextField(
-          controller: _controllerHorario,
+          controller: _controller.controllerHorario,
           keyboardType: TextInputType.datetime,
           //autofocus: true,
           decoration: const InputDecoration(
@@ -257,7 +148,7 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
         ),
         const SizedBox(height: 16,),      
         TextField(
-          controller: _controllerLocal,
+          controller: _controller.controllerLocal,
           //autofocus: true,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
@@ -269,16 +160,29 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
             ),
           ),
         ),
-        const SizedBox(height: 16,),      
-        ElevatedButton(
-          onPressed: () {
-            criarPartida();            
-          },
-          child: Text("CADASTRAR"),
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(Colors.green), //essa merda toda pra mudar a cor do botão oporra
-          ),
-        ),
+        const SizedBox(height: 16,),
+        Observer(builder: (_) {
+          final width = MediaQuery.of(context).size.width;
+
+          return ArenaButton(
+            height: 47,
+            width: width,
+            title: "CADASTRAR",
+            isLoading: _controller.isLoading,
+            function: () async {
+              await _controller.changeLoading(true);
+              
+              _controller.criarPartida();
+              _controller.chamarSnackBar("Partida Cadastrada com Sucesso!!!", context);
+
+              // Simulando uma operação assíncrona com o Future.delayed
+              await _controller.changeLoading(false);
+            },
+            buttonColor: Colors.green,
+            fontSize: 16,
+            borderRadius: 8,
+          );
+        }),
         const SizedBox(height: 2,),       
       ],
     );
@@ -287,9 +191,9 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
   @override
   void initState() {
     super.initState();
-    _recuperarCidades();
-    _recuperarTimesCasa();
-    _recuperarTimesFora();
+    _controller.recuperarCidades();
+    _controller.recuperarTimesCasa();
+    _controller.recuperarTimesFora();
   }
 
   @override
@@ -322,10 +226,8 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
       ),
     );
   }
-
-  String cidadeSelecionada = 'Floresta';
+  
   _chamarDropDownCity(bool isRegister){
-
     return Container(
       margin: const EdgeInsets.all(4),
       height: MediaQuery.of(context).size.height * 0.06,
@@ -335,7 +237,7 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
       ),
       padding: const EdgeInsets.all(10),
       child: DropdownButton<String>(
-              value: cidadeSelecionada,
+              value: _controller.cidadeSelecionada,
               icon: const Icon(Icons.change_circle_outlined, color: Colors.green,),
               isExpanded: true,
               borderRadius: BorderRadius.circular(16),
@@ -350,22 +252,20 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
                   
                   
                 }else{
-                  setState(() {
-                    cidadeSelecionada = newValue!;
-                    if(listaTimesFirebaseCasa.isEmpty){
-                      _recuperarTimesCasa();
-                      _recuperarTimesFora();
-                    }else{
-                      listaTimesFirebaseCasa.clear();
-                      _recuperarTimesCasa();
-                      listaTimesFirebaseFora.clear();
-                      _recuperarTimesFora();
-                    }
-                  });
+                  _controller.cidadeSelecionada = newValue!;
+                  if(_controller.listaTimesFirebaseCasa.isEmpty){
+                    _controller.recuperarTimesCasa();
+                    _controller.recuperarTimesFora();
+                  }else{
+                    _controller.listaTimesFirebaseCasa.clear();
+                    _controller.recuperarTimesCasa();
+                    _controller.listaTimesFirebaseFora.clear();
+                    _controller.recuperarTimesFora();
+                  }
                 }
               },
 
-              items: listaCidadesFirebase.map<DropdownMenuItem<String>>((String value) {
+              items: _controller.listaCidadesFirebase.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
@@ -373,30 +273,9 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
               }).toList(),
             ),
     );
-  }
-
-  //recuperar nomes das cidades no firebase
-  final List<String> listaCidadesFirebase = []; //precisa estar assinalada com o final pra os valores persistirem
-  _recuperarCidades() async {
-    var collection = FirebaseFirestore.instance.collection("competicao"); //cria instancia
-
-    var resultado = await collection.get(); //busca os dados uma vez    
-
-    for(var doc in resultado.docs){
-      // print("TESTE REGIAO -> "+doc["nome"]);
-      setState(() {
-        listaCidadesFirebase.add(doc["nome"]); //adiciona em uma list
-      });
-      
-    }
-    //print("TESTE -> "+listaTimesFirebase.toString());
-
-  }
-
-
-  String timeSelecionadoCasa = 'Lava Jato';
+  }  
+  
   _chamarDropDownTimesCasa(){
-    
     return Container(    
       margin: const EdgeInsets.all(4),
       height: MediaQuery.of(context).size.height * 0.06,
@@ -406,7 +285,7 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
       ),
       padding: const EdgeInsets.all(10),
       child: DropdownButton<String>(
-              value: timeSelecionadoCasa,
+              value: _controller.timeSelecionadoCasa,
               icon: const Icon(Icons.change_circle_outlined, color: Colors.green,),
               isExpanded: true,
               borderRadius: BorderRadius.circular(16),
@@ -417,12 +296,10 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
               alignment: AlignmentDirectional.center,
               //dropdownColor: Colors.green,                            
               onChanged: (String? newValue) {
-                setState(() {
-                  timeSelecionadoCasa = newValue!;
-                });
+                _controller.timeSelecionadoCasa = newValue!;
               },
 
-              items: listaTimesFirebaseCasa.map<DropdownMenuItem<String>>((String value) {
+              items: _controller.listaTimesFirebaseCasa.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
@@ -431,30 +308,8 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
             ),
     );
   }
-
-  //recuperar nomes dos times no firebase
-  List<String> listaTimesFirebaseCasa = []; //precisa estar assinalada com o final pra os valores persistirem
-  _recuperarTimesCasa() async {
-    var collection = FirebaseFirestore.instance.collection("times").where("fk_competicao", isEqualTo: cidadeSelecionada); //cria instancia
-
-    var resultado = await collection.get(); //busca os dados uma vez
-    
-    for(var doc in resultado.docs){
-      print("TESTE TIME -> "+doc["nome"]);
-      setState(() {
-        listaTimesFirebaseCasa.add(doc["nome"]); //adiciona em uma list
-      });
-      
-    }
-    timeSelecionadoCasa = listaTimesFirebaseCasa.first; //a primeira opção do dropdown deve ser iniciada sempre com o primeiro registro da lista
-    //print("TESTE -> "+listaTimesFirebase.toString());    
-
-  }
-
-
-  String timeSelecionadoFora = 'Lava Jato';
+  
   _chamarDropDownTimesFora(){
-    
     return Container(    
       margin: const EdgeInsets.all(4),
       height: MediaQuery.of(context).size.height * 0.06,
@@ -464,7 +319,7 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
       ),
       padding: const EdgeInsets.all(10),
       child: DropdownButton<String>(
-              value: timeSelecionadoFora,
+              value: _controller.timeSelecionadoFora,
               icon: const Icon(Icons.change_circle_outlined, color: Colors.green,),
               isExpanded: true,
               borderRadius: BorderRadius.circular(16),
@@ -475,12 +330,10 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
               alignment: AlignmentDirectional.center,
               //dropdownColor: Colors.green,                            
               onChanged: (String? newValue) {
-                setState(() {
-                  timeSelecionadoFora = newValue!;
-                });
+                _controller.timeSelecionadoFora = newValue!;
               },
 
-              items: listaTimesFirebaseFora.map<DropdownMenuItem<String>>((String value) {
+              items: _controller.listaTimesFirebaseFora.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
@@ -488,25 +341,6 @@ class _CadastrarPartidaState extends State<CadastrarPartida> {
               }).toList(),
             ),
     );
-  }
-
-  //recuperar nomes dos times no firebase
-  List<String> listaTimesFirebaseFora = []; //precisa estar assinalada com o final pra os valores persistirem
-  _recuperarTimesFora() async {
-    var collection = FirebaseFirestore.instance.collection("times").where("fk_competicao", isEqualTo: cidadeSelecionada); //cria instancia
-
-    var resultado = await collection.get(); //busca os dados uma vez
-    
-    for(var doc in resultado.docs){
-      print("TESTE TIME -> "+doc["nome"]);
-      setState(() {
-        listaTimesFirebaseFora.add(doc["nome"]); //adiciona em uma list
-      });
-      
-    }
-    timeSelecionadoFora = listaTimesFirebaseFora.last; //a primeira opção do dropdown deve ser iniciada sempre com o primeiro registro da lista
-    //print("TESTE -> "+listaTimesFirebase.toString());    
-
   }
 
 }

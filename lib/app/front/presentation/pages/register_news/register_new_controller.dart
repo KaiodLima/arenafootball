@@ -199,7 +199,7 @@ abstract class _ControleBase with Store{
 
   //recuperar nomes das cidades no firebase
   @observable
-  ObservableList<String> listaCidadesFirebase = ObservableList<String>(); 
+  ObservableList<String> listaCidadesFirebase = ObservableList<String>();
   // final List<String> listaCidadesFirebase = []; //precisa estar assinalada com o final pra os valores persistirem
 
   @action
