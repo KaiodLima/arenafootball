@@ -5,7 +5,7 @@ import 'package:arena_soccer/app/front/presentation/pages/register_new_destaque/
 import 'package:arena_soccer/app/front/presentation/pages/register_news/CadastrarNoticia.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_match/CadastrarPartida.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_team/CadastrarTime.dart';
-import 'package:arena_soccer/app/front/presentation/pages/register_new_player/register_player_screen.dart';
+import 'package:arena_soccer/app/front/presentation/pages/register_new_player/register_new_player_screen.dart';
 import 'package:arena_soccer/app/front/presentation/pages/calculate_votes_best_player/CalcularVotos.dart';
 import 'package:arena_soccer/app/front/presentation/pages/login/Login.dart';
 import 'package:arena_soccer/abas/AbaCampeonatos.dart';
