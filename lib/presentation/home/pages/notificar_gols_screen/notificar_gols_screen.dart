@@ -1,7 +1,9 @@
 import 'package:arena_soccer/model/Noticia.dart';
 import 'package:arena_soccer/app/front/presentation/components/arena_button.dart';
+import 'package:arena_soccer/presentation/home/pages/notificar_gols_screen/notificar_gols_screen_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 
 class NotificarGolsScreen extends StatefulWidget {
   const NotificarGolsScreen({ Key? key }) : super(key: key);
@@ -11,13 +13,8 @@ class NotificarGolsScreen extends StatefulWidget {
 }
 
 class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
-  String cidadeSelecionada = 'Floresta';
-  String timeSelecionadoCasa = '';
-  String timeSelecionadoFora = '';
-
-  TextEditingController controllerGolCasa = TextEditingController();
-  TextEditingController controllerGolFora = TextEditingController();
-
+  final _controller = NotificarGolsScreenController(); //utilizo mobX
+  
   // int idAtual = 0;
 
   _chamarDropDownCity(){
@@ -31,7 +28,7 @@ class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
       ),
       padding: const EdgeInsets.all(10),
       child: DropdownButton<String>(
-              value: cidadeSelecionada,
+              value: _controller.cidadeSelecionada,
               icon: const Icon(Icons.change_circle_outlined, color: Colors.white,),
               isExpanded: true,
               borderRadius: BorderRadius.circular(16),
@@ -43,17 +40,17 @@ class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
               dropdownColor: Colors.green,
               onChanged: (String? newValue) {
                 setState(() {
-                  cidadeSelecionada = newValue!;
-                  if(listaTimesFirebase.isEmpty){
-                    _recuperarTimes();
+                  _controller.cidadeSelecionada = newValue!;
+                  if(_controller.listaTimesFirebase.isEmpty){
+                    _controller.recuperarTimes();
                   }else{
-                    listaTimesFirebase.clear();
-                    _recuperarTimes();
+                    _controller.listaTimesFirebase.clear();
+                    _controller.recuperarTimes();
                   }
                 });
               },
 
-              items: listaCidadesFirebase.map<DropdownMenuItem<String>>((String value) {
+              items: _controller.listaCidadesFirebase.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
@@ -72,7 +69,7 @@ class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
       ),
       padding: const EdgeInsets.all(10),
       child: DropdownButton<String>(
-              value: timeSelecionadoCasa,
+              value: _controller.timeSelecionadoCasa,
               icon: const Icon(Icons.arrow_downward, color: Colors.white,),
               isExpanded: true,
               borderRadius: BorderRadius.circular(16),
@@ -84,11 +81,11 @@ class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
               dropdownColor: Colors.green,                            
               onChanged: (String? newValue) {
                 setState(() {
-                  timeSelecionadoCasa = newValue!;
+                  _controller.timeSelecionadoCasa = newValue!;
                 });
               },
 
-              items: listaTimesFirebase.map<DropdownMenuItem<String>>((String value) {
+              items: _controller.listaTimesFirebase.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
@@ -107,7 +104,7 @@ class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
       ),
       padding: const EdgeInsets.all(10),
       child: DropdownButton<String>(
-              value: timeSelecionadoFora,
+              value: _controller.timeSelecionadoFora,
               icon: const Icon(Icons.arrow_downward, color: Colors.white,),
               isExpanded: true,
               borderRadius: BorderRadius.circular(16),
@@ -119,11 +116,11 @@ class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
               dropdownColor: Colors.green,
               onChanged: (String? newValue) {
                 setState(() {
-                  timeSelecionadoFora = newValue!;
+                  _controller.timeSelecionadoFora = newValue!;
                 });
               },
 
-              items: listaTimesFirebase.map<DropdownMenuItem<String>>((String value) {
+              items: _controller.listaTimesFirebase.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
@@ -132,11 +129,12 @@ class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
             ),
     );
   }
+
   @override
   void initState() {
     super.initState();
-    _recuperarCidades();
-    _recuperarTimes();
+    _controller.recuperarCidades();
+    _controller.recuperarTimes();
   }
 
   @override
@@ -255,12 +253,18 @@ class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
               
               const SizedBox(height: 8,),
               const Text("Região:", style: TextStyle(fontSize: 24, color: Colors.white,),),
-              _chamarDropDownCity(),
+              Observer(builder: (_){
+                return _chamarDropDownCity();
+              }),
               const SizedBox(height: 8,),
               const Text("Time da Casa:", style: TextStyle(fontSize: 24, color: Colors.white,),),
-              _chamarDropDownTimesCasa(),
+              Observer(builder: (_){
+                return _chamarDropDownTimesCasa();
+              }),
               const Text("Time Visitante:", style: TextStyle(fontSize: 24, color: Colors.white,),),
-              _chamarDropDownTimesFora(),
+              Observer(builder: (_){
+                return _chamarDropDownTimesFora();
+              }),
               const SizedBox(height: 16,),
               // Text("Placar Atual:", style: TextStyle(fontSize: 24, color: Colors.white,),),
               // const SizedBox(height: 8,),
@@ -278,7 +282,7 @@ class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
                       width: width*0.2,
                       height: height*.2,
                       child: TextField(
-                        controller: controllerGolCasa,
+                        controller: _controller.controllerGolCasa,
                         keyboardType: TextInputType.number,
                         onChanged: (value){
 
@@ -313,7 +317,7 @@ class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
                       width: width*0.2,
                       height: height*.2,
                       child: TextField(
-                        controller: controllerGolFora,
+                        controller: _controller.controllerGolFora,
                         keyboardType: TextInputType.number,
                         onChanged: (value){
 
@@ -352,7 +356,12 @@ class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
                 textColor: Colors.white,
                 buttonColor: Colors.green,                      
                 borderRadius: 8,
-                function: criarNoticia,
+                function: () async {
+                  await _controller.changeLoading(true);
+                  
+                  _controller.criarCardGol(context);
+                  await _controller.changeLoading(false);
+                },
               ),
 
             ],
@@ -362,145 +371,8 @@ class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
     );
   }
 
-  //recuperar nomes das cidades no firebase
-  final List<String> listaCidadesFirebase = []; //precisa estar assinalada com o final pra os valores persistirem
-  _recuperarCidades() async {
-    var collection = FirebaseFirestore.instance.collection("competicao"); //cria instancia
-
-    var resultado = await collection.get(); //busca os dados uma vez    
-
-    for(var doc in resultado.docs){
-      // print("TESTE REGIAO -> "+doc["nome"]);
-      setState(() {
-        listaCidadesFirebase.add(doc["nome"]); //adiciona em uma list
-      });
-      
-    }
-    //print("TESTE -> "+listaTimesFirebase.toString());    
-  }
-
-  //recuperar nomes dos times no firebase
-  List<String> listaTimesFirebase = []; //precisa estar assinalada com o final pra os valores persistirem
-  _recuperarTimes() async {
-    var collection = FirebaseFirestore.instance.collection("times").where("fk_competicao", isEqualTo: cidadeSelecionada); //cria instancia
-
-    var resultado = await collection.get(); //busca os dados uma vez
-
-    for(var doc in resultado.docs){
-      // print("TESTE TIME -> "+doc["nome"]);
-      setState(() {
-        listaTimesFirebase.add(doc["nome"]); //adiciona em uma list
-      });
-      
-    }
-    timeSelecionadoCasa = listaTimesFirebase.first; //a primeira opção do dropdown deve ser iniciada sempre com o primeiro registro da lista
-    timeSelecionadoFora = listaTimesFirebase.last;
-    //print("TESTE -> "+listaTimesFirebase.toString());    
-
-  }
 
   TextEditingController _controllerId = TextEditingController();
   TextEditingController _controllerExibir = TextEditingController();
   
-  //capturar dados da noticia
-  criarNoticia() {
-    // int id_noticia = int.parse(_controllerId.text);
-    // int idNoticia = idAtual;
-    String titulo = "";
-    String descricao = "";
-    String urlImagem = "";
-    String link = "";
-    // String exibir = _controllerExibir.text;
-    String exibir = "true";
-
-    String fkCompeticao = cidadeSelecionada;
-    String golCasa = controllerGolCasa.text;
-    String golFora = controllerGolFora.text;
-    String timeCasa = timeSelecionadoCasa;
-    String timeFora = timeSelecionadoFora;
-    String tag = "gol";
-
-    print(" TESTE KAIO::: "+fkCompeticao+" "+golCasa+" "+golFora+" "+timeCasa+" "+timeFora+" "+tag);
-    
-    //validar campos:
-    if (exibir.isNotEmpty) {
-      //criar partida
-      Noticia noticia = Noticia(
-        titulo: titulo, 
-        descricao: descricao, 
-        urlImagem: urlImagem, 
-        link: link, 
-        exibir: exibir,
-        fkCompeticao: fkCompeticao, 
-        timeCasa: timeCasa, 
-        timeFora: timeFora, 
-        golTimeCasa: golCasa, 
-        golTimeFora: golFora, 
-        tag: tag,
-      );        
-
-      //salvar informações do jogador no banco de dados
-      _cadastrarFirebase(noticia);
-    } else {      
-      _chamarSnackBar("Preencha todos os campos!!!");
-    }
-  }
-
-  //cadastrar informações no banco de dados
-  Future<void> _cadastrarFirebase(Noticia noticia) async {
-    FirebaseFirestore db = await FirebaseFirestore.instance;
-    //aqui estou usando o uid do usuário logado pra salvar como  id na colection de dados
-    var addedDocRef = await  db.collection("noticias").add({
-      "id": "",
-      "data": FieldValue.serverTimestamp(),
-
-      "titulo": noticia.titulo,
-      "descricao": noticia.descricao,
-      "urlImagem": noticia.urlImagem,
-      "link": noticia.link,
-      "exibir": noticia.exibir,
-
-      "fk_competicao": noticia.fkCompeticao,
-      "time_casa": noticia.timeCasa,
-      "time_fora": noticia.timeFora,
-      "gol_time_casa": noticia.golTimeCasa,
-      "gol_time_fora": noticia.golTimeFora,
-      "tag": noticia.tag
-
-    });
-
-    db.collection("noticias").doc(addedDocRef.id).set({
-      "id": addedDocRef.id,
-      "data": FieldValue.serverTimestamp(),
-
-      "titulo": noticia.titulo,
-      "descricao": noticia.descricao,
-      "urlImagem": noticia.urlImagem,
-      "link": noticia.link,
-      "exibir": noticia.exibir,
-
-      "fk_competicao": noticia.fkCompeticao,
-      "time_casa": noticia.timeCasa,
-      "time_fora": noticia.timeFora,
-      "gol_time_casa": noticia.golTimeCasa,
-      "gol_time_fora": noticia.golTimeFora,
-      "tag": noticia.tag
-
-    });
-
-    _chamarSnackBar("Gol registrado com Sucesso!!!");
-  }
-
-  //cria a snackBar com a mensagem de alerta
-  var _snackBar;
-  _chamarSnackBar(texto){
-    _snackBar = SnackBar(content: Text(texto),);
-
-    if(_snackBar != null){
-      ScaffoldMessenger.of(context).showSnackBar(_snackBar); //chama o snackBar 
-      //limpa snackbar
-      _snackBar = "";
-    }
-  }
-
 }
