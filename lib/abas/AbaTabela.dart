@@ -65,7 +65,9 @@ class _AbaTabelaState extends State<AbaTabela> {
           case ConnectionState.none:
           case ConnectionState.waiting:
             return const Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                color: Colors.green,
+              ),
             );
           default:
             List<DocumentSnapshot> campeonatos = snapshot.data!.docs;

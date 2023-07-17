@@ -348,20 +348,25 @@ class _NotificarGolsScreenState extends State<NotificarGolsScreen> {
                   ],
                 ),
               ),
-              ArenaButton(
-                height: 47,
-                width: width,
-                title: "Publicar",
-                fontSize: 16,
-                textColor: Colors.white,
-                buttonColor: Colors.green,                      
-                borderRadius: 8,
-                function: () async {
-                  await _controller.changeLoading(true);
-                  
-                  _controller.criarCardGol(context);
-                  await _controller.changeLoading(false);
-                },
+              Observer(
+                builder: (context) {
+                  return ArenaButton(
+                    height: 47,
+                    width: width,
+                    isLoading: _controller.isLoading,
+                    title: "Publicar",
+                    fontSize: 16,
+                    textColor: Colors.white,
+                    buttonColor: Colors.green,                      
+                    borderRadius: 8,
+                    function: () async {
+                      await _controller.changeLoading(true);
+                      
+                      _controller.criarCardGol(context);
+                      await _controller.changeLoading(false);
+                    },
+                  );
+                }
               ),
 
             ],

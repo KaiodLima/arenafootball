@@ -118,7 +118,9 @@ class _AbaNoticiasState extends State<AbaNoticias> {
           case ConnectionState.none:
           case ConnectionState.waiting:
             return const Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                color: Colors.green,
+              ),
             );
           default:
             List<DocumentSnapshot> noticia = snapshot.data!.docs;

@@ -324,27 +324,32 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
                 // ),
               ),
               const SizedBox(height: 16,),
-              ArenaButton(
-                height: 47,
-                width: width,
-                title: "Publicar",
-                fontSize: 16,
-                textColor: Colors.white,
-                buttonColor: Colors.green,                      
-                borderRadius: 8,
-                function: () async {
-                  await _controller.changeLoading(true);
-                  Random random = Random();
-                  int randomNumber = random.nextInt(100000);
-                  
-                  if(_controller.imageFile != null){
-                    await _controller.uploadPhoto(_controller.imageFile!, "noticias${_controller.controllerTitulo.text+randomNumber.toString()}");
-                  }
-                  await _controller.changeLoading(false);
-                  
-                  _controller.criarAnuncio(context);
-                  _controller.chamarSnackBar("Publicidade registrada com Sucesso!!!", context);
-                },
+              Observer(
+                builder: (context) {
+                  return ArenaButton(
+                    height: 47,
+                    width: width,
+                    isLoading: _controller.isLoading,
+                    title: "Publicar",
+                    fontSize: 16,
+                    textColor: Colors.white,
+                    buttonColor: Colors.green,                      
+                    borderRadius: 8,
+                    function: () async {
+                      await _controller.changeLoading(true);
+                      Random random = Random();
+                      int randomNumber = random.nextInt(100000);
+                      
+                      if(_controller.imageFile != null){
+                        await _controller.uploadPhoto(_controller.imageFile!, "noticias${_controller.controllerTitulo.text+randomNumber.toString()}");
+                      }
+                      await _controller.changeLoading(false);
+                      
+                      _controller.criarAnuncio(context);
+                      _controller.chamarSnackBar("Publicidade registrada com Sucesso!!!", context);
+                    },
+                  );
+                }
               ),
 
             ],

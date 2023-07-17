@@ -56,7 +56,9 @@ class _AbaCampeonatosState extends State<AbaCampeonatos> {
           case ConnectionState.none:
           case ConnectionState.waiting:
             return const Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                color: Colors.green,
+              ),
             );
           default:
             List<DocumentSnapshot> campeonatos = snapshot.data!.docs;
@@ -90,7 +92,9 @@ class _AbaCampeonatosState extends State<AbaCampeonatos> {
                             child: CachedNetworkImage(
                               imageUrl: campeonatos[index].get("urlImagem").toString(),
                               fit: BoxFit.scaleDown,
-                              placeholder: (context, url) => const CircularProgressIndicator(),
+                              placeholder: (context, url) => const CircularProgressIndicator(
+                                color: Colors.green,
+                              ),
                               errorWidget: (context, url, error) => const Icon(Icons.error),
                             ),
                         ),

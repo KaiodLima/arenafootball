@@ -82,7 +82,9 @@ class _AbaTimesState extends State<AbaTimes> {
           case ConnectionState.none:
           case ConnectionState.waiting:
             return const Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                color: Colors.green,
+              ),
             );
           default:
             List<DocumentSnapshot> time = snapshot.data!.docs;
