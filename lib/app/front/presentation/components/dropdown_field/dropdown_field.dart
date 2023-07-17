@@ -9,6 +9,7 @@ class ArenaDropdownField extends StatefulWidget {
   final RegisterNewController? controller;
   final RegisterNewDestaqueController? controllerDestaque;
   final NewsEditScreenController? controllerNews;
+  final bool? initialValue;
 
   ArenaDropdownField({
     Key? key,
@@ -16,7 +17,8 @@ class ArenaDropdownField extends StatefulWidget {
     this.onChaged,
     this.controller,
     this.controllerDestaque,
-    this.controllerNews
+    this.controllerNews,
+    this.initialValue,
     // required this.controller
   }) : super(key: key);
 
@@ -34,6 +36,8 @@ class _ArenaDropdownFieldState extends State<ArenaDropdownField> {
 
   @override
   Widget build(BuildContext context) {
+    isSwitched = widget.initialValue ?? false;
+    
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

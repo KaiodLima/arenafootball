@@ -177,6 +177,7 @@ class _NewsEditScreenState extends State<NewsEditScreen> {
         Observer(builder: (_) {
           return ArenaDropdownField(
             controllerNews: _controller,
+            initialValue: _controller.controllerExibir.text == "true"? true : false,
             icon: Icon(
               Icons.visibility,
               color: _controller.validateExibition() == null
@@ -186,23 +187,6 @@ class _NewsEditScreenState extends State<NewsEditScreen> {
             ),
           );
         }),
-        // Observer(
-        //   builder: (_) {
-        //     return TextField(
-        //       controller: _controller.controllerExibir,
-        //       //autofocus: true,
-        //       decoration: const InputDecoration(
-        //         border: OutlineInputBorder(),
-        //         labelText: "Exibir noticia? (true ou false)",
-        //         icon: Icon(
-        //           Icons.visibility,
-        //           color: Colors.green,
-        //           size: 24.0,              
-        //         ),
-        //       ),
-        //     );
-        //   }
-        // ),
         const SizedBox(height: 16,),
         Observer(builder: (_) {
           final width = MediaQuery.of(context).size.width;
