@@ -1,3 +1,4 @@
+import 'package:arena_soccer/app/front/presentation/pages/edit_news/news_edit_screen_controller.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_new_destaque/register_new_destaque_controller.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_news/register_new_controller.dart';
 import 'package:flutter/material.dart';
@@ -7,13 +8,15 @@ class ArenaDropdownField extends StatefulWidget {
   final Function(String)? onChaged;
   final RegisterNewController? controller;
   final RegisterNewDestaqueController? controllerDestaque;
+  final NewsEditScreenController? controllerNews;
 
   ArenaDropdownField({
     Key? key,
     this.icon,
     this.onChaged,
     this.controller,
-    this.controllerDestaque
+    this.controllerDestaque,
+    this.controllerNews
     // required this.controller
   }) : super(key: key);
 
@@ -52,9 +55,11 @@ class _ArenaDropdownFieldState extends State<ArenaDropdownField> {
                     if(isSwitched){
                       widget.controller?.isShow = "true";
                       widget.controllerDestaque?.isShow = "true";
+                      widget.controllerNews?.isShow = "true";
                     }else{
                       widget.controller?.isShow = "false";
                       widget.controllerDestaque?.isShow = "false";
+                      widget.controllerNews?.isShow = "false";
                     }
                     
                   });
