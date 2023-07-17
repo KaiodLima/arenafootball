@@ -90,7 +90,9 @@ class _ExibirJogadoresState extends State<ExibirJogadores> {
                               imageUrl: _jogadorSelecionado!.urlImagem.toString(),
                               fit: BoxFit.scaleDown,
                               placeholder: (context, url) =>
-                                  const Center(child: CircularProgressIndicator()),
+                                  const Center(child: CircularProgressIndicator(
+                                    color: Colors.green,
+                                  )),
                               errorWidget: (context, url, error) =>
                                   const Icon(Icons.error),
                             ),

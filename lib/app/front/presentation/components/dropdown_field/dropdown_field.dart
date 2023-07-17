@@ -1,6 +1,7 @@
 import 'package:arena_soccer/app/front/presentation/pages/edit_news/news_edit_screen_controller.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_new_destaque/register_new_destaque_controller.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_news/register_new_controller.dart';
+import 'package:arena_soccer/presentation/home/pages/publicar_anuncio_screen/publicar_anuncio_screen_controller.dart';
 import 'package:flutter/material.dart';
 
 class ArenaDropdownField extends StatefulWidget {
@@ -9,7 +10,9 @@ class ArenaDropdownField extends StatefulWidget {
   final RegisterNewController? controller;
   final RegisterNewDestaqueController? controllerDestaque;
   final NewsEditScreenController? controllerNews;
+  final PublicCardScreenController? controllerPublic;
   final bool? initialValue;
+  final Color? textColorInactive;
 
   ArenaDropdownField({
     Key? key,
@@ -19,6 +22,8 @@ class ArenaDropdownField extends StatefulWidget {
     this.controllerDestaque,
     this.controllerNews,
     this.initialValue,
+    this.controllerPublic,
+    this.textColorInactive,
     // required this.controller
   }) : super(key: key);
 
@@ -28,6 +33,7 @@ class ArenaDropdownField extends StatefulWidget {
 
 class _ArenaDropdownFieldState extends State<ArenaDropdownField> {
   bool isSwitched = false;
+  bool keyRead = false;
   
   @override
   void initState() {
@@ -36,7 +42,10 @@ class _ArenaDropdownFieldState extends State<ArenaDropdownField> {
 
   @override
   Widget build(BuildContext context) {
-    isSwitched = widget.initialValue ?? false;
+    if(keyRead == false){
+      isSwitched = widget.initialValue ?? false;
+      keyRead = true;
+    }
     
     return Center(
       child: Column(
@@ -48,7 +57,7 @@ class _ArenaDropdownFieldState extends State<ArenaDropdownField> {
             children: [
               Text(
                 'Exibir notícia',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: isSwitched ? Colors.green : Colors.black54,),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: isSwitched ? Colors.green : (widget.textColorInactive??Colors.black54),),
               ),
               const SizedBox(height: 20),
               Switch(
@@ -60,10 +69,12 @@ class _ArenaDropdownFieldState extends State<ArenaDropdownField> {
                       widget.controller?.isShow = "true";
                       widget.controllerDestaque?.isShow = "true";
                       widget.controllerNews?.isShow = "true";
+                      widget.controllerPublic?.isShow = "true";
                     }else{
                       widget.controller?.isShow = "false";
                       widget.controllerDestaque?.isShow = "false";
                       widget.controllerNews?.isShow = "false";
+                      widget.controllerPublic?.isShow = "false";
                     }
                     
                   });

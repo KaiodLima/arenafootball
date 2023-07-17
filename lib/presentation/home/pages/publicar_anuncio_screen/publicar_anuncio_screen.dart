@@ -1,13 +1,9 @@
-import 'dart:io';
 import 'dart:math';
-
-import 'package:arena_soccer/model/Noticia.dart';
 import 'package:arena_soccer/app/front/presentation/components/arena_button.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart' as storage;
-import 'package:firebase_core/firebase_core.dart' as core;
+import 'package:arena_soccer/app/front/presentation/components/dropdown_field/dropdown_field.dart';
+import 'package:arena_soccer/presentation/home/pages/publicar_anuncio_screen/publicar_anuncio_screen_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 
 class PublicarAnuncioScreen extends StatefulWidget {
   const PublicarAnuncioScreen({Key? key}) : super(key: key);
@@ -17,14 +13,9 @@ class PublicarAnuncioScreen extends StatefulWidget {
 }
 
 class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
+  final _controller = PublicCardScreenController(); //utilizo mobX
 
-  String cidadeSelecionada = 'Floresta';
   // int idAtual = 0;
-
-  TextEditingController _controllerLink = TextEditingController();
-  TextEditingController _controllerDescricao = TextEditingController();
-  TextEditingController _controllerTitulo = TextEditingController();
-  TextEditingController _controllerExibir = TextEditingController();
 
   _chamarDropDownCity(){
 
@@ -37,7 +28,7 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
       ),
       padding: const EdgeInsets.all(10),
       child: DropdownButton<String>(
-              value: cidadeSelecionada,
+              value: _controller.cidadeSelecionada,
               icon: const Icon(Icons.change_circle_outlined, color: Colors.white,),
               isExpanded: true,
               borderRadius: BorderRadius.circular(16),
@@ -49,11 +40,11 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
               dropdownColor: Colors.green,
               onChanged: (String? newValue) {
                 setState(() {
-                  cidadeSelecionada = newValue!;
+                  _controller.cidadeSelecionada = newValue!;
                 });
               },
 
-              items: listaCidadesFirebase.map<DropdownMenuItem<String>>((String value) {
+              items: _controller.listaCidadesFirebase.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
@@ -66,8 +57,7 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
   @override
   void initState() {
     super.initState();
-
-    _recuperarCidades();
+    _controller.recuperarCidades();
   }
 
   @override
@@ -90,6 +80,9 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
         centerTitle: true,        
       ),
       body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(
+          parent: AlwaysScrollableScrollPhysics(),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
@@ -110,14 +103,16 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
               const SizedBox(height: 16,),
               const Text("Região:", style: TextStyle(fontSize: 24, color: Colors.white,),),
               const SizedBox(height: 8,),
-              _chamarDropDownCity(),
+              Observer(builder: (_){
+                return _chamarDropDownCity();
+              }),
               const SizedBox(height: 32,),
               // const Text("Time da Casa:", style: TextStyle(fontSize: 24, color: Colors.white,),),
               SizedBox(
                 width: width*1,
                 // height: height*.2,
                 child: TextField(
-                  controller: _controllerTitulo,
+                  controller: _controller.controllerTitulo,
                   onChanged: (value){
 
                   },
@@ -151,12 +146,20 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
                 ),
               ),
               const SizedBox(height: 16,),
-              imageFile != null? Container(          
-                margin: const EdgeInsets.all(10),
-                height: MediaQuery.of(context).size.height * 0.3,
-                width: MediaQuery.of(context).size.width * 1,
-                child: Image.file(imageFile!),
-              ): Container(),
+              Observer(builder: (_){
+                return _controller.imageFile != null? Container(          
+                  margin: const EdgeInsets.all(10),
+                  height: MediaQuery.of(context).size.height * 0.3,
+                  width: MediaQuery.of(context).size.width * 1,
+                  child: Image.file(_controller.imageFile!),
+                ): Container();
+              }),
+              // _controller.imageFile != null? Container(          
+              //   margin: const EdgeInsets.all(10),
+              //   height: MediaQuery.of(context).size.height * 0.3,
+              //   width: MediaQuery.of(context).size.width * 1,
+              //   child: Image.file(_controller.imageFile!),
+              // ): Container(),
               Padding(
                 padding: const EdgeInsets.only(left: 40),
                 child: Row(
@@ -170,7 +173,7 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
                         onPressed: () {                    
                           //Tirar foto:
                           // getImageCamera();
-                          _recoveryImage(true);
+                          _controller.recoveryImage(true);
                                       
                         },
                         label: const Text("Tirar foto"),
@@ -187,7 +190,7 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
                         onPressed: () {
                           //buscar na galeria
                           // getImageGalery();
-                          _recoveryImage(false);
+                          _controller.recoveryImage(false);
                                       
                         },
                         label: const Text("Galeria", style: TextStyle(color: Colors.green),),
@@ -203,7 +206,7 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
               SizedBox(
                 width: width*1,
                 child: TextField(
-                  controller: _controllerDescricao,
+                  controller: _controller.controllerDescricao,
                   maxLines: 5,
                   cursorColor: Colors.white,
                   //autofocus: true,
@@ -236,7 +239,7 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
                 width: width*1,
                 // height: height*.2,
                 child: TextField(
-                  controller: _controllerLink,
+                  controller: _controller.controllerLink,
                   onChanged: (value){
 
                   },
@@ -273,39 +276,52 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
               SizedBox(
                 width: width*1,
                 // height: height*.2,
-                child: TextField(
-                  controller: _controllerExibir,
-                  onChanged: (value){
+                child: Observer(builder: (_) {
+                  return ArenaDropdownField(
+                    controllerPublic: _controller,
+                    textColorInactive: Colors.grey,
+                    icon: Icon(
+                      Icons.visibility,
+                      color: _controller.validateExibition() == null
+                          ? Colors.green
+                          : Colors.red,
+                      size: 24.0,
+                    ),
+                  );
+                }),
+                // child: TextField(
+                //   controller: _controller.controllerExibir,
+                //   onChanged: (value){
 
-                  },
-                  cursorColor: Colors.white,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder( //quando a borda é selecionada
-                      borderSide: BorderSide(
-                        color: Colors.green,
-                        width: 2,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder( //quando a borda não está selecionada
-                      borderSide: BorderSide(
-                        color: Colors.green,
-                      ),
-                    ),
-                    labelText: "Exibir (true ou false)",
-                    labelStyle: TextStyle(fontSize: 16, color: Colors.white),
-                    // icon: Icon(
-                    //   Icons.sort,
-                    //   color: Colors.white,
-                    //   size: 24.0,
-                    // ),
-                  ),
-                  textAlign: TextAlign.start,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    color: Colors.white,
-                  ),
-                ),
+                //   },
+                //   cursorColor: Colors.white,
+                //   decoration: const InputDecoration(
+                //     border: OutlineInputBorder(),
+                //     focusedBorder: OutlineInputBorder( //quando a borda é selecionada
+                //       borderSide: BorderSide(
+                //         color: Colors.green,
+                //         width: 2,
+                //       ),
+                //     ),
+                //     enabledBorder: OutlineInputBorder( //quando a borda não está selecionada
+                //       borderSide: BorderSide(
+                //         color: Colors.green,
+                //       ),
+                //     ),
+                //     labelText: "Exibir (true ou false)",
+                //     labelStyle: TextStyle(fontSize: 16, color: Colors.white),
+                //     // icon: Icon(
+                //     //   Icons.sort,
+                //     //   color: Colors.white,
+                //     //   size: 24.0,
+                //     // ),
+                //   ),
+                //   textAlign: TextAlign.start,
+                //   style: const TextStyle(
+                //     fontSize: 18,
+                //     color: Colors.white,
+                //   ),
+                // ),
               ),
               const SizedBox(height: 16,),
               ArenaButton(
@@ -317,13 +333,17 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
                 buttonColor: Colors.green,                      
                 borderRadius: 8,
                 function: () async {
+                  await _controller.changeLoading(true);
                   Random random = Random();
                   int randomNumber = random.nextInt(100000);
                   
-                  if(imageFile != null){
-                    await uploadPhoto(imageFile!, "noticias${_controllerTitulo.text+randomNumber.toString()}");
+                  if(_controller.imageFile != null){
+                    await _controller.uploadPhoto(_controller.imageFile!, "noticias${_controller.controllerTitulo.text+randomNumber.toString()}");
                   }
-                  criarAnuncio();
+                  await _controller.changeLoading(false);
+                  
+                  _controller.criarAnuncio(context);
+                  _controller.chamarSnackBar("Publicidade registrada com Sucesso!!!", context);
                 },
               ),
 
@@ -333,161 +353,5 @@ class _PublicarAnuncioScreenState extends State<PublicarAnuncioScreen> {
       ),
     );
   }
-
-  //recuperar nomes das cidades no firebase
-  final List<String> listaCidadesFirebase = []; //precisa estar assinalada com o final pra os valores persistirem
-  _recuperarCidades() async {
-    var collection = FirebaseFirestore.instance.collection("competicao"); //cria instancia
-
-    var resultado = await collection.get(); //busca os dados uma vez    
-
-    for(var doc in resultado.docs){
-      // print("TESTE REGIAO -> "+doc["nome"]);
-      setState(() {
-        listaCidadesFirebase.add(doc["nome"]); //adiciona em uma list
-      });
-      
-    }
-    //print("TESTE -> "+listaTimesFirebase.toString());    
-  }
-
-  String? urlDownloadImage;
-  //noticia e anuncio usam o mesmo model
-  criarAnuncio() {
-    // int idNoticia = idAtual;
-    String titulo = _controllerTitulo.text;
-    String descricao = _controllerDescricao.text;
-    String urlImagem = urlDownloadImage?.toString() ?? "";
-    String link = _controllerLink.text;
-    // String exibir = _controllerExibir.text;
-    String exibir = _controllerExibir.text;
-
-    String fkCompeticao = cidadeSelecionada;
-    String golCasa = "";
-    String golFora = "";
-    String timeCasa = "";
-    String timeFora = "";
-    String tag = "publicidade";
-
-    //validar campos:
-    if (exibir.isNotEmpty) {
-      //criar partida
-      Noticia noticia = Noticia(
-        titulo: titulo, 
-        descricao: descricao, 
-        urlImagem: urlImagem, 
-        link: link, 
-        exibir: exibir,
-        fkCompeticao: fkCompeticao, 
-        timeCasa: timeCasa, 
-        timeFora: timeFora, 
-        golTimeCasa: golCasa, 
-        golTimeFora: golFora, 
-        tag: tag,
-      );        
-
-      //salvar informações do jogador no banco de dados
-      _cadastrarFirebase(noticia);
-    } else {      
-      _chamarSnackBar("Preencha todos os campos!!!");
-    }
-  }
-
-  //cadastrar informações no banco de dados
-  Future<void> _cadastrarFirebase(Noticia noticia) async {
-    FirebaseFirestore db = await FirebaseFirestore.instance;
-    //aqui estou usando o uid do usuário logado pra salvar como  id na colection de dados
-    var addedDocRef = await db.collection("noticias").add({
-      "id": "",
-      "data": FieldValue.serverTimestamp(),
-
-      "titulo": noticia.titulo,
-      "descricao": noticia.descricao,
-      "urlImagem": noticia.urlImagem,
-      "link": noticia.link,
-      "exibir": noticia.exibir,
-
-      "fk_competicao": noticia.fkCompeticao,
-      "time_casa": noticia.timeCasa,
-      "time_fora": noticia.timeFora,
-      "gol_time_casa": noticia.golTimeCasa,
-      "gol_time_fora": noticia.golTimeFora,
-      "tag": noticia.tag
-
-    });
-
-    db.collection("noticias").doc(addedDocRef.id).set({
-      "id": addedDocRef.id,
-      "data": FieldValue.serverTimestamp(),
-
-      "titulo": noticia.titulo,
-      "descricao": noticia.descricao,
-      "urlImagem": noticia.urlImagem,
-      "link": noticia.link,
-      "exibir": noticia.exibir,
-
-      "fk_competicao": noticia.fkCompeticao,
-      "time_casa": noticia.timeCasa,
-      "time_fora": noticia.timeFora,
-      "gol_time_casa": noticia.golTimeCasa,
-      "gol_time_fora": noticia.golTimeFora,
-      "tag": noticia.tag
-
-    });
-
-    _chamarSnackBar("Publicidade registrada com Sucesso!!!");
-  }
-
-  //cria a snackBar com a mensagem de alerta
-  var _snackBar;
-  _chamarSnackBar(texto){
-    _snackBar = SnackBar(content: Text(texto),);
-
-    if(_snackBar != null){
-      ScaffoldMessenger.of(context).showSnackBar(_snackBar); //chama o snackBar 
-      //limpa snackbar
-      _snackBar = "";
-    }
-  }
-
-  //Teste camera:
-  PickedFile? _image;
-  File? imageFile;
- 
-  Future _recoveryImage(bool isCamera) async{
-    PickedFile? imageSelected;
-    var imageTemporary;
-    if(isCamera) {
-      _image = await ImagePicker.platform.pickImage(source: ImageSource.camera);
-      imageTemporary = File(_image!.path);
-    } else {
-      print("GALERY!!!");
-      _image = await ImagePicker.platform.pickImage(source: ImageSource.gallery);
-      imageTemporary = File(_image!.path);
-    }
- 
-    setState(() {
-      imageFile = imageTemporary;
-      _image = imageSelected;
-    });
- 
-  }
-
-  Future<void> uploadPhoto(File Image, String fileName) async {
-    print("ENTROU!!! "+Image.uri.toString());
-    try {
-      var result = await storage.FirebaseStorage.instance.ref("noticias/$fileName").putFile(Image);
-      print("RESULT!!! "+result.toString());
-      final urlDownload = await result.ref.getDownloadURL();
-      setState(() {
-        urlDownloadImage = urlDownload;
-        print("TESTE CAMERA URL: "+urlDownloadImage.toString());
-      });
-    } on core.FirebaseException catch(e) {
-      print("Error: ${e.code}");
- 
-    }
-  }
-
 
 }

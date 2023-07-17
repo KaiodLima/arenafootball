@@ -19,7 +19,7 @@ import 'package:arena_soccer/model/Usuario.dart';
 import 'package:arena_soccer/presentation/home/components/destaque.dart';
 import 'package:arena_soccer/presentation/home/pages/destaque_detalhes_screen.dart';
 import 'package:arena_soccer/presentation/home/pages/notificar_gols_screen.dart';
-import 'package:arena_soccer/presentation/home/pages/publicar_anuncio_screen.dart';
+import 'package:arena_soccer/presentation/home/pages/publicar_anuncio_screen/publicar_anuncio_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

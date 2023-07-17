@@ -23,8 +23,6 @@ class NewsEditScreen extends StatefulWidget {
 class _NewsEditScreenState extends State<NewsEditScreen> {
   final _controller = NewsEditScreenController(); //utilizo mobX
 
-  
-
   @override
   void initState() {
     super.initState();
