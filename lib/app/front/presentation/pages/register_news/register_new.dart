@@ -1,24 +1,19 @@
-import 'dart:io';
-
 import 'package:arena_soccer/app/front/presentation/components/arena_button.dart';
 import 'package:arena_soccer/app/front/presentation/components/dropdown_field/dropdown_field.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_news/register_new_controller.dart';
 import 'package:arena_soccer/presentation/cadastro/widgets/arena_textfield.dart';
-import 'package:firebase_storage/firebase_storage.dart' as storage;
-import 'package:firebase_core/firebase_core.dart' as core;
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:image_picker/image_picker.dart';
 import 'dart:math';
 
-class CadastrarNoticia extends StatefulWidget {
-  const CadastrarNoticia({Key? key}) : super(key: key);
+class RegisterNew extends StatefulWidget {
+  const RegisterNew({Key? key}) : super(key: key);
 
   @override
-  State<CadastrarNoticia> createState() => _CadastrarNoticiaState();
+  State<RegisterNew> createState() => _RegisterNewState();
 }
 
-class _CadastrarNoticiaState extends State<CadastrarNoticia> {
+class _RegisterNewState extends State<RegisterNew> {
   final _controller = RegisterNewController(); //utilizo mobX
 
   pageNoticia() {
@@ -47,111 +42,121 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
         const SizedBox(
           height: 8,
         ),
-        imageFile != null
-            ? Container(
-                margin: const EdgeInsets.all(10),
-                height: MediaQuery.of(context).size.height * 0.3,
-                width: MediaQuery.of(context).size.width * 1,
-                child: Image.file(imageFile!),
-              )
-            : Container(),
-        Padding(
-          padding: const EdgeInsets.only(left: 40),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Container(
-                width: 150,
-                height: 50,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.camera_alt),
-                  onPressed: () {
-                    //Tirar foto:
-                    // getImageCamera();
-                    _recoveryImage(true);
-                  },
-                  label: const Text("Tirar foto"),
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(Colors
-                        .green), //essa merda toda pra mudar a cor do botão oporra
+        Observer(builder: (_) {
+          return _controller.imageFile != null
+              ? Container(
+                  margin: const EdgeInsets.all(10),
+                  height: MediaQuery.of(context).size.height * 0.3,
+                  width: MediaQuery.of(context).size.width * 1,
+                  child: Image.file(_controller.imageFile!),
+                )
+              : Container();
+        }),
+        Observer(builder: (context) {
+          return Padding(
+            padding: const EdgeInsets.only(left: 40),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Container(
+                  width: 150,
+                  height: 50,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.camera_alt),
+                    onPressed: () {
+                      //Tirar foto:
+                      // getImageCamera();
+                      _controller.recoveryImage(true);
+                    },
+                    label: const Text("Tirar foto"),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(Colors
+                          .green), //essa merda toda pra mudar a cor do botão oporra
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                width: 150,
-                height: 50,
-                child: ElevatedButton.icon(
-                  icon: const Icon(
-                    Icons.attach_file,
-                    color: Colors.green,
-                  ),
-                  onPressed: () {
-                    //buscar na galeria
-                    // getImageGalery();
-                    _recoveryImage(false);
-                  },
-                  label: const Text(
-                    "Galeria",
-                    style: TextStyle(color: Colors.green),
-                  ),
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(Colors
-                        .white), //essa merda toda pra mudar a cor do botão oporra
+                Container(
+                  width: 150,
+                  height: 50,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(
+                      Icons.attach_file,
+                      color: Colors.green,
+                    ),
+                    onPressed: () {
+                      //buscar na galeria
+                      // getImageGalery();
+                      _controller.recoveryImage(false);
+                    },
+                    label: const Text(
+                      "Galeria",
+                      style: TextStyle(color: Colors.green),
+                    ),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(Colors
+                          .white), //essa merda toda pra mudar a cor do botão oporra
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ),
+              ],
+            ),
+          );
+        }),
         const SizedBox(
           height: 8,
         ),
-        TextField(
-          controller: _controller.controllerDescricao,
-          maxLines: 5,
-          //autofocus: true,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: "Descricao",
-            icon: Icon(
-              Icons.text_fields_outlined,
-              color: Colors.green,
-              size: 24.0,
+        Observer(builder: (_) {
+          return TextField(
+            controller: _controller.controllerDescricao,
+            maxLines: 5,
+            //autofocus: true,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: "Descricao",
+              icon: Icon(
+                Icons.text_fields_outlined,
+                color: Colors.green,
+                size: 24.0,
+              ),
             ),
-          ),
-        ),
+          );
+        }),
         const SizedBox(
           height: 16,
         ),
-        TextField(
-          controller: _controller.controllerTag,
-          //autofocus: true,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: "Tag",
-            icon: Icon(
-              Icons.label,
-              color: Colors.green,
-              size: 24.0,
+        Observer(builder: (_) {
+          return TextField(
+            controller: _controller.controllerTag,
+            //autofocus: true,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: "Tag",
+              icon: Icon(
+                Icons.label,
+                color: Colors.green,
+                size: 24.0,
+              ),
             ),
-          ),
-        ),
+          );
+        }),
         const SizedBox(
           height: 16,
         ),
-        TextField(
-          controller: _controller.controllerLink,
-          //autofocus: true,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: "Link",
-            icon: Icon(
-              Icons.link,
-              color: Colors.green,
-              size: 24.0,
+        Observer(builder: (_) {
+          return TextField(
+            controller: _controller.controllerLink,
+            //autofocus: true,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: "Link",
+              icon: Icon(
+                Icons.link,
+                color: Colors.green,
+                size: 24.0,
+              ),
             ),
-          ),
-        ),
+          );
+        }),
         const SizedBox(
           height: 16,
         ),
@@ -184,13 +189,14 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
               int randomNumber = random.nextInt(100000);
 
               if (_controller.title != null && _controller.title!.isNotEmpty) {
-                if (imageFile != null) {
-                  await uploadPhoto(imageFile!,
+                if (_controller.imageFile != null) {
+                  await _controller.uploadPhoto(_controller.imageFile!,
                       "noticias${_controller.controllerTitulo.text + randomNumber.toString()}");
                 }
                 _controller.criarNoticia(context);
               } else {
-                _controller.chamarSnackBar("A notícia precisa de um título!!!", context);
+                _controller.chamarSnackBar(
+                    "A notícia precisa de um título!!!", context);
               }
 
               // Simulando uma operação assíncrona com o Future.delayed
@@ -232,7 +238,7 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Observer(builder: (_){
+              Observer(builder: (_) {
                 return _controller.chamarDropDownCity(context);
               }),
               const SizedBox(
@@ -291,42 +297,4 @@ class _CadastrarNoticiaState extends State<CadastrarNoticia> {
   //   });
   // }
 
-  //Teste camera:
-  PickedFile? _image;
-  File? imageFile;
-
-  Future _recoveryImage(bool isCamera) async {
-    PickedFile? imageSelected;
-    var imageTemporary;
-    if (isCamera) {
-      _image = await ImagePicker.platform.pickImage(source: ImageSource.camera);
-      imageTemporary = File(_image!.path);
-    } else {
-      print("GALERY!!!");
-      _image =
-          await ImagePicker.platform.pickImage(source: ImageSource.gallery);
-      imageTemporary = File(_image!.path);
-    }
-
-    setState(() {
-      imageFile = imageTemporary;
-      _image = imageSelected;
-    });
-  }
-
-  Future<void> uploadPhoto(File Image, String fileName) async {
-    try {
-      var result = await storage.FirebaseStorage.instance
-          .ref("noticias/$fileName")
-          .putFile(Image);
-
-      final urlDownload = await result.ref.getDownloadURL();
-      setState(() {
-        _controller.urlDownloadImage = urlDownload;
-        print("TESTE CAMERA URL: " + _controller.urlDownloadImage.toString());
-      });
-    } on core.FirebaseException catch (e) {
-      print("Error: ${e.code}");
-    }
-  }
 }

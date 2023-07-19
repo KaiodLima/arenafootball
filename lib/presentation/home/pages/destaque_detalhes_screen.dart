@@ -176,7 +176,9 @@ class _DetalhesDestaqueScreenState extends State<DetalhesDestaqueScreen> with Si
           switch (snapshot.connectionState) {
             case ConnectionState.none:
             case ConnectionState.waiting:
-              return const CircularProgressIndicator();
+              return const CircularProgressIndicator(
+                color: Colors.green,
+              );
             default:
               List<DocumentSnapshot> noticia_destaque = snapshot.data!.docs;
               // print("TESTE::: "+noticia_destaque.first.data().toString());

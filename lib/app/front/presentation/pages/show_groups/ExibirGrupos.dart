@@ -93,7 +93,9 @@ class _ExibirGruposState extends State<ExibirGrupos> {
             case ConnectionState.none:
             case ConnectionState.waiting:
               return const Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  color: Colors.green,
+                ),
               );
             default:
               List<DocumentSnapshot> grupo = snapshot.data!.docs;

@@ -120,7 +120,9 @@ class _ExibirJogadoresState extends State<ExibirJogadores> {
                         imageUrl: _jogadorSelecionado!.urlImagem.toString(),
                         fit: BoxFit.scaleDown,
                         placeholder: (context, url) =>
-                            const CircularProgressIndicator(),
+                            const CircularProgressIndicator(
+                              color: Colors.green,
+                            ),
                         errorWidget: (context, url, error) =>
                             const Icon(Icons.error),
                       )
@@ -370,7 +372,9 @@ class _ExibirJogadoresState extends State<ExibirJogadores> {
             case ConnectionState.none:
             case ConnectionState.waiting:
               return const Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  color: Colors.green,
+                ),
               );
             default:
               List<DocumentSnapshot> jogador = snapshot.data!.docs;

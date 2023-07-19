@@ -201,6 +201,38 @@ mixin _$RegisterNewController on _ControleBase, Store {
     });
   }
 
+  late final _$_imageAtom =
+      Atom(name: '_ControleBase._image', context: context);
+
+  @override
+  PickedFile? get _image {
+    _$_imageAtom.reportRead();
+    return super._image;
+  }
+
+  @override
+  set _image(PickedFile? value) {
+    _$_imageAtom.reportWrite(value, super._image, () {
+      super._image = value;
+    });
+  }
+
+  late final _$imageFileAtom =
+      Atom(name: '_ControleBase.imageFile', context: context);
+
+  @override
+  File? get imageFile {
+    _$imageFileAtom.reportRead();
+    return super.imageFile;
+  }
+
+  @override
+  set imageFile(File? value) {
+    _$imageFileAtom.reportWrite(value, super.imageFile, () {
+      super.imageFile = value;
+    });
+  }
+
   late final _$_ControleBaseActionController =
       ActionController(name: '_ControleBase', context: context);
 
@@ -262,7 +294,8 @@ controllerLink: ${controllerLink},
 controllerExibir: ${controllerExibir},
 controllerTag: ${controllerTag},
 cidadeSelecionada: ${cidadeSelecionada},
-listaCidadesFirebase: ${listaCidadesFirebase}
+listaCidadesFirebase: ${listaCidadesFirebase},
+imageFile: ${imageFile}
     ''';
   }
 }

@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:arena_soccer/model/Noticia.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart' as storage;
+import 'package:firebase_core/firebase_core.dart' as core;
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mobx/mobx.dart';
 part 'register_new_controller.g.dart';
 
@@ -217,6 +222,43 @@ abstract class _ControleBase with Store{
       adicionarString(doc["nome"]);
     }
     //print("TESTE -> "+listaTimesFirebase.toString());
+  }
+
+  //
+  @observable
+  PickedFile? _image;
+  @observable
+  File? imageFile;
+
+  Future recoveryImage(bool isCamera) async {
+    PickedFile? imageSelected;
+    var imageTemporary;
+    if (isCamera) {
+      _image = await ImagePicker.platform.pickImage(source: ImageSource.camera);
+      imageTemporary = File(_image!.path);
+    } else {
+      print("GALERY!!!");
+      _image =
+          await ImagePicker.platform.pickImage(source: ImageSource.gallery);
+      imageTemporary = File(_image!.path);
+    }
+
+    imageFile = imageTemporary;
+    _image = imageSelected;
+  }
+
+  Future<void> uploadPhoto(File Image, String fileName) async {
+    try {
+      var result = await storage.FirebaseStorage.instance
+          .ref("noticias/$fileName")
+          .putFile(Image);
+
+      final urlDownload = await result.ref.getDownloadURL();
+      urlDownloadImage = urlDownload;
+      print("TESTE CAMERA URL: " + urlDownloadImage.toString());
+    } on core.FirebaseException catch (e) {
+      print("Error: ${e.code}");
+    }
   }
 
 }

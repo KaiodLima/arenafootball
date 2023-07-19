@@ -2,7 +2,7 @@ import 'package:arena_soccer/app/front/presentation/components/arena_dropdown/ar
 import 'package:arena_soccer/app/front/presentation/components/arena_dropdown/arena_dropdown_controller.dart';
 import 'package:arena_soccer/app/front/presentation/components/highlights/arena_highlights.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_new_destaque/register_new_destaque.dart';
-import 'package:arena_soccer/app/front/presentation/pages/register_news/CadastrarNoticia.dart';
+import 'package:arena_soccer/app/front/presentation/pages/register_news/register_new.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_match/CadastrarPartida.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_team/CadastrarTime.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_new_player/register_new_player_screen.dart';
@@ -153,7 +153,7 @@ class _InicioState extends State<Inicio> {
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const CadastrarNoticia(),
+              builder: (context) => const RegisterNew(), //cadastrar notícia
             ));
         break;
       case "Cadastrar Time":

@@ -24,7 +24,9 @@ class ARENAHighlights extends StatelessWidget {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
           case ConnectionState.waiting:
-            return const CircularProgressIndicator();
+            return const CircularProgressIndicator(
+              color: Colors.green,
+            );
           default:
             List<QueryDocumentSnapshot> destaque = snapshot.data!.docs;
 

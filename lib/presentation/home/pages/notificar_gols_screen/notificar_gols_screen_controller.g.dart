@@ -56,6 +56,86 @@ mixin _$NotificarGolsScreenController on _ControleBase, Store {
     });
   }
 
+  late final _$cidadeSelecionadaAtom =
+      Atom(name: '_ControleBase.cidadeSelecionada', context: context);
+
+  @override
+  String get cidadeSelecionada {
+    _$cidadeSelecionadaAtom.reportRead();
+    return super.cidadeSelecionada;
+  }
+
+  @override
+  set cidadeSelecionada(String value) {
+    _$cidadeSelecionadaAtom.reportWrite(value, super.cidadeSelecionada, () {
+      super.cidadeSelecionada = value;
+    });
+  }
+
+  late final _$timeSelecionadoCasaAtom =
+      Atom(name: '_ControleBase.timeSelecionadoCasa', context: context);
+
+  @override
+  String get timeSelecionadoCasa {
+    _$timeSelecionadoCasaAtom.reportRead();
+    return super.timeSelecionadoCasa;
+  }
+
+  @override
+  set timeSelecionadoCasa(String value) {
+    _$timeSelecionadoCasaAtom.reportWrite(value, super.timeSelecionadoCasa, () {
+      super.timeSelecionadoCasa = value;
+    });
+  }
+
+  late final _$timeSelecionadoForaAtom =
+      Atom(name: '_ControleBase.timeSelecionadoFora', context: context);
+
+  @override
+  String get timeSelecionadoFora {
+    _$timeSelecionadoForaAtom.reportRead();
+    return super.timeSelecionadoFora;
+  }
+
+  @override
+  set timeSelecionadoFora(String value) {
+    _$timeSelecionadoForaAtom.reportWrite(value, super.timeSelecionadoFora, () {
+      super.timeSelecionadoFora = value;
+    });
+  }
+
+  late final _$controllerGolCasaAtom =
+      Atom(name: '_ControleBase.controllerGolCasa', context: context);
+
+  @override
+  TextEditingController get controllerGolCasa {
+    _$controllerGolCasaAtom.reportRead();
+    return super.controllerGolCasa;
+  }
+
+  @override
+  set controllerGolCasa(TextEditingController value) {
+    _$controllerGolCasaAtom.reportWrite(value, super.controllerGolCasa, () {
+      super.controllerGolCasa = value;
+    });
+  }
+
+  late final _$controllerGolForaAtom =
+      Atom(name: '_ControleBase.controllerGolFora', context: context);
+
+  @override
+  TextEditingController get controllerGolFora {
+    _$controllerGolForaAtom.reportRead();
+    return super.controllerGolFora;
+  }
+
+  @override
+  set controllerGolFora(TextEditingController value) {
+    _$controllerGolForaAtom.reportWrite(value, super.controllerGolFora, () {
+      super.controllerGolFora = value;
+    });
+  }
+
   late final _$_ControleBaseActionController =
       ActionController(name: '_ControleBase', context: context);
 
@@ -97,7 +177,12 @@ mixin _$NotificarGolsScreenController on _ControleBase, Store {
     return '''
 title: ${title},
 isShow: ${isShow},
-isLoading: ${isLoading}
+isLoading: ${isLoading},
+cidadeSelecionada: ${cidadeSelecionada},
+timeSelecionadoCasa: ${timeSelecionadoCasa},
+timeSelecionadoFora: ${timeSelecionadoFora},
+controllerGolCasa: ${controllerGolCasa},
+controllerGolFora: ${controllerGolFora}
     ''';
   }
 }

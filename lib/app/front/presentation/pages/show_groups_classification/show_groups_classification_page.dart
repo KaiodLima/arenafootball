@@ -93,7 +93,9 @@ class _ShowGroupsClassificationPageState extends State<ShowGroupsClassificationP
             case ConnectionState.none:
             case ConnectionState.waiting:
               return const Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  color: Colors.green,
+                ),
               );
             default:
               List<DocumentSnapshot> classificacao = snapshot.data!.docs;
