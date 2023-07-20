@@ -1,6 +1,7 @@
 import 'package:arena_soccer/app/front/presentation/components/arena_dropdown/arena_dropdown.dart';
 import 'package:arena_soccer/app/front/presentation/components/arena_dropdown/arena_dropdown_controller.dart';
 import 'package:arena_soccer/app/front/presentation/components/highlights/arena_highlights.dart';
+import 'package:arena_soccer/app/front/presentation/pages/home_screen/home_screen_controller.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_new_destaque/register_new_destaque.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_news/register_new.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_match/CadastrarPartida.dart';
@@ -37,40 +38,11 @@ class Inicio extends StatefulWidget {
 }
 
 class _InicioState extends State<Inicio> {
-  final ControllerArenaDropdownButton _controller = ControllerArenaDropdownButton(); //utilizo mobX
+  final HomeScreenController _controllerHome = HomeScreenController(); //utilizo mobX
 
   //marcador da janela selecionada
   int _selecionado = 0;
   // String _resultado = "";
-
-  _chamarPreferences() async {
-    // Obter shared preferences.
-    final prefs = await SharedPreferences.getInstance();
-    final String? regiaoPadrao = prefs.getString('regiaoPadrao');
-    final String? anoEscolhido = prefs.getString('anoEscolhido');
-
-    switch (regiaoPadrao.toString()) {
-      case "Floresta":
-        setState(() {
-          _controller.selectedItem = "Floresta";
-          anoSelecionado = anoEscolhido;
-        });
-        break;
-      case "Santo inacio":
-        setState(() {
-          _controller.selectedItem = "Santo inacio";
-          anoSelecionado = anoEscolhido;
-        });
-        break;
-      default:
-        setState(() {
-          _controller.selectedItem = "Floresta";
-          anoSelecionado = anoEscolhido;
-        });
-        break;
-    }
-    // print("REGIAO PADRAO:: "+cidadeSelecionada.toString());
-  }
 
   //deslogar usuário
   Future<void> _logout() async {
@@ -104,7 +76,7 @@ class _InicioState extends State<Inicio> {
     if (widget.isAuthenticated == true) {
       _verificarUsuarioAutenticado();
     }
-    _chamarPreferences();
+    _controllerHome.chamarPreferences();
   }
 
   List<String> listaMenu = [
@@ -177,27 +149,27 @@ class _InicioState extends State<Inicio> {
       //Inicio(_resultado),
       Observer(builder: (_) {
         return AbaNoticias(
-          regiao: _controller.selectedItem ?? "Floresta",
+          regiao: _controllerHome.controllerDropDown.selectedItem ?? "Floresta",
           usuario: widget.usuario,
         );
       }),
       Observer(builder: (_) {
         return AbaCampeonatos(
-          regiao: _controller.selectedItem ?? "Floresta",
-          ano: anoSelecionado,
+          regiao: _controllerHome.controllerDropDown.selectedItem ?? "Floresta",
+          ano: _controllerHome.anoSelecionado,
         );
       }),
       Observer(builder: (_) {
         return AbaTimes(
-          regiao: _controller.selectedItem ?? "Floresta",
-          ano: anoSelecionado,
+          regiao: _controllerHome.controllerDropDown.selectedItem ?? "Floresta",
+          ano: _controllerHome.anoSelecionado,
           usuario: widget.usuario,
         );
       }),
       Observer(builder: (_) {
         return AbaTabela(
-          regiao: _controller.selectedItem ?? "Floresta",
-          ano: anoSelecionado,
+          regiao: _controllerHome.controllerDropDown.selectedItem ?? "Floresta",
+          ano: _controllerHome.anoSelecionado,
           usuario: widget.usuario,
         );
       }),
@@ -281,7 +253,7 @@ class _InicioState extends State<Inicio> {
                 child: ArenaDropdownButton(
                   height: 50,
                   width: width,
-                  controller: _controller,
+                  controller: _controllerHome.controllerDropDown,
                 ),
               )
             else
@@ -606,7 +578,7 @@ class _InicioState extends State<Inicio> {
   }
   
   final List<String> listaAno = ["2022", "2023"];
-  String? anoSelecionado;
+  
   _chamarDropDownAno() {
     return Container(
       margin: const EdgeInsets.all(4),
@@ -617,7 +589,7 @@ class _InicioState extends State<Inicio> {
       ),
       padding: const EdgeInsets.all(10),
       child: DropdownButton<String>(
-        value: anoSelecionado ?? "2023",
+        value: _controllerHome.anoSelecionado ?? "2023",
         icon: const Icon(
           Icons.change_circle_outlined,
           color: Colors.white,
@@ -635,11 +607,11 @@ class _InicioState extends State<Inicio> {
         dropdownColor: Colors.green,
         onChanged: (String? newValue) async {
           setState(() {
-            anoSelecionado = newValue!;
+            _controllerHome.anoSelecionado = newValue!;
           });
 
           final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('anoEscolhido', anoSelecionado.toString());
+          await prefs.setString('anoEscolhido', _controllerHome.anoSelecionado.toString());
         },
 
         items: listaAno.map<DropdownMenuItem<String>>((String value) {

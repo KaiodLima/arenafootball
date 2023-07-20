@@ -39,5 +39,10 @@ abstract class _ControleBase with Store{
     return null;
   }
 
+  @observable
+  bool? isLoading = false;
+  @action
+  changeLoading(bool value) => isLoading = value;
+
 
 }

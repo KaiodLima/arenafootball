@@ -285,12 +285,9 @@ class _RegisterNewState extends State<RegisterNew> {
   // upLoadFile() async {
   //   final path = 'gs://arenasoccerflutter.appspot.com/noticias${_controllerTitulo.text}';
   //   final file = File(selectedImage!.path);
-
   //   final ref = FirebaseStorage.instance.ref().child(path);
   //   uploadTask = ref.putFile(file);
-
   //   final snapshot = await uploadTask!.whenComplete(() => null);
-
   //   final urlDownload = await snapshot.ref.getDownloadURL();
   //   setState(() {
   //     urlDownloadImage = urlDownload;

@@ -26,6 +26,7 @@ class _CadastroState extends State<Cadastro> with SingleTickerProviderStateMixin
 
   //capturar dados do novo usuário
   criarUsuario(){
+    controleCadastro.changeLoading(true);
     // String nomeUsuario = _controllerNome.text;
     // String emailUsuario = _controllerEmail.text;
     // String senhaUsuario = _controllerSenha.text;
@@ -131,6 +132,7 @@ class _CadastroState extends State<Cadastro> with SingleTickerProviderStateMixin
       }
     );*/
     _chamarSnackBar("Usuário Cadastrado com Sucesso!!!");
+    controleCadastro.changeLoading(false);
   }
 
 
@@ -548,6 +550,7 @@ class _CadastroState extends State<Cadastro> with SingleTickerProviderStateMixin
                           builder: (_){
                             return ArenaButton(
                               height: 47,
+                              isLoading: controleCadastro.isLoading,
                               width: width,
                               title: "CADASTRAR",
                               function: controleCadastro.enableButton ? criarUsuario : null,
