@@ -46,7 +46,8 @@ dependencies:
   beautiful_soup_dart: ^0.3.0 #para realizar web scraping
   shared_preferences: ^2.0.17 #guardar dados em cache
   transparent_image: ^2.0.1 #remover fundo de imagem
-  
+  banner_carousel: ^1.2.1 #banner
+  carousel_slider: ^4.2.1 #carrossel de imagens
 
   mobx: ^2.0.0
   flutter_mobx: ^2.0.0

@@ -1,3 +1,4 @@
+import 'package:arena_soccer/app/front/presentation/components/arena_drawer/arena_drawer.dart';
 import 'package:arena_soccer/app/front/presentation/components/arena_dropdown/arena_dropdown.dart';
 import 'package:arena_soccer/app/front/presentation/components/arena_dropdown/arena_dropdown_controller.dart';
 import 'package:arena_soccer/app/front/presentation/components/highlights/arena_highlights.dart';
@@ -65,6 +66,7 @@ class _InicioState extends State<Inicio> {
   _verificarUsuarioAutenticado() async {
     User? usuarioAutenticado = await FirebaseAuth.instance.currentUser;
     // print("Entrou na função: "+usuarioAutenticado!.email.toString());
+    print("Entrou na função: "+usuarioAutenticado!.uid.toString());
     if (usuarioAutenticado == null) {
       _logout();
     }
@@ -75,6 +77,7 @@ class _InicioState extends State<Inicio> {
     super.initState();
     if (widget.isAuthenticated == true) {
       _verificarUsuarioAutenticado();
+      _controllerHome.getUserData(FirebaseAuth.instance.currentUser!.uid.toString());
     }
     _controllerHome.chamarPreferences();
   }
@@ -83,7 +86,7 @@ class _InicioState extends State<Inicio> {
     "Cadastrar Destaques",
     "Cadastrar Jogador",
     "Cadastrar Nova Partida",
-    "Cadastrar Noticia",
+    "Cadastrar Notícia",
     "Cadastrar Time"
   ];
   // List<String> listaMenu = ["Calcular Votos", "Cadastrar Jogador", "Cadastrar Nova Partida", "Cadastrar Noticia"];
@@ -121,7 +124,7 @@ class _InicioState extends State<Inicio> {
               builder: (context) => const CadastrarPartida(),
             ));
         break;
-      case "Cadastrar Noticia":
+      case "Cadastrar Notícia":
         Navigator.push(
             context,
             MaterialPageRoute(
@@ -188,26 +191,26 @@ class _InicioState extends State<Inicio> {
           height: 40,
         ),
         centerTitle: true,
-        leading: Visibility(
-          visible: widget.usuario?.getIsAdmin == true,
-          child: PopupMenuButton<String>(
-            //MENU DO ADMIN
-            icon: const Icon(
-              Icons.menu,
-              color: Colors.white,
-            ),
-            iconSize: 30,
-            onSelected: chamarMenuPop,
-            itemBuilder: (context) {
-              return listaMenu.map((String item) {
-                return PopupMenuItem<String>(
-                  value: item,
-                  child: Text(item),
-                );
-              }).toList();
-            },
-          ),
-        ),
+        // leading: Visibility(
+        //   visible: widget.usuario?.getIsAdmin == true,
+        //   child: PopupMenuButton<String>(
+        //     //MENU DO ADMIN
+        //     icon: const Icon(
+        //       Icons.menu,
+        //       color: Colors.white,
+        //     ),
+        //     iconSize: 30,
+        //     onSelected: chamarMenuPop,
+        //     itemBuilder: (context) {
+        //       return listaMenu.map((String item) {
+        //         return PopupMenuItem<String>(
+        //           value: item,
+        //           child: Text(item),
+        //         );
+        //       }).toList();
+        //     },
+        //   ),
+        // ),
         actions: [
           IconButton(
             color: Colors.white,
@@ -231,6 +234,22 @@ class _InicioState extends State<Inicio> {
             },
           ),*/
         ],
+      ),
+      drawer: Observer(
+        builder: (context) {
+          return ARENADrawer(
+            user: _controllerHome.userCurrent,
+            isAdmin: widget.usuario?.getIsAdmin,
+            imageDrawer: _controllerHome.imageDrawer,
+            textStyle: const TextStyle(
+              fontSize: 16,
+              color: Color.fromARGB(255, 27, 67, 28),
+              fontWeight: FontWeight.bold,
+            ),
+            iconSize: 32,
+            iconColor: const Color.fromARGB(255, 27, 67, 28),
+          );
+        }
       ),
       body: SingleChildScrollView(
         child: Column(

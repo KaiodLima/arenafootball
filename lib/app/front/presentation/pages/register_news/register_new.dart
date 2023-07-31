@@ -2,6 +2,7 @@ import 'package:arena_soccer/app/front/presentation/components/arena_button.dart
 import 'package:arena_soccer/app/front/presentation/components/dropdown_field/dropdown_field.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_news/register_new_controller.dart';
 import 'package:arena_soccer/presentation/cadastro/widgets/arena_textfield.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'dart:math';
@@ -66,7 +67,7 @@ class _RegisterNewState extends State<RegisterNew> {
                     onPressed: () {
                       //Tirar foto:
                       // getImageCamera();
-                      _controller.recoveryImage(true);
+                      _controller.recoveryImage(true, false);
                     },
                     label: const Text("Tirar foto"),
                     style: ButtonStyle(
@@ -86,7 +87,7 @@ class _RegisterNewState extends State<RegisterNew> {
                     onPressed: () {
                       //buscar na galeria
                       // getImageGalery();
-                      _controller.recoveryImage(false);
+                      _controller.recoveryImage(false, false);
                     },
                     label: const Text(
                       "Galeria",
@@ -102,6 +103,92 @@ class _RegisterNewState extends State<RegisterNew> {
             ),
           );
         }),
+        const SizedBox(
+          height: 8,
+        ),
+        Observer(builder: (_) {
+          final width = MediaQuery.of(context).size.width;
+
+          return ArenaButton(
+            height: 47,
+            width: width,
+            title: "ANEXAR FOTOS",
+            isLoading: _controller.isLoading,
+            function: () async {
+              await _controller.changeLoading(true);
+              await _controller.recoveryImage(true, true);
+
+              Random random = Random();
+              int randomNumber = random.nextInt(100000);
+              String name = _controller.controllerTitulo.text + randomNumber.toString();
+
+              // if (_controller.albumFileList != null) {
+                // _controller.albumFileList.forEach((element) async {
+                  await _controller.uploadPhotoAlbum(_controller.albumFileList.last, "noticias${name}");
+              //   });
+              // }
+
+              // Simulando uma operação assíncrona com o Future.delayed
+              await _controller.changeLoading(false);
+            },
+            buttonColor: Colors.green,
+            fontSize: 16,
+            borderRadius: 8,
+          );
+        }),
+        const SizedBox(
+          height: 8,
+        ),
+        Observer(
+          builder: (context) {
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
+              ),
+              child: Row(
+                children: [
+                  ..._controller.albumFileList.map((element){
+                    return Container(
+                      margin: const EdgeInsets.all(4),
+                      height: MediaQuery.of(context).size.height * 0.2,
+                      width: MediaQuery.of(context).size.width * 0.3,
+                      child: Image.file(element),
+                      decoration: BoxDecoration(
+                        // image: DecorationImage(
+                        //   repeat: ImageRepeat.noRepeat,                
+                        //   image: Image.file(element),
+                        //   fit: BoxFit.cover,
+                        // ),
+                        // border: Border.all(),
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            );
+          }
+        ),
+        const SizedBox(
+          height: 8,
+        ),
+        // Observer(
+        //   builder: (context) {
+        //     return Column(
+        //       mainAxisAlignment: MainAxisAlignment.start,
+        //       crossAxisAlignment: CrossAxisAlignment.start,
+        //       children: [
+        //         ..._controller.albumPhotosName.map((element){
+        //           return Text("Arquivo: "+element.toString(), style: TextStyle(color: Colors.green, fontSize: 16),);
+        //         }),
+        //       ],
+        //     );
+        //   }
+        // ),
+        // ..._controller.albumPhotosName.map((element){
+        //   return Text("Arquivo: "+element.toString());
+        // }),
         const SizedBox(
           height: 8,
         ),
@@ -195,8 +282,7 @@ class _RegisterNewState extends State<RegisterNew> {
                 }
                 _controller.criarNoticia(context);
               } else {
-                _controller.chamarSnackBar(
-                    "A notícia precisa de um título!!!", context);
+                _controller.chamarSnackBar("A notícia precisa de um título!!!", context);
               }
 
               // Simulando uma operação assíncrona com o Future.delayed

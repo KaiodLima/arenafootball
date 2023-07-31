@@ -18,6 +18,8 @@ class Noticia {
   String? golTimeCasa;
   String? golTimeFora;
   String? tag;
+  // Photos
+  List<String>? photoUrls; // Adicionando o array de strings
 
   //construtor
   Noticia({
@@ -33,7 +35,8 @@ class Noticia {
     this.timeFora,
     this.golTimeCasa,
     this.golTimeFora,
-    this.tag
+    this.tag,
+    this.photoUrls,
   });
 
   //métodos acessores

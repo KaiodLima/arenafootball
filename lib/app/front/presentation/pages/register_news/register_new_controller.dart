@@ -97,6 +97,7 @@ abstract class _ControleBase with Store{
           golTimeFora: "",
           tag: tag,
           fkCompeticao: fkCompeticao,
+          photoUrls: albumPhotos,
         );
 
         //salvar informações do jogador no banco de dados
@@ -123,7 +124,8 @@ abstract class _ControleBase with Store{
       "time_fora": noticia.timeFora,
       "gol_time_casa": noticia.golTimeCasa,
       "gol_time_fora": noticia.golTimeFora,
-      "tag": noticia.tag
+      "tag": noticia.tag,
+      "images": noticia.photoUrls,
     });
 
     db.collection("noticias").doc(addedDocRef.id).set({
@@ -139,7 +141,8 @@ abstract class _ControleBase with Store{
       "time_fora": noticia.timeFora,
       "gol_time_casa": noticia.golTimeCasa,
       "gol_time_fora": noticia.golTimeFora,
-      "tag": noticia.tag
+      "tag": noticia.tag,
+      "images": noticia.photoUrls,
     });
 
     chamarSnackBar("Notícia Cadastrada com Sucesso!!!", context);
@@ -228,26 +231,56 @@ abstract class _ControleBase with Store{
   @observable
   PickedFile? _image;
   @observable
-  File? imageFile;
+  File? imageFile; //armazena arquivo de imagem
 
-  Future recoveryImage(bool isCamera) async {
+  @observable
+  PickedFile? _imageAlbum;
+  @observable
+  ObservableList<File> albumFileList = ObservableList<File>(); ////armazena lista de arquivos de imagem
+
+  Future recoveryImage(bool isCamera, bool isAlbum) async {
     PickedFile? imageSelected;
     var imageTemporary;
-    if (isCamera) {
-      _image = await ImagePicker.platform.pickImage(source: ImageSource.camera);
-      imageTemporary = File(_image!.path);
-    } else {
-      print("GALERY!!!");
-      _image =
-          await ImagePicker.platform.pickImage(source: ImageSource.gallery);
-      imageTemporary = File(_image!.path);
-    }
 
-    imageFile = imageTemporary;
-    _image = imageSelected;
+    if(isAlbum){
+      if (isCamera) {
+        _imageAlbum = await ImagePicker.platform.pickImage(source: ImageSource.camera);
+        imageTemporary = File(_imageAlbum!.path);
+      } else {
+        print("GALERY!!!");
+        _imageAlbum = await ImagePicker.platform.pickImage(source: ImageSource.gallery);
+        imageTemporary = File(_imageAlbum!.path);
+      }
+
+      if(imageTemporary != null){
+        albumFileList.add(imageTemporary!); //add foto no album
+      }
+      _imageAlbum = imageSelected;
+
+    }else{
+      if (isCamera) {
+        _image = await ImagePicker.platform.pickImage(source: ImageSource.camera);
+        imageTemporary = File(_image!.path);
+      } else {
+        print("GALERY!!!");
+        _image = await ImagePicker.platform.pickImage(source: ImageSource.gallery);
+        imageTemporary = File(_image!.path);
+      }
+
+      imageFile = imageTemporary;
+      _image = imageSelected;
+    }
+    
   }
 
+  //guardar fotos adicionadas
+  @observable
+  ObservableList<String> albumPhotos = ObservableList<String>();
+  @observable
+  ObservableList<String> albumPhotosName = ObservableList<String>();
+
   Future<void> uploadPhoto(File Image, String fileName) async {
+    print("UPLOAD!!!");
     try {
       var result = await storage.FirebaseStorage.instance
           .ref("noticias/$fileName")
@@ -256,6 +289,28 @@ abstract class _ControleBase with Store{
       final urlDownload = await result.ref.getDownloadURL();
       urlDownloadImage = urlDownload;
       print("TESTE CAMERA URL: " + urlDownloadImage.toString());
+    } on core.FirebaseException catch (e) {
+      print("Error: ${e.code}");
+    }
+  }
+
+  Future<void> uploadPhotoAlbum(File Image, String fileName) async {
+    print("UPLOAD!!! "+fileName.toString());
+
+    try {
+      var result = await storage.FirebaseStorage.instance
+          .ref("noticias/$fileName")
+          .putFile(Image);
+
+      final urlDownload = await result.ref.getDownloadURL();
+      urlDownloadImage = urlDownload;
+
+      if(urlDownloadImage != null && urlDownloadImage!.isNotEmpty){
+        print("ADD NAME!!!");
+        albumPhotos.add(urlDownloadImage!); //adiciona "link" das fotos no album
+        albumPhotosName.add(fileName); //adiciona nome das fotos numa lista
+      }
+      
     } on core.FirebaseException catch (e) {
       print("Error: ${e.code}");
     }

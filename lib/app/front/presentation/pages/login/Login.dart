@@ -238,30 +238,58 @@ class _LoginState extends State<Login> {
   //         "gol_time_casa": "",
   //         "gol_time_fora": "",
   //         "tag": doc["tag"] ?? "",
+  //         "images": ["", ""]
   //       }
   //     );
   //   }
 
   // }
 
-  duplicarCollection() async {
-    final origem = FirebaseFirestore.instance.collection('grupos');
-    final destino = FirebaseFirestore.instance.collection('grupos2022');
+  // Método para adicionar o novo campo a todos os documentos na coleção
+  void addNewFieldToAllDocuments() {
+    final CollectionReference usersCollection =
+      FirebaseFirestore.instance.collection('noticias');
 
-    origem.get().then((QuerySnapshot snapshot) {
-      snapshot.docs.forEach((DocumentSnapshot doc) {
-        final Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        destino.doc(doc.id).set(data).then((value) {
-          print('Documento copiado com sucesso!');
+    usersCollection.get().then((querySnapshot) {
+      querySnapshot.docs.forEach((documentSnapshot) {
+        // Referência ao documento que deseja atualizar
+        DocumentReference docRef = documentSnapshot.reference;
+
+        // Mapa com o novo campo que será adicionado ao documento
+        Map<String, dynamic> newField = {
+          'images': ["", ""],
+        };
+
+        // Método update para adicionar o novo campo sem alterar as informações existentes
+        docRef.update(newField).then((value) {
+          print('Novo campo adicionado ao documento ${documentSnapshot.id}');
         }).catchError((error) {
-          print('Erro ao copiar documento: $error');
+          print('Erro ao adicionar novo campo ao documento ${documentSnapshot.id}: $error');
         });
       });
     }).catchError((error) {
-      print('Erro ao obter documentos: $error');
+      print('Erro ao buscar documentos: $error');
     });
-
   }
+
+  // duplicarCollection() async {
+  //   final origem = FirebaseFirestore.instance.collection('grupos');
+  //   final destino = FirebaseFirestore.instance.collection('grupos2022');
+
+  //   origem.get().then((QuerySnapshot snapshot) {
+  //     snapshot.docs.forEach((DocumentSnapshot doc) {
+  //       final Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+  //       destino.doc(doc.id).set(data).then((value) {
+  //         print('Documento copiado com sucesso!');
+  //       }).catchError((error) {
+  //         print('Erro ao copiar documento: $error');
+  //       });
+  //     });
+  //   }).catchError((error) {
+  //     print('Erro ao obter documentos: $error');
+  //   });
+
+  // }
 
   //buscar dado do usuário logado:
   Future<Usuario> searchUser(String idUser) async {
@@ -297,6 +325,7 @@ class _LoginState extends State<Login> {
   void initState() {
     // duplicarCollection();
     super.initState();
+    // addNewFieldToAllDocuments();
     // addNewFieldInFirebaseNoticia();
     _verificaUsuarioLogado();
 
