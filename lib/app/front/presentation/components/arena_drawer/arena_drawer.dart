@@ -4,9 +4,8 @@ import 'package:arena_soccer/app/front/presentation/pages/register_new_player/re
 import 'package:arena_soccer/app/front/presentation/pages/register_news/register_new.dart';
 import 'package:arena_soccer/app/front/presentation/pages/register_team/CadastrarTime.dart';
 import 'package:arena_soccer/model/Usuario.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:arena_soccer/web_scraping_resultados/pages/all_match_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 
 class ARENADrawer extends StatefulWidget {
   final bool fromHome;
@@ -115,6 +114,21 @@ class _ARENADrawerState extends State<ARENADrawer> {
             },
           ),
           Divider(),
+          ListTile(
+              leading: Icon(Icons.manage_search_outlined, size: widget.iconSize, color: widget.iconColor,),
+              title: Text('Resultados'.toUpperCase(), style: widget.textStyle,),
+              onTap: () {
+                // You can add your navigation logic here
+                Navigator.push(
+                  context, //abre uma tela sobre outra (o context é o contexto da tela atual, o método build já trás pra gente automaticamente)
+                  MaterialPageRoute(
+                    builder: (context) => const AllMatchScreen(),
+                  ) //o outro parâmetro é a rota
+                );
+
+                // Navigator.pop(context); // Closes the Drawer
+              },
+            ),
           if(widget.isAdmin == true)
             ListTile(
               leading: Icon(Icons.star_rate_rounded, size: widget.iconSize, color: widget.iconColor,),

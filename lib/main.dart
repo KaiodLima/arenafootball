@@ -2,7 +2,6 @@ import 'package:arena_soccer/app/front/presentation/pages/login/Login.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-
 void main() async {  
   //iniciar aplicação do firebase
   WidgetsFlutterBinding.ensureInitialized();
