@@ -1,0 +1,271 @@
+{
+  "@@locale": "pt",
+  "appTitle": "Arena Football",
+  "commonRequiredField": "Campo obrigatório",
+  "commonTryAgain": "Tentar novamente",
+  "commonLoading": "Carregando...",
+  "commonSave": "SALVAR",
+  "commonCancel": "Cancelar",
+  "commonConfirm": "Confirmar",
+  "commonDelete": "Excluir",
+  "commonEdit": "Editar",
+  "commonGenericError": "Algo deu errado. Tente novamente.",
+  "loginEmailLabel": "Insira seu E-mail",
+  "loginEmailHint": "exemplo@exemplo.com",
+  "loginPasswordLabel": "Insira sua Senha",
+  "loginButton": "ENTRAR",
+  "loginCreateAccountButton": "CRIAR CONTA",
+  "loginSkipButton": "Pular",
+  "loginSuccess": "Usuário Logado!",
+  "loginInvalidEmail": "E-mail inválido!",
+  "loginInvalidPassword": "Senha inválida! Utilize no mínimo 8 caracteres.",
+  "registerTitle": "Criar Conta",
+  "registerNameLabel": "Nome",
+  "registerEmailLabel": "E-mail",
+  "registerPasswordLabel": "Senha",
+  "registerRegionLabel": "Região:",
+  "registerTeamLabel": "Time do coração:",
+  "registerButton": "CADASTRAR",
+  "registerHaveAccountButton": "Já tenho uma conta!",
+  "registerSuccess": "Usuário Cadastrado com Sucesso!",
+  "registerNameTooShort": "Seu nome de usuário deve conter no mínimo 3 caracteres",
+  "registerEmailExample": "Exemplo: teste@teste.com",
+  "registerPasswordTooShort": "Sua senha deve conter no mínimo 8 caracteres",
+  "homeTabHome": "HOME",
+  "homeTabChampionships": "CAMPEONATOS",
+  "homeTabTeams": "TIMES",
+  "homeTabTables": "TABELAS",
+  "drawerHome": "INÍCIO",
+  "drawerResults": "RESULTADOS",
+  "drawerRegisterHighlight": "CADASTRAR DESTAQUES",
+  "drawerRegisterPlayer": "CADASTRAR JOGADOR",
+  "drawerRegisterMatch": "CADASTRAR NOVA PARTIDA",
+  "drawerRegisterNews": "CADASTRAR NOTÍCIA",
+  "drawerRegisterTeam": "CADASTRAR TIME",
+  "drawerFanOf": "Torcedor do: {team}",
+  "@drawerFanOf": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "drawerGuest": "Visitante",
+  "commonTakePhoto": "Tirar foto",
+  "commonGallery": "Galeria",
+  "newsEmpty": "Nenhuma notícia registrada",
+  "newsLoadError": "Não foi possível carregar as notícias.",
+  "newsDeleteConfirm": "DESEJA REALMENTE EXCLUIR ESSA NOTÍCIA ?",
+  "newsMoreInfo": "Mais Informações",
+  "newsAdPlaceholder": "PUBLICIDADE",
+  "newsCreateTitle": "CADASTRAR NOTICIA",
+  "newsEditTitle": "EDITAR NOTÍCIA",
+  "newsTitleLabel": "Título",
+  "newsDescriptionLabel": "Descrição",
+  "newsTagLabel": "Tag",
+  "newsLinkLabel": "Link",
+  "newsVisibleLabel": "Exibir notícia",
+  "newsAttachPhotos": "ANEXAR FOTOS",
+  "newsRegisterButton": "CADASTRAR",
+  "newsUpdateButton": "ATUALIZAR",
+  "newsTitleRequired": "A notícia precisa de um título!!!",
+  "newsTitleTooShort": "O título da notícia deve conter no mínimo 3 caracteres",
+  "newsCreated": "Notícia Cadastrada com Sucesso!!!",
+  "newsUpdated": "Notícia Atualizada com Sucesso!!!",
+  "newsRegionLabel": "Região:",
+  "newsGoalTitle": "Cadastrar Card de Gol:",
+  "newsHomeTeamLabel": "Time da Casa:",
+  "newsAwayTeamLabel": "Time Visitante:",
+  "newsScoreLabel": "Placar:",
+  "newsPublishButton": "Publicar",
+  "newsGoalCreated": "Gol registrado com Sucesso!!!",
+  "newsGoalTeamsRequired": "Selecione os dois times!",
+  "newsAdTitle": "Cadastrar Card de Publicidade:",
+  "newsAdCreated": "Publicidade registrada com Sucesso!!!",
+  "highlightFormTitle": "CADASTRAR DESTAQUE",
+  "highlightTitleLabel": "Título",
+  "highlightLinkLabel": "Link",
+  "highlightVisibleLabel": "Exibir destaque",
+  "highlightRegisterButton": "CADASTRAR",
+  "highlightTitleRequired": "Preencha o campo TÍTULO!!!",
+  "highlightCreated": "Destaque Cadastrado!!!",
+  "highlightNoNews": "Nenhuma notícia disponível!",
+  "teamsEmpty": "Equipes ainda não registradas",
+  "teamsLoadError": "Não foi possível carregar os times.",
+  "teamsFormTitle": "CADASTRAR TIME",
+  "teamsRegionLabel": "Região:",
+  "teamsNameLabel": "Time",
+  "teamsDescriptionLabel": "Descrição",
+  "teamsRegisterButton": "CADASTRAR",
+  "teamsCreated": "Time registrado com Sucesso!!!",
+  "teamsNameRequired": "Preencha os campos obrigatórios!!!",
+  "playersEmpty": "Jogadores ainda não registrados!",
+  "playersLoadError": "Não foi possível carregar os jogadores.",
+  "playersTeamInfo": "Time: {team}",
+  "@playersTeamInfo": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "playersGoalsCount": "Gols: {count}",
+  "@playersGoalsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "playersAssistsCount": "Assistências: {count}",
+  "@playersAssistsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "playersNameRequired": "Preencha o campo NOME!!!",
+  "playersTeamRequired": "Informe um Time!!!",
+  "playersFormTitle": "CADASTRAR JOGADOR",
+  "playersNameLabel": "Nome",
+  "playersGoalsLabel": "Gols",
+  "playersAssistsLabel": "Assistencias",
+  "playersTeamLabel": "Time:",
+  "playersRegisterButton": "CADASTRAR",
+  "playersCreated": "Jogador Cadastrado!!!",
+  "playersPhotoBack": "Voltar",
+  "playersPhotoSave": "Salvar",
+  "statsGoalsTitle": "ARTILHARIA",
+  "statsAssistsTitle": "ASSISTENCIAS",
+  "statsEmpty": "Nenhum jogador no ranking ainda.",
+  "statsLoadError": "Não foi possível carregar o ranking.",
+  "matchesNoChampionship": "Nenhum registro no momento",
+  "matchesEmpty": "Nenhuma partida cadastrada",
+  "matchesLoadError": "Não foi possível carregar as partidas.",
+  "matchesAllGames": "VER TODOS OS JOGOS",
+  "matchesGroups": "VER GRUPOS",
+  "matchesTopScorers": "ARTILHARIA",
+  "matchesAssists": "ASSISTÊNCIAS",
+  "matchesAllGamesTitle": "TODOS OS JOGOS",
+  "matchesVersus": "X",
+  "matchesSchedule": "{date} às {time} horas\n{venue}",
+  "@matchesSchedule": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "venue": {
+        "type": "String"
+      }
+    }
+  },
+  "matchesEditScore": "Editar Placar",
+  "matchesDeleteMatch": "Excluir Partida",
+  "matchesDeleteConfirm": "DESEJA REALMENTE EXCLUIR ESSA PARTIDA ?",
+  "matchesEditScoreTitle": "Alterar Placar:",
+  "matchesHomeLabel": "Casa",
+  "matchesAwayLabel": "Fora",
+  "matchesFormTitle": "CADASTRAR PARTIDA",
+  "matchesRegionLabel": "Região:",
+  "matchesHomeTeamLabel": "Time Casa:",
+  "matchesAwayTeamLabel": "Time Fora:",
+  "matchesDateLabel": "Data",
+  "matchesTimeLabel": "Hora",
+  "matchesVenueLabel": "Local",
+  "matchesRegisterButton": "CADASTRAR",
+  "matchesCreated": "Partida Cadastrada com Sucesso!!!",
+  "matchesFieldsRequired": "Preencha todos os campos!!!",
+  "championshipsEmpty": "Nenhuma competição registrada",
+  "championshipsLoadError": "Não foi possível carregar as competições.",
+  "championshipsDetailsTitle": "Sobre a Competição:",
+  "championshipsPrizes": "PREMIAÇÃO:\n\n1º Lugar: {first}\n2º Lugar: {second}\n3º Lugar: {third}\n\nArtilheiro: {topScorer}\nMelhor Goleiro: {goalkeeper}",
+  "@championshipsPrizes": {
+    "placeholders": {
+      "first": {
+        "type": "String"
+      },
+      "second": {
+        "type": "String"
+      },
+      "third": {
+        "type": "String"
+      },
+      "topScorer": {
+        "type": "String"
+      },
+      "goalkeeper": {
+        "type": "String"
+      }
+    }
+  },
+  "championshipsRules": "REGRAS:\n\n{rules}",
+  "@championshipsRules": {
+    "placeholders": {
+      "rules": {
+        "type": "String"
+      }
+    }
+  },
+  "championshipsGroupsButton": "GRUPOS",
+  "championshipsGroupTitle": "Grupo {name}",
+  "@championshipsGroupTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "championshipsGroupsEmpty": "Vazio",
+  "championshipsGroupsLoadError": "Não foi possível carregar os grupos.",
+  "championshipsStandingsEmpty": "Vazio",
+  "championshipsStandingsLoadError": "Não foi possível carregar a classificação.",
+  "championshipsStandingsPosition": "#{position}",
+  "@championshipsStandingsPosition": {
+    "placeholders": {
+      "position": {
+        "type": "int"
+      }
+    }
+  },
+  "championshipsStandingsWins": "V",
+  "championshipsStandingsLosses": "D",
+  "championshipsStandingsDraws": "E",
+  "championshipsStandingsPoints": "P",
+  "championshipsStandingsGoalsFor": "GF",
+  "championshipsStandingsGoalsAgainst": "GS",
+  "championshipsStandingsGoalDifference": "SG",
+  "votingTitle": "Melhor da Partida",
+  "votingNotice": "Atenção: O VOTO É ÚNICO! Você pode alterar sua opção de voto quantas vezes quiser, mas apenas o último voto é contabilizado!",
+  "votingVoteButton": "VOTAR",
+  "votingBlankVote": "Voto em branco! Tente novamente.",
+  "votingVoteRegistered": "Voto registrado! Você votou em {player}. Muito obrigado pelo seu voto.",
+  "@votingVoteRegistered": {
+    "placeholders": {
+      "player": {
+        "type": "String"
+      }
+    }
+  },
+  "votingLoginRequired": "Faça login para votar.",
+  "votingElectedLabel": "Eleito o melhor jogador da partida: ",
+  "votingVotesCount": "Número de votos: {count}",
+  "@votingVotesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "votingNoVotes": "Nenhum voto registrado para esta partida.",
+  "votingLoadError": "Não foi possível apurar a votação.",
+  "globalResultsTitle": "RESULTADOS PELO MUNDO",
+  "globalResultsYesterday": "Ontem",
+  "globalResultsToday": "Hoje",
+  "globalResultsTomorrow": "Amanhã",
+  "globalResultsEmpty": "Nenhum jogo encontrado.",
+  "globalResultsTomorrowUnavailable": "Os jogos de amanhã ainda não estão disponíveis."
+}
