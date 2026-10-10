@@ -1,0 +1,117 @@
+# Arena Football - Guia do Projeto
+
+App de futebol amador regional: notícias, destaques, times, jogadores, partidas, tabelas de classificação, artilharia, votação de melhor jogador e resultados globais (web scraping).
+
+- **Pacote Dart:** `arena_soccer` — **Application ID:** `com.cdevel.arena_football`
+- **Versão:** ver `version:` no `pubspec.yaml`
+- **Backend:** Firebase (Auth, Firestore, Storage). Não há API REST própria.
+- **Plataforma alvo:** Android (iOS/Windows existem mas não são mantidos)
+- **Idiomas:** PT-BR (principal, template) e EN via l10n (ARB files)
+
+## Documentação detalhada
+
+| Área | Arquivo | Quando abrir |
+|------|---------|--------------|
+| Arquitetura e padrões de código | `.claude/architecture.md` | Cubit/State, UseCase, Repository, DataSource, DI, rotas, Firestore |
+
+## Stack
+
+- Flutter 3.38 / Dart `>=3.0.0 <4.0.0`
+- State: **BLoC/Cubit** (`flutter_bloc`) — Cubits globais no `MultiBlocProvider` de `lib/blocs_load.dart`; os de uma tela só, em route-level no `lib/arena_app.dart`
+- DI: **get_it** — shorthand `sl()`. Registro modular por feature, orquestrado por `init()` em `lib/injection_container.dart`
+- Dados: `cloud_firestore`, `firebase_auth`, `firebase_storage` (instâncias injetadas pelo get_it)
+- Erros: `Either<Failure, T>` via `either_dart`
+- Navegação: constantes em `lib/app_routes.dart`, registradas no `routes:` de `lib/arena_app.dart`
+- Storage local: `shared_preferences` via `PreferencesService` (região e temporada escolhidas)
+- Web scraping: `http` + `beautiful_soup_dart` (soccerstats.com)
+- Android: AGP 8.9, Kotlin 2.2, Gradle 8.11, Java 17, minSdk 23
+
+## Arquitetura
+
+Clean Architecture por feature (`data/` -> `domain/` -> `presentation/`), detalhe em `.claude/architecture.md`:
+
+```
+UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Auth/Storage
+```
+
+## Features (14 módulos em `lib/features/`)
+
+| Feature | Conteúdo |
+|---------|----------|
+| `splash` | Restaura a sessão (auto-login) e decide entre home e login |
+| `auth` | Login, cadastro de usuário, `SessionCubit` (global) |
+| `regions` | Regiões (`competicao`) + região/temporada escolhidas, `RegionCubit` (global) |
+| `home` | Casca: AppBar, drawer, barra inferior com as 4 abas, atalhos do admin |
+| `news` | Feed (aba HOME), detalhe, cadastro/edição, notificação de gol, anúncio |
+| `highlights` | Carrossel de destaques, detalhe, cadastro |
+| `teams` | Aba TIMES, cadastro de time (+ linha na classificação) |
+| `players` | Elenco do time, edição de gols/assistências/foto, cadastro de jogador |
+| `stats` | Ranking de artilharia/assistências (uma tela, `StatsRankingType`) |
+| `championships` | Aba CAMPEONATOS, detalhe, grupos, classificação |
+| `matches` | Aba TABELAS, lista de partidas (hoje/todas), cadastro, placar, votação on/off |
+| `voting` | Votar no melhor jogador, contagem de votos, jogador eleito |
+| `global_results` | Resultados pelo mundo (scraping do soccerstats.com; parser em `data/parsers/`) |
+
+## Fluxo para feature ou tela nova
+
+1. Criar as pastas da feature (`data/{datasources,repositories,dtos}`, `domain/{repositories,usecases}`, `presentation/{bloc,page,widgets}`, `di/`).
+2. Implementar de baixo para cima: DTO -> DataSource -> Repository (interface no `domain`, impl no `data`) -> UseCase -> Cubit + State.
+3. Registrar DataSource/Repository/UseCase em `lib/features/<feature>/di/<feature>_injection.dart` com `registerLazySingleton`, e chamar `registerXxxDependencies()` no `init()` de `lib/injection_container.dart`.
+4. Cubit **não** vai no DI: global em `lib/blocs_load.dart`, ou route-level com `BlocProvider` na rota em `lib/arena_app.dart`.
+5. Adicionar a constante em `lib/app_routes.dart` e a rota em `lib/arena_app.dart`.
+6. Strings novas nos dois ARBs (`lib/l10n/app_pt.arb` e `app_en.arb`) + `flutter gen-l10n`.
+7. `flutter analyze` sem erros.
+
+## Regras invioláveis
+
+**Código**
+- Erros sempre em `Either<Failure, T>` — nunca `throw`. DataSource captura e converte com `mapFirebaseError` (`lib/core/errors/firebase_error.dart`)
+- Streams do Firestore: `.toEither(...)` de `lib/core/firebase/either_stream.dart` (nunca deixar o erro do stream escapar)
+- Coleções por temporada: **sempre** `SeasonCollection.name('partidas', season)` — nunca montar `"partidas$ano"` na mão
+- Firestore só dentro de DataSource. Widget e Cubit nunca importam `cloud_firestore`
+- Sessão (usuário/admin) vem do `SessionCubit`; região/temporada do `RegionCubit`. Não passar por construtor
+- `async/await`, nunca `.then()` em cascata
+- Código (classes, variáveis, métodos) em inglês; comentários e textos em português
+- Imports absolutos (`package:arena_soccer/...`); sem barrel files
+- Logs via `AppLogger` — nunca `print`
+
+**UI**
+- Espaçamento e fontSize sempre `AppSizes.sXX`; cor sempre `AppColors`
+- Snackbar via `showSnackBar(...)` de `lib/utils/components/show_snackbar.dart`
+- Botões/campos: `ArenaButton` (`.primary`/`.outlined`) e `ArenaTextField`
+- Toda string visível via `AppLocalizations.of(context)`
+
+## Schema do Firestore (não mudar sem migração)
+
+| Coleção | Campos principais |
+|---------|-------------------|
+| `usuarios` | idUsuario, nome, email, time, admin (bool). Contas antigas têm `senha` em texto puro — não gravar mais |
+| `noticias` | id, data (Timestamp), titulo, descricao, urlImagem, link, exibir ("true"/"false" **string**), fk_competicao, time_casa, time_fora, gol_time_casa, gol_time_fora, tag ("gol", "publicidade", título de destaque...), images[] |
+| `destaques` | id, title, link, urlImagem, exibir (string), priority |
+| `competicao` | nome (as "regiões": Floresta, Santo inacio...) |
+| `times{ano}` | id_partida (é o id do **time**, nome errado), nome, descricao, fk_competicao, urlImagem |
+| `classificacao{ano}` | campos do time + vitorias, derrotas, empates, gols_feitos, gols_sofridos, pontos, saldo_gols, fk_grupo |
+| `jogadores{ano}` | idJogador, nome, time, urlImagem, nGols, nAssistencias |
+| `partidas{ano}` | id_partida, dataRegistro, timeC, timeF, horario, data, local, id_campeonato, fk_competicao, golTimeCasa, golTimeFora, votacao (string), tituloVotacao, melhorJogador, quantidadeVotos |
+| `campeonatos` | titulo, descricao, urlImagem, premio1-3, premioArtilheiro, premioGoleiro, regras, fk_competicao, id_campeonato |
+| `grupos{ano}` | descricao, fk_competicao |
+| `melhorjogador{timeC}{timeF}` | um doc por votante (id = uid): nome, time |
+
+`{ano}`: temporada do ano corrente usa a coleção sem sufixo; as outras usam o ano como sufixo (ver `SeasonCollection`).
+Storage: `noticias/`, `destaques/`, `times/`, `jogadores/` (ver `StorageFolder`).
+
+## Débito técnico conhecido
+
+- `usuarios.senha` em texto puro nas contas antigas (o app não grava mais; falta limpar a base)
+- Permissão de admin só na UI — falta reforçar nas Security Rules do Firestore
+- Booleanos gravados como string (`exibir`, `votacao`)
+
+## Arquivos críticos
+
+| Arquivo | Propósito |
+|---------|-----------|
+| `lib/main.dart` | Init Firebase, DI, runApp |
+| `lib/arena_app.dart` | MaterialApp, rotas, tema, l10n, Cubits route-level |
+| `lib/app_routes.dart` | Constantes de rota + `AppSession` (navigatorKey) |
+| `lib/blocs_load.dart` | Cubits globais (`SessionCubit`, `RegionCubit`) |
+| `lib/injection_container.dart` | `init()` orquestra `_registerExternal()` + `register*Dependencies()` |
