@@ -28,7 +28,7 @@ class _AuthFormState extends State<AuthForm> {
     //cria um alerta do tipo snackbar na tela
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(msg),
-      backgroundColor: Theme.of(context).errorColor,
+      backgroundColor: Theme.of(context).colorScheme.error,
     ));
   }
 
