@@ -147,13 +147,32 @@
   "highlightNoNews": "Nenhuma notícia disponível!",
   "teamsEmpty": "Equipes ainda não registradas",
   "teamsLoadError": "Não foi possível carregar os times.",
-  "teamsFormTitle": "CADASTRAR TIME",
-  "teamsRegionLabel": "Região:",
-  "teamsNameLabel": "Time",
-  "teamsDescriptionLabel": "Descrição",
-  "teamsRegisterButton": "CADASTRAR",
-  "teamsCreated": "Time registrado com Sucesso!!!",
-  "teamsNameRequired": "Preencha os campos obrigatórios!!!",
+  "teamsFormTitle": "Novo time",
+  "teamsNameLabel": "Nome do time",
+  "teamsDescriptionLabel": "Descrição (opcional)",
+  "teamsCreated": "Time cadastrado!",
+  "teamsNameRequired": "Informe o nome do time (mínimo 3 letras).",
+  "teamsCrestAdd": "Adicionar escudo",
+  "teamsSectionData": "Dados do time",
+  "teamsDescriptionHint": "Ex.: bairro, fundação, apelido",
+  "teamsPreview": "Prévia na aba Times",
+  "teamsInRegion": "Times na região · {count}",
+  "teamsDuplicate": "Já existe um time \"{name}\" nesta região.",
+  "teamsSubmit": "Cadastrar time",
+  "@teamsInRegion": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@teamsDuplicate": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "playersEmpty": "Jogadores ainda não registrados!",
   "playersLoadError": "Não foi possível carregar os jogadores.",
   "playersGoalsCount": "Gols: {count}",

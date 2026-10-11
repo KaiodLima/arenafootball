@@ -804,44 +804,74 @@ abstract class AppLocalizations {
   /// No description provided for @teamsFormTitle.
   ///
   /// In pt, this message translates to:
-  /// **'CADASTRAR TIME'**
+  /// **'Novo time'**
   String get teamsFormTitle;
-
-  /// No description provided for @teamsRegionLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Região:'**
-  String get teamsRegionLabel;
 
   /// No description provided for @teamsNameLabel.
   ///
   /// In pt, this message translates to:
-  /// **'Time'**
+  /// **'Nome do time'**
   String get teamsNameLabel;
 
   /// No description provided for @teamsDescriptionLabel.
   ///
   /// In pt, this message translates to:
-  /// **'Descrição'**
+  /// **'Descrição (opcional)'**
   String get teamsDescriptionLabel;
-
-  /// No description provided for @teamsRegisterButton.
-  ///
-  /// In pt, this message translates to:
-  /// **'CADASTRAR'**
-  String get teamsRegisterButton;
 
   /// No description provided for @teamsCreated.
   ///
   /// In pt, this message translates to:
-  /// **'Time registrado com Sucesso!!!'**
+  /// **'Time cadastrado!'**
   String get teamsCreated;
 
   /// No description provided for @teamsNameRequired.
   ///
   /// In pt, this message translates to:
-  /// **'Preencha os campos obrigatórios!!!'**
+  /// **'Informe o nome do time (mínimo 3 letras).'**
   String get teamsNameRequired;
+
+  /// No description provided for @teamsCrestAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar escudo'**
+  String get teamsCrestAdd;
+
+  /// No description provided for @teamsSectionData.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dados do time'**
+  String get teamsSectionData;
+
+  /// No description provided for @teamsDescriptionHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ex.: bairro, fundação, apelido'**
+  String get teamsDescriptionHint;
+
+  /// No description provided for @teamsPreview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prévia na aba Times'**
+  String get teamsPreview;
+
+  /// No description provided for @teamsInRegion.
+  ///
+  /// In pt, this message translates to:
+  /// **'Times na região · {count}'**
+  String teamsInRegion(int count);
+
+  /// No description provided for @teamsDuplicate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Já existe um time \"{name}\" nesta região.'**
+  String teamsDuplicate(String name);
+
+  /// No description provided for @teamsSubmit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cadastrar time'**
+  String get teamsSubmit;
 
   /// No description provided for @playersEmpty.
   ///

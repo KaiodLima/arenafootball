@@ -133,7 +133,7 @@ class ArenaApp extends StatelessWidget {
 
         // Times e jogadores
         AppRoutes.registerTeamPage: (_) => BlocProvider<TeamFormCubit>(
-              create: (_) => TeamFormCubit(sl(), sl(), sl()),
+              create: (_) => TeamFormCubit(sl(), sl(), sl(), sl()),
               child: const TeamFormPage(),
             ),
         AppRoutes.teamPlayersPage: (context) {

@@ -383,25 +383,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get teamsLoadError => 'Could not load the teams.';
 
   @override
-  String get teamsFormTitle => 'ADD TEAM';
+  String get teamsFormTitle => 'New team';
 
   @override
-  String get teamsRegionLabel => 'Region:';
+  String get teamsNameLabel => 'Team name';
 
   @override
-  String get teamsNameLabel => 'Team';
-
-  @override
-  String get teamsDescriptionLabel => 'Description';
-
-  @override
-  String get teamsRegisterButton => 'SAVE';
+  String get teamsDescriptionLabel => 'Description (optional)';
 
   @override
   String get teamsCreated => 'Team created!';
 
   @override
-  String get teamsNameRequired => 'Fill in the required fields!';
+  String get teamsNameRequired => 'Enter the team name (at least 3 letters).';
+
+  @override
+  String get teamsCrestAdd => 'Add crest';
+
+  @override
+  String get teamsSectionData => 'Team details';
+
+  @override
+  String get teamsDescriptionHint =>
+      'E.g.: neighborhood, founding year, nickname';
+
+  @override
+  String get teamsPreview => 'Preview in the Teams tab';
+
+  @override
+  String teamsInRegion(int count) {
+    return 'Teams in the region · $count';
+  }
+
+  @override
+  String teamsDuplicate(String name) {
+    return 'A team named \"$name\" already exists in this region.';
+  }
+
+  @override
+  String get teamsSubmit => 'Create team';
 
   @override
   String get playersEmpty => 'No players registered yet!';

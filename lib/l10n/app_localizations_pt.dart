@@ -386,25 +386,44 @@ class AppLocalizationsPt extends AppLocalizations {
   String get teamsLoadError => 'Não foi possível carregar os times.';
 
   @override
-  String get teamsFormTitle => 'CADASTRAR TIME';
+  String get teamsFormTitle => 'Novo time';
 
   @override
-  String get teamsRegionLabel => 'Região:';
+  String get teamsNameLabel => 'Nome do time';
 
   @override
-  String get teamsNameLabel => 'Time';
+  String get teamsDescriptionLabel => 'Descrição (opcional)';
 
   @override
-  String get teamsDescriptionLabel => 'Descrição';
+  String get teamsCreated => 'Time cadastrado!';
 
   @override
-  String get teamsRegisterButton => 'CADASTRAR';
+  String get teamsNameRequired => 'Informe o nome do time (mínimo 3 letras).';
 
   @override
-  String get teamsCreated => 'Time registrado com Sucesso!!!';
+  String get teamsCrestAdd => 'Adicionar escudo';
 
   @override
-  String get teamsNameRequired => 'Preencha os campos obrigatórios!!!';
+  String get teamsSectionData => 'Dados do time';
+
+  @override
+  String get teamsDescriptionHint => 'Ex.: bairro, fundação, apelido';
+
+  @override
+  String get teamsPreview => 'Prévia na aba Times';
+
+  @override
+  String teamsInRegion(int count) {
+    return 'Times na região · $count';
+  }
+
+  @override
+  String teamsDuplicate(String name) {
+    return 'Já existe um time \"$name\" nesta região.';
+  }
+
+  @override
+  String get teamsSubmit => 'Cadastrar time';
 
   @override
   String get playersEmpty => 'Jogadores ainda não registrados!';
