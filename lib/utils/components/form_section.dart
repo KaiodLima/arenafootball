@@ -33,8 +33,7 @@ class FormSection extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (trailing != null)
-                  Text(trailing!, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+                if (trailing != null) Text(trailing!, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
               ],
             ),
           ),

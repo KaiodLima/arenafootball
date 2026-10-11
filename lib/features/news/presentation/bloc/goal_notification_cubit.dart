@@ -1,66 +1,111 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/get_today_matches_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/update_match_score_usecase.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/features/news/domain/usecases/create_news_usecase.dart';
 import 'package:arena_soccer/features/news/presentation/bloc/goal_notification_state.dart';
 import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
 
-/// Publica um card de gol (notícia com tag "gol") com o placar da partida.
+/// Publica um card de gol (notícia com tag "gol") com o placar da partida e,
+/// opcionalmente, grava o mesmo placar na partida de hoje correspondente.
 class GoalNotificationCubit extends Cubit<GoalNotificationState> {
   final CreateNewsUseCase createNewsUseCase;
   final GetRegionsUseCase getRegionsUseCase;
   final GetTeamsUseCase getTeamsUseCase;
+  final GetTodayMatchesUseCase getTodayMatchesUseCase;
+  final UpdateMatchScoreUseCase updateMatchScoreUseCase;
+  String? _season;
 
   GoalNotificationCubit(
     this.createNewsUseCase,
     this.getRegionsUseCase,
     this.getTeamsUseCase,
+    this.getTodayMatchesUseCase,
+    this.updateMatchScoreUseCase,
   ) : super(const EditingGoalNotificationState());
 
   void _edit(GoalFormData form) => emit(EditingGoalNotificationState(form: form));
 
-  Future<void> load({required String initialRegion}) async {
+  Future<void> load({required String initialRegion, String? season}) async {
+    _season = season;
     _edit(state.form.copyWith(regions: [initialRegion], selectedRegion: initialRegion));
-    final loadTeams = _loadTeams(initialRegion);
+    final loadRegion = _loadRegionData(initialRegion);
 
     final response = await getRegionsUseCase();
+    if (isClosed) return;
     final regions = response.fold((_) => <String>[], (list) => list);
     if (regions.isNotEmpty) {
       final current = state.form.selectedRegion ?? initialRegion;
       _edit(state.form.copyWith(regions: regions.contains(current) ? regions : [current, ...regions]));
     }
-    await loadTeams;
+    await loadRegion;
   }
 
   Future<void> selectRegion(String region) async {
-    _edit(state.form.copyWith(selectedRegion: region, teams: const [], clearTeams: true));
-    await _loadTeams(region);
+    if (region == state.form.selectedRegion) return;
+    _edit(state.form.copyWith(
+      selectedRegion: region,
+      teams: const [],
+      todayMatches: const [],
+      updateMatch: false,
+      clearTeams: true,
+    ));
+    await _loadRegionData(region);
   }
 
-  /// Times da temporada corrente na região. Como no app antigo, o mandante
-  /// começa no primeiro time e o visitante no último.
-  Future<void> _loadTeams(String region) async {
-    final response = await getTeamsUseCase(region: region);
-    final teams = response.fold((_) => <String>[], (list) => list.map((team) => team.name).toList());
-    if (state.form.selectedRegion != region) return;
-    if (teams.isEmpty) {
-      _edit(state.form.copyWith(teams: const [], clearTeams: true));
-      return;
-    }
-    _edit(state.form.copyWith(teams: teams, homeTeam: teams.first, awayTeam: teams.last));
+  /// Times da temporada corrente e partidas de hoje da região. Como no app
+  /// antigo, o mandante começa no primeiro time e o visitante no último.
+  Future<void> _loadRegionData(String region) async {
+    final teamsFuture = getTeamsUseCase(region: region);
+    final matchesFuture = getTodayMatchesUseCase(region: region, season: _season);
+    final teamsResponse = await teamsFuture;
+    final matchesResponse = await matchesFuture;
+    if (isClosed || state.form.selectedRegion != region) return;
+    final teams = teamsResponse.fold((_) => const <TeamDTO>[], (list) => list);
+    // Sem as partidas de hoje, só não aparece o atalho.
+    final matches = matchesResponse.fold((_) => const <MatchDTO>[], (list) => list);
+
+    final form = state.form.copyWith(teams: teams, todayMatches: matches);
+    _edit(teams.isEmpty
+        ? form.copyWith(clearTeams: true)
+        : form.copyWith(homeTeam: teams.first.name, awayTeam: teams.last.name));
   }
 
   void selectHomeTeam(String team) => _edit(state.form.copyWith(homeTeam: team));
 
   void selectAwayTeam(String team) => _edit(state.form.copyWith(awayTeam: team));
 
-  void changeHomeGoals(String value) => _edit(state.form.copyWith(homeGoals: value.trim()));
+  void incrementHome() => _setGoals(home: state.form.homeGoals + 1);
 
-  void changeAwayGoals(String value) => _edit(state.form.copyWith(awayGoals: value.trim()));
+  void decrementHome() => _setGoals(home: state.form.homeGoals - 1);
+
+  void incrementAway() => _setGoals(away: state.form.awayGoals + 1);
+
+  void decrementAway() => _setGoals(away: state.form.awayGoals - 1);
+
+  void _setGoals({int? home, int? away}) => _edit(state.form.copyWith(
+        homeGoals: home?.clamp(0, GoalFormData.maxGoals),
+        awayGoals: away?.clamp(0, GoalFormData.maxGoals),
+      ));
+
+  /// Atalho "jogos de hoje": preenche times e placar atual e liga a
+  /// atualização da partida.
+  void pickMatch(MatchDTO match) => _edit(state.form.copyWith(
+        homeTeam: match.homeTeam,
+        awayTeam: match.awayTeam,
+        homeGoals: match.homeGoals,
+        awayGoals: match.awayGoals,
+        updateMatch: true,
+      ));
+
+  void toggleUpdateMatch(bool value) => _edit(state.form.copyWith(updateMatch: value));
 
   Future<void> submit() async {
     final form = state.form;
-    if (!form.hasTeams || state is SubmittingGoalNotificationState) return;
+    if (!form.canSubmit || state is SubmittingGoalNotificationState) return;
     emit(SubmittingGoalNotificationState(form: form));
 
     final response = await createNewsUseCase(
@@ -70,13 +115,35 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
         region: form.selectedRegion ?? '',
         homeTeam: form.homeTeam!,
         awayTeam: form.awayTeam!,
-        homeGoals: form.homeGoals,
-        awayGoals: form.awayGoals,
+        homeGoals: '${form.homeGoals}',
+        awayGoals: '${form.awayGoals}',
       ),
     );
-    response.fold(
-      (failure) => emit(ErrorGoalNotificationState(form: form, errorMessage: failure.toString())),
-      (_) => emit(SuccessGoalNotificationState(form: form)),
+    if (isClosed) return;
+    if (response.isLeft) {
+      emit(ErrorGoalNotificationState(form: form, errorMessage: response.left.toString()));
+      return;
+    }
+
+    final match = form.updateMatch ? form.linkedMatch : null;
+    if (match == null) {
+      emit(SuccessGoalNotificationState(form: form));
+      return;
+    }
+    final update = await updateMatchScoreUseCase(
+      match: match,
+      homeGoals: '${form.homeGoals}',
+      awayGoals: '${form.awayGoals}',
+      season: _season,
+    );
+    if (isClosed) return;
+    update.fold(
+      (failure) => emit(PartialGoalNotificationState(form: form, errorMessage: failure.toString())),
+      (updated) {
+        // A lista local passa a ter o placar novo.
+        final matches = [for (final m in form.todayMatches) m.id == updated.id ? updated : m];
+        emit(SuccessGoalNotificationState(form: form.copyWith(todayMatches: matches), matchUpdated: true));
+      },
     );
   }
 }

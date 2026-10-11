@@ -65,7 +65,8 @@ class NewsCoverPicker extends StatelessWidget {
                             onTap: () => _pick(context),
                           ),
                           const SizedBox(width: AppSizes.s8),
-                          _OverlayButton(icon: Icons.delete_outline_rounded, label: l10n.newsCoverRemove, onTap: onRemove),
+                          _OverlayButton(
+                              icon: Icons.delete_outline_rounded, label: l10n.newsCoverRemove, onTap: onRemove),
                         ],
                       ),
                     ),

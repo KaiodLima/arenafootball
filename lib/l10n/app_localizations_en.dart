@@ -276,25 +276,75 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newsRegionLabel => 'Region:';
 
   @override
-  String get newsGoalTitle => 'New Goal Card:';
-
-  @override
-  String get newsHomeTeamLabel => 'Home team:';
-
-  @override
-  String get newsAwayTeamLabel => 'Away team:';
-
-  @override
-  String get newsScoreLabel => 'Score:';
+  String get newsGoalTitle => 'Goal card';
 
   @override
   String get newsPublishButton => 'Publish';
 
   @override
-  String get newsGoalCreated => 'Goal posted successfully!';
+  String get newsGoalCreated => 'Goal published!';
 
   @override
-  String get newsGoalTeamsRequired => 'Select both teams!';
+  String get goalTodayMatches => 'Today\'s matches';
+
+  @override
+  String get goalTodayMatchesHint => 'Tap to fill in the teams and the score.';
+
+  @override
+  String get goalScoreboard => 'Score';
+
+  @override
+  String get goalPickTeam => 'Choose team';
+
+  @override
+  String get goalHome => 'Home';
+
+  @override
+  String get goalAway => 'Away';
+
+  @override
+  String get goalSameTeam => 'Choose two different teams.';
+
+  @override
+  String get goalNoTeams => 'No teams registered in this region.';
+
+  @override
+  String get goalSearchTeam => 'Search team';
+
+  @override
+  String get goalUpdateMatch => 'Update match score';
+
+  @override
+  String get goalUpdateMatchHint =>
+      'Saves the same score on today\'s match in the table.';
+
+  @override
+  String get goalPreview => 'Feed preview';
+
+  @override
+  String get goalPublish => 'Publish goal';
+
+  @override
+  String get goalConfirmTitle => 'Publish goal card?';
+
+  @override
+  String goalConfirmMessage(
+      String home, int homeGoals, int awayGoals, String away) {
+    return '$home $homeGoals × $awayGoals $away';
+  }
+
+  @override
+  String get goalMatchUpdated => 'Goal published and match score updated!';
+
+  @override
+  String get goalMatchUpdateFailed =>
+      'Goal published, but the match score could not be updated.';
+
+  @override
+  String get goalIncrease => 'Increase';
+
+  @override
+  String get goalDecrease => 'Decrease';
 
   @override
   String get newsAdTitle => 'New Advertisement Card:';

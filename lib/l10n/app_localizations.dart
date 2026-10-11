@@ -599,26 +599,8 @@ abstract class AppLocalizations {
   /// No description provided for @newsGoalTitle.
   ///
   /// In pt, this message translates to:
-  /// **'Cadastrar Card de Gol:'**
+  /// **'Card de gol'**
   String get newsGoalTitle;
-
-  /// No description provided for @newsHomeTeamLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Time da Casa:'**
-  String get newsHomeTeamLabel;
-
-  /// No description provided for @newsAwayTeamLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Time Visitante:'**
-  String get newsAwayTeamLabel;
-
-  /// No description provided for @newsScoreLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Placar:'**
-  String get newsScoreLabel;
 
   /// No description provided for @newsPublishButton.
   ///
@@ -629,14 +611,123 @@ abstract class AppLocalizations {
   /// No description provided for @newsGoalCreated.
   ///
   /// In pt, this message translates to:
-  /// **'Gol registrado com Sucesso!!!'**
+  /// **'Gol publicado!'**
   String get newsGoalCreated;
 
-  /// No description provided for @newsGoalTeamsRequired.
+  /// No description provided for @goalTodayMatches.
   ///
   /// In pt, this message translates to:
-  /// **'Selecione os dois times!'**
-  String get newsGoalTeamsRequired;
+  /// **'Jogos de hoje'**
+  String get goalTodayMatches;
+
+  /// No description provided for @goalTodayMatchesHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Toque para preencher os times e o placar.'**
+  String get goalTodayMatchesHint;
+
+  /// No description provided for @goalScoreboard.
+  ///
+  /// In pt, this message translates to:
+  /// **'Placar'**
+  String get goalScoreboard;
+
+  /// No description provided for @goalPickTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolher time'**
+  String get goalPickTeam;
+
+  /// No description provided for @goalHome.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mandante'**
+  String get goalHome;
+
+  /// No description provided for @goalAway.
+  ///
+  /// In pt, this message translates to:
+  /// **'Visitante'**
+  String get goalAway;
+
+  /// No description provided for @goalSameTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha dois times diferentes.'**
+  String get goalSameTeam;
+
+  /// No description provided for @goalNoTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum time cadastrado nesta região.'**
+  String get goalNoTeams;
+
+  /// No description provided for @goalSearchTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Buscar time'**
+  String get goalSearchTeam;
+
+  /// No description provided for @goalUpdateMatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atualizar placar da partida'**
+  String get goalUpdateMatch;
+
+  /// No description provided for @goalUpdateMatchHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grava o mesmo placar no jogo de hoje da tabela.'**
+  String get goalUpdateMatchHint;
+
+  /// No description provided for @goalPreview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prévia no feed'**
+  String get goalPreview;
+
+  /// No description provided for @goalPublish.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publicar gol'**
+  String get goalPublish;
+
+  /// No description provided for @goalConfirmTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publicar card de gol?'**
+  String get goalConfirmTitle;
+
+  /// No description provided for @goalConfirmMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'{home} {homeGoals} × {awayGoals} {away}'**
+  String goalConfirmMessage(
+      String home, int homeGoals, int awayGoals, String away);
+
+  /// No description provided for @goalMatchUpdated.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol publicado e placar da partida atualizado!'**
+  String get goalMatchUpdated;
+
+  /// No description provided for @goalMatchUpdateFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol publicado, mas não foi possível atualizar o placar da partida.'**
+  String get goalMatchUpdateFailed;
+
+  /// No description provided for @goalIncrease.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aumentar'**
+  String get goalIncrease;
+
+  /// No description provided for @goalDecrease.
+  ///
+  /// In pt, this message translates to:
+  /// **'Diminuir'**
+  String get goalDecrease;
 
   /// No description provided for @newsAdTitle.
   ///

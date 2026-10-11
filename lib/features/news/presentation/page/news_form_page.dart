@@ -11,9 +11,9 @@ import 'package:arena_soccer/features/news/presentation/widgets/news_card.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/news_cover_picker.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
-import 'package:arena_soccer/utils/components/arena_button.dart';
 import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_input_decoration.dart';
+import 'package:arena_soccer/utils/components/arena_submit_bar.dart';
 import 'package:arena_soccer/utils/components/form_section.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
@@ -197,7 +197,7 @@ class _NewsFormPageState extends State<NewsFormPage> {
                 const SizedBox(width: AppSizes.s4),
               ],
             ),
-            bottomNavigationBar: _SubmitBar(
+            bottomNavigationBar: ArenaSubmitBar(
               title: _isEditing ? l10n.newsSave : l10n.newsPublish,
               loading: submitting,
               onPressed: () => _submit(form),
@@ -428,36 +428,6 @@ class _VisibleSwitch extends StatelessWidget {
             ),
             Switch(value: value, onChanged: onChanged, activeTrackColor: AppColors.primary),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SubmitBar extends StatelessWidget {
-  final String title;
-  final bool loading;
-  final VoidCallback onPressed;
-
-  const _SubmitBar({required this.title, required this.loading, required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        boxShadow: [BoxShadow(color: AppColors.shadow, blurRadius: AppSizes.s16, offset: Offset(0, -AppSizes.s2))],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s12, AppSizes.s16, AppSizes.s12),
-          child: ArenaButton.primary(
-            title: title,
-            height: AppSizes.buttonHeightLarge,
-            isLoading: loading,
-            function: onPressed,
-          ),
         ),
       ),
     );

@@ -105,7 +105,7 @@ class ArenaApp extends StatelessWidget {
               child: const AdFormPage(),
             ),
         AppRoutes.goalNotificationPage: (_) => BlocProvider<GoalNotificationCubit>(
-              create: (_) => GoalNotificationCubit(sl(), sl(), sl()),
+              create: (_) => GoalNotificationCubit(sl(), sl(), sl(), sl(), sl()),
               child: const GoalNotificationPage(),
             ),
 

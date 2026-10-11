@@ -49,7 +49,8 @@ class NewsAlbumGrid extends StatelessWidget {
             children: [
               const Icon(Icons.add_photo_alternate_outlined, color: AppColors.primaryDark),
               const SizedBox(height: AppSizes.s4),
-              Text(l10n.newsAlbumAdd, style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s12)),
+              Text(l10n.newsAlbumAdd,
+                  style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s12)),
             ],
           ),
         ),

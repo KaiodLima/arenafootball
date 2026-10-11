@@ -277,25 +277,77 @@ class AppLocalizationsPt extends AppLocalizations {
   String get newsRegionLabel => 'Região:';
 
   @override
-  String get newsGoalTitle => 'Cadastrar Card de Gol:';
-
-  @override
-  String get newsHomeTeamLabel => 'Time da Casa:';
-
-  @override
-  String get newsAwayTeamLabel => 'Time Visitante:';
-
-  @override
-  String get newsScoreLabel => 'Placar:';
+  String get newsGoalTitle => 'Card de gol';
 
   @override
   String get newsPublishButton => 'Publicar';
 
   @override
-  String get newsGoalCreated => 'Gol registrado com Sucesso!!!';
+  String get newsGoalCreated => 'Gol publicado!';
 
   @override
-  String get newsGoalTeamsRequired => 'Selecione os dois times!';
+  String get goalTodayMatches => 'Jogos de hoje';
+
+  @override
+  String get goalTodayMatchesHint =>
+      'Toque para preencher os times e o placar.';
+
+  @override
+  String get goalScoreboard => 'Placar';
+
+  @override
+  String get goalPickTeam => 'Escolher time';
+
+  @override
+  String get goalHome => 'Mandante';
+
+  @override
+  String get goalAway => 'Visitante';
+
+  @override
+  String get goalSameTeam => 'Escolha dois times diferentes.';
+
+  @override
+  String get goalNoTeams => 'Nenhum time cadastrado nesta região.';
+
+  @override
+  String get goalSearchTeam => 'Buscar time';
+
+  @override
+  String get goalUpdateMatch => 'Atualizar placar da partida';
+
+  @override
+  String get goalUpdateMatchHint =>
+      'Grava o mesmo placar no jogo de hoje da tabela.';
+
+  @override
+  String get goalPreview => 'Prévia no feed';
+
+  @override
+  String get goalPublish => 'Publicar gol';
+
+  @override
+  String get goalConfirmTitle => 'Publicar card de gol?';
+
+  @override
+  String goalConfirmMessage(
+      String home, int homeGoals, int awayGoals, String away) {
+    return '$home $homeGoals × $awayGoals $away';
+  }
+
+  @override
+  String get goalMatchUpdated =>
+      'Gol publicado e placar da partida atualizado!';
+
+  @override
+  String get goalMatchUpdateFailed =>
+      'Gol publicado, mas não foi possível atualizar o placar da partida.';
+
+  @override
+  String get goalIncrease => 'Aumentar';
+
+  @override
+  String get goalDecrease => 'Diminuir';
 
   @override
   String get newsAdTitle => 'Cadastrar Card de Publicidade:';

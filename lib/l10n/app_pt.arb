@@ -97,13 +97,44 @@
   "newsCreated": "Notícia publicada!",
   "newsUpdated": "Notícia atualizada!",
   "newsRegionLabel": "Região:",
-  "newsGoalTitle": "Cadastrar Card de Gol:",
-  "newsHomeTeamLabel": "Time da Casa:",
-  "newsAwayTeamLabel": "Time Visitante:",
-  "newsScoreLabel": "Placar:",
+  "newsGoalTitle": "Card de gol",
   "newsPublishButton": "Publicar",
-  "newsGoalCreated": "Gol registrado com Sucesso!!!",
-  "newsGoalTeamsRequired": "Selecione os dois times!",
+  "newsGoalCreated": "Gol publicado!",
+  "goalTodayMatches": "Jogos de hoje",
+  "goalTodayMatchesHint": "Toque para preencher os times e o placar.",
+  "goalScoreboard": "Placar",
+  "goalPickTeam": "Escolher time",
+  "goalHome": "Mandante",
+  "goalAway": "Visitante",
+  "goalSameTeam": "Escolha dois times diferentes.",
+  "goalNoTeams": "Nenhum time cadastrado nesta região.",
+  "goalSearchTeam": "Buscar time",
+  "goalUpdateMatch": "Atualizar placar da partida",
+  "goalUpdateMatchHint": "Grava o mesmo placar no jogo de hoje da tabela.",
+  "goalPreview": "Prévia no feed",
+  "goalPublish": "Publicar gol",
+  "goalConfirmTitle": "Publicar card de gol?",
+  "goalConfirmMessage": "{home} {homeGoals} × {awayGoals} {away}",
+  "@goalConfirmMessage": {
+    "placeholders": {
+      "home": {
+        "type": "String"
+      },
+      "homeGoals": {
+        "type": "int"
+      },
+      "awayGoals": {
+        "type": "int"
+      },
+      "away": {
+        "type": "String"
+      }
+    }
+  },
+  "goalMatchUpdated": "Gol publicado e placar da partida atualizado!",
+  "goalMatchUpdateFailed": "Gol publicado, mas não foi possível atualizar o placar da partida.",
+  "goalIncrease": "Aumentar",
+  "goalDecrease": "Diminuir",
   "newsAdTitle": "Cadastrar Card de Publicidade:",
   "newsAdCreated": "Publicidade registrada com Sucesso!!!",
   "highlightFormTitle": "CADASTRAR DESTAQUE",
