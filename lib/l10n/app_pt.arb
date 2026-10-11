@@ -151,6 +151,34 @@
   "matchesTopScorers": "Artilharia",
   "matchesAssists": "Assistências",
   "matchesAllGamesTitle": "Todos os jogos",
+  "matchesSummaryGames": "{count, plural, =1{jogo} other{jogos}}",
+  "@matchesSummaryGames": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matchesSummaryGoals": "{count, plural, =1{gol} other{gols}}",
+  "@matchesSummaryGoals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matchesSummaryAverage": "gols por jogo",
+  "matchesDayCount": "{count, plural, =1{1 jogo} other{{count} jogos}}",
+  "@matchesDayCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matchesNoDate": "Sem data",
+  "matchesFilterAll": "Todos",
+  "matchesEmptyForTeam": "Nenhuma partida deste time",
   "matchesVersus": "X",
   "matchesEditScore": "Editar Placar",
   "matchesDeleteMatch": "Excluir Partida",

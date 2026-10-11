@@ -384,6 +384,51 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchesAllGamesTitle => 'All games';
 
   @override
+  String matchesSummaryGames(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'games',
+      one: 'game',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String matchesSummaryGoals(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'goals',
+      one: 'goal',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get matchesSummaryAverage => 'goals per game';
+
+  @override
+  String matchesDayCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count games',
+      one: '1 game',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get matchesNoDate => 'No date';
+
+  @override
+  String get matchesFilterAll => 'All';
+
+  @override
+  String get matchesEmptyForTeam => 'No matches for this team';
+
+  @override
   String get matchesVersus => 'X';
 
   @override

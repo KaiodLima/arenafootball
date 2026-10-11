@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/page_title_bar.dart';
 import 'package:arena_soccer/features/matches/domain/matches_filter.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/matches_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/matches_list.dart';
@@ -10,8 +11,9 @@ import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 
-/// "TODOS OS JOGOS": todas as partidas do campeonato na temporada, com as
-/// mesmas ações da aba. Sem [region]/[season], usa o [RegionCubit].
+/// "TODOS OS JOGOS": todas as partidas do campeonato na temporada, agrupadas
+/// por data, com resumo, filtro por time e as mesmas ações da aba. Sem
+/// [region]/[season], usa o [RegionCubit].
 class MatchesPage extends StatefulWidget {
   final int championshipId;
   final String? region;
@@ -36,6 +38,7 @@ class _MatchesPageState extends State<MatchesPage> {
     BlocProvider.of<MatchesCubit>(context).watch(
       championshipId: widget.championshipId,
       filter: MatchesFilter.all,
+      region: _region,
       season: _season,
     );
   }
@@ -46,13 +49,12 @@ class _MatchesPageState extends State<MatchesPage> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryDark,
-        foregroundColor: AppColors.white,
-        title: Text(l10n.matchesAllGamesTitle),
+      appBar: PageTitleBar(
+        title: l10n.matchesAllGamesTitle,
+        subtitle: l10n.groupsSubtitle(_region, _season),
         actions: [
           Padding(
-            padding: const EdgeInsets.all(AppSizes.s6),
+            padding: const EdgeInsets.only(right: AppSizes.s12),
             child: ArenaChipButton(
               title: l10n.matchesGroups,
               icon: Icons.groups_rounded,
@@ -65,7 +67,7 @@ class _MatchesPageState extends State<MatchesPage> {
           ),
         ],
       ),
-      body: MatchesList(season: _season),
+      body: MatchesList(season: _season, groupByDate: true),
     );
   }
 }

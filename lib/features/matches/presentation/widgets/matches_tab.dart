@@ -67,8 +67,13 @@ class _ChampionshipMatches extends StatelessWidget {
         final championshipId = championship.championshipId;
         return BlocProvider<MatchesCubit>(
           key: ValueKey(championshipId),
-          create: (_) => MatchesCubit(sl(), sl(), sl(), sl())
-            ..watch(championshipId: championshipId, filter: MatchesFilter.today, season: region.selectedSeason),
+          create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl())
+            ..watch(
+              championshipId: championshipId,
+              filter: MatchesFilter.today,
+              region: region.selectedRegion,
+              season: region.selectedSeason,
+            ),
           child: MatchesList(
             season: region.selectedSeason,
             header: Column(

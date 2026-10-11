@@ -794,6 +794,48 @@ abstract class AppLocalizations {
   /// **'Todos os jogos'**
   String get matchesAllGamesTitle;
 
+  /// No description provided for @matchesSummaryGames.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{jogo} other{jogos}}'**
+  String matchesSummaryGames(int count);
+
+  /// No description provided for @matchesSummaryGoals.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{gol} other{gols}}'**
+  String matchesSummaryGoals(int count);
+
+  /// No description provided for @matchesSummaryAverage.
+  ///
+  /// In pt, this message translates to:
+  /// **'gols por jogo'**
+  String get matchesSummaryAverage;
+
+  /// No description provided for @matchesDayCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 jogo} other{{count} jogos}}'**
+  String matchesDayCount(int count);
+
+  /// No description provided for @matchesNoDate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem data'**
+  String get matchesNoDate;
+
+  /// No description provided for @matchesFilterAll.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos'**
+  String get matchesFilterAll;
+
+  /// No description provided for @matchesEmptyForTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma partida deste time'**
+  String get matchesEmptyForTeam;
+
   /// No description provided for @matchesVersus.
   ///
   /// In pt, this message translates to:
