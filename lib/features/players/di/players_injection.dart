@@ -19,6 +19,6 @@ void registerPlayersDependencies() {
   // UseCases
   _sl.registerLazySingleton(() => WatchTeamPlayersUseCase(_sl()));
   _sl.registerLazySingleton(() => GetPlayersUseCase(_sl()));
-  _sl.registerLazySingleton(() => CreatePlayerUseCase(_sl()));
+  _sl.registerLazySingleton(() => CreatePlayerUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => UpdatePlayerUseCase(_sl(), _sl()));
 }

@@ -26,6 +26,8 @@ class RegionTeamsStrip extends StatelessWidget {
             child: Column(
               children: [
                 DecoratedBox(
+                  // Por cima: a foto/escudo cobriria uma borda desenhada atrás.
+                  position: DecorationPosition.foreground,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(

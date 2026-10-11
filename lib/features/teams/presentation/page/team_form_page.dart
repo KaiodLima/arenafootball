@@ -4,13 +4,13 @@ import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dar
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/presentation/bloc/team_form_cubit.dart';
 import 'package:arena_soccer/features/teams/presentation/bloc/team_form_state.dart';
-import 'package:arena_soccer/features/teams/presentation/widgets/crest_picker.dart';
 import 'package:arena_soccer/features/teams/presentation/widgets/region_teams_strip.dart';
 import 'package:arena_soccer/features/teams/presentation/widgets/team_card.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_input_decoration.dart';
 import 'package:arena_soccer/utils/components/arena_submit_bar.dart';
+import 'package:arena_soccer/utils/components/circle_photo_picker.dart';
 import 'package:arena_soccer/utils/components/form_section.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
@@ -139,7 +139,13 @@ class _TeamFormPageState extends State<TeamFormPage> {
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s20, AppSizes.s16, AppSizes.s24),
               children: [
-                Center(child: CrestPicker(file: form.crest, onPicked: _cubit.setCrest, onRemove: _cubit.clearCrest)),
+                Center(
+                    child: CirclePhotoPicker(
+                  file: form.crest,
+                  addLabel: l10n.teamsCrestAdd,
+                  onPicked: _cubit.setCrest,
+                  onRemove: _cubit.clearCrest,
+                )),
                 const SizedBox(height: AppSizes.s20),
                 Wrap(
                   spacing: AppSizes.s8,

@@ -191,15 +191,40 @@
       }
     }
   },
-  "playersNameRequired": "Preencha o campo NOME!!!",
-  "playersTeamRequired": "Informe um Time!!!",
-  "playersFormTitle": "CADASTRAR JOGADOR",
-  "playersNameLabel": "Nome",
+  "playersNameRequired": "Informe o nome (mínimo 3 letras).",
+  "playersTeamRequired": "Escolha o time do jogador.",
+  "playersFormTitle": "Novo jogador",
+  "playersNameLabel": "Nome do jogador",
   "playersGoalsLabel": "Gols",
-  "playersAssistsLabel": "Assistencias",
-  "playersTeamLabel": "Time:",
-  "playersRegisterButton": "CADASTRAR",
-  "playersCreated": "Jogador Cadastrado!!!",
+  "playersAssistsLabel": "Assistências",
+  "playersCreated": "Jogador cadastrado!",
+  "playersPhotoAdd": "Adicionar foto (opcional)",
+  "playersSectionData": "Dados do jogador",
+  "playersTeam": "Time",
+  "playersPreview": "Prévia no elenco",
+  "playersSquadOf": "Elenco do {team} · {count}",
+  "playersDuplicate": "Já existe \"{name}\" no {team}.",
+  "playersSubmit": "Cadastrar jogador",
+  "@playersSquadOf": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@playersDuplicate": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "team": {
+        "type": "String"
+      }
+    }
+  },
   "playersPhotoBack": "Voltar",
   "playersPhotoSave": "Salvar",
   "statsEmptyGoals": "Nenhum gol marcado ainda",

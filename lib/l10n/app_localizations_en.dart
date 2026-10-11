@@ -440,16 +440,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get playersNameRequired => 'Fill in the NAME field!';
+  String get playersNameRequired => 'Enter the name (at least 3 letters).';
 
   @override
-  String get playersTeamRequired => 'Choose a team!';
+  String get playersTeamRequired => 'Choose the player\'s team.';
 
   @override
-  String get playersFormTitle => 'ADD PLAYER';
+  String get playersFormTitle => 'New player';
 
   @override
-  String get playersNameLabel => 'Name';
+  String get playersNameLabel => 'Player name';
 
   @override
   String get playersGoalsLabel => 'Goals';
@@ -458,13 +458,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playersAssistsLabel => 'Assists';
 
   @override
-  String get playersTeamLabel => 'Team:';
-
-  @override
-  String get playersRegisterButton => 'SAVE';
-
-  @override
   String get playersCreated => 'Player created!';
+
+  @override
+  String get playersPhotoAdd => 'Add photo (optional)';
+
+  @override
+  String get playersSectionData => 'Player details';
+
+  @override
+  String get playersTeam => 'Team';
+
+  @override
+  String get playersPreview => 'Squad preview';
+
+  @override
+  String playersSquadOf(String team, int count) {
+    return '$team squad · $count';
+  }
+
+  @override
+  String playersDuplicate(String name, String team) {
+    return '\"$name\" already plays for $team.';
+  }
+
+  @override
+  String get playersSubmit => 'Create player';
 
   @override
   String get playersPhotoBack => 'Back';

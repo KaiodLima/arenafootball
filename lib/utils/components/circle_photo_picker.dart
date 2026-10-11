@@ -9,16 +9,26 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// Escudo do time em círculo. Vazio: borda tracejada e "Adicionar escudo";
-/// tocar pergunta câmera/galeria. Com escudo: "Trocar" e "Remover" embaixo.
-class CrestPicker extends StatelessWidget {
+/// Foto em círculo (escudo do time, foto do jogador). Vazio: borda
+/// tracejada e [addLabel]; tocar pergunta câmera/galeria. Com foto: "Trocar"
+/// e "Remover" embaixo.
+class CirclePhotoPicker extends StatelessWidget {
   final File? file;
+  final String addLabel;
+  final IconData emptyIcon;
+  final double size;
   final ValueChanged<File> onPicked;
   final VoidCallback onRemove;
 
-  const CrestPicker({super.key, required this.file, required this.onPicked, required this.onRemove});
-
-  static const double _size = AppSizes.s120;
+  const CirclePhotoPicker({
+    super.key,
+    required this.file,
+    required this.addLabel,
+    required this.onPicked,
+    required this.onRemove,
+    this.emptyIcon = Icons.add_photo_alternate_outlined,
+    this.size = AppSizes.s120,
+  });
 
   Future<void> _pick(BuildContext context) async {
     FocusManager.instance.primaryFocus?.unfocus();
@@ -41,8 +51,8 @@ class CrestPicker extends StatelessWidget {
           child: InkWell(
             onTap: () => _pick(context),
             child: SizedBox(
-              width: _size,
-              height: _size,
+              width: size,
+              height: size,
               child: file != null
                   ? Padding(
                       padding: const EdgeInsets.all(AppSizes.s8),
@@ -50,9 +60,8 @@ class CrestPicker extends StatelessWidget {
                     )
                   : CustomPaint(
                       painter: _DashedCirclePainter(),
-                      child: const Center(
-                        child:
-                            Icon(Icons.add_photo_alternate_outlined, color: AppColors.primaryDark, size: AppSizes.s36),
+                      child: Center(
+                        child: Icon(emptyIcon, color: AppColors.primaryDark, size: AppSizes.s36),
                       ),
                     ),
             ),
@@ -60,7 +69,7 @@ class CrestPicker extends StatelessWidget {
         ),
         const SizedBox(height: AppSizes.s10),
         if (file == null)
-          Text(l10n.teamsCrestAdd, style: AppTypography.label(color: AppColors.primaryDark))
+          Text(addLabel, style: AppTypography.label(color: AppColors.primaryDark))
         else
           Row(
             mainAxisSize: MainAxisSize.min,

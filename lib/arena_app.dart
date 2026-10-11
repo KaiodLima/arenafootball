@@ -144,7 +144,7 @@ class ArenaApp extends StatelessWidget {
           );
         },
         AppRoutes.registerPlayerPage: (_) => BlocProvider<PlayerFormCubit>(
-              create: (_) => PlayerFormCubit(sl(), sl(), sl()),
+              create: (_) => PlayerFormCubit(sl(), sl(), sl(), sl()),
               child: const PlayerFormPage(),
             ),
 

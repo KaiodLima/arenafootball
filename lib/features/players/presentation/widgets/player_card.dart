@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
@@ -12,7 +14,10 @@ class PlayerAvatar extends StatelessWidget {
   final PlayerDTO player;
   final double size;
 
-  const PlayerAvatar({super.key, required this.player, this.size = AppSizes.s52});
+  /// Foto local no lugar da URL (prévia do cadastro).
+  final File? photoFile;
+
+  const PlayerAvatar({super.key, required this.player, this.size = AppSizes.s52, this.photoFile});
 
   String get _initials {
     final parts = player.name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
@@ -30,16 +35,18 @@ class PlayerAvatar extends StatelessWidget {
       decoration: const BoxDecoration(color: AppColors.primarySoft, shape: BoxShape.circle),
       clipBehavior: Clip.antiAlias,
       alignment: Alignment.center,
-      child: player.imageUrl.isNotEmpty
-          ? CachedNetworkImage(
-              imageUrl: player.imageUrl,
-              width: size,
-              height: size,
-              fit: BoxFit.cover,
-              placeholder: (_, __) => Center(child: _InitialsText(initials: _initials, size: size)),
-              errorWidget: (_, __, ___) => Center(child: _InitialsText(initials: _initials, size: size)),
-            )
-          : _InitialsText(initials: _initials, size: size),
+      child: photoFile != null
+          ? Image.file(photoFile!, width: size, height: size, fit: BoxFit.cover)
+          : player.imageUrl.isNotEmpty
+              ? CachedNetworkImage(
+                  imageUrl: player.imageUrl,
+                  width: size,
+                  height: size,
+                  fit: BoxFit.cover,
+                  placeholder: (_, __) => Center(child: _InitialsText(initials: _initials, size: size)),
+                  errorWidget: (_, __, ___) => Center(child: _InitialsText(initials: _initials, size: size)),
+                )
+              : _InitialsText(initials: _initials, size: size),
     );
   }
 }
@@ -61,9 +68,12 @@ class _InitialsText extends StatelessWidget {
 class PlayerCard extends StatelessWidget {
   final PlayerDTO player;
   final bool isTopScorer;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
-  const PlayerCard({super.key, required this.player, required this.isTopScorer, required this.onTap});
+  /// Foto local (prévia do cadastro).
+  final File? photoFile;
+
+  const PlayerCard({super.key, required this.player, required this.isTopScorer, this.onTap, this.photoFile});
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +85,7 @@ class PlayerCard extends StatelessWidget {
       onTap: onTap,
       child: Row(
         children: [
-          PlayerAvatar(player: player),
+          PlayerAvatar(player: player, photoFile: photoFile),
           const SizedBox(width: AppSizes.s14),
           Expanded(
             child: Column(

@@ -900,25 +900,25 @@ abstract class AppLocalizations {
   /// No description provided for @playersNameRequired.
   ///
   /// In pt, this message translates to:
-  /// **'Preencha o campo NOME!!!'**
+  /// **'Informe o nome (mínimo 3 letras).'**
   String get playersNameRequired;
 
   /// No description provided for @playersTeamRequired.
   ///
   /// In pt, this message translates to:
-  /// **'Informe um Time!!!'**
+  /// **'Escolha o time do jogador.'**
   String get playersTeamRequired;
 
   /// No description provided for @playersFormTitle.
   ///
   /// In pt, this message translates to:
-  /// **'CADASTRAR JOGADOR'**
+  /// **'Novo jogador'**
   String get playersFormTitle;
 
   /// No description provided for @playersNameLabel.
   ///
   /// In pt, this message translates to:
-  /// **'Nome'**
+  /// **'Nome do jogador'**
   String get playersNameLabel;
 
   /// No description provided for @playersGoalsLabel.
@@ -930,26 +930,56 @@ abstract class AppLocalizations {
   /// No description provided for @playersAssistsLabel.
   ///
   /// In pt, this message translates to:
-  /// **'Assistencias'**
+  /// **'Assistências'**
   String get playersAssistsLabel;
-
-  /// No description provided for @playersTeamLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Time:'**
-  String get playersTeamLabel;
-
-  /// No description provided for @playersRegisterButton.
-  ///
-  /// In pt, this message translates to:
-  /// **'CADASTRAR'**
-  String get playersRegisterButton;
 
   /// No description provided for @playersCreated.
   ///
   /// In pt, this message translates to:
-  /// **'Jogador Cadastrado!!!'**
+  /// **'Jogador cadastrado!'**
   String get playersCreated;
+
+  /// No description provided for @playersPhotoAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar foto (opcional)'**
+  String get playersPhotoAdd;
+
+  /// No description provided for @playersSectionData.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dados do jogador'**
+  String get playersSectionData;
+
+  /// No description provided for @playersTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Time'**
+  String get playersTeam;
+
+  /// No description provided for @playersPreview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prévia no elenco'**
+  String get playersPreview;
+
+  /// No description provided for @playersSquadOf.
+  ///
+  /// In pt, this message translates to:
+  /// **'Elenco do {team} · {count}'**
+  String playersSquadOf(String team, int count);
+
+  /// No description provided for @playersDuplicate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Já existe \"{name}\" no {team}.'**
+  String playersDuplicate(String name, String team);
+
+  /// No description provided for @playersSubmit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cadastrar jogador'**
+  String get playersSubmit;
 
   /// No description provided for @playersPhotoBack.
   ///

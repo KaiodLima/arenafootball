@@ -442,31 +442,50 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get playersNameRequired => 'Preencha o campo NOME!!!';
+  String get playersNameRequired => 'Informe o nome (mínimo 3 letras).';
 
   @override
-  String get playersTeamRequired => 'Informe um Time!!!';
+  String get playersTeamRequired => 'Escolha o time do jogador.';
 
   @override
-  String get playersFormTitle => 'CADASTRAR JOGADOR';
+  String get playersFormTitle => 'Novo jogador';
 
   @override
-  String get playersNameLabel => 'Nome';
+  String get playersNameLabel => 'Nome do jogador';
 
   @override
   String get playersGoalsLabel => 'Gols';
 
   @override
-  String get playersAssistsLabel => 'Assistencias';
+  String get playersAssistsLabel => 'Assistências';
 
   @override
-  String get playersTeamLabel => 'Time:';
+  String get playersCreated => 'Jogador cadastrado!';
 
   @override
-  String get playersRegisterButton => 'CADASTRAR';
+  String get playersPhotoAdd => 'Adicionar foto (opcional)';
 
   @override
-  String get playersCreated => 'Jogador Cadastrado!!!';
+  String get playersSectionData => 'Dados do jogador';
+
+  @override
+  String get playersTeam => 'Time';
+
+  @override
+  String get playersPreview => 'Prévia no elenco';
+
+  @override
+  String playersSquadOf(String team, int count) {
+    return 'Elenco do $team · $count';
+  }
+
+  @override
+  String playersDuplicate(String name, String team) {
+    return 'Já existe \"$name\" no $team.';
+  }
+
+  @override
+  String get playersSubmit => 'Cadastrar jogador';
 
   @override
   String get playersPhotoBack => 'Voltar';
