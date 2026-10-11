@@ -936,7 +936,7 @@ abstract class AppLocalizations {
   /// No description provided for @championshipsGroupsEmpty.
   ///
   /// In pt, this message translates to:
-  /// **'Vazio'**
+  /// **'Nenhum grupo cadastrado nesta temporada.'**
   String get championshipsGroupsEmpty;
 
   /// No description provided for @championshipsGroupsLoadError.
@@ -948,7 +948,7 @@ abstract class AppLocalizations {
   /// No description provided for @championshipsStandingsEmpty.
   ///
   /// In pt, this message translates to:
-  /// **'Vazio'**
+  /// **'Classificação ainda não disponível.'**
   String get championshipsStandingsEmpty;
 
   /// No description provided for @championshipsStandingsLoadError.
@@ -956,12 +956,6 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Não foi possível carregar a classificação.'**
   String get championshipsStandingsLoadError;
-
-  /// No description provided for @championshipsStandingsPosition.
-  ///
-  /// In pt, this message translates to:
-  /// **'#{position}'**
-  String championshipsStandingsPosition(int position);
 
   /// No description provided for @championshipsStandingsWins.
   ///
@@ -986,18 +980,6 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'P'**
   String get championshipsStandingsPoints;
-
-  /// No description provided for @championshipsStandingsGoalsFor.
-  ///
-  /// In pt, this message translates to:
-  /// **'GF'**
-  String get championshipsStandingsGoalsFor;
-
-  /// No description provided for @championshipsStandingsGoalsAgainst.
-  ///
-  /// In pt, this message translates to:
-  /// **'GS'**
-  String get championshipsStandingsGoalsAgainst;
 
   /// No description provided for @championshipsStandingsGoalDifference.
   ///
@@ -1556,6 +1538,72 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Limpar'**
   String get commonClear;
+
+  /// No description provided for @groupsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grupos'**
+  String get groupsTitle;
+
+  /// No description provided for @groupsSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'{region} · Temporada {season}'**
+  String groupsSubtitle(String region, String season);
+
+  /// No description provided for @groupsSeeStandings.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver classificação'**
+  String get groupsSeeStandings;
+
+  /// No description provided for @standingsColPosition.
+  ///
+  /// In pt, this message translates to:
+  /// **'#'**
+  String get standingsColPosition;
+
+  /// No description provided for @standingsColTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Time'**
+  String get standingsColTeam;
+
+  /// No description provided for @standingsColGames.
+  ///
+  /// In pt, this message translates to:
+  /// **'J'**
+  String get standingsColGames;
+
+  /// No description provided for @standingsQualifiedLegend.
+  ///
+  /// In pt, this message translates to:
+  /// **'Classificados para a próxima fase'**
+  String get standingsQualifiedLegend;
+
+  /// No description provided for @standingsGoalsFor.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gols feitos'**
+  String get standingsGoalsFor;
+
+  /// No description provided for @standingsGoalsAgainst.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gols sofridos'**
+  String get standingsGoalsAgainst;
+
+  /// No description provided for @standingsPerformance.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aproveitamento'**
+  String get standingsPerformance;
+
+  /// No description provided for @standingsYourTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu time'**
+  String get standingsYourTeam;
 }
 
 class _AppLocalizationsDelegate

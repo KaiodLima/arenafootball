@@ -7,7 +7,7 @@ import 'package:arena_soccer/features/championships/presentation/bloc/championsh
 import 'package:arena_soccer/features/matches/domain/matches_filter.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/matches_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/matches_list.dart';
-import 'package:arena_soccer/features/matches/presentation/widgets/matches_shortcut_button.dart';
+import 'package:arena_soccer/utils/components/arena_chip_button.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
 import 'package:arena_soccer/injection_container.dart';
@@ -114,7 +114,7 @@ class _Shortcuts extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _padded(MatchesShortcutButton(
+          _padded(ArenaChipButton(
             title: l10n.matchesAllGames,
             icon: Icons.calendar_month_rounded,
             onPressed: () => Navigator.pushNamed(
@@ -123,7 +123,7 @@ class _Shortcuts extends StatelessWidget {
               arguments: {'championshipId': championshipId, 'region': region, 'season': season},
             ),
           )),
-          _padded(MatchesShortcutButton(
+          _padded(ArenaChipButton(
             title: l10n.matchesGroups,
             icon: Icons.groups_rounded,
             onPressed: () => Navigator.pushNamed(
@@ -132,12 +132,12 @@ class _Shortcuts extends StatelessWidget {
               arguments: {'region': region, 'season': season},
             ),
           )),
-          _padded(MatchesShortcutButton(
+          _padded(ArenaChipButton(
             title: l10n.matchesTopScorers,
             icon: Icons.sports_soccer_rounded,
             onPressed: () => _openStats(context, StatsRankingType.goals),
           )),
-          _padded(MatchesShortcutButton(
+          _padded(ArenaChipButton(
             title: l10n.matchesAssists,
             icon: Icons.assistant_rounded,
             onPressed: () => _openStats(context, StatsRankingType.assists),

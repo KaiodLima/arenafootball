@@ -193,24 +193,14 @@
       }
     }
   },
-  "championshipsGroupsEmpty": "Vazio",
+  "championshipsGroupsEmpty": "Nenhum grupo cadastrado nesta temporada.",
   "championshipsGroupsLoadError": "Não foi possível carregar os grupos.",
-  "championshipsStandingsEmpty": "Vazio",
+  "championshipsStandingsEmpty": "Classificação ainda não disponível.",
   "championshipsStandingsLoadError": "Não foi possível carregar a classificação.",
-  "championshipsStandingsPosition": "#{position}",
-  "@championshipsStandingsPosition": {
-    "placeholders": {
-      "position": {
-        "type": "int"
-      }
-    }
-  },
   "championshipsStandingsWins": "V",
   "championshipsStandingsLosses": "D",
   "championshipsStandingsDraws": "E",
   "championshipsStandingsPoints": "P",
-  "championshipsStandingsGoalsFor": "GF",
-  "championshipsStandingsGoalsAgainst": "GS",
   "championshipsStandingsGoalDifference": "SG",
   "votingTitle": "Melhor da Partida",
   "votingNotice": "Atenção: O VOTO É ÚNICO! Você pode alterar sua opção de voto quantas vezes quiser, mas apenas o último voto é contabilizado!",
@@ -362,5 +352,26 @@
   "playersChangePhoto": "Trocar foto",
   "playersEditName": "Editar nome",
   "playersSaveName": "Salvar nome",
-  "commonClear": "Limpar"
+  "commonClear": "Limpar",
+  "groupsTitle": "Grupos",
+  "groupsSubtitle": "{region} · Temporada {season}",
+  "@groupsSubtitle": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      },
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "groupsSeeStandings": "Ver classificação",
+  "standingsColPosition": "#",
+  "standingsColTeam": "Time",
+  "standingsColGames": "J",
+  "standingsQualifiedLegend": "Classificados para a próxima fase",
+  "standingsGoalsFor": "Gols feitos",
+  "standingsGoalsAgainst": "Gols sofridos",
+  "standingsPerformance": "Aproveitamento",
+  "standingsYourTeam": "Seu time"
 }

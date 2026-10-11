@@ -176,14 +176,14 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.groupsPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<GroupsCubit>(
-            create: (_) => GroupsCubit(sl()),
+            create: (_) => GroupsCubit(sl(), sl()),
             child: GroupsPage(region: args?['region'] as String?, season: args?['season'] as String?),
           );
         },
         AppRoutes.standingsPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<StandingsCubit>(
-            create: (_) => StandingsCubit(sl()),
+            create: (_) => StandingsCubit(sl(), sl()),
             child: StandingsPage(
               region: args?['region'] as String,
               season: args?['season'] as String,

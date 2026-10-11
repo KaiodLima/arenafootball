@@ -445,23 +445,20 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get championshipsGroupsEmpty => 'Vazio';
+  String get championshipsGroupsEmpty =>
+      'Nenhum grupo cadastrado nesta temporada.';
 
   @override
   String get championshipsGroupsLoadError =>
       'Não foi possível carregar os grupos.';
 
   @override
-  String get championshipsStandingsEmpty => 'Vazio';
+  String get championshipsStandingsEmpty =>
+      'Classificação ainda não disponível.';
 
   @override
   String get championshipsStandingsLoadError =>
       'Não foi possível carregar a classificação.';
-
-  @override
-  String championshipsStandingsPosition(int position) {
-    return '#$position';
-  }
 
   @override
   String get championshipsStandingsWins => 'V';
@@ -474,12 +471,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get championshipsStandingsPoints => 'P';
-
-  @override
-  String get championshipsStandingsGoalsFor => 'GF';
-
-  @override
-  String get championshipsStandingsGoalsAgainst => 'GS';
 
   @override
   String get championshipsStandingsGoalDifference => 'SG';
@@ -783,4 +774,39 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get commonClear => 'Limpar';
+
+  @override
+  String get groupsTitle => 'Grupos';
+
+  @override
+  String groupsSubtitle(String region, String season) {
+    return '$region · Temporada $season';
+  }
+
+  @override
+  String get groupsSeeStandings => 'Ver classificação';
+
+  @override
+  String get standingsColPosition => '#';
+
+  @override
+  String get standingsColTeam => 'Time';
+
+  @override
+  String get standingsColGames => 'J';
+
+  @override
+  String get standingsQualifiedLegend => 'Classificados para a próxima fase';
+
+  @override
+  String get standingsGoalsFor => 'Gols feitos';
+
+  @override
+  String get standingsGoalsAgainst => 'Gols sofridos';
+
+  @override
+  String get standingsPerformance => 'Aproveitamento';
+
+  @override
+  String get standingsYourTeam => 'Seu time';
 }

@@ -444,21 +444,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get championshipsGroupsEmpty => 'Empty';
+  String get championshipsGroupsEmpty => 'No groups registered this season.';
 
   @override
   String get championshipsGroupsLoadError => 'Could not load the groups.';
 
   @override
-  String get championshipsStandingsEmpty => 'Empty';
+  String get championshipsStandingsEmpty => 'Standings not available yet.';
 
   @override
   String get championshipsStandingsLoadError => 'Could not load the standings.';
-
-  @override
-  String championshipsStandingsPosition(int position) {
-    return '#$position';
-  }
 
   @override
   String get championshipsStandingsWins => 'W';
@@ -471,12 +466,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get championshipsStandingsPoints => 'Pts';
-
-  @override
-  String get championshipsStandingsGoalsFor => 'GF';
-
-  @override
-  String get championshipsStandingsGoalsAgainst => 'GA';
 
   @override
   String get championshipsStandingsGoalDifference => 'GD';
@@ -778,4 +767,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get commonClear => 'Clear';
+
+  @override
+  String get groupsTitle => 'Groups';
+
+  @override
+  String groupsSubtitle(String region, String season) {
+    return '$region · Season $season';
+  }
+
+  @override
+  String get groupsSeeStandings => 'See standings';
+
+  @override
+  String get standingsColPosition => '#';
+
+  @override
+  String get standingsColTeam => 'Team';
+
+  @override
+  String get standingsColGames => 'G';
+
+  @override
+  String get standingsQualifiedLegend => 'Qualified for the next stage';
+
+  @override
+  String get standingsGoalsFor => 'Goals for';
+
+  @override
+  String get standingsGoalsAgainst => 'Goals against';
+
+  @override
+  String get standingsPerformance => 'Performance';
+
+  @override
+  String get standingsYourTeam => 'Your team';
 }

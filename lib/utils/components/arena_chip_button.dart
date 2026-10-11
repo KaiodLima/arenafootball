@@ -3,14 +3,13 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// Chip de atalho (todos os jogos, grupos, artilharia...) da aba de tabelas e
-/// da AppBar de "todos os jogos".
-class MatchesShortcutButton extends StatelessWidget {
+/// Chip de atalho com ícone opcional (todos os jogos, grupos, artilharia...).
+class ArenaChipButton extends StatelessWidget {
   final String title;
   final IconData? icon;
   final VoidCallback onPressed;
 
-  const MatchesShortcutButton({super.key, required this.title, required this.onPressed, this.icon});
+  const ArenaChipButton({super.key, required this.title, required this.onPressed, this.icon});
 
   @override
   Widget build(BuildContext context) {

@@ -4,7 +4,7 @@ import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/matches/domain/matches_filter.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/matches_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/matches_list.dart';
-import 'package:arena_soccer/features/matches/presentation/widgets/matches_shortcut_button.dart';
+import 'package:arena_soccer/utils/components/arena_chip_button.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
@@ -53,7 +53,7 @@ class _MatchesPageState extends State<MatchesPage> {
         actions: [
           Padding(
             padding: const EdgeInsets.all(AppSizes.s6),
-            child: MatchesShortcutButton(
+            child: ArenaChipButton(
               title: l10n.matchesGroups,
               icon: Icons.groups_rounded,
               onPressed: () => Navigator.pushNamed(
