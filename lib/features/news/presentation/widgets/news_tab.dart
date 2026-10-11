@@ -157,7 +157,14 @@ class _NewsItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (news.isGoal) {
-      return GoalCard(news: news, trailing: _adminMenu(context, onImage: false, canEdit: false));
+      return GoalCard(
+        news: news,
+        trailing: _adminMenu(context, onImage: false, canEdit: false),
+        // Admin: lança o próximo gol do mesmo jogo partindo deste placar.
+        onTap: isAdmin
+            ? () => Navigator.pushNamed(context, AppRoutes.goalNotificationPage, arguments: {'news': news})
+            : null,
+      );
     }
     if (news.isAd) {
       return AdCard(

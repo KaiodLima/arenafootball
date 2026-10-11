@@ -12,7 +12,10 @@ class GoalCard extends StatelessWidget {
   final NewsDTO news;
   final Widget? trailing;
 
-  const GoalCard({super.key, required this.news, this.trailing});
+  /// Toque no card (admin: abre o "Card de gol" com este placar).
+  final VoidCallback? onTap;
+
+  const GoalCard({super.key, required this.news, this.trailing, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +23,7 @@ class GoalCard extends StatelessWidget {
     final teamStyle = AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s16);
 
     return ArenaCard(
+      onTap: onTap,
       child: IntrinsicHeight(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,

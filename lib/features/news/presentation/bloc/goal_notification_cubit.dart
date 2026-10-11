@@ -19,6 +19,9 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
   final UpdateMatchScoreUseCase updateMatchScoreUseCase;
   String? _season;
 
+  /// Card de gol de partida (feed): usado só no primeiro carregamento.
+  NewsDTO? _initial;
+
   GoalNotificationCubit(
     this.createNewsUseCase,
     this.getRegionsUseCase,
@@ -29,8 +32,9 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
 
   void _edit(GoalFormData form) => emit(EditingGoalNotificationState(form: form));
 
-  Future<void> load({required String initialRegion, String? season}) async {
+  Future<void> load({required String initialRegion, String? season, NewsDTO? initial}) async {
     _season = season;
+    _initial = initial;
     _edit(state.form.copyWith(regions: [initialRegion], selectedRegion: initialRegion));
     final loadRegion = _loadRegionData(initialRegion);
 
@@ -46,6 +50,7 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
 
   Future<void> selectRegion(String region) async {
     if (region == state.form.selectedRegion) return;
+    _initial = null;
     _edit(state.form.copyWith(
       selectedRegion: region,
       teams: const [],
@@ -69,10 +74,25 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
     final matches = matchesResponse.fold((_) => const <MatchDTO>[], (list) => list);
 
     final form = state.form.copyWith(teams: teams, todayMatches: matches);
+    final initial = _initial;
+    _initial = null;
+    if (initial != null && initial.homeTeam.isNotEmpty && initial.awayTeam.isNotEmpty) {
+      // Parte do card tocado no feed (mesmo que o time não esteja mais na lista).
+      _edit(form.copyWith(
+        homeTeam: initial.homeTeam,
+        awayTeam: initial.awayTeam,
+        homeGoals: _goals(initial.homeGoals),
+        awayGoals: _goals(initial.awayGoals),
+      ));
+      return;
+    }
     _edit(teams.isEmpty
         ? form.copyWith(clearTeams: true)
         : form.copyWith(homeTeam: teams.first.name, awayTeam: teams.last.name));
   }
+
+  /// Gols gravados como texto no card ("2"); vazio ou inválido = 0.
+  static int _goals(String value) => (int.tryParse(value.trim()) ?? 0).clamp(0, GoalFormData.maxGoals);
 
   void selectHomeTeam(String team) => _edit(state.form.copyWith(homeTeam: team));
 

@@ -104,10 +104,14 @@ class ArenaApp extends StatelessWidget {
               create: (_) => NewsFormCubit(sl(), sl(), sl(), sl()),
               child: const AdFormPage(),
             ),
-        AppRoutes.goalNotificationPage: (_) => BlocProvider<GoalNotificationCubit>(
-              create: (_) => GoalNotificationCubit(sl(), sl(), sl(), sl(), sl()),
-              child: const GoalNotificationPage(),
-            ),
+        // `news` opcional: card de gol tocado pelo admin (preenche times e placar).
+        AppRoutes.goalNotificationPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          return BlocProvider<GoalNotificationCubit>(
+            create: (_) => GoalNotificationCubit(sl(), sl(), sl(), sl(), sl()),
+            child: GoalNotificationPage(initial: args?['news'] as NewsDTO?),
+          );
+        },
 
         // Destaques
         AppRoutes.highlightDetailsPage: (context) {

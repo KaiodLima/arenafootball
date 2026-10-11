@@ -169,6 +169,39 @@ void main() {
       expect(state.form.todayMatches.first.homeGoals, 2);
     });
 
+    test('a partir de um card do feed: times na ordem do card e o placar dele', () async {
+      final fromCard = GoalNotificationCubit(
+        createNews,
+        _FakeRegions(),
+        _FakeTeams(),
+        _TodayMatches(matches),
+        UpdateMatchScoreUseCase(matches),
+      );
+      await fromCard.load(
+        initialRegion: 'Floresta',
+        initial: const NewsDTO(tag: NewsDTO.goalTag, homeTeam: 'Volta', awayTeam: 'Lava Jato', homeGoals: '2', awayGoals: '1'),
+      );
+      final form = fromCard.state.form;
+      expect([form.homeTeam, form.awayTeam], ['Volta', 'Lava Jato']);
+      expect([form.homeGoals, form.awayGoals], [2, 1]);
+      expect(form.updateMatch, isFalse);
+    });
+
+    test('placar vazio ou inválido no card vira 0', () async {
+      final fromCard = GoalNotificationCubit(
+        createNews,
+        _FakeRegions(),
+        _FakeTeams(),
+        _TodayMatches(matches),
+        UpdateMatchScoreUseCase(matches),
+      );
+      await fromCard.load(
+        initialRegion: 'Floresta',
+        initial: const NewsDTO(tag: NewsDTO.goalTag, homeTeam: 'Volta', awayTeam: 'Lava Jato', awayGoals: 'x'),
+      );
+      expect([fromCard.state.form.homeGoals, fromCard.state.form.awayGoals], [0, 0]);
+    });
+
     test('card publicado mas partida falhou → estado parcial', () async {
       matches.failUpdate = true;
       cubit.pickMatch(_today);

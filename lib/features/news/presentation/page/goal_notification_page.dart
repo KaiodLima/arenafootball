@@ -20,8 +20,12 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 /// placar com escudos e − / +, prévia ao vivo do card e confirmação antes de
 /// publicar. Opcionalmente grava o placar na partida de hoje. A tela fica
 /// aberta depois de publicar, para o admin atualizar o placar de novo.
+/// Com [initial] (card de gol tocado no feed), começa com os times, o placar e
+/// a região daquele card.
 class GoalNotificationPage extends StatefulWidget {
-  const GoalNotificationPage({super.key});
+  final NewsDTO? initial;
+
+  const GoalNotificationPage({super.key, this.initial});
 
   @override
   State<GoalNotificationPage> createState() => _GoalNotificationPageState();
@@ -35,7 +39,12 @@ class _GoalNotificationPageState extends State<GoalNotificationPage> {
     super.initState();
     _cubit = BlocProvider.of<GoalNotificationCubit>(context);
     final region = BlocProvider.of<RegionCubit>(context).state;
-    _cubit.load(initialRegion: region.selectedRegion, season: region.selectedSeason);
+    final initial = widget.initial;
+    _cubit.load(
+      initialRegion: (initial != null && initial.region.isNotEmpty) ? initial.region : region.selectedRegion,
+      season: region.selectedSeason,
+      initial: initial,
+    );
   }
 
   Future<void> _pickTeam(GoalFormData form, {required bool home}) async {
