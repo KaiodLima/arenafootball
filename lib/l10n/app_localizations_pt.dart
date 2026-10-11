@@ -42,9 +42,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get loginEmailLabel => 'E-mail';
 
   @override
-  String get loginEmailHint => 'exemplo@exemplo.com';
-
-  @override
   String get loginPasswordLabel => 'Senha';
 
   @override
@@ -100,41 +97,41 @@ class AppLocalizationsPt extends AppLocalizations {
       'Sua senha deve conter no mínimo 8 caracteres';
 
   @override
-  String get homeTabHome => 'HOME';
+  String get homeTabHome => 'Início';
 
   @override
-  String get homeTabChampionships => 'CAMPEONATOS';
+  String get homeTabChampionships => 'Campeonatos';
 
   @override
-  String get homeTabTeams => 'TIMES';
+  String get homeTabTeams => 'Times';
 
   @override
-  String get homeTabTables => 'TABELAS';
+  String get homeTabTables => 'Tabelas';
 
   @override
-  String get drawerHome => 'INÍCIO';
+  String get drawerHome => 'Início';
 
   @override
-  String get drawerResults => 'RESULTADOS';
+  String get drawerResults => 'Resultados pelo mundo';
 
   @override
-  String get drawerRegisterHighlight => 'CADASTRAR DESTAQUES';
+  String get drawerRegisterHighlight => 'Cadastrar destaque';
 
   @override
-  String get drawerRegisterPlayer => 'CADASTRAR JOGADOR';
+  String get drawerRegisterPlayer => 'Cadastrar jogador';
 
   @override
-  String get drawerRegisterMatch => 'CADASTRAR NOVA PARTIDA';
+  String get drawerRegisterMatch => 'Cadastrar partida';
 
   @override
-  String get drawerRegisterNews => 'CADASTRAR NOTÍCIA';
+  String get drawerRegisterNews => 'Cadastrar notícia';
 
   @override
-  String get drawerRegisterTeam => 'CADASTRAR TIME';
+  String get drawerRegisterTeam => 'Cadastrar time';
 
   @override
   String drawerFanOf(String team) {
-    return 'Torcedor do: $team';
+    return 'Torcedor do $team';
   }
 
   @override
@@ -361,27 +358,22 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchesLoadError => 'Não foi possível carregar as partidas.';
 
   @override
-  String get matchesAllGames => 'VER TODOS OS JOGOS';
+  String get matchesAllGames => 'Todos os jogos';
 
   @override
-  String get matchesGroups => 'VER GRUPOS';
+  String get matchesGroups => 'Grupos';
 
   @override
-  String get matchesTopScorers => 'ARTILHARIA';
+  String get matchesTopScorers => 'Artilharia';
 
   @override
-  String get matchesAssists => 'ASSISTÊNCIAS';
+  String get matchesAssists => 'Assistências';
 
   @override
-  String get matchesAllGamesTitle => 'TODOS OS JOGOS';
+  String get matchesAllGamesTitle => 'Todos os jogos';
 
   @override
   String get matchesVersus => 'X';
-
-  @override
-  String matchesSchedule(String date, String time, String venue) {
-    return '$date às $time horas\n$venue';
-  }
 
   @override
   String get matchesEditScore => 'Editar Placar';
@@ -633,4 +625,114 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get chooseTeamEmptyTeams => 'Nenhum time cadastrado nesta região.';
+
+  @override
+  String get drawerNavigation => 'Navegação';
+
+  @override
+  String get drawerAdmin => 'Administração';
+
+  @override
+  String get drawerLogout => 'Sair da conta';
+
+  @override
+  String get drawerSignIn => 'Entrar ou criar conta';
+
+  @override
+  String get drawerGuestSubtitle =>
+      'Entre para salvar seu time e votar no melhor da partida.';
+
+  @override
+  String homeGreeting(String name) {
+    return 'Olá, $name 👋';
+  }
+
+  @override
+  String get homeGreetingGuest => 'Bem-vindo ao Arena 👋';
+
+  @override
+  String homeSubtitle(String region) {
+    return 'Futebol amador de $region';
+  }
+
+  @override
+  String get homeHighlights => 'Destaques';
+
+  @override
+  String get homeLatestNews => 'Últimas notícias';
+
+  @override
+  String get homeTodayMatches => 'Jogos de hoje';
+
+  @override
+  String homeSeasonChip(String season) {
+    return 'Temporada $season';
+  }
+
+  @override
+  String get homePublishTitle => 'Publicar';
+
+  @override
+  String get homePublishNews => 'Notícia';
+
+  @override
+  String get homePublishGoal => 'Gol';
+
+  @override
+  String get homePublishAd => 'Anúncio';
+
+  @override
+  String get homePublishHighlight => 'Destaque';
+
+  @override
+  String get homePublishMatch => 'Partida';
+
+  @override
+  String get homePublishTeam => 'Time';
+
+  @override
+  String get homePublishPlayer => 'Jogador';
+
+  @override
+  String get homeOpenMenu => 'Abrir menu';
+
+  @override
+  String get matchesVoteAction => 'Votar no melhor';
+
+  @override
+  String get matchesSeeElected => 'Ver eleito';
+
+  @override
+  String get matchesOpenVoting => 'Abrir votação';
+
+  @override
+  String get matchesCloseVoting => 'Fechar votação';
+
+  @override
+  String get championshipsSeeDetails => 'Ver detalhes';
+
+  @override
+  String get newsAdLabel => 'Publicidade';
+
+  @override
+  String get newsGoalLabel => 'GOL';
+
+  @override
+  String get commonMoreActions => 'Mais ações';
+
+  @override
+  String get timeJustNow => 'agora';
+
+  @override
+  String timeMinutesAgo(int minutes) {
+    return 'há $minutes min';
+  }
+
+  @override
+  String timeHoursAgo(int hours) {
+    return 'há $hours h';
+  }
+
+  @override
+  String get timeYesterday => 'ontem';
 }

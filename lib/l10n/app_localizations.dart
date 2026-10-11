@@ -164,12 +164,6 @@ abstract class AppLocalizations {
   /// **'E-mail'**
   String get loginEmailLabel;
 
-  /// No description provided for @loginEmailHint.
-  ///
-  /// In pt, this message translates to:
-  /// **'exemplo@exemplo.com'**
-  String get loginEmailHint;
-
   /// No description provided for @loginPasswordLabel.
   ///
   /// In pt, this message translates to:
@@ -275,73 +269,73 @@ abstract class AppLocalizations {
   /// No description provided for @homeTabHome.
   ///
   /// In pt, this message translates to:
-  /// **'HOME'**
+  /// **'Início'**
   String get homeTabHome;
 
   /// No description provided for @homeTabChampionships.
   ///
   /// In pt, this message translates to:
-  /// **'CAMPEONATOS'**
+  /// **'Campeonatos'**
   String get homeTabChampionships;
 
   /// No description provided for @homeTabTeams.
   ///
   /// In pt, this message translates to:
-  /// **'TIMES'**
+  /// **'Times'**
   String get homeTabTeams;
 
   /// No description provided for @homeTabTables.
   ///
   /// In pt, this message translates to:
-  /// **'TABELAS'**
+  /// **'Tabelas'**
   String get homeTabTables;
 
   /// No description provided for @drawerHome.
   ///
   /// In pt, this message translates to:
-  /// **'INÍCIO'**
+  /// **'Início'**
   String get drawerHome;
 
   /// No description provided for @drawerResults.
   ///
   /// In pt, this message translates to:
-  /// **'RESULTADOS'**
+  /// **'Resultados pelo mundo'**
   String get drawerResults;
 
   /// No description provided for @drawerRegisterHighlight.
   ///
   /// In pt, this message translates to:
-  /// **'CADASTRAR DESTAQUES'**
+  /// **'Cadastrar destaque'**
   String get drawerRegisterHighlight;
 
   /// No description provided for @drawerRegisterPlayer.
   ///
   /// In pt, this message translates to:
-  /// **'CADASTRAR JOGADOR'**
+  /// **'Cadastrar jogador'**
   String get drawerRegisterPlayer;
 
   /// No description provided for @drawerRegisterMatch.
   ///
   /// In pt, this message translates to:
-  /// **'CADASTRAR NOVA PARTIDA'**
+  /// **'Cadastrar partida'**
   String get drawerRegisterMatch;
 
   /// No description provided for @drawerRegisterNews.
   ///
   /// In pt, this message translates to:
-  /// **'CADASTRAR NOTÍCIA'**
+  /// **'Cadastrar notícia'**
   String get drawerRegisterNews;
 
   /// No description provided for @drawerRegisterTeam.
   ///
   /// In pt, this message translates to:
-  /// **'CADASTRAR TIME'**
+  /// **'Cadastrar time'**
   String get drawerRegisterTeam;
 
   /// No description provided for @drawerFanOf.
   ///
   /// In pt, this message translates to:
-  /// **'Torcedor do: {team}'**
+  /// **'Torcedor do {team}'**
   String drawerFanOf(String team);
 
   /// No description provided for @drawerGuest.
@@ -779,31 +773,31 @@ abstract class AppLocalizations {
   /// No description provided for @matchesAllGames.
   ///
   /// In pt, this message translates to:
-  /// **'VER TODOS OS JOGOS'**
+  /// **'Todos os jogos'**
   String get matchesAllGames;
 
   /// No description provided for @matchesGroups.
   ///
   /// In pt, this message translates to:
-  /// **'VER GRUPOS'**
+  /// **'Grupos'**
   String get matchesGroups;
 
   /// No description provided for @matchesTopScorers.
   ///
   /// In pt, this message translates to:
-  /// **'ARTILHARIA'**
+  /// **'Artilharia'**
   String get matchesTopScorers;
 
   /// No description provided for @matchesAssists.
   ///
   /// In pt, this message translates to:
-  /// **'ASSISTÊNCIAS'**
+  /// **'Assistências'**
   String get matchesAssists;
 
   /// No description provided for @matchesAllGamesTitle.
   ///
   /// In pt, this message translates to:
-  /// **'TODOS OS JOGOS'**
+  /// **'Todos os jogos'**
   String get matchesAllGamesTitle;
 
   /// No description provided for @matchesVersus.
@@ -811,12 +805,6 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'X'**
   String get matchesVersus;
-
-  /// No description provided for @matchesSchedule.
-  ///
-  /// In pt, this message translates to:
-  /// **'{date} às {time} horas\n{venue}'**
-  String matchesSchedule(String date, String time, String venue);
 
   /// No description provided for @matchesEditScore.
   ///
@@ -1274,6 +1262,204 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Nenhum time cadastrado nesta região.'**
   String get chooseTeamEmptyTeams;
+
+  /// No description provided for @drawerNavigation.
+  ///
+  /// In pt, this message translates to:
+  /// **'Navegação'**
+  String get drawerNavigation;
+
+  /// No description provided for @drawerAdmin.
+  ///
+  /// In pt, this message translates to:
+  /// **'Administração'**
+  String get drawerAdmin;
+
+  /// No description provided for @drawerLogout.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sair da conta'**
+  String get drawerLogout;
+
+  /// No description provided for @drawerSignIn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entrar ou criar conta'**
+  String get drawerSignIn;
+
+  /// No description provided for @drawerGuestSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entre para salvar seu time e votar no melhor da partida.'**
+  String get drawerGuestSubtitle;
+
+  /// No description provided for @homeGreeting.
+  ///
+  /// In pt, this message translates to:
+  /// **'Olá, {name} 👋'**
+  String homeGreeting(String name);
+
+  /// No description provided for @homeGreetingGuest.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bem-vindo ao Arena 👋'**
+  String get homeGreetingGuest;
+
+  /// No description provided for @homeSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Futebol amador de {region}'**
+  String homeSubtitle(String region);
+
+  /// No description provided for @homeHighlights.
+  ///
+  /// In pt, this message translates to:
+  /// **'Destaques'**
+  String get homeHighlights;
+
+  /// No description provided for @homeLatestNews.
+  ///
+  /// In pt, this message translates to:
+  /// **'Últimas notícias'**
+  String get homeLatestNews;
+
+  /// No description provided for @homeTodayMatches.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogos de hoje'**
+  String get homeTodayMatches;
+
+  /// No description provided for @homeSeasonChip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Temporada {season}'**
+  String homeSeasonChip(String season);
+
+  /// No description provided for @homePublishTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publicar'**
+  String get homePublishTitle;
+
+  /// No description provided for @homePublishNews.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícia'**
+  String get homePublishNews;
+
+  /// No description provided for @homePublishGoal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol'**
+  String get homePublishGoal;
+
+  /// No description provided for @homePublishAd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Anúncio'**
+  String get homePublishAd;
+
+  /// No description provided for @homePublishHighlight.
+  ///
+  /// In pt, this message translates to:
+  /// **'Destaque'**
+  String get homePublishHighlight;
+
+  /// No description provided for @homePublishMatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Partida'**
+  String get homePublishMatch;
+
+  /// No description provided for @homePublishTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Time'**
+  String get homePublishTeam;
+
+  /// No description provided for @homePublishPlayer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogador'**
+  String get homePublishPlayer;
+
+  /// No description provided for @homeOpenMenu.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abrir menu'**
+  String get homeOpenMenu;
+
+  /// No description provided for @matchesVoteAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votar no melhor'**
+  String get matchesVoteAction;
+
+  /// No description provided for @matchesSeeElected.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver eleito'**
+  String get matchesSeeElected;
+
+  /// No description provided for @matchesOpenVoting.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abrir votação'**
+  String get matchesOpenVoting;
+
+  /// No description provided for @matchesCloseVoting.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fechar votação'**
+  String get matchesCloseVoting;
+
+  /// No description provided for @championshipsSeeDetails.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver detalhes'**
+  String get championshipsSeeDetails;
+
+  /// No description provided for @newsAdLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publicidade'**
+  String get newsAdLabel;
+
+  /// No description provided for @newsGoalLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'GOL'**
+  String get newsGoalLabel;
+
+  /// No description provided for @commonMoreActions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mais ações'**
+  String get commonMoreActions;
+
+  /// No description provided for @timeJustNow.
+  ///
+  /// In pt, this message translates to:
+  /// **'agora'**
+  String get timeJustNow;
+
+  /// No description provided for @timeMinutesAgo.
+  ///
+  /// In pt, this message translates to:
+  /// **'há {minutes} min'**
+  String timeMinutesAgo(int minutes);
+
+  /// No description provided for @timeHoursAgo.
+  ///
+  /// In pt, this message translates to:
+  /// **'há {hours} h'**
+  String timeHoursAgo(int hours);
+
+  /// No description provided for @timeYesterday.
+  ///
+  /// In pt, this message translates to:
+  /// **'ontem'**
+  String get timeYesterday;
 }
 
 class _AppLocalizationsDelegate

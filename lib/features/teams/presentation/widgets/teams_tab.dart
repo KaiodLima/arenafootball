@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
@@ -7,8 +8,11 @@ import 'package:arena_soccer/features/teams/presentation/bloc/teams_cubit.dart';
 import 'package:arena_soccer/features/teams/presentation/bloc/teams_state.dart';
 import 'package:arena_soccer/injection_container.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/utils/components/arena_card.dart';
+import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
+import 'package:arena_soccer/utils/constants/app_typography.dart';
 
 /// Aba de times da home: times da região/temporada selecionadas. Tocar num
 /// time abre o elenco. A home recria a aba (key) quando região/ano mudam.
@@ -37,32 +41,16 @@ class _TeamsList extends StatelessWidget {
         if (state is LoadingTeamsState && state.teams.isEmpty) {
           return const Center(child: CircularProgressIndicator(color: AppColors.primary));
         }
-        if (state is ErrorTeamsState && state.teams.isEmpty) return _Message(text: l10n.teamsLoadError);
-        if (state.teams.isEmpty) return _Message(text: l10n.teamsEmpty);
+        if (state is ErrorTeamsState && state.teams.isEmpty) return ArenaEmptyState.error(message: l10n.teamsLoadError);
+        if (state.teams.isEmpty) return ArenaEmptyState(message: l10n.teamsEmpty, icon: Icons.shield_outlined);
 
         return ListView.builder(
           physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+          padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s20, AppSizes.s16, AppSizes.s100),
           itemCount: state.teams.length,
           itemBuilder: (context, index) => _TeamCard(team: state.teams[index]),
         );
       },
-    );
-  }
-}
-
-class _Message extends StatelessWidget {
-  final String text;
-
-  const _Message({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        text,
-        textAlign: TextAlign.center,
-        style: const TextStyle(color: AppColors.white, fontSize: AppSizes.s20),
-      ),
     );
   }
 }
@@ -74,23 +62,43 @@ class _TeamCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: AppColors.primaryTranslucent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSizes.s48)),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(AppSizes.s16),
-        onTap: () => Navigator.pushNamed(context, AppRoutes.teamPlayersPage, arguments: {'team': team}),
-        leading: CircleAvatar(
-          maxRadius: AppSizes.s30,
-          backgroundColor: AppColors.grey,
-          backgroundImage: team.imageUrl.isNotEmpty ? NetworkImage(team.imageUrl) : null,
-        ),
-        title: Text(
-          team.name,
-          style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold, fontSize: AppSizes.s20),
-        ),
-        subtitle: Text(team.description),
-        trailing: const Icon(Icons.more_vert, size: AppSizes.s30, color: AppColors.white),
+    return ArenaCard(
+      margin: const EdgeInsets.only(bottom: AppSizes.s10),
+      padding: const EdgeInsets.all(AppSizes.s12),
+      onTap: () => Navigator.pushNamed(context, AppRoutes.teamPlayersPage, arguments: {'team': team}),
+      child: Row(
+        children: [
+          Container(
+            width: AppSizes.s56,
+            height: AppSizes.s56,
+            padding: const EdgeInsets.all(AppSizes.s6),
+            decoration: const BoxDecoration(color: AppColors.background, shape: BoxShape.circle),
+            child: ClipOval(
+              child: team.imageUrl.isNotEmpty
+                  ? CachedNetworkImage(imageUrl: team.imageUrl, fit: BoxFit.cover)
+                  : const Icon(Icons.shield_outlined, color: AppColors.textSecondary),
+            ),
+          ),
+          const SizedBox(width: AppSizes.s14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  team.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s16),
+                ),
+                if (team.description.isNotEmpty) ...[
+                  const SizedBox(height: AppSizes.s2),
+                  Text(team.description, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppTypography.subtitle()),
+                ],
+              ],
+            ),
+          ),
+          const Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary),
+        ],
       ),
     );
   }

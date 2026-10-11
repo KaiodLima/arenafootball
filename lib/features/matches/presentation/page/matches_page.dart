@@ -45,7 +45,7 @@ class _MatchesPageState extends State<MatchesPage> {
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.primaryDark,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.primaryDark,
         foregroundColor: AppColors.white,
@@ -55,6 +55,7 @@ class _MatchesPageState extends State<MatchesPage> {
             padding: const EdgeInsets.all(AppSizes.s6),
             child: MatchesShortcutButton(
               title: l10n.matchesGroups,
+              icon: Icons.groups_rounded,
               onPressed: () => Navigator.pushNamed(
                 context,
                 AppRoutes.groupsPage,
@@ -64,7 +65,7 @@ class _MatchesPageState extends State<MatchesPage> {
           ),
         ],
       ),
-      body: MatchesList(season: _season, striped: true),
+      body: MatchesList(season: _season),
     );
   }
 }

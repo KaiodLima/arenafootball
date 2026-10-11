@@ -9,6 +9,7 @@ import 'package:arena_soccer/features/matches/presentation/widgets/edit_score_di
 import 'package:arena_soccer/features/matches/presentation/widgets/match_card.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
+import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
@@ -19,10 +20,10 @@ class MatchesList extends StatelessWidget {
   /// Temporada da lista: as telas de votação leem os jogadores dela.
   final String season;
 
-  /// Alterna a cor dos cards (tela "todos os jogos").
-  final bool striped;
+  /// Conteúdo antes dos cards (ex.: atalhos e título da seção na aba de tabelas).
+  final Widget? header;
 
-  const MatchesList({super.key, required this.season, this.striped = false});
+  const MatchesList({super.key, required this.season, this.header});
 
   void _openVoting(BuildContext context, MatchDTO match) {
     Navigator.pushNamed(
@@ -86,47 +87,40 @@ class MatchesList extends StatelessWidget {
         }
       },
       builder: (context, state) {
+        final Widget? placeholder;
         if (state is LoadingMatchesState && state.matches.isEmpty) {
-          return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+          placeholder = const Padding(
+            padding: EdgeInsets.only(top: AppSizes.s48),
+            child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+          );
+        } else if (state is ErrorMatchesState && state.matches.isEmpty) {
+          placeholder = ArenaEmptyState.error(message: l10n.matchesLoadError);
+        } else if (state.matches.isEmpty) {
+          placeholder = ArenaEmptyState(message: l10n.matchesEmpty, icon: Icons.sports_soccer_outlined);
+        } else {
+          placeholder = null;
         }
-        if (state is ErrorMatchesState && state.matches.isEmpty) return _Message(text: l10n.matchesLoadError);
-        if (state.matches.isEmpty) return _Message(text: l10n.matchesEmpty);
 
-        return ListView.builder(
+        return ListView(
           physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-          padding: const EdgeInsets.only(top: AppSizes.s8),
-          itemCount: state.matches.length,
-          itemBuilder: (context, index) {
-            final match = state.matches[index];
-            return MatchCard(
-              match: match,
-              isAdmin: isAdmin,
-              striped: striped && index.isOdd,
-              onVotingTap: () => _openVoting(context, match),
-              onToggleVoting: () => BlocProvider.of<MatchesCubit>(context).toggleVoting(match),
-              onEditScore: () => _editScore(context, match),
-              onDelete: () => _confirmDelete(context, match),
-            );
-          },
+          padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s20, AppSizes.s16, AppSizes.s100),
+          children: [
+            if (header != null) header!,
+            if (placeholder != null)
+              placeholder
+            else
+              for (final match in state.matches)
+                MatchCard(
+                  match: match,
+                  isAdmin: isAdmin,
+                  onVotingTap: () => _openVoting(context, match),
+                  onToggleVoting: () => BlocProvider.of<MatchesCubit>(context).toggleVoting(match),
+                  onEditScore: () => _editScore(context, match),
+                  onDelete: () => _confirmDelete(context, match),
+                ),
+          ],
         );
       },
-    );
-  }
-}
-
-class _Message extends StatelessWidget {
-  final String text;
-
-  const _Message({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        text,
-        textAlign: TextAlign.center,
-        style: const TextStyle(color: AppColors.white, fontSize: AppSizes.s20),
-      ),
     );
   }
 }

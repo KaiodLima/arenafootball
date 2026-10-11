@@ -8,8 +8,11 @@ import 'package:arena_soccer/features/championships/presentation/bloc/championsh
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/injection_container.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/utils/components/arena_card.dart';
+import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
+import 'package:arena_soccer/utils/constants/app_typography.dart';
 
 /// Aba de campeonatos da home: campeonatos da região selecionada. Tocar num
 /// campeonato abre os detalhes. A home recria a aba (key) quando a região muda.
@@ -39,65 +42,78 @@ class _ChampionshipsList extends StatelessWidget {
           return const Center(child: CircularProgressIndicator(color: AppColors.primary));
         }
         if (state is ErrorChampionshipsState && state.championships.isEmpty) {
-          return _Message(text: l10n.championshipsLoadError);
+          return ArenaEmptyState.error(message: l10n.championshipsLoadError);
         }
-        if (state.championships.isEmpty) return _Message(text: l10n.championshipsEmpty);
+        if (state.championships.isEmpty) {
+          return ArenaEmptyState(message: l10n.championshipsEmpty, icon: Icons.emoji_events_outlined);
+        }
 
         return ListView.builder(
           physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+          padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s20, AppSizes.s16, AppSizes.s100),
           itemCount: state.championships.length,
-          itemBuilder: (context, index) => _ChampionshipItem(championship: state.championships[index]),
+          itemBuilder: (context, index) => _ChampionshipCard(championship: state.championships[index]),
         );
       },
     );
   }
 }
 
-class _Message extends StatelessWidget {
-  final String text;
-
-  const _Message({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        text,
-        textAlign: TextAlign.center,
-        style: const TextStyle(color: AppColors.white, fontSize: AppSizes.s20),
-      ),
-    );
-  }
-}
-
-class _ChampionshipItem extends StatelessWidget {
+class _ChampionshipCard extends StatelessWidget {
   final ChampionshipDTO championship;
 
-  const _ChampionshipItem({required this.championship});
+  const _ChampionshipCard({required this.championship});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    final l10n = AppLocalizations.of(context);
+
+    return ArenaCard(
       onTap: () => Navigator.pushNamed(
         context,
         AppRoutes.championshipDetailsPage,
         arguments: {'championship': championship},
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSizes.s10),
-            child: CachedNetworkImage(
+          if (championship.imageUrl.isNotEmpty)
+            CachedNetworkImage(
               imageUrl: championship.imageUrl,
-              fit: BoxFit.scaleDown,
-              placeholder: (_, __) => const CircularProgressIndicator(color: AppColors.primary),
-              errorWidget: (_, __, ___) => const Icon(Icons.error, color: AppColors.white),
+              fit: BoxFit.cover,
+              placeholder: (_, __) => const AspectRatio(
+                aspectRatio: 16 / 9,
+                child: ColoredBox(color: AppColors.greyLight),
+              ),
+              errorWidget: (_, __, ___) => const AspectRatio(
+                aspectRatio: 16 / 9,
+                child: ColoredBox(
+                  color: AppColors.greyLight,
+                  child: Icon(Icons.emoji_events_outlined, color: AppColors.textSecondary),
+                ),
+              ),
             ),
-          ),
-          ListTile(
-            title: Text(
-              championship.title,
-              style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold, fontSize: AppSizes.s20),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s14, AppSizes.s12, AppSizes.s14),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        championship.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.title().copyWith(fontSize: AppSizes.s18 - 1),
+                      ),
+                      const SizedBox(height: AppSizes.s4),
+                      Text(l10n.championshipsSeeDetails, style: AppTypography.label()),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.chevron_right_rounded, color: AppColors.primary),
+              ],
             ),
           ),
         ],

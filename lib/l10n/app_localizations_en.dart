@@ -42,9 +42,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginEmailLabel => 'E-mail';
 
   @override
-  String get loginEmailHint => 'example@example.com';
-
-  @override
   String get loginPasswordLabel => 'Password';
 
   @override
@@ -100,41 +97,41 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your password must have at least 8 characters';
 
   @override
-  String get homeTabHome => 'HOME';
+  String get homeTabHome => 'Home';
 
   @override
-  String get homeTabChampionships => 'CHAMPIONSHIPS';
+  String get homeTabChampionships => 'Championships';
 
   @override
-  String get homeTabTeams => 'TEAMS';
+  String get homeTabTeams => 'Teams';
 
   @override
-  String get homeTabTables => 'TABLES';
+  String get homeTabTables => 'Tables';
 
   @override
-  String get drawerHome => 'HOME';
+  String get drawerHome => 'Home';
 
   @override
-  String get drawerResults => 'RESULTS';
+  String get drawerResults => 'Results around the world';
 
   @override
-  String get drawerRegisterHighlight => 'ADD HIGHLIGHTS';
+  String get drawerRegisterHighlight => 'Add highlight';
 
   @override
-  String get drawerRegisterPlayer => 'ADD PLAYER';
+  String get drawerRegisterPlayer => 'Add player';
 
   @override
-  String get drawerRegisterMatch => 'ADD MATCH';
+  String get drawerRegisterMatch => 'Add match';
 
   @override
-  String get drawerRegisterNews => 'ADD NEWS';
+  String get drawerRegisterNews => 'Add news';
 
   @override
-  String get drawerRegisterTeam => 'ADD TEAM';
+  String get drawerRegisterTeam => 'Add team';
 
   @override
   String drawerFanOf(String team) {
-    return 'Supports: $team';
+    return 'Supports $team';
   }
 
   @override
@@ -361,27 +358,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchesLoadError => 'Could not load the matches.';
 
   @override
-  String get matchesAllGames => 'SEE ALL GAMES';
+  String get matchesAllGames => 'All games';
 
   @override
-  String get matchesGroups => 'SEE GROUPS';
+  String get matchesGroups => 'Groups';
 
   @override
-  String get matchesTopScorers => 'TOP SCORERS';
+  String get matchesTopScorers => 'Top scorers';
 
   @override
-  String get matchesAssists => 'ASSISTS';
+  String get matchesAssists => 'Assists';
 
   @override
-  String get matchesAllGamesTitle => 'ALL GAMES';
+  String get matchesAllGamesTitle => 'All games';
 
   @override
   String get matchesVersus => 'X';
-
-  @override
-  String matchesSchedule(String date, String time, String venue) {
-    return '$date at $time\n$venue';
-  }
 
   @override
   String get matchesEditScore => 'Edit Score';
@@ -628,4 +620,114 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chooseTeamEmptyTeams => 'No teams registered in this region.';
+
+  @override
+  String get drawerNavigation => 'Navigation';
+
+  @override
+  String get drawerAdmin => 'Administration';
+
+  @override
+  String get drawerLogout => 'Sign out';
+
+  @override
+  String get drawerSignIn => 'Sign in or create account';
+
+  @override
+  String get drawerGuestSubtitle =>
+      'Sign in to save your team and vote for the best player.';
+
+  @override
+  String homeGreeting(String name) {
+    return 'Hi, $name 👋';
+  }
+
+  @override
+  String get homeGreetingGuest => 'Welcome to Arena 👋';
+
+  @override
+  String homeSubtitle(String region) {
+    return 'Amateur football in $region';
+  }
+
+  @override
+  String get homeHighlights => 'Highlights';
+
+  @override
+  String get homeLatestNews => 'Latest news';
+
+  @override
+  String get homeTodayMatches => 'Today\'s matches';
+
+  @override
+  String homeSeasonChip(String season) {
+    return 'Season $season';
+  }
+
+  @override
+  String get homePublishTitle => 'Publish';
+
+  @override
+  String get homePublishNews => 'News';
+
+  @override
+  String get homePublishGoal => 'Goal';
+
+  @override
+  String get homePublishAd => 'Ad';
+
+  @override
+  String get homePublishHighlight => 'Highlight';
+
+  @override
+  String get homePublishMatch => 'Match';
+
+  @override
+  String get homePublishTeam => 'Team';
+
+  @override
+  String get homePublishPlayer => 'Player';
+
+  @override
+  String get homeOpenMenu => 'Open menu';
+
+  @override
+  String get matchesVoteAction => 'Vote for the best';
+
+  @override
+  String get matchesSeeElected => 'See elected';
+
+  @override
+  String get matchesOpenVoting => 'Open voting';
+
+  @override
+  String get matchesCloseVoting => 'Close voting';
+
+  @override
+  String get championshipsSeeDetails => 'See details';
+
+  @override
+  String get newsAdLabel => 'Ad';
+
+  @override
+  String get newsGoalLabel => 'GOAL';
+
+  @override
+  String get commonMoreActions => 'More actions';
+
+  @override
+  String get timeJustNow => 'just now';
+
+  @override
+  String timeMinutesAgo(int minutes) {
+    return '$minutes min ago';
+  }
+
+  @override
+  String timeHoursAgo(int hours) {
+    return '$hours h ago';
+  }
+
+  @override
+  String get timeYesterday => 'yesterday';
 }

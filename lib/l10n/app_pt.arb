@@ -11,7 +11,6 @@
   "commonEdit": "Editar",
   "commonGenericError": "Algo deu errado. Tente novamente.",
   "loginEmailLabel": "E-mail",
-  "loginEmailHint": "exemplo@exemplo.com",
   "loginPasswordLabel": "Senha",
   "loginButton": "ENTRAR",
   "loginCreateAccountButton": "CRIAR CONTA",
@@ -29,18 +28,18 @@
   "registerNameTooShort": "Seu nome de usuário deve conter no mínimo 3 caracteres",
   "registerEmailExample": "Informe um e-mail válido, ex.: nome@email.com",
   "registerPasswordTooShort": "Sua senha deve conter no mínimo 8 caracteres",
-  "homeTabHome": "HOME",
-  "homeTabChampionships": "CAMPEONATOS",
-  "homeTabTeams": "TIMES",
-  "homeTabTables": "TABELAS",
-  "drawerHome": "INÍCIO",
-  "drawerResults": "RESULTADOS",
-  "drawerRegisterHighlight": "CADASTRAR DESTAQUES",
-  "drawerRegisterPlayer": "CADASTRAR JOGADOR",
-  "drawerRegisterMatch": "CADASTRAR NOVA PARTIDA",
-  "drawerRegisterNews": "CADASTRAR NOTÍCIA",
-  "drawerRegisterTeam": "CADASTRAR TIME",
-  "drawerFanOf": "Torcedor do: {team}",
+  "homeTabHome": "Início",
+  "homeTabChampionships": "Campeonatos",
+  "homeTabTeams": "Times",
+  "homeTabTables": "Tabelas",
+  "drawerHome": "Início",
+  "drawerResults": "Resultados pelo mundo",
+  "drawerRegisterHighlight": "Cadastrar destaque",
+  "drawerRegisterPlayer": "Cadastrar jogador",
+  "drawerRegisterMatch": "Cadastrar partida",
+  "drawerRegisterNews": "Cadastrar notícia",
+  "drawerRegisterTeam": "Cadastrar time",
+  "drawerFanOf": "Torcedor do {team}",
   "@drawerFanOf": {
     "placeholders": {
       "team": {
@@ -141,26 +140,12 @@
   "matchesNoChampionship": "Nenhum registro no momento",
   "matchesEmpty": "Nenhuma partida cadastrada",
   "matchesLoadError": "Não foi possível carregar as partidas.",
-  "matchesAllGames": "VER TODOS OS JOGOS",
-  "matchesGroups": "VER GRUPOS",
-  "matchesTopScorers": "ARTILHARIA",
-  "matchesAssists": "ASSISTÊNCIAS",
-  "matchesAllGamesTitle": "TODOS OS JOGOS",
+  "matchesAllGames": "Todos os jogos",
+  "matchesGroups": "Grupos",
+  "matchesTopScorers": "Artilharia",
+  "matchesAssists": "Assistências",
+  "matchesAllGamesTitle": "Todos os jogos",
   "matchesVersus": "X",
-  "matchesSchedule": "{date} às {time} horas\n{venue}",
-  "@matchesSchedule": {
-    "placeholders": {
-      "date": {
-        "type": "String"
-      },
-      "time": {
-        "type": "String"
-      },
-      "venue": {
-        "type": "String"
-      }
-    }
-  },
   "matchesEditScore": "Editar Placar",
   "matchesDeleteMatch": "Excluir Partida",
   "matchesDeleteConfirm": "DESEJA REALMENTE EXCLUIR ESSA PARTIDA ?",
@@ -290,5 +275,73 @@
   "chooseTeamConfirm": "CONCLUIR",
   "chooseTeamSkip": "Pular por agora",
   "chooseTeamLoadError": "Não foi possível carregar as regiões e os times.",
-  "chooseTeamEmptyTeams": "Nenhum time cadastrado nesta região."
+  "chooseTeamEmptyTeams": "Nenhum time cadastrado nesta região.",
+  "drawerNavigation": "Navegação",
+  "drawerAdmin": "Administração",
+  "drawerLogout": "Sair da conta",
+  "drawerSignIn": "Entrar ou criar conta",
+  "drawerGuestSubtitle": "Entre para salvar seu time e votar no melhor da partida.",
+  "homeGreeting": "Olá, {name} 👋",
+  "@homeGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeGreetingGuest": "Bem-vindo ao Arena 👋",
+  "homeSubtitle": "Futebol amador de {region}",
+  "@homeSubtitle": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "homeHighlights": "Destaques",
+  "homeLatestNews": "Últimas notícias",
+  "homeTodayMatches": "Jogos de hoje",
+  "homeSeasonChip": "Temporada {season}",
+  "@homeSeasonChip": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "homePublishTitle": "Publicar",
+  "homePublishNews": "Notícia",
+  "homePublishGoal": "Gol",
+  "homePublishAd": "Anúncio",
+  "homePublishHighlight": "Destaque",
+  "homePublishMatch": "Partida",
+  "homePublishTeam": "Time",
+  "homePublishPlayer": "Jogador",
+  "homeOpenMenu": "Abrir menu",
+  "matchesVoteAction": "Votar no melhor",
+  "matchesSeeElected": "Ver eleito",
+  "matchesOpenVoting": "Abrir votação",
+  "matchesCloseVoting": "Fechar votação",
+  "championshipsSeeDetails": "Ver detalhes",
+  "newsAdLabel": "Publicidade",
+  "newsGoalLabel": "GOL",
+  "commonMoreActions": "Mais ações",
+  "timeJustNow": "agora",
+  "timeMinutesAgo": "há {minutes} min",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "timeHoursAgo": "há {hours} h",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "timeYesterday": "ontem"
 }

@@ -16,7 +16,7 @@ class ChampionshipDetailsPage extends StatelessWidget {
 
   void _openGroups(BuildContext context) {
     // Como no app antigo: os grupos são os da temporada do campeonato (`ano`).
-    final season = championship.season.isNotEmpty ? championship.season : SeasonCollection.currentYear;
+    final season = championship.season.isNotEmpty ? championship.season : SeasonCollection.currentSeason;
     Navigator.pushNamed(
       context,
       AppRoutes.groupsPage,
