@@ -124,9 +124,24 @@
   "playersCreated": "Jogador Cadastrado!!!",
   "playersPhotoBack": "Voltar",
   "playersPhotoSave": "Salvar",
-  "statsGoalsTitle": "ARTILHARIA",
-  "statsAssistsTitle": "ASSISTENCIAS",
-  "statsEmpty": "Nenhum jogador no ranking ainda.",
+  "statsEmptyGoals": "Nenhum gol marcado ainda",
+  "statsEmptyAssists": "Nenhuma assistência ainda",
+  "statsUnitGoals": "{count, plural, =1{gol} other{gols}}",
+  "@statsUnitGoals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statsUnitAssists": "{count, plural, =1{assist.} other{assist.}}",
+  "@statsUnitAssists": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "statsLoadError": "Não foi possível carregar o ranking.",
   "matchesNoChampionship": "Nenhum registro no momento",
   "matchesEmpty": "Nenhuma partida cadastrada",

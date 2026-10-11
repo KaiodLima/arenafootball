@@ -53,4 +53,6 @@ class AppColors {
   static const Color danger = Color(0xFFD32F2F);
   static const Color warning = Color(0xFFFFA000);
   static const Color gold = Color(0xFFFFC107);
+  static const Color silver = Color(0xFFC4CCD4);
+  static const Color bronze = Color(0xFFCD8B4E);
 }

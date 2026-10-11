@@ -716,23 +716,29 @@ abstract class AppLocalizations {
   /// **'Salvar'**
   String get playersPhotoSave;
 
-  /// No description provided for @statsGoalsTitle.
+  /// No description provided for @statsEmptyGoals.
   ///
   /// In pt, this message translates to:
-  /// **'ARTILHARIA'**
-  String get statsGoalsTitle;
+  /// **'Nenhum gol marcado ainda'**
+  String get statsEmptyGoals;
 
-  /// No description provided for @statsAssistsTitle.
+  /// No description provided for @statsEmptyAssists.
   ///
   /// In pt, this message translates to:
-  /// **'ASSISTENCIAS'**
-  String get statsAssistsTitle;
+  /// **'Nenhuma assistência ainda'**
+  String get statsEmptyAssists;
 
-  /// No description provided for @statsEmpty.
+  /// No description provided for @statsUnitGoals.
   ///
   /// In pt, this message translates to:
-  /// **'Nenhum jogador no ranking ainda.'**
-  String get statsEmpty;
+  /// **'{count, plural, =1{gol} other{gols}}'**
+  String statsUnitGoals(int count);
+
+  /// No description provided for @statsUnitAssists.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{assist.} other{assist.}}'**
+  String statsUnitAssists(int count);
 
   /// No description provided for @statsLoadError.
   ///

@@ -329,13 +329,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playersPhotoSave => 'Save';
 
   @override
-  String get statsGoalsTitle => 'TOP SCORERS';
+  String get statsEmptyGoals => 'No goals scored yet';
 
   @override
-  String get statsAssistsTitle => 'ASSISTS';
+  String get statsEmptyAssists => 'No assists yet';
 
   @override
-  String get statsEmpty => 'No players in the ranking yet.';
+  String statsUnitGoals(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'goals',
+      one: 'goal',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String statsUnitAssists(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'assists',
+      one: 'assist',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get statsLoadError => 'Could not load the ranking.';
