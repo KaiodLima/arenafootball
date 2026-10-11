@@ -90,7 +90,6 @@
   "teamsNameRequired": "Fill in the required fields!",
   "playersEmpty": "No players registered yet!",
   "playersLoadError": "Could not load the players.",
-  "playersTeamInfo": "Team: {team}",
   "playersGoalsCount": "Goals: {count}",
   "playersAssistsCount": "Assists: {count}",
   "playersNameRequired": "Fill in the NAME field!",
@@ -230,5 +229,18 @@
   "newsShareFooter": "via Arena Football",
   "newsReadMore": "Read more",
   "galleryClose": "Close",
-  "galleryCounter": "{current}/{total}"
+  "galleryCounter": "{current}/{total}",
+  "playersSummaryPlayers": "Players",
+  "playersSummaryGoals": "Goals",
+  "playersSummaryAssists": "Assists",
+  "playersSortGoals": "Goals",
+  "playersSortAssists": "Assists",
+  "playersSortName": "A–Z",
+  "playersSearchHint": "Search player",
+  "playersNoResults": "No players found.",
+  "playersTopScorer": "Team top scorer",
+  "playersChangePhoto": "Change photo",
+  "playersEditName": "Edit name",
+  "playersSaveName": "Save name",
+  "commonClear": "Clear"
 }

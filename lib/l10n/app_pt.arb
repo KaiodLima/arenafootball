@@ -97,14 +97,6 @@
   "teamsNameRequired": "Preencha os campos obrigatórios!!!",
   "playersEmpty": "Jogadores ainda não registrados!",
   "playersLoadError": "Não foi possível carregar os jogadores.",
-  "playersTeamInfo": "Time: {team}",
-  "@playersTeamInfo": {
-    "placeholders": {
-      "team": {
-        "type": "String"
-      }
-    }
-  },
   "playersGoalsCount": "Gols: {count}",
   "@playersGoalsCount": {
     "placeholders": {
@@ -357,5 +349,18 @@
         "type": "int"
       }
     }
-  }
+  },
+  "playersSummaryPlayers": "Jogadores",
+  "playersSummaryGoals": "Gols",
+  "playersSummaryAssists": "Assistências",
+  "playersSortGoals": "Gols",
+  "playersSortAssists": "Assistências",
+  "playersSortName": "A–Z",
+  "playersSearchHint": "Buscar jogador",
+  "playersNoResults": "Nenhum jogador encontrado.",
+  "playersTopScorer": "Artilheiro do time",
+  "playersChangePhoto": "Trocar foto",
+  "playersEditName": "Editar nome",
+  "playersSaveName": "Salvar nome",
+  "commonClear": "Limpar"
 }

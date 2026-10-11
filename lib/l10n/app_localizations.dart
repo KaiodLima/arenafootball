@@ -638,12 +638,6 @@ abstract class AppLocalizations {
   /// **'Não foi possível carregar os jogadores.'**
   String get playersLoadError;
 
-  /// No description provided for @playersTeamInfo.
-  ///
-  /// In pt, this message translates to:
-  /// **'Time: {team}'**
-  String playersTeamInfo(String team);
-
   /// No description provided for @playersGoalsCount.
   ///
   /// In pt, this message translates to:
@@ -1484,6 +1478,84 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'{current}/{total}'**
   String galleryCounter(int current, int total);
+
+  /// No description provided for @playersSummaryPlayers.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogadores'**
+  String get playersSummaryPlayers;
+
+  /// No description provided for @playersSummaryGoals.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gols'**
+  String get playersSummaryGoals;
+
+  /// No description provided for @playersSummaryAssists.
+  ///
+  /// In pt, this message translates to:
+  /// **'Assistências'**
+  String get playersSummaryAssists;
+
+  /// No description provided for @playersSortGoals.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gols'**
+  String get playersSortGoals;
+
+  /// No description provided for @playersSortAssists.
+  ///
+  /// In pt, this message translates to:
+  /// **'Assistências'**
+  String get playersSortAssists;
+
+  /// No description provided for @playersSortName.
+  ///
+  /// In pt, this message translates to:
+  /// **'A–Z'**
+  String get playersSortName;
+
+  /// No description provided for @playersSearchHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Buscar jogador'**
+  String get playersSearchHint;
+
+  /// No description provided for @playersNoResults.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum jogador encontrado.'**
+  String get playersNoResults;
+
+  /// No description provided for @playersTopScorer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Artilheiro do time'**
+  String get playersTopScorer;
+
+  /// No description provided for @playersChangePhoto.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar foto'**
+  String get playersChangePhoto;
+
+  /// No description provided for @playersEditName.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar nome'**
+  String get playersEditName;
+
+  /// No description provided for @playersSaveName.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salvar nome'**
+  String get playersSaveName;
+
+  /// No description provided for @commonClear.
+  ///
+  /// In pt, this message translates to:
+  /// **'Limpar'**
+  String get commonClear;
 }
 
 class _AppLocalizationsDelegate

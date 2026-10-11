@@ -6,6 +6,7 @@ import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dar
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/presentation/bloc/teams_cubit.dart';
 import 'package:arena_soccer/features/teams/presentation/bloc/teams_state.dart';
+import 'package:arena_soccer/features/teams/presentation/widgets/team_crest_hero.dart';
 import 'package:arena_soccer/injection_container.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_card.dart';
@@ -68,15 +69,18 @@ class _TeamCard extends StatelessWidget {
       onTap: () => Navigator.pushNamed(context, AppRoutes.teamPlayersPage, arguments: {'team': team}),
       child: Row(
         children: [
-          Container(
-            width: AppSizes.s56,
-            height: AppSizes.s56,
-            padding: const EdgeInsets.all(AppSizes.s6),
-            decoration: const BoxDecoration(color: AppColors.background, shape: BoxShape.circle),
-            child: ClipOval(
-              child: team.imageUrl.isNotEmpty
-                  ? CachedNetworkImage(imageUrl: team.imageUrl, fit: BoxFit.cover)
-                  : const Icon(Icons.shield_outlined, color: AppColors.textSecondary),
+          Hero(
+            tag: teamCrestHeroTag(team.id),
+            child: Container(
+              width: AppSizes.s56,
+              height: AppSizes.s56,
+              padding: const EdgeInsets.all(AppSizes.s6),
+              decoration: const BoxDecoration(color: AppColors.background, shape: BoxShape.circle),
+              child: ClipOval(
+                child: team.imageUrl.isNotEmpty
+                    ? CachedNetworkImage(imageUrl: team.imageUrl, fit: BoxFit.cover)
+                    : const Icon(Icons.shield_outlined, color: AppColors.textSecondary),
+              ),
             ),
           ),
           const SizedBox(width: AppSizes.s14),

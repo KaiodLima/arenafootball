@@ -286,11 +286,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get playersLoadError => 'Não foi possível carregar os jogadores.';
 
   @override
-  String playersTeamInfo(String team) {
-    return 'Time: $team';
-  }
-
-  @override
   String playersGoalsCount(int count) {
     return 'Gols: $count';
   }
@@ -749,4 +744,43 @@ class AppLocalizationsPt extends AppLocalizations {
   String galleryCounter(int current, int total) {
     return '$current/$total';
   }
+
+  @override
+  String get playersSummaryPlayers => 'Jogadores';
+
+  @override
+  String get playersSummaryGoals => 'Gols';
+
+  @override
+  String get playersSummaryAssists => 'Assistências';
+
+  @override
+  String get playersSortGoals => 'Gols';
+
+  @override
+  String get playersSortAssists => 'Assistências';
+
+  @override
+  String get playersSortName => 'A–Z';
+
+  @override
+  String get playersSearchHint => 'Buscar jogador';
+
+  @override
+  String get playersNoResults => 'Nenhum jogador encontrado.';
+
+  @override
+  String get playersTopScorer => 'Artilheiro do time';
+
+  @override
+  String get playersChangePhoto => 'Trocar foto';
+
+  @override
+  String get playersEditName => 'Editar nome';
+
+  @override
+  String get playersSaveName => 'Salvar nome';
+
+  @override
+  String get commonClear => 'Limpar';
 }

@@ -23,13 +23,39 @@ class TeamPlayersCubit extends Cubit<TeamPlayersState> {
   void watch({required String teamName, required String season}) {
     _season = season;
     _subscription?.cancel();
-    emit(LoadingTeamPlayersState(players: state.players));
+    emit(LoadingTeamPlayersState(players: state.players, sort: state.sort, query: state.query));
     _subscription = watchTeamPlayersUseCase(teamName: teamName, season: season).listen((response) {
       response.fold(
-        (failure) => emit(ErrorTeamPlayersState(errorMessage: failure.toString(), players: state.players)),
-        (players) => emit(SuccessTeamPlayersState(players: players)),
+        (failure) => emit(ErrorTeamPlayersState(
+          errorMessage: failure.toString(),
+          players: state.players,
+          sort: state.sort,
+          query: state.query,
+        )),
+        (players) => emit(SuccessTeamPlayersState(players: players, sort: state.sort, query: state.query)),
       );
     });
+  }
+
+  void setSort(PlayersSort sort) => emit(_withView(sort: sort));
+
+  void setQuery(String query) => emit(_withView(query: query));
+
+  /// Mesmo estado (e tipo) com outra ordenação/busca.
+  TeamPlayersState _withView({PlayersSort? sort, String? query}) {
+    final s = state;
+    final newSort = sort ?? s.sort;
+    final newQuery = query ?? s.query;
+    if (s is LoadingTeamPlayersState) {
+      return LoadingTeamPlayersState(players: s.players, sort: newSort, query: newQuery);
+    }
+    if (s is SavingTeamPlayersState) {
+      return SavingTeamPlayersState(playerId: s.playerId, players: s.players, sort: newSort, query: newQuery);
+    }
+    if (s is ErrorTeamPlayersState) {
+      return ErrorTeamPlayersState(errorMessage: s.errorMessage, players: s.players, sort: newSort, query: newQuery);
+    }
+    return SuccessTeamPlayersState(players: s.players, sort: newSort, query: newQuery);
   }
 
   /// Soma [delta] aos gols (nunca abaixo de zero).
@@ -51,19 +77,24 @@ class TeamPlayersCubit extends Cubit<TeamPlayersState> {
 
   Future<void> changePhoto(PlayerDTO player, File image) async {
     final current = state.playerById(player.id, player);
-    emit(SavingTeamPlayersState(playerId: current.id, players: state.players));
+    emit(SavingTeamPlayersState(playerId: current.id, players: state.players, sort: state.sort, query: state.query));
     await _save(current, image: image);
   }
 
   /// Sem foto, atualiza a lista na hora (o stream confirma depois); com foto,
   /// espera o upload. Grava o documento inteiro, como o app antigo.
   Future<void> _save(PlayerDTO updated, {File? image}) async {
-    if (image == null) emit(SuccessTeamPlayersState(players: _replace(updated)));
+    if (image == null) emit(SuccessTeamPlayersState(players: _replace(updated), sort: state.sort, query: state.query));
     final response = await updatePlayerUseCase(player: updated, image: image, season: _season);
     if (isClosed) return;
     response.fold(
-      (failure) => emit(ErrorTeamPlayersState(errorMessage: failure.toString(), players: state.players)),
-      (saved) => emit(SuccessTeamPlayersState(players: _replace(saved))),
+      (failure) => emit(ErrorTeamPlayersState(
+        errorMessage: failure.toString(),
+        players: state.players,
+        sort: state.sort,
+        query: state.query,
+      )),
+      (saved) => emit(SuccessTeamPlayersState(players: _replace(saved), sort: state.sort, query: state.query)),
     );
   }
 
