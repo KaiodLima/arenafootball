@@ -32,6 +32,21 @@ class VotingDataSource {
     }
   }
 
+  /// Voto atual de [voterId] na partida; `null` se ainda não votou.
+  Future<Either<Failure, VoteDTO?>> getVote({
+    required String homeTeam,
+    required String awayTeam,
+    required String voterId,
+  }) async {
+    try {
+      final doc = await _votes(homeTeam, awayTeam).doc(voterId).get();
+      return Right(doc.exists ? VoteDTO.fromFirestore(doc) : null);
+    } catch (e) {
+      AppLogger.e('getVote $homeTeam x $awayTeam', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível carregar o seu voto.'));
+    }
+  }
+
   Future<Either<Failure, List<VoteDTO>>> getVotes({required String homeTeam, required String awayTeam}) async {
     try {
       final result = await _votes(homeTeam, awayTeam).get();

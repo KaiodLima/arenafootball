@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/core/utils/search_text.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 
 /// Ordenação do elenco na tela.
@@ -24,9 +25,9 @@ class TeamPlayersState extends Equatable {
 
   /// Elenco filtrado pela busca e ordenado (empate pelo nome).
   List<PlayerDTO> get visiblePlayers {
-    final term = _normalize(query.trim());
-    final filtered = term.isEmpty ? [...players] : players.where((p) => _normalize(p.name).contains(term)).toList();
-    int byName(PlayerDTO a, PlayerDTO b) => _normalize(a.name).compareTo(_normalize(b.name));
+    final term = foldForSearch(query.trim());
+    final filtered = term.isEmpty ? [...players] : players.where((p) => foldForSearch(p.name).contains(term)).toList();
+    int byName(PlayerDTO a, PlayerDTO b) => foldForSearch(a.name).compareTo(foldForSearch(b.name));
     filtered.sort((a, b) {
       switch (sort) {
         case PlayersSort.goals:
@@ -54,24 +55,6 @@ class TeamPlayersState extends Equatable {
     }
     return top?.id;
   }
-
-  static const _accents = {
-    'á': 'a',
-    'à': 'a',
-    'â': 'a',
-    'ã': 'a',
-    'é': 'e',
-    'ê': 'e',
-    'í': 'i',
-    'ó': 'o',
-    'ô': 'o',
-    'õ': 'o',
-    'ú': 'u',
-    'ü': 'u',
-    'ç': 'c'
-  };
-
-  static String _normalize(String text) => text.toLowerCase().split('').map((char) => _accents[char] ?? char).join();
 
   @override
   List<Object?> get props => [players, sort, query];

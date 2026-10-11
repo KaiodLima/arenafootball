@@ -196,7 +196,7 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.voteBestPlayerPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<VoteBestPlayerCubit>(
-            create: (_) => VoteBestPlayerCubit(sl(), sl()),
+            create: (_) => VoteBestPlayerCubit(sl(), sl(), sl(), sl()),
             child: VoteBestPlayerPage(match: args?['match'] as MatchDTO, season: args?['season'] as String),
           );
         },

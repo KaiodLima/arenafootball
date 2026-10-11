@@ -5,28 +5,45 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
 import 'package:arena_soccer/features/voting/data/dtos/vote_dto.dart';
 import 'package:arena_soccer/features/voting/domain/usecases/cast_vote_usecase.dart';
+import 'package:arena_soccer/features/voting/domain/usecases/get_my_vote_usecase.dart';
 import 'package:arena_soccer/features/voting/presentation/bloc/vote_best_player_state.dart';
 
-/// Votação de melhor jogador: elencos dos dois times em tempo real, escolha
-/// de um jogador e envio do voto.
+/// Votação de melhor jogador: elencos dos dois times em tempo real, o voto
+/// atual do usuário (pré-selecionado), escolha de um jogador e envio do voto.
+/// Também guarda o time exibido, a busca e os escudos.
 class VoteBestPlayerCubit extends Cubit<VoteBestPlayerState> {
   final WatchTeamPlayersUseCase watchTeamPlayersUseCase;
   final CastVoteUseCase castVoteUseCase;
+  final GetMyVoteUseCase getMyVoteUseCase;
+  final GetTeamsUseCase getTeamsUseCase;
   StreamSubscription<Either<Failure, List<PlayerDTO>>>? _homeSubscription;
   StreamSubscription<Either<Failure, List<PlayerDTO>>>? _awaySubscription;
   String _homeTeam = '';
   String _awayTeam = '';
 
-  VoteBestPlayerCubit(this.watchTeamPlayersUseCase, this.castVoteUseCase) : super(const LoadingVoteBestPlayerState());
+  /// O voto atual só pré-seleciona uma vez (depois o usuário manda).
+  bool _preselected = false;
 
-  void watch({required String homeTeam, required String awayTeam, required String season}) {
+  VoteBestPlayerCubit(
+    this.watchTeamPlayersUseCase,
+    this.castVoteUseCase,
+    this.getMyVoteUseCase,
+    this.getTeamsUseCase,
+  ) : super(const LoadingVoteBestPlayerState());
+
+  /// [voterId] vazio = convidado (não tem voto atual).
+  void watch({required String homeTeam, required String awayTeam, required String season, required String voterId}) {
     _homeTeam = homeTeam;
     _awayTeam = awayTeam;
+    _preselected = false;
     _homeSubscription?.cancel();
     _awaySubscription?.cancel();
     emit(const LoadingVoteBestPlayerState());
+    _loadCrests(season: season);
+    _loadMyVote(voterId: voterId);
     _homeSubscription = watchTeamPlayersUseCase(teamName: homeTeam, season: season).listen(
       (response) => _onPlayers(response, isHome: true),
     );
@@ -35,27 +52,70 @@ class VoteBestPlayerCubit extends Cubit<VoteBestPlayerState> {
     );
   }
 
+  /// Escudos são só decoração: se falhar, fica o ícone padrão.
+  Future<void> _loadCrests({required String season}) async {
+    final response = await getTeamsUseCase(season: season);
+    if (isClosed || response.isLeft) return;
+    var home = '';
+    var away = '';
+    for (final team in response.right) {
+      if (home.isEmpty && team.name == _homeTeam) home = team.imageUrl;
+      if (away.isEmpty && team.name == _awayTeam) away = team.imageUrl;
+    }
+    _emitSame(homeCrest: home, awayCrest: away);
+  }
+
+  /// Falhar ao ler o voto atual não impede votar: só não mostra o selo.
+  Future<void> _loadMyVote({required String voterId}) async {
+    final response = await getMyVoteUseCase(homeTeam: _homeTeam, awayTeam: _awayTeam, voterId: voterId);
+    if (isClosed || response.isLeft || response.right == null) return;
+    _emitSame(myVote: response.right);
+    _preselectMyVote();
+  }
+
   void _onPlayers(Either<Failure, List<PlayerDTO>> response, {required bool isHome}) {
     response.fold(
-      (failure) => emit(ErrorVoteBestPlayerState(
-        errorMessage: failure.toString(),
-        homePlayers: state.homePlayers,
-        awayPlayers: state.awayPlayers,
-        selected: state.selected,
-      )),
-      (players) => emit(ReadyVoteBestPlayerState(
-        homePlayers: isHome ? players : state.homePlayers,
-        awayPlayers: isHome ? state.awayPlayers : players,
-        selected: state.selected,
-      )),
+      (failure) => emit(_error(failure)),
+      (players) {
+        emit(ReadyVoteBestPlayerState(
+          homePlayers: isHome ? players : state.homePlayers,
+          awayPlayers: isHome ? state.awayPlayers : players,
+          selected: state.selected,
+          myVote: state.myVote,
+          showAway: state.showAway,
+          query: state.query,
+          homeCrest: state.homeCrest,
+          awayCrest: state.awayCrest,
+        ));
+        _preselectMyVote();
+      },
     );
   }
 
-  void select(PlayerDTO player) => emit(ReadyVoteBestPlayerState(
-        homePlayers: state.homePlayers,
-        awayPlayers: state.awayPlayers,
-        selected: player,
-      ));
+  /// Marca o jogador do voto atual e abre no time dele, assim que o voto e o
+  /// elenco correspondente estiverem carregados.
+  void _preselectMyVote() {
+    final vote = state.myVote;
+    if (_preselected || vote == null || state.selected != null) return;
+    final isAway = vote.team == _awayTeam;
+    final squad = isAway ? state.awayPlayers : state.homePlayers;
+    for (final player in squad) {
+      if (player.name == vote.playerName && player.team == vote.team) {
+        _preselected = true;
+        emit(_ready(selected: player, showAway: isAway));
+        return;
+      }
+    }
+  }
+
+  void select(PlayerDTO player) => emit(_ready(selected: player));
+
+  void setShowAway(bool showAway) {
+    if (showAway == state.showAway) return;
+    emit(_ready(showAway: showAway, query: ''));
+  }
+
+  void setQuery(String query) => emit(_ready(query: query));
 
   /// [voterId] vazio = convidado (o UseCase recusa).
   Future<void> vote({required String voterId}) async {
@@ -65,28 +125,86 @@ class VoteBestPlayerCubit extends Cubit<VoteBestPlayerState> {
       homePlayers: state.homePlayers,
       awayPlayers: state.awayPlayers,
       selected: selected,
+      myVote: state.myVote,
+      showAway: state.showAway,
+      query: state.query,
+      homeCrest: state.homeCrest,
+      awayCrest: state.awayCrest,
     ));
 
-    final response = await castVoteUseCase(
-      homeTeam: _homeTeam,
-      awayTeam: _awayTeam,
-      vote: VoteDTO(voterId: voterId, playerName: selected?.name ?? '', team: selected?.team ?? ''),
-    );
+    final vote = VoteDTO(voterId: voterId, playerName: selected?.name ?? '', team: selected?.team ?? '');
+    final response = await castVoteUseCase(homeTeam: _homeTeam, awayTeam: _awayTeam, vote: vote);
     if (isClosed) return;
     response.fold(
-      (failure) => emit(ErrorVoteBestPlayerState(
-        errorMessage: failure.toString(),
-        errorCode: failure is ErrorWithMessage ? failure.code : null,
-        homePlayers: state.homePlayers,
-        awayPlayers: state.awayPlayers,
-        selected: selected,
-      )),
+      (failure) => emit(_error(failure)),
       (_) => emit(SuccessVoteBestPlayerState(
         homePlayers: state.homePlayers,
         awayPlayers: state.awayPlayers,
         selected: selected,
+        myVote: vote,
+        showAway: state.showAway,
+        query: state.query,
+        homeCrest: state.homeCrest,
+        awayCrest: state.awayCrest,
       )),
     );
+  }
+
+  /// Estado "pronto" com os campos trocados; os demais vêm do atual.
+  ReadyVoteBestPlayerState _ready({PlayerDTO? selected, bool? showAway, String? query}) => ReadyVoteBestPlayerState(
+        homePlayers: state.homePlayers,
+        awayPlayers: state.awayPlayers,
+        selected: selected ?? state.selected,
+        myVote: state.myVote,
+        showAway: showAway ?? state.showAway,
+        query: query ?? state.query,
+        homeCrest: state.homeCrest,
+        awayCrest: state.awayCrest,
+      );
+
+  ErrorVoteBestPlayerState _error(Failure failure) => ErrorVoteBestPlayerState(
+        errorMessage: failure.toString(),
+        errorCode: failure is ErrorWithMessage ? failure.code : null,
+        homePlayers: state.homePlayers,
+        awayPlayers: state.awayPlayers,
+        selected: state.selected,
+        myVote: state.myVote,
+        showAway: state.showAway,
+        query: state.query,
+        homeCrest: state.homeCrest,
+        awayCrest: state.awayCrest,
+      );
+
+  /// Reemite o estado atual (mesmo tipo) com escudos/voto atualizados. Erro
+  /// já mostrado vira "pronto" para não repetir o snackbar.
+  void _emitSame({String? homeCrest, String? awayCrest, VoteDTO? myVote}) {
+    final s = state;
+    final homePlayers = s.homePlayers;
+    final awayPlayers = s.awayPlayers;
+    final crestHome = homeCrest ?? s.homeCrest;
+    final crestAway = awayCrest ?? s.awayCrest;
+    final vote = myVote ?? s.myVote;
+    emit(s is LoadingVoteBestPlayerState
+        ? LoadingVoteBestPlayerState(
+            homePlayers: homePlayers,
+            awayPlayers: awayPlayers,
+            selected: s.selected,
+            myVote: vote,
+            showAway: s.showAway,
+            query: s.query,
+            homeCrest: crestHome,
+            awayCrest: crestAway,
+          )
+        : ReadyVoteBestPlayerState(
+            homePlayers: homePlayers,
+            awayPlayers: awayPlayers,
+            selected: s.selected,
+            myVote: vote,
+            showAway: s.showAway,
+            query: s.query,
+            homeCrest: crestHome,
+            awayCrest: crestAway,
+          ));
   }
 
   @override

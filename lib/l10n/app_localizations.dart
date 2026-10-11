@@ -1041,29 +1041,89 @@ abstract class AppLocalizations {
   /// **'Melhor da Partida'**
   String get votingTitle;
 
-  /// No description provided for @votingNotice.
-  ///
-  /// In pt, this message translates to:
-  /// **'Atenção: O VOTO É ÚNICO! Você pode alterar sua opção de voto quantas vezes quiser, mas apenas o último voto é contabilizado!'**
-  String get votingNotice;
-
-  /// No description provided for @votingVoteButton.
-  ///
-  /// In pt, this message translates to:
-  /// **'VOTAR'**
-  String get votingVoteButton;
-
   /// No description provided for @votingBlankVote.
   ///
   /// In pt, this message translates to:
   /// **'Voto em branco! Tente novamente.'**
   String get votingBlankVote;
 
-  /// No description provided for @votingVoteRegistered.
+  /// No description provided for @votingHint.
   ///
   /// In pt, this message translates to:
-  /// **'Voto registrado! Você votou em {player}. Muito obrigado pelo seu voto.'**
-  String votingVoteRegistered(String player);
+  /// **'Você pode trocar o voto quando quiser; só o último conta.'**
+  String get votingHint;
+
+  /// No description provided for @votingSearchHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Buscar jogador'**
+  String get votingSearchHint;
+
+  /// No description provided for @votingChoosePlayer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha um jogador'**
+  String get votingChoosePlayer;
+
+  /// No description provided for @votingVoteFor.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votar em {name}'**
+  String votingVoteFor(String name);
+
+  /// No description provided for @votingChangeVoteTo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar voto para {name}'**
+  String votingChangeVoteTo(String name);
+
+  /// No description provided for @votingYouVotedFor.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você votou em {name}'**
+  String votingYouVotedFor(String name);
+
+  /// No description provided for @votingYourVote.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu voto'**
+  String get votingYourVote;
+
+  /// No description provided for @votingGuestTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entre na sua conta para votar no craque da partida'**
+  String get votingGuestTitle;
+
+  /// No description provided for @votingGuestAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entrar'**
+  String get votingGuestAction;
+
+  /// No description provided for @votingSuccessTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Voto registrado!'**
+  String get votingSuccessTitle;
+
+  /// No description provided for @votingEmptySquad.
+  ///
+  /// In pt, this message translates to:
+  /// **'Elenco não cadastrado'**
+  String get votingEmptySquad;
+
+  /// No description provided for @votingNoSearchResults.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum jogador encontrado'**
+  String get votingNoSearchResults;
+
+  /// No description provided for @commonClose.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fechar'**
+  String get commonClose;
 
   /// No description provided for @votingLoginRequired.
   ///

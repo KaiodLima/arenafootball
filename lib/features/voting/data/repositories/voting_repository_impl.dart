@@ -14,6 +14,10 @@ class VotingRepositoryImpl implements IVotingRepository {
       _dataSource.castVote(homeTeam: homeTeam, awayTeam: awayTeam, vote: vote);
 
   @override
+  Future<Either<Failure, VoteDTO?>> getVote({required String homeTeam, required String awayTeam, required String voterId}) =>
+      _dataSource.getVote(homeTeam: homeTeam, awayTeam: awayTeam, voterId: voterId);
+
+  @override
   Future<Either<Failure, List<VoteDTO>>> getVotes({required String homeTeam, required String awayTeam}) =>
       _dataSource.getVotes(homeTeam: homeTeam, awayTeam: awayTeam);
 }

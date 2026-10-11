@@ -538,19 +538,53 @@ class AppLocalizationsEn extends AppLocalizations {
   String get votingTitle => 'Best Player of the Match';
 
   @override
-  String get votingNotice =>
-      'Attention: ONE VOTE PER PERSON! You can change your vote as many times as you want, but only the last vote counts!';
-
-  @override
-  String get votingVoteButton => 'VOTE';
-
-  @override
   String get votingBlankVote => 'Blank vote! Try again.';
 
   @override
-  String votingVoteRegistered(String player) {
-    return 'Vote registered! You voted for $player. Thank you for voting.';
+  String get votingHint =>
+      'You can change your vote anytime; only the last one counts.';
+
+  @override
+  String get votingSearchHint => 'Search player';
+
+  @override
+  String get votingChoosePlayer => 'Choose a player';
+
+  @override
+  String votingVoteFor(String name) {
+    return 'Vote for $name';
   }
+
+  @override
+  String votingChangeVoteTo(String name) {
+    return 'Change vote to $name';
+  }
+
+  @override
+  String votingYouVotedFor(String name) {
+    return 'You voted for $name';
+  }
+
+  @override
+  String get votingYourVote => 'Your vote';
+
+  @override
+  String get votingGuestTitle => 'Log in to vote for the player of the match';
+
+  @override
+  String get votingGuestAction => 'Log in';
+
+  @override
+  String get votingSuccessTitle => 'Vote registered!';
+
+  @override
+  String get votingEmptySquad => 'Squad not registered';
+
+  @override
+  String get votingNoSearchResults => 'No players found';
+
+  @override
+  String get commonClose => 'Close';
 
   @override
   String get votingLoginRequired => 'Log in to vote.';

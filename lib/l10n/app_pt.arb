@@ -246,17 +246,41 @@
   "championshipsStandingsPoints": "P",
   "championshipsStandingsGoalDifference": "SG",
   "votingTitle": "Melhor da Partida",
-  "votingNotice": "Atenção: O VOTO É ÚNICO! Você pode alterar sua opção de voto quantas vezes quiser, mas apenas o último voto é contabilizado!",
-  "votingVoteButton": "VOTAR",
   "votingBlankVote": "Voto em branco! Tente novamente.",
-  "votingVoteRegistered": "Voto registrado! Você votou em {player}. Muito obrigado pelo seu voto.",
-  "@votingVoteRegistered": {
+  "votingHint": "Você pode trocar o voto quando quiser; só o último conta.",
+  "votingSearchHint": "Buscar jogador",
+  "votingChoosePlayer": "Escolha um jogador",
+  "votingVoteFor": "Votar em {name}",
+  "@votingVoteFor": {
     "placeholders": {
-      "player": {
+      "name": {
         "type": "String"
       }
     }
   },
+  "votingChangeVoteTo": "Trocar voto para {name}",
+  "@votingChangeVoteTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "votingYouVotedFor": "Você votou em {name}",
+  "@votingYouVotedFor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "votingYourVote": "Seu voto",
+  "votingGuestTitle": "Entre na sua conta para votar no craque da partida",
+  "votingGuestAction": "Entrar",
+  "votingSuccessTitle": "Voto registrado!",
+  "votingEmptySquad": "Elenco não cadastrado",
+  "votingNoSearchResults": "Nenhum jogador encontrado",
+  "commonClose": "Fechar",
   "votingLoginRequired": "Faça login para votar.",
   "votingElectedTitle": "Craque da partida",
   "votingMatchSubtitle": "{home} x {away}",
