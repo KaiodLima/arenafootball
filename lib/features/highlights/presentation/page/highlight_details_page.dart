@@ -137,11 +137,11 @@ class _HighlightNewsList extends StatelessWidget {
         return Column(
           children: state.news
               .map(
-                (news) => GestureDetector(
-                  onTap: () => Navigator.pushNamed(context, AppRoutes.newsDetailsPage, arguments: {'news': news}),
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSizes.s8),
-                    child: NewsCard(news: news),
+                (news) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8),
+                  child: NewsCard(
+                    news: news,
+                    onTap: () => Navigator.pushNamed(context, AppRoutes.newsDetailsPage, arguments: {'news': news}),
                   ),
                 ),
               )

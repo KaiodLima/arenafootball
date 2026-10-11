@@ -5,6 +5,7 @@ import 'package:arena_soccer/features/voting/domain/repositories/voting_reposito
 import 'package:arena_soccer/features/voting/domain/usecases/calculate_best_player_usecase.dart';
 import 'package:arena_soccer/features/voting/domain/usecases/cast_vote_usecase.dart';
 import 'package:arena_soccer/features/voting/domain/usecases/get_elected_player_usecase.dart';
+import 'package:arena_soccer/features/voting/domain/usecases/get_my_vote_usecase.dart';
 
 final _sl = GetIt.instance;
 
@@ -19,5 +20,6 @@ void registerVotingDependencies() {
   // UseCases
   _sl.registerLazySingleton(() => CastVoteUseCase(_sl()));
   _sl.registerLazySingleton(() => CalculateBestPlayerUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetMyVoteUseCase(_sl()));
   _sl.registerLazySingleton(() => GetElectedPlayerUseCase(_sl(), _sl(), _sl()));
 }

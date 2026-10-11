@@ -1,18 +1,23 @@
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/services/share_service.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/page_title_bar.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/voting/domain/elected_player.dart';
 import 'package:arena_soccer/features/voting/presentation/bloc/elected_player_cubit.dart';
 import 'package:arena_soccer/features/voting/presentation/bloc/elected_player_state.dart';
+import 'package:arena_soccer/features/voting/presentation/widgets/elected_player_card.dart';
+import 'package:arena_soccer/features/voting/presentation/widgets/match_score_header.dart';
+import 'package:arena_soccer/features/voting/presentation/widgets/vote_ranking_card.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
-import 'package:arena_soccer/utils/constants/app_images.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
+import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// Melhor jogador eleito da partida (votação encerrada): foto do jogador à
-/// esquerda, escudo do time à direita, nome e número de votos.
+/// Craque da partida (votação encerrada): o placar no topo escuro, o cartão
+/// do eleito sobreposto a ele e o ranking de todos os votados. Sem votos, o
+/// placar continua e embaixo aparece o aviso.
 class ElectedPlayerPage extends StatefulWidget {
   final MatchDTO match;
   final String season;
@@ -24,6 +29,9 @@ class ElectedPlayerPage extends StatefulWidget {
 }
 
 class _ElectedPlayerPageState extends State<ElectedPlayerPage> {
+  /// Quanto o cartão do eleito sobe sobre o topo escuro.
+  static const double _overlap = AppSizes.s48;
+
   @override
   void initState() {
     super.initState();
@@ -34,168 +42,131 @@ class _ElectedPlayerPageState extends State<ElectedPlayerPage> {
     );
   }
 
+  void _share(AppLocalizations l10n, ElectedPlayer elected) {
+    final match = widget.match;
+    ShareService.shareText(
+      l10n.votingShareText(
+        elected.playerName,
+        '${match.homeTeam} ${match.homeGoals} x ${match.awayGoals} ${match.awayTeam}',
+        l10n.votingVotes(elected.votes),
+      ),
+      subject: l10n.votingElectedTitle,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    return Scaffold(
-      backgroundColor: AppColors.primaryDark,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryDark,
-        foregroundColor: AppColors.white,
-        elevation: 0,
-        centerTitle: true,
-        title: Image.asset(AppImages.logo, width: AppSizes.logoWidth, height: AppSizes.logoHeight),
-      ),
-      body: BlocBuilder<ElectedPlayerCubit, ElectedPlayerState>(
-        builder: (context, state) {
-          if (state is LoadingElectedPlayerState) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
-          }
-          if (state is ErrorElectedPlayerState) return _Message(text: l10n.votingLoadError);
-          final elected = state.elected;
-          if (elected == null) return _Message(text: l10n.votingNoVotes);
-          return _ElectedView(elected: elected);
-        },
-      ),
-    );
-  }
-}
+    return BlocBuilder<ElectedPlayerCubit, ElectedPlayerState>(
+      builder: (context, state) {
+        final result = state.result;
+        final elected = result?.elected;
 
-class _Message extends StatelessWidget {
-  final String text;
-
-  const _Message({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSizes.s16),
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: const TextStyle(color: AppColors.white, fontSize: AppSizes.s18),
-        ),
-      ),
-    );
-  }
-}
-
-class _ElectedView extends StatelessWidget {
-  final ElectedPlayer elected;
-
-  const _ElectedView({required this.elected});
-
-  static const _radius = BorderRadius.all(Radius.circular(AppSizes.s24));
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final width = MediaQuery.of(context).size.width;
-    final hasPlayer = elected.playerImageUrl.isNotEmpty;
-    final hasTeam = elected.teamImageUrl.isNotEmpty;
-
-    return Stack(
-      children: [
-        if (hasPlayer)
-          Align(
-            alignment: Alignment.centerLeft,
-            child: _FadedImage(
-              url: elected.playerImageUrl,
-              width: width * 0.7,
-              begin: Alignment.centerRight,
-              end: Alignment.center,
-            ),
-          ),
-        if (hasTeam)
-          Align(
-            alignment: Alignment.centerRight,
-            // Só com o escudo, ele ocupa a tela toda, sem esmaecer.
-            child: hasPlayer
-                ? _FadedImage(
-                    url: elected.teamImageUrl,
-                    width: width * 0.5,
-                    begin: Alignment.center,
-                    end: Alignment.centerRight,
-                  )
-                : _Image(url: elected.teamImageUrl),
-          ),
-        Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [AppColors.black, AppColors.transparent],
-              begin: Alignment.bottomCenter,
-              end: Alignment.center,
-            ),
-            borderRadius: _radius,
-          ),
-          padding: const EdgeInsets.only(bottom: AppSizes.s64, left: AppSizes.s8, right: AppSizes.s8),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              AutoSizeText(
-                l10n.votingElectedLabel,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: AppSizes.s18, fontWeight: FontWeight.bold, color: AppColors.white),
-              ),
-              const SizedBox(height: AppSizes.s8),
-              AutoSizeText(
-                elected.playerName,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: AppSizes.s30, fontWeight: FontWeight.bold, color: AppColors.white),
-              ),
-              const SizedBox(height: AppSizes.s10),
-              Text(
-                l10n.votingVotesCount(elected.votes),
-                style: const TextStyle(fontSize: AppSizes.s16, color: AppColors.white),
-              ),
-              const SizedBox(height: AppSizes.s10),
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          appBar: PageTitleBar(
+            title: l10n.votingElectedTitle,
+            subtitle: l10n.votingMatchSubtitle(widget.match.homeTeam, widget.match.awayTeam),
+            actions: [
+              if (elected != null)
+                IconButton(
+                  tooltip: l10n.newsShare,
+                  icon: const Icon(Icons.share_rounded),
+                  onPressed: () => _share(l10n, elected),
+                ),
             ],
           ),
+          body: CustomScrollView(
+            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+            slivers: [
+              SliverToBoxAdapter(
+                child: ColoredBox(
+                  color: AppColors.primaryDark,
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      AppSizes.s16,
+                      AppSizes.s8,
+                      AppSizes.s16,
+                      elected != null ? AppSizes.s24 : AppSizes.s28,
+                    ),
+                    child: MatchScoreHeader(
+                      match: widget.match,
+                      homeCrest: result?.homeCrest,
+                      awayCrest: result?.awayCrest,
+                    ),
+                  ),
+                ),
+              ),
+              ..._body(l10n, state),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  List<Widget> _body(AppLocalizations l10n, ElectedPlayerState state) {
+    Widget fill(Widget child) => SliverFillRemaining(hasScrollBody: false, child: child);
+
+    if (state is LoadingElectedPlayerState) {
+      return [fill(const Center(child: CircularProgressIndicator(color: AppColors.primary)))];
+    }
+    final result = state.result;
+    if (state is ErrorElectedPlayerState || result == null) {
+      return [fill(ArenaEmptyState.error(message: l10n.votingLoadError))];
+    }
+    final elected = result.elected;
+    if (elected == null) {
+      return [fill(ArenaEmptyState(message: l10n.votingNoVotesYet, icon: Icons.how_to_vote_outlined))];
+    }
+
+    return [
+      SliverToBoxAdapter(
+        child: Stack(
+          children: [
+            // Faixa escura atrás do topo do cartão, para ele "subir" no placar.
+            const Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              height: _overlap,
+              child: ColoredBox(color: AppColors.primaryDark),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSizes.s16),
+              // Filho não posicionado do Stack recebe restrição frouxa: força a largura toda.
+              child: SizedBox(
+                width: double.infinity,
+                child: ElectedPlayerCard(elected: elected, share: result.shareOf(elected.votes)),
+              ),
+            ),
+          ],
         ),
-      ],
-    );
-  }
-}
-
-class _Image extends StatelessWidget {
-  final String url;
-  final double? width;
-
-  const _Image({required this.url, this.width});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      decoration: BoxDecoration(
-        image: DecorationImage(image: CachedNetworkImageProvider(url), fit: BoxFit.cover),
-        borderRadius: _ElectedView._radius,
       ),
-    );
-  }
-}
-
-/// Imagem que some em degradê de [begin] para [end].
-class _FadedImage extends StatelessWidget {
-  final String url;
-  final double width;
-  final Alignment begin;
-  final Alignment end;
-
-  const _FadedImage({required this.url, required this.width, required this.begin, required this.end});
-
-  @override
-  Widget build(BuildContext context) {
-    return ShaderMask(
-      blendMode: BlendMode.dstIn,
-      shaderCallback: (bounds) => LinearGradient(
-        begin: begin,
-        end: end,
-        colors: const [AppColors.transparent, AppColors.black],
-      ).createShader(bounds),
-      child: _Image(url: url, width: width),
-    );
+      SliverPadding(
+        padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s24, AppSizes.s16, AppSizes.s32),
+        sliver: SliverList.list(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: AppSizes.s4, bottom: AppSizes.s10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(l10n.votingRankingTitle, style: AppTypography.title().copyWith(fontSize: AppSizes.s18)),
+                  const SizedBox(width: AppSizes.s8),
+                  Text(
+                    l10n.votingVotes(result.totalVotes),
+                    style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+                  ),
+                ],
+              ),
+            ),
+            VoteRankingCard(result: result),
+          ],
+        ),
+      ),
+    ];
   }
 }

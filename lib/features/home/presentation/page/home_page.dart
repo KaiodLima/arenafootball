@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
@@ -6,18 +7,22 @@ import 'package:arena_soccer/features/championships/presentation/widgets/champio
 import 'package:arena_soccer/features/highlights/presentation/widgets/highlights_carousel.dart';
 import 'package:arena_soccer/features/home/presentation/bloc/home_cubit.dart';
 import 'package:arena_soccer/features/home/presentation/bloc/home_state.dart';
+import 'package:arena_soccer/features/home/presentation/widgets/admin_publish_sheet.dart';
 import 'package:arena_soccer/features/home/presentation/widgets/home_bottom_bar.dart';
 import 'package:arena_soccer/features/home/presentation/widgets/home_drawer.dart';
+import 'package:arena_soccer/features/home/presentation/widgets/home_header.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/matches_tab.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/news_tab.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_state.dart';
-import 'package:arena_soccer/features/regions/presentation/widgets/region_selector.dart';
 import 'package:arena_soccer/features/teams/presentation/widgets/teams_tab.dart';
+import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/utils/components/section_header.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
-import 'package:arena_soccer/utils/constants/app_images.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 
+/// Casca da home: header escuro (saudação + região), folha clara com a aba
+/// selecionada, barra de navegação inferior e, para o admin, o botão "Publicar".
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -26,6 +31,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   late final HomeCubit _homeCubit;
 
   @override
@@ -42,11 +48,20 @@ class _HomePageState extends State<HomePage> {
     Navigator.pushNamedAndRemoveUntil(context, AppRoutes.loginPage, (_) => false);
   }
 
-  Widget _tabContent(HomeTab tab, RegionState region) {
+  Widget _tabContent(HomeTab tab, RegionState region, AppLocalizations l10n) {
     final key = ValueKey('${tab.name}-${region.selectedRegion}-${region.selectedSeason}');
     switch (tab) {
       case HomeTab.news:
-        return NewsTab(key: key);
+        return NewsTab(
+          key: key,
+          header: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const HighlightsCarousel(),
+              SectionHeader(title: l10n.homeLatestNews),
+            ],
+          ),
+        );
       case HomeTab.championships:
         return ChampionshipsTab(key: key);
       case HomeTab.teams:
@@ -58,82 +73,67 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    final l10n = AppLocalizations.of(context);
     final session = context.watch<SessionCubit>().state;
     final region = context.watch<RegionCubit>().state;
 
     return BlocBuilder<HomeCubit, HomeState>(
       builder: (context, home) {
-        final showRegion = home.tab == HomeTab.news || home.tab == HomeTab.championships;
+        // Times e tabelas dependem da temporada; notícias e campeonatos, só da região.
+        final showSeason = home.tab == HomeTab.teams || home.tab == HomeTab.tables;
 
-        return Scaffold(
-          backgroundColor: AppColors.primaryDark,
-          appBar: AppBar(
-            backgroundColor: AppColors.primaryDark,
-            foregroundColor: AppColors.white,
-            elevation: 0,
-            centerTitle: true,
-            title: Image.asset(AppImages.logo, width: AppSizes.logoWidth, height: AppSizes.logoHeight),
-            actions: [
-              IconButton(
-                color: AppColors.white,
-                iconSize: AppSizes.s24,
-                icon: const Icon(Icons.logout),
-                onPressed: _logout,
-              ),
-            ],
-          ),
-          drawer: HomeDrawer(user: session.user, favoriteTeamImage: home.favoriteTeamImage),
-          body: SingleChildScrollView(
-            child: Column(
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle.light,
+          child: Scaffold(
+            key: _scaffoldKey,
+            backgroundColor: AppColors.background,
+            drawer: HomeDrawer(user: session.user, favoriteTeamImage: home.favoriteTeamImage, onLogout: _logout),
+            body: Column(
               children: [
-                const HighlightsCarousel(),
-                const SizedBox(height: AppSizes.s10),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSizes.s12),
-                  child: RegionSelector(mode: showRegion ? RegionSelectorMode.region : RegionSelectorMode.season),
+                HomeHeader(
+                  user: session.user,
+                  region: region.selectedRegion,
+                  favoriteTeamImage: home.favoriteTeamImage,
+                  showSeason: showSeason,
+                  onOpenMenu: () => _scaffoldKey.currentState?.openDrawer(),
                 ),
-                Container(
-                  width: size.width,
-                  height: size.height * 0.55,
-                  padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s14, AppSizes.s16, AppSizes.s4),
-                  child: _tabContent(home.tab, region),
+                Expanded(
+                  // A folha clara sobe sobre o header (cantos arredondados por cima do
+                  // gradiente) e cresce o mesmo tanto, para continuar encostada na barra.
+                  child: LayoutBuilder(
+                    builder: (context, constraints) => OverflowBox(
+                      alignment: Alignment.topCenter,
+                      maxHeight: constraints.maxHeight + AppSizes.sheetOverlap,
+                      child: Transform.translate(
+                        offset: const Offset(0, -AppSizes.sheetOverlap),
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            color: AppColors.background,
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(AppSizes.radiusLarge)),
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 250),
+                            child: _tabContent(home.tab, region, l10n),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
+            bottomNavigationBar: HomeBottomBar(selected: home.tab, onSelected: _homeCubit.selectTab),
+            floatingActionButton: session.isAdmin
+                ? FloatingActionButton(
+                    tooltip: l10n.homePublishTitle,
+                    onPressed: () => AdminPublishSheet.show(context),
+                    child: const Icon(Icons.add_rounded),
+                  )
+                : null,
           ),
-          bottomNavigationBar: HomeBottomBar(selected: home.tab, onSelected: _homeCubit.selectTab),
-          floatingActionButton: session.isAdmin ? const _AdminActions() : null,
         );
       },
     );
   }
 }
-
-/// Atalhos do admin: publicar anúncio e notificar gol.
-class _AdminActions extends StatelessWidget {
-  const _AdminActions();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        FloatingActionButton.small(
-          heroTag: 'btnAnuncio',
-          backgroundColor: AppColors.primary,
-          onPressed: () => Navigator.pushNamed(context, AppRoutes.publishAdPage),
-          child: const Icon(Icons.stacked_line_chart),
-        ),
-        const SizedBox(height: AppSizes.s4),
-        FloatingActionButton.small(
-          heroTag: 'btnGol',
-          backgroundColor: AppColors.primary,
-          onPressed: () => Navigator.pushNamed(context, AppRoutes.goalNotificationPage),
-          child: const Icon(Icons.sports_soccer),
-        ),
-      ],
-    );
-  }
-}
-

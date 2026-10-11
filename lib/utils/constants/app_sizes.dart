@@ -21,6 +21,7 @@ class AppSizes {
   static const double s32 = 32.0;
   static const double s36 = 36.0;
   static const double s40 = 40.0;
+  static const double s44 = 44.0;
   static const double s47 = 47.0;
   static const double s48 = 48.0;
   static const double s50 = 50.0;
@@ -28,6 +29,7 @@ class AppSizes {
   static const double s56 = 56.0;
   static const double s60 = 60.0;
   static const double s64 = 64.0;
+  static const double s72 = 72.0;
   static const double s80 = 80.0;
   static const double s100 = 100.0;
   static const double s110 = 110.0;
@@ -57,6 +59,18 @@ class AppSizes {
 
   /// Quanto o card das telas de entrada sobe sobre o hero.
   static const double cardOverlap = s24;
+
+  /// Raio dos cards de conteúdo.
+  static const double cardRadius = s20;
+
+  /// Quanto a folha de conteúdo da home sobe sobre o header.
+  static const double sheetOverlap = s20;
+
+  /// Diâmetro do círculo dos destaques (stories).
+  static const double storySize = s64;
+
+  /// Altura da barra de navegação inferior (NavigationBar).
+  static const double navBarHeight = s72;
 
   /// Altura padrão de botão.
   static const double buttonHeight = s47;

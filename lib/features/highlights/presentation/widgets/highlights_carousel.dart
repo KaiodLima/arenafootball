@@ -5,11 +5,12 @@ import 'package:arena_soccer/features/highlights/presentation/bloc/highlights_cu
 import 'package:arena_soccer/features/highlights/presentation/bloc/highlights_state.dart';
 import 'package:arena_soccer/features/highlights/presentation/widgets/highlight_avatar.dart';
 import 'package:arena_soccer/injection_container.dart';
-import 'package:arena_soccer/utils/constants/app_colors.dart';
+import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/utils/components/section_header.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 
-/// Carrossel de destaques do topo da home. Sem destaques, ou se a leitura
-/// falhar (ex.: visitante sem permissão no Firestore), não ocupa espaço.
+/// Destaques no topo do feed, no formato "stories". Sem destaques, ou se a
+/// leitura falhar, não ocupa espaço.
 class HighlightsCarousel extends StatelessWidget {
   const HighlightsCarousel({super.key});
 
@@ -25,39 +26,45 @@ class HighlightsCarousel extends StatelessWidget {
 class _HighlightsRow extends StatelessWidget {
   const _HighlightsRow();
 
+  static const double _rowHeight = AppSizes.storySize + AppSizes.s30;
+
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height * 0.12;
+    final l10n = AppLocalizations.of(context);
 
     return BlocBuilder<HighlightsCubit, HighlightsState>(
       builder: (context, state) {
-        if (state is LoadingHighlightsState && state.highlights.isEmpty) {
-          return SizedBox(
-            height: height,
-            child: const Center(child: CircularProgressIndicator(color: AppColors.primary)),
-          );
-        }
-        if (state.highlights.isEmpty) return const SizedBox.shrink();
+        final loading = state is LoadingHighlightsState && state.highlights.isEmpty;
+        if (!loading && state.highlights.isEmpty) return const SizedBox.shrink();
 
-        return SizedBox(
-          height: height,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-            padding: const EdgeInsets.symmetric(horizontal: AppSizes.s16),
-            itemCount: state.highlights.length,
-            itemBuilder: (context, index) {
-              final highlight = state.highlights[index];
-              return GestureDetector(
-                onTap: () => Navigator.pushNamed(
-                  context,
-                  AppRoutes.highlightDetailsPage,
-                  arguments: {'highlight': highlight},
-                ),
-                child: HighlightAvatar(imageUrl: highlight.imageUrl),
-              );
-            },
-          ),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SectionHeader(title: l10n.homeHighlights),
+            SizedBox(
+              height: _rowHeight,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                itemCount: loading ? 4 : state.highlights.length,
+                separatorBuilder: (_, __) => const SizedBox(width: AppSizes.s8),
+                itemBuilder: (context, index) {
+                  if (loading) return const HighlightAvatar.skeleton();
+                  final highlight = state.highlights[index];
+                  return HighlightAvatar(
+                    imageUrl: highlight.imageUrl,
+                    title: highlight.title,
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      AppRoutes.highlightDetailsPage,
+                      arguments: {'highlight': highlight},
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: AppSizes.s12),
+          ],
         );
       },
     );

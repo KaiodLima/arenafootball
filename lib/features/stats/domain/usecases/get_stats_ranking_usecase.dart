@@ -1,7 +1,7 @@
 import 'package:either_dart/either.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
-import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/domain/usecases/get_players_usecase.dart';
+import 'package:arena_soccer/features/stats/domain/ranking_entry.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
 
@@ -11,14 +11,15 @@ import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.da
 /// - só entram jogadores cujo `time` é o nome de um time da região;
 /// - quem tem 0 no quesito não aparece;
 /// - ordem decrescente pelo quesito; empate mantém a ordem em que os
-///   jogadores vieram do Firestore (não há critério de desempate).
+///   jogadores vieram do Firestore (não há critério de desempate), e os
+///   empatados dividem a posição.
 class GetStatsRankingUseCase {
   final GetTeamsUseCase _getTeams;
   final GetPlayersUseCase _getPlayers;
 
   GetStatsRankingUseCase(this._getTeams, this._getPlayers);
 
-  Future<Either<Failure, List<PlayerDTO>>> call({
+  Future<Either<Failure, StatsRanking>> call({
     required StatsRankingType type,
     required String region,
     String? season,
@@ -39,6 +40,13 @@ class GetStatsRankingUseCase {
         final byValue = type.valueOf(b.value).compareTo(type.valueOf(a.value));
         return byValue != 0 ? byValue : a.key.compareTo(b.key);
       });
-    return Right(indexed.map((entry) => entry.value).toList());
+    final sorted = indexed.map((entry) => entry.value).toList();
+    return Right(StatsRanking(
+      entries: buildRanking(sorted, type),
+      crests: {
+        for (final team in teams.right)
+          if (team.imageUrl.isNotEmpty) team.name: team.imageUrl,
+      },
+    ));
   }
 }

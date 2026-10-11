@@ -5,9 +5,10 @@ import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.da
 import 'package:arena_soccer/features/voting/domain/elected_player.dart';
 import 'package:arena_soccer/features/voting/domain/usecases/calculate_best_player_usecase.dart';
 
-/// Melhor jogador eleito de uma partida, com a foto do jogador e o escudo do
-/// time da temporada. Sem votos devolve `null`. Falha ao buscar foto/escudo
-/// não impede o resultado: a tela só fica sem a imagem.
+/// Apuração de uma partida para a tela do eleito: o ranking dos votados, o
+/// eleito com foto, escudo, gols e assistências na temporada, e os escudos
+/// dos dois times da partida. Sem votos, `elected` é `null`. Falha ao buscar
+/// fotos/escudos/elenco não impede o resultado: a tela só fica sem o dado.
 class GetElectedPlayerUseCase {
   final CalculateBestPlayerUseCase _calculateBestPlayer;
   final GetTeamsUseCase _getTeams;
@@ -15,38 +16,50 @@ class GetElectedPlayerUseCase {
 
   GetElectedPlayerUseCase(this._calculateBestPlayer, this._getTeams, this._watchTeamPlayers);
 
-  Future<Either<Failure, ElectedPlayer?>> call({
+  Future<Either<Failure, VotingResult>> call({
     required String homeTeam,
     required String awayTeam,
     String? season,
   }) async {
     final response = await _calculateBestPlayer(homeTeam: homeTeam, awayTeam: awayTeam);
     if (response.isLeft) return Left(response.left);
-    final elected = response.right;
-    if (elected == null || elected.team.isEmpty) return Right(elected);
+    final ranking = response.right;
 
-    var teamImageUrl = '';
+    final crests = <String, String>{};
     final teams = await _getTeams(season: season);
     if (teams.isRight) {
       for (final team in teams.right) {
-        if (team.name == elected.team) {
-          teamImageUrl = team.imageUrl;
-          break;
+        crests.putIfAbsent(team.name, () => team.imageUrl);
+      }
+    }
+
+    ElectedPlayer? elected;
+    if (ranking.isNotEmpty) {
+      final winner = ranking.first;
+      elected = ElectedPlayer(
+        playerName: winner.playerName,
+        team: winner.team,
+        votes: winner.votes,
+        teamImageUrl: crests[winner.team] ?? '',
+      );
+      if (winner.team.isNotEmpty) {
+        final players = await _watchTeamPlayers(teamName: winner.team, season: season).first;
+        if (players.isRight) {
+          for (final player in players.right) {
+            if (player.name == winner.playerName) {
+              elected = elected!.copyWith(playerImageUrl: player.imageUrl, goals: player.goals, assists: player.assists);
+              break;
+            }
+          }
         }
       }
     }
 
-    var playerImageUrl = '';
-    final players = await _watchTeamPlayers(teamName: elected.team, season: season).first;
-    if (players.isRight) {
-      for (final player in players.right) {
-        if (player.name == elected.playerName) {
-          playerImageUrl = player.imageUrl;
-          break;
-        }
-      }
-    }
-
-    return Right(elected.copyWith(playerImageUrl: playerImageUrl, teamImageUrl: teamImageUrl));
+    return Right(VotingResult(
+      elected: elected,
+      ranking: ranking,
+      homeCrest: crests[homeTeam] ?? '',
+      awayCrest: crests[awayTeam] ?? '',
+    ));
   }
 }

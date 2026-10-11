@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
+import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/groups_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/groups_state.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/group_card.dart';
-import 'package:arena_soccer/features/championships/presentation/widgets/stats_shortcut_actions.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/page_title_bar.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/stats_shortcuts_bar.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
-import 'package:arena_soccer/utils/constants/app_images.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 
 /// Grupos de uma região na temporada. Sem [region]/[season], usa a região e
@@ -40,66 +42,44 @@ class _GroupsPageState extends State<GroupsPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final favorite = context.watch<SessionCubit>().state.user?.favoriteTeam;
+    final favoriteKey = (favorite == null || favorite.trim().isEmpty) ? null : normalizeTeamName(favorite);
 
     return Scaffold(
-      backgroundColor: AppColors.primaryDark,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryDark,
-        foregroundColor: AppColors.white,
-        elevation: 0,
-        centerTitle: true,
-        title: Image.asset(AppImages.logo, width: AppSizes.logoWidth, height: AppSizes.logoHeight),
-        actions: statsShortcutActions(context, region: _region, season: _season),
-      ),
+      backgroundColor: AppColors.background,
+      appBar: PageTitleBar(title: l10n.groupsTitle, subtitle: l10n.groupsSubtitle(_region, _season)),
+      bottomNavigationBar: StatsShortcutsBar(region: _region, season: _season),
       body: BlocBuilder<GroupsCubit, GroupsState>(
         builder: (context, state) {
           if (state is LoadingGroupsState && state.groups.isEmpty) {
             return const Center(child: CircularProgressIndicator(color: AppColors.primary));
           }
           if (state is ErrorGroupsState && state.groups.isEmpty) {
-            return _Message(text: l10n.championshipsGroupsLoadError);
+            return ArenaEmptyState.error(message: l10n.championshipsGroupsLoadError);
           }
-          if (state.groups.isEmpty) return _Message(text: l10n.championshipsGroupsEmpty);
+          if (state.groups.isEmpty) {
+            return ArenaEmptyState(message: l10n.championshipsGroupsEmpty, icon: Icons.grid_view_rounded);
+          }
 
-          return GridView.builder(
-            padding: const EdgeInsets.all(AppSizes.s8),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: AppSizes.s10,
-              crossAxisSpacing: AppSizes.s10,
-              childAspectRatio: 0.8,
-            ),
+          return ListView.builder(
+            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+            padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s20, AppSizes.s16, AppSizes.s24),
             itemCount: state.groups.length,
             itemBuilder: (context, index) {
               final group = state.groups[index];
-              return GestureDetector(
+              return GroupCard(
+                group: group,
+                crestOf: state.crestOf,
+                favoriteTeam: favoriteKey,
                 onTap: () => Navigator.pushNamed(
                   context,
                   AppRoutes.standingsPage,
                   arguments: {'region': _region, 'season': _season, 'group': group.description},
                 ),
-                child: GroupCard(group: group),
               );
             },
           );
         },
-      ),
-    );
-  }
-}
-
-class _Message extends StatelessWidget {
-  final String text;
-
-  const _Message({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        text,
-        textAlign: TextAlign.center,
-        style: const TextStyle(color: AppColors.white, fontSize: AppSizes.s18),
       ),
     );
   }

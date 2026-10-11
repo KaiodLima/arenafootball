@@ -11,7 +11,6 @@
   "commonEdit": "Editar",
   "commonGenericError": "Algo deu errado. Tente novamente.",
   "loginEmailLabel": "E-mail",
-  "loginEmailHint": "exemplo@exemplo.com",
   "loginPasswordLabel": "Senha",
   "loginButton": "ENTRAR",
   "loginCreateAccountButton": "CRIAR CONTA",
@@ -29,18 +28,18 @@
   "registerNameTooShort": "Seu nome de usuário deve conter no mínimo 3 caracteres",
   "registerEmailExample": "Informe um e-mail válido, ex.: nome@email.com",
   "registerPasswordTooShort": "Sua senha deve conter no mínimo 8 caracteres",
-  "homeTabHome": "HOME",
-  "homeTabChampionships": "CAMPEONATOS",
-  "homeTabTeams": "TIMES",
-  "homeTabTables": "TABELAS",
-  "drawerHome": "INÍCIO",
-  "drawerResults": "RESULTADOS",
-  "drawerRegisterHighlight": "CADASTRAR DESTAQUES",
-  "drawerRegisterPlayer": "CADASTRAR JOGADOR",
-  "drawerRegisterMatch": "CADASTRAR NOVA PARTIDA",
-  "drawerRegisterNews": "CADASTRAR NOTÍCIA",
-  "drawerRegisterTeam": "CADASTRAR TIME",
-  "drawerFanOf": "Torcedor do: {team}",
+  "homeTabHome": "Início",
+  "homeTabChampionships": "Campeonatos",
+  "homeTabTeams": "Times",
+  "homeTabTables": "Tabelas",
+  "drawerHome": "Início",
+  "drawerResults": "Resultados pelo mundo",
+  "drawerRegisterHighlight": "Cadastrar destaque",
+  "drawerRegisterPlayer": "Cadastrar jogador",
+  "drawerRegisterMatch": "Cadastrar partida",
+  "drawerRegisterNews": "Cadastrar notícia",
+  "drawerRegisterTeam": "Cadastrar time",
+  "drawerFanOf": "Torcedor do {team}",
   "@drawerFanOf": {
     "placeholders": {
       "team": {
@@ -54,7 +53,6 @@
   "newsEmpty": "Nenhuma notícia registrada",
   "newsLoadError": "Não foi possível carregar as notícias.",
   "newsDeleteConfirm": "DESEJA REALMENTE EXCLUIR ESSA NOTÍCIA ?",
-  "newsMoreInfo": "Mais Informações",
   "newsAdPlaceholder": "PUBLICIDADE",
   "newsCreateTitle": "CADASTRAR NOTICIA",
   "newsEditTitle": "EDITAR NOTÍCIA",
@@ -99,14 +97,6 @@
   "teamsNameRequired": "Preencha os campos obrigatórios!!!",
   "playersEmpty": "Jogadores ainda não registrados!",
   "playersLoadError": "Não foi possível carregar os jogadores.",
-  "playersTeamInfo": "Time: {team}",
-  "@playersTeamInfo": {
-    "placeholders": {
-      "team": {
-        "type": "String"
-      }
-    }
-  },
   "playersGoalsCount": "Gols: {count}",
   "@playersGoalsCount": {
     "placeholders": {
@@ -134,33 +124,62 @@
   "playersCreated": "Jogador Cadastrado!!!",
   "playersPhotoBack": "Voltar",
   "playersPhotoSave": "Salvar",
-  "statsGoalsTitle": "ARTILHARIA",
-  "statsAssistsTitle": "ASSISTENCIAS",
-  "statsEmpty": "Nenhum jogador no ranking ainda.",
+  "statsEmptyGoals": "Nenhum gol marcado ainda",
+  "statsEmptyAssists": "Nenhuma assistência ainda",
+  "statsUnitGoals": "{count, plural, =1{gol} other{gols}}",
+  "@statsUnitGoals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statsUnitAssists": "{count, plural, =1{assist.} other{assist.}}",
+  "@statsUnitAssists": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "statsLoadError": "Não foi possível carregar o ranking.",
   "matchesNoChampionship": "Nenhum registro no momento",
   "matchesEmpty": "Nenhuma partida cadastrada",
   "matchesLoadError": "Não foi possível carregar as partidas.",
-  "matchesAllGames": "VER TODOS OS JOGOS",
-  "matchesGroups": "VER GRUPOS",
-  "matchesTopScorers": "ARTILHARIA",
-  "matchesAssists": "ASSISTÊNCIAS",
-  "matchesAllGamesTitle": "TODOS OS JOGOS",
-  "matchesVersus": "X",
-  "matchesSchedule": "{date} às {time} horas\n{venue}",
-  "@matchesSchedule": {
+  "matchesAllGames": "Todos os jogos",
+  "matchesGroups": "Grupos",
+  "matchesTopScorers": "Artilharia",
+  "matchesAssists": "Assistências",
+  "matchesAllGamesTitle": "Todos os jogos",
+  "matchesSummaryGames": "{count, plural, =1{jogo} other{jogos}}",
+  "@matchesSummaryGames": {
     "placeholders": {
-      "date": {
-        "type": "String"
-      },
-      "time": {
-        "type": "String"
-      },
-      "venue": {
-        "type": "String"
+      "count": {
+        "type": "int"
       }
     }
   },
+  "matchesSummaryGoals": "{count, plural, =1{gol} other{gols}}",
+  "@matchesSummaryGoals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matchesSummaryAverage": "gols por jogo",
+  "matchesDayCount": "{count, plural, =1{1 jogo} other{{count} jogos}}",
+  "@matchesDayCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matchesNoDate": "Sem data",
+  "matchesFilterAll": "Todos",
+  "matchesEmptyForTeam": "Nenhuma partida deste time",
+  "matchesVersus": "X",
   "matchesEditScore": "Editar Placar",
   "matchesDeleteMatch": "Excluir Partida",
   "matchesDeleteConfirm": "DESEJA REALMENTE EXCLUIR ESSA PARTIDA ?",
@@ -217,48 +236,96 @@
       }
     }
   },
-  "championshipsGroupsEmpty": "Vazio",
+  "championshipsGroupsEmpty": "Nenhum grupo cadastrado nesta temporada.",
   "championshipsGroupsLoadError": "Não foi possível carregar os grupos.",
-  "championshipsStandingsEmpty": "Vazio",
+  "championshipsStandingsEmpty": "Classificação ainda não disponível.",
   "championshipsStandingsLoadError": "Não foi possível carregar a classificação.",
-  "championshipsStandingsPosition": "#{position}",
-  "@championshipsStandingsPosition": {
-    "placeholders": {
-      "position": {
-        "type": "int"
-      }
-    }
-  },
   "championshipsStandingsWins": "V",
   "championshipsStandingsLosses": "D",
   "championshipsStandingsDraws": "E",
   "championshipsStandingsPoints": "P",
-  "championshipsStandingsGoalsFor": "GF",
-  "championshipsStandingsGoalsAgainst": "GS",
   "championshipsStandingsGoalDifference": "SG",
   "votingTitle": "Melhor da Partida",
-  "votingNotice": "Atenção: O VOTO É ÚNICO! Você pode alterar sua opção de voto quantas vezes quiser, mas apenas o último voto é contabilizado!",
-  "votingVoteButton": "VOTAR",
   "votingBlankVote": "Voto em branco! Tente novamente.",
-  "votingVoteRegistered": "Voto registrado! Você votou em {player}. Muito obrigado pelo seu voto.",
-  "@votingVoteRegistered": {
+  "votingHint": "Você pode trocar o voto quando quiser; só o último conta.",
+  "votingSearchHint": "Buscar jogador",
+  "votingChoosePlayer": "Escolha um jogador",
+  "votingVoteFor": "Votar em {name}",
+  "@votingVoteFor": {
     "placeholders": {
-      "player": {
+      "name": {
         "type": "String"
       }
     }
   },
+  "votingChangeVoteTo": "Trocar voto para {name}",
+  "@votingChangeVoteTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "votingYouVotedFor": "Você votou em {name}",
+  "@votingYouVotedFor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "votingYourVote": "Seu voto",
+  "votingGuestTitle": "Entre na sua conta para votar no craque da partida",
+  "votingGuestAction": "Entrar",
+  "votingSuccessTitle": "Voto registrado!",
+  "votingEmptySquad": "Elenco não cadastrado",
+  "votingNoSearchResults": "Nenhum jogador encontrado",
+  "commonClose": "Fechar",
   "votingLoginRequired": "Faça login para votar.",
-  "votingElectedLabel": "Eleito o melhor jogador da partida: ",
-  "votingVotesCount": "Número de votos: {count}",
-  "@votingVotesCount": {
+  "votingElectedTitle": "Craque da partida",
+  "votingMatchSubtitle": "{home} x {away}",
+  "@votingMatchSubtitle": {
+    "placeholders": {
+      "home": {
+        "type": "String"
+      },
+      "away": {
+        "type": "String"
+      }
+    }
+  },
+  "votingVotes": "{count, plural, =1{1 voto} other{{count} votos}}",
+  "@votingVotes": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "votingNoVotes": "Nenhum voto registrado para esta partida.",
+  "votingShareOfVotes": "{percent}% dos votos",
+  "@votingShareOfVotes": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "votingRankingTitle": "Votação",
+  "votingNoVotesYet": "Ninguém votou nesta partida ainda",
+  "votingShareText": "{player} foi eleito o craque de {match} com {votes}! ⚽ via Arena Football",
+  "@votingShareText": {
+    "placeholders": {
+      "player": {
+        "type": "String"
+      },
+      "match": {
+        "type": "String"
+      },
+      "votes": {
+        "type": "String"
+      }
+    }
+  },
   "votingLoadError": "Não foi possível apurar a votação.",
   "globalResultsTitle": "RESULTADOS PELO MUNDO",
   "globalResultsYesterday": "Ontem",
@@ -290,5 +357,122 @@
   "chooseTeamConfirm": "CONCLUIR",
   "chooseTeamSkip": "Pular por agora",
   "chooseTeamLoadError": "Não foi possível carregar as regiões e os times.",
-  "chooseTeamEmptyTeams": "Nenhum time cadastrado nesta região."
+  "chooseTeamEmptyTeams": "Nenhum time cadastrado nesta região.",
+  "drawerNavigation": "Navegação",
+  "drawerAdmin": "Administração",
+  "drawerLogout": "Sair da conta",
+  "drawerSignIn": "Entrar ou criar conta",
+  "drawerGuestSubtitle": "Entre para salvar seu time e votar no melhor da partida.",
+  "homeGreeting": "Olá, {name} 👋",
+  "@homeGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeGreetingGuest": "Bem-vindo ao Arena 👋",
+  "homeSubtitle": "Futebol amador de {region}",
+  "@homeSubtitle": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "homeHighlights": "Destaques",
+  "homeLatestNews": "Últimas notícias",
+  "homeTodayMatches": "Jogos de hoje",
+  "homeSeasonChip": "Temporada {season}",
+  "@homeSeasonChip": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "homePublishTitle": "Publicar",
+  "homePublishNews": "Notícia",
+  "homePublishGoal": "Gol",
+  "homePublishAd": "Anúncio",
+  "homePublishHighlight": "Destaque",
+  "homePublishMatch": "Partida",
+  "homePublishTeam": "Time",
+  "homePublishPlayer": "Jogador",
+  "homeOpenMenu": "Abrir menu",
+  "matchesVoteAction": "Votar no melhor",
+  "matchesSeeElected": "Ver eleito",
+  "matchesOpenVoting": "Abrir votação",
+  "matchesCloseVoting": "Fechar votação",
+  "championshipsSeeDetails": "Ver detalhes",
+  "newsAdLabel": "Publicidade",
+  "newsGoalLabel": "GOL",
+  "commonMoreActions": "Mais ações",
+  "timeJustNow": "agora",
+  "timeMinutesAgo": "há {minutes} min",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "timeHoursAgo": "há {hours} h",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "timeYesterday": "ontem",
+  "newsShare": "Compartilhar",
+  "newsShareFooter": "via Arena Football",
+  "newsReadMore": "Saiba mais",
+  "galleryClose": "Fechar",
+  "galleryCounter": "{current}/{total}",
+  "@galleryCounter": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "playersSummaryPlayers": "Jogadores",
+  "playersSummaryGoals": "Gols",
+  "playersSummaryAssists": "Assistências",
+  "playersSortGoals": "Gols",
+  "playersSortAssists": "Assistências",
+  "playersSortName": "A–Z",
+  "playersSearchHint": "Buscar jogador",
+  "playersNoResults": "Nenhum jogador encontrado.",
+  "playersTopScorer": "Artilheiro do time",
+  "playersChangePhoto": "Trocar foto",
+  "playersEditName": "Editar nome",
+  "playersSaveName": "Salvar nome",
+  "commonClear": "Limpar",
+  "groupsTitle": "Grupos",
+  "groupsSubtitle": "{region} · Temporada {season}",
+  "@groupsSubtitle": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      },
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "groupsSeeStandings": "Ver classificação",
+  "standingsColPosition": "#",
+  "standingsColTeam": "Time",
+  "standingsColGames": "J",
+  "standingsQualifiedLegend": "Classificados para a próxima fase",
+  "standingsGoalsFor": "Gols feitos",
+  "standingsGoalsAgainst": "Gols sofridos",
+  "standingsPerformance": "Aproveitamento",
+  "standingsYourTeam": "Seu time"
 }

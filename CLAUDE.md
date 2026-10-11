@@ -97,7 +97,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | `grupos{ano}` | descricao, fk_competicao |
 | `melhorjogador{timeC}{timeF}` | um doc por votante (id = uid): nome, time |
 
-`{ano}`: temporada do ano corrente usa a coleção sem sufixo; as outras usam o ano como sufixo (ver `SeasonCollection`).
+`{ano}`: a temporada corrente (`SeasonCollection.currentSeason`, hoje **2023**) fica nas coleções sem sufixo; as anteriores usam o ano como sufixo (`times2022`). Não comparar com o ano do relógio. Para abrir uma temporada nova: copiar as coleções sem sufixo para `<nome><ano>`, limpar as sem sufixo e atualizar `currentSeason`/`seasons`.
 Storage: `noticias/`, `destaques/`, `times/`, `jogadores/` (ver `StorageFolder`).
 
 ## Security Rules

@@ -42,9 +42,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get loginEmailLabel => 'E-mail';
 
   @override
-  String get loginEmailHint => 'exemplo@exemplo.com';
-
-  @override
   String get loginPasswordLabel => 'Senha';
 
   @override
@@ -100,41 +97,41 @@ class AppLocalizationsPt extends AppLocalizations {
       'Sua senha deve conter no mínimo 8 caracteres';
 
   @override
-  String get homeTabHome => 'HOME';
+  String get homeTabHome => 'Início';
 
   @override
-  String get homeTabChampionships => 'CAMPEONATOS';
+  String get homeTabChampionships => 'Campeonatos';
 
   @override
-  String get homeTabTeams => 'TIMES';
+  String get homeTabTeams => 'Times';
 
   @override
-  String get homeTabTables => 'TABELAS';
+  String get homeTabTables => 'Tabelas';
 
   @override
-  String get drawerHome => 'INÍCIO';
+  String get drawerHome => 'Início';
 
   @override
-  String get drawerResults => 'RESULTADOS';
+  String get drawerResults => 'Resultados pelo mundo';
 
   @override
-  String get drawerRegisterHighlight => 'CADASTRAR DESTAQUES';
+  String get drawerRegisterHighlight => 'Cadastrar destaque';
 
   @override
-  String get drawerRegisterPlayer => 'CADASTRAR JOGADOR';
+  String get drawerRegisterPlayer => 'Cadastrar jogador';
 
   @override
-  String get drawerRegisterMatch => 'CADASTRAR NOVA PARTIDA';
+  String get drawerRegisterMatch => 'Cadastrar partida';
 
   @override
-  String get drawerRegisterNews => 'CADASTRAR NOTÍCIA';
+  String get drawerRegisterNews => 'Cadastrar notícia';
 
   @override
-  String get drawerRegisterTeam => 'CADASTRAR TIME';
+  String get drawerRegisterTeam => 'Cadastrar time';
 
   @override
   String drawerFanOf(String team) {
-    return 'Torcedor do: $team';
+    return 'Torcedor do $team';
   }
 
   @override
@@ -154,9 +151,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get newsDeleteConfirm => 'DESEJA REALMENTE EXCLUIR ESSA NOTÍCIA ?';
-
-  @override
-  String get newsMoreInfo => 'Mais Informações';
 
   @override
   String get newsAdPlaceholder => 'PUBLICIDADE';
@@ -292,11 +286,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get playersLoadError => 'Não foi possível carregar os jogadores.';
 
   @override
-  String playersTeamInfo(String team) {
-    return 'Time: $team';
-  }
-
-  @override
   String playersGoalsCount(int count) {
     return 'Gols: $count';
   }
@@ -340,13 +329,32 @@ class AppLocalizationsPt extends AppLocalizations {
   String get playersPhotoSave => 'Salvar';
 
   @override
-  String get statsGoalsTitle => 'ARTILHARIA';
+  String get statsEmptyGoals => 'Nenhum gol marcado ainda';
 
   @override
-  String get statsAssistsTitle => 'ASSISTENCIAS';
+  String get statsEmptyAssists => 'Nenhuma assistência ainda';
 
   @override
-  String get statsEmpty => 'Nenhum jogador no ranking ainda.';
+  String statsUnitGoals(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'gols',
+      one: 'gol',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String statsUnitAssists(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'assist.',
+      one: 'assist.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get statsLoadError => 'Não foi possível carregar o ranking.';
@@ -361,27 +369,67 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchesLoadError => 'Não foi possível carregar as partidas.';
 
   @override
-  String get matchesAllGames => 'VER TODOS OS JOGOS';
+  String get matchesAllGames => 'Todos os jogos';
 
   @override
-  String get matchesGroups => 'VER GRUPOS';
+  String get matchesGroups => 'Grupos';
 
   @override
-  String get matchesTopScorers => 'ARTILHARIA';
+  String get matchesTopScorers => 'Artilharia';
 
   @override
-  String get matchesAssists => 'ASSISTÊNCIAS';
+  String get matchesAssists => 'Assistências';
 
   @override
-  String get matchesAllGamesTitle => 'TODOS OS JOGOS';
+  String get matchesAllGamesTitle => 'Todos os jogos';
+
+  @override
+  String matchesSummaryGames(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'jogos',
+      one: 'jogo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String matchesSummaryGoals(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'gols',
+      one: 'gol',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get matchesSummaryAverage => 'gols por jogo';
+
+  @override
+  String matchesDayCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count jogos',
+      one: '1 jogo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get matchesNoDate => 'Sem data';
+
+  @override
+  String get matchesFilterAll => 'Todos';
+
+  @override
+  String get matchesEmptyForTeam => 'Nenhuma partida deste time';
 
   @override
   String get matchesVersus => 'X';
-
-  @override
-  String matchesSchedule(String date, String time, String venue) {
-    return '$date às $time horas\n$venue';
-  }
 
   @override
   String get matchesEditScore => 'Editar Placar';
@@ -461,23 +509,20 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get championshipsGroupsEmpty => 'Vazio';
+  String get championshipsGroupsEmpty =>
+      'Nenhum grupo cadastrado nesta temporada.';
 
   @override
   String get championshipsGroupsLoadError =>
       'Não foi possível carregar os grupos.';
 
   @override
-  String get championshipsStandingsEmpty => 'Vazio';
+  String get championshipsStandingsEmpty =>
+      'Classificação ainda não disponível.';
 
   @override
   String get championshipsStandingsLoadError =>
       'Não foi possível carregar a classificação.';
-
-  @override
-  String championshipsStandingsPosition(int position) {
-    return '#$position';
-  }
 
   @override
   String get championshipsStandingsWins => 'V';
@@ -492,45 +537,98 @@ class AppLocalizationsPt extends AppLocalizations {
   String get championshipsStandingsPoints => 'P';
 
   @override
-  String get championshipsStandingsGoalsFor => 'GF';
-
-  @override
-  String get championshipsStandingsGoalsAgainst => 'GS';
-
-  @override
   String get championshipsStandingsGoalDifference => 'SG';
 
   @override
   String get votingTitle => 'Melhor da Partida';
 
   @override
-  String get votingNotice =>
-      'Atenção: O VOTO É ÚNICO! Você pode alterar sua opção de voto quantas vezes quiser, mas apenas o último voto é contabilizado!';
-
-  @override
-  String get votingVoteButton => 'VOTAR';
-
-  @override
   String get votingBlankVote => 'Voto em branco! Tente novamente.';
 
   @override
-  String votingVoteRegistered(String player) {
-    return 'Voto registrado! Você votou em $player. Muito obrigado pelo seu voto.';
+  String get votingHint =>
+      'Você pode trocar o voto quando quiser; só o último conta.';
+
+  @override
+  String get votingSearchHint => 'Buscar jogador';
+
+  @override
+  String get votingChoosePlayer => 'Escolha um jogador';
+
+  @override
+  String votingVoteFor(String name) {
+    return 'Votar em $name';
   }
+
+  @override
+  String votingChangeVoteTo(String name) {
+    return 'Trocar voto para $name';
+  }
+
+  @override
+  String votingYouVotedFor(String name) {
+    return 'Você votou em $name';
+  }
+
+  @override
+  String get votingYourVote => 'Seu voto';
+
+  @override
+  String get votingGuestTitle =>
+      'Entre na sua conta para votar no craque da partida';
+
+  @override
+  String get votingGuestAction => 'Entrar';
+
+  @override
+  String get votingSuccessTitle => 'Voto registrado!';
+
+  @override
+  String get votingEmptySquad => 'Elenco não cadastrado';
+
+  @override
+  String get votingNoSearchResults => 'Nenhum jogador encontrado';
+
+  @override
+  String get commonClose => 'Fechar';
 
   @override
   String get votingLoginRequired => 'Faça login para votar.';
 
   @override
-  String get votingElectedLabel => 'Eleito o melhor jogador da partida: ';
+  String get votingElectedTitle => 'Craque da partida';
 
   @override
-  String votingVotesCount(int count) {
-    return 'Número de votos: $count';
+  String votingMatchSubtitle(String home, String away) {
+    return '$home x $away';
   }
 
   @override
-  String get votingNoVotes => 'Nenhum voto registrado para esta partida.';
+  String votingVotes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count votos',
+      one: '1 voto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String votingShareOfVotes(int percent) {
+    return '$percent% dos votos';
+  }
+
+  @override
+  String get votingRankingTitle => 'Votação';
+
+  @override
+  String get votingNoVotesYet => 'Ninguém votou nesta partida ainda';
+
+  @override
+  String votingShareText(String player, String match, String votes) {
+    return '$player foi eleito o craque de $match com $votes! ⚽ via Arena Football';
+  }
 
   @override
   String get votingLoadError => 'Não foi possível apurar a votação.';
@@ -633,4 +731,205 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get chooseTeamEmptyTeams => 'Nenhum time cadastrado nesta região.';
+
+  @override
+  String get drawerNavigation => 'Navegação';
+
+  @override
+  String get drawerAdmin => 'Administração';
+
+  @override
+  String get drawerLogout => 'Sair da conta';
+
+  @override
+  String get drawerSignIn => 'Entrar ou criar conta';
+
+  @override
+  String get drawerGuestSubtitle =>
+      'Entre para salvar seu time e votar no melhor da partida.';
+
+  @override
+  String homeGreeting(String name) {
+    return 'Olá, $name 👋';
+  }
+
+  @override
+  String get homeGreetingGuest => 'Bem-vindo ao Arena 👋';
+
+  @override
+  String homeSubtitle(String region) {
+    return 'Futebol amador de $region';
+  }
+
+  @override
+  String get homeHighlights => 'Destaques';
+
+  @override
+  String get homeLatestNews => 'Últimas notícias';
+
+  @override
+  String get homeTodayMatches => 'Jogos de hoje';
+
+  @override
+  String homeSeasonChip(String season) {
+    return 'Temporada $season';
+  }
+
+  @override
+  String get homePublishTitle => 'Publicar';
+
+  @override
+  String get homePublishNews => 'Notícia';
+
+  @override
+  String get homePublishGoal => 'Gol';
+
+  @override
+  String get homePublishAd => 'Anúncio';
+
+  @override
+  String get homePublishHighlight => 'Destaque';
+
+  @override
+  String get homePublishMatch => 'Partida';
+
+  @override
+  String get homePublishTeam => 'Time';
+
+  @override
+  String get homePublishPlayer => 'Jogador';
+
+  @override
+  String get homeOpenMenu => 'Abrir menu';
+
+  @override
+  String get matchesVoteAction => 'Votar no melhor';
+
+  @override
+  String get matchesSeeElected => 'Ver eleito';
+
+  @override
+  String get matchesOpenVoting => 'Abrir votação';
+
+  @override
+  String get matchesCloseVoting => 'Fechar votação';
+
+  @override
+  String get championshipsSeeDetails => 'Ver detalhes';
+
+  @override
+  String get newsAdLabel => 'Publicidade';
+
+  @override
+  String get newsGoalLabel => 'GOL';
+
+  @override
+  String get commonMoreActions => 'Mais ações';
+
+  @override
+  String get timeJustNow => 'agora';
+
+  @override
+  String timeMinutesAgo(int minutes) {
+    return 'há $minutes min';
+  }
+
+  @override
+  String timeHoursAgo(int hours) {
+    return 'há $hours h';
+  }
+
+  @override
+  String get timeYesterday => 'ontem';
+
+  @override
+  String get newsShare => 'Compartilhar';
+
+  @override
+  String get newsShareFooter => 'via Arena Football';
+
+  @override
+  String get newsReadMore => 'Saiba mais';
+
+  @override
+  String get galleryClose => 'Fechar';
+
+  @override
+  String galleryCounter(int current, int total) {
+    return '$current/$total';
+  }
+
+  @override
+  String get playersSummaryPlayers => 'Jogadores';
+
+  @override
+  String get playersSummaryGoals => 'Gols';
+
+  @override
+  String get playersSummaryAssists => 'Assistências';
+
+  @override
+  String get playersSortGoals => 'Gols';
+
+  @override
+  String get playersSortAssists => 'Assistências';
+
+  @override
+  String get playersSortName => 'A–Z';
+
+  @override
+  String get playersSearchHint => 'Buscar jogador';
+
+  @override
+  String get playersNoResults => 'Nenhum jogador encontrado.';
+
+  @override
+  String get playersTopScorer => 'Artilheiro do time';
+
+  @override
+  String get playersChangePhoto => 'Trocar foto';
+
+  @override
+  String get playersEditName => 'Editar nome';
+
+  @override
+  String get playersSaveName => 'Salvar nome';
+
+  @override
+  String get commonClear => 'Limpar';
+
+  @override
+  String get groupsTitle => 'Grupos';
+
+  @override
+  String groupsSubtitle(String region, String season) {
+    return '$region · Temporada $season';
+  }
+
+  @override
+  String get groupsSeeStandings => 'Ver classificação';
+
+  @override
+  String get standingsColPosition => '#';
+
+  @override
+  String get standingsColTeam => 'Time';
+
+  @override
+  String get standingsColGames => 'J';
+
+  @override
+  String get standingsQualifiedLegend => 'Classificados para a próxima fase';
+
+  @override
+  String get standingsGoalsFor => 'Gols feitos';
+
+  @override
+  String get standingsGoalsAgainst => 'Gols sofridos';
+
+  @override
+  String get standingsPerformance => 'Aproveitamento';
+
+  @override
+  String get standingsYourTeam => 'Seu time';
 }

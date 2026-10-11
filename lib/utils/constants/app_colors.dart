@@ -30,6 +30,12 @@ class AppColors {
   /// (`Colors.blueGrey[200]`).
   static const Color blueGreyLight = Color(0xFFB0BEC5);
 
+  /// Fundo claro das áreas de conteúdo (folha da home, listas).
+  static const Color background = Color(0xFFF3F6F3);
+
+  /// Verde a 12%: indicador da barra inferior, cápsulas de ícone, item ativo.
+  static const Color primarySoft = Color(0x1F4CAF50);
+
   /// Superfície dos cards e sheets.
   static const Color surface = Colors.white;
 
@@ -47,4 +53,6 @@ class AppColors {
   static const Color danger = Color(0xFFD32F2F);
   static const Color warning = Color(0xFFFFA000);
   static const Color gold = Color(0xFFFFC107);
+  static const Color silver = Color(0xFFC4CCD4);
+  static const Color bronze = Color(0xFFCD8B4E);
 }

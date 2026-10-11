@@ -13,27 +13,35 @@ import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dar
 import 'package:arena_soccer/injection_container.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
+import 'package:arena_soccer/utils/components/arena_empty_state.dart';
+import 'package:arena_soccer/utils/components/card_menu_button.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
+import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// Aba de notícias da home: feed da região selecionada.
+/// Aba Início da home: feed de notícias da região selecionada.
+/// [header] entra no topo da lista e rola junto (ex.: destaques).
 /// A home recria a aba (key) quando a região muda.
 class NewsTab extends StatelessWidget {
-  const NewsTab({super.key});
+  final Widget? header;
+
+  const NewsTab({super.key, this.header});
 
   @override
   Widget build(BuildContext context) {
     final region = BlocProvider.of<RegionCubit>(context).state.selectedRegion;
     return BlocProvider<NewsFeedCubit>(
       create: (_) => NewsFeedCubit(sl(), sl())..watch(region: region),
-      child: const _NewsFeed(),
+      child: _NewsFeed(header: header),
     );
   }
 }
 
 class _NewsFeed extends StatelessWidget {
-  const _NewsFeed();
+  final Widget? header;
+
+  const _NewsFeed({this.header});
 
   @override
   Widget build(BuildContext context) {
@@ -49,37 +57,33 @@ class _NewsFeed extends StatelessWidget {
         }
       },
       builder: (context, state) {
+        final Widget? placeholder;
         if (state is LoadingNewsFeedState && state.news.isEmpty) {
-          return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+          placeholder = const Padding(
+            padding: EdgeInsets.only(top: AppSizes.s48),
+            child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+          );
+        } else if (state is ErrorNewsFeedState && state.news.isEmpty) {
+          placeholder = ArenaEmptyState.error(message: l10n.newsLoadError);
+        } else if (state.news.isEmpty) {
+          placeholder = ArenaEmptyState(message: l10n.newsEmpty, icon: Icons.article_outlined);
+        } else {
+          placeholder = null;
         }
-        if (state is ErrorNewsFeedState && state.news.isEmpty) {
-          return _Message(text: l10n.newsLoadError);
-        }
-        if (state.news.isEmpty) return _Message(text: l10n.newsEmpty);
 
-        return ListView.builder(
+        return ListView(
           physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-          itemCount: state.news.length,
-          itemBuilder: (context, index) => _NewsItem(news: state.news[index], isAdmin: isAdmin),
+          // Espaço no fim para o FAB do admin não cobrir o último card.
+          padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s20, AppSizes.s16, AppSizes.s100),
+          children: [
+            if (header != null) header!,
+            if (placeholder != null)
+              placeholder
+            else
+              for (final news in state.news) _NewsItem(news: news, isAdmin: isAdmin),
+          ],
         );
       },
-    );
-  }
-}
-
-class _Message extends StatelessWidget {
-  final String text;
-
-  const _Message({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        text,
-        textAlign: TextAlign.center,
-        style: const TextStyle(color: AppColors.white, fontSize: AppSizes.s18),
-      ),
     );
   }
 }
@@ -95,91 +99,37 @@ class _NewsItem extends StatelessWidget {
     if (uri != null) await launchUrl(uri);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final Widget card;
-    final List<Widget> actions;
-
-    if (news.isGoal) {
-      card = GoalCard(news: news);
-      actions = [_DeleteAction(news: news)];
-    } else if (news.isAd) {
-      card = InkWell(onTap: news.link.isNotEmpty ? _openLink : null, child: AdCard(news: news));
-      actions = [_DeleteAction(news: news)];
-    } else {
-      card = GestureDetector(
-        onTap: () => Navigator.pushNamed(context, AppRoutes.newsDetailsPage, arguments: {'news': news}),
-        child: NewsCard(news: news),
-      );
-      actions = [_EditAction(news: news), _DeleteAction(news: news)];
-    }
-
-    return Padding(
-      padding: const EdgeInsets.all(AppSizes.s8),
-      child: Stack(
-        children: [
-          card,
-          if (isAdmin)
-            Positioned(
-              top: AppSizes.s8,
-              right: AppSizes.s8,
-              child: Column(children: actions),
-            ),
-        ],
-      ),
+  Widget? _adminMenu(BuildContext context, {required bool onImage, required bool canEdit}) {
+    if (!isAdmin) return null;
+    final l10n = AppLocalizations.of(context);
+    return CardMenuButton(
+      onImage: onImage,
+      actions: [
+        if (canEdit)
+          CardMenuAction(
+            icon: Icons.edit_outlined,
+            label: l10n.commonEdit,
+            onSelected: () => Navigator.pushNamed(context, AppRoutes.registerNewsPage, arguments: {'news': news}),
+          ),
+        CardMenuAction(
+          icon: Icons.delete_outline_rounded,
+          label: l10n.commonDelete,
+          destructive: true,
+          onSelected: () => _confirmDelete(context),
+        ),
+      ],
     );
   }
-}
 
-class _ActionButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _ActionButton({required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSizes.s8),
-      child: Material(
-        color: AppColors.white,
-        shape: const CircleBorder(side: BorderSide(color: AppColors.black)),
-        child: IconButton(icon: Icon(icon, color: AppColors.black), onPressed: onTap),
-      ),
-    );
-  }
-}
-
-class _EditAction extends StatelessWidget {
-  final NewsDTO news;
-
-  const _EditAction({required this.news});
-
-  @override
-  Widget build(BuildContext context) {
-    return _ActionButton(
-      icon: Icons.edit,
-      onTap: () => Navigator.pushNamed(context, AppRoutes.registerNewsPage, arguments: {'news': news}),
-    );
-  }
-}
-
-class _DeleteAction extends StatelessWidget {
-  final NewsDTO news;
-
-  const _DeleteAction({required this.news});
-
-  Future<void> _confirm(BuildContext context) async {
+  Future<void> _confirmDelete(BuildContext context) async {
     final cubit = BlocProvider.of<NewsFeedCubit>(context);
     final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        content: Text(
-          l10n.newsDeleteConfirm,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: AppSizes.s20, fontWeight: FontWeight.bold),
-        ),
+        backgroundColor: AppColors.surface,
+        surfaceTintColor: AppColors.transparent,
+        content: Text(l10n.newsDeleteConfirm, textAlign: TextAlign.center, style: AppTypography.title()),
         actions: [
           Row(
             children: [
@@ -206,6 +156,20 @@ class _DeleteAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _ActionButton(icon: Icons.delete, onTap: () => _confirm(context));
+    if (news.isGoal) {
+      return GoalCard(news: news, trailing: _adminMenu(context, onImage: false, canEdit: false));
+    }
+    if (news.isAd) {
+      return AdCard(
+        news: news,
+        onTap: news.link.isNotEmpty ? _openLink : null,
+        trailing: _adminMenu(context, onImage: true, canEdit: false),
+      );
+    }
+    return NewsCard(
+      news: news,
+      onTap: () => Navigator.pushNamed(context, AppRoutes.newsDetailsPage, arguments: {'news': news}),
+      trailing: _adminMenu(context, onImage: true, canEdit: true),
+    );
   }
 }

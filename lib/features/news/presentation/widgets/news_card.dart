@@ -1,88 +1,96 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/core/utils/relative_time.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
+import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/utils/components/arena_card.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
+import 'package:arena_soccer/utils/constants/app_typography.dart';
 
 /// Imagem usada quando a notícia não tem foto.
 const String newsPlaceholderImageUrl =
     'https://firebasestorage.googleapis.com/v0/b/arenasoccerflutter.appspot.com/o/noticias%2Fic_arena.png?alt=media&token=6f3cd481-7199-489a-91b5-a8527e919710';
 
-/// Card de notícia comum: imagem de fundo com título e resumo por cima.
+/// Tag do Hero da imagem de uma notícia (card do feed → topo do detalhe).
+String newsImageHeroTag(String newsId) => 'news-image-$newsId';
+
+/// Card de notícia: imagem 16:9, título, resumo e há quanto tempo foi publicada.
+/// [trailing] fica sobre a imagem, no canto (ex.: menu do admin).
 class NewsCard extends StatelessWidget {
   final NewsDTO news;
+  final VoidCallback? onTap;
+  final Widget? trailing;
 
-  const NewsCard({super.key, required this.news});
-
-  static const int _titleMaxLength = 40;
-  static const int _titleCutAt = 30;
-  static const int _descriptionMaxLength = 120;
-  static const int _descriptionCutAt = 110;
-
-  static String _ellipsis(String text, int maxLength, int cutAt) {
-    if (text.length <= maxLength) return text;
-    return '${text.substring(0, cutAt)}...';
-  }
+  const NewsCard({super.key, required this.news, this.onTap, this.trailing});
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final height = size.height * 0.55;
-    const radius = BorderRadius.all(Radius.circular(AppSizes.s24));
+    final l10n = AppLocalizations.of(context);
 
-    return Stack(
-      children: [
-        Container(
-          height: height,
-          width: size.width,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: CachedNetworkImageProvider(news.imageUrl.isNotEmpty ? news.imageUrl : newsPlaceholderImageUrl),
-              fit: BoxFit.cover,
-            ),
-            borderRadius: radius,
-          ),
-        ),
-        Container(
-          height: height,
-          width: size.width,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [AppColors.black, AppColors.black.withAlpha(0)],
-              begin: Alignment.bottomCenter,
-              end: Alignment.center,
-            ),
-            borderRadius: radius,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return ArenaCard(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Stack(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(AppSizes.s10),
-                child: AutoSizeText(
-                  _ellipsis(news.title, _titleMaxLength, _titleCutAt),
-                  style: const TextStyle(
-                    fontSize: AppSizes.s24,
-                    color: AppColors.white,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'PTSans',
+              AspectRatio(
+                aspectRatio: 16 / 9,
+                child: Hero(
+                  tag: newsImageHeroTag(news.id),
+                  child: CachedNetworkImage(
+                    imageUrl: news.imageUrl.isNotEmpty ? news.imageUrl : newsPlaceholderImageUrl,
+                    fit: BoxFit.cover,
+                    placeholder: (_, __) => const ColoredBox(color: AppColors.greyLight),
+                    errorWidget: (_, __, ___) => const ColoredBox(
+                      color: AppColors.greyLight,
+                      child: Icon(Icons.image_not_supported_outlined, color: AppColors.textSecondary),
+                    ),
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(AppSizes.s10),
-                child: AutoSizeText(
-                  _ellipsis(news.description, _descriptionMaxLength, _descriptionCutAt),
-                  textAlign: TextAlign.justify,
-                  style: const TextStyle(fontSize: AppSizes.s18, color: AppColors.white, fontFamily: 'PTSans'),
-                ),
-              ),
+              if (trailing != null) Positioned(top: AppSizes.s8, right: AppSizes.s8, child: trailing!),
             ],
           ),
-        ),
-      ],
+          Padding(
+            padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s14, AppSizes.s16, AppSizes.s16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  news.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.title().copyWith(fontSize: AppSizes.s18 - 1),
+                ),
+                if (news.description.isNotEmpty) ...[
+                  const SizedBox(height: AppSizes.s6),
+                  Text(
+                    news.description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.subtitle(),
+                  ),
+                ],
+                if (news.date != null) ...[
+                  const SizedBox(height: AppSizes.s10),
+                  Row(
+                    children: [
+                      const Icon(Icons.schedule_rounded, size: AppSizes.s14, color: AppColors.textSecondary),
+                      const SizedBox(width: AppSizes.s4),
+                      Text(
+                        RelativeTime.format(news.date!, l10n),
+                        style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

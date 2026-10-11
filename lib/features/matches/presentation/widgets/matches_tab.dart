@@ -7,11 +7,13 @@ import 'package:arena_soccer/features/championships/presentation/bloc/championsh
 import 'package:arena_soccer/features/matches/domain/matches_filter.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/matches_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/matches_list.dart';
-import 'package:arena_soccer/features/matches/presentation/widgets/matches_shortcut_button.dart';
+import 'package:arena_soccer/utils/components/arena_chip_button.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
 import 'package:arena_soccer/injection_container.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/utils/components/arena_empty_state.dart';
+import 'package:arena_soccer/utils/components/section_header.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 
@@ -45,9 +47,11 @@ class _ChampionshipMatches extends StatelessWidget {
           return const Center(child: CircularProgressIndicator(color: AppColors.primary));
         }
         if (state is ErrorChampionshipsState && state.championships.isEmpty) {
-          return _Message(text: l10n.championshipsLoadError);
+          return ArenaEmptyState.error(message: l10n.championshipsLoadError);
         }
-        if (state.championships.isEmpty) return _Message(text: l10n.matchesNoChampionship);
+        if (state.championships.isEmpty) {
+          return ArenaEmptyState(message: l10n.matchesNoChampionship, icon: Icons.emoji_events_outlined);
+        }
 
         ChampionshipDTO? championship;
         for (final item in state.championships) {
@@ -56,22 +60,34 @@ class _ChampionshipMatches extends StatelessWidget {
             break;
           }
         }
-        if (championship == null) return const SizedBox.shrink();
+        if (championship == null) {
+          return ArenaEmptyState(message: l10n.matchesNoChampionship, icon: Icons.emoji_events_outlined);
+        }
 
         final championshipId = championship.championshipId;
         return BlocProvider<MatchesCubit>(
           key: ValueKey(championshipId),
-          create: (_) => MatchesCubit(sl(), sl(), sl(), sl())
-            ..watch(championshipId: championshipId, filter: MatchesFilter.today, season: region.selectedSeason),
-          child: Column(
-            children: [
-              _Shortcuts(
-                championshipId: championshipId,
-                region: region.selectedRegion,
-                season: region.selectedSeason,
-              ),
-              Expanded(child: MatchesList(season: region.selectedSeason)),
-            ],
+          create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl())
+            ..watch(
+              championshipId: championshipId,
+              filter: MatchesFilter.today,
+              region: region.selectedRegion,
+              season: region.selectedSeason,
+            ),
+          child: MatchesList(
+            season: region.selectedSeason,
+            header: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _Shortcuts(
+                  championshipId: championshipId,
+                  region: region.selectedRegion,
+                  season: region.selectedSeason,
+                ),
+                const SizedBox(height: AppSizes.s16),
+                SectionHeader(title: l10n.homeTodayMatches),
+              ],
+            ),
           ),
         );
       },
@@ -92,10 +108,7 @@ class _Shortcuts extends StatelessWidget {
         arguments: {'type': type, 'region': region, 'season': season},
       );
 
-  Widget _padded(Widget child) => Padding(
-        padding: const EdgeInsets.only(top: AppSizes.s6, bottom: AppSizes.s6, right: AppSizes.s6),
-        child: child,
-      );
+  Widget _padded(Widget child) => Padding(padding: const EdgeInsets.only(right: AppSizes.s8), child: child);
 
   @override
   Widget build(BuildContext context) {
@@ -106,48 +119,35 @@ class _Shortcuts extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _padded(MatchesShortcutButton(
+          _padded(ArenaChipButton(
             title: l10n.matchesAllGames,
+            icon: Icons.calendar_month_rounded,
             onPressed: () => Navigator.pushNamed(
               context,
               AppRoutes.matchesPage,
               arguments: {'championshipId': championshipId, 'region': region, 'season': season},
             ),
           )),
-          _padded(MatchesShortcutButton(
+          _padded(ArenaChipButton(
             title: l10n.matchesGroups,
+            icon: Icons.groups_rounded,
             onPressed: () => Navigator.pushNamed(
               context,
               AppRoutes.groupsPage,
               arguments: {'region': region, 'season': season},
             ),
           )),
-          _padded(MatchesShortcutButton(
+          _padded(ArenaChipButton(
             title: l10n.matchesTopScorers,
+            icon: Icons.sports_soccer_rounded,
             onPressed: () => _openStats(context, StatsRankingType.goals),
           )),
-          _padded(MatchesShortcutButton(
+          _padded(ArenaChipButton(
             title: l10n.matchesAssists,
+            icon: Icons.assistant_rounded,
             onPressed: () => _openStats(context, StatsRankingType.assists),
           )),
         ],
-      ),
-    );
-  }
-}
-
-class _Message extends StatelessWidget {
-  final String text;
-
-  const _Message({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        text,
-        textAlign: TextAlign.center,
-        style: const TextStyle(color: AppColors.white, fontSize: AppSizes.s20),
       ),
     );
   }

@@ -2,27 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
+import 'package:arena_soccer/features/championships/presentation/bloc/groups_state.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/matches_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/matches_state.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/edit_score_dialog.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_card.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/matches_summary_card.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/team_filter_chips.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
+import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
+import 'package:arena_soccer/utils/constants/app_typography.dart';
 
 /// Lista de partidas do [MatchesCubit] do contexto (usada pela aba de
-/// tabelas, com as partidas do dia, e pela tela "todos os jogos").
+/// tabelas, com as partidas do dia, e pela tela "todos os jogos"). Com
+/// [groupByDate] ("todos os jogos"), mostra o resumo, o filtro por time e as
+/// partidas agrupadas por data.
 class MatchesList extends StatelessWidget {
   /// Temporada da lista: as telas de votação leem os jogadores dela.
   final String season;
 
-  /// Alterna a cor dos cards (tela "todos os jogos").
-  final bool striped;
+  /// Conteúdo antes dos cards (ex.: atalhos e título da seção na aba de tabelas).
+  final Widget? header;
 
-  const MatchesList({super.key, required this.season, this.striped = false});
+  final bool groupByDate;
+
+  const MatchesList({super.key, required this.season, this.header, this.groupByDate = false});
 
   void _openVoting(BuildContext context, MatchDTO match) {
     Navigator.pushNamed(
@@ -76,7 +85,11 @@ class MatchesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final isAdmin = context.watch<SessionCubit>().state.isAdmin;
+    final session = context.watch<SessionCubit>().state;
+    final isAdmin = session.isAdmin;
+    final favorite = session.user?.favoriteTeam;
+    final favoriteKey = (favorite == null || favorite.trim().isEmpty) ? null : normalizeTeamName(favorite);
+    bool isFavoriteTeam(String team) => favoriteKey != null && normalizeTeamName(team) == favoriteKey;
 
     return BlocConsumer<MatchesCubit, MatchesState>(
       listener: (context, state) {
@@ -86,46 +99,93 @@ class MatchesList extends StatelessWidget {
         }
       },
       builder: (context, state) {
+        final Widget? placeholder;
         if (state is LoadingMatchesState && state.matches.isEmpty) {
-          return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+          placeholder = const Padding(
+            padding: EdgeInsets.only(top: AppSizes.s48),
+            child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+          );
+        } else if (state is ErrorMatchesState && state.matches.isEmpty) {
+          placeholder = ArenaEmptyState.error(message: l10n.matchesLoadError);
+        } else if (state.matches.isEmpty) {
+          placeholder = ArenaEmptyState(message: l10n.matchesEmpty, icon: Icons.sports_soccer_outlined);
+        } else if (state.visibleMatches.isEmpty) {
+          placeholder = ArenaEmptyState(message: l10n.matchesEmptyForTeam, icon: Icons.filter_alt_off_outlined);
+        } else {
+          placeholder = null;
         }
-        if (state is ErrorMatchesState && state.matches.isEmpty) return _Message(text: l10n.matchesLoadError);
-        if (state.matches.isEmpty) return _Message(text: l10n.matchesEmpty);
 
-        return ListView.builder(
-          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-          padding: const EdgeInsets.only(top: AppSizes.s8),
-          itemCount: state.matches.length,
-          itemBuilder: (context, index) {
-            final match = state.matches[index];
-            return MatchCard(
+        Widget card(MatchDTO match) => MatchCard(
               match: match,
               isAdmin: isAdmin,
-              striped: striped && index.isOdd,
+              homeCrest: state.crestOf(match.homeTeam),
+              awayCrest: state.crestOf(match.awayTeam),
+              isFavorite: isFavoriteTeam(match.homeTeam) || isFavoriteTeam(match.awayTeam),
+              isFavoriteTeam: isFavoriteTeam,
               onVotingTap: () => _openVoting(context, match),
               onToggleVoting: () => BlocProvider.of<MatchesCubit>(context).toggleVoting(match),
               onEditScore: () => _editScore(context, match),
               onDelete: () => _confirmDelete(context, match),
             );
-          },
+
+        final teams = state.teams;
+        return ListView(
+          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+          padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s20, AppSizes.s16, AppSizes.s100),
+          children: [
+            if (header != null) header!,
+            if (groupByDate && state.matches.isNotEmpty) ...[
+              MatchesSummaryCard(summary: state.summary),
+              const SizedBox(height: AppSizes.s14),
+              TeamFilterChips(
+                teams: teams,
+                selected: state.teamFilter,
+                favoriteTeam: teams.where(isFavoriteTeam).firstOrNull,
+                crestOf: state.crestOf,
+                onSelected: BlocProvider.of<MatchesCubit>(context).setTeamFilter,
+              ),
+              const SizedBox(height: AppSizes.s6),
+            ],
+            if (placeholder != null)
+              placeholder
+            else if (groupByDate)
+              for (final day in state.days) ...[
+                _DayHeader(
+                  title: day.date.isEmpty ? l10n.matchesNoDate : day.date,
+                  count: l10n.matchesDayCount(day.matches.length),
+                ),
+                for (final match in day.matches) card(match),
+              ]
+            else
+              for (final match in state.visibleMatches) card(match),
+          ],
         );
       },
     );
   }
 }
 
-class _Message extends StatelessWidget {
-  final String text;
+/// "08/06  ·  2 jogos" acima das partidas do dia.
+class _DayHeader extends StatelessWidget {
+  final String title;
+  final String count;
 
-  const _Message({required this.text});
+  const _DayHeader({required this.title, required this.count});
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        text,
-        textAlign: TextAlign.center,
-        style: const TextStyle(color: AppColors.white, fontSize: AppSizes.s20),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(AppSizes.s4, AppSizes.s14, AppSizes.s4, AppSizes.s10),
+      child: Row(
+        children: [
+          const Icon(Icons.event_rounded, size: AppSizes.s18, color: AppColors.primaryDark),
+          const SizedBox(width: AppSizes.s8),
+          Text(title, style: AppTypography.title().copyWith(fontSize: AppSizes.s16)),
+          const SizedBox(width: AppSizes.s8),
+          Text(count, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+          const SizedBox(width: AppSizes.s12),
+          const Expanded(child: Divider(height: 1, thickness: 1, color: AppColors.greyLight)),
+        ],
       ),
     );
   }

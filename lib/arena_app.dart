@@ -155,7 +155,7 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.matchesPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<MatchesCubit>(
-            create: (_) => MatchesCubit(sl(), sl(), sl(), sl()),
+            create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl()),
             child: MatchesPage(
               championshipId: args?['championshipId'] as int,
               region: args?['region'] as String?,
@@ -176,14 +176,14 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.groupsPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<GroupsCubit>(
-            create: (_) => GroupsCubit(sl()),
+            create: (_) => GroupsCubit(sl(), sl()),
             child: GroupsPage(region: args?['region'] as String?, season: args?['season'] as String?),
           );
         },
         AppRoutes.standingsPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<StandingsCubit>(
-            create: (_) => StandingsCubit(sl()),
+            create: (_) => StandingsCubit(sl(), sl()),
             child: StandingsPage(
               region: args?['region'] as String,
               season: args?['season'] as String,
@@ -196,7 +196,7 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.voteBestPlayerPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<VoteBestPlayerCubit>(
-            create: (_) => VoteBestPlayerCubit(sl(), sl()),
+            create: (_) => VoteBestPlayerCubit(sl(), sl(), sl(), sl()),
             child: VoteBestPlayerPage(match: args?['match'] as MatchDTO, season: args?['season'] as String),
           );
         },

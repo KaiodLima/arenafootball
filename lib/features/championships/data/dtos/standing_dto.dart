@@ -8,6 +8,9 @@ class StandingDTO extends Equatable {
   final String teamName;
   final String region;
 
+  /// Escudo do time (`urlImagem`, copiado do time ao cadastrá-lo).
+  final String imageUrl;
+
   /// `fk_grupo`: descrição do grupo do time.
   final String group;
   final int wins;
@@ -24,6 +27,7 @@ class StandingDTO extends Equatable {
     required this.id,
     required this.teamName,
     this.region = '',
+    this.imageUrl = '',
     this.group = '',
     this.wins = 0,
     this.losses = 0,
@@ -37,6 +41,12 @@ class StandingDTO extends Equatable {
   /// Saldo exibido: calculado de gols feitos - sofridos, como no app antigo.
   int get goalDifference => goalsFor - goalsAgainst;
 
+  /// Jogos disputados no grupo.
+  int get games => wins + draws + losses;
+
+  /// Aproveitamento (0–1): pontos ganhos sobre os possíveis (3 por jogo).
+  double get performance => games == 0 ? 0 : points / (games * 3);
+
   static int _int(Object? value) => (value as num?)?.toInt() ?? 0;
 
   factory StandingDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -45,6 +55,7 @@ class StandingDTO extends Equatable {
       id: doc.id,
       teamName: data['nome']?.toString() ?? '',
       region: data['fk_competicao']?.toString() ?? '',
+      imageUrl: data['urlImagem']?.toString() ?? '',
       group: data['fk_grupo']?.toString() ?? '',
       wins: _int(data['vitorias']),
       losses: _int(data['derrotas']),
@@ -59,6 +70,7 @@ class StandingDTO extends Equatable {
   Map<String, dynamic> toMap() => {
         'nome': teamName,
         'fk_competicao': region,
+        'urlImagem': imageUrl,
         'fk_grupo': group,
         'vitorias': wins,
         'derrotas': losses,
@@ -73,6 +85,7 @@ class StandingDTO extends Equatable {
     String? id,
     String? teamName,
     String? region,
+    String? imageUrl,
     String? group,
     int? wins,
     int? losses,
@@ -86,6 +99,7 @@ class StandingDTO extends Equatable {
       id: id ?? this.id,
       teamName: teamName ?? this.teamName,
       region: region ?? this.region,
+      imageUrl: imageUrl ?? this.imageUrl,
       group: group ?? this.group,
       wins: wins ?? this.wins,
       losses: losses ?? this.losses,
@@ -102,6 +116,7 @@ class StandingDTO extends Equatable {
         id,
         teamName,
         region,
+        imageUrl,
         group,
         wins,
         losses,
