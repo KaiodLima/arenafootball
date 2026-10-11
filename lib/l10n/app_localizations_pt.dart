@@ -153,9 +153,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get newsDeleteConfirm => 'DESEJA REALMENTE EXCLUIR ESSA NOTÍCIA ?';
 
   @override
-  String get newsMoreInfo => 'Mais Informações';
-
-  @override
   String get newsAdPlaceholder => 'PUBLICIDADE';
 
   @override
@@ -735,4 +732,21 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get timeYesterday => 'ontem';
+
+  @override
+  String get newsShare => 'Compartilhar';
+
+  @override
+  String get newsShareFooter => 'via Arena Football';
+
+  @override
+  String get newsReadMore => 'Saiba mais';
+
+  @override
+  String get galleryClose => 'Fechar';
+
+  @override
+  String galleryCounter(int current, int total) {
+    return '$current/$total';
+  }
 }

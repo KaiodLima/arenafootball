@@ -46,7 +46,6 @@
   "newsEmpty": "No news yet",
   "newsLoadError": "Could not load the news.",
   "newsDeleteConfirm": "DO YOU REALLY WANT TO DELETE THIS NEWS?",
-  "newsMoreInfo": "More information",
   "newsAdPlaceholder": "ADVERTISEMENT",
   "newsCreateTitle": "ADD NEWS",
   "newsEditTitle": "EDIT NEWS",
@@ -226,5 +225,10 @@
   "timeJustNow": "just now",
   "timeMinutesAgo": "{minutes} min ago",
   "timeHoursAgo": "{hours} h ago",
-  "timeYesterday": "yesterday"
+  "timeYesterday": "yesterday",
+  "newsShare": "Share",
+  "newsShareFooter": "via Arena Football",
+  "newsReadMore": "Read more",
+  "galleryClose": "Close",
+  "galleryCounter": "{current}/{total}"
 }

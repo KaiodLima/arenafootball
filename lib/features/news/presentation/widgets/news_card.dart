@@ -12,6 +12,9 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 const String newsPlaceholderImageUrl =
     'https://firebasestorage.googleapis.com/v0/b/arenasoccerflutter.appspot.com/o/noticias%2Fic_arena.png?alt=media&token=6f3cd481-7199-489a-91b5-a8527e919710';
 
+/// Tag do Hero da imagem de uma notícia (card do feed → topo do detalhe).
+String newsImageHeroTag(String newsId) => 'news-image-$newsId';
+
 /// Card de notícia: imagem 16:9, título, resumo e há quanto tempo foi publicada.
 /// [trailing] fica sobre a imagem, no canto (ex.: menu do admin).
 class NewsCard extends StatelessWidget {
@@ -34,13 +37,16 @@ class NewsCard extends StatelessWidget {
             children: [
               AspectRatio(
                 aspectRatio: 16 / 9,
-                child: CachedNetworkImage(
-                  imageUrl: news.imageUrl.isNotEmpty ? news.imageUrl : newsPlaceholderImageUrl,
-                  fit: BoxFit.cover,
-                  placeholder: (_, __) => const ColoredBox(color: AppColors.greyLight),
-                  errorWidget: (_, __, ___) => const ColoredBox(
-                    color: AppColors.greyLight,
-                    child: Icon(Icons.image_not_supported_outlined, color: AppColors.textSecondary),
+                child: Hero(
+                  tag: newsImageHeroTag(news.id),
+                  child: CachedNetworkImage(
+                    imageUrl: news.imageUrl.isNotEmpty ? news.imageUrl : newsPlaceholderImageUrl,
+                    fit: BoxFit.cover,
+                    placeholder: (_, __) => const ColoredBox(color: AppColors.greyLight),
+                    errorWidget: (_, __, ___) => const ColoredBox(
+                      color: AppColors.greyLight,
+                      child: Icon(Icons.image_not_supported_outlined, color: AppColors.textSecondary),
+                    ),
                   ),
                 ),
               ),

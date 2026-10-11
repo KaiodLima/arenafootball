@@ -374,12 +374,6 @@ abstract class AppLocalizations {
   /// **'DESEJA REALMENTE EXCLUIR ESSA NOTÍCIA ?'**
   String get newsDeleteConfirm;
 
-  /// No description provided for @newsMoreInfo.
-  ///
-  /// In pt, this message translates to:
-  /// **'Mais Informações'**
-  String get newsMoreInfo;
-
   /// No description provided for @newsAdPlaceholder.
   ///
   /// In pt, this message translates to:
@@ -1460,6 +1454,36 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'ontem'**
   String get timeYesterday;
+
+  /// No description provided for @newsShare.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compartilhar'**
+  String get newsShare;
+
+  /// No description provided for @newsShareFooter.
+  ///
+  /// In pt, this message translates to:
+  /// **'via Arena Football'**
+  String get newsShareFooter;
+
+  /// No description provided for @newsReadMore.
+  ///
+  /// In pt, this message translates to:
+  /// **'Saiba mais'**
+  String get newsReadMore;
+
+  /// No description provided for @galleryClose.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fechar'**
+  String get galleryClose;
+
+  /// No description provided for @galleryCounter.
+  ///
+  /// In pt, this message translates to:
+  /// **'{current}/{total}'**
+  String galleryCounter(int current, int total);
 }
 
 class _AppLocalizationsDelegate

@@ -53,7 +53,6 @@
   "newsEmpty": "Nenhuma notícia registrada",
   "newsLoadError": "Não foi possível carregar as notícias.",
   "newsDeleteConfirm": "DESEJA REALMENTE EXCLUIR ESSA NOTÍCIA ?",
-  "newsMoreInfo": "Mais Informações",
   "newsAdPlaceholder": "PUBLICIDADE",
   "newsCreateTitle": "CADASTRAR NOTICIA",
   "newsEditTitle": "EDITAR NOTÍCIA",
@@ -343,5 +342,20 @@
       }
     }
   },
-  "timeYesterday": "ontem"
+  "timeYesterday": "ontem",
+  "newsShare": "Compartilhar",
+  "newsShareFooter": "via Arena Football",
+  "newsReadMore": "Saiba mais",
+  "galleryClose": "Fechar",
+  "galleryCounter": "{current}/{total}",
+  "@galleryCounter": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
 }

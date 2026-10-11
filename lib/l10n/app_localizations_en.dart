@@ -153,9 +153,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newsDeleteConfirm => 'DO YOU REALLY WANT TO DELETE THIS NEWS?';
 
   @override
-  String get newsMoreInfo => 'More information';
-
-  @override
   String get newsAdPlaceholder => 'ADVERTISEMENT';
 
   @override
@@ -730,4 +727,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get timeYesterday => 'yesterday';
+
+  @override
+  String get newsShare => 'Share';
+
+  @override
+  String get newsShareFooter => 'via Arena Football';
+
+  @override
+  String get newsReadMore => 'Read more';
+
+  @override
+  String get galleryClose => 'Close';
+
+  @override
+  String galleryCounter(int current, int total) {
+    return '$current/$total';
+  }
 }
