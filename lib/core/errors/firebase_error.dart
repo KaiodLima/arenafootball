@@ -27,6 +27,8 @@ String? _authMessage(String code) {
       return 'Já existe uma conta com esse e-mail.';
     case 'weak-password':
       return 'Senha muito fraca.';
+    case 'too-many-requests':
+      return 'Muitas tentativas. Aguarde alguns minutos e tente de novo.';
     case 'network-request-failed':
       return 'Sem conexão com a internet.';
     default:

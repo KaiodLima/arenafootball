@@ -14,6 +14,8 @@ abstract class IAuthRepository {
 
   Future<Either<Failure, void>> signOut();
 
+  Future<Either<Failure, void>> sendPasswordReset(String email);
+
   /// Usuário logado, ou `Right(null)` quando não há sessão.
   Future<Either<Failure, UserDTO?>> getCurrentUser();
 }

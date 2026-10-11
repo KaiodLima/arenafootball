@@ -26,6 +26,9 @@ class AuthRepositoryImpl implements IAuthRepository {
   Future<Either<Failure, void>> signOut() => _dataSource.signOut();
 
   @override
+  Future<Either<Failure, void>> sendPasswordReset(String email) => _dataSource.sendPasswordReset(email);
+
+  @override
   Future<Either<Failure, UserDTO?>> getCurrentUser() async {
     final userId = _dataSource.currentUserId;
     if (userId == null) return const Right(null);

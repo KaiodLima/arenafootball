@@ -39,22 +39,19 @@ class AppLocalizationsPt extends AppLocalizations {
   String get commonGenericError => 'Algo deu errado. Tente novamente.';
 
   @override
-  String get loginEmailLabel => 'Insira seu E-mail';
+  String get loginEmailLabel => 'E-mail';
 
   @override
   String get loginEmailHint => 'exemplo@exemplo.com';
 
   @override
-  String get loginPasswordLabel => 'Insira sua Senha';
+  String get loginPasswordLabel => 'Senha';
 
   @override
   String get loginButton => 'ENTRAR';
 
   @override
   String get loginCreateAccountButton => 'CRIAR CONTA';
-
-  @override
-  String get loginSkipButton => 'Pular';
 
   @override
   String get loginSuccess => 'Usuário Logado!';
@@ -67,7 +64,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Senha inválida! Utilize no mínimo 8 caracteres.';
 
   @override
-  String get registerTitle => 'Criar Conta';
+  String get registerTitle => 'Criar conta';
 
   @override
   String get registerNameLabel => 'Nome';
@@ -79,10 +76,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get registerPasswordLabel => 'Senha';
 
   @override
-  String get registerRegionLabel => 'Região:';
+  String get registerRegionLabel => 'Região';
 
   @override
-  String get registerTeamLabel => 'Time do coração:';
+  String get registerTeamLabel => 'Time do coração';
 
   @override
   String get registerButton => 'CADASTRAR';
@@ -558,4 +555,43 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get globalResultsTomorrowUnavailable =>
       'Os jogos de amanhã ainda não estão disponíveis.';
+
+  @override
+  String get loginWelcomeTitle => 'Bem-vindo de volta 👋';
+
+  @override
+  String get loginWelcomeSubtitle =>
+      'Entre para acompanhar seu time, os jogos e a tabela.';
+
+  @override
+  String get loginForgotPassword => 'Esqueci minha senha';
+
+  @override
+  String get loginOr => 'ou';
+
+  @override
+  String get loginContinueAsGuest => 'Continuar sem conta';
+
+  @override
+  String get loginShowPassword => 'Mostrar senha';
+
+  @override
+  String get loginHidePassword => 'Ocultar senha';
+
+  @override
+  String get forgotPasswordTitle => 'Recuperar senha';
+
+  @override
+  String get forgotPasswordDescription =>
+      'Informe o e-mail da sua conta e enviaremos um link para você criar uma nova senha.';
+
+  @override
+  String get forgotPasswordSend => 'ENVIAR LINK';
+
+  @override
+  String get forgotPasswordSent =>
+      'Enviamos um link de recuperação para o seu e-mail.';
+
+  @override
+  String get registerSubtitle => 'Leva menos de um minuto.';
 }

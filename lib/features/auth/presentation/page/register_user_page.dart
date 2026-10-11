@@ -4,14 +4,16 @@ import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/register_user_cubit.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/register_user_state.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
+import 'package:arena_soccer/features/auth/presentation/widgets/auth_dropdown_field.dart';
+import 'package:arena_soccer/features/auth/presentation/widgets/auth_scaffold.dart';
+import 'package:arena_soccer/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
-import 'package:arena_soccer/utils/components/arena_text_field.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
-import 'package:arena_soccer/utils/constants/app_images.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
+import 'package:arena_soccer/utils/constants/app_typography.dart';
 
 class RegisterUserPage extends StatefulWidget {
   const RegisterUserPage({super.key});
@@ -47,130 +49,103 @@ class _RegisterUserPageState extends State<RegisterUserPage> {
     }
   }
 
-  Icon _fieldIcon(IconData icon, RegisterFieldError? error) {
-    return Icon(icon, size: AppSizes.s24, color: error == null ? AppColors.primary : AppColors.danger);
+  void _onChanged(String field, ValueChanged<String> update, String value) {
+    setState(() => _touched.add(field));
+    update(value);
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    return Scaffold(
-      appBar: AppBar(title: Text(l10n.registerTitle)),
-      body: BlocConsumer<RegisterUserCubit, RegisterUserState>(
-        listener: (context, state) {
-          if (state is SuccessRegisterUserState) {
-            showSnackBar(context: context, message: l10n.registerSuccess);
-            BlocProvider.of<SessionCubit>(context).signedIn(state.user);
-            Navigator.pushNamedAndRemoveUntil(context, AppRoutes.home, (_) => false);
-          }
-          if (state is ErrorRegisterUserState) {
-            showSnackBar(context: context, message: state.errorMessage, isSuccess: false);
-          }
-        },
-        builder: (context, state) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSizes.screenPadding),
+    return BlocConsumer<RegisterUserCubit, RegisterUserState>(
+      listener: (context, state) {
+        if (state is SuccessRegisterUserState) {
+          showSnackBar(context: context, message: l10n.registerSuccess);
+          BlocProvider.of<SessionCubit>(context).signedIn(state.user);
+          Navigator.pushNamedAndRemoveUntil(context, AppRoutes.home, (_) => false);
+        }
+        if (state is ErrorRegisterUserState) {
+          showSnackBar(context: context, message: state.errorMessage, isSuccess: false);
+        }
+      },
+      builder: (context, state) {
+        return AuthScaffold(
+          compact: true,
+          title: l10n.registerTitle,
+          subtitle: l10n.registerSubtitle,
+          onBack: () => Navigator.pop(context),
+          child: AutofillGroup(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Image.asset(AppImages.logo, height: AppSizes.loginLogoHeight),
-                const SizedBox(height: AppSizes.s32),
-                ArenaTextField(
-                  labelText: l10n.registerNameLabel,
-                  onChaged: (value) {
-                    _touched.add('name');
-                    _cubit.changeName(value);
-                  },
-                  errorText: () => _errorText('name', state.nameError, l10n),
-                  icon: _fieldIcon(Icons.account_box_outlined, state.nameError),
+                AuthTextField(
+                  label: l10n.registerNameLabel,
+                  icon: Icons.person_outline_rounded,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.name],
+                  errorText: _errorText('name', state.nameError, l10n),
+                  onChanged: (value) => _onChanged('name', _cubit.changeName, value),
                 ),
-                const SizedBox(height: AppSizes.s16),
-                ArenaTextField(
-                  labelText: l10n.registerEmailLabel,
+                const SizedBox(height: AppSizes.s14),
+                AuthTextField(
+                  label: l10n.registerEmailLabel,
+                  icon: Icons.mail_outline_rounded,
                   keyboardType: TextInputType.emailAddress,
-                  onChaged: (value) {
-                    _touched.add('email');
-                    _cubit.changeEmail(value);
-                  },
-                  errorText: () => _errorText('email', state.emailError, l10n),
-                  icon: _fieldIcon(Icons.email, state.emailError),
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.email],
+                  errorText: _errorText('email', state.emailError, l10n),
+                  onChanged: (value) => _onChanged('email', _cubit.changeEmail, value),
                 ),
-                const SizedBox(height: AppSizes.s16),
-                ArenaTextField(
-                  labelText: l10n.registerPasswordLabel,
-                  obscureText: true,
-                  onChaged: (value) {
-                    _touched.add('password');
-                    _cubit.changePassword(value);
-                  },
-                  errorText: () => _errorText('password', state.passwordError, l10n),
-                  icon: _fieldIcon(Icons.key, state.passwordError),
+                const SizedBox(height: AppSizes.s14),
+                AuthTextField(
+                  label: l10n.registerPasswordLabel,
+                  icon: Icons.lock_outline_rounded,
+                  isPassword: true,
+                  textInputAction: TextInputAction.done,
+                  autofillHints: const [AutofillHints.newPassword],
+                  errorText: _errorText('password', state.passwordError, l10n),
+                  onChanged: (value) => _onChanged('password', _cubit.changePassword, value),
                 ),
-                const SizedBox(height: AppSizes.s16),
-                Text(l10n.registerRegionLabel, style: const TextStyle(fontSize: AppSizes.s16)),
-                _OutlinedDropdown(
+                const SizedBox(height: AppSizes.s14),
+                AuthDropdownField(
+                  label: l10n.registerRegionLabel,
+                  icon: Icons.place_outlined,
                   value: state.selectedRegion,
                   items: state.regions,
                   onChanged: _cubit.selectRegion,
                 ),
-                const SizedBox(height: AppSizes.s8),
-                Text(l10n.registerTeamLabel, style: const TextStyle(fontSize: AppSizes.s16)),
-                _OutlinedDropdown(
+                const SizedBox(height: AppSizes.s14),
+                AuthDropdownField(
+                  label: l10n.registerTeamLabel,
+                  icon: Icons.shield_outlined,
                   value: state.selectedTeam,
                   items: state.teams,
                   onChanged: _cubit.selectTeam,
                 ),
-                const SizedBox(height: AppSizes.s24),
+                const SizedBox(height: AppSizes.s28),
                 ArenaButton(
                   title: l10n.registerButton,
-                  fontSize: AppSizes.s18,
+                  height: AppSizes.buttonHeightLarge,
+                  borderRadius: AppSizes.fieldRadius,
+                  fontSize: AppSizes.s16,
                   textColor: AppColors.white,
                   buttonColor: state.canSubmit ? AppColors.primary : AppColors.grey,
-                  borderRadius: AppSizes.radius,
                   isLoading: state is SubmittingRegisterUserState,
                   function: state.canSubmit ? _cubit.submit : null,
                 ),
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(l10n.registerHaveAccountButton),
+                const SizedBox(height: AppSizes.s8),
+                Center(
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(l10n.registerHaveAccountButton, style: AppTypography.label()),
+                  ),
                 ),
               ],
             ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _OutlinedDropdown extends StatelessWidget {
-  final String? value;
-  final List<String> items;
-  final ValueChanged<String> onChanged;
-
-  const _OutlinedDropdown({required this.value, required this.items, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(AppSizes.s4),
-      padding: const EdgeInsets.symmetric(horizontal: AppSizes.s10),
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColors.primary),
-        borderRadius: BorderRadius.circular(AppSizes.s4),
-      ),
-      child: DropdownButton<String>(
-        value: items.contains(value) ? value : null,
-        icon: const Icon(Icons.arrow_downward),
-        isExpanded: true,
-        underline: const SizedBox.shrink(),
-        style: const TextStyle(color: AppColors.black, fontSize: AppSizes.s18),
-        onChanged: (newValue) {
-          if (newValue != null) onChanged(newValue);
-        },
-        items: items.map((item) => DropdownMenuItem<String>(value: item, child: Text(item))).toList(),
-      ),
+          ),
+        );
+      },
     );
   }
 }

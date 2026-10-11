@@ -37,6 +37,15 @@ class InvalidLoginState extends LoginState {
   List<Object?> get props => [error];
 }
 
+/// Enviando o e-mail de "esqueci minha senha".
+class SendingPasswordResetLoginState extends LoginState {
+  const SendingPasswordResetLoginState();
+}
+
+class PasswordResetSentLoginState extends LoginState {
+  const PasswordResetSentLoginState();
+}
+
 class ErrorLoginState extends LoginState {
   final String errorMessage;
 

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_state.dart';
+import 'package:arena_soccer/features/auth/presentation/widgets/auth_scaffold.dart';
+import 'package:arena_soccer/utils/components/arena_hero_background.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_images.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
@@ -32,16 +35,32 @@ class _SplashPageState extends State<SplashPage> {
           Navigator.pushReplacementNamed(context, AppRoutes.loginPage);
         }
       },
-      child: Scaffold(
-        backgroundColor: AppColors.primaryDark,
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.asset(AppImages.logo, height: AppSizes.loginLogoHeight),
-              const SizedBox(height: AppSizes.s24),
-              const CircularProgressIndicator(color: AppColors.primary),
-            ],
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.light,
+        child: Scaffold(
+          body: ArenaHeroBackground(
+            watermarkFactor: 0.55,
+            child: SafeArea(
+              child: Column(
+                children: [
+                  const Spacer(),
+                  Hero(
+                    tag: arenaLogoHeroTag,
+                    child: Image.asset(AppImages.logo, height: AppSizes.s150),
+                  ),
+                  const Spacer(),
+                  const SizedBox(
+                    width: AppSizes.s120,
+                    child: LinearProgressIndicator(
+                      minHeight: AppSizes.s2,
+                      color: AppColors.white,
+                      backgroundColor: AppColors.whiteMuted,
+                    ),
+                  ),
+                  const SizedBox(height: AppSizes.s48),
+                ],
+              ),
+            ),
           ),
         ),
       ),

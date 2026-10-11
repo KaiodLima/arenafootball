@@ -54,6 +54,17 @@ class AuthDataSource {
     }
   }
 
+  Future<Either<Failure, void>> sendPasswordReset(String email) async {
+    const fallback = 'Não foi possível enviar o link de recuperação.';
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('sendPasswordReset', name: 'AuthDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: fallback));
+    }
+  }
+
   String? get currentUserId => _auth.currentUser?.uid;
 
   Future<Either<Failure, UserDTO>> getUser(String userId) async {

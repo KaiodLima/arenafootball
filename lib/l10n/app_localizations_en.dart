@@ -39,22 +39,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonGenericError => 'Something went wrong. Please try again.';
 
   @override
-  String get loginEmailLabel => 'Enter your e-mail';
+  String get loginEmailLabel => 'E-mail';
 
   @override
   String get loginEmailHint => 'example@example.com';
 
   @override
-  String get loginPasswordLabel => 'Enter your password';
+  String get loginPasswordLabel => 'Password';
 
   @override
   String get loginButton => 'SIGN IN';
 
   @override
   String get loginCreateAccountButton => 'CREATE ACCOUNT';
-
-  @override
-  String get loginSkipButton => 'Skip';
 
   @override
   String get loginSuccess => 'Signed in!';
@@ -67,7 +64,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Invalid password! Use at least 8 characters.';
 
   @override
-  String get registerTitle => 'Create Account';
+  String get registerTitle => 'Create account';
 
   @override
   String get registerNameLabel => 'Name';
@@ -79,10 +76,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registerPasswordLabel => 'Password';
 
   @override
-  String get registerRegionLabel => 'Region:';
+  String get registerRegionLabel => 'Region';
 
   @override
-  String get registerTeamLabel => 'Favorite team:';
+  String get registerTeamLabel => 'Favorite team';
 
   @override
   String get registerButton => 'SIGN UP';
@@ -555,4 +552,42 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get globalResultsTomorrowUnavailable =>
       'Tomorrow\'s matches are not available yet.';
+
+  @override
+  String get loginWelcomeTitle => 'Welcome back 👋';
+
+  @override
+  String get loginWelcomeSubtitle =>
+      'Sign in to follow your team, the matches and the standings.';
+
+  @override
+  String get loginForgotPassword => 'Forgot my password';
+
+  @override
+  String get loginOr => 'or';
+
+  @override
+  String get loginContinueAsGuest => 'Continue without an account';
+
+  @override
+  String get loginShowPassword => 'Show password';
+
+  @override
+  String get loginHidePassword => 'Hide password';
+
+  @override
+  String get forgotPasswordTitle => 'Reset password';
+
+  @override
+  String get forgotPasswordDescription =>
+      'Enter your account e-mail and we will send you a link to create a new password.';
+
+  @override
+  String get forgotPasswordSend => 'SEND LINK';
+
+  @override
+  String get forgotPasswordSent => 'We sent a recovery link to your e-mail.';
+
+  @override
+  String get registerSubtitle => 'It takes less than a minute.';
 }
