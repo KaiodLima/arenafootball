@@ -2,13 +2,14 @@ import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/features/voting/domain/elected_player.dart';
 
 class ElectedPlayerState extends Equatable {
-  /// Resultado da apuração; nulo enquanto carrega ou quando não há votos.
-  final ElectedPlayer? elected;
+  /// Apuração; nula enquanto carrega ou após erro. Sem votos, vem com
+  /// `elected == null` e o ranking vazio.
+  final VotingResult? result;
 
-  const ElectedPlayerState({this.elected});
+  const ElectedPlayerState({this.result});
 
   @override
-  List<Object?> get props => [elected];
+  List<Object?> get props => [result];
 }
 
 class LoadingElectedPlayerState extends ElectedPlayerState {
@@ -16,7 +17,7 @@ class LoadingElectedPlayerState extends ElectedPlayerState {
 }
 
 class SuccessElectedPlayerState extends ElectedPlayerState {
-  const SuccessElectedPlayerState({super.elected});
+  const SuccessElectedPlayerState({required VotingResult super.result});
 }
 
 class ErrorElectedPlayerState extends ElectedPlayerState {
@@ -25,5 +26,5 @@ class ErrorElectedPlayerState extends ElectedPlayerState {
   const ErrorElectedPlayerState({required this.errorMessage});
 
   @override
-  List<Object?> get props => [elected, errorMessage];
+  List<Object?> get props => [result, errorMessage];
 }

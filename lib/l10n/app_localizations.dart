@@ -1071,23 +1071,47 @@ abstract class AppLocalizations {
   /// **'Faça login para votar.'**
   String get votingLoginRequired;
 
-  /// No description provided for @votingElectedLabel.
+  /// No description provided for @votingElectedTitle.
   ///
   /// In pt, this message translates to:
-  /// **'Eleito o melhor jogador da partida: '**
-  String get votingElectedLabel;
+  /// **'Craque da partida'**
+  String get votingElectedTitle;
 
-  /// No description provided for @votingVotesCount.
+  /// No description provided for @votingMatchSubtitle.
   ///
   /// In pt, this message translates to:
-  /// **'Número de votos: {count}'**
-  String votingVotesCount(int count);
+  /// **'{home} x {away}'**
+  String votingMatchSubtitle(String home, String away);
 
-  /// No description provided for @votingNoVotes.
+  /// No description provided for @votingVotes.
   ///
   /// In pt, this message translates to:
-  /// **'Nenhum voto registrado para esta partida.'**
-  String get votingNoVotes;
+  /// **'{count, plural, =1{1 voto} other{{count} votos}}'**
+  String votingVotes(int count);
+
+  /// No description provided for @votingShareOfVotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'{percent}% dos votos'**
+  String votingShareOfVotes(int percent);
+
+  /// No description provided for @votingRankingTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votação'**
+  String get votingRankingTitle;
+
+  /// No description provided for @votingNoVotesYet.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ninguém votou nesta partida ainda'**
+  String get votingNoVotesYet;
+
+  /// No description provided for @votingShareText.
+  ///
+  /// In pt, this message translates to:
+  /// **'{player} foi eleito o craque de {match} com {votes}! ⚽ via Arena Football'**
+  String votingShareText(String player, String match, String votes);
 
   /// No description provided for @votingLoadError.
   ///

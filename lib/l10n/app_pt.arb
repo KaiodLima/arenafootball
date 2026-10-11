@@ -258,16 +258,50 @@
     }
   },
   "votingLoginRequired": "Faça login para votar.",
-  "votingElectedLabel": "Eleito o melhor jogador da partida: ",
-  "votingVotesCount": "Número de votos: {count}",
-  "@votingVotesCount": {
+  "votingElectedTitle": "Craque da partida",
+  "votingMatchSubtitle": "{home} x {away}",
+  "@votingMatchSubtitle": {
+    "placeholders": {
+      "home": {
+        "type": "String"
+      },
+      "away": {
+        "type": "String"
+      }
+    }
+  },
+  "votingVotes": "{count, plural, =1{1 voto} other{{count} votos}}",
+  "@votingVotes": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "votingNoVotes": "Nenhum voto registrado para esta partida.",
+  "votingShareOfVotes": "{percent}% dos votos",
+  "@votingShareOfVotes": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "votingRankingTitle": "Votação",
+  "votingNoVotesYet": "Ninguém votou nesta partida ainda",
+  "votingShareText": "{player} foi eleito o craque de {match} com {votes}! ⚽ via Arena Football",
+  "@votingShareText": {
+    "placeholders": {
+      "player": {
+        "type": "String"
+      },
+      "match": {
+        "type": "String"
+      },
+      "votes": {
+        "type": "String"
+      }
+    }
+  },
   "votingLoadError": "Não foi possível apurar a votação.",
   "globalResultsTitle": "RESULTADOS PELO MUNDO",
   "globalResultsYesterday": "Ontem",

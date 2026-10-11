@@ -14,7 +14,7 @@ class ElectedPlayerCubit extends Cubit<ElectedPlayerState> {
     if (isClosed) return;
     response.fold(
       (failure) => emit(ErrorElectedPlayerState(errorMessage: failure.toString())),
-      (elected) => emit(SuccessElectedPlayerState(elected: elected)),
+      (result) => emit(SuccessElectedPlayerState(result: result)),
     );
   }
 }

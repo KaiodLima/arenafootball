@@ -561,15 +561,39 @@ class AppLocalizationsPt extends AppLocalizations {
   String get votingLoginRequired => 'Faça login para votar.';
 
   @override
-  String get votingElectedLabel => 'Eleito o melhor jogador da partida: ';
+  String get votingElectedTitle => 'Craque da partida';
 
   @override
-  String votingVotesCount(int count) {
-    return 'Número de votos: $count';
+  String votingMatchSubtitle(String home, String away) {
+    return '$home x $away';
   }
 
   @override
-  String get votingNoVotes => 'Nenhum voto registrado para esta partida.';
+  String votingVotes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count votos',
+      one: '1 voto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String votingShareOfVotes(int percent) {
+    return '$percent% dos votos';
+  }
+
+  @override
+  String get votingRankingTitle => 'Votação';
+
+  @override
+  String get votingNoVotesYet => 'Ninguém votou nesta partida ainda';
+
+  @override
+  String votingShareText(String player, String match, String votes) {
+    return '$player foi eleito o craque de $match com $votes! ⚽ via Arena Football';
+  }
 
   @override
   String get votingLoadError => 'Não foi possível apurar a votação.';
