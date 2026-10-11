@@ -245,16 +245,46 @@
   "matchesEditScoreTitle": "Alterar Placar:",
   "matchesHomeLabel": "Casa",
   "matchesAwayLabel": "Fora",
-  "matchesFormTitle": "CADASTRAR PARTIDA",
-  "matchesRegionLabel": "Região:",
-  "matchesHomeTeamLabel": "Time Casa:",
-  "matchesAwayTeamLabel": "Time Fora:",
-  "matchesDateLabel": "Data",
-  "matchesTimeLabel": "Hora",
-  "matchesVenueLabel": "Local",
-  "matchesRegisterButton": "CADASTRAR",
-  "matchesCreated": "Partida Cadastrada com Sucesso!!!",
-  "matchesFieldsRequired": "Preencha todos os campos!!!",
+  "matchesFormTitle": "Nova partida",
+  "matchesCreated": "Partida cadastrada!",
+  "matchFormMatchup": "Confronto",
+  "matchFormSwap": "Inverter mando",
+  "matchFormWhen": "Quando",
+  "matchFormWhere": "Onde",
+  "matchFormToday": "Hoje",
+  "matchFormTomorrow": "Amanhã",
+  "matchFormOtherDate": "Outra data",
+  "matchFormOtherTime": "Outro horário",
+  "matchFormNewVenue": "Novo local",
+  "matchFormVenueHint": "Nome do local",
+  "matchFormPreview": "Prévia",
+  "matchFormSubmit": "Cadastrar partida",
+  "matchFormMissingTeams": "Escolha os dois times.",
+  "matchFormMissingDate": "Escolha a data da partida.",
+  "matchFormMissingTime": "Escolha o horário da partida.",
+  "matchFormConflictTeam": "{team} já tem jogo nesta data ({times}).",
+  "@matchFormConflictTeam": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      },
+      "times": {
+        "type": "String"
+      }
+    }
+  },
+  "matchFormConflictVenue": "{venue} já tem jogo nesta data às {time}.",
+  "@matchFormConflictVenue": {
+    "placeholders": {
+      "venue": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "matchFormSaved": "Partida cadastrada! Escolha os times da próxima.",
   "championshipsEmpty": "Nenhuma competição registrada",
   "championshipsLoadError": "Não foi possível carregar as competições.",
   "championshipsDetailsTitle": "Sobre a Competição:",

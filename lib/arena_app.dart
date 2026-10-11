@@ -165,7 +165,7 @@ class ArenaApp extends StatelessWidget {
           );
         },
         AppRoutes.registerMatchPage: (_) => BlocProvider<MatchFormCubit>(
-              create: (_) => MatchFormCubit(sl(), sl(), sl()),
+              create: (_) => MatchFormCubit(sl(), sl(), sl(), sl()),
               child: const MatchFormPage(),
             ),
 

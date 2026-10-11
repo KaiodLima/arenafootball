@@ -577,34 +577,69 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchesAwayLabel => 'Fora';
 
   @override
-  String get matchesFormTitle => 'CADASTRAR PARTIDA';
+  String get matchesFormTitle => 'Nova partida';
 
   @override
-  String get matchesRegionLabel => 'Região:';
+  String get matchesCreated => 'Partida cadastrada!';
 
   @override
-  String get matchesHomeTeamLabel => 'Time Casa:';
+  String get matchFormMatchup => 'Confronto';
 
   @override
-  String get matchesAwayTeamLabel => 'Time Fora:';
+  String get matchFormSwap => 'Inverter mando';
 
   @override
-  String get matchesDateLabel => 'Data';
+  String get matchFormWhen => 'Quando';
 
   @override
-  String get matchesTimeLabel => 'Hora';
+  String get matchFormWhere => 'Onde';
 
   @override
-  String get matchesVenueLabel => 'Local';
+  String get matchFormToday => 'Hoje';
 
   @override
-  String get matchesRegisterButton => 'CADASTRAR';
+  String get matchFormTomorrow => 'Amanhã';
 
   @override
-  String get matchesCreated => 'Partida Cadastrada com Sucesso!!!';
+  String get matchFormOtherDate => 'Outra data';
 
   @override
-  String get matchesFieldsRequired => 'Preencha todos os campos!!!';
+  String get matchFormOtherTime => 'Outro horário';
+
+  @override
+  String get matchFormNewVenue => 'Novo local';
+
+  @override
+  String get matchFormVenueHint => 'Nome do local';
+
+  @override
+  String get matchFormPreview => 'Prévia';
+
+  @override
+  String get matchFormSubmit => 'Cadastrar partida';
+
+  @override
+  String get matchFormMissingTeams => 'Escolha os dois times.';
+
+  @override
+  String get matchFormMissingDate => 'Escolha a data da partida.';
+
+  @override
+  String get matchFormMissingTime => 'Escolha o horário da partida.';
+
+  @override
+  String matchFormConflictTeam(String team, String times) {
+    return '$team já tem jogo nesta data ($times).';
+  }
+
+  @override
+  String matchFormConflictVenue(String venue, String time) {
+    return '$venue já tem jogo nesta data às $time.';
+  }
+
+  @override
+  String get matchFormSaved =>
+      'Partida cadastrada! Escolha os times da próxima.';
 
   @override
   String get championshipsEmpty => 'Nenhuma competição registrada';

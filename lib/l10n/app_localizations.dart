@@ -1098,62 +1098,122 @@ abstract class AppLocalizations {
   /// No description provided for @matchesFormTitle.
   ///
   /// In pt, this message translates to:
-  /// **'CADASTRAR PARTIDA'**
+  /// **'Nova partida'**
   String get matchesFormTitle;
-
-  /// No description provided for @matchesRegionLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Região:'**
-  String get matchesRegionLabel;
-
-  /// No description provided for @matchesHomeTeamLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Time Casa:'**
-  String get matchesHomeTeamLabel;
-
-  /// No description provided for @matchesAwayTeamLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Time Fora:'**
-  String get matchesAwayTeamLabel;
-
-  /// No description provided for @matchesDateLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Data'**
-  String get matchesDateLabel;
-
-  /// No description provided for @matchesTimeLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Hora'**
-  String get matchesTimeLabel;
-
-  /// No description provided for @matchesVenueLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Local'**
-  String get matchesVenueLabel;
-
-  /// No description provided for @matchesRegisterButton.
-  ///
-  /// In pt, this message translates to:
-  /// **'CADASTRAR'**
-  String get matchesRegisterButton;
 
   /// No description provided for @matchesCreated.
   ///
   /// In pt, this message translates to:
-  /// **'Partida Cadastrada com Sucesso!!!'**
+  /// **'Partida cadastrada!'**
   String get matchesCreated;
 
-  /// No description provided for @matchesFieldsRequired.
+  /// No description provided for @matchFormMatchup.
   ///
   /// In pt, this message translates to:
-  /// **'Preencha todos os campos!!!'**
-  String get matchesFieldsRequired;
+  /// **'Confronto'**
+  String get matchFormMatchup;
+
+  /// No description provided for @matchFormSwap.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inverter mando'**
+  String get matchFormSwap;
+
+  /// No description provided for @matchFormWhen.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quando'**
+  String get matchFormWhen;
+
+  /// No description provided for @matchFormWhere.
+  ///
+  /// In pt, this message translates to:
+  /// **'Onde'**
+  String get matchFormWhere;
+
+  /// No description provided for @matchFormToday.
+  ///
+  /// In pt, this message translates to:
+  /// **'Hoje'**
+  String get matchFormToday;
+
+  /// No description provided for @matchFormTomorrow.
+  ///
+  /// In pt, this message translates to:
+  /// **'Amanhã'**
+  String get matchFormTomorrow;
+
+  /// No description provided for @matchFormOtherDate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Outra data'**
+  String get matchFormOtherDate;
+
+  /// No description provided for @matchFormOtherTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'Outro horário'**
+  String get matchFormOtherTime;
+
+  /// No description provided for @matchFormNewVenue.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novo local'**
+  String get matchFormNewVenue;
+
+  /// No description provided for @matchFormVenueHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome do local'**
+  String get matchFormVenueHint;
+
+  /// No description provided for @matchFormPreview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prévia'**
+  String get matchFormPreview;
+
+  /// No description provided for @matchFormSubmit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cadastrar partida'**
+  String get matchFormSubmit;
+
+  /// No description provided for @matchFormMissingTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha os dois times.'**
+  String get matchFormMissingTeams;
+
+  /// No description provided for @matchFormMissingDate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha a data da partida.'**
+  String get matchFormMissingDate;
+
+  /// No description provided for @matchFormMissingTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha o horário da partida.'**
+  String get matchFormMissingTime;
+
+  /// No description provided for @matchFormConflictTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'{team} já tem jogo nesta data ({times}).'**
+  String matchFormConflictTeam(String team, String times);
+
+  /// No description provided for @matchFormConflictVenue.
+  ///
+  /// In pt, this message translates to:
+  /// **'{venue} já tem jogo nesta data às {time}.'**
+  String matchFormConflictVenue(String venue, String time);
+
+  /// No description provided for @matchFormSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Partida cadastrada! Escolha os times da próxima.'**
+  String get matchFormSaved;
 
   /// No description provided for @championshipsEmpty.
   ///

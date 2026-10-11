@@ -48,8 +48,7 @@ class MatchDTO extends Equatable {
     this.registeredAt,
   });
 
-  static int _int(Object? value) =>
-      value is num ? value.toInt() : int.tryParse(value?.toString() ?? '') ?? 0;
+  static int _int(Object? value) => value is num ? value.toInt() : int.tryParse(value?.toString() ?? '') ?? 0;
 
   factory MatchDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? const {};

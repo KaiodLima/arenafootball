@@ -29,6 +29,9 @@ class MatchCard extends StatelessWidget {
   final VoidCallback onEditScore;
   final VoidCallback onDelete;
 
+  /// Mostra o botão de votação (falso na prévia do cadastro).
+  final bool showVoting;
+
   const MatchCard({
     super.key,
     required this.match,
@@ -41,6 +44,7 @@ class MatchCard extends StatelessWidget {
     this.awayCrest,
     this.isFavorite = false,
     this.isFavoriteTeam = _none,
+    this.showVoting = true,
   });
 
   static bool _none(String _) => false;
@@ -136,7 +140,7 @@ class MatchCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: AppSizes.s8),
-                  _VotingChip(isOpen: match.isVotingOpen, onTap: onVotingTap),
+                  if (showVoting) _VotingChip(isOpen: match.isVotingOpen, onTap: onVotingTap),
                 ],
               ),
             ),

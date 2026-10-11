@@ -58,7 +58,8 @@ class _Chip extends StatelessWidget {
   final bool isFavorite;
   final VoidCallback onTap;
 
-  const _Chip({required this.label, required this.selected, required this.onTap, this.leading, this.isFavorite = false});
+  const _Chip(
+      {required this.label, required this.selected, required this.onTap, this.leading, this.isFavorite = false});
 
   @override
   Widget build(BuildContext context) {

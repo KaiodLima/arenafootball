@@ -5,7 +5,7 @@ import 'package:arena_soccer/features/news/presentation/bloc/goal_notification_c
 import 'package:arena_soccer/features/news/presentation/bloc/goal_notification_state.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/goal_card.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/goal_scoreboard.dart';
-import 'package:arena_soccer/features/news/presentation/widgets/team_picker_sheet.dart';
+import 'package:arena_soccer/utils/components/team_picker_sheet.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/today_matches_strip.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';

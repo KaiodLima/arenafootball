@@ -574,34 +574,69 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchesAwayLabel => 'Away';
 
   @override
-  String get matchesFormTitle => 'REGISTER MATCH';
+  String get matchesFormTitle => 'New match';
 
   @override
-  String get matchesRegionLabel => 'Region:';
+  String get matchesCreated => 'Match created!';
 
   @override
-  String get matchesHomeTeamLabel => 'Home Team:';
+  String get matchFormMatchup => 'Matchup';
 
   @override
-  String get matchesAwayTeamLabel => 'Away Team:';
+  String get matchFormSwap => 'Swap home and away';
 
   @override
-  String get matchesDateLabel => 'Date';
+  String get matchFormWhen => 'When';
 
   @override
-  String get matchesTimeLabel => 'Time';
+  String get matchFormWhere => 'Where';
 
   @override
-  String get matchesVenueLabel => 'Venue';
+  String get matchFormToday => 'Today';
 
   @override
-  String get matchesRegisterButton => 'REGISTER';
+  String get matchFormTomorrow => 'Tomorrow';
 
   @override
-  String get matchesCreated => 'Match registered successfully!';
+  String get matchFormOtherDate => 'Other date';
 
   @override
-  String get matchesFieldsRequired => 'Fill in all the fields!';
+  String get matchFormOtherTime => 'Other time';
+
+  @override
+  String get matchFormNewVenue => 'New venue';
+
+  @override
+  String get matchFormVenueHint => 'Venue name';
+
+  @override
+  String get matchFormPreview => 'Preview';
+
+  @override
+  String get matchFormSubmit => 'Create match';
+
+  @override
+  String get matchFormMissingTeams => 'Choose both teams.';
+
+  @override
+  String get matchFormMissingDate => 'Choose the match date.';
+
+  @override
+  String get matchFormMissingTime => 'Choose the match time.';
+
+  @override
+  String matchFormConflictTeam(String team, String times) {
+    return '$team already plays on this date ($times).';
+  }
+
+  @override
+  String matchFormConflictVenue(String venue, String time) {
+    return '$venue already has a match on this date at $time.';
+  }
+
+  @override
+  String get matchFormSaved =>
+      'Match created! Choose the teams for the next one.';
 
   @override
   String get championshipsEmpty => 'No competitions registered';
