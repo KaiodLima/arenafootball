@@ -96,12 +96,12 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.registerNewsPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<NewsFormCubit>(
-            create: (_) => NewsFormCubit(sl(), sl(), sl()),
+            create: (_) => NewsFormCubit(sl(), sl(), sl(), sl()),
             child: NewsFormPage(news: args?['news'] as NewsDTO?),
           );
         },
         AppRoutes.publishAdPage: (_) => BlocProvider<NewsFormCubit>(
-              create: (_) => NewsFormCubit(sl(), sl(), sl()),
+              create: (_) => NewsFormCubit(sl(), sl(), sl(), sl()),
               child: const AdFormPage(),
             ),
         AppRoutes.goalNotificationPage: (_) => BlocProvider<GoalNotificationCubit>(

@@ -156,47 +156,121 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newsAdPlaceholder => 'ADVERTISEMENT';
 
   @override
-  String get newsCreateTitle => 'ADD NEWS';
+  String get newsCreateTitle => 'New article';
 
   @override
-  String get newsEditTitle => 'EDIT NEWS';
+  String get newsEditTitle => 'Edit article';
 
   @override
   String get newsTitleLabel => 'Title';
 
   @override
-  String get newsDescriptionLabel => 'Description';
+  String get newsCoverAdd => 'Add cover';
 
   @override
-  String get newsTagLabel => 'Tag';
+  String get newsCoverHint => 'Tap to take a photo or pick from the gallery';
+
+  @override
+  String get newsCoverChange => 'Change';
+
+  @override
+  String get newsCoverRemove => 'Remove';
+
+  @override
+  String get newsSectionContent => 'Content';
+
+  @override
+  String get newsSectionAlbum => 'Photo album';
+
+  @override
+  String get newsSectionPublish => 'Publishing';
+
+  @override
+  String newsAlbumCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count photos',
+      one: '1 photo',
+      zero: 'no photos',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get newsAlbumAdd => 'Add';
+
+  @override
+  String get newsAlbumHint => 'Photos show up in the article gallery.';
+
+  @override
+  String get newsRegion => 'Region';
+
+  @override
+  String get newsHighlight => 'Highlight';
+
+  @override
+  String get newsHighlightNone => 'None';
+
+  @override
+  String get newsHighlightHint =>
+      'The article also shows up inside the chosen highlight.';
+
+  @override
+  String get newsLinkHint => 'External link (optional)';
+
+  @override
+  String get newsVisibleHint =>
+      'When off, the article is saved but hidden in the app.';
+
+  @override
+  String get newsVisibleOnHint => 'The article shows up in the app feed.';
+
+  @override
+  String get newsPreview => 'Preview';
+
+  @override
+  String get newsPreviewTitle => 'How it will look in the feed';
+
+  @override
+  String get newsDiscardTitle => 'Discard changes?';
+
+  @override
+  String get newsDiscardMessage => 'What you filled in will be lost.';
+
+  @override
+  String get newsDiscardKeep => 'Keep editing';
+
+  @override
+  String get newsDiscardConfirm => 'Discard';
+
+  @override
+  String get newsPublish => 'Publish article';
+
+  @override
+  String get newsSave => 'Save changes';
+
+  @override
+  String get newsDescriptionLabel => 'Description';
 
   @override
   String get newsLinkLabel => 'Link';
 
   @override
-  String get newsVisibleLabel => 'Show news';
+  String get newsVisibleLabel => 'Visible in the app';
 
   @override
-  String get newsAttachPhotos => 'ATTACH PHOTOS';
-
-  @override
-  String get newsRegisterButton => 'SAVE';
-
-  @override
-  String get newsUpdateButton => 'UPDATE';
-
-  @override
-  String get newsTitleRequired => 'The news needs a title!';
+  String get newsTitleRequired => 'Enter the article title';
 
   @override
   String get newsTitleTooShort =>
       'The news title must have at least 3 characters';
 
   @override
-  String get newsCreated => 'News created successfully!';
+  String get newsCreated => 'Article published!';
 
   @override
-  String get newsUpdated => 'News updated successfully!';
+  String get newsUpdated => 'Article updated!';
 
   @override
   String get newsRegionLabel => 'Region:';

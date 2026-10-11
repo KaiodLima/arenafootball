@@ -156,47 +156,122 @@ class AppLocalizationsPt extends AppLocalizations {
   String get newsAdPlaceholder => 'PUBLICIDADE';
 
   @override
-  String get newsCreateTitle => 'CADASTRAR NOTICIA';
+  String get newsCreateTitle => 'Nova notícia';
 
   @override
-  String get newsEditTitle => 'EDITAR NOTÍCIA';
+  String get newsEditTitle => 'Editar notícia';
 
   @override
   String get newsTitleLabel => 'Título';
 
   @override
-  String get newsDescriptionLabel => 'Descrição';
+  String get newsCoverAdd => 'Adicionar capa';
 
   @override
-  String get newsTagLabel => 'Tag';
+  String get newsCoverHint =>
+      'Toque para tirar uma foto ou escolher da galeria';
+
+  @override
+  String get newsCoverChange => 'Trocar';
+
+  @override
+  String get newsCoverRemove => 'Remover';
+
+  @override
+  String get newsSectionContent => 'Conteúdo';
+
+  @override
+  String get newsSectionAlbum => 'Álbum de fotos';
+
+  @override
+  String get newsSectionPublish => 'Publicação';
+
+  @override
+  String newsAlbumCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotos',
+      one: '1 foto',
+      zero: 'nenhuma foto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get newsAlbumAdd => 'Adicionar';
+
+  @override
+  String get newsAlbumHint => 'As fotos aparecem na galeria da notícia.';
+
+  @override
+  String get newsRegion => 'Região';
+
+  @override
+  String get newsHighlight => 'Destaque';
+
+  @override
+  String get newsHighlightNone => 'Nenhum';
+
+  @override
+  String get newsHighlightHint =>
+      'A notícia também aparece dentro do destaque escolhido.';
+
+  @override
+  String get newsLinkHint => 'Link externo (opcional)';
+
+  @override
+  String get newsVisibleHint =>
+      'Desligado, a notícia fica salva mas não aparece no app.';
+
+  @override
+  String get newsVisibleOnHint => 'A notícia aparece no feed do app.';
+
+  @override
+  String get newsPreview => 'Pré-visualizar';
+
+  @override
+  String get newsPreviewTitle => 'Como vai aparecer no feed';
+
+  @override
+  String get newsDiscardTitle => 'Descartar alterações?';
+
+  @override
+  String get newsDiscardMessage => 'O que você preencheu será perdido.';
+
+  @override
+  String get newsDiscardKeep => 'Continuar editando';
+
+  @override
+  String get newsDiscardConfirm => 'Descartar';
+
+  @override
+  String get newsPublish => 'Publicar notícia';
+
+  @override
+  String get newsSave => 'Salvar alterações';
+
+  @override
+  String get newsDescriptionLabel => 'Descrição';
 
   @override
   String get newsLinkLabel => 'Link';
 
   @override
-  String get newsVisibleLabel => 'Exibir notícia';
+  String get newsVisibleLabel => 'Visível no app';
 
   @override
-  String get newsAttachPhotos => 'ANEXAR FOTOS';
-
-  @override
-  String get newsRegisterButton => 'CADASTRAR';
-
-  @override
-  String get newsUpdateButton => 'ATUALIZAR';
-
-  @override
-  String get newsTitleRequired => 'A notícia precisa de um título!!!';
+  String get newsTitleRequired => 'Informe o título da notícia';
 
   @override
   String get newsTitleTooShort =>
       'O título da notícia deve conter no mínimo 3 caracteres';
 
   @override
-  String get newsCreated => 'Notícia Cadastrada com Sucesso!!!';
+  String get newsCreated => 'Notícia publicada!';
 
   @override
-  String get newsUpdated => 'Notícia Atualizada com Sucesso!!!';
+  String get newsUpdated => 'Notícia atualizada!';
 
   @override
   String get newsRegionLabel => 'Região:';

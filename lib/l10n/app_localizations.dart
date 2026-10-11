@@ -383,13 +383,13 @@ abstract class AppLocalizations {
   /// No description provided for @newsCreateTitle.
   ///
   /// In pt, this message translates to:
-  /// **'CADASTRAR NOTICIA'**
+  /// **'Nova notícia'**
   String get newsCreateTitle;
 
   /// No description provided for @newsEditTitle.
   ///
   /// In pt, this message translates to:
-  /// **'EDITAR NOTÍCIA'**
+  /// **'Editar notícia'**
   String get newsEditTitle;
 
   /// No description provided for @newsTitleLabel.
@@ -398,17 +398,161 @@ abstract class AppLocalizations {
   /// **'Título'**
   String get newsTitleLabel;
 
+  /// No description provided for @newsCoverAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar capa'**
+  String get newsCoverAdd;
+
+  /// No description provided for @newsCoverHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Toque para tirar uma foto ou escolher da galeria'**
+  String get newsCoverHint;
+
+  /// No description provided for @newsCoverChange.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar'**
+  String get newsCoverChange;
+
+  /// No description provided for @newsCoverRemove.
+  ///
+  /// In pt, this message translates to:
+  /// **'Remover'**
+  String get newsCoverRemove;
+
+  /// No description provided for @newsSectionContent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conteúdo'**
+  String get newsSectionContent;
+
+  /// No description provided for @newsSectionAlbum.
+  ///
+  /// In pt, this message translates to:
+  /// **'Álbum de fotos'**
+  String get newsSectionAlbum;
+
+  /// No description provided for @newsSectionPublish.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publicação'**
+  String get newsSectionPublish;
+
+  /// No description provided for @newsAlbumCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{nenhuma foto} =1{1 foto} other{{count} fotos}}'**
+  String newsAlbumCount(int count);
+
+  /// No description provided for @newsAlbumAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar'**
+  String get newsAlbumAdd;
+
+  /// No description provided for @newsAlbumHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'As fotos aparecem na galeria da notícia.'**
+  String get newsAlbumHint;
+
+  /// No description provided for @newsRegion.
+  ///
+  /// In pt, this message translates to:
+  /// **'Região'**
+  String get newsRegion;
+
+  /// No description provided for @newsHighlight.
+  ///
+  /// In pt, this message translates to:
+  /// **'Destaque'**
+  String get newsHighlight;
+
+  /// No description provided for @newsHighlightNone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum'**
+  String get newsHighlightNone;
+
+  /// No description provided for @newsHighlightHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'A notícia também aparece dentro do destaque escolhido.'**
+  String get newsHighlightHint;
+
+  /// No description provided for @newsLinkHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Link externo (opcional)'**
+  String get newsLinkHint;
+
+  /// No description provided for @newsVisibleHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desligado, a notícia fica salva mas não aparece no app.'**
+  String get newsVisibleHint;
+
+  /// No description provided for @newsVisibleOnHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'A notícia aparece no feed do app.'**
+  String get newsVisibleOnHint;
+
+  /// No description provided for @newsPreview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pré-visualizar'**
+  String get newsPreview;
+
+  /// No description provided for @newsPreviewTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Como vai aparecer no feed'**
+  String get newsPreviewTitle;
+
+  /// No description provided for @newsDiscardTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Descartar alterações?'**
+  String get newsDiscardTitle;
+
+  /// No description provided for @newsDiscardMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'O que você preencheu será perdido.'**
+  String get newsDiscardMessage;
+
+  /// No description provided for @newsDiscardKeep.
+  ///
+  /// In pt, this message translates to:
+  /// **'Continuar editando'**
+  String get newsDiscardKeep;
+
+  /// No description provided for @newsDiscardConfirm.
+  ///
+  /// In pt, this message translates to:
+  /// **'Descartar'**
+  String get newsDiscardConfirm;
+
+  /// No description provided for @newsPublish.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publicar notícia'**
+  String get newsPublish;
+
+  /// No description provided for @newsSave.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salvar alterações'**
+  String get newsSave;
+
   /// No description provided for @newsDescriptionLabel.
   ///
   /// In pt, this message translates to:
   /// **'Descrição'**
   String get newsDescriptionLabel;
-
-  /// No description provided for @newsTagLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Tag'**
-  String get newsTagLabel;
 
   /// No description provided for @newsLinkLabel.
   ///
@@ -419,31 +563,13 @@ abstract class AppLocalizations {
   /// No description provided for @newsVisibleLabel.
   ///
   /// In pt, this message translates to:
-  /// **'Exibir notícia'**
+  /// **'Visível no app'**
   String get newsVisibleLabel;
-
-  /// No description provided for @newsAttachPhotos.
-  ///
-  /// In pt, this message translates to:
-  /// **'ANEXAR FOTOS'**
-  String get newsAttachPhotos;
-
-  /// No description provided for @newsRegisterButton.
-  ///
-  /// In pt, this message translates to:
-  /// **'CADASTRAR'**
-  String get newsRegisterButton;
-
-  /// No description provided for @newsUpdateButton.
-  ///
-  /// In pt, this message translates to:
-  /// **'ATUALIZAR'**
-  String get newsUpdateButton;
 
   /// No description provided for @newsTitleRequired.
   ///
   /// In pt, this message translates to:
-  /// **'A notícia precisa de um título!!!'**
+  /// **'Informe o título da notícia'**
   String get newsTitleRequired;
 
   /// No description provided for @newsTitleTooShort.
@@ -455,13 +581,13 @@ abstract class AppLocalizations {
   /// No description provided for @newsCreated.
   ///
   /// In pt, this message translates to:
-  /// **'Notícia Cadastrada com Sucesso!!!'**
+  /// **'Notícia publicada!'**
   String get newsCreated;
 
   /// No description provided for @newsUpdated.
   ///
   /// In pt, this message translates to:
-  /// **'Notícia Atualizada com Sucesso!!!'**
+  /// **'Notícia atualizada!'**
   String get newsUpdated;
 
   /// No description provided for @newsRegionLabel.
