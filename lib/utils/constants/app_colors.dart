@@ -30,6 +30,19 @@ class AppColors {
   /// (`Colors.blueGrey[200]`).
   static const Color blueGreyLight = Color(0xFFB0BEC5);
 
+  /// Superfície dos cards e sheets.
+  static const Color surface = Colors.white;
+
+  /// Fundo dos campos preenchidos (telas de entrada).
+  static const Color inputFill = Color(0xFFF1F5F1);
+
+  /// Texto principal e secundário sobre superfícies claras.
+  static const Color textPrimary = Color(0xFF14231A);
+  static const Color textSecondary = Color(0xFF6B7A70);
+
+  /// Sombra suave de cards elevados.
+  static const Color shadow = Color(0x1F000000);
+
   static const Color success = primary;
   static const Color danger = Color(0xFFD32F2F);
   static const Color warning = Color(0xFFFFA000);

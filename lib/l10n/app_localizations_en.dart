@@ -39,22 +39,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonGenericError => 'Something went wrong. Please try again.';
 
   @override
-  String get loginEmailLabel => 'Enter your e-mail';
+  String get loginEmailLabel => 'E-mail';
 
   @override
   String get loginEmailHint => 'example@example.com';
 
   @override
-  String get loginPasswordLabel => 'Enter your password';
+  String get loginPasswordLabel => 'Password';
 
   @override
   String get loginButton => 'SIGN IN';
 
   @override
   String get loginCreateAccountButton => 'CREATE ACCOUNT';
-
-  @override
-  String get loginSkipButton => 'Skip';
 
   @override
   String get loginSuccess => 'Signed in!';
@@ -67,7 +64,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Invalid password! Use at least 8 characters.';
 
   @override
-  String get registerTitle => 'Create Account';
+  String get registerTitle => 'Create account';
 
   @override
   String get registerNameLabel => 'Name';
@@ -79,13 +76,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registerPasswordLabel => 'Password';
 
   @override
-  String get registerRegionLabel => 'Region:';
+  String get registerRegionLabel => 'Region';
 
   @override
-  String get registerTeamLabel => 'Favorite team:';
-
-  @override
-  String get registerButton => 'SIGN UP';
+  String get registerTeamLabel => 'Favorite team';
 
   @override
   String get registerHaveAccountButton => 'I already have an account!';
@@ -98,7 +92,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your username must have at least 3 characters';
 
   @override
-  String get registerEmailExample => 'Example: test@test.com';
+  String get registerEmailExample =>
+      'Enter a valid e-mail, e.g. name@email.com';
 
   @override
   String get registerPasswordTooShort =>
@@ -555,4 +550,82 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get globalResultsTomorrowUnavailable =>
       'Tomorrow\'s matches are not available yet.';
+
+  @override
+  String get loginWelcomeTitle => 'Welcome back 👋';
+
+  @override
+  String get loginWelcomeSubtitle =>
+      'Sign in to follow your team, the matches and the standings.';
+
+  @override
+  String get loginForgotPassword => 'Forgot my password';
+
+  @override
+  String get loginOr => 'or';
+
+  @override
+  String get loginContinueAsGuest => 'Continue without an account';
+
+  @override
+  String get loginShowPassword => 'Show password';
+
+  @override
+  String get loginHidePassword => 'Hide password';
+
+  @override
+  String get forgotPasswordTitle => 'Reset password';
+
+  @override
+  String get forgotPasswordDescription =>
+      'Enter your account e-mail and we will send you a link to create a new password.';
+
+  @override
+  String get forgotPasswordSend => 'SEND LINK';
+
+  @override
+  String get forgotPasswordSent => 'We sent a recovery link to your e-mail.';
+
+  @override
+  String get registerStepOne => 'Step 1 of 2 · your sign-in details';
+
+  @override
+  String get registerCreateAccountButton => 'CREATE ACCOUNT';
+
+  @override
+  String get registerConfirmPasswordLabel => 'Confirm password';
+
+  @override
+  String get registerPasswordMismatch => 'Passwords do not match';
+
+  @override
+  String get passwordStrengthWeak => 'Weak password';
+
+  @override
+  String get passwordStrengthMedium => 'Medium password';
+
+  @override
+  String get passwordStrengthStrong => 'Strong password';
+
+  @override
+  String get chooseTeamTitle => 'Your favorite team';
+
+  @override
+  String get chooseTeamSubtitle => 'Step 2 of 2 · personalize the app';
+
+  @override
+  String get chooseTeamDescription =>
+      'Choose your region and the team you follow. You can change it later.';
+
+  @override
+  String get chooseTeamConfirm => 'FINISH';
+
+  @override
+  String get chooseTeamSkip => 'Skip for now';
+
+  @override
+  String get chooseTeamLoadError => 'Could not load the regions and teams.';
+
+  @override
+  String get chooseTeamEmptyTeams => 'No teams registered in this region.';
 }

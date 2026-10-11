@@ -3,9 +3,11 @@ import 'package:arena_soccer/features/auth/data/datasources/auth_datasource.dart
 import 'package:arena_soccer/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:arena_soccer/features/auth/domain/repositories/auth_repository_interface.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/get_current_user_usecase.dart';
+import 'package:arena_soccer/features/auth/domain/usecases/send_password_reset_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/sign_in_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/sign_out_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/sign_up_usecase.dart';
+import 'package:arena_soccer/features/auth/domain/usecases/update_favorite_team_usecase.dart';
 
 final _sl = GetIt.instance;
 
@@ -21,4 +23,6 @@ void registerAuthDependencies() {
   _sl.registerLazySingleton(() => SignUpUseCase(_sl()));
   _sl.registerLazySingleton(() => SignOutUseCase(_sl()));
   _sl.registerLazySingleton(() => GetCurrentUserUseCase(_sl()));
+  _sl.registerLazySingleton(() => SendPasswordResetUseCase(_sl()));
+  _sl.registerLazySingleton(() => UpdateFavoriteTeamUseCase(_sl()));
 }

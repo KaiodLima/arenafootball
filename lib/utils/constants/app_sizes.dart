@@ -24,6 +24,7 @@ class AppSizes {
   static const double s47 = 47.0;
   static const double s48 = 48.0;
   static const double s50 = 50.0;
+  static const double s52 = 52.0;
   static const double s56 = 56.0;
   static const double s60 = 60.0;
   static const double s64 = 64.0;
@@ -41,6 +42,21 @@ class AppSizes {
 
   /// Gutter lateral padrão das telas.
   static const double screenPadding = s16;
+
+  /// Raio do card das telas de entrada e dos bottom sheets.
+  static const double radiusLarge = s28;
+
+  /// Raio dos campos e botões das telas de entrada.
+  static const double fieldRadius = s14;
+
+  /// Altura dos botões principais das telas de entrada.
+  static const double buttonHeightLarge = s52;
+
+  /// Fração da altura da tela ocupada pelo hero do login.
+  static const double heroHeightFactor = 0.38;
+
+  /// Quanto o card das telas de entrada sobe sobre o hero.
+  static const double cardOverlap = s24;
 
   /// Altura padrão de botão.
   static const double buttonHeight = s47;

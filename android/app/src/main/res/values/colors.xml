@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Mesmo verde-escuro de AppColors.primaryDark: a abertura nativa emenda no splash do Flutter. -->
+    <color name="launch_background">#FF1B431C</color>
+</resources>

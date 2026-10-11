@@ -1,0 +1,16 @@
+rules_version = '2';
+
+// Security Rules do Firebase Storage do Arena Football.
+// Deploy: firebase deploy --only storage --project arenasoccerflutter
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Imagens do app (StorageFolder em lib/core/services/storage_upload_service.dart).
+    match /{folder}/{fileName} {
+      allow read: if true;
+      allow write: if request.auth != null
+        && folder in ['noticias', 'destaques', 'times', 'jogadores']
+        && request.resource.size < 10 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+  }
+}

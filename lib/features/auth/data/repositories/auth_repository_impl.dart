@@ -18,12 +18,18 @@ class AuthRepositoryImpl implements IAuthRepository {
     required String name,
     required String email,
     required String password,
-    required String favoriteTeam,
   }) =>
-      _dataSource.signUp(name: name, email: email, password: password, favoriteTeam: favoriteTeam);
+      _dataSource.signUp(name: name, email: email, password: password);
+
+  @override
+  Future<Either<Failure, void>> updateFavoriteTeam({required String userId, required String team}) =>
+      _dataSource.updateFavoriteTeam(userId: userId, team: team);
 
   @override
   Future<Either<Failure, void>> signOut() => _dataSource.signOut();
+
+  @override
+  Future<Either<Failure, void>> sendPasswordReset(String email) => _dataSource.sendPasswordReset(email);
 
   @override
   Future<Either<Failure, UserDTO?>> getCurrentUser() async {

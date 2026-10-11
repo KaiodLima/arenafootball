@@ -9,6 +9,10 @@ ErrorWithMessage mapFirebaseError(Object error, {required String fallbackMessage
     return ErrorWithMessage(_authMessage(error.code) ?? fallbackMessage, code: error.code);
   }
   if (error is FirebaseException) {
+    // Negado pelas Security Rules (firestore.rules / storage.rules).
+    if (error.code == 'permission-denied' || error.code == 'unauthorized') {
+      return ErrorWithMessage('O servidor recusou a operação. Tente novamente mais tarde.', code: error.code);
+    }
     return ErrorWithMessage(fallbackMessage, code: error.code);
   }
   return ErrorWithMessage(fallbackMessage);
@@ -27,6 +31,8 @@ String? _authMessage(String code) {
       return 'Já existe uma conta com esse e-mail.';
     case 'weak-password':
       return 'Senha muito fraca.';
+    case 'too-many-requests':
+      return 'Muitas tentativas. Aguarde alguns minutos e tente de novo.';
     case 'network-request-failed':
       return 'Sem conexão com a internet.';
     default:

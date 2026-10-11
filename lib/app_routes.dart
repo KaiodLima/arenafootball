@@ -4,6 +4,7 @@ class AppRoutes {
   static const String splash = '/splash';
   static const String loginPage = '/login_page';
   static const String registerUserPage = '/register_user_page';
+  static const String chooseTeamPage = '/choose_team_page';
   static const String home = '/home';
 
   // Resultados globais (web scraping)

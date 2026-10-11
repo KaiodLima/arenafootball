@@ -1,0 +1,48 @@
+rules_version = '2';
+
+// Security Rules do Firestore do Arena Football.
+// Deploy: firebase deploy --only firestore:rules --project arenasoccerflutter
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Admin = flag `admin` no próprio documento de `usuarios/{uid}`.
+    function isAdmin() {
+      return signedIn()
+        && get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.admin == true;
+    }
+
+    // Perfil: só o dono (ou admin) lê. O dono cria e edita o próprio perfil,
+    // mas nunca consegue se promover a admin nem trocar o idUsuario.
+    match /usuarios/{userId} {
+      // `userId == uid` vem antes: permite o get() do próprio doc mesmo quando
+      // ele ainda não existe (recuperação de conta órfã no login).
+      // `resource.data.idUsuario` cobre contas antigas com id de doc diferente do uid.
+      function isOwner() {
+        return signedIn() && (userId == request.auth.uid || resource.data.idUsuario == request.auth.uid);
+      }
+
+      allow read: if isOwner() || isAdmin();
+      allow create: if signedIn()
+        && userId == request.auth.uid
+        && request.resource.data.idUsuario == request.auth.uid
+        && request.resource.data.admin == false;
+      allow update: if isOwner()
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin', 'idUsuario']);
+      allow delete: if isOwner();
+    }
+
+    // Conteúdo do app: noticias, destaques, competicao, campeonatos,
+    // times{ano}, jogadores{ano}, partidas{ano}, classificacao{ano}, grupos{ano}
+    // e os votos melhorjogador{timeC}{timeF}.
+    // Leitura pública (inclui o modo convidado); escrita só do admin.
+    // Exceção: cada usuário logado grava/atualiza só o próprio voto (doc id = uid).
+    match /{collection}/{docId} {
+      allow read: if collection != 'usuarios';
+      allow write: if isAdmin()
+        || (collection.matches('melhorjogador.*') && signedIn() && docId == request.auth.uid);
+    }
+  }
+}

@@ -161,7 +161,7 @@ abstract class AppLocalizations {
   /// No description provided for @loginEmailLabel.
   ///
   /// In pt, this message translates to:
-  /// **'Insira seu E-mail'**
+  /// **'E-mail'**
   String get loginEmailLabel;
 
   /// No description provided for @loginEmailHint.
@@ -173,7 +173,7 @@ abstract class AppLocalizations {
   /// No description provided for @loginPasswordLabel.
   ///
   /// In pt, this message translates to:
-  /// **'Insira sua Senha'**
+  /// **'Senha'**
   String get loginPasswordLabel;
 
   /// No description provided for @loginButton.
@@ -187,12 +187,6 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'CRIAR CONTA'**
   String get loginCreateAccountButton;
-
-  /// No description provided for @loginSkipButton.
-  ///
-  /// In pt, this message translates to:
-  /// **'Pular'**
-  String get loginSkipButton;
 
   /// No description provided for @loginSuccess.
   ///
@@ -215,7 +209,7 @@ abstract class AppLocalizations {
   /// No description provided for @registerTitle.
   ///
   /// In pt, this message translates to:
-  /// **'Criar Conta'**
+  /// **'Criar conta'**
   String get registerTitle;
 
   /// No description provided for @registerNameLabel.
@@ -239,20 +233,14 @@ abstract class AppLocalizations {
   /// No description provided for @registerRegionLabel.
   ///
   /// In pt, this message translates to:
-  /// **'Região:'**
+  /// **'Região'**
   String get registerRegionLabel;
 
   /// No description provided for @registerTeamLabel.
   ///
   /// In pt, this message translates to:
-  /// **'Time do coração:'**
+  /// **'Time do coração'**
   String get registerTeamLabel;
-
-  /// No description provided for @registerButton.
-  ///
-  /// In pt, this message translates to:
-  /// **'CADASTRAR'**
-  String get registerButton;
 
   /// No description provided for @registerHaveAccountButton.
   ///
@@ -275,7 +263,7 @@ abstract class AppLocalizations {
   /// No description provided for @registerEmailExample.
   ///
   /// In pt, this message translates to:
-  /// **'Exemplo: teste@teste.com'**
+  /// **'Informe um e-mail válido, ex.: nome@email.com'**
   String get registerEmailExample;
 
   /// No description provided for @registerPasswordTooShort.
@@ -1136,6 +1124,156 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Os jogos de amanhã ainda não estão disponíveis.'**
   String get globalResultsTomorrowUnavailable;
+
+  /// No description provided for @loginWelcomeTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bem-vindo de volta 👋'**
+  String get loginWelcomeTitle;
+
+  /// No description provided for @loginWelcomeSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entre para acompanhar seu time, os jogos e a tabela.'**
+  String get loginWelcomeSubtitle;
+
+  /// No description provided for @loginForgotPassword.
+  ///
+  /// In pt, this message translates to:
+  /// **'Esqueci minha senha'**
+  String get loginForgotPassword;
+
+  /// No description provided for @loginOr.
+  ///
+  /// In pt, this message translates to:
+  /// **'ou'**
+  String get loginOr;
+
+  /// No description provided for @loginContinueAsGuest.
+  ///
+  /// In pt, this message translates to:
+  /// **'Continuar sem conta'**
+  String get loginContinueAsGuest;
+
+  /// No description provided for @loginShowPassword.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mostrar senha'**
+  String get loginShowPassword;
+
+  /// No description provided for @loginHidePassword.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ocultar senha'**
+  String get loginHidePassword;
+
+  /// No description provided for @forgotPasswordTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Recuperar senha'**
+  String get forgotPasswordTitle;
+
+  /// No description provided for @forgotPasswordDescription.
+  ///
+  /// In pt, this message translates to:
+  /// **'Informe o e-mail da sua conta e enviaremos um link para você criar uma nova senha.'**
+  String get forgotPasswordDescription;
+
+  /// No description provided for @forgotPasswordSend.
+  ///
+  /// In pt, this message translates to:
+  /// **'ENVIAR LINK'**
+  String get forgotPasswordSend;
+
+  /// No description provided for @forgotPasswordSent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviamos um link de recuperação para o seu e-mail.'**
+  String get forgotPasswordSent;
+
+  /// No description provided for @registerStepOne.
+  ///
+  /// In pt, this message translates to:
+  /// **'Etapa 1 de 2 · seus dados de acesso'**
+  String get registerStepOne;
+
+  /// No description provided for @registerCreateAccountButton.
+  ///
+  /// In pt, this message translates to:
+  /// **'CRIAR CONTA'**
+  String get registerCreateAccountButton;
+
+  /// No description provided for @registerConfirmPasswordLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confirmar senha'**
+  String get registerConfirmPasswordLabel;
+
+  /// No description provided for @registerPasswordMismatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'As senhas não coincidem'**
+  String get registerPasswordMismatch;
+
+  /// No description provided for @passwordStrengthWeak.
+  ///
+  /// In pt, this message translates to:
+  /// **'Senha fraca'**
+  String get passwordStrengthWeak;
+
+  /// No description provided for @passwordStrengthMedium.
+  ///
+  /// In pt, this message translates to:
+  /// **'Senha média'**
+  String get passwordStrengthMedium;
+
+  /// No description provided for @passwordStrengthStrong.
+  ///
+  /// In pt, this message translates to:
+  /// **'Senha forte'**
+  String get passwordStrengthStrong;
+
+  /// No description provided for @chooseTeamTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu time do coração'**
+  String get chooseTeamTitle;
+
+  /// No description provided for @chooseTeamSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Etapa 2 de 2 · personalize o app'**
+  String get chooseTeamSubtitle;
+
+  /// No description provided for @chooseTeamDescription.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha sua região e o time que você acompanha. Dá para mudar depois.'**
+  String get chooseTeamDescription;
+
+  /// No description provided for @chooseTeamConfirm.
+  ///
+  /// In pt, this message translates to:
+  /// **'CONCLUIR'**
+  String get chooseTeamConfirm;
+
+  /// No description provided for @chooseTeamSkip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pular por agora'**
+  String get chooseTeamSkip;
+
+  /// No description provided for @chooseTeamLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar as regiões e os times.'**
+  String get chooseTeamLoadError;
+
+  /// No description provided for @chooseTeamEmptyTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum time cadastrado nesta região.'**
+  String get chooseTeamEmptyTeams;
 }
 
 class _AppLocalizationsDelegate

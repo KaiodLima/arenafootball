@@ -4,13 +4,16 @@ import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/login_cubit.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/login_state.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
+import 'package:arena_soccer/features/auth/presentation/widgets/auth_scaffold.dart';
+import 'package:arena_soccer/features/auth/presentation/widgets/auth_text_field.dart';
+import 'package:arena_soccer/features/auth/presentation/widgets/forgot_password_sheet.dart';
+import 'package:arena_soccer/features/auth/presentation/widgets/or_divider.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
-import 'package:arena_soccer/utils/components/arena_text_field.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
-import 'package:arena_soccer/utils/constants/app_images.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
+import 'package:arena_soccer/utils/constants/app_typography.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -23,6 +26,9 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  /// Enquanto o sheet de recuperação está aberto, os erros aparecem nele.
+  bool _resetSheetOpen = false;
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -31,85 +37,128 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _submit() {
+    FocusScope.of(context).unfocus();
     BlocProvider.of<LoginCubit>(context).signIn(
       email: _emailController.text.trim(),
       password: _passwordController.text,
     );
   }
 
+  Future<void> _openForgotPassword() async {
+    setState(() => _resetSheetOpen = true);
+    await ForgotPasswordSheet.show(context, initialEmail: _emailController.text.trim());
+    if (mounted) setState(() => _resetSheetOpen = false);
+  }
+
   void _goHome() => Navigator.pushReplacementNamed(context, AppRoutes.home);
+
+  void _onStateChanged(BuildContext context, LoginState state, AppLocalizations l10n) {
+    if (state is SuccessLoginState) {
+      BlocProvider.of<SessionCubit>(context).signedIn(state.user);
+      showSnackBar(context: context, message: l10n.loginSuccess);
+      // Contas antigas (ou quem pulou a etapa 2) ainda podem escolher o time.
+      if (state.user.hasFavoriteTeam) {
+        _goHome();
+      } else {
+        Navigator.pushReplacementNamed(context, AppRoutes.chooseTeamPage);
+      }
+    }
+    if (state is PasswordResetSentLoginState) {
+      showSnackBar(context: context, message: l10n.forgotPasswordSent);
+    }
+    if (_resetSheetOpen) return;
+    if (state is InvalidLoginState) {
+      final message =
+          state.error == LoginValidationError.invalidEmail ? l10n.loginInvalidEmail : l10n.loginInvalidPassword;
+      showSnackBar(context: context, message: message, isSuccess: false);
+    }
+    if (state is ErrorLoginState) {
+      showSnackBar(context: context, message: state.errorMessage, isSuccess: false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    return Scaffold(
-      body: BlocConsumer<LoginCubit, LoginState>(
-        listener: (context, state) {
-          if (state is SuccessLoginState) {
-            BlocProvider.of<SessionCubit>(context).signedIn(state.user);
-            showSnackBar(context: context, message: l10n.loginSuccess);
-            _goHome();
-          }
-          if (state is InvalidLoginState) {
-            final message = state.error == LoginValidationError.invalidEmail
-                ? l10n.loginInvalidEmail
-                : l10n.loginInvalidPassword;
-            showSnackBar(context: context, message: message, isSuccess: false);
-          }
-          if (state is ErrorLoginState) {
-            showSnackBar(context: context, message: state.errorMessage, isSuccess: false);
-          }
-        },
-        builder: (context, state) {
-          return SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSizes.screenPadding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Image.asset(AppImages.logo, height: AppSizes.loginLogoHeight),
-                  const SizedBox(height: AppSizes.s16),
-                  ArenaTextField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    autofocus: true,
-                    labelText: l10n.loginEmailLabel,
-                    hintText: l10n.loginEmailHint,
-                    icon: const Icon(Icons.email, color: AppColors.primary, size: AppSizes.s24),
+    return BlocConsumer<LoginCubit, LoginState>(
+      listener: (context, state) => _onStateChanged(context, state, l10n),
+      builder: (context, state) {
+        return AuthScaffold(
+          child: AutofillGroup(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(l10n.loginWelcomeTitle, style: AppTypography.display()),
+                const SizedBox(height: AppSizes.s6),
+                Text(l10n.loginWelcomeSubtitle, style: AppTypography.subtitle()),
+                const SizedBox(height: AppSizes.s28),
+                AuthTextField(
+                  controller: _emailController,
+                  label: l10n.loginEmailLabel,
+                  icon: Icons.mail_outline_rounded,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.email],
+                ),
+                const SizedBox(height: AppSizes.s14),
+                AuthTextField(
+                  controller: _passwordController,
+                  label: l10n.loginPasswordLabel,
+                  icon: Icons.lock_outline_rounded,
+                  isPassword: true,
+                  textInputAction: TextInputAction.done,
+                  autofillHints: const [AutofillHints.password],
+                  onSubmitted: (_) => _submit(),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: _openForgotPassword,
+                    child: Text(l10n.loginForgotPassword, style: AppTypography.label()),
                   ),
-                  const SizedBox(height: AppSizes.s8),
-                  ArenaTextField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    labelText: l10n.loginPasswordLabel,
-                    icon: const Icon(Icons.key, color: AppColors.primary, size: AppSizes.s24),
-                  ),
-                  const SizedBox(height: AppSizes.s24),
-                  ArenaButton.primary(
-                    title: l10n.loginButton,
-                    isLoading: state is LoadingLoginState,
-                    function: _submit,
-                  ),
-                  const SizedBox(height: AppSizes.s8),
-                  ArenaButton.outlined(
-                    title: l10n.loginCreateAccountButton,
-                    function: () => Navigator.pushNamed(context, AppRoutes.registerUserPage),
-                  ),
-                  const SizedBox(height: AppSizes.s8),
-                  TextButton(
+                ),
+                const SizedBox(height: AppSizes.s8),
+                ArenaButton(
+                  title: l10n.loginButton,
+                  height: AppSizes.buttonHeightLarge,
+                  borderRadius: AppSizes.fieldRadius,
+                  fontSize: AppSizes.s16,
+                  buttonColor: AppColors.primary,
+                  textColor: AppColors.white,
+                  isLoading: state is LoadingLoginState,
+                  function: _submit,
+                ),
+                const SizedBox(height: AppSizes.s20),
+                OrDivider(label: l10n.loginOr),
+                const SizedBox(height: AppSizes.s20),
+                ArenaButton(
+                  title: l10n.loginCreateAccountButton,
+                  height: AppSizes.buttonHeightLarge,
+                  borderRadius: AppSizes.fieldRadius,
+                  fontSize: AppSizes.s16,
+                  buttonColor: AppColors.surface,
+                  buttonBorderColor: AppColors.primary,
+                  textColor: AppColors.primary,
+                  function: () => Navigator.pushNamed(context, AppRoutes.registerUserPage),
+                ),
+                const SizedBox(height: AppSizes.s16),
+                Center(
+                  child: TextButton.icon(
                     onPressed: () {
                       BlocProvider.of<SessionCubit>(context).continueAsGuest();
                       _goHome();
                     },
-                    child: Text(l10n.loginSkipButton),
+                    iconAlignment: IconAlignment.end,
+                    icon: const Icon(Icons.arrow_forward_rounded, size: AppSizes.s18, color: AppColors.textSecondary),
+                    label: Text(l10n.loginContinueAsGuest, style: AppTypography.label(color: AppColors.textSecondary)),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }

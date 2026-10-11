@@ -39,22 +39,19 @@ class AppLocalizationsPt extends AppLocalizations {
   String get commonGenericError => 'Algo deu errado. Tente novamente.';
 
   @override
-  String get loginEmailLabel => 'Insira seu E-mail';
+  String get loginEmailLabel => 'E-mail';
 
   @override
   String get loginEmailHint => 'exemplo@exemplo.com';
 
   @override
-  String get loginPasswordLabel => 'Insira sua Senha';
+  String get loginPasswordLabel => 'Senha';
 
   @override
   String get loginButton => 'ENTRAR';
 
   @override
   String get loginCreateAccountButton => 'CRIAR CONTA';
-
-  @override
-  String get loginSkipButton => 'Pular';
 
   @override
   String get loginSuccess => 'Usuário Logado!';
@@ -67,7 +64,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Senha inválida! Utilize no mínimo 8 caracteres.';
 
   @override
-  String get registerTitle => 'Criar Conta';
+  String get registerTitle => 'Criar conta';
 
   @override
   String get registerNameLabel => 'Nome';
@@ -79,13 +76,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get registerPasswordLabel => 'Senha';
 
   @override
-  String get registerRegionLabel => 'Região:';
+  String get registerRegionLabel => 'Região';
 
   @override
-  String get registerTeamLabel => 'Time do coração:';
-
-  @override
-  String get registerButton => 'CADASTRAR';
+  String get registerTeamLabel => 'Time do coração';
 
   @override
   String get registerHaveAccountButton => 'Já tenho uma conta!';
@@ -98,7 +92,8 @@ class AppLocalizationsPt extends AppLocalizations {
       'Seu nome de usuário deve conter no mínimo 3 caracteres';
 
   @override
-  String get registerEmailExample => 'Exemplo: teste@teste.com';
+  String get registerEmailExample =>
+      'Informe um e-mail válido, ex.: nome@email.com';
 
   @override
   String get registerPasswordTooShort =>
@@ -558,4 +553,84 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get globalResultsTomorrowUnavailable =>
       'Os jogos de amanhã ainda não estão disponíveis.';
+
+  @override
+  String get loginWelcomeTitle => 'Bem-vindo de volta 👋';
+
+  @override
+  String get loginWelcomeSubtitle =>
+      'Entre para acompanhar seu time, os jogos e a tabela.';
+
+  @override
+  String get loginForgotPassword => 'Esqueci minha senha';
+
+  @override
+  String get loginOr => 'ou';
+
+  @override
+  String get loginContinueAsGuest => 'Continuar sem conta';
+
+  @override
+  String get loginShowPassword => 'Mostrar senha';
+
+  @override
+  String get loginHidePassword => 'Ocultar senha';
+
+  @override
+  String get forgotPasswordTitle => 'Recuperar senha';
+
+  @override
+  String get forgotPasswordDescription =>
+      'Informe o e-mail da sua conta e enviaremos um link para você criar uma nova senha.';
+
+  @override
+  String get forgotPasswordSend => 'ENVIAR LINK';
+
+  @override
+  String get forgotPasswordSent =>
+      'Enviamos um link de recuperação para o seu e-mail.';
+
+  @override
+  String get registerStepOne => 'Etapa 1 de 2 · seus dados de acesso';
+
+  @override
+  String get registerCreateAccountButton => 'CRIAR CONTA';
+
+  @override
+  String get registerConfirmPasswordLabel => 'Confirmar senha';
+
+  @override
+  String get registerPasswordMismatch => 'As senhas não coincidem';
+
+  @override
+  String get passwordStrengthWeak => 'Senha fraca';
+
+  @override
+  String get passwordStrengthMedium => 'Senha média';
+
+  @override
+  String get passwordStrengthStrong => 'Senha forte';
+
+  @override
+  String get chooseTeamTitle => 'Seu time do coração';
+
+  @override
+  String get chooseTeamSubtitle => 'Etapa 2 de 2 · personalize o app';
+
+  @override
+  String get chooseTeamDescription =>
+      'Escolha sua região e o time que você acompanha. Dá para mudar depois.';
+
+  @override
+  String get chooseTeamConfirm => 'CONCLUIR';
+
+  @override
+  String get chooseTeamSkip => 'Pular por agora';
+
+  @override
+  String get chooseTeamLoadError =>
+      'Não foi possível carregar as regiões e os times.';
+
+  @override
+  String get chooseTeamEmptyTeams => 'Nenhum time cadastrado nesta região.';
 }
