@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/global_results/presentation/bloc/global_results_cubit.dart';
+import 'package:arena_soccer/features/global_results/presentation/bloc/match_goals_cubit.dart';
 import 'package:arena_soccer/features/global_results/presentation/page/global_results_page.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/choose_team_cubit.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/login_cubit.dart';
@@ -208,8 +209,12 @@ class ArenaApp extends StatelessWidget {
           );
         },
 
-        AppRoutes.globalResultsPage: (_) => BlocProvider<GlobalResultsCubit>(
-              create: (_) => GlobalResultsCubit(sl()),
+        // Os gols dos jogos encerrados vêm sob demanda (MatchGoalsCubit).
+        AppRoutes.globalResultsPage: (_) => MultiBlocProvider(
+              providers: [
+                BlocProvider<GlobalResultsCubit>(create: (_) => GlobalResultsCubit(sl())),
+                BlocProvider<MatchGoalsCubit>(create: (_) => MatchGoalsCubit(sl())),
+              ],
               child: const GlobalResultsPage(),
             ),
       },

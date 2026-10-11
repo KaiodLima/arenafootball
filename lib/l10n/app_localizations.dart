@@ -1257,6 +1257,18 @@ abstract class AppLocalizations {
   /// **'pênalti'**
   String get globalResultsPenalty;
 
+  /// No description provided for @globalResultsOwnGoal.
+  ///
+  /// In pt, this message translates to:
+  /// **'contra'**
+  String get globalResultsOwnGoal;
+
+  /// No description provided for @globalResultsGoalsError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar os gols. Toque para tentar de novo.'**
+  String get globalResultsGoalsError;
+
   /// No description provided for @loginWelcomeTitle.
   ///
   /// In pt, this message translates to:

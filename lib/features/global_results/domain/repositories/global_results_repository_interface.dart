@@ -5,4 +5,6 @@ import 'package:arena_soccer/features/global_results/domain/entities/results_day
 
 abstract class IGlobalResultsRepository {
   Future<Either<Failure, List<ScrapedMatchDTO>>> getMatches(ResultsDay day);
+
+  Future<Either<Failure, List<ScrapedGoalDTO>>> getMatchGoals(String url);
 }

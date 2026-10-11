@@ -11,14 +11,23 @@ class GoalEvent extends Equatable {
   final String minute;
   final String scorer;
 
-  /// Gol do mandante (sai da mudança do placar parcial).
+  /// Gol a favor do mandante.
   final bool isHome;
   final bool isPenalty;
 
-  const GoalEvent({required this.minute, required this.scorer, required this.isHome, this.isPenalty = false});
+  /// Gol contra (conta para o lado em [isHome]).
+  final bool isOwnGoal;
+
+  const GoalEvent({
+    required this.minute,
+    required this.scorer,
+    required this.isHome,
+    this.isPenalty = false,
+    this.isOwnGoal = false,
+  });
 
   @override
-  List<Object?> get props => [minute, scorer, isHome, isPenalty];
+  List<Object?> get props => [minute, scorer, isHome, isPenalty, isOwnGoal];
 }
 
 /// Uma partida já interpretada para exibição.
@@ -40,6 +49,9 @@ class GlobalMatch extends Equatable {
   final int? awayGoals;
   final List<GoalEvent> goals;
 
+  /// Página de análise (jogos encerrados): de lá saem os gols sob demanda.
+  final String detailsUrl;
+
   const GlobalMatch({
     required this.league,
     required this.homeTeam,
@@ -51,6 +63,7 @@ class GlobalMatch extends Equatable {
     this.homeGoals,
     this.awayGoals,
     this.goals = const [],
+    this.detailsUrl = '',
   });
 
   bool get hasScore => homeGoals != null && awayGoals != null;
@@ -58,6 +71,11 @@ class GlobalMatch extends Equatable {
   bool get homeWon => hasScore && homeGoals! > awayGoals!;
   bool get awayWon => hasScore && awayGoals! > homeGoals!;
 
+  /// Encerrado com gols, mas sem a lista de autores: dá para buscar na
+  /// página de análise.
+  bool get canLoadGoals =>
+      goals.isEmpty && detailsUrl.isNotEmpty && status == MatchStatus.finished && (homeGoals ?? 0) + (awayGoals ?? 0) > 0;
+
   @override
-  List<Object?> get props => [league, kickoff, status, minute, homeTeam, awayTeam, homeGoals, awayGoals, goals];
+  List<Object?> get props => [league, kickoff, status, minute, homeTeam, awayTeam, homeGoals, awayGoals, goals, detailsUrl];
 }

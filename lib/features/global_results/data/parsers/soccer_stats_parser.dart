@@ -22,6 +22,9 @@ class SoccerStatsParser {
   static final RegExp _score = RegExp(r'(\d+)\s*:\s*(\d+)');
   static final RegExp _kickoff = RegExp(r'^\d{1,2}:\d{2}$');
   static final RegExp _goal = RegExp(r"^(\d+)-(\d+)\s+(.+?)\s*\((\d+(?:\+\d+)?)'\)$");
+  static final RegExp _timelineScore = RegExp(r'^(\d+):(\d+)$');
+  static final RegExp _timelineMinute = RegExp(r'\((\d+(?:\+\d+)?)\)\s*$');
+  static const String _baseUrl = 'https://www.soccerstats.com/';
 
   List<ScrapedMatchDTO> parse(String html, ResultsDay day) {
     final soup = BeautifulSoup(html);
@@ -63,6 +66,7 @@ class SoccerStatsParser {
         homeGoals: score == null ? null : int.parse(score.group(1)!),
         awayGoals: score == null ? null : int.parse(score.group(2)!),
         goals: scorers == null ? const [] : _goals(scorers),
+        detailsUrl: _detailsUrl(row),
       ));
     }
     return matches;
@@ -80,6 +84,7 @@ class SoccerStatsParser {
       } else if (row.classes.contains('team1row')) {
         home = row;
       } else if (row.classes.contains('team2row') && home != null) {
+        final home0 = home;
         final homeCells = home.findAll('td');
         final awayCells = row.findAll('td');
         home = null;
@@ -99,10 +104,58 @@ class SoccerStatsParser {
           // e o "pp." ocupam as duas linhas com rowspan).
           awayGoals: homeGoals == null || awayCells.length < 2 ? null : int.tryParse(_clean(awayCells[1].text)),
           postponed: postponed,
+          detailsUrl: _detailsUrl(home0),
         ));
       }
     }
     return matches;
+  }
+
+  /// Cronologia dos gols da página de análise do jogo (`round_details.asp`):
+  /// uma linha por gol com 3 `td` — autor da casa | placar parcial | autor do
+  /// visitante. O lado preenchido diz de quem é o gol; "(o.g.)" é gol contra
+  /// (fica do lado do time beneficiado) e "(pen.)", pênalti.
+  List<ScrapedGoalDTO> parseGoals(String html) {
+    final goals = <ScrapedGoalDTO>[];
+    for (final row in BeautifulSoup(html).findAll('tr')) {
+      final cells = row.children.where((c) => c.name == 'td').toList();
+      if (cells.length != 3) continue;
+      final score = _timelineScore.firstMatch(_clean(cells[1].text));
+      if (score == null) continue;
+      final home = _clean(cells[0].text);
+      final away = _clean(cells[2].text);
+      if (home.isEmpty == away.isEmpty) continue;
+
+      final text = home.isNotEmpty ? home : away;
+      final minute = _timelineMinute.firstMatch(text)?.group(1) ?? '';
+      final isOwnGoal = text.contains('(o.g.)');
+      final isPenalty = text.contains('(pen.)');
+      final scorer = text
+          .replaceAll(_timelineMinute, '')
+          .replaceAll('(o.g.)', '')
+          .replaceAll('(pen.)', '')
+          .replaceAll(RegExp(r'\s+'), ' ')
+          .trim();
+      goals.add(ScrapedGoalDTO(
+        homeScore: int.parse(score.group(1)!),
+        awayScore: int.parse(score.group(2)!),
+        scorer: scorer,
+        minute: minute,
+        isHome: home.isNotEmpty,
+        isOwnGoal: isOwnGoal,
+        isPenalty: isPenalty,
+      ));
+    }
+    return goals;
+  }
+
+  /// Link da página de análise do jogo (só existe para jogos encerrados).
+  String _detailsUrl(Bs4Element row) {
+    for (final link in row.findAll('a')) {
+      final href = link.attributes['href'] ?? '';
+      if (href.contains('round_details.asp')) return href.startsWith('http') ? href : '$_baseUrl$href';
+    }
+    return '';
   }
 
   /// "England - Premier League" (sem o link "stats" que algumas páginas
@@ -139,5 +192,5 @@ class SoccerStatsParser {
 
   /// Junta espaços (inclui `&nbsp;`) e apara.
   static String _clean(String text) =>
-      text.replaceAll('&nbsp;', ' ').replaceAll(' ', ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
+      text.replaceAll('&nbsp;', ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
 }

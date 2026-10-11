@@ -49,7 +49,9 @@ class GetGlobalResultsUseCase {
     for (final dto in scraped.where((d) => !d.featured)) {
       final live = featured[key(dto)];
       if (live != null) used.add(key(dto));
-      matches.add(live == null ? _fromRow(dto, flagOf(dto)) : _fromFeatured(live, flagOf(dto), kickoff: dto.kickoff));
+      matches.add(live == null
+          ? _fromRow(dto, flagOf(dto))
+          : _fromFeatured(live, flagOf(dto), kickoff: dto.kickoff, detailsUrl: dto.detailsUrl));
     }
     for (final entry in featured.entries) {
       if (!used.contains(entry.key)) matches.add(_fromFeatured(entry.value, flagOf(entry.value)));
@@ -73,12 +75,13 @@ class GetGlobalResultsUseCase {
       awayTeam: dto.awayTeam,
       homeGoals: hasScore ? dto.homeGoals : null,
       awayGoals: hasScore ? dto.awayGoals : null,
+      detailsUrl: dto.detailsUrl,
     );
   }
 
   /// Seção de destaque: "FT" encerrado, "HT" intervalo, "87'" (ou "'" em
   /// vermelho) ao vivo; "'" cinza ainda não começou.
-  static GlobalMatch _fromFeatured(ScrapedMatchDTO dto, Uint8List? flag, {String? kickoff}) {
+  static GlobalMatch _fromFeatured(ScrapedMatchDTO dto, Uint8List? flag, {String? kickoff, String? detailsUrl}) {
     final text = dto.statusText.toUpperCase();
     final minute = _minute.firstMatch(dto.statusText)?.group(1) ?? '';
     final MatchStatus status;
@@ -105,26 +108,29 @@ class GetGlobalResultsUseCase {
       awayTeam: dto.awayTeam,
       homeGoals: started ? dto.homeGoals : null,
       awayGoals: started ? dto.awayGoals : null,
-      goals: _goals(dto.goals),
+      goals: goalsOf(dto.goals),
+      detailsUrl: (detailsUrl ?? '').isNotEmpty ? detailsUrl! : dto.detailsUrl,
     );
   }
 
   static bool _isKickoff(String text) => RegExp(r'^\d{1,2}:\d{2}$').hasMatch(text);
 
-  /// Quem marcou sai da mudança do placar parcial ("0-1" depois de "0-0" é
-  /// gol do visitante). "(pen.)" vira flag.
-  static List<GoalEvent> _goals(List<ScrapedGoalDTO> scraped) {
+  /// Converte os gols do site. Quando o lado não vem informado (destaque),
+  /// sai da mudança do placar parcial ("0-1" depois de "0-0" é gol do
+  /// visitante). "(pen.)" no nome vira flag.
+  static List<GoalEvent> goalsOf(List<ScrapedGoalDTO> scraped) {
     var home = 0;
     final goals = <GoalEvent>[];
     for (final goal in scraped) {
-      final isHome = goal.homeScore > home;
+      final isHome = goal.isHome ?? goal.homeScore > home;
       home = goal.homeScore;
-      final isPenalty = goal.scorer.contains('(pen.)');
+      final isPenalty = goal.isPenalty || goal.scorer.contains('(pen.)');
       goals.add(GoalEvent(
         minute: goal.minute,
         scorer: goal.scorer.replaceAll('(pen.)', '').trim(),
         isHome: isHome,
         isPenalty: isPenalty,
+        isOwnGoal: goal.isOwnGoal,
       ));
     }
     return goals;

@@ -1,16 +1,31 @@
 import 'package:equatable/equatable.dart';
 
-/// Gol extraído da lista de autores ("0-1 Erling Haaland (65')").
+/// Gol extraído do site: da lista de autores do destaque ("0-1 Erling
+/// Haaland (65')") ou da cronologia da página de análise do jogo.
 class ScrapedGoalDTO extends Equatable {
   final int homeScore;
   final int awayScore;
   final String scorer;
   final String minute;
 
-  const ScrapedGoalDTO({required this.homeScore, required this.awayScore, required this.scorer, required this.minute});
+  /// Lado do gol quando o site informa (página de análise); nulo no destaque,
+  /// onde sai da mudança do placar.
+  final bool? isHome;
+  final bool isOwnGoal;
+  final bool isPenalty;
+
+  const ScrapedGoalDTO({
+    required this.homeScore,
+    required this.awayScore,
+    required this.scorer,
+    required this.minute,
+    this.isHome,
+    this.isOwnGoal = false,
+    this.isPenalty = false,
+  });
 
   @override
-  List<Object?> get props => [homeScore, awayScore, scorer, minute];
+  List<Object?> get props => [homeScore, awayScore, scorer, minute, isHome, isOwnGoal, isPenalty];
 }
 
 /// Partida extraída do HTML do soccerstats.com, ainda com o status em texto
@@ -39,6 +54,9 @@ class ScrapedMatchDTO extends Equatable {
   final bool postponed;
   final List<ScrapedGoalDTO> goals;
 
+  /// Página de análise do jogo encerrado (tem a cronologia dos gols).
+  final String detailsUrl;
+
   const ScrapedMatchDTO({
     required this.homeTeam,
     required this.awayTeam,
@@ -52,6 +70,7 @@ class ScrapedMatchDTO extends Equatable {
     this.awayGoals,
     this.postponed = false,
     this.goals = const [],
+    this.detailsUrl = '',
   });
 
   @override
@@ -68,5 +87,6 @@ class ScrapedMatchDTO extends Equatable {
         awayGoals,
         postponed,
         goals,
+        detailsUrl,
       ];
 }

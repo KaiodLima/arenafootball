@@ -193,6 +193,8 @@
   "globalResultsSearchHint": "Search team or league",
   "globalResultsNoMatches": "No matches found",
   "globalResultsPenalty": "penalty",
+  "globalResultsOwnGoal": "own goal",
+  "globalResultsGoalsError": "Could not load the goals. Tap to try again.",
   "loginWelcomeTitle": "Welcome back 👋",
   "loginWelcomeSubtitle": "Sign in to follow your team, the matches and the standings.",
   "loginForgotPassword": "Forgot my password",

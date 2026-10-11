@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/global_results/domain/entities/global_match.dart';
+import 'package:arena_soccer/features/global_results/presentation/bloc/match_goals_cubit.dart';
 import 'package:arena_soccer/features/global_results/presentation/widgets/match_status_badge.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
@@ -7,8 +9,9 @@ import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
 /// Linha de uma partida: status à esquerda, os dois times empilhados com o
-/// placar à direita (vencedor em negrito, perdedor esmaecido). Com gols,
-/// tocar expande a lista de autores.
+/// placar à direita (vencedor em negrito, perdedor esmaecido). Tocar expande
+/// a lista de autores: a do destaque vem junto; a dos demais encerrados é
+/// buscada na página de análise ao abrir ([MatchGoalsCubit]).
 class GlobalMatchRow extends StatefulWidget {
   final GlobalMatch match;
 
@@ -24,10 +27,24 @@ class _GlobalMatchRowState extends State<GlobalMatchRow> {
   @override
   Widget build(BuildContext context) {
     final match = widget.match;
-    final hasGoals = match.goals.isNotEmpty;
+    final expandable = match.goals.isNotEmpty || match.canLoadGoals;
+    // Só a linha deste jogo reconstrói quando os gols dele chegam.
+    final loaded = match.canLoadGoals
+        ? context.select<MatchGoalsCubit, MatchGoals?>((cubit) => cubit.state[match.detailsUrl])
+        : null;
+
+    void toggle() {
+      // Aberto com falha: o toque tenta de novo em vez de fechar.
+      if (_expanded && loaded?.status == GoalsStatus.failed) {
+        BlocProvider.of<MatchGoalsCubit>(context).load(match);
+        return;
+      }
+      setState(() => _expanded = !_expanded);
+      if (_expanded && match.canLoadGoals) BlocProvider.of<MatchGoalsCubit>(context).load(match);
+    }
 
     return InkWell(
-      onTap: hasGoals ? () => setState(() => _expanded = !_expanded) : null,
+      onTap: expandable ? toggle : null,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(AppSizes.s14, AppSizes.s10, AppSizes.s10, AppSizes.s10),
         child: Column(
@@ -62,7 +79,7 @@ class _GlobalMatchRowState extends State<GlobalMatchRow> {
                 ),
                 SizedBox(
                   width: AppSizes.s28,
-                  child: hasGoals
+                  child: expandable
                       ? AnimatedRotation(
                           turns: _expanded ? 0.5 : 0,
                           duration: const Duration(milliseconds: 200),
@@ -79,7 +96,7 @@ class _GlobalMatchRowState extends State<GlobalMatchRow> {
               child: _expanded
                   ? Padding(
                       padding: const EdgeInsets.only(top: AppSizes.s10, left: AppSizes.s80, right: AppSizes.s28),
-                      child: Column(children: [for (final goal in match.goals) _GoalLine(goal: goal)]),
+                      child: _Goals(goals: match.goals, loaded: loaded),
                     )
                   : const SizedBox(width: double.infinity),
             ),
@@ -87,6 +104,40 @@ class _GlobalMatchRowState extends State<GlobalMatchRow> {
         ),
       ),
     );
+  }
+}
+
+/// Gols já conhecidos, ou o andamento da busca: carregando, falha (tocar a
+/// linha tenta de novo) ou a lista carregada.
+class _Goals extends StatelessWidget {
+  final List<GoalEvent> goals;
+  final MatchGoals? loaded;
+
+  const _Goals({required this.goals, required this.loaded});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final list = goals.isNotEmpty ? goals : loaded?.goals ?? const <GoalEvent>[];
+
+    if (goals.isEmpty && (loaded == null || loaded!.status == GoalsStatus.loading)) {
+      return const Padding(
+        padding: EdgeInsets.only(bottom: AppSizes.s4),
+        child: SizedBox(
+          width: AppSizes.s18,
+          height: AppSizes.s18,
+          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+        ),
+      );
+    }
+    if (goals.isEmpty && loaded!.status == GoalsStatus.failed) {
+      return Text(
+        l10n.globalResultsGoalsError,
+        textAlign: TextAlign.center,
+        style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+      );
+    }
+    return Column(children: [for (final goal in list) _GoalLine(goal: goal)]);
   }
 }
 
@@ -136,7 +187,12 @@ class _GoalLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final text = goal.isPenalty ? '${goal.scorer} (${l10n.globalResultsPenalty})' : goal.scorer;
+    final note = goal.isOwnGoal
+        ? l10n.globalResultsOwnGoal
+        : goal.isPenalty
+            ? l10n.globalResultsPenalty
+            : null;
+    final text = note == null ? goal.scorer : '${goal.scorer} ($note)';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSizes.s4),

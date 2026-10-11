@@ -675,6 +675,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get globalResultsPenalty => 'pênalti';
 
   @override
+  String get globalResultsOwnGoal => 'contra';
+
+  @override
+  String get globalResultsGoalsError =>
+      'Não foi possível carregar os gols. Toque para tentar de novo.';
+
+  @override
   String get loginWelcomeTitle => 'Bem-vindo de volta 👋';
 
   @override

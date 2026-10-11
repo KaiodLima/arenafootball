@@ -46,7 +46,7 @@ Jérémy Doku  (90+2')
 FC Ingolstadt
 </td><td><b>2:4</b></td><td colspan='4'>
 Wehen Wiesbaden
-</td><td></td></tr>
+</td><td><a class='vsmall' href='round_details.asp?league=germany3&mrevid=m77&st1=11&st2=7' title='Result analysis'><img src='img/own/sshplogo.png'></a></td></tr>
 <tr class='child'><td align='center'><font color='green'>18:30</font></td><td align='right'>Dusseldorf</td><td> vs </td><td colspan='4'>Verl</td><td></td></tr>
 <tr class='child'><td align='center'><font color='green'>16:30</font></td><td align='right'>Liverpool</td><td> vs </td><td colspan='4'>Manchester City</td><td></td></tr>
 </table>
@@ -59,9 +59,26 @@ const _yesterdayHtml = '''
 <tr class='team1row'><td class='steam'>Rayo Vallecano</td><td rowspan='2'>pp.</td><td></td></tr>
 <tr class='team2row'><td class='steam'>Athletic Bilbao</td><td></td></tr>
 <tr height='14'><td colspan='9'></td></tr>
-<tr class='team1row'><td class='steam'>Alaves</td><td><b>1</b></td><td></td></tr>
+<tr class='team1row'><td class='steam'>Alaves</td><td><b>1</b></td><td></td><td rowspan='2'><a class='vsmall' href='round_details.asp?league=spain&mrevid=m80&st1=1&st2=13'>analysis</a></td></tr>
 <tr class='team2row'><td class='steam'>Atletico Madrid</td><td><b>2</b></td><td></td></tr>
 </table>
+''';
+
+// Cronologia da página de análise (FC Ingolstadt 2x4 Wehen Wiesbaden).
+const _goalsHtml = '''
+<table>
+<tr><td height='8' colspan='3' align='center'></td></tr>
+<tr><td align='right'></td><td align='center'> <font><b>0:1</b></font> </td><td align='left'>
+Florian Hübner <font color='green'>(59)</font>
+</td></tr>
+<tr><td align='right'>
+Michael Schultz <font color='gray'>(o.g.)</font> <font color='green'>(73)</font>
+</td><td align='center'> <font><b>1:1</b></font> </td><td align='left'></td></tr>
+<tr><td align='right'>
+O. Ugondu (pen.) <font color='green'>(90+3)</font>
+</td><td align='center'> <font><b>2:1</b></font> </td><td align='left'></td></tr>
+</table>
+<table><tr><td>Lead durations</td><td>0</td><td>90</td></tr></table>
 ''';
 
 const _tomorrowHtml = '''
@@ -105,7 +122,10 @@ void main() {
       expect(finished.homeTeam, 'FC Ingolstadt');
       expect(finished.awayTeam, 'Wehen Wiesbaden');
       expect([finished.homeGoals, finished.awayGoals], [2, 4]);
+      expect(finished.detailsUrl,
+          'https://www.soccerstats.com/round_details.asp?league=germany3&mrevid=m77&st1=11&st2=7');
       expect(rows[5].homeGoals, isNull);
+      expect(rows[5].detailsUrl, isEmpty);
     });
   });
 
@@ -120,6 +140,19 @@ void main() {
       expect(rows[1].league, 'Spain - LaLiga');
       expect(rows[1].flagBase64, 'BBBB');
       expect([rows[1].homeGoals, rows[1].awayGoals], [1, 2]);
+      expect(rows[1].detailsUrl, 'https://www.soccerstats.com/round_details.asp?league=spain&mrevid=m80&st1=1&st2=13');
+      expect(rows[0].detailsUrl, isEmpty);
+    });
+
+    test('cronologia da análise: lado, minuto, gol contra e pênalti', () {
+      final goals = GetGlobalResultsUseCase.goalsOf(parser.parseGoals(_goalsHtml));
+      expect(goals.map((g) => '${g.isHome ? 'C' : 'F'} ${g.minute} ${g.scorer}'), [
+        'F 59 Florian Hübner',
+        'C 73 Michael Schultz',
+        'C 90+3 O. Ugondu',
+      ]);
+      expect(goals.map((g) => g.isOwnGoal), [false, true, false]);
+      expect(goals.map((g) => g.isPenalty), [false, false, true]);
     });
 
     test('amanhã: horário no lugar do placar', () {
@@ -149,6 +182,9 @@ void main() {
       expect(liverpool.goals[1].scorer, 'Mohamed Salah');
 
       expect(byTeams['FC Ingolstadt']!.status, MatchStatus.finished);
+      expect(byTeams['FC Ingolstadt']!.canLoadGoals, isTrue);
+      // O destaque já traz os gols: não precisa buscar.
+      expect(liverpool.canLoadGoals, isFalse);
       expect(byTeams['Dusseldorf']!.status, MatchStatus.scheduled);
       expect(byTeams['Dusseldorf']!.homeGoals, isNull);
       expect(byTeams['Jong Gent']!.status, MatchStatus.live);

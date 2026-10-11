@@ -12,4 +12,7 @@ class GlobalResultsRepositoryImpl implements IGlobalResultsRepository {
 
   @override
   Future<Either<Failure, List<ScrapedMatchDTO>>> getMatches(ResultsDay day) => _dataSource.getMatches(day);
+
+  @override
+  Future<Either<Failure, List<ScrapedGoalDTO>>> getMatchGoals(String url) => _dataSource.getMatchGoals(url);
 }

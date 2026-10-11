@@ -347,6 +347,8 @@
   "globalResultsSearchHint": "Buscar time ou liga",
   "globalResultsNoMatches": "Nenhum jogo encontrado",
   "globalResultsPenalty": "pênalti",
+  "globalResultsOwnGoal": "contra",
+  "globalResultsGoalsError": "Não foi possível carregar os gols. Toque para tentar de novo.",
   "loginWelcomeTitle": "Bem-vindo de volta 👋",
   "loginWelcomeSubtitle": "Entre para acompanhar seu time, os jogos e a tabela.",
   "loginForgotPassword": "Esqueci minha senha",
