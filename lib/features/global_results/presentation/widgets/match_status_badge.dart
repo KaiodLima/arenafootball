@@ -34,8 +34,7 @@ class MatchStatusBadge extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(l10n.globalResultsFinished, style: small),
-            if (match.kickoff.isNotEmpty)
-              Text(match.kickoff, style: small.copyWith(fontWeight: FontWeight.w400)),
+            if (match.kickoff.isNotEmpty) Text(match.kickoff, style: small.copyWith(fontWeight: FontWeight.w400)),
           ],
         );
       case MatchStatus.scheduled:
@@ -58,7 +57,8 @@ class _Pill extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s4),
-      decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(AppSizes.s10)),
+      decoration:
+          BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(AppSizes.s10)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

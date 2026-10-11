@@ -316,7 +316,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get goalUpdateMatchHint =>
-      'Saves the same score on today\'s match in the table.';
+      'Saves the same score on the match in the table.';
 
   @override
   String get goalPreview => 'Feed preview';

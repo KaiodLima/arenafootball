@@ -30,9 +30,8 @@ class GetStatsRankingUseCase {
     if (players.isLeft) return Left(players.left);
 
     final teamNames = teams.right.map((team) => team.name).toSet();
-    final ranked = players.right
-        .where((player) => teamNames.contains(player.team) && type.valueOf(player) > 0)
-        .toList();
+    final ranked =
+        players.right.where((player) => teamNames.contains(player.team) && type.valueOf(player) > 0).toList();
 
     // Ordenação estável: o índice original desempata.
     final indexed = ranked.asMap().entries.toList()

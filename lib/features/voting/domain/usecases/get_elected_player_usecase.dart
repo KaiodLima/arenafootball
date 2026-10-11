@@ -47,7 +47,8 @@ class GetElectedPlayerUseCase {
         if (players.isRight) {
           for (final player in players.right) {
             if (player.name == winner.playerName) {
-              elected = elected!.copyWith(playerImageUrl: player.imageUrl, goals: player.goals, assists: player.assists);
+              elected =
+                  elected!.copyWith(playerImageUrl: player.imageUrl, goals: player.goals, assists: player.assists);
               break;
             }
           }

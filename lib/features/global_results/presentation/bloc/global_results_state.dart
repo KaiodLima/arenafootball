@@ -50,7 +50,8 @@ class SuccessGlobalResultsState extends GlobalResultsState {
 class ErrorGlobalResultsState extends GlobalResultsState {
   final String errorMessage;
 
-  const ErrorGlobalResultsState({required super.day, required this.errorMessage, super.matches, super.query, super.liveOnly});
+  const ErrorGlobalResultsState(
+      {required super.day, required this.errorMessage, super.matches, super.query, super.liveOnly});
 
   @override
   List<Object?> get props => [...super.props, errorMessage];

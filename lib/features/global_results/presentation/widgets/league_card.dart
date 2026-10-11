@@ -47,8 +47,11 @@ class LeagueCard extends StatelessWidget {
                     TextSpan(
                       children: [
                         if (country.isNotEmpty)
-                          TextSpan(text: '$country · ', style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
-                        TextSpan(text: league, style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s14)),
+                          TextSpan(
+                              text: '$country · ', style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+                        TextSpan(
+                            text: league,
+                            style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s14)),
                       ],
                     ),
                     maxLines: 1,

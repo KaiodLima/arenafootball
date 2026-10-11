@@ -22,6 +22,9 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
   /// Card de gol de partida (feed): usado só no primeiro carregamento.
   NewsDTO? _initial;
 
+  /// Partida tocada na lista (admin): usada só no primeiro carregamento.
+  MatchDTO? _initialMatch;
+
   GoalNotificationCubit(
     this.createNewsUseCase,
     this.getRegionsUseCase,
@@ -32,9 +35,15 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
 
   void _edit(GoalFormData form) => emit(EditingGoalNotificationState(form: form));
 
-  Future<void> load({required String initialRegion, String? season, NewsDTO? initial}) async {
+  Future<void> load({
+    required String initialRegion,
+    String? season,
+    NewsDTO? initial,
+    MatchDTO? initialMatch,
+  }) async {
     _season = season;
     _initial = initial;
+    _initialMatch = initialMatch;
     _edit(state.form.copyWith(regions: [initialRegion], selectedRegion: initialRegion));
     final loadRegion = _loadRegionData(initialRegion);
 
@@ -51,11 +60,13 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
   Future<void> selectRegion(String region) async {
     if (region == state.form.selectedRegion) return;
     _initial = null;
+    _initialMatch = null;
     _edit(state.form.copyWith(
       selectedRegion: region,
       teams: const [],
       todayMatches: const [],
       updateMatch: false,
+      clearPinned: true,
       clearTeams: true,
     ));
     await _loadRegionData(region);
@@ -74,6 +85,21 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
     final matches = matchesResponse.fold((_) => const <MatchDTO>[], (list) => list);
 
     final form = state.form.copyWith(teams: teams, todayMatches: matches);
+    final initialMatch = _initialMatch;
+    _initialMatch = null;
+    if (initialMatch != null) {
+      // Veio do card de partida: parte do placar dela e já liga a atualização.
+      _initial = null;
+      _edit(form.copyWith(
+        homeTeam: initialMatch.homeTeam,
+        awayTeam: initialMatch.awayTeam,
+        homeGoals: initialMatch.homeGoals.clamp(0, GoalFormData.maxGoals),
+        awayGoals: initialMatch.awayGoals.clamp(0, GoalFormData.maxGoals),
+        pinnedMatch: initialMatch,
+        updateMatch: true,
+      ));
+      return;
+    }
     final initial = _initial;
     _initial = null;
     if (initial != null && initial.homeTeam.isNotEmpty && initial.awayTeam.isNotEmpty) {
@@ -162,7 +188,11 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
       (updated) {
         // A lista local passa a ter o placar novo.
         final matches = [for (final m in form.todayMatches) m.id == updated.id ? updated : m];
-        emit(SuccessGoalNotificationState(form: form.copyWith(todayMatches: matches), matchUpdated: true));
+        final pinned = form.pinnedMatch?.id == updated.id ? updated : form.pinnedMatch;
+        emit(SuccessGoalNotificationState(
+          form: form.copyWith(todayMatches: matches, pinnedMatch: pinned),
+          matchUpdated: true,
+        ));
       },
     );
   }

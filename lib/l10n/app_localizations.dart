@@ -677,7 +677,7 @@ abstract class AppLocalizations {
   /// No description provided for @goalUpdateMatchHint.
   ///
   /// In pt, this message translates to:
-  /// **'Grava o mesmo placar no jogo de hoje da tabela.'**
+  /// **'Grava o mesmo placar na partida da tabela.'**
   String get goalUpdateMatchHint;
 
   /// No description provided for @goalPreview.

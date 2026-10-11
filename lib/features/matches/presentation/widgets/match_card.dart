@@ -32,6 +32,9 @@ class MatchCard extends StatelessWidget {
   /// Mostra o botão de votação (falso na prévia do cadastro).
   final bool showVoting;
 
+  /// Toque no card (admin: abre o "Card de gol" com esta partida).
+  final VoidCallback? onTap;
+
   const MatchCard({
     super.key,
     required this.match,
@@ -45,6 +48,7 @@ class MatchCard extends StatelessWidget {
     this.isFavorite = false,
     this.isFavoriteTeam = _none,
     this.showVoting = true,
+    this.onTap,
   });
 
   static bool _none(String _) => false;
@@ -57,6 +61,7 @@ class MatchCard extends StatelessWidget {
     final awayWon = match.awayGoals > match.homeGoals;
 
     return ArenaCard(
+      onTap: onTap,
       margin: const EdgeInsets.only(bottom: AppSizes.s10),
       child: Container(
         color: isFavorite ? AppColors.primarySoft : AppColors.transparent,

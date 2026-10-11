@@ -191,6 +191,5 @@ class SoccerStatsParser {
   }
 
   /// Junta espaços (inclui `&nbsp;`) e apara.
-  static String _clean(String text) =>
-      text.replaceAll('&nbsp;', ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
+  static String _clean(String text) => text.replaceAll('&nbsp;', ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
 }

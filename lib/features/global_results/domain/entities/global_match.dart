@@ -74,8 +74,12 @@ class GlobalMatch extends Equatable {
   /// Encerrado com gols, mas sem a lista de autores: dá para buscar na
   /// página de análise.
   bool get canLoadGoals =>
-      goals.isEmpty && detailsUrl.isNotEmpty && status == MatchStatus.finished && (homeGoals ?? 0) + (awayGoals ?? 0) > 0;
+      goals.isEmpty &&
+      detailsUrl.isNotEmpty &&
+      status == MatchStatus.finished &&
+      (homeGoals ?? 0) + (awayGoals ?? 0) > 0;
 
   @override
-  List<Object?> get props => [league, kickoff, status, minute, homeTeam, awayTeam, homeGoals, awayGoals, goals, detailsUrl];
+  List<Object?> get props =>
+      [league, kickoff, status, minute, homeTeam, awayTeam, homeGoals, awayGoals, goals, detailsUrl];
 }

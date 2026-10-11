@@ -20,6 +20,10 @@ class GoalFormData extends Equatable {
   /// Gravar também o placar na partida de hoje correspondente.
   final bool updateMatch;
 
+  /// Partida de onde o admin veio (toque no card de partida); vale para o
+  /// vínculo mesmo que não seja de hoje.
+  final MatchDTO? pinnedMatch;
+
   const GoalFormData({
     this.regions = const [],
     this.selectedRegion,
@@ -30,6 +34,7 @@ class GoalFormData extends Equatable {
     this.awayGoals = 0,
     this.todayMatches = const [],
     this.updateMatch = false,
+    this.pinnedMatch,
   });
 
   bool get hasTeams => homeTeam != null && awayTeam != null;
@@ -38,8 +43,11 @@ class GoalFormData extends Equatable {
 
   bool get canSubmit => hasTeams && !sameTeam;
 
-  /// Partida de hoje com o mesmo mandante e visitante escolhidos.
+  /// Partida vinculada: a de origem (card de partida) ou a de hoje com o
+  /// mesmo mandante e visitante escolhidos.
   MatchDTO? get linkedMatch {
+    final pinned = pinnedMatch;
+    if (pinned != null && pinned.homeTeam == homeTeam && pinned.awayTeam == awayTeam) return pinned;
     for (final match in todayMatches) {
       if (match.homeTeam == homeTeam && match.awayTeam == awayTeam) return match;
     }
@@ -64,6 +72,8 @@ class GoalFormData extends Equatable {
     int? awayGoals,
     List<MatchDTO>? todayMatches,
     bool? updateMatch,
+    MatchDTO? pinnedMatch,
+    bool clearPinned = false,
     bool clearTeams = false,
   }) {
     return GoalFormData(
@@ -76,12 +86,23 @@ class GoalFormData extends Equatable {
       awayGoals: awayGoals ?? this.awayGoals,
       todayMatches: todayMatches ?? this.todayMatches,
       updateMatch: updateMatch ?? this.updateMatch,
+      pinnedMatch: clearPinned ? null : (pinnedMatch ?? this.pinnedMatch),
     );
   }
 
   @override
-  List<Object?> get props =>
-      [regions, selectedRegion, teams, homeTeam, awayTeam, homeGoals, awayGoals, todayMatches, updateMatch];
+  List<Object?> get props => [
+        regions,
+        selectedRegion,
+        teams,
+        homeTeam,
+        awayTeam,
+        homeGoals,
+        awayGoals,
+        todayMatches,
+        updateMatch,
+        pinnedMatch
+      ];
 }
 
 class GoalNotificationState extends Equatable {

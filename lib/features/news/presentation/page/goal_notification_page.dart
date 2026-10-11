@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/features/news/presentation/bloc/goal_notification_cubit.dart';
 import 'package:arena_soccer/features/news/presentation/bloc/goal_notification_state.dart';
@@ -20,12 +21,15 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 /// placar com escudos e − / +, prévia ao vivo do card e confirmação antes de
 /// publicar. Opcionalmente grava o placar na partida de hoje. A tela fica
 /// aberta depois de publicar, para o admin atualizar o placar de novo.
-/// Com [initial] (card de gol tocado no feed), começa com os times, o placar e
-/// a região daquele card.
+/// Com [initial] (card de gol tocado no feed) ou [initialMatch] (card de
+/// partida tocado na lista), começa com os times, o placar e a região dele; a
+/// partida já vem vinculada para atualizar o placar em [season].
 class GoalNotificationPage extends StatefulWidget {
   final NewsDTO? initial;
+  final MatchDTO? initialMatch;
+  final String? season;
 
-  const GoalNotificationPage({super.key, this.initial});
+  const GoalNotificationPage({super.key, this.initial, this.initialMatch, this.season});
 
   @override
   State<GoalNotificationPage> createState() => _GoalNotificationPageState();
@@ -40,10 +44,16 @@ class _GoalNotificationPageState extends State<GoalNotificationPage> {
     _cubit = BlocProvider.of<GoalNotificationCubit>(context);
     final region = BlocProvider.of<RegionCubit>(context).state;
     final initial = widget.initial;
+    final match = widget.initialMatch;
+    final startRegion = [match?.region, initial?.region].whereType<String>().firstWhere(
+          (r) => r.isNotEmpty,
+          orElse: () => region.selectedRegion,
+        );
     _cubit.load(
-      initialRegion: (initial != null && initial.region.isNotEmpty) ? initial.region : region.selectedRegion,
-      season: region.selectedSeason,
+      initialRegion: startRegion,
+      season: widget.season ?? region.selectedSeason,
       initial: initial,
+      initialMatch: match,
     );
   }
 

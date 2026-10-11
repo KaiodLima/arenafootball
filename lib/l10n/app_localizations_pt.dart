@@ -318,7 +318,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get goalUpdateMatchHint =>
-      'Grava o mesmo placar no jogo de hoje da tabela.';
+      'Grava o mesmo placar na partida da tabela.';
 
   @override
   String get goalPreview => 'Prévia no feed';

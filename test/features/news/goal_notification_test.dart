@@ -202,6 +202,45 @@ void main() {
       expect([fromCard.state.form.homeGoals, fromCard.state.form.awayGoals], [0, 0]);
     });
 
+    test('a partir de um card de partida (não é de hoje): vinculada e atualizada', () async {
+      const old = MatchDTO(
+        id: 'antiga',
+        homeTeam: 'Volta',
+        awayTeam: 'Lava Jato',
+        date: '03/06',
+        region: 'Floresta',
+        homeGoals: 3,
+        awayGoals: 0,
+      );
+      final fromMatch = GoalNotificationCubit(
+        createNews,
+        _FakeRegions(),
+        _FakeTeams(),
+        _TodayMatches(matches),
+        UpdateMatchScoreUseCase(matches),
+      );
+      await fromMatch.load(initialRegion: 'Floresta', season: '2023', initialMatch: old);
+      var form = fromMatch.state.form;
+      expect([form.homeTeam, form.awayTeam], ['Volta', 'Lava Jato']);
+      expect([form.homeGoals, form.awayGoals], [3, 0]);
+      expect(form.updateMatch, isTrue);
+      expect(form.linkedMatch, old);
+
+      fromMatch.incrementAway();
+      await fromMatch.submit();
+      expect(matches.updates, 1);
+      form = fromMatch.state.form;
+      expect(form.pinnedMatch!.awayGoals, 1);
+
+      // Trocar o confronto desfaz o vínculo com a partida de origem
+      // (Lava Jato x Volta passaria a apontar para o jogo de hoje).
+      fromMatch.selectAwayTeam('Riacho');
+      expect(fromMatch.state.form.linkedMatch, isNull);
+      fromMatch.selectHomeTeam('Lava Jato');
+      fromMatch.selectAwayTeam('Volta');
+      expect(fromMatch.state.form.linkedMatch!.id, 'm1');
+    });
+
     test('card publicado mas partida falhou → estado parcial', () async {
       matches.failUpdate = true;
       cubit.pickMatch(_today);

@@ -201,7 +201,8 @@ class _GoalLine extends StatelessWidget {
         children: [
           const Icon(Icons.sports_soccer_rounded, size: AppSizes.s14, color: AppColors.primaryDark),
           const SizedBox(width: AppSizes.s4),
-          Text("${goal.minute}'", style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s12)),
+          Text("${goal.minute}'",
+              style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s12)),
           const SizedBox(width: AppSizes.s6),
           Flexible(
             child: Text(

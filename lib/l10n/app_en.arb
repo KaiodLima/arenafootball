@@ -96,7 +96,7 @@
   "goalNoTeams": "No teams registered in this region.",
   "goalSearchTeam": "Search team",
   "goalUpdateMatch": "Update match score",
-  "goalUpdateMatchHint": "Saves the same score on today's match in the table.",
+  "goalUpdateMatchHint": "Saves the same score on the match in the table.",
   "goalPreview": "Feed preview",
   "goalPublish": "Publish goal",
   "goalConfirmTitle": "Publish goal card?",
