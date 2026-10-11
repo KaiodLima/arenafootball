@@ -9,8 +9,9 @@ abstract class IAuthRepository {
     required String name,
     required String email,
     required String password,
-    required String favoriteTeam,
   });
+
+  Future<Either<Failure, void>> updateFavoriteTeam({required String userId, required String team});
 
   Future<Either<Failure, void>> signOut();
 

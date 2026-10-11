@@ -12,7 +12,6 @@ class SignUpUseCase {
     required String name,
     required String email,
     required String password,
-    required String favoriteTeam,
   }) =>
-      _repository.signUp(name: name.trim(), email: email.trim(), password: password, favoriteTeam: favoriteTeam);
+      _repository.signUp(name: name.trim(), email: email.trim().toLowerCase(), password: password);
 }

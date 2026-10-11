@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/global_results/presentation/bloc/global_results_cubit.dart';
 import 'package:arena_soccer/features/global_results/presentation/page/global_results_page.dart';
+import 'package:arena_soccer/features/auth/presentation/bloc/choose_team_cubit.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/login_cubit.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/register_user_cubit.dart';
+import 'package:arena_soccer/features/auth/presentation/page/choose_team_page.dart';
 import 'package:arena_soccer/features/auth/presentation/page/login_page.dart';
 import 'package:arena_soccer/features/auth/presentation/page/register_user_page.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
@@ -72,8 +74,12 @@ class ArenaApp extends StatelessWidget {
               child: const LoginPage(),
             ),
         AppRoutes.registerUserPage: (_) => BlocProvider<RegisterUserCubit>(
-              create: (_) => RegisterUserCubit(sl(), sl(), sl()),
+              create: (_) => RegisterUserCubit(sl()),
               child: const RegisterUserPage(),
+            ),
+        AppRoutes.chooseTeamPage: (_) => BlocProvider<ChooseTeamCubit>(
+              create: (_) => ChooseTeamCubit(sl(), sl(), sl()),
+              child: const ChooseTeamPage(),
             ),
         AppRoutes.home: (_) => BlocProvider<HomeCubit>(
               create: (_) => HomeCubit(sl()),

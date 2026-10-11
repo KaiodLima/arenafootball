@@ -82,9 +82,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registerTeamLabel => 'Favorite team';
 
   @override
-  String get registerButton => 'SIGN UP';
-
-  @override
   String get registerHaveAccountButton => 'I already have an account!';
 
   @override
@@ -95,7 +92,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your username must have at least 3 characters';
 
   @override
-  String get registerEmailExample => 'Example: test@test.com';
+  String get registerEmailExample =>
+      'Enter a valid e-mail, e.g. name@email.com';
 
   @override
   String get registerPasswordTooShort =>
@@ -589,5 +587,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get forgotPasswordSent => 'We sent a recovery link to your e-mail.';
 
   @override
-  String get registerSubtitle => 'It takes less than a minute.';
+  String get registerStepOne => 'Step 1 of 2 · your sign-in details';
+
+  @override
+  String get registerCreateAccountButton => 'CREATE ACCOUNT';
+
+  @override
+  String get registerConfirmPasswordLabel => 'Confirm password';
+
+  @override
+  String get registerPasswordMismatch => 'Passwords do not match';
+
+  @override
+  String get passwordStrengthWeak => 'Weak password';
+
+  @override
+  String get passwordStrengthMedium => 'Medium password';
+
+  @override
+  String get passwordStrengthStrong => 'Strong password';
+
+  @override
+  String get chooseTeamTitle => 'Your favorite team';
+
+  @override
+  String get chooseTeamSubtitle => 'Step 2 of 2 · personalize the app';
+
+  @override
+  String get chooseTeamDescription =>
+      'Choose your region and the team you follow. You can change it later.';
+
+  @override
+  String get chooseTeamConfirm => 'FINISH';
+
+  @override
+  String get chooseTeamSkip => 'Skip for now';
+
+  @override
+  String get chooseTeamLoadError => 'Could not load the regions and teams.';
+
+  @override
+  String get chooseTeamEmptyTeams => 'No teams registered in this region.';
 }

@@ -7,6 +7,7 @@ import 'package:arena_soccer/injection_container.dart';
 // Cubits em route-level (lib/arena_app.dart):
 // - LoginCubit         → loginPage
 // - RegisterUserCubit  → registerUserPage
+// - ChooseTeamCubit    → chooseTeamPage
 // - HomeCubit          → home
 // - NewsFormCubit      → registerNewsPage, publishAdPage
 // - GoalNotificationCubit → goalNotificationPage

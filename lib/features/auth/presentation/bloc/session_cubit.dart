@@ -22,6 +22,11 @@ class SessionCubit extends Cubit<SessionState> {
 
   void signedIn(UserDTO user) => emit(AuthenticatedSessionState(user: user));
 
+  /// Atualiza os dados do usuário logado (ex.: time escolhido na etapa 2).
+  void updateUser(UserDTO user) {
+    if (state.isAuthenticated) emit(AuthenticatedSessionState(user: user));
+  }
+
   void continueAsGuest() => emit(const GuestSessionState());
 
   Future<void> signOut() async {

@@ -1,52 +1,61 @@
 import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
+import 'package:arena_soccer/features/auth/domain/validators/email_validator.dart';
+import 'package:arena_soccer/features/auth/domain/validators/password_strength.dart';
 
 /// Erro de validação de um campo, traduzido na página via l10n.
-enum RegisterFieldError { required, nameTooShort, invalidEmail, passwordTooShort }
+enum RegisterFieldError { required, nameTooShort, invalidEmail, passwordTooShort, passwordMismatch }
 
-/// O estado base carrega o formulário inteiro, para ele sobreviver às
-/// transições Editing → Submitting → Error.
+/// Etapa 1 do cadastro (dados de acesso). O estado base carrega o formulário
+/// inteiro, para ele sobreviver às transições Editing → Submitting → Error.
 class RegisterUserState extends Equatable {
   final String name;
   final String email;
   final String password;
-  final List<String> regions;
-  final String? selectedRegion;
-  final List<String> teams;
-  final String? selectedTeam;
+  final String confirmPassword;
+
+  /// Depois de uma tentativa de envio, todos os erros ficam visíveis.
+  final bool submitAttempted;
 
   const RegisterUserState({
     this.name = '',
     this.email = '',
     this.password = '',
-    this.regions = const [],
-    this.selectedRegion,
-    this.teams = const [],
-    this.selectedTeam,
+    this.confirmPassword = '',
+    this.submitAttempted = false,
   });
 
   RegisterFieldError? get nameError {
-    if (name.isEmpty) return RegisterFieldError.required;
+    if (name.trim().isEmpty) return RegisterFieldError.required;
     if (name.trim().length < 3) return RegisterFieldError.nameTooShort;
     return null;
   }
 
   RegisterFieldError? get emailError {
-    if (email.isEmpty) return RegisterFieldError.required;
-    if (!email.contains('@') || !email.contains('.')) return RegisterFieldError.invalidEmail;
+    if (email.trim().isEmpty) return RegisterFieldError.required;
+    if (!EmailValidator.isValid(email)) return RegisterFieldError.invalidEmail;
     return null;
   }
 
   RegisterFieldError? get passwordError {
     if (password.isEmpty) return RegisterFieldError.required;
-    if (password.length < 8) return RegisterFieldError.passwordTooShort;
+    if (password.length < PasswordStrength.minLength) return RegisterFieldError.passwordTooShort;
     return null;
   }
 
-  bool get canSubmit => nameError == null && emailError == null && passwordError == null && selectedTeam != null;
+  RegisterFieldError? get confirmPasswordError {
+    if (confirmPassword.isEmpty) return RegisterFieldError.required;
+    if (confirmPassword != password) return RegisterFieldError.passwordMismatch;
+    return null;
+  }
+
+  PasswordStrength get passwordStrength => PasswordStrength.evaluate(password);
+
+  bool get canSubmit =>
+      nameError == null && emailError == null && passwordError == null && confirmPasswordError == null;
 
   @override
-  List<Object?> get props => [name, email, password, regions, selectedRegion, teams, selectedTeam];
+  List<Object?> get props => [name, email, password, confirmPassword, submitAttempted];
 }
 
 class EditingRegisterUserState extends RegisterUserState {
@@ -54,30 +63,23 @@ class EditingRegisterUserState extends RegisterUserState {
     super.name,
     super.email,
     super.password,
-    super.regions,
-    super.selectedRegion,
-    super.teams,
-    super.selectedTeam,
+    super.confirmPassword,
+    super.submitAttempted,
   });
 
   EditingRegisterUserState copyWith({
     String? name,
     String? email,
     String? password,
-    List<String>? regions,
-    String? selectedRegion,
-    List<String>? teams,
-    String? selectedTeam,
-    bool clearTeam = false,
+    String? confirmPassword,
+    bool? submitAttempted,
   }) {
     return EditingRegisterUserState(
       name: name ?? this.name,
       email: email ?? this.email,
       password: password ?? this.password,
-      regions: regions ?? this.regions,
-      selectedRegion: selectedRegion ?? this.selectedRegion,
-      teams: teams ?? this.teams,
-      selectedTeam: clearTeam ? null : (selectedTeam ?? this.selectedTeam),
+      confirmPassword: confirmPassword ?? this.confirmPassword,
+      submitAttempted: submitAttempted ?? this.submitAttempted,
     );
   }
 }
@@ -88,10 +90,8 @@ class SubmittingRegisterUserState extends RegisterUserState {
           name: form.name,
           email: form.email,
           password: form.password,
-          regions: form.regions,
-          selectedRegion: form.selectedRegion,
-          teams: form.teams,
-          selectedTeam: form.selectedTeam,
+          confirmPassword: form.confirmPassword,
+          submitAttempted: true,
         );
 }
 
@@ -112,10 +112,8 @@ class ErrorRegisterUserState extends RegisterUserState {
           name: form.name,
           email: form.email,
           password: form.password,
-          regions: form.regions,
-          selectedRegion: form.selectedRegion,
-          teams: form.teams,
-          selectedTeam: form.selectedTeam,
+          confirmPassword: form.confirmPassword,
+          submitAttempted: true,
         );
 
   @override

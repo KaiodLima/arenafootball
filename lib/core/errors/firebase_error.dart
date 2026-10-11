@@ -9,6 +9,10 @@ ErrorWithMessage mapFirebaseError(Object error, {required String fallbackMessage
     return ErrorWithMessage(_authMessage(error.code) ?? fallbackMessage, code: error.code);
   }
   if (error is FirebaseException) {
+    // Negado pelas Security Rules (firestore.rules / storage.rules).
+    if (error.code == 'permission-denied' || error.code == 'unauthorized') {
+      return ErrorWithMessage('O servidor recusou a operação. Tente novamente mais tarde.', code: error.code);
+    }
     return ErrorWithMessage(fallbackMessage, code: error.code);
   }
   return ErrorWithMessage(fallbackMessage);

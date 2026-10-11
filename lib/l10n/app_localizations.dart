@@ -242,12 +242,6 @@ abstract class AppLocalizations {
   /// **'Time do coração'**
   String get registerTeamLabel;
 
-  /// No description provided for @registerButton.
-  ///
-  /// In pt, this message translates to:
-  /// **'CADASTRAR'**
-  String get registerButton;
-
   /// No description provided for @registerHaveAccountButton.
   ///
   /// In pt, this message translates to:
@@ -269,7 +263,7 @@ abstract class AppLocalizations {
   /// No description provided for @registerEmailExample.
   ///
   /// In pt, this message translates to:
-  /// **'Exemplo: teste@teste.com'**
+  /// **'Informe um e-mail válido, ex.: nome@email.com'**
   String get registerEmailExample;
 
   /// No description provided for @registerPasswordTooShort.
@@ -1197,11 +1191,89 @@ abstract class AppLocalizations {
   /// **'Enviamos um link de recuperação para o seu e-mail.'**
   String get forgotPasswordSent;
 
-  /// No description provided for @registerSubtitle.
+  /// No description provided for @registerStepOne.
   ///
   /// In pt, this message translates to:
-  /// **'Leva menos de um minuto.'**
-  String get registerSubtitle;
+  /// **'Etapa 1 de 2 · seus dados de acesso'**
+  String get registerStepOne;
+
+  /// No description provided for @registerCreateAccountButton.
+  ///
+  /// In pt, this message translates to:
+  /// **'CRIAR CONTA'**
+  String get registerCreateAccountButton;
+
+  /// No description provided for @registerConfirmPasswordLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confirmar senha'**
+  String get registerConfirmPasswordLabel;
+
+  /// No description provided for @registerPasswordMismatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'As senhas não coincidem'**
+  String get registerPasswordMismatch;
+
+  /// No description provided for @passwordStrengthWeak.
+  ///
+  /// In pt, this message translates to:
+  /// **'Senha fraca'**
+  String get passwordStrengthWeak;
+
+  /// No description provided for @passwordStrengthMedium.
+  ///
+  /// In pt, this message translates to:
+  /// **'Senha média'**
+  String get passwordStrengthMedium;
+
+  /// No description provided for @passwordStrengthStrong.
+  ///
+  /// In pt, this message translates to:
+  /// **'Senha forte'**
+  String get passwordStrengthStrong;
+
+  /// No description provided for @chooseTeamTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu time do coração'**
+  String get chooseTeamTitle;
+
+  /// No description provided for @chooseTeamSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Etapa 2 de 2 · personalize o app'**
+  String get chooseTeamSubtitle;
+
+  /// No description provided for @chooseTeamDescription.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha sua região e o time que você acompanha. Dá para mudar depois.'**
+  String get chooseTeamDescription;
+
+  /// No description provided for @chooseTeamConfirm.
+  ///
+  /// In pt, this message translates to:
+  /// **'CONCLUIR'**
+  String get chooseTeamConfirm;
+
+  /// No description provided for @chooseTeamSkip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pular por agora'**
+  String get chooseTeamSkip;
+
+  /// No description provided for @chooseTeamLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar as regiões e os times.'**
+  String get chooseTeamLoadError;
+
+  /// No description provided for @chooseTeamEmptyTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum time cadastrado nesta região.'**
+  String get chooseTeamEmptyTeams;
 }
 
 class _AppLocalizationsDelegate

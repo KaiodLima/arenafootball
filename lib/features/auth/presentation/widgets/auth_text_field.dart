@@ -119,14 +119,17 @@ class _AuthTextFieldState extends State<AuthTextField> {
         label: widget.label,
         icon: widget.icon,
         errorText: widget.errorText,
+        // Fora da ordem de foco: o "próximo" do teclado deve pular para o campo seguinte.
         suffix: widget.isPassword
-            ? IconButton(
-                tooltip: _obscured ? l10n.loginShowPassword : l10n.loginHidePassword,
-                onPressed: () => setState(() => _obscured = !_obscured),
-                icon: Icon(
-                  _obscured ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                  color: AppColors.textSecondary,
-                  size: AppSizes.s20,
+            ? ExcludeFocus(
+                child: IconButton(
+                  tooltip: _obscured ? l10n.loginShowPassword : l10n.loginHidePassword,
+                  onPressed: () => setState(() => _obscured = !_obscured),
+                  icon: Icon(
+                    _obscured ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                    color: AppColors.textSecondary,
+                    size: AppSizes.s20,
+                  ),
                 ),
               )
             : null,

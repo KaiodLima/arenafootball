@@ -38,6 +38,19 @@ class UserDTO extends Equatable {
         'admin': isAdmin,
       };
 
+  /// Contas antigas e quem pulou a etapa 2 do cadastro ficam com `time` vazio.
+  bool get hasFavoriteTeam => favoriteTeam.trim().isNotEmpty;
+
+  UserDTO copyWith({String? name, String? email, String? favoriteTeam}) {
+    return UserDTO(
+      id: id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      favoriteTeam: favoriteTeam ?? this.favoriteTeam,
+      isAdmin: isAdmin,
+    );
+  }
+
   @override
   List<Object?> get props => [id, name, email, favoriteTeam, isAdmin];
 }

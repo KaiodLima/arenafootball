@@ -100,10 +100,22 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 `{ano}`: temporada do ano corrente usa a coleção sem sufixo; as outras usam o ano como sufixo (ver `SeasonCollection`).
 Storage: `noticias/`, `destaques/`, `times/`, `jogadores/` (ver `StorageFolder`).
 
+## Security Rules
+
+Versionadas no repo: `firestore.rules` e `storage.rules` (projeto em `.firebaserc`). Qualquer mudança passa por esses arquivos e é publicada com:
+
+```
+firebase deploy --only firestore:rules,storage
+```
+
+- Leitura pública do conteúdo (inclui o modo convidado); `usuarios` só pelo dono ou admin.
+- Escrita de conteúdo só do admin (`usuarios/{uid}.admin == true`); o usuário não consegue gravar `admin` no próprio perfil.
+- Votos (`melhorjogador*`): cada usuário logado grava só o doc com o próprio uid.
+- Erro `PERMISSION_DENIED` no logcat = regra negando; ajuste as regras, não o app.
+
 ## Débito técnico conhecido
 
 - `usuarios.senha` em texto puro nas contas antigas (o app não grava mais; falta limpar a base)
-- Permissão de admin só na UI — falta reforçar nas Security Rules do Firestore
 - Booleanos gravados como string (`exibir`, `votacao`)
 
 ## Arquivos críticos

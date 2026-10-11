@@ -56,7 +56,12 @@ class _LoginPageState extends State<LoginPage> {
     if (state is SuccessLoginState) {
       BlocProvider.of<SessionCubit>(context).signedIn(state.user);
       showSnackBar(context: context, message: l10n.loginSuccess);
-      _goHome();
+      // Contas antigas (ou quem pulou a etapa 2) ainda podem escolher o time.
+      if (state.user.hasFavoriteTeam) {
+        _goHome();
+      } else {
+        Navigator.pushReplacementNamed(context, AppRoutes.chooseTeamPage);
+      }
     }
     if (state is PasswordResetSentLoginState) {
       showSnackBar(context: context, message: l10n.forgotPasswordSent);

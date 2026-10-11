@@ -82,9 +82,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get registerTeamLabel => 'Time do coração';
 
   @override
-  String get registerButton => 'CADASTRAR';
-
-  @override
   String get registerHaveAccountButton => 'Já tenho uma conta!';
 
   @override
@@ -95,7 +92,8 @@ class AppLocalizationsPt extends AppLocalizations {
       'Seu nome de usuário deve conter no mínimo 3 caracteres';
 
   @override
-  String get registerEmailExample => 'Exemplo: teste@teste.com';
+  String get registerEmailExample =>
+      'Informe um e-mail válido, ex.: nome@email.com';
 
   @override
   String get registerPasswordTooShort =>
@@ -593,5 +591,46 @@ class AppLocalizationsPt extends AppLocalizations {
       'Enviamos um link de recuperação para o seu e-mail.';
 
   @override
-  String get registerSubtitle => 'Leva menos de um minuto.';
+  String get registerStepOne => 'Etapa 1 de 2 · seus dados de acesso';
+
+  @override
+  String get registerCreateAccountButton => 'CRIAR CONTA';
+
+  @override
+  String get registerConfirmPasswordLabel => 'Confirmar senha';
+
+  @override
+  String get registerPasswordMismatch => 'As senhas não coincidem';
+
+  @override
+  String get passwordStrengthWeak => 'Senha fraca';
+
+  @override
+  String get passwordStrengthMedium => 'Senha média';
+
+  @override
+  String get passwordStrengthStrong => 'Senha forte';
+
+  @override
+  String get chooseTeamTitle => 'Seu time do coração';
+
+  @override
+  String get chooseTeamSubtitle => 'Etapa 2 de 2 · personalize o app';
+
+  @override
+  String get chooseTeamDescription =>
+      'Escolha sua região e o time que você acompanha. Dá para mudar depois.';
+
+  @override
+  String get chooseTeamConfirm => 'CONCLUIR';
+
+  @override
+  String get chooseTeamSkip => 'Pular por agora';
+
+  @override
+  String get chooseTeamLoadError =>
+      'Não foi possível carregar as regiões e os times.';
+
+  @override
+  String get chooseTeamEmptyTeams => 'Nenhum time cadastrado nesta região.';
 }
