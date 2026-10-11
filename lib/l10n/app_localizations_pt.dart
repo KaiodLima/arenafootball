@@ -634,7 +634,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get votingLoadError => 'Não foi possível apurar a votação.';
 
   @override
-  String get globalResultsTitle => 'RESULTADOS PELO MUNDO';
+  String get globalResultsTitle => 'Resultados pelo mundo';
 
   @override
   String get globalResultsYesterday => 'Ontem';
@@ -646,11 +646,33 @@ class AppLocalizationsPt extends AppLocalizations {
   String get globalResultsTomorrow => 'Amanhã';
 
   @override
-  String get globalResultsEmpty => 'Nenhum jogo encontrado.';
+  String get globalResultsSubtitle => 'Placares das principais ligas do mundo';
 
   @override
-  String get globalResultsTomorrowUnavailable =>
-      'Os jogos de amanhã ainda não estão disponíveis.';
+  String get globalResultsLive => 'Ao vivo';
+
+  @override
+  String get globalResultsHalfTime => 'Intervalo';
+
+  @override
+  String get globalResultsFinished => 'Encerrado';
+
+  @override
+  String get globalResultsPostponed => 'Adiado';
+
+  @override
+  String globalResultsLiveFilter(int count) {
+    return 'Ao vivo ($count)';
+  }
+
+  @override
+  String get globalResultsSearchHint => 'Buscar time ou liga';
+
+  @override
+  String get globalResultsNoMatches => 'Nenhum jogo encontrado';
+
+  @override
+  String get globalResultsPenalty => 'pênalti';
 
   @override
   String get loginWelcomeTitle => 'Bem-vindo de volta 👋';

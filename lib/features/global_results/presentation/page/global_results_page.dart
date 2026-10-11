@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:arena_soccer/features/global_results/domain/entities/global_match.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/page_title_bar.dart';
 import 'package:arena_soccer/features/global_results/domain/entities/results_day.dart';
 import 'package:arena_soccer/features/global_results/presentation/bloc/global_results_cubit.dart';
 import 'package:arena_soccer/features/global_results/presentation/bloc/global_results_state.dart';
+import 'package:arena_soccer/features/global_results/presentation/widgets/league_card.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
+import 'package:arena_soccer/utils/components/arena_empty_state.dart';
+import 'package:arena_soccer/utils/components/arena_search_field.dart';
+import 'package:arena_soccer/utils/components/arena_segmented_pill.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
+import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// Resultados de jogos pelo mundo (web scraping do soccerstats.com).
+/// Resultados de jogos pelo mundo (web scraping do soccerstats.com): seletor
+/// de dia no topo escuro, busca + filtro "ao vivo" e os jogos em cards por
+/// liga. Puxar para baixo recarrega o dia.
 class GlobalResultsPage extends StatefulWidget {
   const GlobalResultsPage({super.key});
 
@@ -27,48 +34,82 @@ class _GlobalResultsPageState extends State<GlobalResultsPage> {
     _cubit.load(ResultsDay.today);
   }
 
-  String _dayLabel(ResultsDay day, AppLocalizations l10n) {
-    switch (day) {
-      case ResultsDay.yesterday:
-        return l10n.globalResultsYesterday;
-      case ResultsDay.today:
-        return l10n.globalResultsToday;
-      case ResultsDay.tomorrow:
-        return l10n.globalResultsTomorrow;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.globalResultsTitle)),
+      backgroundColor: AppColors.background,
+      appBar: PageTitleBar(title: l10n.globalResultsTitle, subtitle: l10n.globalResultsSubtitle),
       body: BlocBuilder<GlobalResultsCubit, GlobalResultsState>(
         builder: (context, state) {
-          return Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(AppSizes.s8),
-                child: Row(
-                  children: ResultsDay.values.map((day) {
-                    return Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSizes.s4),
-                        child: ArenaButton(
-                          height: AppSizes.s50,
-                          title: _dayLabel(day, l10n),
-                          buttonColor: state.day == day ? AppColors.primaryDark : AppColors.primary,
-                          borderRadius: AppSizes.s32,
-                          function: () => _cubit.load(day),
+          final groups = state.groups;
+          final showLive = state.day == ResultsDay.today && state.liveCount > 0;
+
+          return RefreshIndicator(
+            color: AppColors.primary,
+            onRefresh: _cubit.refresh,
+            child: CustomScrollView(
+              physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              slivers: [
+                SliverToBoxAdapter(child: _Header(day: state.day, onChanged: _cubit.load)),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s12),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ArenaSearchField(hint: l10n.globalResultsSearchHint, onChanged: _cubit.setQuery),
                         ),
-                      ),
-                    );
-                  }).toList(),
+                        if (showLive) ...[
+                          const SizedBox(width: AppSizes.s8),
+                          _LiveChip(
+                            label: l10n.globalResultsLiveFilter(state.liveCount),
+                            selected: state.liveOnly,
+                            onTap: _cubit.toggleLive,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-              Expanded(child: _Content(state: state)),
-            ],
+                if (state is LoadingGlobalResultsState)
+                  const SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+                  )
+                else if (state is ErrorGlobalResultsState && state.matches.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ArenaEmptyState.error(message: state.errorMessage),
+                        ArenaButton.outlined(
+                          title: l10n.commonTryAgain,
+                          width: AppSizes.s200,
+                          function: () => _cubit.load(state.day),
+                        ),
+                      ],
+                    ),
+                  )
+                else if (groups.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: ArenaEmptyState(message: l10n.globalResultsNoMatches, icon: Icons.sports_soccer_outlined),
+                  )
+                else
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s32),
+                    sliver: SliverList.builder(
+                      itemCount: groups.length,
+                      itemBuilder: (context, index) =>
+                          LeagueCard(key: ValueKey(groups[index].league), group: groups[index]),
+                    ),
+                  ),
+              ],
+            ),
           );
         },
       ),
@@ -76,124 +117,87 @@ class _GlobalResultsPageState extends State<GlobalResultsPage> {
   }
 }
 
-class _Content extends StatelessWidget {
-  final GlobalResultsState state;
+/// Topo escuro: seletor Ontem | Hoje | Amanhã e a borda arredondada da folha
+/// clara que vem embaixo.
+class _Header extends StatelessWidget {
+  final ResultsDay day;
+  final ValueChanged<ResultsDay> onChanged;
 
-  const _Content({required this.state});
+  const _Header({required this.day, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    if (state is LoadingGlobalResultsState) {
-      return const Center(child: CircularProgressIndicator(color: AppColors.primary));
-    }
-    if (state is ErrorGlobalResultsState) {
-      return _Message(text: (state as ErrorGlobalResultsState).errorMessage);
-    }
-    if (state.day == ResultsDay.tomorrow) return _Message(text: l10n.globalResultsTomorrowUnavailable);
-    if (state.matches.isEmpty) return _Message(text: l10n.globalResultsEmpty);
-
-    final matches = state.matches;
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8),
-      itemCount: matches.length,
-      itemBuilder: (context, i) {
-        final showLeague = i == 0 || matches[i].league != matches[i - 1].league;
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (showLeague && matches[i].league.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: AppSizes.s12, bottom: AppSizes.s4),
-                child: Text(
-                  matches[i].league,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            _MatchTile(match: matches[i]),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _MatchTile extends StatelessWidget {
-  final GlobalMatch match;
-
-  const _MatchTile({required this.match});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: AppSizes.s4),
-      padding: const EdgeInsets.all(AppSizes.s8),
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColors.greyLight),
-        borderRadius: BorderRadius.circular(AppSizes.radius),
-      ),
+    return ColoredBox(
+      color: AppColors.primaryDark,
       child: Column(
         children: [
-          Row(
-            children: [
-              if (match.time.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSizes.s6, vertical: AppSizes.s2),
-                  margin: const EdgeInsets.only(right: AppSizes.s8),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(AppSizes.s4),
-                  ),
-                  child: Text(match.time, style: const TextStyle(color: AppColors.white)),
-                ),
-              Expanded(
-                child: Text(
-                  match.homeTeam,
-                  textAlign: TextAlign.end,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: AppSizes.s16),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8),
-                child: Text(
-                  match.score,
-                  style: const TextStyle(fontSize: AppSizes.s16, fontWeight: FontWeight.bold),
-                ),
-              ),
-              Expanded(
-                child: Text(
-                  match.awayTeam,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: AppSizes.s16),
-                ),
-              ),
-            ],
-          ),
-          if (match.scorers.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: AppSizes.s4),
-              child: Text(match.scorers, textAlign: TextAlign.center, style: const TextStyle(fontSize: AppSizes.s12)),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s4, AppSizes.s16, AppSizes.s20),
+            child: ArenaSegmentedPill(
+              segments: [
+                ArenaSegment(label: l10n.globalResultsYesterday),
+                ArenaSegment(label: l10n.globalResultsToday),
+                ArenaSegment(label: l10n.globalResultsTomorrow),
+              ],
+              selectedIndex: ResultsDay.values.indexOf(day),
+              onChanged: (index) {
+                final selected = ResultsDay.values[index];
+                if (selected != day) onChanged(selected);
+              },
             ),
+          ),
+          Container(
+            height: AppSizes.sheetOverlap,
+            decoration: const BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(AppSizes.radiusLarge)),
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-class _Message extends StatelessWidget {
-  final String text;
+/// Chip "● Ao vivo (5)": liga/desliga o filtro de jogos em andamento.
+class _LiveChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
 
-  const _Message({required this.text});
+  const _LiveChip({required this.label, required this.selected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSizes.s24),
-        child: Text(text, textAlign: TextAlign.center, style: const TextStyle(fontSize: AppSizes.s16)),
+    final foreground = selected ? AppColors.white : AppColors.danger;
+
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: Material(
+        color: selected ? AppColors.danger : AppColors.surface,
+        shape: StadiumBorder(side: BorderSide(color: selected ? AppColors.danger : AppColors.greyLight)),
+        child: InkWell(
+          customBorder: const StadiumBorder(),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSizes.s14, vertical: AppSizes.s14),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: AppSizes.s8,
+                  height: AppSizes.s8,
+                  decoration: BoxDecoration(color: foreground, shape: BoxShape.circle),
+                ),
+                const SizedBox(width: AppSizes.s6),
+                Text(label, style: AppTypography.label(color: foreground).copyWith(fontSize: AppSizes.s14)),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -327,12 +327,26 @@
     }
   },
   "votingLoadError": "Não foi possível apurar a votação.",
-  "globalResultsTitle": "RESULTADOS PELO MUNDO",
+  "globalResultsTitle": "Resultados pelo mundo",
   "globalResultsYesterday": "Ontem",
   "globalResultsToday": "Hoje",
   "globalResultsTomorrow": "Amanhã",
-  "globalResultsEmpty": "Nenhum jogo encontrado.",
-  "globalResultsTomorrowUnavailable": "Os jogos de amanhã ainda não estão disponíveis.",
+  "globalResultsSubtitle": "Placares das principais ligas do mundo",
+  "globalResultsLive": "Ao vivo",
+  "globalResultsHalfTime": "Intervalo",
+  "globalResultsFinished": "Encerrado",
+  "globalResultsPostponed": "Adiado",
+  "globalResultsLiveFilter": "Ao vivo ({count})",
+  "@globalResultsLiveFilter": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "globalResultsSearchHint": "Buscar time ou liga",
+  "globalResultsNoMatches": "Nenhum jogo encontrado",
+  "globalResultsPenalty": "pênalti",
   "loginWelcomeTitle": "Bem-vindo de volta 👋",
   "loginWelcomeSubtitle": "Entre para acompanhar seu time, os jogos e a tabela.",
   "loginForgotPassword": "Esqueci minha senha",

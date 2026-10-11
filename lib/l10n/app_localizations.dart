@@ -1182,7 +1182,7 @@ abstract class AppLocalizations {
   /// No description provided for @globalResultsTitle.
   ///
   /// In pt, this message translates to:
-  /// **'RESULTADOS PELO MUNDO'**
+  /// **'Resultados pelo mundo'**
   String get globalResultsTitle;
 
   /// No description provided for @globalResultsYesterday.
@@ -1203,17 +1203,59 @@ abstract class AppLocalizations {
   /// **'Amanhã'**
   String get globalResultsTomorrow;
 
-  /// No description provided for @globalResultsEmpty.
+  /// No description provided for @globalResultsSubtitle.
   ///
   /// In pt, this message translates to:
-  /// **'Nenhum jogo encontrado.'**
-  String get globalResultsEmpty;
+  /// **'Placares das principais ligas do mundo'**
+  String get globalResultsSubtitle;
 
-  /// No description provided for @globalResultsTomorrowUnavailable.
+  /// No description provided for @globalResultsLive.
   ///
   /// In pt, this message translates to:
-  /// **'Os jogos de amanhã ainda não estão disponíveis.'**
-  String get globalResultsTomorrowUnavailable;
+  /// **'Ao vivo'**
+  String get globalResultsLive;
+
+  /// No description provided for @globalResultsHalfTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'Intervalo'**
+  String get globalResultsHalfTime;
+
+  /// No description provided for @globalResultsFinished.
+  ///
+  /// In pt, this message translates to:
+  /// **'Encerrado'**
+  String get globalResultsFinished;
+
+  /// No description provided for @globalResultsPostponed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adiado'**
+  String get globalResultsPostponed;
+
+  /// No description provided for @globalResultsLiveFilter.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ao vivo ({count})'**
+  String globalResultsLiveFilter(int count);
+
+  /// No description provided for @globalResultsSearchHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Buscar time ou liga'**
+  String get globalResultsSearchHint;
+
+  /// No description provided for @globalResultsNoMatches.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum jogo encontrado'**
+  String get globalResultsNoMatches;
+
+  /// No description provided for @globalResultsPenalty.
+  ///
+  /// In pt, this message translates to:
+  /// **'pênalti'**
+  String get globalResultsPenalty;
 
   /// No description provided for @loginWelcomeTitle.
   ///

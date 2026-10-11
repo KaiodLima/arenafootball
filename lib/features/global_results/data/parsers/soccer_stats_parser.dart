@@ -1,99 +1,143 @@
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
-import 'package:arena_soccer/features/global_results/data/dtos/scraped_row_dto.dart';
+import 'package:arena_soccer/features/global_results/data/dtos/scraped_match_dto.dart';
 import 'package:arena_soccer/features/global_results/domain/entities/results_day.dart';
 
-/// Extrai as partidas do HTML do soccerstats.com. A estrutura da página não
-/// tem classes estáveis: as linhas de liga são reconhecidas pelo texto
-/// "stats" e os jogos por posição. Se o site mudar, é aqui que quebra.
+/// Extrai as partidas do HTML do soccerstats.com. A página não tem classes
+/// estáveis para tudo; a estrutura usada (conferida em out/2026):
+///
+/// - Hoje (página inicial): linhas `tr.parent` com a liga seguidas de
+///   `tr.child` com os jogos (≥4 `td`: status/horário, casa, placar, fora).
+///   Há duas seções: a de destaque (o 1º `td` tem `<a href='#mNN'>`), com
+///   minuto ao vivo em vermelho, FT/HT e os autores dos gols em
+///   `p.ScorersList`; e a lista completa do dia, com horário e o placar final
+///   (ou "vs").
+/// - Ontem/Amanhã: `tr.parent` com a liga e cada jogo em `tr.team1row` +
+///   `tr.team2row`; o 2º `td` traz os gols (ontem), o horário (amanhã) ou
+///   "pp." (adiado).
+///
+/// As linhas são percorridas na ordem do documento, guardando a última liga
+/// vista. Se o site mudar, é aqui que quebra.
 class SoccerStatsParser {
-  List<ScrapedRowDTO> parse(String html, ResultsDay day) {
+  static const String _liveColor = '#c70039';
+  static final RegExp _score = RegExp(r'(\d+)\s*:\s*(\d+)');
+  static final RegExp _kickoff = RegExp(r'^\d{1,2}:\d{2}$');
+  static final RegExp _goal = RegExp(r"^(\d+)-(\d+)\s+(.+?)\s*\((\d+(?:\+\d+)?)'\)$");
+
+  List<ScrapedMatchDTO> parse(String html, ResultsDay day) {
     final soup = BeautifulSoup(html);
-    switch (day) {
-      case ResultsDay.today:
-        return _parseToday(soup);
-      case ResultsDay.yesterday:
-        return _parseYesterday(soup);
-      case ResultsDay.tomorrow:
-        return _parseTomorrow(soup);
-    }
+    return day == ResultsDay.today ? _parseToday(soup) : _parseByTeamRows(soup);
   }
 
-  List<ScrapedRowDTO> _parseToday(BeautifulSoup soup) {
-    final rows = <ScrapedRowDTO>[];
-    for (final item in soup.findAll('tr', class_: 'child')) {
-      if (item.children.length < 4) continue;
-      rows.add(
-        ScrapedRowDTO(
-          league: _leagueAbove(item),
-          time: item.children[0].text,
-          home: item.children[1].text,
-          // O placar fica dentro de um <a>, e os autores dos gols num <p>.
-          score: item.children[2].a?.children.firstOrNull?.text ?? 'x',
-          away: item.children[3].text,
-          scorers: item.children[2].p?.text.trim() ?? '',
-        ),
-      );
-    }
-    return rows;
-  }
-
-  /// Sobe pelos irmãos anteriores até achar a linha da liga (contém "stats"
-  /// e não tem horário).
-  String _leagueAbove(Bs4Element item) {
-    Bs4Element? current = item.previousSibling;
-    while (current != null) {
-      final text = current.text;
-      if (text.contains('stats') && !text.contains(':')) return text.split('stats').first;
-      current = current.previousSibling;
-    }
-    return '';
-  }
-
-  List<ScrapedRowDTO> _parseYesterday(BeautifulSoup soup) {
-    // Achata, em ordem, a linha de cada liga seguida das linhas dos seus jogos.
-    final texts = <String?>[];
-    for (final league in soup.findAll('tr', class_: 'parent')) {
-      texts.add(league.text);
-      var element = league.nextSibling;
-      if (element != null && element.text.contains('Scope')) element = element.nextSibling;
-      texts.add(element?.text);
-
-      while (element != null && !element.text.contains('stats')) {
-        element = element.nextSibling;
-        texts.add(element?.text);
-        if (element == null || element.text.contains('stats')) break;
-        element = element.nextSibling;
-        texts.add(element?.text);
-      }
-    }
-
-    final rows = <ScrapedRowDTO>[];
+  List<ScrapedMatchDTO> _parseToday(BeautifulSoup soup) {
+    final matches = <ScrapedMatchDTO>[];
     var league = '';
-    for (var i = 0; i < texts.length; i++) {
-      final text = texts[i];
-      if (text == null || text.isEmpty) continue;
-      if (text.contains('stats')) {
-        league = text.split('stats').first;
+    var flag = '';
+    for (final row in soup.findAll('tr')) {
+      if (row.classes.contains('parent')) {
+        league = _leagueName(row);
+        flag = _flag(row);
         continue;
       }
-      // Cada linha é "<time><gols>"; o último caractere é o placar do time.
-      final teamAndGoals = text.contains('analysis') ? text.split('analysis').first : text;
-      if (teamAndGoals.isEmpty) continue;
-      rows.add(
-        ScrapedRowDTO(
-          home: teamAndGoals.substring(0, teamAndGoals.length - 1),
-          score: teamAndGoals[teamAndGoals.length - 1],
-          league: league,
-        ),
-      );
+      if (!row.classes.contains('child')) continue;
+      final cells = row.findAll('td');
+      if (cells.length < 4) continue;
+
+      final status = cells[0];
+      final featured = status.find('a')?.attributes['href']?.startsWith('#m') ?? false;
+      final statusText = _clean(status.text);
+      final scoreCell = cells[2];
+      final scorers = scoreCell.find('p', class_: 'ScorersList');
+      final scoreText = scorers == null ? scoreCell.text : scoreCell.text.replaceFirst(scorers.text, '');
+      final score = _score.firstMatch(scoreText);
+
+      matches.add(ScrapedMatchDTO(
+        league: league,
+        flagBase64: flag,
+        // Na lista completa o 1º `td` é o horário; no destaque, o status.
+        kickoff: _kickoff.hasMatch(statusText) ? statusText : '',
+        statusText: featured ? statusText : '',
+        isLive: featured && (status.find('font')?.attributes['color']?.toLowerCase() == _liveColor),
+        featured: featured,
+        homeTeam: _clean(cells[1].text),
+        awayTeam: _clean(cells[3].text),
+        homeGoals: score == null ? null : int.parse(score.group(1)!),
+        awayGoals: score == null ? null : int.parse(score.group(2)!),
+        goals: scorers == null ? const [] : _goals(scorers),
+      ));
     }
-    return rows;
+    return matches;
   }
 
-  List<ScrapedRowDTO> _parseTomorrow(BeautifulSoup soup) {
-    return soup
-        .findAll('td', class_: 'steam')
-        .map((item) => ScrapedRowDTO(home: item.text, time: item.nextElement?.text ?? ''))
-        .toList();
+  List<ScrapedMatchDTO> _parseByTeamRows(BeautifulSoup soup) {
+    final matches = <ScrapedMatchDTO>[];
+    var league = '';
+    var flag = '';
+    Bs4Element? home;
+    for (final row in soup.findAll('tr')) {
+      if (row.classes.contains('parent')) {
+        league = _leagueName(row);
+        flag = _flag(row);
+      } else if (row.classes.contains('team1row')) {
+        home = row;
+      } else if (row.classes.contains('team2row') && home != null) {
+        final homeCells = home.findAll('td');
+        final awayCells = row.findAll('td');
+        home = null;
+        if (homeCells.length < 2 || awayCells.isEmpty) continue;
+
+        final info = _clean(homeCells[1].text);
+        final postponed = info.toLowerCase().startsWith('pp');
+        final homeGoals = int.tryParse(info);
+        matches.add(ScrapedMatchDTO(
+          league: league,
+          flagBase64: flag,
+          kickoff: _kickoff.hasMatch(info) ? info : '',
+          homeTeam: _clean(homeCells[0].text),
+          awayTeam: _clean(awayCells[0].text),
+          homeGoals: homeGoals,
+          // O placar do visitante só existe quando o da casa existe (o horário
+          // e o "pp." ocupam as duas linhas com rowspan).
+          awayGoals: homeGoals == null || awayCells.length < 2 ? null : int.tryParse(_clean(awayCells[1].text)),
+          postponed: postponed,
+        ));
+      }
+    }
+    return matches;
   }
+
+  /// "England - Premier League" (sem o link "stats" que algumas páginas
+  /// colocam na mesma linha).
+  String _leagueName(Bs4Element row) {
+    final text = _clean(row.text);
+    final index = text.lastIndexOf(' stats');
+    return (index >= 0 ? text.substring(0, index) : text).trim();
+  }
+
+  String _flag(Bs4Element row) {
+    final src = row.find('img')?.attributes['src'] ?? '';
+    final comma = src.indexOf('base64,');
+    return src.startsWith('data:image') && comma >= 0 ? src.substring(comma + 'base64,'.length) : '';
+  }
+
+  /// Autores dos gols, um por `<br>`: "<b>0-1</b>&nbsp;&nbsp;Erling Haaland  (65')".
+  /// O "---" separa os tempos e é ignorado.
+  List<ScrapedGoalDTO> _goals(Bs4Element list) {
+    final goals = <ScrapedGoalDTO>[];
+    for (final line in list.innerHtml.split(RegExp(r'<br\s*/?>', caseSensitive: false))) {
+      final text = _clean(line.replaceAll(RegExp(r'<[^>]+>'), ' '));
+      final match = _goal.firstMatch(text);
+      if (match == null) continue;
+      goals.add(ScrapedGoalDTO(
+        homeScore: int.parse(match.group(1)!),
+        awayScore: int.parse(match.group(2)!),
+        scorer: match.group(3)!.trim(),
+        minute: match.group(4)!,
+      ));
+    }
+    return goals;
+  }
+
+  /// Junta espaços (inclui `&nbsp;`) e apara.
+  static String _clean(String text) =>
+      text.replaceAll('&nbsp;', ' ').replaceAll(' ', ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
 }

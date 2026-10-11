@@ -628,7 +628,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get votingLoadError => 'Could not count the votes.';
 
   @override
-  String get globalResultsTitle => 'RESULTS AROUND THE WORLD';
+  String get globalResultsTitle => 'Results around the world';
 
   @override
   String get globalResultsYesterday => 'Yesterday';
@@ -640,11 +640,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get globalResultsTomorrow => 'Tomorrow';
 
   @override
-  String get globalResultsEmpty => 'No matches found.';
+  String get globalResultsSubtitle =>
+      'Scores from top leagues around the world';
 
   @override
-  String get globalResultsTomorrowUnavailable =>
-      'Tomorrow\'s matches are not available yet.';
+  String get globalResultsLive => 'Live';
+
+  @override
+  String get globalResultsHalfTime => 'Half time';
+
+  @override
+  String get globalResultsFinished => 'Finished';
+
+  @override
+  String get globalResultsPostponed => 'Postponed';
+
+  @override
+  String globalResultsLiveFilter(int count) {
+    return 'Live ($count)';
+  }
+
+  @override
+  String get globalResultsSearchHint => 'Search team or league';
+
+  @override
+  String get globalResultsNoMatches => 'No matches found';
+
+  @override
+  String get globalResultsPenalty => 'penalty';
 
   @override
   String get loginWelcomeTitle => 'Welcome back 👋';
