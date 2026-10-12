@@ -72,6 +72,13 @@ service cloud.firestore {
       allow delete: if (isRequester() && resource.data.status == 'pendente') || isAdmin();
     }
 
+    // Temporada atual e lista do seletor: todo mundo lê (inclusive convidado),
+    // só o admin troca (painel "Temporadas").
+    match /config/temporadas {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Notificações push (Cloud Functions em functions/).
     // Liga/desliga por ação: só o admin lê e altera.
     match /config/notificacoes {

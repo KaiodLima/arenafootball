@@ -1932,4 +1932,99 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get homePublishChampionship => 'Campeonato';
+
+  @override
+  String get championshipsCurrentBadge => 'EM ANDAMENTO';
+
+  @override
+  String get championshipsPrevious => 'Anteriores';
+
+  @override
+  String get championshipTabOverview => 'Visão geral';
+
+  @override
+  String get championshipTabTeams => 'Times';
+
+  @override
+  String get championshipTabRules => 'Regulamento';
+
+  @override
+  String get championshipRulesEmpty => 'Regulamento ainda não publicado';
+
+  @override
+  String get championshipTeamsEmpty => 'Times ainda não definidos';
+
+  @override
+  String get championshipGroupsAndStandings => 'Grupos e classificação';
+
+  @override
+  String championshipSeasonShort(String season) {
+    return 'Temporada $season';
+  }
+
+  @override
+  String get championshipOverviewEmpty =>
+      'Premiação e informações ainda não publicadas';
+
+  @override
+  String get championshipAbout => 'Sobre';
+
+  @override
+  String get seasonsPanelTitle => 'Temporadas';
+
+  @override
+  String get seasonsCurrentLabel => 'Temporada atual';
+
+  @override
+  String get seasonsCurrentInfo =>
+      'Times, partidas, jogadores e campeonatos novos são gravados nesta temporada.';
+
+  @override
+  String get seasonsAvailable => 'Temporadas disponíveis';
+
+  @override
+  String get seasonsCurrentTag => 'Atual';
+
+  @override
+  String seasonsStartTitle(String season) {
+    return 'Iniciar temporada $season';
+  }
+
+  @override
+  String seasonsStartInfo(String current) {
+    return 'A temporada $current fica guardada para consulta no seletor de temporada. Nada é apagado.';
+  }
+
+  @override
+  String get seasonsCopyTeams => 'Copiar os times da temporada atual';
+
+  @override
+  String get seasonsCopyTeamsHint =>
+      'Os times entram na nova temporada com a classificação zerada. Os elencos começam vazios.';
+
+  @override
+  String seasonsStartButton(String season) {
+    return 'INICIAR TEMPORADA $season';
+  }
+
+  @override
+  String seasonsConfirmTitle(String season) {
+    return 'Iniciar a temporada $season?';
+  }
+
+  @override
+  String seasonsConfirmMessage(String season) {
+    return 'Todos os usuários passam a ver $season como temporada atual e os novos cadastros vão para ela. Não dá para desfazer pelo app.';
+  }
+
+  @override
+  String get seasonsConfirmAction => 'Iniciar';
+
+  @override
+  String seasonsStarted(String season) {
+    return 'Temporada $season iniciada!';
+  }
+
+  @override
+  String get matchFormChampionship => 'Campeonato';
 }

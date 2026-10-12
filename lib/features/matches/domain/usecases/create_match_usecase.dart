@@ -45,7 +45,8 @@ class CreateMatchUseCase {
         time: match.time,
         venue: match.venue,
         region: match.region,
-        championshipId: await _championshipIdOf(match.region),
+        // Escolhido no formulário; sem escolha, o da região na temporada.
+        championshipId: match.championshipId > 0 ? match.championshipId : await _championshipIdOf(match.region),
       ),
     );
   }

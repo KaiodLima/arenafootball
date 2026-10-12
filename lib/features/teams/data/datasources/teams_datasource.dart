@@ -32,7 +32,7 @@ class TeamsDataSource {
 
   Future<Either<Failure, TeamDTO?>> getTeamByName(String name) async {
     try {
-      final result = await _firestore.collection('times').where('nome', isEqualTo: name).limit(1).get();
+      final result = await _firestore.collection(SeasonCollection.name('times', null)).where('nome', isEqualTo: name).limit(1).get();
       return Right(result.docs.isEmpty ? null : TeamDTO.fromFirestore(result.docs.first));
     } catch (e) {
       AppLogger.e('getTeamByName name=$name', name: 'TeamsDataSource', error: e);

@@ -60,6 +60,23 @@ export function topicSlug(value: string): string {
 }
 
 export const ALL_TOPIC = 'todos';
+
+/**
+ * Temporadas (igual a lib/core/firebase/season_collection.dart): 2023 é a
+ * única sem sufixo; as outras usam o ano (`partidas2024`). A atual fica em
+ * `config/temporadas.atual`.
+ */
+export const LEGACY_SEASON = '2023';
+
+export function seasonCollection(base: string, season: string): string {
+  return !season || season === LEGACY_SEASON ? base : `${base}${season}`;
+}
+
+/** Temporada atual gravada na config (sem config: a legada). */
+export function currentSeasonOf(config: Doc | undefined): string {
+  const value = text(config?.atual);
+  return value || LEGACY_SEASON;
+}
 export const regionTopic = (region: string): string => `regiao_${topicSlug(region)}`;
 export const teamTopic = (team: string): string => `time_${topicSlug(team)}`;
 /** Administradores (o app assina quando a conta é admin). */

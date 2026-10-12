@@ -1914,4 +1914,99 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homePublishChampionship => 'Championship';
+
+  @override
+  String get championshipsCurrentBadge => 'IN PROGRESS';
+
+  @override
+  String get championshipsPrevious => 'Previous';
+
+  @override
+  String get championshipTabOverview => 'Overview';
+
+  @override
+  String get championshipTabTeams => 'Teams';
+
+  @override
+  String get championshipTabRules => 'Rules';
+
+  @override
+  String get championshipRulesEmpty => 'Rules not published yet';
+
+  @override
+  String get championshipTeamsEmpty => 'Teams not defined yet';
+
+  @override
+  String get championshipGroupsAndStandings => 'Groups and standings';
+
+  @override
+  String championshipSeasonShort(String season) {
+    return '$season season';
+  }
+
+  @override
+  String get championshipOverviewEmpty =>
+      'Prizes and details not published yet';
+
+  @override
+  String get championshipAbout => 'About';
+
+  @override
+  String get seasonsPanelTitle => 'Seasons';
+
+  @override
+  String get seasonsCurrentLabel => 'Current season';
+
+  @override
+  String get seasonsCurrentInfo =>
+      'New teams, matches, players and championships are saved to this season.';
+
+  @override
+  String get seasonsAvailable => 'Available seasons';
+
+  @override
+  String get seasonsCurrentTag => 'Current';
+
+  @override
+  String seasonsStartTitle(String season) {
+    return 'Start $season season';
+  }
+
+  @override
+  String seasonsStartInfo(String current) {
+    return 'The $current season stays available in the season picker. Nothing is deleted.';
+  }
+
+  @override
+  String get seasonsCopyTeams => 'Copy the current season\'s teams';
+
+  @override
+  String get seasonsCopyTeamsHint =>
+      'Teams join the new season with zeroed standings. Squads start empty.';
+
+  @override
+  String seasonsStartButton(String season) {
+    return 'START $season SEASON';
+  }
+
+  @override
+  String seasonsConfirmTitle(String season) {
+    return 'Start the $season season?';
+  }
+
+  @override
+  String seasonsConfirmMessage(String season) {
+    return 'Every user will see $season as the current season and new records go to it. This can\'t be undone in the app.';
+  }
+
+  @override
+  String get seasonsConfirmAction => 'Start';
+
+  @override
+  String seasonsStarted(String season) {
+    return '$season season started!';
+  }
+
+  @override
+  String get matchFormChampionship => 'Championship';
 }

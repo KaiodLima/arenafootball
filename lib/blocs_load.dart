@@ -30,7 +30,7 @@ class BlocsLoad extends StatelessWidget {
         BlocProvider<SessionCubit>(create: (_) => SessionCubit(sl(), sl())),
 
         // Região e temporada — global: filtram notícias, times, tabelas...
-        BlocProvider<RegionCubit>(create: (_) => RegionCubit(sl(), sl(), sl(), sl())..load()),
+        BlocProvider<RegionCubit>(create: (_) => RegionCubit(sl(), sl(), sl(), sl(), sl())..load()),
       ],
       // Tópicos de push acompanham a região e o time do coração.
       child: PushTopicsListener(child: child),

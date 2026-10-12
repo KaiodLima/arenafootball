@@ -56,6 +56,8 @@ import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/presentation/page/player_form_page.dart';
 import 'package:arena_soccer/features/players/presentation/page/team_players_page.dart';
 import 'package:arena_soccer/features/splash/presentation/page/splash_page.dart';
+import 'package:arena_soccer/features/seasons/presentation/bloc/seasons_panel_cubit.dart';
+import 'package:arena_soccer/features/seasons/presentation/page/seasons_panel_page.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
 import 'package:arena_soccer/features/stats/presentation/bloc/stats_ranking_cubit.dart';
 import 'package:arena_soccer/features/stats/presentation/page/stats_ranking_page.dart';
@@ -227,7 +229,7 @@ class ArenaApp extends StatelessWidget {
           );
         },
         AppRoutes.registerMatchPage: (_) => BlocProvider<MatchFormCubit>(
-              create: (_) => MatchFormCubit(sl(), sl(), sl(), sl()),
+              create: (_) => MatchFormCubit(sl(), sl(), sl(), sl(), sl()),
               child: const MatchFormPage(),
             ),
 
@@ -239,6 +241,10 @@ class ArenaApp extends StatelessWidget {
             child: ChampionshipDetailsPage(championship: args?['championship'] as ChampionshipDTO),
           );
         },
+        AppRoutes.seasonsPanelPage: (_) => BlocProvider<SeasonsPanelCubit>(
+              create: (_) => SeasonsPanelCubit(sl(), sl()),
+              child: const SeasonsPanelPage(),
+            ),
         AppRoutes.manageChampionshipsPage: (_) => BlocProvider<ManageChampionshipsCubit>(
               create: (_) => ManageChampionshipsCubit(sl(), sl()),
               child: const ManageChampionshipsPage(),
@@ -255,7 +261,11 @@ class ArenaApp extends StatelessWidget {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<GroupsCubit>(
             create: (_) => GroupsCubit(sl(), sl()),
-            child: GroupsPage(region: args?['region'] as String?, season: args?['season'] as String?),
+            child: GroupsPage(
+              region: args?['region'] as String?,
+              season: args?['season'] as String?,
+              championshipId: args?['championshipId'] as int?,
+            ),
           );
         },
         AppRoutes.standingsPage: (context) {

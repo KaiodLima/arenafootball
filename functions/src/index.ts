@@ -20,6 +20,7 @@ import { onDocumentCreated, onDocumentUpdated, onDocumentWritten } from 'firebas
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import {
   PushMessage,
+  currentSeasonOf,
   dailyGameMessage,
   describeTarget,
   goalMessage,
@@ -29,6 +30,7 @@ import {
   newsMessage,
   playerRequestAnswerMessage,
   playerRequestMessage,
+  seasonCollection,
   todayKey,
   votingMessage,
 } from './messages';
@@ -103,19 +105,44 @@ export const onNewsCreated = onDocumentCreated('noticias/{newsId}', async (event
   if (message) await deliver(`${message.tipo}_${event.id}`, message, `noticias/${event.params.newsId}`);
 });
 
-/** Partida cadastrada na temporada corrente. */
-export const onMatchCreated = onDocumentCreated('partidas/{matchId}', async (event) => {
+let seasonCache: { value: string; at: number } | undefined;
+
+/** Temporada atual (`config/temporadas`), com cache de 5 min por instância. */
+async function currentSeason(): Promise<string> {
+  if (seasonCache && Date.now() - seasonCache.at < 5 * 60 * 1000) return seasonCache.value;
+  const { db } = await admin();
+  const value = currentSeasonOf((await db.doc('config/temporadas').get()).data());
+  seasonCache = { value, at: Date.now() };
+  return value;
+}
+
+/**
+ * A coleção de partidas muda a cada temporada (`partidas`, `partidas2024`...),
+ * então o gatilho escuta qualquer coleção e só segue na da temporada atual.
+ * Os nomes de coleção são checados antes de qualquer leitura.
+ */
+async function isCurrentMatchCollection(collection: string): Promise<boolean> {
+  if (!/^partidas(\d{4})?$/.test(collection)) return false;
+  return collection === seasonCollection('partidas', await currentSeason());
+}
+
+/** Partida cadastrada na temporada atual. */
+export const onMatchCreated = onDocumentCreated('{colecao}/{matchId}', async (event) => {
+  if (!(await isCurrentMatchCollection(event.params.colecao))) return;
   const data = event.data?.data();
   const message = data ? matchCreatedMessage(data) : null;
-  if (message) await deliver(`partida_${event.id}`, message, `partidas/${event.params.matchId}`);
+  if (message) await deliver(`partida_${event.id}`, message, `${event.params.colecao}/${event.params.matchId}`);
 });
 
 /** Votação de melhor jogador aberta/encerrada. */
-export const onMatchUpdated = onDocumentUpdated('partidas/{matchId}', async (event) => {
+export const onMatchUpdated = onDocumentUpdated('{colecao}/{matchId}', async (event) => {
+  if (!(await isCurrentMatchCollection(event.params.colecao))) return;
   const before = event.data?.before.data();
   const after = event.data?.after.data();
   const message = before && after ? votingMessage(before, after) : null;
-  if (message) await deliver(`${message.tipo}_${event.id}`, message, `partidas/${event.params.matchId}`);
+  if (message) {
+    await deliver(`${message.tipo}_${event.id}`, message, `${event.params.colecao}/${event.params.matchId}`);
+  }
 });
 
 /** Aviso manual enviado pelo painel. */
@@ -125,7 +152,6 @@ export const onNoticeCreated = onDocumentCreated('push_avisos/{noticeId}', async
   if (message) await deliver(`aviso_${event.params.noticeId}`, message, `push_avisos/${event.params.noticeId}`);
 });
 
-/** Todo dia às 9h: lembra os torcedores dos times que jogam hoje. */
 /** Pedido "Sou jogador": novo/reenviado avisa os admins; resposta avisa quem pediu. */
 export const onPlayerRequestWritten = onDocumentWritten('solicitacoes_jogador/{uid}', async (event) => {
   const uid = event.params.uid;
@@ -138,12 +164,14 @@ export const onPlayerRequestWritten = onDocumentWritten('solicitacoes_jogador/{u
   if (toUser) await deliver(`resposta_${event.id}`, toUser, origem);
 });
 
+/** Todo dia às 9h: lembra os torcedores dos times que jogam hoje (temporada atual). */
 export const dailyGames = onSchedule({ schedule: '0 9 * * *', timeZone: 'America/Sao_Paulo' }, async () => {
   const today = todayKey();
   const { db } = await admin();
-  const matches = await db.collection('partidas').where('data', '==', today).get();
+  const collection = seasonCollection('partidas', await currentSeason());
+  const matches = await db.collection(collection).where('data', '==', today).get();
   for (const doc of matches.docs) {
     const message = dailyGameMessage(doc.data());
-    if (message) await deliver(`jogo_do_dia_${today.replace('/', '-')}_${doc.id}`, message, `partidas/${doc.id}`);
+    if (message) await deliver(`jogo_do_dia_${today.replace('/', '-')}_${doc.id}`, message, `${collection}/${doc.id}`);
   }
 });

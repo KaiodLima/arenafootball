@@ -6,9 +6,11 @@ import {
   isEnabled,
   manualMessage,
   matchCreatedMessage,
+  currentSeasonOf,
   newsMessage,
   playerRequestAnswerMessage,
   playerRequestMessage,
+  seasonCollection,
   targetFor,
   todayKey,
   topicSlug,
@@ -111,4 +113,12 @@ test('tirado do elenco: avisa o usuário que as estatísticas ficam', () => {
   assert.equal(removed?.corpo, 'Você não faz mais parte do Lava Jato. Suas estatísticas continuam salvas.');
   assert.deepEqual(removed?.alvo, { topic: 'usuario_AbC1' });
   assert.equal(playerRequestAnswerMessage('AbC1', { ...approved, status: 'removido' }, { ...approved, status: 'removido' }), null);
+});
+
+test('coleção por temporada: 2023 sem sufixo, as outras com o ano', () => {
+  assert.equal(seasonCollection('partidas', '2023'), 'partidas');
+  assert.equal(seasonCollection('partidas', '2024'), 'partidas2024');
+  assert.equal(seasonCollection('partidas', '2022'), 'partidas2022');
+  assert.equal(currentSeasonOf(undefined), '2023');
+  assert.equal(currentSeasonOf({ atual: '2024' }), '2024');
 });

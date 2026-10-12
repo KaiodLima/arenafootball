@@ -3417,6 +3417,162 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Campeonato'**
   String get homePublishChampionship;
+
+  /// No description provided for @championshipsCurrentBadge.
+  ///
+  /// In pt, this message translates to:
+  /// **'EM ANDAMENTO'**
+  String get championshipsCurrentBadge;
+
+  /// No description provided for @championshipsPrevious.
+  ///
+  /// In pt, this message translates to:
+  /// **'Anteriores'**
+  String get championshipsPrevious;
+
+  /// No description provided for @championshipTabOverview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Visão geral'**
+  String get championshipTabOverview;
+
+  /// No description provided for @championshipTabTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Times'**
+  String get championshipTabTeams;
+
+  /// No description provided for @championshipTabRules.
+  ///
+  /// In pt, this message translates to:
+  /// **'Regulamento'**
+  String get championshipTabRules;
+
+  /// No description provided for @championshipRulesEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Regulamento ainda não publicado'**
+  String get championshipRulesEmpty;
+
+  /// No description provided for @championshipTeamsEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Times ainda não definidos'**
+  String get championshipTeamsEmpty;
+
+  /// No description provided for @championshipGroupsAndStandings.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grupos e classificação'**
+  String get championshipGroupsAndStandings;
+
+  /// No description provided for @championshipSeasonShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'Temporada {season}'**
+  String championshipSeasonShort(String season);
+
+  /// No description provided for @championshipOverviewEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Premiação e informações ainda não publicadas'**
+  String get championshipOverviewEmpty;
+
+  /// No description provided for @championshipAbout.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sobre'**
+  String get championshipAbout;
+
+  /// No description provided for @seasonsPanelTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Temporadas'**
+  String get seasonsPanelTitle;
+
+  /// No description provided for @seasonsCurrentLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Temporada atual'**
+  String get seasonsCurrentLabel;
+
+  /// No description provided for @seasonsCurrentInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Times, partidas, jogadores e campeonatos novos são gravados nesta temporada.'**
+  String get seasonsCurrentInfo;
+
+  /// No description provided for @seasonsAvailable.
+  ///
+  /// In pt, this message translates to:
+  /// **'Temporadas disponíveis'**
+  String get seasonsAvailable;
+
+  /// No description provided for @seasonsCurrentTag.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atual'**
+  String get seasonsCurrentTag;
+
+  /// No description provided for @seasonsStartTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Iniciar temporada {season}'**
+  String seasonsStartTitle(String season);
+
+  /// No description provided for @seasonsStartInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'A temporada {current} fica guardada para consulta no seletor de temporada. Nada é apagado.'**
+  String seasonsStartInfo(String current);
+
+  /// No description provided for @seasonsCopyTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Copiar os times da temporada atual'**
+  String get seasonsCopyTeams;
+
+  /// No description provided for @seasonsCopyTeamsHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os times entram na nova temporada com a classificação zerada. Os elencos começam vazios.'**
+  String get seasonsCopyTeamsHint;
+
+  /// No description provided for @seasonsStartButton.
+  ///
+  /// In pt, this message translates to:
+  /// **'INICIAR TEMPORADA {season}'**
+  String seasonsStartButton(String season);
+
+  /// No description provided for @seasonsConfirmTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Iniciar a temporada {season}?'**
+  String seasonsConfirmTitle(String season);
+
+  /// No description provided for @seasonsConfirmMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos os usuários passam a ver {season} como temporada atual e os novos cadastros vão para ela. Não dá para desfazer pelo app.'**
+  String seasonsConfirmMessage(String season);
+
+  /// No description provided for @seasonsConfirmAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Iniciar'**
+  String get seasonsConfirmAction;
+
+  /// No description provided for @seasonsStarted.
+  ///
+  /// In pt, this message translates to:
+  /// **'Temporada {season} iniciada!'**
+  String seasonsStarted(String season);
+
+  /// No description provided for @matchFormChampionship.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeonato'**
+  String get matchFormChampionship;
 }
 
 class _AppLocalizationsDelegate

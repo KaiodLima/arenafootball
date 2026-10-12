@@ -1126,5 +1126,80 @@
   "championshipFormLoadError": "Não foi possível carregar as regiões e os times.",
   "championshipRulesOpen": "Abrir regulamento",
   "championshipRulesOpenError": "Não foi possível abrir o regulamento.",
-  "homePublishChampionship": "Campeonato"
+  "homePublishChampionship": "Campeonato",
+  "championshipsCurrentBadge": "EM ANDAMENTO",
+  "championshipsPrevious": "Anteriores",
+  "championshipTabOverview": "Visão geral",
+  "championshipTabTeams": "Times",
+  "championshipTabRules": "Regulamento",
+  "championshipRulesEmpty": "Regulamento ainda não publicado",
+  "championshipTeamsEmpty": "Times ainda não definidos",
+  "championshipGroupsAndStandings": "Grupos e classificação",
+  "championshipSeasonShort": "Temporada {season}",
+  "@championshipSeasonShort": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "championshipOverviewEmpty": "Premiação e informações ainda não publicadas",
+  "championshipAbout": "Sobre",
+  "seasonsPanelTitle": "Temporadas",
+  "seasonsCurrentLabel": "Temporada atual",
+  "seasonsCurrentInfo": "Times, partidas, jogadores e campeonatos novos são gravados nesta temporada.",
+  "seasonsAvailable": "Temporadas disponíveis",
+  "seasonsCurrentTag": "Atual",
+  "seasonsStartTitle": "Iniciar temporada {season}",
+  "@seasonsStartTitle": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "seasonsStartInfo": "A temporada {current} fica guardada para consulta no seletor de temporada. Nada é apagado.",
+  "@seasonsStartInfo": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      }
+    }
+  },
+  "seasonsCopyTeams": "Copiar os times da temporada atual",
+  "seasonsCopyTeamsHint": "Os times entram na nova temporada com a classificação zerada. Os elencos começam vazios.",
+  "seasonsStartButton": "INICIAR TEMPORADA {season}",
+  "@seasonsStartButton": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "seasonsConfirmTitle": "Iniciar a temporada {season}?",
+  "@seasonsConfirmTitle": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "seasonsConfirmMessage": "Todos os usuários passam a ver {season} como temporada atual e os novos cadastros vão para ela. Não dá para desfazer pelo app.",
+  "@seasonsConfirmMessage": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "seasonsConfirmAction": "Iniciar",
+  "seasonsStarted": "Temporada {season} iniciada!",
+  "@seasonsStarted": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "matchFormChampionship": "Campeonato"
 }

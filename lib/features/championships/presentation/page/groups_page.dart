@@ -20,7 +20,10 @@ class GroupsPage extends StatefulWidget {
   final String? region;
   final String? season;
 
-  const GroupsPage({super.key, this.region, this.season});
+  /// Só os grupos deste campeonato (nulo = todos da região).
+  final int? championshipId;
+
+  const GroupsPage({super.key, this.region, this.season, this.championshipId});
 
   @override
   State<GroupsPage> createState() => _GroupsPageState();
@@ -36,7 +39,11 @@ class _GroupsPageState extends State<GroupsPage> {
     final selected = BlocProvider.of<RegionCubit>(context).state;
     _region = widget.region ?? selected.selectedRegion;
     _season = widget.season ?? selected.selectedSeason;
-    BlocProvider.of<GroupsCubit>(context).watch(region: _region, season: _season);
+    BlocProvider.of<GroupsCubit>(context).watch(
+      region: _region,
+      season: _season,
+      championshipId: widget.championshipId,
+    );
   }
 
   @override

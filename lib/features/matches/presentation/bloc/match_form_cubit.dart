@@ -1,4 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/firebase/season_collection.dart';
+import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_usecase.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/create_match_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_usecase.dart';
@@ -15,12 +18,14 @@ class MatchFormCubit extends Cubit<MatchFormState> {
   final GetRegionsUseCase getRegionsUseCase;
   final GetTeamsUseCase getTeamsUseCase;
   final GetRegionMatchesUseCase getRegionMatchesUseCase;
+  final GetRegionChampionshipsUseCase getRegionChampionshipsUseCase;
 
   MatchFormCubit(
     this.createMatchUseCase,
     this.getRegionsUseCase,
     this.getTeamsUseCase,
     this.getRegionMatchesUseCase,
+    this.getRegionChampionshipsUseCase,
   ) : super(const EditingMatchFormState());
 
   void _edit(MatchFormData form) {
@@ -47,29 +52,58 @@ class MatchFormCubit extends Cubit<MatchFormState> {
 
   Future<void> selectRegion(String region) async {
     if (region == state.form.selectedRegion) return;
-    _edit(state.form.copyWith(selectedRegion: region, teams: const [], existing: const [], clearTeams: true));
+    _edit(state.form.copyWith(
+      selectedRegion: region,
+      teams: const [],
+      regionTeams: const [],
+      championships: const [],
+      championshipId: () => null,
+      existing: const [],
+      clearTeams: true,
+    ));
     await _loadRegionData(region);
   }
 
-  /// Times da temporada corrente e partidas já cadastradas na região. O
+  /// Times da temporada atual, campeonatos da região e partidas já
+  /// cadastradas nela. Com vários campeonatos, começa no mais antigo. O
   /// mandante começa no primeiro time e o visitante no último (como no app
   /// antigo); o local começa no mais usado.
   Future<void> _loadRegionData(String region) async {
     final teamsFuture = getTeamsUseCase(region: region);
     final matchesFuture = getRegionMatchesUseCase(region: region);
+    final championshipsFuture = getRegionChampionshipsUseCase(region: region, season: SeasonCollection.currentSeason);
     final teamsResponse = await teamsFuture;
     final matchesResponse = await matchesFuture;
+    final championshipsResponse = await championshipsFuture;
     if (isClosed || state.form.selectedRegion != region) return;
 
-    final teams = teamsResponse.fold((_) => const <TeamDTO>[], (list) => list);
+    final regionTeams = teamsResponse.fold((_) => const <TeamDTO>[], (list) => list);
     // Sem as partidas, só faltam as sugestões e o aviso de conflito.
     final existing = matchesResponse.fold((_) => const <MatchDTO>[], (list) => list);
-    var form = state.form.copyWith(teams: teams, existing: existing);
-    form = teams.isEmpty
-        ? form.copyWith(clearTeams: true)
-        : form.copyWith(homeTeam: teams.first.name, awayTeam: teams.last.name);
+    // Sem os campeonatos, o UseCase resolve pelo campeonato da região.
+    final championships = championshipsResponse.fold((_) => const <ChampionshipDTO>[], (list) => list);
+    final championshipId = championships.firstOrNull?.championshipId;
+
+    var form = state.form.copyWith(
+      regionTeams: regionTeams,
+      championships: championships,
+      championshipId: () => championshipId,
+      existing: existing,
+    );
+    form = _withTeams(form.copyWith(teams: form.teamsFor(championshipId)));
     if (form.venue.isEmpty && form.frequentVenues.isNotEmpty) form = form.copyWith(venue: form.frequentVenues.first);
     _edit(form);
+  }
+
+  MatchFormData _withTeams(MatchFormData form) => form.teams.isEmpty
+      ? form.copyWith(clearTeams: true)
+      : form.copyWith(homeTeam: form.teams.first.name, awayTeam: form.teams.last.name);
+
+  /// Outro campeonato: os times oferecidos passam a ser os dele.
+  void selectChampionship(int championshipId) {
+    if (championshipId == state.form.championshipId) return;
+    final form = state.form.copyWith(championshipId: () => championshipId);
+    _edit(_withTeams(form.copyWith(teams: form.teamsFor(championshipId))));
   }
 
   void selectHomeTeam(String team) => _edit(state.form.copyWith(homeTeam: team));

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/get_region_championship_usecase.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_usecase.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/match_form_hints.dart';
 import 'package:arena_soccer/features/matches/domain/repositories/matches_repository_interface.dart';
@@ -62,6 +63,14 @@ class _FakeChampionship implements GetRegionChampionshipUseCase {
 class _FakeRegions implements GetRegionsUseCase {
   @override
   Future<Either<Failure, List<String>>> call() async => const Right(['Floresta', 'Santo inacio']);
+}
+
+class _FakeChampionships implements GetRegionChampionshipsUseCase {
+  List<ChampionshipDTO> list = const [];
+
+  @override
+  Future<Either<Failure, List<ChampionshipDTO>>> call({required String region, required String season}) async =>
+      Right(list);
 }
 
 class _FakeTeams implements GetTeamsUseCase {
@@ -141,8 +150,39 @@ void main() {
         _FakeRegions(),
         _FakeTeams(),
         GetRegionMatchesUseCase(repository),
+        _FakeChampionships(),
       );
       await cubit.load(initialRegion: 'Floresta', now: DateTime(2026, 10, 18));
+    });
+
+    test('vários campeonatos: times do escolhido e id gravado na partida', () async {
+      final championships = _FakeChampionships()
+        ..list = const [
+          ChampionshipDTO(id: 'a', championshipId: 5, title: 'Society', teams: ['Volta', 'Riacho']),
+          ChampionshipDTO(id: 'b', championshipId: 6, title: 'Futsal'),
+        ];
+      final multi = MatchFormCubit(
+        CreateMatchUseCase(repository, championship),
+        _FakeRegions(),
+        _FakeTeams(),
+        GetRegionMatchesUseCase(repository),
+        championships,
+      );
+      await multi.load(initialRegion: 'Floresta', now: DateTime(2026, 10, 18));
+      expect(multi.state.form.championshipId, 5);
+      expect(multi.state.form.teams.map((t) => t.name), ['Volta', 'Riacho']);
+
+      // Campeonato sem times marcados: todos da região.
+      multi.selectChampionship(6);
+      expect(multi.state.form.teams.length, 3);
+
+      multi
+        ..selectTime('20:00')
+        ..selectHomeTeam('Lava Jato')
+        ..selectAwayTeam('Volta');
+      await multi.submit();
+      expect(repository.created.last.championshipId, 6);
+      await multi.close();
     });
 
     test('carrega a região: data de hoje, times e local mais usado', () {

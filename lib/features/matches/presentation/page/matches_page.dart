@@ -61,7 +61,7 @@ class _MatchesPageState extends State<MatchesPage> {
               onPressed: () => Navigator.pushNamed(
                 context,
                 AppRoutes.groupsPage,
-                arguments: {'region': _region, 'season': _season},
+                arguments: {'region': _region, 'season': _season, 'championshipId': widget.championshipId},
               ),
             ),
           ),

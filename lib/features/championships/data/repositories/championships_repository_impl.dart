@@ -44,4 +44,11 @@ class ChampionshipsRepositoryImpl implements IChampionshipsRepository {
     required String season,
   }) =>
       _dataSource.getChampionshipForRegion(region: region, season: season);
+
+  @override
+  Future<Either<Failure, List<ChampionshipDTO>>> getRegionChampionships({
+    required String region,
+    required String season,
+  }) =>
+      _dataSource.getRegionChampionships(region: region, season: season);
 }

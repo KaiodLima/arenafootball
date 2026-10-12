@@ -106,6 +106,23 @@ class ChampionshipsDataSource {
     }
   }
 
+  /// Campeonatos da região na temporada (`ano`), do mais antigo (menor
+  /// `id_campeonato`) para o mais novo.
+  Future<Either<Failure, List<ChampionshipDTO>>> getRegionChampionships({
+    required String region,
+    required String season,
+  }) async {
+    try {
+      final result = await _championships.where('fk_competicao', isEqualTo: region).get();
+      final list = result.docs.map(ChampionshipDTO.fromFirestore).where((c) => c.season == season).toList()
+        ..sort((a, b) => a.championshipId.compareTo(b.championshipId));
+      return Right(list);
+    } catch (e) {
+      AppLogger.e('getRegionChampionships region=$region', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível carregar os campeonatos.'));
+    }
+  }
+
   /// Campeonato da região na temporada (`ano`); nulo se não houver.
   Future<Either<Failure, ChampionshipDTO?>> getChampionshipForRegion({
     required String region,

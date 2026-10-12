@@ -1,21 +1,26 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
+import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/championships_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/championships_state.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/championship_hero_card.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/championship_list_row.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/championship_rules_launcher.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
+import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
 import 'package:arena_soccer/injection_container.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
-import 'package:arena_soccer/utils/components/arena_card.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
+import 'package:arena_soccer/utils/components/section_header.dart';
+import 'package:arena_soccer/utils/components/shortcut_tile.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
-import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// Aba de campeonatos da home: campeonatos da região selecionada. Tocar num
-/// campeonato abre os detalhes. A home recria a aba (key) quando a região muda.
+/// Aba de campeonatos da home: os campeonatos da temporada num carrossel de
+/// destaque (com atalhos para grupos, artilharia e regulamento do que está na
+/// tela) e os anteriores da região numa lista compacta. A home recria a aba (key) quando a região muda.
 class ChampionshipsTab extends StatelessWidget {
   const ChampionshipsTab({super.key});
 
@@ -29,12 +34,33 @@ class ChampionshipsTab extends StatelessWidget {
   }
 }
 
-class _ChampionshipsList extends StatelessWidget {
+class _ChampionshipsList extends StatefulWidget {
   const _ChampionshipsList();
+
+  @override
+  State<_ChampionshipsList> createState() => _ChampionshipsListState();
+}
+
+class _ChampionshipsListState extends State<_ChampionshipsList> {
+  final _pageController = PageController();
+  int _page = 0;
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _openDetails(ChampionshipDTO championship) => Navigator.pushNamed(
+        context,
+        AppRoutes.championshipDetailsPage,
+        arguments: {'championship': championship},
+      );
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final selectedSeason = BlocProvider.of<RegionCubit>(context).state.selectedSeason;
 
     return BlocBuilder<ChampionshipsCubit, ChampionshipsState>(
       builder: (context, state) {
@@ -48,76 +74,111 @@ class _ChampionshipsList extends StatelessWidget {
           return ArenaEmptyState(message: l10n.championshipsEmpty, icon: Icons.emoji_events_outlined);
         }
 
-        return ListView.builder(
+        // Destaque: todos os da temporada escolhida (podem ser vários ao mesmo
+        // tempo), num carrossel; sem nenhum, o mais recente. O resto em "Anteriores".
+        final sorted = [...state.championships]..sort((a, b) => b.season.compareTo(a.season));
+        final ofSeason = sorted.where((c) => c.season == selectedSeason).toList()
+          ..sort((a, b) => a.championshipId.compareTo(b.championshipId));
+        final featured = ofSeason.isNotEmpty ? ofSeason : [sorted.first];
+        final featuredIds = featured.map((c) => c.id).toSet();
+        final previous = sorted.where((c) => !featuredIds.contains(c.id)).toList();
+        final current = featured[_page.clamp(0, featured.length - 1)];
+
+        return ListView(
           physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
           padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s20, AppSizes.s16, AppSizes.s100),
-          itemCount: state.championships.length,
-          itemBuilder: (context, index) => _ChampionshipCard(championship: state.championships[index]),
+          children: [
+            LayoutBuilder(
+              builder: (context, constraints) => SizedBox(
+                // Mesma proporção do card (4:3).
+                height: constraints.maxWidth * 3 / 4,
+                child: PageView.builder(
+                  controller: _pageController,
+                  itemCount: featured.length,
+                  onPageChanged: (page) => setState(() => _page = page),
+                  itemBuilder: (context, index) => Padding(
+                    padding: EdgeInsets.symmetric(horizontal: featured.length > 1 ? AppSizes.s4 : 0),
+                    child: ChampionshipHeroCard(
+                      championship: featured[index],
+                      onTap: () => _openDetails(featured[index]),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            if (featured.length > 1) ...[
+              const SizedBox(height: AppSizes.s10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  for (var i = 0; i < featured.length; i++)
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      margin: const EdgeInsets.symmetric(horizontal: AppSizes.s4),
+                      width: i == _page ? AppSizes.s20 : AppSizes.s8,
+                      height: AppSizes.s8,
+                      decoration: BoxDecoration(
+                        color: i == _page ? AppColors.primary : AppColors.greyLight,
+                        borderRadius: BorderRadius.circular(AppSizes.s4),
+                      ),
+                    ),
+                ],
+              ),
+            ],
+            const SizedBox(height: AppSizes.s16),
+            _Shortcuts(championship: current),
+            if (previous.isNotEmpty) ...[
+              const SizedBox(height: AppSizes.s20),
+              SectionHeader(title: l10n.championshipsPrevious),
+              for (final championship in previous)
+                ChampionshipListRow(championship: championship, onTap: () => _openDetails(championship)),
+            ],
+          ],
         );
       },
     );
   }
 }
 
-class _ChampionshipCard extends StatelessWidget {
+/// Grupos, artilharia e (se houver) o regulamento do campeonato em destaque.
+class _Shortcuts extends StatelessWidget {
   final ChampionshipDTO championship;
 
-  const _ChampionshipCard({required this.championship});
+  const _Shortcuts({required this.championship});
+
+  String get _season => championship.season.isNotEmpty ? championship.season : SeasonCollection.currentSeason;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-
-    return ArenaCard(
-      onTap: () => Navigator.pushNamed(
-        context,
-        AppRoutes.championshipDetailsPage,
-        arguments: {'championship': championship},
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (championship.imageUrl.isNotEmpty)
-            CachedNetworkImage(
-              imageUrl: championship.imageUrl,
-              fit: BoxFit.cover,
-              placeholder: (_, __) => const AspectRatio(
-                aspectRatio: 16 / 9,
-                child: ColoredBox(color: AppColors.greyLight),
-              ),
-              errorWidget: (_, __, ___) => const AspectRatio(
-                aspectRatio: 16 / 9,
-                child: ColoredBox(
-                  color: AppColors.greyLight,
-                  child: Icon(Icons.emoji_events_outlined, color: AppColors.textSecondary),
-                ),
-              ),
-            ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s14, AppSizes.s12, AppSizes.s14),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        championship.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTypography.title().copyWith(fontSize: AppSizes.s18 - 1),
-                      ),
-                      const SizedBox(height: AppSizes.s4),
-                      Text(l10n.championshipsSeeDetails, style: AppTypography.label()),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.chevron_right_rounded, color: AppColors.primary),
-              ],
-            ),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ShortcutTile(
+          title: l10n.matchesGroups,
+          icon: Icons.groups_rounded,
+          onTap: () => Navigator.pushNamed(
+            context,
+            AppRoutes.groupsPage,
+            arguments: {'region': championship.region, 'season': _season, 'championshipId': championship.championshipId},
           ),
-        ],
-      ),
+        ),
+        ShortcutTile(
+          title: l10n.matchesTopScorers,
+          icon: Icons.sports_soccer_rounded,
+          onTap: () => Navigator.pushNamed(
+            context,
+            AppRoutes.statsRankingPage,
+            arguments: {'type': StatsRankingType.goals, 'region': championship.region, 'season': _season},
+          ),
+        ),
+        if (championship.rulesUrl.isNotEmpty)
+          ShortcutTile(
+            title: l10n.championshipTabRules,
+            icon: Icons.picture_as_pdf_rounded,
+            onTap: () => openChampionshipRules(context, championship),
+          ),
+      ],
     );
   }
 }
