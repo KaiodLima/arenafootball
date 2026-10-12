@@ -5,7 +5,10 @@ import 'package:equatable/equatable.dart';
 enum PlayerRequestStatus {
   pending('pendente'),
   approved('aprovada'),
-  rejected('rejeitada');
+  rejected('rejeitada'),
+
+  /// Estava aprovado e o admin tirou do elenco (o atleta e os números ficam).
+  removed('removido');
 
   final String key;
 

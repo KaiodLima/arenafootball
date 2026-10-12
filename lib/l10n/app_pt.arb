@@ -975,5 +975,77 @@
   "pushActionPlayerRequest": "Nova solicitação de jogador",
   "pushActionPlayerRequestHint": "Para os admins · \"Fulano quer jogar no Lava Jato\"",
   "pushActionPlayerRequestAnswer": "Resposta da solicitação",
-  "pushActionPlayerRequestAnswerHint": "Para quem pediu · aprovada ou rejeitada"
+  "pushActionPlayerRequestAnswerHint": "Para quem pediu · aprovada ou rejeitada",
+  "athleteDelete": "Excluir atleta",
+  "athleteDeleteTitle": "Excluir {name}?",
+  "@athleteDeleteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "athleteDeleteMessage": "{name} sai do elenco do {team}. Gols e assistências dele deixam de contar no ranking. Essa ação não pode ser desfeita.",
+  "@athleteDeleteMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "athleteDeleted": "{name} foi excluído do {team}.",
+  "@athleteDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "athleteRemoveFromSquad": "Remover do elenco",
+  "athleteRemoveTitle": "Remover {name} do elenco?",
+  "@athleteRemoveTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "athleteRemoveMessage": "{name} sai do elenco do {team}. Os gols e assistências continuam na conta dele, e ele pode pedir para entrar em outro time.",
+  "@athleteRemoveMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "athleteRemoved": "{name} saiu do elenco do {team}.",
+  "@athleteRemoved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "playerRequestStatusRemoved": "Fora do elenco",
+  "playerRequestRemovedInfo": "Você saiu do elenco do {team}. Suas estatísticas continuam salvas e você pode pedir para entrar em outro time.",
+  "@playerRequestRemovedInfo": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "playerRequestJoinAnother": "Pedir para entrar em outro time"
 }

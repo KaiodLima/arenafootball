@@ -238,10 +238,21 @@ export function playerRequestMessage(uid: string, before: Doc | undefined, after
   };
 }
 
-/** Admin respondeu o pedido: avisa só quem pediu. */
+/** Admin respondeu o pedido, ou tirou o atleta do elenco: avisa só quem pediu. */
 export function playerRequestAnswerMessage(uid: string, before: Doc | undefined, after: Doc | undefined): PushMessage | null {
-  if (!before || !after || !uid || text(before.status) !== 'pendente') return null;
+  if (!before || !after || !uid) return null;
   const status = text(after.status);
+  if (text(before.status) === 'aprovada' && status === 'removido') {
+    return {
+      tipo: 'solicitacao_resposta',
+      titulo: 'Você saiu do elenco',
+      corpo: `Você não faz mais parte do ${text(after.time)}. Suas estatísticas continuam salvas.`,
+      aba: 'sou_jogador',
+      regiao: text(after.regiao),
+      alvo: { topic: userTopic(uid) },
+    };
+  }
+  if (text(before.status) !== 'pendente') return null;
   if (status !== 'aprovada' && status !== 'rejeitada') return null;
   const team = text(after.time);
   const reason = text(after.motivo);

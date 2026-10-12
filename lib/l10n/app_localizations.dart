@@ -3063,6 +3063,72 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Para quem pediu · aprovada ou rejeitada'**
   String get pushActionPlayerRequestAnswerHint;
+
+  /// No description provided for @athleteDelete.
+  ///
+  /// In pt, this message translates to:
+  /// **'Excluir atleta'**
+  String get athleteDelete;
+
+  /// No description provided for @athleteDeleteTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Excluir {name}?'**
+  String athleteDeleteTitle(String name);
+
+  /// No description provided for @athleteDeleteMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} sai do elenco do {team}. Gols e assistências dele deixam de contar no ranking. Essa ação não pode ser desfeita.'**
+  String athleteDeleteMessage(String name, String team);
+
+  /// No description provided for @athleteDeleted.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} foi excluído do {team}.'**
+  String athleteDeleted(String name, String team);
+
+  /// No description provided for @athleteRemoveFromSquad.
+  ///
+  /// In pt, this message translates to:
+  /// **'Remover do elenco'**
+  String get athleteRemoveFromSquad;
+
+  /// No description provided for @athleteRemoveTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Remover {name} do elenco?'**
+  String athleteRemoveTitle(String name);
+
+  /// No description provided for @athleteRemoveMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} sai do elenco do {team}. Os gols e assistências continuam na conta dele, e ele pode pedir para entrar em outro time.'**
+  String athleteRemoveMessage(String name, String team);
+
+  /// No description provided for @athleteRemoved.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} saiu do elenco do {team}.'**
+  String athleteRemoved(String name, String team);
+
+  /// No description provided for @playerRequestStatusRemoved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fora do elenco'**
+  String get playerRequestStatusRemoved;
+
+  /// No description provided for @playerRequestRemovedInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você saiu do elenco do {team}. Suas estatísticas continuam salvas e você pode pedir para entrar em outro time.'**
+  String playerRequestRemovedInfo(String team);
+
+  /// No description provided for @playerRequestJoinAnother.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedir para entrar em outro time'**
+  String get playerRequestJoinAnother;
 }
 
 class _AppLocalizationsDelegate

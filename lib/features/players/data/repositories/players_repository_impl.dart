@@ -29,6 +29,14 @@ class PlayersRepositoryImpl implements IPlayersRepository {
       _dataSource.updatePlayer(player, season: season);
 
   @override
+  Future<Either<Failure, void>> deletePlayer(PlayerDTO player, {String? season}) =>
+      _dataSource.deletePlayer(player, season: season);
+
+  @override
+  Future<Either<Failure, void>> removeFromSquad(PlayerDTO player, {String? season}) =>
+      _dataSource.removeFromSquad(player, season: season);
+
+  @override
   Future<Either<Failure, void>> incrementStats({
     required String playerId,
     int goals = 0,

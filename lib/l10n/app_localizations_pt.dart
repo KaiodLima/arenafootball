@@ -1712,4 +1712,51 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get pushActionPlayerRequestAnswerHint =>
       'Para quem pediu · aprovada ou rejeitada';
+
+  @override
+  String get athleteDelete => 'Excluir atleta';
+
+  @override
+  String athleteDeleteTitle(String name) {
+    return 'Excluir $name?';
+  }
+
+  @override
+  String athleteDeleteMessage(String name, String team) {
+    return '$name sai do elenco do $team. Gols e assistências dele deixam de contar no ranking. Essa ação não pode ser desfeita.';
+  }
+
+  @override
+  String athleteDeleted(String name, String team) {
+    return '$name foi excluído do $team.';
+  }
+
+  @override
+  String get athleteRemoveFromSquad => 'Remover do elenco';
+
+  @override
+  String athleteRemoveTitle(String name) {
+    return 'Remover $name do elenco?';
+  }
+
+  @override
+  String athleteRemoveMessage(String name, String team) {
+    return '$name sai do elenco do $team. Os gols e assistências continuam na conta dele, e ele pode pedir para entrar em outro time.';
+  }
+
+  @override
+  String athleteRemoved(String name, String team) {
+    return '$name saiu do elenco do $team.';
+  }
+
+  @override
+  String get playerRequestStatusRemoved => 'Fora do elenco';
+
+  @override
+  String playerRequestRemovedInfo(String team) {
+    return 'Você saiu do elenco do $team. Suas estatísticas continuam salvas e você pode pedir para entrar em outro time.';
+  }
+
+  @override
+  String get playerRequestJoinAnother => 'Pedir para entrar em outro time';
 }

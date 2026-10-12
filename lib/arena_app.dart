@@ -174,7 +174,7 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.playerProfilePage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
           return BlocProvider<PlayerProfileCubit>(
-            create: (_) => PlayerProfileCubit(sl(), sl(), sl(), sl(), sl()),
+            create: (_) => PlayerProfileCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl()),
             child: PlayerProfilePage(
               playerId: args['playerId'] as String,
               season: args['season'] as String?,

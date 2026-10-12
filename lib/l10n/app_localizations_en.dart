@@ -1698,4 +1698,51 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get pushActionPlayerRequestAnswerHint =>
       'To the requester · approved or rejected';
+
+  @override
+  String get athleteDelete => 'Delete player';
+
+  @override
+  String athleteDeleteTitle(String name) {
+    return 'Delete $name?';
+  }
+
+  @override
+  String athleteDeleteMessage(String name, String team) {
+    return '$name leaves the $team squad. Their goals and assists no longer count in the rankings. This can’t be undone.';
+  }
+
+  @override
+  String athleteDeleted(String name, String team) {
+    return '$name was removed from $team.';
+  }
+
+  @override
+  String get athleteRemoveFromSquad => 'Remove from squad';
+
+  @override
+  String athleteRemoveTitle(String name) {
+    return 'Remove $name from the squad?';
+  }
+
+  @override
+  String athleteRemoveMessage(String name, String team) {
+    return '$name leaves the $team squad. Their goals and assists stay on their account, and they can ask to join another team.';
+  }
+
+  @override
+  String athleteRemoved(String name, String team) {
+    return '$name left the $team squad.';
+  }
+
+  @override
+  String get playerRequestStatusRemoved => 'Out of the squad';
+
+  @override
+  String playerRequestRemovedInfo(String team) {
+    return 'You left the $team squad. Your stats are kept and you can ask to join another team.';
+  }
+
+  @override
+  String get playerRequestJoinAnother => 'Ask to join another team';
 }

@@ -67,12 +67,22 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
     final isAdmin = context.watch<SessionCubit>().state.isAdmin;
 
     return BlocConsumer<PlayerProfileCubit, PlayerProfileState>(
-      listenWhen: (_, current) => current is ErrorPlayerProfileState && current.player != null,
-      listener: (context, state) => showSnackBar(
-        context: context,
-        message: (state as ErrorPlayerProfileState).errorMessage,
-        isSuccess: false,
-      ),
+      listenWhen: (_, current) =>
+          (current is ErrorPlayerProfileState && current.player != null) ||
+          current is DeletedPlayerProfileState ||
+          current is RemovedFromSquadPlayerProfileState,
+      listener: (context, state) {
+        if (state is RemovedFromSquadPlayerProfileState) {
+          showSnackBar(context: context, message: l10n.athleteRemoved(state.name, state.teamName));
+          return;
+        }
+        if (state is DeletedPlayerProfileState) {
+          showSnackBar(context: context, message: l10n.athleteDeleted(state.name, state.teamName));
+          Navigator.pop(context);
+          return;
+        }
+        showSnackBar(context: context, message: (state as ErrorPlayerProfileState).errorMessage, isSuccess: false);
+      },
       builder: (context, state) {
         final player = state.player;
 
@@ -355,6 +365,38 @@ class _AdminEditorState extends State<_AdminEditor> {
     await BlocProvider.of<PlayerProfileCubit>(context).rename(value);
   }
 
+  /// Com conta vinculada, só tira do elenco (mantém os números); sem conta,
+  /// exclui o jogador.
+  Future<void> _confirmRemoval(AppLocalizations l10n) async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    final player = widget.player;
+    final linked = player.userId.isNotEmpty;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(linked ? l10n.athleteRemoveTitle(player.name) : l10n.athleteDeleteTitle(player.name)),
+        content: Text(
+          linked
+              ? l10n.athleteRemoveMessage(player.name, player.team)
+              : l10n.athleteDeleteMessage(player.name, player.team),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.commonCancel)),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(
+              linked ? l10n.athleteRemoveFromSquad : l10n.commonDelete,
+              style: const TextStyle(color: AppColors.danger),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    final cubit = BlocProvider.of<PlayerProfileCubit>(context);
+    linked ? await cubit.removeFromSquad() : await cubit.delete();
+  }
+
   Future<void> _pickPhoto() async {
     FocusManager.instance.primaryFocus?.unfocus();
     final cubit = BlocProvider.of<PlayerProfileCubit>(context);
@@ -426,6 +468,19 @@ class _AdminEditorState extends State<_AdminEditor> {
                   label: Text(l10n.playersChangePhoto),
                 ),
               ),
+              // Vinculado e já sem time: não há o que remover.
+              if (player.userId.isEmpty || player.team.isNotEmpty) ...[
+                const Divider(height: AppSizes.s24),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton.icon(
+                    onPressed: widget.saving ? null : () => _confirmRemoval(l10n),
+                    style: TextButton.styleFrom(foregroundColor: AppColors.danger),
+                    icon: const Icon(Icons.person_remove_outlined, size: AppSizes.s18),
+                    label: Text(player.userId.isEmpty ? l10n.athleteDelete : l10n.athleteRemoveFromSquad),
+                  ),
+                ),
+              ],
             ],
           ),
         ),

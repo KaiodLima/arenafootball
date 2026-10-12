@@ -34,6 +34,7 @@ class PlayerRequestStatusBadge extends StatelessWidget {
       PlayerRequestStatus.pending => (l10n.playerRequestStatusPending, AppColors.warning, Icons.schedule_rounded),
       PlayerRequestStatus.approved => (l10n.playerRequestStatusApproved, AppColors.primary, Icons.check_circle_rounded),
       PlayerRequestStatus.rejected => (l10n.playerRequestStatusRejected, AppColors.danger, Icons.cancel_rounded),
+      PlayerRequestStatus.removed => (l10n.playerRequestStatusRemoved, AppColors.textSecondary, Icons.logout_rounded),
     };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSizes.s10, vertical: AppSizes.s4),

@@ -104,3 +104,11 @@ test('resposta do pedido: só para quem pediu, com motivo na rejeição', () => 
   assert.equal(playerRequestAnswerMessage('AbC1', undefined, pending), null);
   assert.equal(playerRequestAnswerMessage('AbC1', { ...pending, status: 'aprovada' }, { ...pending, status: 'aprovada' }), null);
 });
+
+test('tirado do elenco: avisa o usuário que as estatísticas ficam', () => {
+  const approved = { nome: 'Kaio', time: 'Lava Jato', regiao: 'Floresta', status: 'aprovada' };
+  const removed = playerRequestAnswerMessage('AbC1', approved, { ...approved, status: 'removido' });
+  assert.equal(removed?.corpo, 'Você não faz mais parte do Lava Jato. Suas estatísticas continuam salvas.');
+  assert.deepEqual(removed?.alvo, { topic: 'usuario_AbC1' });
+  assert.equal(playerRequestAnswerMessage('AbC1', { ...approved, status: 'removido' }, { ...approved, status: 'removido' }), null);
+});

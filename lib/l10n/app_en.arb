@@ -493,5 +493,16 @@
   "pushActionPlayerRequest": "New player request",
   "pushActionPlayerRequestHint": "To admins · \"John wants to play for Lava Jato\"",
   "pushActionPlayerRequestAnswer": "Request answered",
-  "pushActionPlayerRequestAnswerHint": "To the requester · approved or rejected"
+  "pushActionPlayerRequestAnswerHint": "To the requester · approved or rejected",
+  "athleteDelete": "Delete player",
+  "athleteDeleteTitle": "Delete {name}?",
+  "athleteDeleteMessage": "{name} leaves the {team} squad. Their goals and assists no longer count in the rankings. This can’t be undone.",
+  "athleteDeleted": "{name} was removed from {team}.",
+  "athleteRemoveFromSquad": "Remove from squad",
+  "athleteRemoveTitle": "Remove {name} from the squad?",
+  "athleteRemoveMessage": "{name} leaves the {team} squad. Their goals and assists stay on their account, and they can ask to join another team.",
+  "athleteRemoved": "{name} left the {team} squad.",
+  "playerRequestStatusRemoved": "Out of the squad",
+  "playerRequestRemovedInfo": "You left the {team} squad. Your stats are kept and you can ask to join another team.",
+  "playerRequestJoinAnother": "Ask to join another team"
 }

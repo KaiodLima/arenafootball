@@ -89,27 +89,41 @@ class PlayerRequestsDataSource {
     }
   }
 
-  /// Cria o jogador (vinculado à conta) e marca o pedido como aprovado, numa
-  /// escrita só: não sobra jogador sem pedido aprovado nem o contrário.
+  /// Aprova o pedido, numa escrita só com a marcação do pedido. Se a conta já
+  /// tem atleta na temporada (saiu de outro elenco), reaproveita ele: troca
+  /// time, nome, posição e foto e mantém gols e assistências. Senão, cria.
   Future<Either<Failure, String>> approve(PlayerRequestDTO request) async {
     try {
-      final playerRef = _firestore.collection(SeasonCollection.name('jogadores', request.season)).doc();
-      final player = PlayerDTO(
-        id: playerRef.id,
-        name: request.name,
-        team: request.team,
-        imageUrl: request.imageUrl,
-        userId: request.userId,
-        position: request.position?.key ?? '',
-      );
-      final batch = _firestore.batch()
-        ..set(playerRef, player.toMap())
-        ..update(_requests.doc(request.userId), {
-          'status': PlayerRequestStatus.approved.key,
-          'idJogador': playerRef.id,
-          'motivo': '',
-          'atualizado_em': FieldValue.serverTimestamp(),
+      final players = _firestore.collection(SeasonCollection.name('jogadores', request.season));
+      final existing = await players.where('idUsuario', isEqualTo: request.userId).limit(1).get();
+      final batch = _firestore.batch();
+      final DocumentReference<Map<String, dynamic>> playerRef;
+      if (existing.docs.isNotEmpty) {
+        playerRef = existing.docs.first.reference;
+        batch.update(playerRef, {
+          'nome': request.name,
+          'time': request.team,
+          'posicao': request.position?.key ?? '',
+          if (request.imageUrl.isNotEmpty) 'urlImagem': request.imageUrl,
         });
+      } else {
+        playerRef = players.doc();
+        final player = PlayerDTO(
+          id: playerRef.id,
+          name: request.name,
+          team: request.team,
+          imageUrl: request.imageUrl,
+          userId: request.userId,
+          position: request.position?.key ?? '',
+        );
+        batch.set(playerRef, player.toMap());
+      }
+      batch.update(_requests.doc(request.userId), {
+        'status': PlayerRequestStatus.approved.key,
+        'idJogador': playerRef.id,
+        'motivo': '',
+        'atualizado_em': FieldValue.serverTimestamp(),
+      });
       await batch.commit();
       return Right(playerRef.id);
     } catch (e) {

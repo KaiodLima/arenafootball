@@ -331,6 +331,7 @@ class _StatusView extends StatelessWidget {
       PlayerRequestStatus.pending => (l10n.playerRequestPendingInfo, AppColors.textSecondary),
       PlayerRequestStatus.approved => (l10n.playerRequestApprovedInfo(request.team), AppColors.primaryDark),
       PlayerRequestStatus.rejected => (l10n.playerRequestRejectedInfo, AppColors.textSecondary),
+      PlayerRequestStatus.removed => (l10n.playerRequestRemovedInfo(request.team), AppColors.textSecondary),
     };
 
     return ListView(
@@ -404,6 +405,14 @@ class _StatusView extends StatelessWidget {
           PlayerRequestStatus.approved => [
               if (request.playerId.isNotEmpty)
                 ArenaButton.primary(title: l10n.playerRequestViewProfile, function: onOpenProfile),
+            ],
+          // Saiu do elenco: pede outro time; o perfil (com os números) continua.
+          PlayerRequestStatus.removed => [
+              ArenaButton.primary(title: l10n.playerRequestJoinAnother, function: onResubmit),
+              if (request.playerId.isNotEmpty) ...[
+                const SizedBox(height: AppSizes.s8),
+                ArenaButton.outlined(title: l10n.playerRequestViewProfile, function: onOpenProfile),
+              ],
             ],
         },
       ],

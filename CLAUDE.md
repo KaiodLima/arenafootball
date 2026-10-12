@@ -100,7 +100,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | `melhorjogador{timeC}{timeF}` | um doc por votante (id = uid): nome, time |
 | `config/notificacoes` | liga/desliga por ação de push: gol, noticia, partida, votacao_aberta, votacao_encerrada, jogo_do_dia, aviso (bool; ausente = padrão das functions) |
 | `notificacoes_envios` | histórico gravado pelas Cloud Functions (id = evento): tipo, titulo, corpo, alvo, regiao, data, status (enviado/desligado/erro), erro, origem |
-| `solicitacoes_jogador` | pedido "Sou jogador", id = uid (um por usuário): uid, nome_usuario, email, nome, time, regiao, temporada, posicao, mensagem, urlImagem, status (pendente/aprovada/rejeitada), motivo, idJogador, data, atualizado_em. Aprovar = batch que cria o jogador e marca o pedido |
+| `solicitacoes_jogador` | pedido "Sou jogador", id = uid (um por usuário): uid, nome_usuario, email, nome, time, regiao, temporada, posicao, mensagem, urlImagem, status (pendente/aprovada/rejeitada/removido), motivo, idJogador, data, atualizado_em. Aprovar = batch que cria o jogador (ou reaproveita o atleta da conta, mantendo os números) e marca o pedido. Atleta vinculado não é excluído: "remover do elenco" zera o `time` e o pedido vira `removido` |
 | `push_avisos` | aviso manual do admin (titulo, corpo, regiao vazia = todos, data); a function envia |
 
 `{ano}`: a temporada corrente (`SeasonCollection.currentSeason`, hoje **2023**) fica nas coleções sem sufixo; as anteriores usam o ano como sufixo (`times2022`). Não comparar com o ano do relógio. Para abrir uma temporada nova: copiar as coleções sem sufixo para `<nome><ano>`, limpar as sem sufixo e atualizar `currentSeason`/`seasons`.

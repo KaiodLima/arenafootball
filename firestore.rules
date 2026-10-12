@@ -46,7 +46,8 @@ service cloud.firestore {
     }
 
     // "Sou jogador": pedido para entrar no elenco de um time (id do doc = uid).
-    // O usuário cria, corrige enquanto pendente e reenvia depois de rejeitado,
+    // O usuário cria, corrige enquanto pendente e reenvia depois de rejeitado
+    // ou de removido do elenco,
     // sempre como "pendente" e só com os próprios campos; nunca se autoaprova.
     // O admin lê tudo e responde (aprovar cria o jogador, pelo app).
     match /solicitacoes_jogador/{userId} {
