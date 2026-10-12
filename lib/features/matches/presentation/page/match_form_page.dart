@@ -148,6 +148,24 @@ class _MatchFormPageState extends State<MatchFormPage> {
                     ),
                 ],
               ),
+              // Vários campeonatos ao mesmo tempo na região: escolhe em qual entra.
+              if (form.championships.length > 1) ...[
+                const SizedBox(height: AppSizes.s20),
+                _Label(l10n.matchFormChampionship),
+                Wrap(
+                  spacing: AppSizes.s8,
+                  runSpacing: AppSizes.s8,
+                  children: [
+                    for (final championship in form.championships)
+                      ArenaChoiceChip(
+                        label: championship.title,
+                        icon: Icons.emoji_events_outlined,
+                        selected: championship.championshipId == form.championshipId,
+                        onTap: () => _cubit.selectChampionship(championship.championshipId),
+                      ),
+                  ],
+                ),
+              ],
               const SizedBox(height: AppSizes.s20),
               _Label(l10n.matchFormMatchup),
               MatchupPicker(

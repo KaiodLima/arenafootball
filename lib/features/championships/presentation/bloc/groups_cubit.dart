@@ -17,7 +17,9 @@ class GroupsCubit extends Cubit<GroupsState> {
 
   GroupsCubit(this.watchGroupsUseCase, this.getTeamsUseCase) : super(const LoadingGroupsState());
 
-  void watch({required String region, required String season}) {
+  /// [championshipId] mostra só os grupos desse campeonato (ver
+  /// [GroupDTO.forChampionship]); nulo = todos da região.
+  void watch({required String region, required String season, int? championshipId}) {
     _subscription?.cancel();
     emit(LoadingGroupsState(groups: state.groups, crests: state.crests));
     _loadCrests(region: region, season: season);
@@ -26,7 +28,10 @@ class GroupsCubit extends Cubit<GroupsState> {
         (failure) => emit(
           ErrorGroupsState(errorMessage: failure.toString(), groups: state.groups, crests: state.crests),
         ),
-        (groups) => emit(SuccessGroupsState(groups: groups, crests: state.crests)),
+        (groups) => emit(SuccessGroupsState(
+          groups: GroupDTO.forChampionship(groups, championshipId),
+          crests: state.crests,
+        )),
       );
     });
   }

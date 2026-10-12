@@ -1783,4 +1783,248 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get matchesNoGamesTomorrow => 'Nenhum jogo amanhã';
+
+  @override
+  String get championshipsManageTitle => 'Campeonatos';
+
+  @override
+  String get championshipsManageEmpty =>
+      'Nenhum campeonato cadastrado nesta região.';
+
+  @override
+  String championshipsManageTeamsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count times',
+      one: '1 time',
+      zero: 'Sem times',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String championshipsManageDeleteTitle(String title) {
+    return 'Excluir $title?';
+  }
+
+  @override
+  String get championshipsManageDeleteMessage =>
+      'O campeonato sai da lista. Partidas, grupos e classificação continuam salvos.';
+
+  @override
+  String get championshipsManageDeleted => 'Campeonato excluído.';
+
+  @override
+  String championshipsSeasonLabel(String region, String season) {
+    return '$region · temporada $season';
+  }
+
+  @override
+  String get championshipFormNewTitle => 'Novo campeonato';
+
+  @override
+  String get championshipFormEditTitle => 'Editar campeonato';
+
+  @override
+  String get championshipFormSectionData => 'Dados';
+
+  @override
+  String get championshipFormTitleLabel => 'Nome do campeonato';
+
+  @override
+  String get championshipFormTitleRequired =>
+      'Informe o nome (mínimo 3 letras).';
+
+  @override
+  String get championshipFormDescriptionLabel => 'Descrição (opcional)';
+
+  @override
+  String get championshipFormSeasonLabel => 'Temporada';
+
+  @override
+  String get championshipFormSectionTeams => 'Times participantes';
+
+  @override
+  String get championshipFormTeamsAll => 'Todos';
+
+  @override
+  String get championshipFormTeamsClear => 'Limpar';
+
+  @override
+  String get championshipFormTeamsRequired => 'Escolha ao menos um time.';
+
+  @override
+  String get championshipFormTeamsEmpty =>
+      'Nenhum time cadastrado nesta região.';
+
+  @override
+  String championshipFormTeamsSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count selecionados',
+      one: '1 selecionado',
+      zero: 'Nenhum selecionado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get championshipFormSectionRules => 'Regulamento';
+
+  @override
+  String get championshipFormRulesHint =>
+      'Anexe o regulamento em PDF: os usuários abrem na página do campeonato.';
+
+  @override
+  String get championshipFormRulesAttach => 'Anexar PDF';
+
+  @override
+  String get championshipFormRulesReplace => 'Trocar';
+
+  @override
+  String get championshipFormRulesRemove => 'Remover';
+
+  @override
+  String get championshipFormRulesTooBig => 'O PDF passa de 10 MB.';
+
+  @override
+  String get championshipFormRulesSummary => 'Resumo das regras (opcional)';
+
+  @override
+  String get championshipFormSectionPrizes => 'Premiação';
+
+  @override
+  String get championshipFormPrize1 => '1º lugar';
+
+  @override
+  String get championshipFormPrize2 => '2º lugar';
+
+  @override
+  String get championshipFormPrize3 => '3º lugar';
+
+  @override
+  String get championshipFormPrizeTopScorer => 'Artilheiro';
+
+  @override
+  String get championshipFormPrizeGoalkeeper => 'Melhor goleiro';
+
+  @override
+  String get championshipFormSubmitCreate => 'CADASTRAR CAMPEONATO';
+
+  @override
+  String get championshipFormCreated => 'Campeonato cadastrado!';
+
+  @override
+  String get championshipFormSaved => 'Campeonato atualizado!';
+
+  @override
+  String get championshipFormLoadError =>
+      'Não foi possível carregar as regiões e os times.';
+
+  @override
+  String get championshipRulesOpen => 'Abrir regulamento';
+
+  @override
+  String get championshipRulesOpenError =>
+      'Não foi possível abrir o regulamento.';
+
+  @override
+  String get homePublishChampionship => 'Campeonato';
+
+  @override
+  String get championshipsCurrentBadge => 'EM ANDAMENTO';
+
+  @override
+  String get championshipsPrevious => 'Anteriores';
+
+  @override
+  String get championshipTabOverview => 'Visão geral';
+
+  @override
+  String get championshipTabTeams => 'Times';
+
+  @override
+  String get championshipTabRules => 'Regulamento';
+
+  @override
+  String get championshipRulesEmpty => 'Regulamento ainda não publicado';
+
+  @override
+  String get championshipTeamsEmpty => 'Times ainda não definidos';
+
+  @override
+  String get championshipGroupsAndStandings => 'Grupos e classificação';
+
+  @override
+  String championshipSeasonShort(String season) {
+    return 'Temporada $season';
+  }
+
+  @override
+  String get championshipOverviewEmpty =>
+      'Premiação e informações ainda não publicadas';
+
+  @override
+  String get championshipAbout => 'Sobre';
+
+  @override
+  String get seasonsPanelTitle => 'Temporadas';
+
+  @override
+  String get seasonsCurrentLabel => 'Temporada atual';
+
+  @override
+  String get seasonsCurrentInfo =>
+      'Times, partidas, jogadores e campeonatos novos são gravados nesta temporada.';
+
+  @override
+  String get seasonsAvailable => 'Temporadas disponíveis';
+
+  @override
+  String get seasonsCurrentTag => 'Atual';
+
+  @override
+  String seasonsStartTitle(String season) {
+    return 'Iniciar temporada $season';
+  }
+
+  @override
+  String seasonsStartInfo(String current) {
+    return 'A temporada $current fica guardada para consulta no seletor de temporada. Nada é apagado.';
+  }
+
+  @override
+  String get seasonsCopyTeams => 'Copiar os times da temporada atual';
+
+  @override
+  String get seasonsCopyTeamsHint =>
+      'Os times entram na nova temporada com a classificação zerada. Os elencos começam vazios.';
+
+  @override
+  String seasonsStartButton(String season) {
+    return 'INICIAR TEMPORADA $season';
+  }
+
+  @override
+  String seasonsConfirmTitle(String season) {
+    return 'Iniciar a temporada $season?';
+  }
+
+  @override
+  String seasonsConfirmMessage(String season) {
+    return 'Todos os usuários passam a ver $season como temporada atual e os novos cadastros vão para ela. Não dá para desfazer pelo app.';
+  }
+
+  @override
+  String get seasonsConfirmAction => 'Iniciar';
+
+  @override
+  String seasonsStarted(String season) {
+    return 'Temporada $season iniciada!';
+  }
+
+  @override
+  String get matchFormChampionship => 'Campeonato';
 }

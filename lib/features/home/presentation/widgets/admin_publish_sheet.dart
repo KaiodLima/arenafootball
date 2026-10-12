@@ -27,6 +27,7 @@ class AdminPublishSheet extends StatelessWidget {
       _PublishOption(Icons.sports_soccer_rounded, l10n.homePublishGoal, AppRoutes.goalNotificationPage),
       _PublishOption(Icons.campaign_outlined, l10n.homePublishAd, AppRoutes.publishAdPage),
       _PublishOption(Icons.star_outline_rounded, l10n.homePublishHighlight, AppRoutes.registerHighlightPage),
+      _PublishOption(Icons.emoji_events_outlined, l10n.homePublishChampionship, AppRoutes.championshipFormPage),
       _PublishOption(Icons.scoreboard_outlined, l10n.homePublishMatch, AppRoutes.registerMatchPage),
       _PublishOption(Icons.shield_outlined, l10n.homePublishTeam, AppRoutes.registerTeamPage),
       _PublishOption(Icons.person_add_alt_outlined, l10n.homePublishPlayer, AppRoutes.registerPlayerPage),

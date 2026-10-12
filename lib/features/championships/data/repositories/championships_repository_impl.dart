@@ -26,4 +26,29 @@ class ChampionshipsRepositoryImpl implements IChampionshipsRepository {
     String? season,
   }) =>
       _dataSource.watchStandings(region: region, group: group, season: season);
+
+  @override
+  Future<Either<Failure, ChampionshipDTO>> createChampionship(ChampionshipDTO championship) =>
+      _dataSource.createChampionship(championship);
+
+  @override
+  Future<Either<Failure, ChampionshipDTO>> updateChampionship(ChampionshipDTO championship) =>
+      _dataSource.updateChampionship(championship);
+
+  @override
+  Future<Either<Failure, void>> deleteChampionship(String id) => _dataSource.deleteChampionship(id);
+
+  @override
+  Future<Either<Failure, ChampionshipDTO?>> getChampionshipForRegion({
+    required String region,
+    required String season,
+  }) =>
+      _dataSource.getChampionshipForRegion(region: region, season: season);
+
+  @override
+  Future<Either<Failure, List<ChampionshipDTO>>> getRegionChampionships({
+    required String region,
+    required String season,
+  }) =>
+      _dataSource.getRegionChampionships(region: region, season: season);
 }

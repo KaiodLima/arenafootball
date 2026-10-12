@@ -11,10 +11,15 @@ import 'package:arena_soccer/features/auth/presentation/page/choose_team_page.da
 import 'package:arena_soccer/features/auth/presentation/page/login_page.dart';
 import 'package:arena_soccer/features/auth/presentation/page/register_user_page.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/championships/presentation/bloc/championship_details_cubit.dart';
+import 'package:arena_soccer/features/championships/presentation/bloc/championship_form_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/groups_cubit.dart';
+import 'package:arena_soccer/features/championships/presentation/bloc/manage_championships_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/standings_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/page/championship_details_page.dart';
+import 'package:arena_soccer/features/championships/presentation/page/championship_form_page.dart';
 import 'package:arena_soccer/features/championships/presentation/page/groups_page.dart';
+import 'package:arena_soccer/features/championships/presentation/page/manage_championships_page.dart';
 import 'package:arena_soccer/features/championships/presentation/page/standings_page.dart';
 import 'package:arena_soccer/features/home/presentation/bloc/home_cubit.dart';
 import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
@@ -51,6 +56,8 @@ import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/presentation/page/player_form_page.dart';
 import 'package:arena_soccer/features/players/presentation/page/team_players_page.dart';
 import 'package:arena_soccer/features/splash/presentation/page/splash_page.dart';
+import 'package:arena_soccer/features/seasons/presentation/bloc/seasons_panel_cubit.dart';
+import 'package:arena_soccer/features/seasons/presentation/page/seasons_panel_page.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
 import 'package:arena_soccer/features/stats/presentation/bloc/stats_ranking_cubit.dart';
 import 'package:arena_soccer/features/stats/presentation/page/stats_ranking_page.dart';
@@ -222,20 +229,43 @@ class ArenaApp extends StatelessWidget {
           );
         },
         AppRoutes.registerMatchPage: (_) => BlocProvider<MatchFormCubit>(
-              create: (_) => MatchFormCubit(sl(), sl(), sl(), sl()),
+              create: (_) => MatchFormCubit(sl(), sl(), sl(), sl(), sl()),
               child: const MatchFormPage(),
             ),
 
         // Campeonatos, grupos e classificação
         AppRoutes.championshipDetailsPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-          return ChampionshipDetailsPage(championship: args?['championship'] as ChampionshipDTO);
+          return BlocProvider<ChampionshipDetailsCubit>(
+            create: (_) => ChampionshipDetailsCubit(sl()),
+            child: ChampionshipDetailsPage(championship: args?['championship'] as ChampionshipDTO),
+          );
+        },
+        AppRoutes.seasonsPanelPage: (_) => BlocProvider<SeasonsPanelCubit>(
+              create: (_) => SeasonsPanelCubit(sl(), sl()),
+              child: const SeasonsPanelPage(),
+            ),
+        AppRoutes.manageChampionshipsPage: (_) => BlocProvider<ManageChampionshipsCubit>(
+              create: (_) => ManageChampionshipsCubit(sl(), sl()),
+              child: const ManageChampionshipsPage(),
+            ),
+        // `championship` opcional: campeonato a editar (sem ele, cadastra um novo).
+        AppRoutes.championshipFormPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          return BlocProvider<ChampionshipFormCubit>(
+            create: (_) => ChampionshipFormCubit(sl(), sl(), sl()),
+            child: ChampionshipFormPage(championship: args?['championship'] as ChampionshipDTO?),
+          );
         },
         AppRoutes.groupsPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<GroupsCubit>(
             create: (_) => GroupsCubit(sl(), sl()),
-            child: GroupsPage(region: args?['region'] as String?, season: args?['season'] as String?),
+            child: GroupsPage(
+              region: args?['region'] as String?,
+              season: args?['season'] as String?,
+              championshipId: args?['championshipId'] as int?,
+            ),
           );
         },
         AppRoutes.standingsPage: (context) {

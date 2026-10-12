@@ -13,16 +13,21 @@ class RegionState extends Equatable {
   const RegionState({
     this.regions = const [],
     this.selectedRegion = GetRegionPreferencesUseCase.defaultRegion,
-    this.selectedSeason = SeasonCollection.defaultSeason,
-    this.seasons = SeasonCollection.seasons,
+    this.selectedSeason = SeasonCollection.fallbackSeason,
+    this.seasons = SeasonCollection.fallbackSeasons,
   });
 
-  RegionState copyWith({List<String>? regions, String? selectedRegion, String? selectedSeason}) {
+  RegionState copyWith({
+    List<String>? regions,
+    String? selectedRegion,
+    String? selectedSeason,
+    List<String>? seasons,
+  }) {
     return RegionState(
       regions: regions ?? this.regions,
       selectedRegion: selectedRegion ?? this.selectedRegion,
       selectedSeason: selectedSeason ?? this.selectedSeason,
-      seasons: seasons,
+      seasons: seasons ?? this.seasons,
     );
   }
 

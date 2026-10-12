@@ -11,6 +11,9 @@ class GroupDTO extends Equatable {
   final String region;
   final List<String> teams;
 
+  /// `fk_campeonato` (`id_campeonato`); 0 = grupo antigo, sem campeonato.
+  final int championshipId;
+
   static const int maxTeams = 4;
 
   const GroupDTO({
@@ -18,7 +21,16 @@ class GroupDTO extends Equatable {
     required this.description,
     this.region = '',
     this.teams = const [],
+    this.championshipId = 0,
   });
+
+  /// Grupos do campeonato [id]: os marcados com ele; se nenhum estiver
+  /// marcado, os antigos (sem campeonato). [id] nulo = todos.
+  static List<GroupDTO> forChampionship(List<GroupDTO> groups, int? id) {
+    if (id == null) return groups;
+    final tagged = groups.where((g) => g.championshipId == id).toList();
+    return tagged.isNotEmpty ? tagged : groups.where((g) => g.championshipId == 0).toList();
+  }
 
   factory GroupDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? const {};
@@ -26,6 +38,7 @@ class GroupDTO extends Equatable {
       id: doc.id,
       description: data['descricao']?.toString() ?? '',
       region: data['fk_competicao']?.toString() ?? '',
+      championshipId: (data['fk_campeonato'] as num?)?.toInt() ?? 0,
       teams: [
         for (var i = 1; i <= maxTeams; i++) data['time$i']?.toString() ?? '',
       ],
@@ -35,6 +48,7 @@ class GroupDTO extends Equatable {
   Map<String, dynamic> toMap() => {
         'descricao': description,
         'fk_competicao': region,
+        if (championshipId > 0) 'fk_campeonato': championshipId,
         for (var i = 0; i < maxTeams; i++) 'time${i + 1}': i < teams.length ? teams[i] : '',
       };
 
@@ -48,5 +62,5 @@ class GroupDTO extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, description, region, teams];
+  List<Object?> get props => [id, description, region, teams, championshipId];
 }

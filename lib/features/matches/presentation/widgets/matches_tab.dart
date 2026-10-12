@@ -13,15 +13,18 @@ import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dar
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
 import 'package:arena_soccer/injection_container.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/section_header.dart';
+import 'package:arena_soccer/utils/components/shortcut_tile.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// Aba de tabelas da home: encontra o campeonato da região selecionada e
-/// mostra as partidas de ontem, hoje ou amanhã, com atalhos para todos os jogos, grupos,
-/// artilharia e assistências. A home recria a aba (key) quando região/ano mudam.
+/// Aba de tabelas da home: campeonatos da região na temporada (chips quando
+/// há mais de um ao mesmo tempo) e as partidas de ontem, hoje ou amanhã do
+/// escolhido, com atalhos para todos os jogos, grupos, artilharia e
+/// assistências. A home recria a aba (key) quando região/ano mudam.
 class MatchesTab extends StatelessWidget {
   const MatchesTab({super.key});
 
@@ -35,13 +38,23 @@ class MatchesTab extends StatelessWidget {
   }
 }
 
-class _ChampionshipMatches extends StatelessWidget {
+class _ChampionshipMatches extends StatefulWidget {
   const _ChampionshipMatches();
+
+  @override
+  State<_ChampionshipMatches> createState() => _ChampionshipMatchesState();
+}
+
+class _ChampionshipMatchesState extends State<_ChampionshipMatches> {
+  /// Campeonato escolhido por região/temporada, lembrado enquanto o app está
+  /// aberto (a home recria a aba ao trocar de região).
+  static final Map<String, int> _remembered = {};
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final region = BlocProvider.of<RegionCubit>(context).state;
+    final key = '${region.selectedRegion}|${region.selectedSeason}';
 
     return BlocBuilder<ChampionshipsCubit, ChampionshipsState>(
       builder: (context, state) {
@@ -51,32 +64,59 @@ class _ChampionshipMatches extends StatelessWidget {
         if (state is ErrorChampionshipsState && state.championships.isEmpty) {
           return ArenaEmptyState.error(message: l10n.championshipsLoadError);
         }
-        if (state.championships.isEmpty) {
-          return ArenaEmptyState(message: l10n.matchesNoChampionship, icon: Icons.emoji_events_outlined);
-        }
 
-        ChampionshipDTO? championship;
-        for (final item in state.championships) {
-          if (item.region == region.selectedRegion) {
-            championship = item;
-            break;
-          }
-        }
-        if (championship == null) {
+        // Os da temporada selecionada (podem ser vários ao mesmo tempo); sem
+        // nenhum, o primeiro da região (dados antigos sem `ano`).
+        final inRegion = state.championships.where((c) => c.region == region.selectedRegion).toList();
+        final ofSeason = inRegion.where((c) => c.season == region.selectedSeason).toList()
+          ..sort((a, b) => a.championshipId.compareTo(b.championshipId));
+        final options = ofSeason.isNotEmpty ? ofSeason : [if (inRegion.isNotEmpty) inRegion.first];
+        if (options.isEmpty) {
           return ArenaEmptyState(message: l10n.matchesNoChampionship, icon: Icons.emoji_events_outlined);
         }
+        final ChampionshipDTO championship =
+            options.where((c) => c.championshipId == _remembered[key]).firstOrNull ?? options.first;
 
         final championshipId = championship.championshipId;
-        return BlocProvider<MatchesCubit>(
-          key: ValueKey(championshipId),
-          create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl())
-            ..watch(
-              championshipId: championshipId,
-              filter: MatchesFilter.today,
-              region: region.selectedRegion,
-              season: region.selectedSeason,
+        return Column(
+          children: [
+            if (options.length > 1)
+              SizedBox(
+                height: AppSizes.s56,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s12, AppSizes.s16, 0),
+                  itemCount: options.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: AppSizes.s8),
+                  itemBuilder: (context, index) {
+                    final option = options[index];
+                    return ArenaChoiceChip(
+                      label: option.title,
+                      icon: Icons.emoji_events_outlined,
+                      selected: option.championshipId == championshipId,
+                      onTap: () => setState(() => _remembered[key] = option.championshipId),
+                    );
+                  },
+                ),
+              ),
+            Expanded(
+              child: BlocProvider<MatchesCubit>(
+                key: ValueKey(championshipId),
+                create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl())
+                  ..watch(
+                    championshipId: championshipId,
+                    filter: MatchesFilter.today,
+                    region: region.selectedRegion,
+                    season: region.selectedSeason,
+                  ),
+                child: _DayMatches(
+                  championshipId: championshipId,
+                  region: region.selectedRegion,
+                  season: region.selectedSeason,
+                ),
+              ),
             ),
-          child: _DayMatches(championshipId: championshipId, region: region.selectedRegion, season: region.selectedSeason),
+          ],
         );
       },
     );
@@ -158,7 +198,7 @@ class _Shortcuts extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _ShortcutTile(
+        ShortcutTile(
           title: l10n.matchesAllGames,
           icon: Icons.calendar_month_rounded,
           onTap: () => Navigator.pushNamed(
@@ -167,71 +207,26 @@ class _Shortcuts extends StatelessWidget {
             arguments: {'championshipId': championshipId, 'region': region, 'season': season},
           ),
         ),
-        _ShortcutTile(
+        ShortcutTile(
           title: l10n.matchesGroups,
           icon: Icons.groups_rounded,
           onTap: () => Navigator.pushNamed(
             context,
             AppRoutes.groupsPage,
-            arguments: {'region': region, 'season': season},
+            arguments: {'region': region, 'season': season, 'championshipId': championshipId},
           ),
         ),
-        _ShortcutTile(
+        ShortcutTile(
           title: l10n.matchesTopScorers,
           icon: Icons.sports_soccer_rounded,
           onTap: () => _openStats(context, StatsRankingType.goals),
         ),
-        _ShortcutTile(
+        ShortcutTile(
           title: l10n.matchesAssists,
           icon: Icons.assistant_rounded,
           onTap: () => _openStats(context, StatsRankingType.assists),
         ),
       ],
-    );
-  }
-}
-
-/// Bloco de atalho: ícone num círculo verde-claro e o rótulo embaixo.
-class _ShortcutTile extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _ShortcutTile({required this.title, required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Semantics(
-        button: true,
-        label: title,
-        excludeSemantics: true,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(AppSizes.fieldRadius),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: AppSizes.s6, horizontal: AppSizes.s2),
-            child: Column(
-              children: [
-                Container(
-                  width: AppSizes.s48,
-                  height: AppSizes.s48,
-                  decoration: const BoxDecoration(color: AppColors.primarySoft, shape: BoxShape.circle),
-                  child: Icon(icon, color: AppColors.primaryDark, size: AppSizes.s22),
-                ),
-                const SizedBox(height: AppSizes.s6),
-                Text(
-                  title,
-                  maxLines: 2,
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s12, height: 1.15),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

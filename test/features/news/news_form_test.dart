@@ -22,6 +22,9 @@ class _FakeStorage implements StorageUploadService {
     uploads++;
     return Right('https://storage/${file.path}');
   }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 class _FakeRepository implements INewsRepository {

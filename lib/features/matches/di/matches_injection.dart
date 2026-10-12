@@ -21,7 +21,7 @@ void registerMatchesDependencies() {
 
   // UseCases
   _sl.registerLazySingleton(() => WatchMatchesUseCase(_sl()));
-  _sl.registerLazySingleton(() => CreateMatchUseCase(_sl()));
+  _sl.registerLazySingleton(() => CreateMatchUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => UpdateMatchScoreUseCase(_sl()));
   _sl.registerLazySingleton(() => GetTodayMatchesUseCase(_sl()));
   _sl.registerLazySingleton(() => GetRegionMatchesUseCase(_sl()));

@@ -22,6 +22,13 @@ class ChampionshipDTO extends Equatable {
   /// Campo `ano`: temporada do campeonato (usada para abrir os grupos).
   final String season;
 
+  /// Nomes dos times participantes (mesmo nome gravado nas partidas).
+  final List<String> teams;
+
+  /// Regulamento em PDF (Storage `campeonatos/`); vazio se não houver.
+  final String rulesUrl;
+  final String rulesFileName;
+
   const ChampionshipDTO({
     required this.id,
     this.championshipId = 0,
@@ -36,6 +43,9 @@ class ChampionshipDTO extends Equatable {
     this.rules = '',
     this.region = '',
     this.season = '',
+    this.teams = const [],
+    this.rulesUrl = '',
+    this.rulesFileName = '',
   });
 
   factory ChampionshipDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -55,6 +65,9 @@ class ChampionshipDTO extends Equatable {
       rules: data['regras']?.toString() ?? '',
       region: data['fk_competicao']?.toString() ?? '',
       season: data['ano']?.toString() ?? '',
+      teams: (data['times'] as List?)?.map((t) => t.toString()).toList() ?? const [],
+      rulesUrl: data['regulamentoUrl']?.toString() ?? '',
+      rulesFileName: data['regulamentoNome']?.toString() ?? '',
     );
   }
 
@@ -71,6 +84,9 @@ class ChampionshipDTO extends Equatable {
         'regras': rules,
         'fk_competicao': region,
         'ano': season,
+        'times': teams,
+        'regulamentoUrl': rulesUrl,
+        'regulamentoNome': rulesFileName,
       };
 
   ChampionshipDTO copyWith({
@@ -87,6 +103,9 @@ class ChampionshipDTO extends Equatable {
     String? rules,
     String? region,
     String? season,
+    List<String>? teams,
+    String? rulesUrl,
+    String? rulesFileName,
   }) {
     return ChampionshipDTO(
       id: id ?? this.id,
@@ -102,6 +121,9 @@ class ChampionshipDTO extends Equatable {
       rules: rules ?? this.rules,
       region: region ?? this.region,
       season: season ?? this.season,
+      teams: teams ?? this.teams,
+      rulesUrl: rulesUrl ?? this.rulesUrl,
+      rulesFileName: rulesFileName ?? this.rulesFileName,
     );
   }
 
@@ -120,5 +142,8 @@ class ChampionshipDTO extends Equatable {
         rules,
         region,
         season,
+        teams,
+        rulesUrl,
+        rulesFileName,
       ];
 }

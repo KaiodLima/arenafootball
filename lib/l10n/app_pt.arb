@@ -1055,5 +1055,151 @@
   "matchesTomorrowTitle": "Jogos de amanhã",
   "matchesNoGamesYesterday": "Nenhum jogo ontem",
   "matchesNoGamesToday": "Nenhum jogo hoje",
-  "matchesNoGamesTomorrow": "Nenhum jogo amanhã"
+  "matchesNoGamesTomorrow": "Nenhum jogo amanhã",
+  "championshipsManageTitle": "Campeonatos",
+  "championshipsManageEmpty": "Nenhum campeonato cadastrado nesta região.",
+  "championshipsManageTeamsCount": "{count, plural, =0{Sem times} =1{1 time} other{{count} times}}",
+  "@championshipsManageTeamsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "championshipsManageDeleteTitle": "Excluir {title}?",
+  "@championshipsManageDeleteTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "championshipsManageDeleteMessage": "O campeonato sai da lista. Partidas, grupos e classificação continuam salvos.",
+  "championshipsManageDeleted": "Campeonato excluído.",
+  "championshipsSeasonLabel": "{region} · temporada {season}",
+  "@championshipsSeasonLabel": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      },
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "championshipFormNewTitle": "Novo campeonato",
+  "championshipFormEditTitle": "Editar campeonato",
+  "championshipFormSectionData": "Dados",
+  "championshipFormTitleLabel": "Nome do campeonato",
+  "championshipFormTitleRequired": "Informe o nome (mínimo 3 letras).",
+  "championshipFormDescriptionLabel": "Descrição (opcional)",
+  "championshipFormSeasonLabel": "Temporada",
+  "championshipFormSectionTeams": "Times participantes",
+  "championshipFormTeamsAll": "Todos",
+  "championshipFormTeamsClear": "Limpar",
+  "championshipFormTeamsRequired": "Escolha ao menos um time.",
+  "championshipFormTeamsEmpty": "Nenhum time cadastrado nesta região.",
+  "championshipFormTeamsSelected": "{count, plural, =0{Nenhum selecionado} =1{1 selecionado} other{{count} selecionados}}",
+  "@championshipFormTeamsSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "championshipFormSectionRules": "Regulamento",
+  "championshipFormRulesHint": "Anexe o regulamento em PDF: os usuários abrem na página do campeonato.",
+  "championshipFormRulesAttach": "Anexar PDF",
+  "championshipFormRulesReplace": "Trocar",
+  "championshipFormRulesRemove": "Remover",
+  "championshipFormRulesTooBig": "O PDF passa de 10 MB.",
+  "championshipFormRulesSummary": "Resumo das regras (opcional)",
+  "championshipFormSectionPrizes": "Premiação",
+  "championshipFormPrize1": "1º lugar",
+  "championshipFormPrize2": "2º lugar",
+  "championshipFormPrize3": "3º lugar",
+  "championshipFormPrizeTopScorer": "Artilheiro",
+  "championshipFormPrizeGoalkeeper": "Melhor goleiro",
+  "championshipFormSubmitCreate": "CADASTRAR CAMPEONATO",
+  "championshipFormCreated": "Campeonato cadastrado!",
+  "championshipFormSaved": "Campeonato atualizado!",
+  "championshipFormLoadError": "Não foi possível carregar as regiões e os times.",
+  "championshipRulesOpen": "Abrir regulamento",
+  "championshipRulesOpenError": "Não foi possível abrir o regulamento.",
+  "homePublishChampionship": "Campeonato",
+  "championshipsCurrentBadge": "EM ANDAMENTO",
+  "championshipsPrevious": "Anteriores",
+  "championshipTabOverview": "Visão geral",
+  "championshipTabTeams": "Times",
+  "championshipTabRules": "Regulamento",
+  "championshipRulesEmpty": "Regulamento ainda não publicado",
+  "championshipTeamsEmpty": "Times ainda não definidos",
+  "championshipGroupsAndStandings": "Grupos e classificação",
+  "championshipSeasonShort": "Temporada {season}",
+  "@championshipSeasonShort": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "championshipOverviewEmpty": "Premiação e informações ainda não publicadas",
+  "championshipAbout": "Sobre",
+  "seasonsPanelTitle": "Temporadas",
+  "seasonsCurrentLabel": "Temporada atual",
+  "seasonsCurrentInfo": "Times, partidas, jogadores e campeonatos novos são gravados nesta temporada.",
+  "seasonsAvailable": "Temporadas disponíveis",
+  "seasonsCurrentTag": "Atual",
+  "seasonsStartTitle": "Iniciar temporada {season}",
+  "@seasonsStartTitle": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "seasonsStartInfo": "A temporada {current} fica guardada para consulta no seletor de temporada. Nada é apagado.",
+  "@seasonsStartInfo": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      }
+    }
+  },
+  "seasonsCopyTeams": "Copiar os times da temporada atual",
+  "seasonsCopyTeamsHint": "Os times entram na nova temporada com a classificação zerada. Os elencos começam vazios.",
+  "seasonsStartButton": "INICIAR TEMPORADA {season}",
+  "@seasonsStartButton": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "seasonsConfirmTitle": "Iniciar a temporada {season}?",
+  "@seasonsConfirmTitle": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "seasonsConfirmMessage": "Todos os usuários passam a ver {season} como temporada atual e os novos cadastros vão para ela. Não dá para desfazer pelo app.",
+  "@seasonsConfirmMessage": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "seasonsConfirmAction": "Iniciar",
+  "seasonsStarted": "Temporada {season} iniciada!",
+  "@seasonsStarted": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "matchFormChampionship": "Campeonato"
 }

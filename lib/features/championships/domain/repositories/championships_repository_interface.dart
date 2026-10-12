@@ -14,4 +14,17 @@ abstract class IChampionshipsRepository {
     required String group,
     String? season,
   });
+
+  Future<Either<Failure, ChampionshipDTO>> createChampionship(ChampionshipDTO championship);
+
+  Future<Either<Failure, ChampionshipDTO>> updateChampionship(ChampionshipDTO championship);
+
+  Future<Either<Failure, void>> deleteChampionship(String id);
+
+  Future<Either<Failure, ChampionshipDTO?>> getChampionshipForRegion({required String region, required String season});
+
+  Future<Either<Failure, List<ChampionshipDTO>>> getRegionChampionships({
+    required String region,
+    required String season,
+  });
 }

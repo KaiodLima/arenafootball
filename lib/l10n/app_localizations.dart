@@ -3177,6 +3177,402 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Nenhum jogo amanhã'**
   String get matchesNoGamesTomorrow;
+
+  /// No description provided for @championshipsManageTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeonatos'**
+  String get championshipsManageTitle;
+
+  /// No description provided for @championshipsManageEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum campeonato cadastrado nesta região.'**
+  String get championshipsManageEmpty;
+
+  /// No description provided for @championshipsManageTeamsCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{Sem times} =1{1 time} other{{count} times}}'**
+  String championshipsManageTeamsCount(int count);
+
+  /// No description provided for @championshipsManageDeleteTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Excluir {title}?'**
+  String championshipsManageDeleteTitle(String title);
+
+  /// No description provided for @championshipsManageDeleteMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'O campeonato sai da lista. Partidas, grupos e classificação continuam salvos.'**
+  String get championshipsManageDeleteMessage;
+
+  /// No description provided for @championshipsManageDeleted.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeonato excluído.'**
+  String get championshipsManageDeleted;
+
+  /// No description provided for @championshipsSeasonLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'{region} · temporada {season}'**
+  String championshipsSeasonLabel(String region, String season);
+
+  /// No description provided for @championshipFormNewTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novo campeonato'**
+  String get championshipFormNewTitle;
+
+  /// No description provided for @championshipFormEditTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar campeonato'**
+  String get championshipFormEditTitle;
+
+  /// No description provided for @championshipFormSectionData.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dados'**
+  String get championshipFormSectionData;
+
+  /// No description provided for @championshipFormTitleLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome do campeonato'**
+  String get championshipFormTitleLabel;
+
+  /// No description provided for @championshipFormTitleRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Informe o nome (mínimo 3 letras).'**
+  String get championshipFormTitleRequired;
+
+  /// No description provided for @championshipFormDescriptionLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Descrição (opcional)'**
+  String get championshipFormDescriptionLabel;
+
+  /// No description provided for @championshipFormSeasonLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Temporada'**
+  String get championshipFormSeasonLabel;
+
+  /// No description provided for @championshipFormSectionTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Times participantes'**
+  String get championshipFormSectionTeams;
+
+  /// No description provided for @championshipFormTeamsAll.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos'**
+  String get championshipFormTeamsAll;
+
+  /// No description provided for @championshipFormTeamsClear.
+  ///
+  /// In pt, this message translates to:
+  /// **'Limpar'**
+  String get championshipFormTeamsClear;
+
+  /// No description provided for @championshipFormTeamsRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha ao menos um time.'**
+  String get championshipFormTeamsRequired;
+
+  /// No description provided for @championshipFormTeamsEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum time cadastrado nesta região.'**
+  String get championshipFormTeamsEmpty;
+
+  /// No description provided for @championshipFormTeamsSelected.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{Nenhum selecionado} =1{1 selecionado} other{{count} selecionados}}'**
+  String championshipFormTeamsSelected(int count);
+
+  /// No description provided for @championshipFormSectionRules.
+  ///
+  /// In pt, this message translates to:
+  /// **'Regulamento'**
+  String get championshipFormSectionRules;
+
+  /// No description provided for @championshipFormRulesHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Anexe o regulamento em PDF: os usuários abrem na página do campeonato.'**
+  String get championshipFormRulesHint;
+
+  /// No description provided for @championshipFormRulesAttach.
+  ///
+  /// In pt, this message translates to:
+  /// **'Anexar PDF'**
+  String get championshipFormRulesAttach;
+
+  /// No description provided for @championshipFormRulesReplace.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar'**
+  String get championshipFormRulesReplace;
+
+  /// No description provided for @championshipFormRulesRemove.
+  ///
+  /// In pt, this message translates to:
+  /// **'Remover'**
+  String get championshipFormRulesRemove;
+
+  /// No description provided for @championshipFormRulesTooBig.
+  ///
+  /// In pt, this message translates to:
+  /// **'O PDF passa de 10 MB.'**
+  String get championshipFormRulesTooBig;
+
+  /// No description provided for @championshipFormRulesSummary.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resumo das regras (opcional)'**
+  String get championshipFormRulesSummary;
+
+  /// No description provided for @championshipFormSectionPrizes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Premiação'**
+  String get championshipFormSectionPrizes;
+
+  /// No description provided for @championshipFormPrize1.
+  ///
+  /// In pt, this message translates to:
+  /// **'1º lugar'**
+  String get championshipFormPrize1;
+
+  /// No description provided for @championshipFormPrize2.
+  ///
+  /// In pt, this message translates to:
+  /// **'2º lugar'**
+  String get championshipFormPrize2;
+
+  /// No description provided for @championshipFormPrize3.
+  ///
+  /// In pt, this message translates to:
+  /// **'3º lugar'**
+  String get championshipFormPrize3;
+
+  /// No description provided for @championshipFormPrizeTopScorer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Artilheiro'**
+  String get championshipFormPrizeTopScorer;
+
+  /// No description provided for @championshipFormPrizeGoalkeeper.
+  ///
+  /// In pt, this message translates to:
+  /// **'Melhor goleiro'**
+  String get championshipFormPrizeGoalkeeper;
+
+  /// No description provided for @championshipFormSubmitCreate.
+  ///
+  /// In pt, this message translates to:
+  /// **'CADASTRAR CAMPEONATO'**
+  String get championshipFormSubmitCreate;
+
+  /// No description provided for @championshipFormCreated.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeonato cadastrado!'**
+  String get championshipFormCreated;
+
+  /// No description provided for @championshipFormSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeonato atualizado!'**
+  String get championshipFormSaved;
+
+  /// No description provided for @championshipFormLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar as regiões e os times.'**
+  String get championshipFormLoadError;
+
+  /// No description provided for @championshipRulesOpen.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abrir regulamento'**
+  String get championshipRulesOpen;
+
+  /// No description provided for @championshipRulesOpenError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível abrir o regulamento.'**
+  String get championshipRulesOpenError;
+
+  /// No description provided for @homePublishChampionship.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeonato'**
+  String get homePublishChampionship;
+
+  /// No description provided for @championshipsCurrentBadge.
+  ///
+  /// In pt, this message translates to:
+  /// **'EM ANDAMENTO'**
+  String get championshipsCurrentBadge;
+
+  /// No description provided for @championshipsPrevious.
+  ///
+  /// In pt, this message translates to:
+  /// **'Anteriores'**
+  String get championshipsPrevious;
+
+  /// No description provided for @championshipTabOverview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Visão geral'**
+  String get championshipTabOverview;
+
+  /// No description provided for @championshipTabTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Times'**
+  String get championshipTabTeams;
+
+  /// No description provided for @championshipTabRules.
+  ///
+  /// In pt, this message translates to:
+  /// **'Regulamento'**
+  String get championshipTabRules;
+
+  /// No description provided for @championshipRulesEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Regulamento ainda não publicado'**
+  String get championshipRulesEmpty;
+
+  /// No description provided for @championshipTeamsEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Times ainda não definidos'**
+  String get championshipTeamsEmpty;
+
+  /// No description provided for @championshipGroupsAndStandings.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grupos e classificação'**
+  String get championshipGroupsAndStandings;
+
+  /// No description provided for @championshipSeasonShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'Temporada {season}'**
+  String championshipSeasonShort(String season);
+
+  /// No description provided for @championshipOverviewEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Premiação e informações ainda não publicadas'**
+  String get championshipOverviewEmpty;
+
+  /// No description provided for @championshipAbout.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sobre'**
+  String get championshipAbout;
+
+  /// No description provided for @seasonsPanelTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Temporadas'**
+  String get seasonsPanelTitle;
+
+  /// No description provided for @seasonsCurrentLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Temporada atual'**
+  String get seasonsCurrentLabel;
+
+  /// No description provided for @seasonsCurrentInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Times, partidas, jogadores e campeonatos novos são gravados nesta temporada.'**
+  String get seasonsCurrentInfo;
+
+  /// No description provided for @seasonsAvailable.
+  ///
+  /// In pt, this message translates to:
+  /// **'Temporadas disponíveis'**
+  String get seasonsAvailable;
+
+  /// No description provided for @seasonsCurrentTag.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atual'**
+  String get seasonsCurrentTag;
+
+  /// No description provided for @seasonsStartTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Iniciar temporada {season}'**
+  String seasonsStartTitle(String season);
+
+  /// No description provided for @seasonsStartInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'A temporada {current} fica guardada para consulta no seletor de temporada. Nada é apagado.'**
+  String seasonsStartInfo(String current);
+
+  /// No description provided for @seasonsCopyTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Copiar os times da temporada atual'**
+  String get seasonsCopyTeams;
+
+  /// No description provided for @seasonsCopyTeamsHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os times entram na nova temporada com a classificação zerada. Os elencos começam vazios.'**
+  String get seasonsCopyTeamsHint;
+
+  /// No description provided for @seasonsStartButton.
+  ///
+  /// In pt, this message translates to:
+  /// **'INICIAR TEMPORADA {season}'**
+  String seasonsStartButton(String season);
+
+  /// No description provided for @seasonsConfirmTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Iniciar a temporada {season}?'**
+  String seasonsConfirmTitle(String season);
+
+  /// No description provided for @seasonsConfirmMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos os usuários passam a ver {season} como temporada atual e os novos cadastros vão para ela. Não dá para desfazer pelo app.'**
+  String seasonsConfirmMessage(String season);
+
+  /// No description provided for @seasonsConfirmAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Iniciar'**
+  String get seasonsConfirmAction;
+
+  /// No description provided for @seasonsStarted.
+  ///
+  /// In pt, this message translates to:
+  /// **'Temporada {season} iniciada!'**
+  String seasonsStarted(String season);
+
+  /// No description provided for @matchFormChampionship.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeonato'**
+  String get matchFormChampionship;
 }
 
 class _AppLocalizationsDelegate

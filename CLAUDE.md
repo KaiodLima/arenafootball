@@ -48,7 +48,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | `players` | Elenco do time, edição de gols/assistências/foto, cadastro de jogador |
 | `player_requests` | "Sou jogador": usuário pede para entrar num time; painel do admin aprova (cria o jogador vinculado), rejeita ou edita |
 | `stats` | Ranking de artilharia/assistências (uma tela, `StatsRankingType`) |
-| `championships` | Aba CAMPEONATOS, detalhe, grupos, classificação |
+| `championships` | Aba CAMPEONATOS, detalhe (regulamento PDF, times, premiação), grupos, classificação, cadastro/edição do admin |
 | `matches` | Aba TABELAS, lista de partidas (hoje/todas), cadastro, placar, votação on/off |
 | `voting` | Votar no melhor jogador, contagem de votos, jogador eleito |
 | `global_results` | Resultados pelo mundo (scraping do soccerstats.com; parser em `data/parsers/`) |
@@ -95,20 +95,21 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | `classificacao{ano}` | campos do time + vitorias, derrotas, empates, gols_feitos, gols_sofridos, pontos, saldo_gols, fk_grupo |
 | `jogadores{ano}` | idJogador, nome, time, urlImagem, nGols, nAssistencias. Opcionais: idUsuario (conta vinculada pelo "Sou jogador"), posicao (goleiro/zagueiro/lateral/meia/atacante) |
 | `partidas{ano}` | id_partida, dataRegistro, timeC, timeF, horario, data, local, id_campeonato, fk_competicao, golTimeCasa, golTimeFora, votacao (string), tituloVotacao, melhorJogador, quantidadeVotos |
-| `campeonatos` | titulo, descricao, urlImagem, premio1-3, premioArtilheiro, premioGoleiro, regras, fk_competicao, id_campeonato |
-| `grupos{ano}` | descricao, fk_competicao |
+| `campeonatos` | titulo, descricao, urlImagem, premio1-3, premioArtilheiro, premioGoleiro, regras (resumo em texto), fk_competicao, id_campeonato (int; novo = maior + 1), ano, times[] (nomes dos participantes), regulamentoUrl, regulamentoNome (PDF no Storage). Cadastro pelo admin em "Campeonatos"; partidas pegam o id_campeonato do campeonato da região na temporada corrente (senão, a tabela fixa do `CreateMatchUseCase`) |
+| `grupos{ano}` | descricao, fk_competicao, time1-4, fk_campeonato (opcional: `id_campeonato`; sem ele = grupo antigo, mostrado no campeonato que não tiver grupos próprios) |
 | `melhorjogador{timeC}{timeF}` | um doc por votante (id = uid): nome, time |
+| `config/temporadas` | atual (temporada em andamento), lista (seletor) |
 | `config/notificacoes` | liga/desliga por ação de push: gol, noticia, partida, votacao_aberta, votacao_encerrada, jogo_do_dia, aviso (bool; ausente = padrão das functions) |
 | `notificacoes_envios` | histórico gravado pelas Cloud Functions (id = evento): tipo, titulo, corpo, alvo, regiao, data, status (enviado/desligado/erro), erro, origem |
 | `solicitacoes_jogador` | pedido "Sou jogador", id = uid (um por usuário): uid, nome_usuario, email, nome, time, regiao, temporada, posicao, mensagem, urlImagem, status (pendente/aprovada/rejeitada/removido), motivo, idJogador, data, atualizado_em. Aprovar = batch que cria o jogador (ou reaproveita o atleta da conta, mantendo os números) e marca o pedido. Atleta vinculado não é excluído: "remover do elenco" zera o `time` e o pedido vira `removido` |
 | `push_avisos` | aviso manual do admin (titulo, corpo, regiao vazia = todos, data); a function envia |
 
-`{ano}`: a temporada corrente (`SeasonCollection.currentSeason`, hoje **2023**) fica nas coleções sem sufixo; as anteriores usam o ano como sufixo (`times2022`). Não comparar com o ano do relógio. Para abrir uma temporada nova: copiar as coleções sem sufixo para `<nome><ano>`, limpar as sem sufixo e atualizar `currentSeason`/`seasons`.
-Storage: `noticias/`, `destaques/`, `times/`, `jogadores/` (ver `StorageFolder`).
+`{ano}`: **2023 é a única temporada sem sufixo** (legado: `times`, `partidas`...); todas as outras usam o ano (`times2022`, `times2024`). A temporada **atual** fica em `config/temporadas` (`atual`, `lista`; leitura pública, escrita do admin), carregada no `RegionCubit.load()` e aplicada em `SeasonCollection.configure`. Sem a config, vale 2023. Para abrir a temporada nova: admin → **Temporadas** → "Iniciar temporada" (opcionalmente copia os times com a classificação zerada); nada é copiado à mão nem renomeado, e os cadastros passam a ir para as coleções do ano novo. Não comparar com o ano do relógio.
+Storage: `noticias/`, `destaques/`, `times/`, `jogadores/`, `campeonatos/` (banner e regulamento em PDF) (ver `StorageFolder`).
 
 ## Notificações push (FCM)
 
-- **Envio:** Cloud Functions em `functions/` (TypeScript, região `us-central1`, a mesma do Firestore `nam5`). Gatilhos em `noticias`, `partidas` (temporada corrente), `push_avisos` e `solicitacoes_jogador`, mais o agendamento diário `dailyGames` (9h, Brasília). Mensagens e alvos em `functions/src/messages.ts` (funções puras, `npm test`).
+- **Envio:** Cloud Functions em `functions/` (TypeScript, região `us-central1`, a mesma do Firestore `nam5`). Gatilhos em `noticias`, `partidas` da temporada atual (gatilho em `{colecao}/{id}` filtrando a coleção de partidas da `config/temporadas`), `push_avisos` e `solicitacoes_jogador`, mais o agendamento diário `dailyGames` (9h, Brasília). Mensagens e alvos em `functions/src/messages.ts` (funções puras, `npm test`).
 - **Tópicos:** `todos`, `regiao_<slug>`, `time_<slug>`, `usuario_<uid>` (logado) e `admins` (conta admin). O slug de `lib/core/utils/push_topics.dart` e o de `messages.ts` precisam ser iguais.
 - **App:** `PushService` (`lib/core/services/push_service.dart`) faz permissão, exibição em primeiro plano e toque (abre a aba do `data.aba`). O `PushTopicsListener` (em `blocs_load.dart`) mantém os tópicos de acordo com a região e o time do coração.
 - **Deploy das functions:** `cd functions && npm install`, depois `firebase deploy --only functions`.
