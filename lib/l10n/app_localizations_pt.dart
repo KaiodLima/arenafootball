@@ -2221,4 +2221,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String teamDeleted(String team) {
     return '$team foi excluído.';
   }
+
+  @override
+  String drawerPlayerOf(String team) {
+    return 'Jogador do $team';
+  }
+
+  @override
+  String drawerOwnerOf(String team) {
+    return 'Dono/treinador do $team';
+  }
+
+  @override
+  String get drawerMyPlayerProfile => 'Meu perfil de jogador';
 }

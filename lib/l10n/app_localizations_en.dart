@@ -2201,4 +2201,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String teamDeleted(String team) {
     return '$team was deleted.';
   }
+
+  @override
+  String drawerPlayerOf(String team) {
+    return 'Plays for $team';
+  }
+
+  @override
+  String drawerOwnerOf(String team) {
+    return 'Owner/coach of $team';
+  }
+
+  @override
+  String get drawerMyPlayerProfile => 'My player profile';
 }

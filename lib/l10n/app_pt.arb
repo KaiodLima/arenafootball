@@ -1335,5 +1335,22 @@
         "type": "String"
       }
     }
-  }
+  },
+  "drawerPlayerOf": "Jogador do {team}",
+  "@drawerPlayerOf": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "drawerOwnerOf": "Dono/treinador do {team}",
+  "@drawerOwnerOf": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "drawerMyPlayerProfile": "Meu perfil de jogador"
 }

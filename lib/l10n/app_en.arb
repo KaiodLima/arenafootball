@@ -632,5 +632,8 @@
   "teamDelete": "Delete team",
   "teamDeleteTitle": "Delete {team}?",
   "teamDeleteMessage": "The team leaves the {season} season. Players with an app account become free agents and keep their stats; the other squad players are deleted. Matches already registered stay in the history. This can't be undone.",
-  "teamDeleted": "{team} was deleted."
+  "teamDeleted": "{team} was deleted.",
+  "drawerPlayerOf": "Plays for {team}",
+  "drawerOwnerOf": "Owner/coach of {team}",
+  "drawerMyPlayerProfile": "My player profile"
 }

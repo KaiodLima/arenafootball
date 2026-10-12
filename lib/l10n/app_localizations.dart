@@ -3897,6 +3897,24 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'{team} foi excluído.'**
   String teamDeleted(String team);
+
+  /// No description provided for @drawerPlayerOf.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogador do {team}'**
+  String drawerPlayerOf(String team);
+
+  /// No description provided for @drawerOwnerOf.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dono/treinador do {team}'**
+  String drawerOwnerOf(String team);
+
+  /// No description provided for @drawerMyPlayerProfile.
+  ///
+  /// In pt, this message translates to:
+  /// **'Meu perfil de jogador'**
+  String get drawerMyPlayerProfile;
 }
 
 class _AppLocalizationsDelegate
