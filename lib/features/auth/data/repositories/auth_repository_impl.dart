@@ -14,6 +14,9 @@ class AuthRepositoryImpl implements IAuthRepository {
       _dataSource.signIn(email: email, password: password);
 
   @override
+  Future<Either<Failure, UserDTO?>> signInWithGoogle() => _dataSource.signInWithGoogle();
+
+  @override
   Future<Either<Failure, UserDTO>> signUp({
     required String name,
     required String email,

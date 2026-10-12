@@ -938,6 +938,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get loginOr => 'ou';
 
   @override
+  String get loginWithGoogleButton => 'ENTRAR COM GOOGLE';
+
+  @override
   String get loginContinueAsGuest => 'Continuar sem conta';
 
   @override

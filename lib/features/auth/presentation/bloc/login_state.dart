@@ -19,6 +19,11 @@ class LoadingLoginState extends LoginState {
   const LoadingLoginState();
 }
 
+/// Login com Google em andamento (spinner só no botão do Google).
+class GoogleLoadingLoginState extends LoginState {
+  const GoogleLoadingLoginState();
+}
+
 class SuccessLoginState extends LoginState {
   final UserDTO user;
 

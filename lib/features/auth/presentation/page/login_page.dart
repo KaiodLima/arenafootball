@@ -7,6 +7,7 @@ import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart'
 import 'package:arena_soccer/features/auth/presentation/widgets/auth_scaffold.dart';
 import 'package:arena_soccer/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:arena_soccer/features/auth/presentation/widgets/forgot_password_sheet.dart';
+import 'package:arena_soccer/features/auth/presentation/widgets/google_logo.dart';
 import 'package:arena_soccer/features/auth/presentation/widgets/or_divider.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
@@ -42,6 +43,11 @@ class _LoginPageState extends State<LoginPage> {
       email: _emailController.text.trim(),
       password: _passwordController.text,
     );
+  }
+
+  void _signInWithGoogle() {
+    FocusScope.of(context).unfocus();
+    BlocProvider.of<LoginCubit>(context).signInWithGoogle();
   }
 
   Future<void> _openForgotPassword() async {
@@ -84,6 +90,7 @@ class _LoginPageState extends State<LoginPage> {
     return BlocConsumer<LoginCubit, LoginState>(
       listener: (context, state) => _onStateChanged(context, state, l10n),
       builder: (context, state) {
+        final busy = state is LoadingLoginState || state is GoogleLoadingLoginState;
         return AuthScaffold(
           child: AutofillGroup(
             child: Column(
@@ -127,11 +134,24 @@ class _LoginPageState extends State<LoginPage> {
                   buttonColor: AppColors.primary,
                   textColor: AppColors.white,
                   isLoading: state is LoadingLoginState,
-                  function: _submit,
+                  function: busy ? null : _submit,
                 ),
                 const SizedBox(height: AppSizes.s20),
                 OrDivider(label: l10n.loginOr),
                 const SizedBox(height: AppSizes.s20),
+                ArenaButton(
+                  title: l10n.loginWithGoogleButton,
+                  height: AppSizes.buttonHeightLarge,
+                  borderRadius: AppSizes.fieldRadius,
+                  fontSize: AppSizes.s16,
+                  buttonColor: AppColors.surface,
+                  buttonBorderColor: AppColors.greyLight,
+                  textColor: AppColors.textPrimary,
+                  leading: const GoogleLogo(),
+                  isLoading: state is GoogleLoadingLoginState,
+                  function: busy ? null : _signInWithGoogle,
+                ),
+                const SizedBox(height: AppSizes.s12),
                 ArenaButton(
                   title: l10n.loginCreateAccountButton,
                   height: AppSizes.buttonHeightLarge,

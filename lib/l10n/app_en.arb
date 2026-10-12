@@ -265,6 +265,7 @@
   "loginWelcomeSubtitle": "Sign in to follow your team, the matches and the standings.",
   "loginForgotPassword": "Forgot my password",
   "loginOr": "or",
+  "loginWithGoogleButton": "SIGN IN WITH GOOGLE",
   "loginContinueAsGuest": "Continue without an account",
   "loginShowPassword": "Show password",
   "loginHidePassword": "Hide password",

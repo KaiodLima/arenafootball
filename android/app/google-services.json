@@ -12,7 +12,28 @@
           "package_name": "com.caiolima.arenafootball"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "168000497644-87gh7opicge1jlvm4vllulh24lepfhc9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.caiolima.arenafootball",
+            "certificate_hash": "bb5d45beade0daf890aa3b1459c06bb10d5f9c09"
+          }
+        },
+        {
+          "client_id": "168000497644-itr4qoq6a77l2aukaui9l1jrd2fhjipa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.caiolima.arenafootball",
+            "certificate_hash": "141bb7cc10fa842b7b3d82abb7d1efb6a127bc89"
+          }
+        },
+        {
+          "client_id": "168000497644-28p2cr5e0p5u58pgmpko9k2m6vhlvf8v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDuFtmDR_xPPcRblfej97figtXufY1i-3w"
@@ -20,7 +41,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "168000497644-28p2cr5e0p5u58pgmpko9k2m6vhlvf8v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     },
@@ -31,7 +57,12 @@
           "package_name": "com.cdevel.arena_football"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "168000497644-28p2cr5e0p5u58pgmpko9k2m6vhlvf8v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDuFtmDR_xPPcRblfej97figtXufY1i-3w"
@@ -39,7 +70,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "168000497644-28p2cr5e0p5u58pgmpko9k2m6vhlvf8v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     },
@@ -50,7 +86,12 @@
           "package_name": "com.example.arena_soccer"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "168000497644-28p2cr5e0p5u58pgmpko9k2m6vhlvf8v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDuFtmDR_xPPcRblfej97figtXufY1i-3w"
@@ -58,7 +99,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "168000497644-28p2cr5e0p5u58pgmpko9k2m6vhlvf8v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

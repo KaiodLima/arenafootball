@@ -931,6 +931,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginOr => 'or';
 
   @override
+  String get loginWithGoogleButton => 'SIGN IN WITH GOOGLE';
+
+  @override
   String get loginContinueAsGuest => 'Continue without an account';
 
   @override
