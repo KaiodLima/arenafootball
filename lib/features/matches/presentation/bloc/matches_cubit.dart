@@ -25,6 +25,7 @@ class MatchesCubit extends Cubit<MatchesState> {
   final GetTeamsUseCase getTeamsUseCase;
   StreamSubscription<Either<Failure, List<MatchDTO>>>? _subscription;
   String? _season;
+  int? _championshipId;
 
   MatchesCubit(
     this.watchMatchesUseCase,
@@ -41,10 +42,22 @@ class MatchesCubit extends Cubit<MatchesState> {
     required String season,
   }) {
     _season = season;
+    _championshipId = championshipId;
+    _loadCrests(region: region, season: season);
+    _subscribe(filter);
+  }
+
+  /// Troca o dia da aba de tabelas (ontem/hoje/amanhã) sem recarregar os
+  /// escudos; a lista anterior fica na tela até chegar a nova.
+  void selectDay(MatchesFilter filter) {
+    if (_championshipId == null) return;
+    _subscribe(filter);
+  }
+
+  void _subscribe(MatchesFilter filter) {
     _subscription?.cancel();
     emit(LoadingMatchesState(matches: state.matches, teamFilter: state.teamFilter, crests: state.crests));
-    _loadCrests(region: region, season: season);
-    _subscription = watchMatchesUseCase(championshipId: championshipId, filter: filter, season: season).listen(
+    _subscription = watchMatchesUseCase(championshipId: _championshipId!, filter: filter, season: _season).listen(
       (response) {
         response.fold(
           (failure) => emit(ErrorMatchesState(

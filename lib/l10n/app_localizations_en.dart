@@ -1745,4 +1745,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get playerRequestJoinAnother => 'Ask to join another team';
+
+  @override
+  String get matchesYesterday => 'Yesterday';
+
+  @override
+  String get matchesToday => 'Today';
+
+  @override
+  String get matchesTomorrow => 'Tomorrow';
+
+  @override
+  String get matchesYesterdayTitle => 'Yesterday\'s games';
+
+  @override
+  String get matchesTomorrowTitle => 'Tomorrow\'s games';
+
+  @override
+  String get matchesNoGamesYesterday => 'No games yesterday';
+
+  @override
+  String get matchesNoGamesToday => 'No games today';
+
+  @override
+  String get matchesNoGamesTomorrow => 'No games tomorrow';
 }

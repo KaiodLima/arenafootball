@@ -504,5 +504,13 @@
   "athleteRemoved": "{name} left the {team} squad.",
   "playerRequestStatusRemoved": "Out of the squad",
   "playerRequestRemovedInfo": "You left the {team} squad. Your stats are kept and you can ask to join another team.",
-  "playerRequestJoinAnother": "Ask to join another team"
+  "playerRequestJoinAnother": "Ask to join another team",
+  "matchesYesterday": "Yesterday",
+  "matchesToday": "Today",
+  "matchesTomorrow": "Tomorrow",
+  "matchesYesterdayTitle": "Yesterday's games",
+  "matchesTomorrowTitle": "Tomorrow's games",
+  "matchesNoGamesYesterday": "No games yesterday",
+  "matchesNoGamesToday": "No games today",
+  "matchesNoGamesTomorrow": "No games tomorrow"
 }

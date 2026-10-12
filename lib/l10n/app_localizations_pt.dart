@@ -1759,4 +1759,28 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get playerRequestJoinAnother => 'Pedir para entrar em outro time';
+
+  @override
+  String get matchesYesterday => 'Ontem';
+
+  @override
+  String get matchesToday => 'Hoje';
+
+  @override
+  String get matchesTomorrow => 'Amanhã';
+
+  @override
+  String get matchesYesterdayTitle => 'Jogos de ontem';
+
+  @override
+  String get matchesTomorrowTitle => 'Jogos de amanhã';
+
+  @override
+  String get matchesNoGamesYesterday => 'Nenhum jogo ontem';
+
+  @override
+  String get matchesNoGamesToday => 'Nenhum jogo hoje';
+
+  @override
+  String get matchesNoGamesTomorrow => 'Nenhum jogo amanhã';
 }

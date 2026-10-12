@@ -3129,6 +3129,54 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Pedir para entrar em outro time'**
   String get playerRequestJoinAnother;
+
+  /// No description provided for @matchesYesterday.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ontem'**
+  String get matchesYesterday;
+
+  /// No description provided for @matchesToday.
+  ///
+  /// In pt, this message translates to:
+  /// **'Hoje'**
+  String get matchesToday;
+
+  /// No description provided for @matchesTomorrow.
+  ///
+  /// In pt, this message translates to:
+  /// **'Amanhã'**
+  String get matchesTomorrow;
+
+  /// No description provided for @matchesYesterdayTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogos de ontem'**
+  String get matchesYesterdayTitle;
+
+  /// No description provided for @matchesTomorrowTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogos de amanhã'**
+  String get matchesTomorrowTitle;
+
+  /// No description provided for @matchesNoGamesYesterday.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum jogo ontem'**
+  String get matchesNoGamesYesterday;
+
+  /// No description provided for @matchesNoGamesToday.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum jogo hoje'**
+  String get matchesNoGamesToday;
+
+  /// No description provided for @matchesNoGamesTomorrow.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum jogo amanhã'**
+  String get matchesNoGamesTomorrow;
 }
 
 class _AppLocalizationsDelegate

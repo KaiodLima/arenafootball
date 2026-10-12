@@ -31,7 +31,10 @@ class MatchesList extends StatelessWidget {
 
   final bool groupByDate;
 
-  const MatchesList({super.key, required this.season, this.header, this.groupByDate = false});
+  /// Mensagem quando não há partidas no recorte (padrão: "Nenhuma partida cadastrada").
+  final String? emptyMessage;
+
+  const MatchesList({super.key, required this.season, this.header, this.groupByDate = false, this.emptyMessage});
 
   void _openVoting(BuildContext context, MatchDTO match) {
     Navigator.pushNamed(
@@ -108,7 +111,7 @@ class MatchesList extends StatelessWidget {
         } else if (state is ErrorMatchesState && state.matches.isEmpty) {
           placeholder = ArenaEmptyState.error(message: l10n.matchesLoadError);
         } else if (state.matches.isEmpty) {
-          placeholder = ArenaEmptyState(message: l10n.matchesEmpty, icon: Icons.sports_soccer_outlined);
+          placeholder = ArenaEmptyState(message: emptyMessage ?? l10n.matchesEmpty, icon: Icons.sports_soccer_outlined);
         } else if (state.visibleMatches.isEmpty) {
           placeholder = ArenaEmptyState(message: l10n.matchesEmptyForTeam, icon: Icons.filter_alt_off_outlined);
         } else {

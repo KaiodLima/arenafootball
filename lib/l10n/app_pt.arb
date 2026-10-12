@@ -1047,5 +1047,13 @@
       }
     }
   },
-  "playerRequestJoinAnother": "Pedir para entrar em outro time"
+  "playerRequestJoinAnother": "Pedir para entrar em outro time",
+  "matchesYesterday": "Ontem",
+  "matchesToday": "Hoje",
+  "matchesTomorrow": "Amanhã",
+  "matchesYesterdayTitle": "Jogos de ontem",
+  "matchesTomorrowTitle": "Jogos de amanhã",
+  "matchesNoGamesYesterday": "Nenhum jogo ontem",
+  "matchesNoGamesToday": "Nenhum jogo hoje",
+  "matchesNoGamesTomorrow": "Nenhum jogo amanhã"
 }

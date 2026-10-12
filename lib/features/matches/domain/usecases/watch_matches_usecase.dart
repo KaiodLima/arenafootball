@@ -5,8 +5,8 @@ import 'package:arena_soccer/features/matches/domain/matches_filter.dart';
 import 'package:arena_soccer/features/matches/domain/repositories/matches_repository_interface.dart';
 
 /// Partidas de um campeonato na temporada, das mais recentes para as mais
-/// antigas. Com [MatchesFilter.today], só as do dia: a data da partida é texto
-/// "dd/MM" e é comparada com a data de hoje no mesmo formato.
+/// antigas. Com ontem/hoje/amanhã ([MatchesFilter.dayOffset]), só as daquele
+/// dia: a data da partida é texto "dd/MM" e é comparada com o dia no mesmo formato.
 class WatchMatchesUseCase {
   final IMatchesRepository _repository;
 
@@ -22,12 +22,15 @@ class WatchMatchesUseCase {
     String? season,
     DateTime? now,
   }) {
-    final today = formatMatchDate(now ?? DateTime.now());
+    final offset = filter.dayOffset;
+    final base = now ?? DateTime.now();
+    // Construtor com dia somado (não Duration): atravessa mês/ano e horário de verão.
+    final day = offset == null ? null : formatMatchDate(DateTime(base.year, base.month, base.day + offset));
     return _repository.watchMatches(season: season).map(
           (response) => response.map(
             (matches) => matches
                 .where((match) => match.championshipId == championshipId)
-                .where((match) => filter == MatchesFilter.all || match.date == today)
+                .where((match) => day == null || match.date == day)
                 .toList(),
           ),
         );
