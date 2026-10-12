@@ -663,5 +663,13 @@
   "fanCardChangePhoto": "Change photo",
   "fanCardAddPhoto": "Add photo",
   "fanCardPhotoSaved": "Photo updated!",
-  "fanCardHint": "Show your fan card at your team's games."
+  "fanCardHint": "Show your fan card at your team's games.",
+  "fanCardShare": "SHARE FAN CARD",
+  "fanCardShareTitle": "Share fan card",
+  "shareInstagramStories": "Instagram Stories",
+  "shareWhatsApp": "WhatsApp",
+  "shareMoreOptions": "More options",
+  "fanCardShareText": "I support {team} on Arena Football! ⚽",
+  "fanCardShareTextNoTeam": "My fan card on Arena Football! ⚽",
+  "fanCardShareFooter": "Arena Football · amateur football in your region"
 }

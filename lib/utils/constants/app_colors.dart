@@ -24,6 +24,11 @@ class AppColors {
   static const Color googleYellow = Color(0xFFFBBC05);
   static const Color googleGreen = Color(0xFF34A853);
 
+  /// Cores das redes no compartilhamento (disco do ícone de cada destino).
+  static const Color whatsapp = Color(0xFF25D366);
+  static const Color instagramStart = Color(0xFF833AB4);
+  static const Color instagramEnd = Color(0xFFF77737);
+
   /// Paleta de cores de time (cadastro de time: cor principal e secundária).
   /// Uma cor por família; vinho e azul-marinho são clássicas de time.
   static const Color teamWhite = Color(0xFFFFFFFF);

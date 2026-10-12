@@ -2324,4 +2324,32 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get fanCardHint => 'Mostre a sua carteirinha nos jogos do seu time.';
+
+  @override
+  String get fanCardShare => 'COMPARTILHAR CARTEIRINHA';
+
+  @override
+  String get fanCardShareTitle => 'Compartilhar carteirinha';
+
+  @override
+  String get shareInstagramStories => 'Instagram Stories';
+
+  @override
+  String get shareWhatsApp => 'WhatsApp';
+
+  @override
+  String get shareMoreOptions => 'Mais opções';
+
+  @override
+  String fanCardShareText(String team) {
+    return 'Sou torcedor do $team no Arena Football! ⚽';
+  }
+
+  @override
+  String get fanCardShareTextNoTeam =>
+      'Minha carteirinha de torcedor no Arena Football! ⚽';
+
+  @override
+  String get fanCardShareFooter =>
+      'Arena Football · o futebol amador da sua região';
 }

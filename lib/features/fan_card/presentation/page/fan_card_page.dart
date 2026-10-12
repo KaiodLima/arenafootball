@@ -10,6 +10,8 @@ import 'package:arena_soccer/features/fan_card/domain/fan_card_number.dart';
 import 'package:arena_soccer/features/fan_card/presentation/bloc/fan_card_cubit.dart';
 import 'package:arena_soccer/features/fan_card/presentation/bloc/fan_card_state.dart';
 import 'package:arena_soccer/features/fan_card/presentation/widgets/fan_card.dart';
+import 'package:arena_soccer/features/fan_card/presentation/widgets/fan_card_share_image.dart';
+import 'package:arena_soccer/features/fan_card/presentation/widgets/share_fan_card_sheet.dart';
 import 'package:arena_soccer/features/player_requests/presentation/bloc/my_player_cubit.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/team_requests/presentation/bloc/owned_team_cubit.dart';
@@ -54,13 +56,42 @@ class _FanCardPageState extends State<FanCardPage> {
     _cubit.load(favoriteTeam: BlocProvider.of<SessionCubit>(context).state.user?.favoriteTeam ?? '');
   }
 
+  /// Mesma carteirinha da tela, para a prévia e a imagem compartilhada.
+  FanCard _buildCard(FanCardState state) {
+    final user = BlocProvider.of<SessionCubit>(context).state.user!;
+    final region = BlocProvider.of<RegionCubit>(context).state.selectedRegion;
+    return FanCard(
+      name: user.name,
+      photoUrl: user.photoUrl,
+      favoriteTeam: user.favoriteTeam,
+      team: state.team,
+      region: state.team?.region.isNotEmpty == true ? state.team!.region : region,
+      memberSince: state.memberSince,
+      number: fanCardNumber(user.id),
+      playerTeam: BlocProvider.of<MyPlayerCubit>(context).state.teamName,
+      ownedTeam: BlocProvider.of<OwnedTeamCubit>(context).state.teamName,
+    );
+  }
+
+  void _share() {
+    final l10n = AppLocalizations.of(context);
+    final user = BlocProvider.of<SessionCubit>(context).state.user;
+    if (user == null || _cubit.state.loading) return;
+    showShareFanCardSheet(
+      context,
+      preview: FanCardShareImage(card: _buildCard(_cubit.state), date: DateTime.now()),
+      shareText: user.hasFavoriteTeam ? l10n.fanCardShareText(user.favoriteTeam) : l10n.fanCardShareTextNoTeam,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final user = context.watch<SessionCubit>().state.user;
-    final region = context.watch<RegionCubit>().state.selectedRegion;
-    final player = context.watch<MyPlayerCubit>().state;
-    final owned = context.watch<OwnedTeamCubit>().state;
+    // Reconstrói quando região/papéis mudam (o card lê os valores em _buildCard).
+    context.watch<RegionCubit>();
+    context.watch<MyPlayerCubit>();
+    context.watch<OwnedTeamCubit>();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -73,6 +104,14 @@ class _FanCardPageState extends State<FanCardPage> {
           l10n.fanCardTitle,
           style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s20),
         ),
+        actions: [
+          if (user != null)
+            IconButton(
+              tooltip: l10n.fanCardShare,
+              onPressed: _share,
+              icon: const Icon(Icons.share_rounded),
+            ),
+        ],
       ),
       body: user == null
           ? const SizedBox.shrink()
@@ -95,17 +134,7 @@ class _FanCardPageState extends State<FanCardPage> {
                     AnimatedOpacity(
                       opacity: state.loading ? 0.4 : 1,
                       duration: const Duration(milliseconds: 250),
-                      child: FanCard(
-                        name: user.name,
-                        photoUrl: user.photoUrl,
-                        favoriteTeam: user.favoriteTeam,
-                        team: state.team,
-                        region: state.team?.region.isNotEmpty == true ? state.team!.region : region,
-                        memberSince: state.memberSince,
-                        number: fanCardNumber(user.id),
-                        playerTeam: player.teamName,
-                        ownedTeam: owned.teamName,
-                      ),
+                      child: _buildCard(state),
                     ),
                     const SizedBox(height: AppSizes.s16),
                     Text(
@@ -114,6 +143,11 @@ class _FanCardPageState extends State<FanCardPage> {
                       style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
                     ),
                     const SizedBox(height: AppSizes.s24),
+                    ArenaButton.primary(
+                      title: l10n.fanCardShare,
+                      function: state.loading ? null : _share,
+                    ),
+                    const SizedBox(height: AppSizes.s12),
                     ArenaButton.outlined(
                       title: user.photoUrl.isEmpty ? l10n.fanCardAddPhoto : l10n.fanCardChangePhoto,
                       isLoading: state.savingPhoto,

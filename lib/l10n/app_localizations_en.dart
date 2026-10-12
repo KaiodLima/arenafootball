@@ -2304,4 +2304,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fanCardHint => 'Show your fan card at your team\'s games.';
+
+  @override
+  String get fanCardShare => 'SHARE FAN CARD';
+
+  @override
+  String get fanCardShareTitle => 'Share fan card';
+
+  @override
+  String get shareInstagramStories => 'Instagram Stories';
+
+  @override
+  String get shareWhatsApp => 'WhatsApp';
+
+  @override
+  String get shareMoreOptions => 'More options';
+
+  @override
+  String fanCardShareText(String team) {
+    return 'I support $team on Arena Football! ⚽';
+  }
+
+  @override
+  String get fanCardShareTextNoTeam => 'My fan card on Arena Football! ⚽';
+
+  @override
+  String get fanCardShareFooter =>
+      'Arena Football · amateur football in your region';
 }

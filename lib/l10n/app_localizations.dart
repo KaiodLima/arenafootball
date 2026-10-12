@@ -4083,6 +4083,54 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Mostre a sua carteirinha nos jogos do seu time.'**
   String get fanCardHint;
+
+  /// No description provided for @fanCardShare.
+  ///
+  /// In pt, this message translates to:
+  /// **'COMPARTILHAR CARTEIRINHA'**
+  String get fanCardShare;
+
+  /// No description provided for @fanCardShareTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compartilhar carteirinha'**
+  String get fanCardShareTitle;
+
+  /// No description provided for @shareInstagramStories.
+  ///
+  /// In pt, this message translates to:
+  /// **'Instagram Stories'**
+  String get shareInstagramStories;
+
+  /// No description provided for @shareWhatsApp.
+  ///
+  /// In pt, this message translates to:
+  /// **'WhatsApp'**
+  String get shareWhatsApp;
+
+  /// No description provided for @shareMoreOptions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mais opções'**
+  String get shareMoreOptions;
+
+  /// No description provided for @fanCardShareText.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sou torcedor do {team} no Arena Football! ⚽'**
+  String fanCardShareText(String team);
+
+  /// No description provided for @fanCardShareTextNoTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Minha carteirinha de torcedor no Arena Football! ⚽'**
+  String get fanCardShareTextNoTeam;
+
+  /// No description provided for @fanCardShareFooter.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arena Football · o futebol amador da sua região'**
+  String get fanCardShareFooter;
 }
 
 class _AppLocalizationsDelegate

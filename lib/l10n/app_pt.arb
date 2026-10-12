@@ -1401,5 +1401,20 @@
   "fanCardChangePhoto": "Trocar foto",
   "fanCardAddPhoto": "Adicionar foto",
   "fanCardPhotoSaved": "Foto atualizada!",
-  "fanCardHint": "Mostre a sua carteirinha nos jogos do seu time."
+  "fanCardHint": "Mostre a sua carteirinha nos jogos do seu time.",
+  "fanCardShare": "COMPARTILHAR CARTEIRINHA",
+  "fanCardShareTitle": "Compartilhar carteirinha",
+  "shareInstagramStories": "Instagram Stories",
+  "shareWhatsApp": "WhatsApp",
+  "shareMoreOptions": "Mais opções",
+  "fanCardShareText": "Sou torcedor do {team} no Arena Football! ⚽",
+  "@fanCardShareText": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "fanCardShareTextNoTeam": "Minha carteirinha de torcedor no Arena Football! ⚽",
+  "fanCardShareFooter": "Arena Football · o futebol amador da sua região"
 }
