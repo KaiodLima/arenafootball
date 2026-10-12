@@ -1,13 +1,16 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/send_password_reset_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/sign_in_usecase.dart';
+import 'package:arena_soccer/features/auth/domain/usecases/sign_in_with_google_usecase.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/login_state.dart';
 
 class LoginCubit extends Cubit<LoginState> {
   final SignInUseCase signInUseCase;
   final SendPasswordResetUseCase sendPasswordResetUseCase;
+  final SignInWithGoogleUseCase signInWithGoogleUseCase;
 
-  LoginCubit(this.signInUseCase, this.sendPasswordResetUseCase) : super(const InitialLoginState());
+  LoginCubit(this.signInUseCase, this.sendPasswordResetUseCase, this.signInWithGoogleUseCase)
+      : super(const InitialLoginState());
 
   /// Volta ao estado inicial antes de emitir um aviso: estados iguais
   /// (Equatable) não são reemitidos, e o snackbar não apareceria de novo.
@@ -36,6 +39,16 @@ class LoginCubit extends Cubit<LoginState> {
     response.fold(
       (failure) => emit(ErrorLoginState(errorMessage: failure.toString())),
       (user) => emit(SuccessLoginState(user: user)),
+    );
+  }
+
+  Future<void> signInWithGoogle() async {
+    emit(const GoogleLoadingLoginState());
+    final response = await signInWithGoogleUseCase();
+    response.fold(
+      (failure) => emit(ErrorLoginState(errorMessage: failure.toString())),
+      // Seletor de contas fechado: só volta ao estado inicial, sem erro.
+      (user) => emit(user == null ? const InitialLoginState() : SuccessLoginState(user: user)),
     );
   }
 

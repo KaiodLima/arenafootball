@@ -78,7 +78,7 @@ class ArenaApp extends StatelessWidget {
       routes: {
         AppRoutes.splash: (_) => const SplashPage(),
         AppRoutes.loginPage: (_) => BlocProvider<LoginCubit>(
-              create: (_) => LoginCubit(sl(), sl()),
+              create: (_) => LoginCubit(sl(), sl(), sl()),
               child: const LoginPage(),
             ),
         AppRoutes.registerUserPage: (_) => BlocProvider<RegisterUserCubit>(

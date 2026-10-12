@@ -18,6 +18,12 @@ class AppColors {
   /// Verde translúcido dos cards de time sobre o fundo escuro.
   static const Color primaryTranslucent = Color.fromRGBO(0, 255, 0, 0.25);
 
+  /// Cores da marca do Google (logo do botão "Entrar com Google").
+  static const Color googleBlue = Color(0xFF4285F4);
+  static const Color googleRed = Color(0xFFEA4335);
+  static const Color googleYellow = Color(0xFFFBBC05);
+  static const Color googleGreen = Color(0xFF34A853);
+
   static const Color white = Colors.white;
   static const Color whiteMuted = Colors.white24;
   static const Color whiteSoft = Colors.white70;

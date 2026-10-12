@@ -1690,6 +1690,12 @@ abstract class AppLocalizations {
   /// **'ou'**
   String get loginOr;
 
+  /// No description provided for @loginWithGoogleButton.
+  ///
+  /// In pt, this message translates to:
+  /// **'ENTRAR COM GOOGLE'**
+  String get loginWithGoogleButton;
+
   /// No description provided for @loginContinueAsGuest.
   ///
   /// In pt, this message translates to:

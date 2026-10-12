@@ -33,6 +33,10 @@ String? _authMessage(String code) {
       return 'Senha muito fraca.';
     case 'too-many-requests':
       return 'Muitas tentativas. Aguarde alguns minutos e tente de novo.';
+    case 'account-exists-with-different-credential':
+      return 'Esse e-mail já está cadastrado com outra forma de login.';
+    case 'user-disabled':
+      return 'Essa conta foi desativada.';
     case 'network-request-failed':
       return 'Sem conexão com a internet.';
     default:

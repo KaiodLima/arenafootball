@@ -544,6 +544,7 @@
   "loginWelcomeSubtitle": "Entre para acompanhar seu time, os jogos e a tabela.",
   "loginForgotPassword": "Esqueci minha senha",
   "loginOr": "ou",
+  "loginWithGoogleButton": "ENTRAR COM GOOGLE",
   "loginContinueAsGuest": "Continuar sem conta",
   "loginShowPassword": "Mostrar senha",
   "loginHidePassword": "Ocultar senha",

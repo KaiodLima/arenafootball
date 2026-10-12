@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:either_dart/either.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/errors/firebase_error.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
@@ -9,8 +10,13 @@ import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
 class AuthDataSource {
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
+  final GoogleSignIn _googleSignIn;
 
-  AuthDataSource(this._auth, this._firestore);
+  AuthDataSource(this._auth, this._firestore, this._googleSignIn);
+
+  /// O plugin do Google só pode ser inicializado uma vez. No Android o client id
+  /// vem do `default_web_client_id` gerado a partir do google-services.json.
+  Future<void>? _googleInit;
 
   static const String _userDataNotFound = 'user-data-not-found';
 
@@ -20,26 +26,52 @@ class AuthDataSource {
     const fallback = 'Não foi possível entrar. Tente novamente.';
     try {
       final credential = await _auth.signInWithEmailAndPassword(email: email, password: password);
-      final authUser = credential.user!;
-      final result = await getUser(authUser.uid);
-      if (result.isRight) return result;
-
-      // Conta criada no Auth sem o documento (cadastro interrompido): recria.
-      final failure = result.left;
-      if (failure is ErrorWithMessage && failure.code == _userDataNotFound) {
-        final user = UserDTO(id: authUser.uid, name: authUser.displayName ?? '', email: authUser.email ?? email);
-        await _users.doc(user.id).set(user.toMap());
-        return Right(user);
-      }
-
-      // Sem os dados do usuário não há sessão válida: não deixa o Auth logado pela metade.
-      await _auth.signOut();
-      return result;
+      return await _loadOrCreateUser(credential.user!);
     } catch (e) {
       AppLogger.e('signIn', name: 'AuthDataSource', error: e);
       if (_auth.currentUser != null) await _auth.signOut();
       return Left(mapFirebaseError(e, fallbackMessage: fallback));
     }
+  }
+
+  /// `Right(null)` quando o usuário fecha o seletor de contas do Google.
+  Future<Either<Failure, UserDTO?>> signInWithGoogle() async {
+    const fallback = 'Não foi possível entrar com o Google. Tente novamente.';
+    try {
+      await (_googleInit ??= _googleSignIn.initialize());
+      final account = await _googleSignIn.authenticate();
+      final idToken = account.authentication.idToken;
+      if (idToken == null) return Left(ErrorWithMessage(fallback));
+
+      final credential = await _auth.signInWithCredential(GoogleAuthProvider.credential(idToken: idToken));
+      return await _loadOrCreateUser(credential.user!);
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) return const Right(null);
+      AppLogger.e('signInWithGoogle', name: 'AuthDataSource', error: e);
+      return Left(ErrorWithMessage(fallback));
+    } catch (e) {
+      AppLogger.e('signInWithGoogle', name: 'AuthDataSource', error: e);
+      if (_auth.currentUser != null) await signOut();
+      return Left(mapFirebaseError(e, fallbackMessage: fallback));
+    }
+  }
+
+  /// Dados do usuário recém-autenticado. Sem documento (cadastro interrompido ou
+  /// primeiro acesso pelo Google), cria um com o time vazio.
+  Future<Either<Failure, UserDTO>> _loadOrCreateUser(User authUser) async {
+    final result = await getUser(authUser.uid);
+    if (result.isRight) return result;
+
+    final failure = result.left;
+    if (failure is ErrorWithMessage && failure.code == _userDataNotFound) {
+      final user = UserDTO(id: authUser.uid, name: authUser.displayName ?? '', email: authUser.email ?? '');
+      await _users.doc(user.id).set(user.toMap());
+      return Right(user);
+    }
+
+    // Sem os dados do usuário não há sessão válida: não deixa o Auth logado pela metade.
+    await signOut();
+    return result;
   }
 
   Future<Either<Failure, UserDTO>> signUp({
@@ -85,10 +117,21 @@ class AuthDataSource {
     const fallback = 'Não foi possível sair da conta.';
     try {
       await _auth.signOut();
+      await _signOutGoogle();
       return const Right(null);
     } catch (e) {
       AppLogger.e('signOut', name: 'AuthDataSource', error: e);
       return Left(mapFirebaseError(e, fallbackMessage: fallback));
+    }
+  }
+
+  /// Sem isso o Google reaproveita a última conta e não mostra o seletor.
+  Future<void> _signOutGoogle() async {
+    try {
+      await (_googleInit ??= _googleSignIn.initialize());
+      await _googleSignIn.signOut();
+    } catch (e) {
+      AppLogger.e('signOut google', name: 'AuthDataSource', error: e);
     }
   }
 
