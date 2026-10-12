@@ -9,12 +9,16 @@ class UserDTO extends Equatable {
   final String favoriteTeam;
   final bool isAdmin;
 
+  /// `urlImagem`: foto da conta (carteirinha de torcedor); vazio = sem foto.
+  final String photoUrl;
+
   const UserDTO({
     required this.id,
     required this.name,
     required this.email,
     this.favoriteTeam = '',
     this.isAdmin = false,
+    this.photoUrl = '',
   });
 
   factory UserDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -25,6 +29,7 @@ class UserDTO extends Equatable {
       email: data['email']?.toString() ?? '',
       favoriteTeam: data['time']?.toString() ?? '',
       isAdmin: data['admin'] == true,
+      photoUrl: data['urlImagem']?.toString() ?? '',
     );
   }
 
@@ -36,21 +41,23 @@ class UserDTO extends Equatable {
         'email': email,
         'time': favoriteTeam,
         'admin': isAdmin,
+        if (photoUrl.isNotEmpty) 'urlImagem': photoUrl,
       };
 
   /// Contas antigas e quem pulou a etapa 2 do cadastro ficam com `time` vazio.
   bool get hasFavoriteTeam => favoriteTeam.trim().isNotEmpty;
 
-  UserDTO copyWith({String? name, String? email, String? favoriteTeam}) {
+  UserDTO copyWith({String? name, String? email, String? favoriteTeam, String? photoUrl}) {
     return UserDTO(
       id: id,
       name: name ?? this.name,
       email: email ?? this.email,
       favoriteTeam: favoriteTeam ?? this.favoriteTeam,
       isAdmin: isAdmin,
+      photoUrl: photoUrl ?? this.photoUrl,
     );
   }
 
   @override
-  List<Object?> get props => [id, name, email, favoriteTeam, isAdmin];
+  List<Object?> get props => [id, name, email, favoriteTeam, isAdmin, photoUrl];
 }

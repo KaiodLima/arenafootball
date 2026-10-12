@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
+import 'package:arena_soccer/features/fan_card/presentation/bloc/fan_card_cubit.dart';
+import 'package:arena_soccer/features/fan_card/presentation/page/fan_card_page.dart';
 import 'package:arena_soccer/features/global_results/presentation/bloc/global_results_cubit.dart';
 import 'package:arena_soccer/features/global_results/presentation/bloc/match_goals_cubit.dart';
 import 'package:arena_soccer/features/global_results/presentation/page/global_results_page.dart';
@@ -104,6 +106,10 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.chooseTeamPage: (_) => BlocProvider<ChooseTeamCubit>(
               create: (_) => ChooseTeamCubit(sl(), sl(), sl()),
               child: const ChooseTeamPage(),
+            ),
+        AppRoutes.fanCardPage: (_) => BlocProvider<FanCardCubit>(
+              create: (_) => FanCardCubit(sl(), sl(), sl()),
+              child: const FanCardPage(),
             ),
         AppRoutes.home: (_) => BlocProvider<HomeCubit>(
               create: (_) => HomeCubit(sl(), sl(), sl()),

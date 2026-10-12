@@ -14,6 +14,9 @@ class StorageFolder {
   static const String teams = 'times';
   static const String players = 'jogadores';
 
+  /// Foto da conta (carteirinha de torcedor).
+  static const String users = 'usuarios';
+
   /// Banner e regulamento (PDF) dos campeonatos.
   static const String championships = 'campeonatos';
 }

@@ -2285,4 +2285,43 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get colorPink => 'Rosa';
+
+  @override
+  String get fanCardMenu => 'Minha carteirinha';
+
+  @override
+  String get fanCardTitle => 'Carteirinha de torcedor';
+
+  @override
+  String get fanCardLabel => 'CARTEIRINHA DE TORCEDOR';
+
+  @override
+  String fanCardFanOf(String team) {
+    return 'Torcedor do $team';
+  }
+
+  @override
+  String get fanCardNoTeam => 'Sem time do coração';
+
+  @override
+  String fanCardSince(String year) {
+    return 'Torcedor desde $year';
+  }
+
+  @override
+  String fanCardNumber(String number) {
+    return 'Nº $number';
+  }
+
+  @override
+  String get fanCardChangePhoto => 'Trocar foto';
+
+  @override
+  String get fanCardAddPhoto => 'Adicionar foto';
+
+  @override
+  String get fanCardPhotoSaved => 'Foto atualizada!';
+
+  @override
+  String get fanCardHint => 'Mostre a sua carteirinha nos jogos do seu time.';
 }

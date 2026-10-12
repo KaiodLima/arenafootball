@@ -101,6 +101,12 @@ class HomeDrawer extends StatelessWidget {
                 ),
                 if (user != null)
                   _DrawerItem(
+                    icon: Icons.badge_outlined,
+                    title: l10n.fanCardMenu,
+                    onTap: () => _open(context, AppRoutes.fanCardPage),
+                  ),
+                if (user != null)
+                  _DrawerItem(
                     icon: Icons.sports_soccer_rounded,
                     title: playerTeam != null ? l10n.drawerMyPlayerProfile : l10n.playerRequestMenu,
                     onTap: () => _open(context, AppRoutes.playerRequestPage),

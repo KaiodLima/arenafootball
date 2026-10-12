@@ -4017,6 +4017,72 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Rosa'**
   String get colorPink;
+
+  /// No description provided for @fanCardMenu.
+  ///
+  /// In pt, this message translates to:
+  /// **'Minha carteirinha'**
+  String get fanCardMenu;
+
+  /// No description provided for @fanCardTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Carteirinha de torcedor'**
+  String get fanCardTitle;
+
+  /// No description provided for @fanCardLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'CARTEIRINHA DE TORCEDOR'**
+  String get fanCardLabel;
+
+  /// No description provided for @fanCardFanOf.
+  ///
+  /// In pt, this message translates to:
+  /// **'Torcedor do {team}'**
+  String fanCardFanOf(String team);
+
+  /// No description provided for @fanCardNoTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem time do coração'**
+  String get fanCardNoTeam;
+
+  /// No description provided for @fanCardSince.
+  ///
+  /// In pt, this message translates to:
+  /// **'Torcedor desde {year}'**
+  String fanCardSince(String year);
+
+  /// No description provided for @fanCardNumber.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nº {number}'**
+  String fanCardNumber(String number);
+
+  /// No description provided for @fanCardChangePhoto.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar foto'**
+  String get fanCardChangePhoto;
+
+  /// No description provided for @fanCardAddPhoto.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar foto'**
+  String get fanCardAddPhoto;
+
+  /// No description provided for @fanCardPhotoSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Foto atualizada!'**
+  String get fanCardPhotoSaved;
+
+  /// No description provided for @fanCardHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mostre a sua carteirinha nos jogos do seu time.'**
+  String get fanCardHint;
 }
 
 class _AppLocalizationsDelegate

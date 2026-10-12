@@ -652,5 +652,16 @@
   "colorBlue": "Blue",
   "colorNavy": "Navy",
   "colorPurple": "Purple",
-  "colorPink": "Pink"
+  "colorPink": "Pink",
+  "fanCardMenu": "My fan card",
+  "fanCardTitle": "Fan card",
+  "fanCardLabel": "FAN CARD",
+  "fanCardFanOf": "Supports {team}",
+  "fanCardNoTeam": "No favorite team",
+  "fanCardSince": "Fan since {year}",
+  "fanCardNumber": "No. {number}",
+  "fanCardChangePhoto": "Change photo",
+  "fanCardAddPhoto": "Add photo",
+  "fanCardPhotoSaved": "Photo updated!",
+  "fanCardHint": "Show your fan card at your team's games."
 }

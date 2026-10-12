@@ -2265,4 +2265,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get colorPink => 'Pink';
+
+  @override
+  String get fanCardMenu => 'My fan card';
+
+  @override
+  String get fanCardTitle => 'Fan card';
+
+  @override
+  String get fanCardLabel => 'FAN CARD';
+
+  @override
+  String fanCardFanOf(String team) {
+    return 'Supports $team';
+  }
+
+  @override
+  String get fanCardNoTeam => 'No favorite team';
+
+  @override
+  String fanCardSince(String year) {
+    return 'Fan since $year';
+  }
+
+  @override
+  String fanCardNumber(String number) {
+    return 'No. $number';
+  }
+
+  @override
+  String get fanCardChangePhoto => 'Change photo';
+
+  @override
+  String get fanCardAddPhoto => 'Add photo';
+
+  @override
+  String get fanCardPhotoSaved => 'Photo updated!';
+
+  @override
+  String get fanCardHint => 'Show your fan card at your team\'s games.';
 }

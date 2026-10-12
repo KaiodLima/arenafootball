@@ -64,7 +64,13 @@ class AuthDataSource {
 
     final failure = result.left;
     if (failure is ErrorWithMessage && failure.code == _userDataNotFound) {
-      final user = UserDTO(id: authUser.uid, name: authUser.displayName ?? '', email: authUser.email ?? '');
+      // Primeiro acesso pelo Google: a foto da conta Google vira a foto do app.
+      final user = UserDTO(
+        id: authUser.uid,
+        name: authUser.displayName ?? '',
+        email: authUser.email ?? '',
+        photoUrl: authUser.photoURL ?? '',
+      );
       await _users.doc(user.id).set(user.toMap());
       return Right(user);
     }
@@ -162,7 +168,10 @@ class AuthDataSource {
     try {
       final doc = await _findUserDoc(userId);
       if (doc == null) return Left(ErrorWithMessage(fallback, code: _userDataNotFound));
-      return Right(UserDTO.fromFirestore(doc));
+      final user = UserDTO.fromFirestore(doc);
+      // Conta Google antiga sem foto no app: usa a do Google até trocar.
+      final authPhoto = _auth.currentUser?.uid == userId ? _auth.currentUser?.photoURL : null;
+      return Right(user.photoUrl.isEmpty && authPhoto != null ? user.copyWith(photoUrl: authPhoto) : user);
     } catch (e) {
       AppLogger.e('getUser id=$userId', name: 'AuthDataSource', error: e);
       return Left(mapFirebaseError(e, fallbackMessage: fallback));
@@ -181,4 +190,21 @@ class AuthDataSource {
       return Left(mapFirebaseError(e, fallbackMessage: fallback));
     }
   }
+
+  /// Grava a foto da conta (`urlImagem`) no documento do próprio usuário.
+  Future<Either<Failure, void>> updatePhoto({required String userId, required String photoUrl}) async {
+    const fallback = 'Não foi possível salvar a foto.';
+    try {
+      final doc = await _findUserDoc(userId);
+      if (doc == null) return Left(ErrorWithMessage(fallback, code: _userDataNotFound));
+      await doc.reference.update({'urlImagem': photoUrl});
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('updatePhoto id=$userId', name: 'AuthDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: fallback));
+    }
+  }
+
+  /// Quando a conta logada foi criada (Firebase Auth); nulo sem sessão.
+  DateTime? get accountCreatedAt => _auth.currentUser?.metadata.creationTime;
 }

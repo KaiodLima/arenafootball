@@ -22,4 +22,9 @@ abstract class IAuthRepository {
 
   /// Usuário logado, ou `Right(null)` quando não há sessão.
   Future<Either<Failure, UserDTO?>> getCurrentUser();
+
+  Future<Either<Failure, void>> updatePhoto({required String userId, required String photoUrl});
+
+  /// Quando a conta logada foi criada; nulo sem sessão.
+  DateTime? get accountCreatedAt;
 }

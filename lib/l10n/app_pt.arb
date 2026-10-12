@@ -1369,5 +1369,37 @@
   "colorBlue": "Azul",
   "colorNavy": "Azul-marinho",
   "colorPurple": "Roxo",
-  "colorPink": "Rosa"
+  "colorPink": "Rosa",
+  "fanCardMenu": "Minha carteirinha",
+  "fanCardTitle": "Carteirinha de torcedor",
+  "fanCardLabel": "CARTEIRINHA DE TORCEDOR",
+  "fanCardFanOf": "Torcedor do {team}",
+  "@fanCardFanOf": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "fanCardNoTeam": "Sem time do coração",
+  "fanCardSince": "Torcedor desde {year}",
+  "@fanCardSince": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "fanCardNumber": "Nº {number}",
+  "@fanCardNumber": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "fanCardChangePhoto": "Trocar foto",
+  "fanCardAddPhoto": "Adicionar foto",
+  "fanCardPhotoSaved": "Foto atualizada!",
+  "fanCardHint": "Mostre a sua carteirinha nos jogos do seu time."
 }

@@ -41,4 +41,11 @@ class AuthRepositoryImpl implements IAuthRepository {
     final result = await _dataSource.getUser(userId);
     return result.fold((failure) => Left(failure), (user) => Right(user));
   }
+
+  @override
+  Future<Either<Failure, void>> updatePhoto({required String userId, required String photoUrl}) =>
+      _dataSource.updatePhoto(userId: userId, photoUrl: photoUrl);
+
+  @override
+  DateTime? get accountCreatedAt => _dataSource.accountCreatedAt;
 }
