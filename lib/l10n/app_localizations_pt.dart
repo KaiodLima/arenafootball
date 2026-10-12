@@ -115,7 +115,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get drawerResults => 'Resultados pelo mundo';
 
   @override
-  String get drawerRegisterHighlight => 'Cadastrar destaque';
+  String get drawerRegisterHighlight => 'Destaques';
 
   @override
   String get drawerRegisterPlayer => 'Cadastrar jogador';
@@ -156,80 +156,256 @@ class AppLocalizationsPt extends AppLocalizations {
   String get newsAdPlaceholder => 'PUBLICIDADE';
 
   @override
-  String get newsCreateTitle => 'CADASTRAR NOTICIA';
+  String get newsCreateTitle => 'Nova notícia';
 
   @override
-  String get newsEditTitle => 'EDITAR NOTÍCIA';
+  String get newsEditTitle => 'Editar notícia';
 
   @override
   String get newsTitleLabel => 'Título';
 
   @override
-  String get newsDescriptionLabel => 'Descrição';
+  String get newsCoverAdd => 'Adicionar capa';
 
   @override
-  String get newsTagLabel => 'Tag';
+  String get newsCoverHint =>
+      'Toque para tirar uma foto ou escolher da galeria';
+
+  @override
+  String get newsCoverChange => 'Trocar';
+
+  @override
+  String get newsCoverRemove => 'Remover';
+
+  @override
+  String get newsSectionContent => 'Conteúdo';
+
+  @override
+  String get newsSectionAlbum => 'Álbum de fotos';
+
+  @override
+  String get newsSectionPublish => 'Publicação';
+
+  @override
+  String newsAlbumCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotos',
+      one: '1 foto',
+      zero: 'nenhuma foto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get newsAlbumAdd => 'Adicionar';
+
+  @override
+  String get newsAlbumHint => 'As fotos aparecem na galeria da notícia.';
+
+  @override
+  String get newsRegion => 'Região';
+
+  @override
+  String get newsHighlight => 'Destaque';
+
+  @override
+  String get newsHighlightNone => 'Nenhum';
+
+  @override
+  String get newsHighlightHint =>
+      'A notícia também aparece dentro do destaque escolhido.';
+
+  @override
+  String get newsLinkHint => 'Link externo (opcional)';
+
+  @override
+  String get newsVisibleHint =>
+      'Desligado, a notícia fica salva mas não aparece no app.';
+
+  @override
+  String get newsVisibleOnHint => 'A notícia aparece no feed do app.';
+
+  @override
+  String get newsPreview => 'Pré-visualizar';
+
+  @override
+  String get newsPreviewTitle => 'Como vai aparecer no feed';
+
+  @override
+  String get newsDiscardTitle => 'Descartar alterações?';
+
+  @override
+  String get newsDiscardMessage => 'O que você preencheu será perdido.';
+
+  @override
+  String get newsDiscardKeep => 'Continuar editando';
+
+  @override
+  String get newsDiscardConfirm => 'Descartar';
+
+  @override
+  String get newsPublish => 'Publicar notícia';
+
+  @override
+  String get newsSave => 'Salvar alterações';
+
+  @override
+  String get newsDescriptionLabel => 'Descrição';
 
   @override
   String get newsLinkLabel => 'Link';
 
   @override
-  String get newsVisibleLabel => 'Exibir notícia';
+  String get newsVisibleLabel => 'Visível no app';
 
   @override
-  String get newsAttachPhotos => 'ANEXAR FOTOS';
-
-  @override
-  String get newsRegisterButton => 'CADASTRAR';
-
-  @override
-  String get newsUpdateButton => 'ATUALIZAR';
-
-  @override
-  String get newsTitleRequired => 'A notícia precisa de um título!!!';
+  String get newsTitleRequired => 'Informe o título da notícia';
 
   @override
   String get newsTitleTooShort =>
       'O título da notícia deve conter no mínimo 3 caracteres';
 
   @override
-  String get newsCreated => 'Notícia Cadastrada com Sucesso!!!';
+  String get newsCreated => 'Notícia publicada!';
 
   @override
-  String get newsUpdated => 'Notícia Atualizada com Sucesso!!!';
+  String get newsUpdated => 'Notícia atualizada!';
 
   @override
   String get newsRegionLabel => 'Região:';
 
   @override
-  String get newsGoalTitle => 'Cadastrar Card de Gol:';
-
-  @override
-  String get newsHomeTeamLabel => 'Time da Casa:';
-
-  @override
-  String get newsAwayTeamLabel => 'Time Visitante:';
-
-  @override
-  String get newsScoreLabel => 'Placar:';
+  String get newsGoalTitle => 'Card de gol';
 
   @override
   String get newsPublishButton => 'Publicar';
 
   @override
-  String get newsGoalCreated => 'Gol registrado com Sucesso!!!';
+  String get newsGoalCreated => 'Gol publicado!';
 
   @override
-  String get newsGoalTeamsRequired => 'Selecione os dois times!';
+  String get goalTodayMatches => 'Jogos de hoje';
 
   @override
-  String get newsAdTitle => 'Cadastrar Card de Publicidade:';
+  String get goalTodayMatchesHint =>
+      'Toque para preencher os times e o placar.';
 
   @override
-  String get newsAdCreated => 'Publicidade registrada com Sucesso!!!';
+  String get goalScoreboard => 'Placar';
 
   @override
-  String get highlightFormTitle => 'CADASTRAR DESTAQUE';
+  String get goalPickTeam => 'Escolher time';
+
+  @override
+  String get goalHome => 'Mandante';
+
+  @override
+  String get goalAway => 'Visitante';
+
+  @override
+  String get goalSameTeam => 'Escolha dois times diferentes.';
+
+  @override
+  String get goalNoTeams => 'Nenhum time cadastrado nesta região.';
+
+  @override
+  String get goalSearchTeam => 'Buscar time';
+
+  @override
+  String get goalUpdateMatch => 'Atualizar placar da partida';
+
+  @override
+  String get goalUpdateMatchHint =>
+      'Grava o mesmo placar na partida da tabela.';
+
+  @override
+  String get goalPreview => 'Prévia no feed';
+
+  @override
+  String get goalPublish => 'Publicar gol';
+
+  @override
+  String get goalConfirmTitle => 'Publicar card de gol?';
+
+  @override
+  String goalConfirmMessage(
+      String home, int homeGoals, int awayGoals, String away) {
+    return '$home $homeGoals × $awayGoals $away';
+  }
+
+  @override
+  String get goalMatchUpdated =>
+      'Gol publicado e placar da partida atualizado!';
+
+  @override
+  String get goalMatchUpdateFailed =>
+      'Gol publicado, mas não foi possível atualizar o placar da partida.';
+
+  @override
+  String goalOfTeam(String team) {
+    return 'Gol do $team';
+  }
+
+  @override
+  String get goalWhoScoredQ => 'Quem fez o gol?';
+
+  @override
+  String goalWhoAssistedQ(String scorer) {
+    return 'Quem deu o passe para $scorer?';
+  }
+
+  @override
+  String get goalSkip => 'Pular';
+
+  @override
+  String get goalNoAssist => 'Sem assistência';
+
+  @override
+  String get goalBack => 'Voltar';
+
+  @override
+  String get goalEditScorer => 'Editar';
+
+  @override
+  String get goalSearchPlayer => 'Buscar jogador';
+
+  @override
+  String get goalClear => 'Limpar';
+
+  @override
+  String goalScorerLine(String scorer) {
+    return '⚽ $scorer';
+  }
+
+  @override
+  String goalScorerAssistLine(String scorer, String assistant) {
+    return '⚽ $scorer · assist. $assistant';
+  }
+
+  @override
+  String goalStatsSaved(String scorer) {
+    return 'Gol publicado! $scorer +1 gol.';
+  }
+
+  @override
+  String goalStatsSavedWithAssist(String scorer, String assistant) {
+    return 'Gol publicado! $scorer +1 gol, $assistant +1 assistência.';
+  }
+
+  @override
+  String get goalStatsFailed =>
+      'Gol publicado, mas não foi possível somar nos números dos jogadores.';
+
+  @override
+  String get goalIncrease => 'Aumentar';
+
+  @override
+  String get goalDecrease => 'Diminuir';
+
+  @override
+  String get newsAdCreated => 'Publicidade publicada!';
 
   @override
   String get highlightTitleLabel => 'Título';
@@ -238,19 +414,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get highlightLinkLabel => 'Link';
 
   @override
-  String get highlightVisibleLabel => 'Exibir destaque';
+  String get highlightVisibleLabel => 'Exibir no carrossel';
 
   @override
-  String get highlightRegisterButton => 'CADASTRAR';
+  String get highlightTitleRequired => 'Informe o título do destaque.';
 
   @override
-  String get highlightTitleRequired => 'Preencha o campo TÍTULO!!!';
-
-  @override
-  String get highlightCreated => 'Destaque Cadastrado!!!';
-
-  @override
-  String get highlightNoNews => 'Nenhuma notícia disponível!';
+  String get highlightCreated => 'Destaque publicado!';
 
   @override
   String get teamsEmpty => 'Equipes ainda não registradas';
@@ -259,25 +429,44 @@ class AppLocalizationsPt extends AppLocalizations {
   String get teamsLoadError => 'Não foi possível carregar os times.';
 
   @override
-  String get teamsFormTitle => 'CADASTRAR TIME';
+  String get teamsFormTitle => 'Novo time';
 
   @override
-  String get teamsRegionLabel => 'Região:';
+  String get teamsNameLabel => 'Nome do time';
 
   @override
-  String get teamsNameLabel => 'Time';
+  String get teamsDescriptionLabel => 'Descrição (opcional)';
 
   @override
-  String get teamsDescriptionLabel => 'Descrição';
+  String get teamsCreated => 'Time cadastrado!';
 
   @override
-  String get teamsRegisterButton => 'CADASTRAR';
+  String get teamsNameRequired => 'Informe o nome do time (mínimo 3 letras).';
 
   @override
-  String get teamsCreated => 'Time registrado com Sucesso!!!';
+  String get teamsCrestAdd => 'Adicionar escudo';
 
   @override
-  String get teamsNameRequired => 'Preencha os campos obrigatórios!!!';
+  String get teamsSectionData => 'Dados do time';
+
+  @override
+  String get teamsDescriptionHint => 'Ex.: bairro, fundação, apelido';
+
+  @override
+  String get teamsPreview => 'Prévia na aba Times';
+
+  @override
+  String teamsInRegion(int count) {
+    return 'Times na região · $count';
+  }
+
+  @override
+  String teamsDuplicate(String name) {
+    return 'Já existe um time \"$name\" nesta região.';
+  }
+
+  @override
+  String get teamsSubmit => 'Cadastrar time';
 
   @override
   String get playersEmpty => 'Jogadores ainda não registrados!';
@@ -296,31 +485,50 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get playersNameRequired => 'Preencha o campo NOME!!!';
+  String get playersNameRequired => 'Informe o nome (mínimo 3 letras).';
 
   @override
-  String get playersTeamRequired => 'Informe um Time!!!';
+  String get playersTeamRequired => 'Escolha o time do jogador.';
 
   @override
-  String get playersFormTitle => 'CADASTRAR JOGADOR';
+  String get playersFormTitle => 'Novo jogador';
 
   @override
-  String get playersNameLabel => 'Nome';
+  String get playersNameLabel => 'Nome do jogador';
 
   @override
   String get playersGoalsLabel => 'Gols';
 
   @override
-  String get playersAssistsLabel => 'Assistencias';
+  String get playersAssistsLabel => 'Assistências';
 
   @override
-  String get playersTeamLabel => 'Time:';
+  String get playersCreated => 'Jogador cadastrado!';
 
   @override
-  String get playersRegisterButton => 'CADASTRAR';
+  String get playersPhotoAdd => 'Adicionar foto (opcional)';
 
   @override
-  String get playersCreated => 'Jogador Cadastrado!!!';
+  String get playersSectionData => 'Dados do jogador';
+
+  @override
+  String get playersTeam => 'Time';
+
+  @override
+  String get playersPreview => 'Prévia no elenco';
+
+  @override
+  String playersSquadOf(String team, int count) {
+    return 'Elenco do $team · $count';
+  }
+
+  @override
+  String playersDuplicate(String name, String team) {
+    return 'Já existe \"$name\" no $team.';
+  }
+
+  @override
+  String get playersSubmit => 'Cadastrar jogador';
 
   @override
   String get playersPhotoBack => 'Voltar';
@@ -450,34 +658,69 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchesAwayLabel => 'Fora';
 
   @override
-  String get matchesFormTitle => 'CADASTRAR PARTIDA';
+  String get matchesFormTitle => 'Nova partida';
 
   @override
-  String get matchesRegionLabel => 'Região:';
+  String get matchesCreated => 'Partida cadastrada!';
 
   @override
-  String get matchesHomeTeamLabel => 'Time Casa:';
+  String get matchFormMatchup => 'Confronto';
 
   @override
-  String get matchesAwayTeamLabel => 'Time Fora:';
+  String get matchFormSwap => 'Inverter mando';
 
   @override
-  String get matchesDateLabel => 'Data';
+  String get matchFormWhen => 'Quando';
 
   @override
-  String get matchesTimeLabel => 'Hora';
+  String get matchFormWhere => 'Onde';
 
   @override
-  String get matchesVenueLabel => 'Local';
+  String get matchFormToday => 'Hoje';
 
   @override
-  String get matchesRegisterButton => 'CADASTRAR';
+  String get matchFormTomorrow => 'Amanhã';
 
   @override
-  String get matchesCreated => 'Partida Cadastrada com Sucesso!!!';
+  String get matchFormOtherDate => 'Outra data';
 
   @override
-  String get matchesFieldsRequired => 'Preencha todos os campos!!!';
+  String get matchFormOtherTime => 'Outro horário';
+
+  @override
+  String get matchFormNewVenue => 'Novo local';
+
+  @override
+  String get matchFormVenueHint => 'Nome do local';
+
+  @override
+  String get matchFormPreview => 'Prévia';
+
+  @override
+  String get matchFormSubmit => 'Cadastrar partida';
+
+  @override
+  String get matchFormMissingTeams => 'Escolha os dois times.';
+
+  @override
+  String get matchFormMissingDate => 'Escolha a data da partida.';
+
+  @override
+  String get matchFormMissingTime => 'Escolha o horário da partida.';
+
+  @override
+  String matchFormConflictTeam(String team, String times) {
+    return '$team já tem jogo nesta data ($times).';
+  }
+
+  @override
+  String matchFormConflictVenue(String venue, String time) {
+    return '$venue já tem jogo nesta data às $time.';
+  }
+
+  @override
+  String get matchFormSaved =>
+      'Partida cadastrada! Escolha os times da próxima.';
 
   @override
   String get championshipsEmpty => 'Nenhuma competição registrada';
@@ -634,7 +877,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get votingLoadError => 'Não foi possível apurar a votação.';
 
   @override
-  String get globalResultsTitle => 'RESULTADOS PELO MUNDO';
+  String get globalResultsTitle => 'Resultados pelo mundo';
 
   @override
   String get globalResultsYesterday => 'Ontem';
@@ -646,11 +889,40 @@ class AppLocalizationsPt extends AppLocalizations {
   String get globalResultsTomorrow => 'Amanhã';
 
   @override
-  String get globalResultsEmpty => 'Nenhum jogo encontrado.';
+  String get globalResultsSubtitle => 'Placares das principais ligas do mundo';
 
   @override
-  String get globalResultsTomorrowUnavailable =>
-      'Os jogos de amanhã ainda não estão disponíveis.';
+  String get globalResultsLive => 'Ao vivo';
+
+  @override
+  String get globalResultsHalfTime => 'Intervalo';
+
+  @override
+  String get globalResultsFinished => 'Encerrado';
+
+  @override
+  String get globalResultsPostponed => 'Adiado';
+
+  @override
+  String globalResultsLiveFilter(int count) {
+    return 'Ao vivo ($count)';
+  }
+
+  @override
+  String get globalResultsSearchHint => 'Buscar time ou liga';
+
+  @override
+  String get globalResultsNoMatches => 'Nenhum jogo encontrado';
+
+  @override
+  String get globalResultsPenalty => 'pênalti';
+
+  @override
+  String get globalResultsOwnGoal => 'contra';
+
+  @override
+  String get globalResultsGoalsError =>
+      'Não foi possível carregar os gols. Toque para tentar de novo.';
 
   @override
   String get loginWelcomeTitle => 'Bem-vindo de volta 👋';
@@ -932,4 +1204,316 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get standingsYourTeam => 'Seu time';
+
+  @override
+  String get athleteTitle => 'Atleta';
+
+  @override
+  String get athleteScored => 'Fez o gol';
+
+  @override
+  String get athleteAssisted => 'Deu o passe';
+
+  @override
+  String athleteRankGoals(int position) {
+    return '$positionº na artilharia';
+  }
+
+  @override
+  String athleteRankAssists(int position) {
+    return '$positionº em assistências';
+  }
+
+  @override
+  String get athleteNoRank => 'Fora do ranking';
+
+  @override
+  String get athleteParticipations => 'Participações em gols';
+
+  @override
+  String get athleteNoParticipations => 'Ainda sem gols registrados no feed.';
+
+  @override
+  String get athleteNotFound => 'Jogador não encontrado.';
+
+  @override
+  String get athleteLoadError => 'Não foi possível carregar o jogador.';
+
+  @override
+  String get athleteEdit => 'Editar (admin)';
+
+  @override
+  String get athleteShare => 'Compartilhar';
+
+  @override
+  String athleteShareText(String name, String team, int goals, int assists) {
+    return '$name ($team): $goals gols e $assists assistências · via Arena Football';
+  }
+
+  @override
+  String athleteSeason(String season) {
+    return 'Temporada $season';
+  }
+
+  @override
+  String get adCreateTitle => 'Nova publicidade';
+
+  @override
+  String get adEditTitle => 'Editar publicidade';
+
+  @override
+  String get adPublish => 'Publicar anúncio';
+
+  @override
+  String get adUpdated => 'Publicidade atualizada!';
+
+  @override
+  String get adBannerAdd => 'Adicionar banner';
+
+  @override
+  String get adBannerHint =>
+      'Use uma imagem horizontal 2:1 (ex.: 1200×600). É assim que ela aparece no feed.';
+
+  @override
+  String get adSectionAd => 'Anúncio';
+
+  @override
+  String get adNameLabel => 'Anunciante (opcional)';
+
+  @override
+  String get adNameHint => 'Só para você identificar o anúncio';
+
+  @override
+  String get adLinkHint => 'Site, Instagram ou WhatsApp do anunciante';
+
+  @override
+  String get adLinkInvalid => 'Link inválido. Ex.: https://loja.com.br';
+
+  @override
+  String get adTestLink => 'Testar';
+
+  @override
+  String get adImageRequired => 'Escolha a imagem do anúncio.';
+
+  @override
+  String get highlightCreateTitle => 'Novo destaque';
+
+  @override
+  String get highlightPhotoAdd => 'Adicionar foto';
+
+  @override
+  String get highlightPhotoHint =>
+      'Aparece no círculo do carrossel. Prefira uma imagem quadrada.';
+
+  @override
+  String get highlightPreview => 'Prévia no carrossel';
+
+  @override
+  String get highlightSection => 'Destaque';
+
+  @override
+  String get highlightTitleHint =>
+      'Notícias marcadas com este destaque aparecem nele';
+
+  @override
+  String get highlightTitleTooShort => 'Use pelo menos 3 letras.';
+
+  @override
+  String get highlightDuplicate => 'Já existe um destaque com esse nome.';
+
+  @override
+  String get highlightVisibleOnHint => 'Aparece no topo da home para todos.';
+
+  @override
+  String get highlightVisibleHint => 'Fica oculto até você ativar.';
+
+  @override
+  String get highlightPublish => 'Publicar destaque';
+
+  @override
+  String highlightNewsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count notícias',
+      one: '1 notícia',
+      zero: 'Nenhuma notícia',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get highlightOpenLink => 'Abrir link';
+
+  @override
+  String get highlightEmpty => 'Ainda não há notícias neste destaque.';
+
+  @override
+  String get highlightLoadError => 'Não foi possível carregar as notícias.';
+
+  @override
+  String get highlightAddNews => 'Notícia';
+
+  @override
+  String highlightShareText(String title) {
+    return '$title · Arena Football';
+  }
+
+  @override
+  String get highlightsManageTitle => 'Destaques';
+
+  @override
+  String get highlightsReorderHint =>
+      'Arraste pela alça para definir a ordem do carrossel.';
+
+  @override
+  String get highlightsEmpty =>
+      'Nenhum destaque cadastrado. Toque em + para criar.';
+
+  @override
+  String get highlightHidden => 'Oculto';
+
+  @override
+  String get highlightView => 'Ver';
+
+  @override
+  String get highlightEditTitle => 'Editar destaque';
+
+  @override
+  String get highlightUpdated => 'Destaque atualizado!';
+
+  @override
+  String highlightRenameHint(String old) {
+    return 'As notícias marcadas com \"$old\" passam para o novo nome.';
+  }
+
+  @override
+  String highlightDeleteTitle(String title) {
+    return 'Excluir \"$title\"?';
+  }
+
+  @override
+  String get highlightDeleteMessage =>
+      'As notícias marcadas continuam no feed, só perdem a marcação deste destaque.';
+
+  @override
+  String highlightDeleted(String title) {
+    return '\"$title\" excluído.';
+  }
+
+  @override
+  String get pushPanelTitle => 'Notificações';
+
+  @override
+  String get pushTabActions => 'Ações';
+
+  @override
+  String get pushTabHistory => 'Histórico';
+
+  @override
+  String get pushTabSend => 'Enviar aviso';
+
+  @override
+  String get pushActionsIntro =>
+      'Escolha quais ações enviam push. Cada usuário recebe da região escolhida no app; os jogos também chegam para quem torce pelos times.';
+
+  @override
+  String get pushActionGoal => 'Gol';
+
+  @override
+  String get pushActionGoalHint =>
+      'Card de gol publicado · \"⚽ GOL! Lava Jato 2 × 1 Volta\"';
+
+  @override
+  String get pushActionNews => 'Notícia publicada';
+
+  @override
+  String get pushActionNewsHint =>
+      'Notícia visível no feed (sem anúncios) · título da notícia';
+
+  @override
+  String get pushActionMatch => 'Nova partida';
+
+  @override
+  String get pushActionMatchHint =>
+      'Partida cadastrada · data, horário e local';
+
+  @override
+  String get pushActionVotingOpen => 'Votação aberta';
+
+  @override
+  String get pushActionVotingOpenHint =>
+      'Votação do melhor da partida liberada';
+
+  @override
+  String get pushActionVotingClosed => 'Votação encerrada';
+
+  @override
+  String get pushActionVotingClosedHint =>
+      'Votação fechada · convida a ver o eleito';
+
+  @override
+  String get pushActionDailyGame => 'Jogo do seu time';
+
+  @override
+  String get pushActionDailyGameHint =>
+      'Todo dia às 9h, para quem torce por um time que joga hoje';
+
+  @override
+  String get pushActionNotice => 'Aviso manual';
+
+  @override
+  String get pushActionNoticeHint =>
+      'Avisos enviados pela aba \"Enviar aviso\"';
+
+  @override
+  String get pushHistoryEmpty => 'Nenhuma notificação enviada ainda.';
+
+  @override
+  String get pushStatusSent => 'Enviada';
+
+  @override
+  String get pushStatusDisabled => 'Desligada';
+
+  @override
+  String get pushStatusError => 'Erro';
+
+  @override
+  String get pushAllRegions => 'Todas as regiões';
+
+  @override
+  String get pushAudienceTeams => 'Torcedores dos times';
+
+  @override
+  String get pushNoticeSection => 'Aviso';
+
+  @override
+  String get pushNoticeTitle => 'Título';
+
+  @override
+  String get pushNoticeBody => 'Mensagem';
+
+  @override
+  String get pushNoticeAudience => 'Para quem';
+
+  @override
+  String get pushNoticePreview => 'Prévia';
+
+  @override
+  String get pushNoticeHint =>
+      'O envio leva alguns segundos e aparece no Histórico.';
+
+  @override
+  String get pushSend => 'Enviar';
+
+  @override
+  String get pushSendConfirmTitle => 'Enviar notificação?';
+
+  @override
+  String pushSendConfirmMessage(String audience) {
+    return 'Todos os usuários de \"$audience\" vão receber este aviso agora.';
+  }
+
+  @override
+  String get pushSent => 'Aviso enviado!';
 }

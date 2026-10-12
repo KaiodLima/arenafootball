@@ -4,6 +4,7 @@ import 'package:arena_soccer/features/news/data/repositories/news_repository_imp
 import 'package:arena_soccer/features/news/domain/repositories/news_repository_interface.dart';
 import 'package:arena_soccer/features/news/domain/usecases/create_news_usecase.dart';
 import 'package:arena_soccer/features/news/domain/usecases/delete_news_usecase.dart';
+import 'package:arena_soccer/features/news/domain/usecases/get_player_goal_cards_usecase.dart';
 import 'package:arena_soccer/features/news/domain/usecases/update_news_usecase.dart';
 import 'package:arena_soccer/features/news/domain/usecases/watch_news_by_tag_usecase.dart';
 import 'package:arena_soccer/features/news/domain/usecases/watch_news_feed_usecase.dart';
@@ -23,4 +24,5 @@ void registerNewsDependencies() {
   _sl.registerLazySingleton(() => CreateNewsUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => UpdateNewsUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => DeleteNewsUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetPlayerGoalCardsUseCase(_sl()));
 }

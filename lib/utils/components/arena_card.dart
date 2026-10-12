@@ -26,7 +26,9 @@ class ArenaCard extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: radius,
-          boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: AppSizes.s14, offset: Offset(0, AppSizes.s4))],
+          boxShadow: const [
+            BoxShadow(color: AppColors.shadow, blurRadius: AppSizes.s14, offset: Offset(0, AppSizes.s4))
+          ],
         ),
         child: Material(
           color: AppColors.surface,

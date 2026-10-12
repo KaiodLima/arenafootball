@@ -12,4 +12,6 @@ abstract class INewsRepository {
   Future<Either<Failure, void>> updateNews(NewsDTO news);
 
   Future<Either<Failure, void>> deleteNews(String id);
+
+  Future<Either<Failure, List<NewsDTO>>> getGoalCardsByPlayer(String playerId);
 }

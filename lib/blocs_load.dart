@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
+import 'package:arena_soccer/features/notifications/presentation/widgets/push_topics_listener.dart';
 import 'package:arena_soccer/injection_container.dart';
 
 // Cubits em route-level (lib/arena_app.dart):
@@ -13,6 +14,8 @@ import 'package:arena_soccer/injection_container.dart';
 // - GoalNotificationCubit → goalNotificationPage
 // - HighlightNewsCubit → highlightDetailsPage
 // - HighlightFormCubit → registerHighlightPage
+// - ManageHighlightsCubit → manageHighlightsPage
+// - NotificationsPanelCubit → notificationsPanelPage
 // Cubits criados dentro de widgets: NewsFeedCubit (NewsTab), HighlightsCubit (HighlightsCarousel)
 
 class BlocsLoad extends StatelessWidget {
@@ -29,7 +32,8 @@ class BlocsLoad extends StatelessWidget {
         // Região e temporada — global: filtram notícias, times, tabelas...
         BlocProvider<RegionCubit>(create: (_) => RegionCubit(sl(), sl(), sl(), sl())..load()),
       ],
-      child: child,
+      // Tópicos de push acompanham a região e o time do coração.
+      child: PushTopicsListener(child: child),
     );
   }
 }

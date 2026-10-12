@@ -27,6 +27,15 @@ class PlayersDataSource {
         );
   }
 
+  /// Um jogador em tempo real; `null` se o documento não existe.
+  Stream<Either<Failure, PlayerDTO?>> watchPlayer({required String id, String? season}) {
+    return _players(season).doc(id).snapshots().toEither(
+          (doc) => doc.exists ? PlayerDTO.fromFirestore(doc) : null,
+          fallbackMessage: _loadFallback,
+          logName: 'PlayersDataSource',
+        );
+  }
+
   /// Todos os jogadores da temporada (base da artilharia/assistências).
   Future<Either<Failure, List<PlayerDTO>>> getPlayers({String? season}) async {
     try {
@@ -59,6 +68,28 @@ class PlayersDataSource {
       return const Right(null);
     } catch (e) {
       AppLogger.e('updatePlayer id=${player.id}', name: 'PlayersDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
+    }
+  }
+
+  /// Soma [goals] gols e [assists] assistências ao jogador, de forma atômica
+  /// (`FieldValue.increment`): não lê nem regrava o documento, então duas
+  /// somas ao mesmo tempo não se perdem.
+  Future<Either<Failure, void>> incrementStats({
+    required String playerId,
+    int goals = 0,
+    int assists = 0,
+    String? season,
+  }) async {
+    if (goals == 0 && assists == 0) return const Right(null);
+    try {
+      await _players(season).doc(playerId).update({
+        if (goals != 0) 'nGols': FieldValue.increment(goals),
+        if (assists != 0) 'nAssistencias': FieldValue.increment(assists),
+      });
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('incrementStats id=$playerId', name: 'PlayersDataSource', error: e);
       return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
     }
   }

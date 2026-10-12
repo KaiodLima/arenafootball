@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/core/utils/relative_time.dart';
@@ -22,7 +24,10 @@ class NewsCard extends StatelessWidget {
   final VoidCallback? onTap;
   final Widget? trailing;
 
-  const NewsCard({super.key, required this.news, this.onTap, this.trailing});
+  /// Imagem local no lugar da URL (prévia do formulário, antes do envio).
+  final File? imageFile;
+
+  const NewsCard({super.key, required this.news, this.onTap, this.trailing, this.imageFile});
 
   @override
   Widget build(BuildContext context) {
@@ -39,15 +44,17 @@ class NewsCard extends StatelessWidget {
                 aspectRatio: 16 / 9,
                 child: Hero(
                   tag: newsImageHeroTag(news.id),
-                  child: CachedNetworkImage(
-                    imageUrl: news.imageUrl.isNotEmpty ? news.imageUrl : newsPlaceholderImageUrl,
-                    fit: BoxFit.cover,
-                    placeholder: (_, __) => const ColoredBox(color: AppColors.greyLight),
-                    errorWidget: (_, __, ___) => const ColoredBox(
-                      color: AppColors.greyLight,
-                      child: Icon(Icons.image_not_supported_outlined, color: AppColors.textSecondary),
-                    ),
-                  ),
+                  child: imageFile != null
+                      ? Image.file(imageFile!, fit: BoxFit.cover)
+                      : CachedNetworkImage(
+                          imageUrl: news.imageUrl.isNotEmpty ? news.imageUrl : newsPlaceholderImageUrl,
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) => const ColoredBox(color: AppColors.greyLight),
+                          errorWidget: (_, __, ___) => const ColoredBox(
+                            color: AppColors.greyLight,
+                            child: Icon(Icons.image_not_supported_outlined, color: AppColors.textSecondary),
+                          ),
+                        ),
                 ),
               ),
               if (trailing != null) Positioned(top: AppSizes.s8, right: AppSizes.s8, child: trailing!),

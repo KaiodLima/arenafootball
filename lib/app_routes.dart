@@ -16,6 +16,7 @@ class AppRoutes {
 
   // Times, jogadores e estatísticas
   static const String teamPlayersPage = '/team_players_page';
+  static const String playerProfilePage = '/player_profile_page';
   static const String statsRankingPage = '/stats_ranking_page';
 
   // Partidas, campeonatos e votação
@@ -33,6 +34,8 @@ class AppRoutes {
   static const String registerNewsPage = '/register_news_page';
   static const String registerTeamPage = '/register_team_page';
   static const String publishAdPage = '/publish_ad_page';
+  static const String manageHighlightsPage = '/manage_highlights_page';
+  static const String notificationsPanelPage = '/notifications_panel_page';
   static const String goalNotificationPage = '/goal_notification_page';
 }
 

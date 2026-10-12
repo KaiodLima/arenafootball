@@ -2,4 +2,5 @@
 <resources>
     <!-- Mesmo verde-escuro de AppColors.primaryDark: a abertura nativa emenda no splash do Flutter. -->
     <color name="launch_background">#FF1B431C</color>
+    <color name="notification_color">#4CAF50</color>
 </resources>

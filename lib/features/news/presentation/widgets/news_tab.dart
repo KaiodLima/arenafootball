@@ -109,7 +109,11 @@ class _NewsItem extends StatelessWidget {
           CardMenuAction(
             icon: Icons.edit_outlined,
             label: l10n.commonEdit,
-            onSelected: () => Navigator.pushNamed(context, AppRoutes.registerNewsPage, arguments: {'news': news}),
+            onSelected: () => Navigator.pushNamed(
+              context,
+              news.isAd ? AppRoutes.publishAdPage : AppRoutes.registerNewsPage,
+              arguments: {'news': news},
+            ),
           ),
         CardMenuAction(
           icon: Icons.delete_outline_rounded,
@@ -154,16 +158,35 @@ class _NewsItem extends StatelessWidget {
     if (confirmed == true) await cubit.delete(news.id);
   }
 
+  /// Tela do atleta, na temporada gravada no card (os jogadores são por
+  /// temporada).
+  void _openAthlete(BuildContext context, String playerId, String name) {
+    Navigator.pushNamed(
+      context,
+      AppRoutes.playerProfilePage,
+      arguments: {'playerId': playerId, 'season': news.season.isEmpty ? null : news.season, 'name': name},
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (news.isGoal) {
-      return GoalCard(news: news, trailing: _adminMenu(context, onImage: false, canEdit: false));
+      return GoalCard(
+        news: news,
+        trailing: _adminMenu(context, onImage: false, canEdit: false),
+        // Admin: lança o próximo gol do mesmo jogo partindo deste placar.
+        onTap: isAdmin
+            ? () => Navigator.pushNamed(context, AppRoutes.goalNotificationPage, arguments: {'news': news})
+            : null,
+        onScorerTap: news.hasScorer ? () => _openAthlete(context, news.scorerId, news.scorerName) : null,
+        onAssistantTap: news.hasAssistant ? () => _openAthlete(context, news.assistantId, news.assistantName) : null,
+      );
     }
     if (news.isAd) {
       return AdCard(
         news: news,
         onTap: news.link.isNotEmpty ? _openLink : null,
-        trailing: _adminMenu(context, onImage: true, canEdit: false),
+        trailing: _adminMenu(context, onImage: true, canEdit: true),
       );
     }
     return NewsCard(

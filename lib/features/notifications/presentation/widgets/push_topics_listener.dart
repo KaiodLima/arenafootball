@@ -1,0 +1,42 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/services/push_service.dart';
+import 'package:arena_soccer/core/utils/push_topics.dart';
+import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
+import 'package:arena_soccer/features/auth/presentation/bloc/session_state.dart';
+import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
+import 'package:arena_soccer/features/regions/presentation/bloc/region_state.dart';
+import 'package:arena_soccer/injection_container.dart';
+
+/// Mantém os tópicos de push do aparelho iguais à região escolhida e ao time
+/// do coração: trocar um deles troca a inscrição.
+class PushTopicsListener extends StatelessWidget {
+  final Widget child;
+
+  const PushTopicsListener({super.key, required this.child});
+
+  /// Assina os tópicos atuais (a home chama ao abrir; depois, só mudanças).
+  static void syncNow(BuildContext context) {
+    final region = BlocProvider.of<RegionCubit>(context).state.selectedRegion;
+    final team = BlocProvider.of<SessionCubit>(context).state.user?.favoriteTeam;
+    sl<PushTopicSync>().sync(desiredTopics(region: region, favoriteTeam: team));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<RegionCubit, RegionState>(
+          listenWhen: (previous, current) => previous.selectedRegion != current.selectedRegion,
+          listener: (context, _) => syncNow(context),
+        ),
+        BlocListener<SessionCubit, SessionState>(
+          listenWhen: (previous, current) =>
+              current is! CheckingSessionState && previous.user?.favoriteTeam != current.user?.favoriteTeam,
+          listener: (context, _) => syncNow(context),
+        ),
+      ],
+      child: child,
+    );
+  }
+}

@@ -54,6 +54,7 @@ class _HighlightsRow extends StatelessWidget {
                   return HighlightAvatar(
                     imageUrl: highlight.imageUrl,
                     title: highlight.title,
+                    heroTag: highlightHeroTag(highlight.id),
                     onTap: () => Navigator.pushNamed(
                       context,
                       AppRoutes.highlightDetailsPage,

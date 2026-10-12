@@ -126,6 +126,14 @@ class MatchesList extends StatelessWidget {
               onToggleVoting: () => BlocProvider.of<MatchesCubit>(context).toggleVoting(match),
               onEditScore: () => _editScore(context, match),
               onDelete: () => _confirmDelete(context, match),
+              // Admin: lança um card de gol desta partida (e atualiza o placar dela).
+              onTap: isAdmin
+                  ? () => Navigator.pushNamed(
+                        context,
+                        AppRoutes.goalNotificationPage,
+                        arguments: {'match': match, 'season': season},
+                      )
+                  : null,
             );
 
         final teams = state.teams;

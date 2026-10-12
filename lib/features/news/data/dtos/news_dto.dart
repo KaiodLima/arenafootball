@@ -25,6 +25,19 @@ class NewsDTO extends Equatable {
   final String tag;
   final List<String> images;
 
+  /// Card de gol: autor e quem deu o passe (id do jogador + nome no momento
+  /// do gol) e a temporada dos jogadores. Vazios quando não informados.
+  final String scorerId;
+  final String scorerName;
+  final String assistantId;
+  final String assistantName;
+  final String season;
+
+  /// Card de gol: time que marcou e o escudo dele (gravado no card para o
+  /// feed não precisar ler os times). Vazios quando não se sabe.
+  final String scoringTeam;
+  final String scoringTeamCrest;
+
   const NewsDTO({
     this.id = '',
     this.date,
@@ -40,7 +53,18 @@ class NewsDTO extends Equatable {
     this.awayGoals = '',
     this.tag = '',
     this.images = const [],
+    this.scorerId = '',
+    this.scorerName = '',
+    this.assistantId = '',
+    this.assistantName = '',
+    this.season = '',
+    this.scoringTeam = '',
+    this.scoringTeamCrest = '',
   });
+
+  bool get hasScorer => scorerId.isNotEmpty && scorerName.isNotEmpty;
+
+  bool get hasAssistant => assistantId.isNotEmpty && assistantName.isNotEmpty;
 
   bool get isGoal => tag == goalTag;
 
@@ -67,6 +91,13 @@ class NewsDTO extends Equatable {
       images: rawImages is List
           ? rawImages.map((item) => item.toString()).where((url) => url.isNotEmpty).toList()
           : const [],
+      scorerId: data['autor_gol_id']?.toString() ?? '',
+      scorerName: data['autor_gol']?.toString() ?? '',
+      assistantId: data['assistencia_id']?.toString() ?? '',
+      assistantName: data['assistencia']?.toString() ?? '',
+      season: data['temporada']?.toString() ?? '',
+      scoringTeam: data['time_marcador']?.toString() ?? '',
+      scoringTeamCrest: data['escudo_marcador']?.toString() ?? '',
     );
   }
 
@@ -88,6 +119,14 @@ class NewsDTO extends Equatable {
         'gol_time_fora': awayGoals,
         'tag': tag,
         if (images.isNotEmpty) 'images': images,
+        // Só nos cards de gol com autor/assistência informados.
+        if (scorerId.isNotEmpty) 'autor_gol_id': scorerId,
+        if (scorerName.isNotEmpty) 'autor_gol': scorerName,
+        if (assistantId.isNotEmpty) 'assistencia_id': assistantId,
+        if (assistantName.isNotEmpty) 'assistencia': assistantName,
+        if (season.isNotEmpty) 'temporada': season,
+        if (scoringTeam.isNotEmpty) 'time_marcador': scoringTeam,
+        if (scoringTeamCrest.isNotEmpty) 'escudo_marcador': scoringTeamCrest,
       };
 
   NewsDTO copyWith({
@@ -105,6 +144,13 @@ class NewsDTO extends Equatable {
     String? awayGoals,
     String? tag,
     List<String>? images,
+    String? scorerId,
+    String? scorerName,
+    String? assistantId,
+    String? assistantName,
+    String? season,
+    String? scoringTeam,
+    String? scoringTeamCrest,
   }) {
     return NewsDTO(
       id: id ?? this.id,
@@ -121,6 +167,13 @@ class NewsDTO extends Equatable {
       awayGoals: awayGoals ?? this.awayGoals,
       tag: tag ?? this.tag,
       images: images ?? this.images,
+      scorerId: scorerId ?? this.scorerId,
+      scorerName: scorerName ?? this.scorerName,
+      assistantId: assistantId ?? this.assistantId,
+      assistantName: assistantName ?? this.assistantName,
+      season: season ?? this.season,
+      scoringTeam: scoringTeam ?? this.scoringTeam,
+      scoringTeamCrest: scoringTeamCrest ?? this.scoringTeamCrest,
     );
   }
 
@@ -140,5 +193,12 @@ class NewsDTO extends Equatable {
         awayGoals,
         tag,
         images,
+        scorerId,
+        scorerName,
+        assistantId,
+        assistantName,
+        season,
+        scoringTeam,
+        scoringTeamCrest,
       ];
 }

@@ -9,6 +9,7 @@ import 'package:arena_soccer/features/global_results/di/global_results_injection
 import 'package:arena_soccer/features/auth/di/auth_injection.dart';
 import 'package:arena_soccer/features/championships/di/championships_injection.dart';
 import 'package:arena_soccer/features/highlights/di/highlights_injection.dart';
+import 'package:arena_soccer/features/notifications/di/notifications_injection.dart';
 import 'package:arena_soccer/features/matches/di/matches_injection.dart';
 import 'package:arena_soccer/features/news/di/news_injection.dart';
 import 'package:arena_soccer/features/players/di/players_injection.dart';
@@ -32,6 +33,7 @@ Future<void> init() async {
   registerNewsDependencies();
   registerHighlightsDependencies();
   registerGlobalResultsDependencies();
+  registerNotificationsDependencies();
 }
 
 void _registerExternal() {

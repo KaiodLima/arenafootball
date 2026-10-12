@@ -305,7 +305,7 @@ abstract class AppLocalizations {
   /// No description provided for @drawerRegisterHighlight.
   ///
   /// In pt, this message translates to:
-  /// **'Cadastrar destaque'**
+  /// **'Destaques'**
   String get drawerRegisterHighlight;
 
   /// No description provided for @drawerRegisterPlayer.
@@ -383,13 +383,13 @@ abstract class AppLocalizations {
   /// No description provided for @newsCreateTitle.
   ///
   /// In pt, this message translates to:
-  /// **'CADASTRAR NOTICIA'**
+  /// **'Nova notícia'**
   String get newsCreateTitle;
 
   /// No description provided for @newsEditTitle.
   ///
   /// In pt, this message translates to:
-  /// **'EDITAR NOTÍCIA'**
+  /// **'Editar notícia'**
   String get newsEditTitle;
 
   /// No description provided for @newsTitleLabel.
@@ -398,17 +398,161 @@ abstract class AppLocalizations {
   /// **'Título'**
   String get newsTitleLabel;
 
+  /// No description provided for @newsCoverAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar capa'**
+  String get newsCoverAdd;
+
+  /// No description provided for @newsCoverHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Toque para tirar uma foto ou escolher da galeria'**
+  String get newsCoverHint;
+
+  /// No description provided for @newsCoverChange.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar'**
+  String get newsCoverChange;
+
+  /// No description provided for @newsCoverRemove.
+  ///
+  /// In pt, this message translates to:
+  /// **'Remover'**
+  String get newsCoverRemove;
+
+  /// No description provided for @newsSectionContent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conteúdo'**
+  String get newsSectionContent;
+
+  /// No description provided for @newsSectionAlbum.
+  ///
+  /// In pt, this message translates to:
+  /// **'Álbum de fotos'**
+  String get newsSectionAlbum;
+
+  /// No description provided for @newsSectionPublish.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publicação'**
+  String get newsSectionPublish;
+
+  /// No description provided for @newsAlbumCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{nenhuma foto} =1{1 foto} other{{count} fotos}}'**
+  String newsAlbumCount(int count);
+
+  /// No description provided for @newsAlbumAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar'**
+  String get newsAlbumAdd;
+
+  /// No description provided for @newsAlbumHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'As fotos aparecem na galeria da notícia.'**
+  String get newsAlbumHint;
+
+  /// No description provided for @newsRegion.
+  ///
+  /// In pt, this message translates to:
+  /// **'Região'**
+  String get newsRegion;
+
+  /// No description provided for @newsHighlight.
+  ///
+  /// In pt, this message translates to:
+  /// **'Destaque'**
+  String get newsHighlight;
+
+  /// No description provided for @newsHighlightNone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum'**
+  String get newsHighlightNone;
+
+  /// No description provided for @newsHighlightHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'A notícia também aparece dentro do destaque escolhido.'**
+  String get newsHighlightHint;
+
+  /// No description provided for @newsLinkHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Link externo (opcional)'**
+  String get newsLinkHint;
+
+  /// No description provided for @newsVisibleHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desligado, a notícia fica salva mas não aparece no app.'**
+  String get newsVisibleHint;
+
+  /// No description provided for @newsVisibleOnHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'A notícia aparece no feed do app.'**
+  String get newsVisibleOnHint;
+
+  /// No description provided for @newsPreview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pré-visualizar'**
+  String get newsPreview;
+
+  /// No description provided for @newsPreviewTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Como vai aparecer no feed'**
+  String get newsPreviewTitle;
+
+  /// No description provided for @newsDiscardTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Descartar alterações?'**
+  String get newsDiscardTitle;
+
+  /// No description provided for @newsDiscardMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'O que você preencheu será perdido.'**
+  String get newsDiscardMessage;
+
+  /// No description provided for @newsDiscardKeep.
+  ///
+  /// In pt, this message translates to:
+  /// **'Continuar editando'**
+  String get newsDiscardKeep;
+
+  /// No description provided for @newsDiscardConfirm.
+  ///
+  /// In pt, this message translates to:
+  /// **'Descartar'**
+  String get newsDiscardConfirm;
+
+  /// No description provided for @newsPublish.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publicar notícia'**
+  String get newsPublish;
+
+  /// No description provided for @newsSave.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salvar alterações'**
+  String get newsSave;
+
   /// No description provided for @newsDescriptionLabel.
   ///
   /// In pt, this message translates to:
   /// **'Descrição'**
   String get newsDescriptionLabel;
-
-  /// No description provided for @newsTagLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Tag'**
-  String get newsTagLabel;
 
   /// No description provided for @newsLinkLabel.
   ///
@@ -419,31 +563,13 @@ abstract class AppLocalizations {
   /// No description provided for @newsVisibleLabel.
   ///
   /// In pt, this message translates to:
-  /// **'Exibir notícia'**
+  /// **'Visível no app'**
   String get newsVisibleLabel;
-
-  /// No description provided for @newsAttachPhotos.
-  ///
-  /// In pt, this message translates to:
-  /// **'ANEXAR FOTOS'**
-  String get newsAttachPhotos;
-
-  /// No description provided for @newsRegisterButton.
-  ///
-  /// In pt, this message translates to:
-  /// **'CADASTRAR'**
-  String get newsRegisterButton;
-
-  /// No description provided for @newsUpdateButton.
-  ///
-  /// In pt, this message translates to:
-  /// **'ATUALIZAR'**
-  String get newsUpdateButton;
 
   /// No description provided for @newsTitleRequired.
   ///
   /// In pt, this message translates to:
-  /// **'A notícia precisa de um título!!!'**
+  /// **'Informe o título da notícia'**
   String get newsTitleRequired;
 
   /// No description provided for @newsTitleTooShort.
@@ -455,13 +581,13 @@ abstract class AppLocalizations {
   /// No description provided for @newsCreated.
   ///
   /// In pt, this message translates to:
-  /// **'Notícia Cadastrada com Sucesso!!!'**
+  /// **'Notícia publicada!'**
   String get newsCreated;
 
   /// No description provided for @newsUpdated.
   ///
   /// In pt, this message translates to:
-  /// **'Notícia Atualizada com Sucesso!!!'**
+  /// **'Notícia atualizada!'**
   String get newsUpdated;
 
   /// No description provided for @newsRegionLabel.
@@ -473,26 +599,8 @@ abstract class AppLocalizations {
   /// No description provided for @newsGoalTitle.
   ///
   /// In pt, this message translates to:
-  /// **'Cadastrar Card de Gol:'**
+  /// **'Card de gol'**
   String get newsGoalTitle;
-
-  /// No description provided for @newsHomeTeamLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Time da Casa:'**
-  String get newsHomeTeamLabel;
-
-  /// No description provided for @newsAwayTeamLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Time Visitante:'**
-  String get newsAwayTeamLabel;
-
-  /// No description provided for @newsScoreLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Placar:'**
-  String get newsScoreLabel;
 
   /// No description provided for @newsPublishButton.
   ///
@@ -503,32 +611,213 @@ abstract class AppLocalizations {
   /// No description provided for @newsGoalCreated.
   ///
   /// In pt, this message translates to:
-  /// **'Gol registrado com Sucesso!!!'**
+  /// **'Gol publicado!'**
   String get newsGoalCreated;
 
-  /// No description provided for @newsGoalTeamsRequired.
+  /// No description provided for @goalTodayMatches.
   ///
   /// In pt, this message translates to:
-  /// **'Selecione os dois times!'**
-  String get newsGoalTeamsRequired;
+  /// **'Jogos de hoje'**
+  String get goalTodayMatches;
 
-  /// No description provided for @newsAdTitle.
+  /// No description provided for @goalTodayMatchesHint.
   ///
   /// In pt, this message translates to:
-  /// **'Cadastrar Card de Publicidade:'**
-  String get newsAdTitle;
+  /// **'Toque para preencher os times e o placar.'**
+  String get goalTodayMatchesHint;
+
+  /// No description provided for @goalScoreboard.
+  ///
+  /// In pt, this message translates to:
+  /// **'Placar'**
+  String get goalScoreboard;
+
+  /// No description provided for @goalPickTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolher time'**
+  String get goalPickTeam;
+
+  /// No description provided for @goalHome.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mandante'**
+  String get goalHome;
+
+  /// No description provided for @goalAway.
+  ///
+  /// In pt, this message translates to:
+  /// **'Visitante'**
+  String get goalAway;
+
+  /// No description provided for @goalSameTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha dois times diferentes.'**
+  String get goalSameTeam;
+
+  /// No description provided for @goalNoTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum time cadastrado nesta região.'**
+  String get goalNoTeams;
+
+  /// No description provided for @goalSearchTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Buscar time'**
+  String get goalSearchTeam;
+
+  /// No description provided for @goalUpdateMatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atualizar placar da partida'**
+  String get goalUpdateMatch;
+
+  /// No description provided for @goalUpdateMatchHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grava o mesmo placar na partida da tabela.'**
+  String get goalUpdateMatchHint;
+
+  /// No description provided for @goalPreview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prévia no feed'**
+  String get goalPreview;
+
+  /// No description provided for @goalPublish.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publicar gol'**
+  String get goalPublish;
+
+  /// No description provided for @goalConfirmTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publicar card de gol?'**
+  String get goalConfirmTitle;
+
+  /// No description provided for @goalConfirmMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'{home} {homeGoals} × {awayGoals} {away}'**
+  String goalConfirmMessage(
+      String home, int homeGoals, int awayGoals, String away);
+
+  /// No description provided for @goalMatchUpdated.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol publicado e placar da partida atualizado!'**
+  String get goalMatchUpdated;
+
+  /// No description provided for @goalMatchUpdateFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol publicado, mas não foi possível atualizar o placar da partida.'**
+  String get goalMatchUpdateFailed;
+
+  /// No description provided for @goalOfTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol do {team}'**
+  String goalOfTeam(String team);
+
+  /// No description provided for @goalWhoScoredQ.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem fez o gol?'**
+  String get goalWhoScoredQ;
+
+  /// No description provided for @goalWhoAssistedQ.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem deu o passe para {scorer}?'**
+  String goalWhoAssistedQ(String scorer);
+
+  /// No description provided for @goalSkip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pular'**
+  String get goalSkip;
+
+  /// No description provided for @goalNoAssist.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem assistência'**
+  String get goalNoAssist;
+
+  /// No description provided for @goalBack.
+  ///
+  /// In pt, this message translates to:
+  /// **'Voltar'**
+  String get goalBack;
+
+  /// No description provided for @goalEditScorer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar'**
+  String get goalEditScorer;
+
+  /// No description provided for @goalSearchPlayer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Buscar jogador'**
+  String get goalSearchPlayer;
+
+  /// No description provided for @goalClear.
+  ///
+  /// In pt, this message translates to:
+  /// **'Limpar'**
+  String get goalClear;
+
+  /// No description provided for @goalScorerLine.
+  ///
+  /// In pt, this message translates to:
+  /// **'⚽ {scorer}'**
+  String goalScorerLine(String scorer);
+
+  /// No description provided for @goalScorerAssistLine.
+  ///
+  /// In pt, this message translates to:
+  /// **'⚽ {scorer} · assist. {assistant}'**
+  String goalScorerAssistLine(String scorer, String assistant);
+
+  /// No description provided for @goalStatsSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol publicado! {scorer} +1 gol.'**
+  String goalStatsSaved(String scorer);
+
+  /// No description provided for @goalStatsSavedWithAssist.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol publicado! {scorer} +1 gol, {assistant} +1 assistência.'**
+  String goalStatsSavedWithAssist(String scorer, String assistant);
+
+  /// No description provided for @goalStatsFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol publicado, mas não foi possível somar nos números dos jogadores.'**
+  String get goalStatsFailed;
+
+  /// No description provided for @goalIncrease.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aumentar'**
+  String get goalIncrease;
+
+  /// No description provided for @goalDecrease.
+  ///
+  /// In pt, this message translates to:
+  /// **'Diminuir'**
+  String get goalDecrease;
 
   /// No description provided for @newsAdCreated.
   ///
   /// In pt, this message translates to:
-  /// **'Publicidade registrada com Sucesso!!!'**
+  /// **'Publicidade publicada!'**
   String get newsAdCreated;
-
-  /// No description provided for @highlightFormTitle.
-  ///
-  /// In pt, this message translates to:
-  /// **'CADASTRAR DESTAQUE'**
-  String get highlightFormTitle;
 
   /// No description provided for @highlightTitleLabel.
   ///
@@ -545,32 +834,20 @@ abstract class AppLocalizations {
   /// No description provided for @highlightVisibleLabel.
   ///
   /// In pt, this message translates to:
-  /// **'Exibir destaque'**
+  /// **'Exibir no carrossel'**
   String get highlightVisibleLabel;
-
-  /// No description provided for @highlightRegisterButton.
-  ///
-  /// In pt, this message translates to:
-  /// **'CADASTRAR'**
-  String get highlightRegisterButton;
 
   /// No description provided for @highlightTitleRequired.
   ///
   /// In pt, this message translates to:
-  /// **'Preencha o campo TÍTULO!!!'**
+  /// **'Informe o título do destaque.'**
   String get highlightTitleRequired;
 
   /// No description provided for @highlightCreated.
   ///
   /// In pt, this message translates to:
-  /// **'Destaque Cadastrado!!!'**
+  /// **'Destaque publicado!'**
   String get highlightCreated;
-
-  /// No description provided for @highlightNoNews.
-  ///
-  /// In pt, this message translates to:
-  /// **'Nenhuma notícia disponível!'**
-  String get highlightNoNews;
 
   /// No description provided for @teamsEmpty.
   ///
@@ -587,44 +864,74 @@ abstract class AppLocalizations {
   /// No description provided for @teamsFormTitle.
   ///
   /// In pt, this message translates to:
-  /// **'CADASTRAR TIME'**
+  /// **'Novo time'**
   String get teamsFormTitle;
-
-  /// No description provided for @teamsRegionLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Região:'**
-  String get teamsRegionLabel;
 
   /// No description provided for @teamsNameLabel.
   ///
   /// In pt, this message translates to:
-  /// **'Time'**
+  /// **'Nome do time'**
   String get teamsNameLabel;
 
   /// No description provided for @teamsDescriptionLabel.
   ///
   /// In pt, this message translates to:
-  /// **'Descrição'**
+  /// **'Descrição (opcional)'**
   String get teamsDescriptionLabel;
-
-  /// No description provided for @teamsRegisterButton.
-  ///
-  /// In pt, this message translates to:
-  /// **'CADASTRAR'**
-  String get teamsRegisterButton;
 
   /// No description provided for @teamsCreated.
   ///
   /// In pt, this message translates to:
-  /// **'Time registrado com Sucesso!!!'**
+  /// **'Time cadastrado!'**
   String get teamsCreated;
 
   /// No description provided for @teamsNameRequired.
   ///
   /// In pt, this message translates to:
-  /// **'Preencha os campos obrigatórios!!!'**
+  /// **'Informe o nome do time (mínimo 3 letras).'**
   String get teamsNameRequired;
+
+  /// No description provided for @teamsCrestAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar escudo'**
+  String get teamsCrestAdd;
+
+  /// No description provided for @teamsSectionData.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dados do time'**
+  String get teamsSectionData;
+
+  /// No description provided for @teamsDescriptionHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ex.: bairro, fundação, apelido'**
+  String get teamsDescriptionHint;
+
+  /// No description provided for @teamsPreview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prévia na aba Times'**
+  String get teamsPreview;
+
+  /// No description provided for @teamsInRegion.
+  ///
+  /// In pt, this message translates to:
+  /// **'Times na região · {count}'**
+  String teamsInRegion(int count);
+
+  /// No description provided for @teamsDuplicate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Já existe um time \"{name}\" nesta região.'**
+  String teamsDuplicate(String name);
+
+  /// No description provided for @teamsSubmit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cadastrar time'**
+  String get teamsSubmit;
 
   /// No description provided for @playersEmpty.
   ///
@@ -653,25 +960,25 @@ abstract class AppLocalizations {
   /// No description provided for @playersNameRequired.
   ///
   /// In pt, this message translates to:
-  /// **'Preencha o campo NOME!!!'**
+  /// **'Informe o nome (mínimo 3 letras).'**
   String get playersNameRequired;
 
   /// No description provided for @playersTeamRequired.
   ///
   /// In pt, this message translates to:
-  /// **'Informe um Time!!!'**
+  /// **'Escolha o time do jogador.'**
   String get playersTeamRequired;
 
   /// No description provided for @playersFormTitle.
   ///
   /// In pt, this message translates to:
-  /// **'CADASTRAR JOGADOR'**
+  /// **'Novo jogador'**
   String get playersFormTitle;
 
   /// No description provided for @playersNameLabel.
   ///
   /// In pt, this message translates to:
-  /// **'Nome'**
+  /// **'Nome do jogador'**
   String get playersNameLabel;
 
   /// No description provided for @playersGoalsLabel.
@@ -683,26 +990,56 @@ abstract class AppLocalizations {
   /// No description provided for @playersAssistsLabel.
   ///
   /// In pt, this message translates to:
-  /// **'Assistencias'**
+  /// **'Assistências'**
   String get playersAssistsLabel;
-
-  /// No description provided for @playersTeamLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Time:'**
-  String get playersTeamLabel;
-
-  /// No description provided for @playersRegisterButton.
-  ///
-  /// In pt, this message translates to:
-  /// **'CADASTRAR'**
-  String get playersRegisterButton;
 
   /// No description provided for @playersCreated.
   ///
   /// In pt, this message translates to:
-  /// **'Jogador Cadastrado!!!'**
+  /// **'Jogador cadastrado!'**
   String get playersCreated;
+
+  /// No description provided for @playersPhotoAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar foto (opcional)'**
+  String get playersPhotoAdd;
+
+  /// No description provided for @playersSectionData.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dados do jogador'**
+  String get playersSectionData;
+
+  /// No description provided for @playersTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Time'**
+  String get playersTeam;
+
+  /// No description provided for @playersPreview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prévia no elenco'**
+  String get playersPreview;
+
+  /// No description provided for @playersSquadOf.
+  ///
+  /// In pt, this message translates to:
+  /// **'Elenco do {team} · {count}'**
+  String playersSquadOf(String team, int count);
+
+  /// No description provided for @playersDuplicate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Já existe \"{name}\" no {team}.'**
+  String playersDuplicate(String name, String team);
+
+  /// No description provided for @playersSubmit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cadastrar jogador'**
+  String get playersSubmit;
 
   /// No description provided for @playersPhotoBack.
   ///
@@ -881,62 +1218,122 @@ abstract class AppLocalizations {
   /// No description provided for @matchesFormTitle.
   ///
   /// In pt, this message translates to:
-  /// **'CADASTRAR PARTIDA'**
+  /// **'Nova partida'**
   String get matchesFormTitle;
-
-  /// No description provided for @matchesRegionLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Região:'**
-  String get matchesRegionLabel;
-
-  /// No description provided for @matchesHomeTeamLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Time Casa:'**
-  String get matchesHomeTeamLabel;
-
-  /// No description provided for @matchesAwayTeamLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Time Fora:'**
-  String get matchesAwayTeamLabel;
-
-  /// No description provided for @matchesDateLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Data'**
-  String get matchesDateLabel;
-
-  /// No description provided for @matchesTimeLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Hora'**
-  String get matchesTimeLabel;
-
-  /// No description provided for @matchesVenueLabel.
-  ///
-  /// In pt, this message translates to:
-  /// **'Local'**
-  String get matchesVenueLabel;
-
-  /// No description provided for @matchesRegisterButton.
-  ///
-  /// In pt, this message translates to:
-  /// **'CADASTRAR'**
-  String get matchesRegisterButton;
 
   /// No description provided for @matchesCreated.
   ///
   /// In pt, this message translates to:
-  /// **'Partida Cadastrada com Sucesso!!!'**
+  /// **'Partida cadastrada!'**
   String get matchesCreated;
 
-  /// No description provided for @matchesFieldsRequired.
+  /// No description provided for @matchFormMatchup.
   ///
   /// In pt, this message translates to:
-  /// **'Preencha todos os campos!!!'**
-  String get matchesFieldsRequired;
+  /// **'Confronto'**
+  String get matchFormMatchup;
+
+  /// No description provided for @matchFormSwap.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inverter mando'**
+  String get matchFormSwap;
+
+  /// No description provided for @matchFormWhen.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quando'**
+  String get matchFormWhen;
+
+  /// No description provided for @matchFormWhere.
+  ///
+  /// In pt, this message translates to:
+  /// **'Onde'**
+  String get matchFormWhere;
+
+  /// No description provided for @matchFormToday.
+  ///
+  /// In pt, this message translates to:
+  /// **'Hoje'**
+  String get matchFormToday;
+
+  /// No description provided for @matchFormTomorrow.
+  ///
+  /// In pt, this message translates to:
+  /// **'Amanhã'**
+  String get matchFormTomorrow;
+
+  /// No description provided for @matchFormOtherDate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Outra data'**
+  String get matchFormOtherDate;
+
+  /// No description provided for @matchFormOtherTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'Outro horário'**
+  String get matchFormOtherTime;
+
+  /// No description provided for @matchFormNewVenue.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novo local'**
+  String get matchFormNewVenue;
+
+  /// No description provided for @matchFormVenueHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome do local'**
+  String get matchFormVenueHint;
+
+  /// No description provided for @matchFormPreview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prévia'**
+  String get matchFormPreview;
+
+  /// No description provided for @matchFormSubmit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cadastrar partida'**
+  String get matchFormSubmit;
+
+  /// No description provided for @matchFormMissingTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha os dois times.'**
+  String get matchFormMissingTeams;
+
+  /// No description provided for @matchFormMissingDate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha a data da partida.'**
+  String get matchFormMissingDate;
+
+  /// No description provided for @matchFormMissingTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha o horário da partida.'**
+  String get matchFormMissingTime;
+
+  /// No description provided for @matchFormConflictTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'{team} já tem jogo nesta data ({times}).'**
+  String matchFormConflictTeam(String team, String times);
+
+  /// No description provided for @matchFormConflictVenue.
+  ///
+  /// In pt, this message translates to:
+  /// **'{venue} já tem jogo nesta data às {time}.'**
+  String matchFormConflictVenue(String venue, String time);
+
+  /// No description provided for @matchFormSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Partida cadastrada! Escolha os times da próxima.'**
+  String get matchFormSaved;
 
   /// No description provided for @championshipsEmpty.
   ///
@@ -1182,7 +1579,7 @@ abstract class AppLocalizations {
   /// No description provided for @globalResultsTitle.
   ///
   /// In pt, this message translates to:
-  /// **'RESULTADOS PELO MUNDO'**
+  /// **'Resultados pelo mundo'**
   String get globalResultsTitle;
 
   /// No description provided for @globalResultsYesterday.
@@ -1203,17 +1600,71 @@ abstract class AppLocalizations {
   /// **'Amanhã'**
   String get globalResultsTomorrow;
 
-  /// No description provided for @globalResultsEmpty.
+  /// No description provided for @globalResultsSubtitle.
   ///
   /// In pt, this message translates to:
-  /// **'Nenhum jogo encontrado.'**
-  String get globalResultsEmpty;
+  /// **'Placares das principais ligas do mundo'**
+  String get globalResultsSubtitle;
 
-  /// No description provided for @globalResultsTomorrowUnavailable.
+  /// No description provided for @globalResultsLive.
   ///
   /// In pt, this message translates to:
-  /// **'Os jogos de amanhã ainda não estão disponíveis.'**
-  String get globalResultsTomorrowUnavailable;
+  /// **'Ao vivo'**
+  String get globalResultsLive;
+
+  /// No description provided for @globalResultsHalfTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'Intervalo'**
+  String get globalResultsHalfTime;
+
+  /// No description provided for @globalResultsFinished.
+  ///
+  /// In pt, this message translates to:
+  /// **'Encerrado'**
+  String get globalResultsFinished;
+
+  /// No description provided for @globalResultsPostponed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adiado'**
+  String get globalResultsPostponed;
+
+  /// No description provided for @globalResultsLiveFilter.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ao vivo ({count})'**
+  String globalResultsLiveFilter(int count);
+
+  /// No description provided for @globalResultsSearchHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Buscar time ou liga'**
+  String get globalResultsSearchHint;
+
+  /// No description provided for @globalResultsNoMatches.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum jogo encontrado'**
+  String get globalResultsNoMatches;
+
+  /// No description provided for @globalResultsPenalty.
+  ///
+  /// In pt, this message translates to:
+  /// **'pênalti'**
+  String get globalResultsPenalty;
+
+  /// No description provided for @globalResultsOwnGoal.
+  ///
+  /// In pt, this message translates to:
+  /// **'contra'**
+  String get globalResultsOwnGoal;
+
+  /// No description provided for @globalResultsGoalsError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar os gols. Toque para tentar de novo.'**
+  String get globalResultsGoalsError;
 
   /// No description provided for @loginWelcomeTitle.
   ///
@@ -1736,6 +2187,546 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Seu time'**
   String get standingsYourTeam;
+
+  /// No description provided for @athleteTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atleta'**
+  String get athleteTitle;
+
+  /// No description provided for @athleteScored.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fez o gol'**
+  String get athleteScored;
+
+  /// No description provided for @athleteAssisted.
+  ///
+  /// In pt, this message translates to:
+  /// **'Deu o passe'**
+  String get athleteAssisted;
+
+  /// No description provided for @athleteRankGoals.
+  ///
+  /// In pt, this message translates to:
+  /// **'{position}º na artilharia'**
+  String athleteRankGoals(int position);
+
+  /// No description provided for @athleteRankAssists.
+  ///
+  /// In pt, this message translates to:
+  /// **'{position}º em assistências'**
+  String athleteRankAssists(int position);
+
+  /// No description provided for @athleteNoRank.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fora do ranking'**
+  String get athleteNoRank;
+
+  /// No description provided for @athleteParticipations.
+  ///
+  /// In pt, this message translates to:
+  /// **'Participações em gols'**
+  String get athleteParticipations;
+
+  /// No description provided for @athleteNoParticipations.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ainda sem gols registrados no feed.'**
+  String get athleteNoParticipations;
+
+  /// No description provided for @athleteNotFound.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogador não encontrado.'**
+  String get athleteNotFound;
+
+  /// No description provided for @athleteLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar o jogador.'**
+  String get athleteLoadError;
+
+  /// No description provided for @athleteEdit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar (admin)'**
+  String get athleteEdit;
+
+  /// No description provided for @athleteShare.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compartilhar'**
+  String get athleteShare;
+
+  /// No description provided for @athleteShareText.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} ({team}): {goals} gols e {assists} assistências · via Arena Football'**
+  String athleteShareText(String name, String team, int goals, int assists);
+
+  /// No description provided for @athleteSeason.
+  ///
+  /// In pt, this message translates to:
+  /// **'Temporada {season}'**
+  String athleteSeason(String season);
+
+  /// No description provided for @adCreateTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nova publicidade'**
+  String get adCreateTitle;
+
+  /// No description provided for @adEditTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar publicidade'**
+  String get adEditTitle;
+
+  /// No description provided for @adPublish.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publicar anúncio'**
+  String get adPublish;
+
+  /// No description provided for @adUpdated.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publicidade atualizada!'**
+  String get adUpdated;
+
+  /// No description provided for @adBannerAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar banner'**
+  String get adBannerAdd;
+
+  /// No description provided for @adBannerHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Use uma imagem horizontal 2:1 (ex.: 1200×600). É assim que ela aparece no feed.'**
+  String get adBannerHint;
+
+  /// No description provided for @adSectionAd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Anúncio'**
+  String get adSectionAd;
+
+  /// No description provided for @adNameLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Anunciante (opcional)'**
+  String get adNameLabel;
+
+  /// No description provided for @adNameHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Só para você identificar o anúncio'**
+  String get adNameHint;
+
+  /// No description provided for @adLinkHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Site, Instagram ou WhatsApp do anunciante'**
+  String get adLinkHint;
+
+  /// No description provided for @adLinkInvalid.
+  ///
+  /// In pt, this message translates to:
+  /// **'Link inválido. Ex.: https://loja.com.br'**
+  String get adLinkInvalid;
+
+  /// No description provided for @adTestLink.
+  ///
+  /// In pt, this message translates to:
+  /// **'Testar'**
+  String get adTestLink;
+
+  /// No description provided for @adImageRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha a imagem do anúncio.'**
+  String get adImageRequired;
+
+  /// No description provided for @highlightCreateTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novo destaque'**
+  String get highlightCreateTitle;
+
+  /// No description provided for @highlightPhotoAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar foto'**
+  String get highlightPhotoAdd;
+
+  /// No description provided for @highlightPhotoHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aparece no círculo do carrossel. Prefira uma imagem quadrada.'**
+  String get highlightPhotoHint;
+
+  /// No description provided for @highlightPreview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prévia no carrossel'**
+  String get highlightPreview;
+
+  /// No description provided for @highlightSection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Destaque'**
+  String get highlightSection;
+
+  /// No description provided for @highlightTitleHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícias marcadas com este destaque aparecem nele'**
+  String get highlightTitleHint;
+
+  /// No description provided for @highlightTitleTooShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'Use pelo menos 3 letras.'**
+  String get highlightTitleTooShort;
+
+  /// No description provided for @highlightDuplicate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Já existe um destaque com esse nome.'**
+  String get highlightDuplicate;
+
+  /// No description provided for @highlightVisibleOnHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aparece no topo da home para todos.'**
+  String get highlightVisibleOnHint;
+
+  /// No description provided for @highlightVisibleHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fica oculto até você ativar.'**
+  String get highlightVisibleHint;
+
+  /// No description provided for @highlightPublish.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publicar destaque'**
+  String get highlightPublish;
+
+  /// No description provided for @highlightNewsCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{Nenhuma notícia} =1{1 notícia} other{{count} notícias}}'**
+  String highlightNewsCount(int count);
+
+  /// No description provided for @highlightOpenLink.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abrir link'**
+  String get highlightOpenLink;
+
+  /// No description provided for @highlightEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ainda não há notícias neste destaque.'**
+  String get highlightEmpty;
+
+  /// No description provided for @highlightLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar as notícias.'**
+  String get highlightLoadError;
+
+  /// No description provided for @highlightAddNews.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícia'**
+  String get highlightAddNews;
+
+  /// No description provided for @highlightShareText.
+  ///
+  /// In pt, this message translates to:
+  /// **'{title} · Arena Football'**
+  String highlightShareText(String title);
+
+  /// No description provided for @highlightsManageTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Destaques'**
+  String get highlightsManageTitle;
+
+  /// No description provided for @highlightsReorderHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arraste pela alça para definir a ordem do carrossel.'**
+  String get highlightsReorderHint;
+
+  /// No description provided for @highlightsEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum destaque cadastrado. Toque em + para criar.'**
+  String get highlightsEmpty;
+
+  /// No description provided for @highlightHidden.
+  ///
+  /// In pt, this message translates to:
+  /// **'Oculto'**
+  String get highlightHidden;
+
+  /// No description provided for @highlightView.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver'**
+  String get highlightView;
+
+  /// No description provided for @highlightEditTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar destaque'**
+  String get highlightEditTitle;
+
+  /// No description provided for @highlightUpdated.
+  ///
+  /// In pt, this message translates to:
+  /// **'Destaque atualizado!'**
+  String get highlightUpdated;
+
+  /// No description provided for @highlightRenameHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'As notícias marcadas com \"{old}\" passam para o novo nome.'**
+  String highlightRenameHint(String old);
+
+  /// No description provided for @highlightDeleteTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Excluir \"{title}\"?'**
+  String highlightDeleteTitle(String title);
+
+  /// No description provided for @highlightDeleteMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'As notícias marcadas continuam no feed, só perdem a marcação deste destaque.'**
+  String get highlightDeleteMessage;
+
+  /// No description provided for @highlightDeleted.
+  ///
+  /// In pt, this message translates to:
+  /// **'\"{title}\" excluído.'**
+  String highlightDeleted(String title);
+
+  /// No description provided for @pushPanelTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notificações'**
+  String get pushPanelTitle;
+
+  /// No description provided for @pushTabActions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ações'**
+  String get pushTabActions;
+
+  /// No description provided for @pushTabHistory.
+  ///
+  /// In pt, this message translates to:
+  /// **'Histórico'**
+  String get pushTabHistory;
+
+  /// No description provided for @pushTabSend.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar aviso'**
+  String get pushTabSend;
+
+  /// No description provided for @pushActionsIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha quais ações enviam push. Cada usuário recebe da região escolhida no app; os jogos também chegam para quem torce pelos times.'**
+  String get pushActionsIntro;
+
+  /// No description provided for @pushActionGoal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol'**
+  String get pushActionGoal;
+
+  /// No description provided for @pushActionGoalHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Card de gol publicado · \"⚽ GOL! Lava Jato 2 × 1 Volta\"'**
+  String get pushActionGoalHint;
+
+  /// No description provided for @pushActionNews.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícia publicada'**
+  String get pushActionNews;
+
+  /// No description provided for @pushActionNewsHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícia visível no feed (sem anúncios) · título da notícia'**
+  String get pushActionNewsHint;
+
+  /// No description provided for @pushActionMatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nova partida'**
+  String get pushActionMatch;
+
+  /// No description provided for @pushActionMatchHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Partida cadastrada · data, horário e local'**
+  String get pushActionMatchHint;
+
+  /// No description provided for @pushActionVotingOpen.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votação aberta'**
+  String get pushActionVotingOpen;
+
+  /// No description provided for @pushActionVotingOpenHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votação do melhor da partida liberada'**
+  String get pushActionVotingOpenHint;
+
+  /// No description provided for @pushActionVotingClosed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votação encerrada'**
+  String get pushActionVotingClosed;
+
+  /// No description provided for @pushActionVotingClosedHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votação fechada · convida a ver o eleito'**
+  String get pushActionVotingClosedHint;
+
+  /// No description provided for @pushActionDailyGame.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogo do seu time'**
+  String get pushActionDailyGame;
+
+  /// No description provided for @pushActionDailyGameHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todo dia às 9h, para quem torce por um time que joga hoje'**
+  String get pushActionDailyGameHint;
+
+  /// No description provided for @pushActionNotice.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aviso manual'**
+  String get pushActionNotice;
+
+  /// No description provided for @pushActionNoticeHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Avisos enviados pela aba \"Enviar aviso\"'**
+  String get pushActionNoticeHint;
+
+  /// No description provided for @pushHistoryEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma notificação enviada ainda.'**
+  String get pushHistoryEmpty;
+
+  /// No description provided for @pushStatusSent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviada'**
+  String get pushStatusSent;
+
+  /// No description provided for @pushStatusDisabled.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desligada'**
+  String get pushStatusDisabled;
+
+  /// No description provided for @pushStatusError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Erro'**
+  String get pushStatusError;
+
+  /// No description provided for @pushAllRegions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todas as regiões'**
+  String get pushAllRegions;
+
+  /// No description provided for @pushAudienceTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Torcedores dos times'**
+  String get pushAudienceTeams;
+
+  /// No description provided for @pushNoticeSection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aviso'**
+  String get pushNoticeSection;
+
+  /// No description provided for @pushNoticeTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Título'**
+  String get pushNoticeTitle;
+
+  /// No description provided for @pushNoticeBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mensagem'**
+  String get pushNoticeBody;
+
+  /// No description provided for @pushNoticeAudience.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para quem'**
+  String get pushNoticeAudience;
+
+  /// No description provided for @pushNoticePreview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prévia'**
+  String get pushNoticePreview;
+
+  /// No description provided for @pushNoticeHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'O envio leva alguns segundos e aparece no Histórico.'**
+  String get pushNoticeHint;
+
+  /// No description provided for @pushSend.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar'**
+  String get pushSend;
+
+  /// No description provided for @pushSendConfirmTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar notificação?'**
+  String get pushSendConfirmTitle;
+
+  /// No description provided for @pushSendConfirmMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos os usuários de \"{audience}\" vão receber este aviso agora.'**
+  String pushSendConfirmMessage(String audience);
+
+  /// No description provided for @pushSent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aviso enviado!'**
+  String get pushSent;
 }
 
 class _AppLocalizationsDelegate

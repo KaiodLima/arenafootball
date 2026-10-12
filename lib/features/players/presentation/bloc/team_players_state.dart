@@ -14,15 +14,6 @@ class TeamPlayersState extends Equatable {
 
   const TeamPlayersState({this.players = const [], this.sort = PlayersSort.goals, this.query = ''});
 
-  /// Versão mais recente do jogador na lista (o painel de detalhes lê daqui
-  /// para refletir as edições). [fallback] se ele não estiver mais na lista.
-  PlayerDTO playerById(String id, PlayerDTO fallback) {
-    for (final player in players) {
-      if (player.id == id) return player;
-    }
-    return fallback;
-  }
-
   /// Elenco filtrado pela busca e ordenado (empate pelo nome).
   List<PlayerDTO> get visiblePlayers {
     final term = foldForSearch(query.trim());
@@ -66,16 +57,6 @@ class LoadingTeamPlayersState extends TeamPlayersState {
 
 class SuccessTeamPlayersState extends TeamPlayersState {
   const SuccessTeamPlayersState({required super.players, super.sort, super.query});
-}
-
-/// Enviando a foto de um jogador.
-class SavingTeamPlayersState extends TeamPlayersState {
-  final String playerId;
-
-  const SavingTeamPlayersState({required this.playerId, required super.players, super.sort, super.query});
-
-  @override
-  List<Object?> get props => [...super.props, playerId];
 }
 
 class ErrorTeamPlayersState extends TeamPlayersState {

@@ -1,18 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/player_form_cubit.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/player_form_state.dart';
+import 'package:arena_soccer/features/players/presentation/widgets/count_stepper.dart';
+import 'package:arena_soccer/features/players/presentation/widgets/player_card.dart';
+import 'package:arena_soccer/features/players/presentation/widgets/squad_strip.dart';
+import 'package:arena_soccer/features/players/presentation/widgets/team_select_tile.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
-import 'package:arena_soccer/utils/components/arena_button.dart';
-import 'package:arena_soccer/utils/components/arena_dropdown_field.dart';
-import 'package:arena_soccer/utils/components/arena_text_field.dart';
+import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
+import 'package:arena_soccer/utils/components/arena_input_decoration.dart';
+import 'package:arena_soccer/utils/components/arena_submit_bar.dart';
+import 'package:arena_soccer/utils/components/circle_photo_picker.dart';
+import 'package:arena_soccer/utils/components/form_section.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
+import 'package:arena_soccer/utils/components/team_picker_sheet.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
-import 'package:arena_soccer/utils/constants/app_images.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
+import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// Cadastro de jogador (admin). A foto é enviada depois, na tela do elenco.
+/// Cadastro de jogador (admin): região, time (com escudo), foto opcional,
+/// nome e gols/assistências com − / +, prévia do card do elenco, aviso de
+/// nome repetido e o elenco atual do time. Depois de cadastrar, limpa nome,
+/// foto e números e mantém o time para o próximo. Sair com algo preenchido
+/// pede confirmação.
 class PlayerFormPage extends StatefulWidget {
   const PlayerFormPage({super.key});
 
@@ -21,10 +33,16 @@ class PlayerFormPage extends StatefulWidget {
 }
 
 class _PlayerFormPageState extends State<PlayerFormPage> {
+  static const int _nameMaxLength = 40;
+
   late final PlayerFormCubit _cubit;
   final _nameController = TextEditingController();
-  final _goalsController = TextEditingController();
-  final _assistsController = TextEditingController();
+
+  /// Erros só depois da primeira tentativa de cadastrar.
+  bool _showErrors = false;
+
+  /// Liberado para fechar sem perguntar (após confirmar o descarte).
+  bool _leaving = false;
 
   @override
   void initState() {
@@ -36,104 +54,242 @@ class _PlayerFormPageState extends State<PlayerFormPage> {
   @override
   void dispose() {
     _nameController.dispose();
-    _goalsController.dispose();
-    _assistsController.dispose();
     super.dispose();
   }
 
-  void _submit(PlayerFormData form, AppLocalizations l10n) {
-    switch (form.error) {
-      case PlayerFormError.name:
-        showSnackBar(context: context, message: l10n.playersNameRequired, isSuccess: false);
-      case PlayerFormError.team:
-        showSnackBar(context: context, message: l10n.playersTeamRequired, isSuccess: false);
-      case null:
-        _cubit.submit();
+  Future<void> _pickTeam(PlayerFormData form) async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    final l10n = AppLocalizations.of(context);
+    final picked = await showTeamPickerSheet(
+      context,
+      title: l10n.playersTeam,
+      teams: form.teams,
+      selected: form.selectedTeam,
+    );
+    if (picked != null) _cubit.selectTeam(picked);
+  }
+
+  void _submit(PlayerFormData form) {
+    FocusManager.instance.primaryFocus?.unfocus();
+    if (form.error != null) {
+      setState(() => _showErrors = true);
+      return;
     }
+    _cubit.submit();
+  }
+
+  Future<void> _confirmDiscard(AppLocalizations l10n) async {
+    final discard = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.newsDiscardTitle),
+        content: Text(l10n.newsDiscardMessage),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.newsDiscardKeep)),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(l10n.newsDiscardConfirm, style: const TextStyle(color: AppColors.danger)),
+          ),
+        ],
+      ),
+    );
+    if (discard != true || !mounted) return;
+    // Sem isso o teclado do campo de nome continua aberto na tela anterior.
+    FocusManager.instance.primaryFocus?.unfocus();
+    // O PopScope só aceita depois de reconstruir com canPop verdadeiro.
+    setState(() => _leaving = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) Navigator.pop(context);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.playersFormTitle),
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
-      ),
-      body: BlocConsumer<PlayerFormCubit, PlayerFormState>(
-        listener: (context, state) {
-          if (state is SuccessPlayerFormState) {
-            _nameController.clear();
-            _goalsController.clear();
-            _assistsController.clear();
-            showSnackBar(context: context, message: l10n.playersCreated);
-          }
-          if (state is ErrorPlayerFormState) {
-            showSnackBar(context: context, message: state.errorMessage, isSuccess: false);
-          }
-        },
-        builder: (context, state) {
-          final form = state.form;
-          return SingleChildScrollView(
-            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-            padding: const EdgeInsets.all(AppSizes.screenPadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+    return BlocConsumer<PlayerFormCubit, PlayerFormState>(
+      listener: (context, state) {
+        if (state is SuccessPlayerFormState) {
+          _nameController.clear();
+          setState(() => _showErrors = false);
+          showSnackBar(context: context, message: l10n.playersCreated);
+        }
+        if (state is ErrorPlayerFormState) {
+          showSnackBar(context: context, message: state.errorMessage, isSuccess: false);
+        }
+      },
+      builder: (context, state) {
+        final form = state.form;
+        final submitting = state is SubmittingPlayerFormState;
+        final error = _showErrors ? form.error : null;
+        final duplicate = form.duplicate;
+        final team = form.selectedTeam;
+
+        return PopScope(
+          canPop: _leaving || !form.isDirty,
+          onPopInvokedWithResult: (didPop, _) {
+            if (!didPop && !submitting) _confirmDiscard(l10n);
+          },
+          child: Scaffold(
+            backgroundColor: AppColors.background,
+            appBar: AppBar(
+              backgroundColor: AppColors.primaryDark,
+              foregroundColor: AppColors.white,
+              surfaceTintColor: AppColors.transparent,
+              leading: IconButton(icon: const Icon(Icons.close_rounded), onPressed: () => Navigator.maybePop(context)),
+              titleSpacing: 0,
+              title: Text(
+                l10n.playersFormTitle,
+                style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s20),
+              ),
+            ),
+            bottomNavigationBar: ArenaSubmitBar(
+              title: l10n.playersSubmit,
+              loading: submitting,
+              onPressed: () => _submit(form),
+            ),
+            body: ListView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, AppSizes.s24),
               children: [
-                const SizedBox(height: AppSizes.s12),
-                Image.asset(AppImages.logo, height: AppSizes.s100),
-                const SizedBox(height: AppSizes.s16),
-                ArenaTextField(
-                  labelText: l10n.playersNameLabel,
-                  controller: _nameController,
-                  onChaged: _cubit.changeName,
-                  icon: const Icon(Icons.account_box_outlined, color: AppColors.primary, size: AppSizes.s24),
-                ),
-                const SizedBox(height: AppSizes.s16),
-                Row(
+                Wrap(
+                  spacing: AppSizes.s8,
+                  runSpacing: AppSizes.s8,
                   children: [
-                    Expanded(
-                      child: ArenaTextField(
-                        labelText: l10n.playersGoalsLabel,
-                        controller: _goalsController,
-                        onChaged: _cubit.changeGoals,
-                        keyboardType: TextInputType.number,
-                        icon: const Icon(Icons.sports_soccer_outlined, color: AppColors.primary, size: AppSizes.s24),
+                    for (final region in form.regions)
+                      ArenaChoiceChip(
+                        label: region,
+                        icon: Icons.place_outlined,
+                        selected: region == form.selectedRegion,
+                        onTap: () => _cubit.selectRegion(region),
                       ),
-                    ),
-                    const SizedBox(width: AppSizes.s14),
-                    Expanded(
-                      child: ArenaTextField(
-                        labelText: l10n.playersAssistsLabel,
-                        controller: _assistsController,
-                        onChaged: _cubit.changeAssists,
-                        keyboardType: TextInputType.number,
-                        icon: const Icon(Icons.account_box_outlined, color: AppColors.primary, size: AppSizes.s24),
-                      ),
-                    ),
                   ],
                 ),
-                const SizedBox(height: AppSizes.s8),
-                ArenaDropdownField(
-                  value: form.selectedRegion,
-                  items: form.regions,
-                  icon: Icons.change_circle_outlined,
-                  onChanged: _cubit.selectRegion,
-                ),
-                Text(l10n.playersTeamLabel, style: const TextStyle(fontSize: AppSizes.s16)),
-                ArenaDropdownField(value: form.selectedTeam, items: form.teams, onChanged: _cubit.selectTeam),
                 const SizedBox(height: AppSizes.s16),
-                ArenaButton.primary(
-                  title: l10n.playersRegisterButton,
-                  isLoading: state is SubmittingPlayerFormState,
-                  function: () => _submit(form, l10n),
+                TeamSelectTile(
+                  label: l10n.playersTeam,
+                  team: team,
+                  crest: form.crestOf(team),
+                  placeholder: l10n.goalPickTeam,
+                  errorText: error == PlayerFormError.team ? l10n.playersTeamRequired : null,
+                  onTap: () => _pickTeam(form),
                 ),
+                const SizedBox(height: AppSizes.s20),
+                Center(
+                  child: CirclePhotoPicker(
+                    file: form.photo,
+                    addLabel: l10n.playersPhotoAdd,
+                    emptyIcon: Icons.add_a_photo_outlined,
+                    size: AppSizes.s100,
+                    onPicked: _cubit.setPhoto,
+                    onRemove: _cubit.clearPhoto,
+                  ),
+                ),
+                const SizedBox(height: AppSizes.s20),
+                FormSection(
+                  title: l10n.playersSectionData,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextField(
+                        controller: _nameController,
+                        onChanged: _cubit.changeName,
+                        maxLength: _nameMaxLength,
+                        textCapitalization: TextCapitalization.words,
+                        style: AppTypography.body().copyWith(fontWeight: FontWeight.w600),
+                        decoration: arenaInputDecoration(
+                          label: l10n.playersNameLabel,
+                          icon: Icons.person_outline_rounded,
+                          errorText: error == PlayerFormError.name ? l10n.playersNameRequired : null,
+                        ),
+                      ),
+                      if (duplicate != null && team != null) ...[
+                        _DuplicateWarning(text: l10n.playersDuplicate(duplicate.name, team)),
+                        const SizedBox(height: AppSizes.s12),
+                      ],
+                      CountStepper(
+                        icon: Icons.sports_soccer_rounded,
+                        label: l10n.playersGoalsLabel,
+                        value: form.goals,
+                        max: PlayerFormData.maxCount,
+                        onIncrement: _cubit.incrementGoals,
+                        onDecrement: _cubit.decrementGoals,
+                      ),
+                      const SizedBox(height: AppSizes.s12),
+                      CountStepper(
+                        icon: Icons.assistant_rounded,
+                        label: l10n.playersAssistsLabel,
+                        value: form.assists,
+                        max: PlayerFormData.maxCount,
+                        onIncrement: _cubit.incrementAssists,
+                        onDecrement: _cubit.decrementAssists,
+                      ),
+                    ],
+                  ),
+                ),
+                if (form.name.trim().isNotEmpty) ...[
+                  _Label(l10n.playersPreview),
+                  PlayerCard(
+                    player: PlayerDTO(
+                      name: form.name.trim(),
+                      team: team ?? '',
+                      goals: form.goals,
+                      assists: form.assists,
+                    ),
+                    isTopScorer: false,
+                    photoFile: form.photo,
+                  ),
+                  const SizedBox(height: AppSizes.s8),
+                ],
+                if (team != null && form.squad.isNotEmpty) ...[
+                  _Label(l10n.playersSquadOf(team, form.squad.length)),
+                  SquadStrip(players: form.squad, highlightId: duplicate?.id),
+                ],
               ],
             ),
-          );
-        },
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _Label extends StatelessWidget {
+  final String text;
+
+  const _Label(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(AppSizes.s4, 0, AppSizes.s4, AppSizes.s8),
+      child: Text(
+        text.toUpperCase(),
+        style: AppTypography.label(color: AppColors.textSecondary).copyWith(fontSize: AppSizes.s12, letterSpacing: 1.1),
+      ),
+    );
+  }
+}
+
+class _DuplicateWarning extends StatelessWidget {
+  final String text;
+
+  const _DuplicateWarning({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSizes.s10),
+      decoration: BoxDecoration(
+        color: AppColors.warning.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppSizes.s12),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.warning_amber_rounded, color: AppColors.warning, size: AppSizes.s20),
+          const SizedBox(width: AppSizes.s8),
+          Expanded(child: Text(text, style: AppTypography.body().copyWith(fontSize: AppSizes.s14))),
+        ],
       ),
     );
   }

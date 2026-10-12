@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
+import 'package:arena_soccer/core/services/push_service.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/championships_tab.dart';
 import 'package:arena_soccer/features/highlights/presentation/widgets/highlights_carousel.dart';
@@ -13,9 +16,11 @@ import 'package:arena_soccer/features/home/presentation/widgets/home_drawer.dart
 import 'package:arena_soccer/features/home/presentation/widgets/home_header.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/matches_tab.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/news_tab.dart';
+import 'package:arena_soccer/features/notifications/presentation/widgets/push_topics_listener.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_state.dart';
 import 'package:arena_soccer/features/teams/presentation/widgets/teams_tab.dart';
+import 'package:arena_soccer/injection_container.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/section_header.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
@@ -33,6 +38,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   late final HomeCubit _homeCubit;
+  StreamSubscription<String>? _pushTabs;
 
   @override
   void initState() {
@@ -40,6 +46,25 @@ class _HomePageState extends State<HomePage> {
     _homeCubit = BlocProvider.of<HomeCubit>(context);
     final user = BlocProvider.of<SessionCubit>(context).state.user;
     if (user != null) _homeCubit.loadFavoriteTeam(user.favoriteTeam);
+
+    // Push: pede a permissão (Android 13+) e abre a aba da notificação tocada.
+    final push = sl<PushService>();
+    push.requestPermission();
+    PushTopicsListener.syncNow(context);
+    _openPushTab(push.takePendingTab());
+    _pushTabs = push.tabRequests.listen(_openPushTab);
+  }
+
+  @override
+  void dispose() {
+    _pushTabs?.cancel();
+    super.dispose();
+  }
+
+  /// `aba` do payload: "tabelas" abre a aba de partidas; o resto, o feed.
+  void _openPushTab(String? tab) {
+    if (tab == null) return;
+    _homeCubit.selectTab(tab == 'tabelas' ? HomeTab.tables : HomeTab.news);
   }
 
   Future<void> _logout() async {

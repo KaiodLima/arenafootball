@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/global_results/presentation/bloc/global_results_cubit.dart';
+import 'package:arena_soccer/features/global_results/presentation/bloc/match_goals_cubit.dart';
 import 'package:arena_soccer/features/global_results/presentation/page/global_results_page.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/choose_team_cubit.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/login_cubit.dart';
@@ -18,6 +19,10 @@ import 'package:arena_soccer/features/championships/presentation/page/standings_
 import 'package:arena_soccer/features/home/presentation/bloc/home_cubit.dart';
 import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
 import 'package:arena_soccer/features/highlights/presentation/bloc/highlight_form_cubit.dart';
+import 'package:arena_soccer/features/highlights/presentation/bloc/manage_highlights_cubit.dart';
+import 'package:arena_soccer/features/highlights/presentation/page/manage_highlights_page.dart';
+import 'package:arena_soccer/features/notifications/presentation/bloc/notifications_panel_cubit.dart';
+import 'package:arena_soccer/features/notifications/presentation/page/notifications_panel_page.dart';
 import 'package:arena_soccer/features/highlights/presentation/bloc/highlight_news_cubit.dart';
 import 'package:arena_soccer/features/highlights/presentation/page/highlight_details_page.dart';
 import 'package:arena_soccer/features/highlights/presentation/page/highlight_form_page.dart';
@@ -36,6 +41,9 @@ import 'package:arena_soccer/features/news/presentation/page/news_details_page.d
 import 'package:arena_soccer/features/news/presentation/page/news_form_page.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/player_form_cubit.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/team_players_cubit.dart';
+import 'package:arena_soccer/features/players/presentation/bloc/player_profile_cubit.dart';
+import 'package:arena_soccer/features/players/presentation/page/player_profile_page.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/presentation/page/player_form_page.dart';
 import 'package:arena_soccer/features/players/presentation/page/team_players_page.dart';
 import 'package:arena_soccer/features/splash/presentation/page/splash_page.dart';
@@ -95,18 +103,31 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.registerNewsPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<NewsFormCubit>(
-            create: (_) => NewsFormCubit(sl(), sl(), sl()),
-            child: NewsFormPage(news: args?['news'] as NewsDTO?),
+            create: (_) => NewsFormCubit(sl(), sl(), sl(), sl()),
+            child: NewsFormPage(news: args?['news'] as NewsDTO?, tag: args?['tag'] as String?),
           );
         },
-        AppRoutes.publishAdPage: (_) => BlocProvider<NewsFormCubit>(
-              create: (_) => NewsFormCubit(sl(), sl(), sl()),
-              child: const AdFormPage(),
+        // `news` opcional: anúncio a editar.
+        AppRoutes.publishAdPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          return BlocProvider<NewsFormCubit>(
+            create: (_) => NewsFormCubit(sl(), sl(), sl(), sl()),
+            child: AdFormPage(news: args?['news'] as NewsDTO?),
+          );
+        },
+        // Opcionais: `news` (card de gol tocado pelo admin) ou `match` + `season`
+        // (card de partida tocado pelo admin) preenchem times e placar.
+        AppRoutes.goalNotificationPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          return BlocProvider<GoalNotificationCubit>(
+            create: (_) => GoalNotificationCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl()),
+            child: GoalNotificationPage(
+              initial: args?['news'] as NewsDTO?,
+              initialMatch: args?['match'] as MatchDTO?,
+              season: args?['season'] as String?,
             ),
-        AppRoutes.goalNotificationPage: (_) => BlocProvider<GoalNotificationCubit>(
-              create: (_) => GoalNotificationCubit(sl(), sl(), sl()),
-              child: const GoalNotificationPage(),
-            ),
+          );
+        },
 
         // Destaques
         AppRoutes.highlightDetailsPage: (context) {
@@ -116,25 +137,50 @@ class ArenaApp extends StatelessWidget {
             child: HighlightDetailsPage(highlight: args?['highlight'] as HighlightDTO),
           );
         },
-        AppRoutes.registerHighlightPage: (_) => BlocProvider<HighlightFormCubit>(
-              create: (_) => HighlightFormCubit(sl()),
-              child: const HighlightFormPage(),
+        // `highlight` opcional: destaque a editar.
+        AppRoutes.registerHighlightPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          return BlocProvider<HighlightFormCubit>(
+            create: (_) => HighlightFormCubit(sl(), sl(), sl()),
+            child: HighlightFormPage(highlight: args?['highlight'] as HighlightDTO?),
+          );
+        },
+        AppRoutes.notificationsPanelPage: (_) => BlocProvider<NotificationsPanelCubit>(
+              create: (_) => NotificationsPanelCubit(sl(), sl(), sl(), sl(), sl()),
+              child: const NotificationsPanelPage(),
+            ),
+        AppRoutes.manageHighlightsPage: (_) => BlocProvider<ManageHighlightsCubit>(
+              create: (_) => ManageHighlightsCubit(sl(), sl(), sl(), sl()),
+              child: const ManageHighlightsPage(),
             ),
 
         // Times e jogadores
         AppRoutes.registerTeamPage: (_) => BlocProvider<TeamFormCubit>(
-              create: (_) => TeamFormCubit(sl(), sl(), sl()),
+              create: (_) => TeamFormCubit(sl(), sl(), sl(), sl()),
               child: const TeamFormPage(),
             ),
         AppRoutes.teamPlayersPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<TeamPlayersCubit>(
-            create: (_) => TeamPlayersCubit(sl(), sl()),
+            create: (_) => TeamPlayersCubit(sl()),
             child: TeamPlayersPage(team: args?['team'] as TeamDTO),
           );
         },
+        // `playerId` obrigatório; `season` nulo = corrente; `player` (opcional) aparece na hora.
+        AppRoutes.playerProfilePage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+          return BlocProvider<PlayerProfileCubit>(
+            create: (_) => PlayerProfileCubit(sl(), sl(), sl(), sl(), sl()),
+            child: PlayerProfilePage(
+              playerId: args['playerId'] as String,
+              season: args['season'] as String?,
+              name: args['name'] as String?,
+              initial: args['player'] as PlayerDTO?,
+            ),
+          );
+        },
         AppRoutes.registerPlayerPage: (_) => BlocProvider<PlayerFormCubit>(
-              create: (_) => PlayerFormCubit(sl(), sl(), sl()),
+              create: (_) => PlayerFormCubit(sl(), sl(), sl(), sl()),
               child: const PlayerFormPage(),
             ),
 
@@ -164,7 +210,7 @@ class ArenaApp extends StatelessWidget {
           );
         },
         AppRoutes.registerMatchPage: (_) => BlocProvider<MatchFormCubit>(
-              create: (_) => MatchFormCubit(sl(), sl(), sl()),
+              create: (_) => MatchFormCubit(sl(), sl(), sl(), sl()),
               child: const MatchFormPage(),
             ),
 
@@ -208,8 +254,12 @@ class ArenaApp extends StatelessWidget {
           );
         },
 
-        AppRoutes.globalResultsPage: (_) => BlocProvider<GlobalResultsCubit>(
-              create: (_) => GlobalResultsCubit(sl()),
+        // Os gols dos jogos encerrados vêm sob demanda (MatchGoalsCubit).
+        AppRoutes.globalResultsPage: (_) => MultiBlocProvider(
+              providers: [
+                BlocProvider<GlobalResultsCubit>(create: (_) => GlobalResultsCubit(sl())),
+                BlocProvider<MatchGoalsCubit>(create: (_) => MatchGoalsCubit(sl())),
+              ],
               child: const GlobalResultsPage(),
             ),
       },

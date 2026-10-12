@@ -64,3 +64,20 @@ class HighlightDTO extends Equatable {
   @override
   List<Object?> get props => [id, title, link, imageUrl, isVisible, priority];
 }
+
+/// `priority` como número (string no Firestore); sem valor vai para o fim.
+int highlightPriorityOf(HighlightDTO highlight) => int.tryParse(highlight.priority.trim()) ?? 1 << 30;
+
+/// Destaques na ordem do carrossel (empate mantém a ordem recebida).
+List<HighlightDTO> sortHighlightsByPriority(List<HighlightDTO> highlights) {
+  final indexed = highlights.asMap().entries.toList()
+    ..sort((a, b) {
+      final byPriority = highlightPriorityOf(a.value).compareTo(highlightPriorityOf(b.value));
+      return byPriority != 0 ? byPriority : a.key.compareTo(b.key);
+    });
+  return indexed.map((entry) => entry.value).toList();
+}
+
+/// `priority` gravado com 3 dígitos ("007"): a ordenação por string do
+/// carrossel fica igual à numérica.
+String highlightPriorityAt(int index) => index.toString().padLeft(3, '0');

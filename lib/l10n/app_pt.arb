@@ -34,7 +34,7 @@
   "homeTabTables": "Tabelas",
   "drawerHome": "Início",
   "drawerResults": "Resultados pelo mundo",
-  "drawerRegisterHighlight": "Cadastrar destaque",
+  "drawerRegisterHighlight": "Destaques",
   "drawerRegisterPlayer": "Cadastrar jogador",
   "drawerRegisterMatch": "Cadastrar partida",
   "drawerRegisterNews": "Cadastrar notícia",
@@ -54,47 +54,183 @@
   "newsLoadError": "Não foi possível carregar as notícias.",
   "newsDeleteConfirm": "DESEJA REALMENTE EXCLUIR ESSA NOTÍCIA ?",
   "newsAdPlaceholder": "PUBLICIDADE",
-  "newsCreateTitle": "CADASTRAR NOTICIA",
-  "newsEditTitle": "EDITAR NOTÍCIA",
+  "newsCreateTitle": "Nova notícia",
+  "newsEditTitle": "Editar notícia",
   "newsTitleLabel": "Título",
+  "newsCoverAdd": "Adicionar capa",
+  "newsCoverHint": "Toque para tirar uma foto ou escolher da galeria",
+  "newsCoverChange": "Trocar",
+  "newsCoverRemove": "Remover",
+  "newsSectionContent": "Conteúdo",
+  "newsSectionAlbum": "Álbum de fotos",
+  "newsSectionPublish": "Publicação",
+  "newsAlbumCount": "{count, plural, =0{nenhuma foto} =1{1 foto} other{{count} fotos}}",
+  "@newsAlbumCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "newsAlbumAdd": "Adicionar",
+  "newsAlbumHint": "As fotos aparecem na galeria da notícia.",
+  "newsRegion": "Região",
+  "newsHighlight": "Destaque",
+  "newsHighlightNone": "Nenhum",
+  "newsHighlightHint": "A notícia também aparece dentro do destaque escolhido.",
+  "newsLinkHint": "Link externo (opcional)",
+  "newsVisibleHint": "Desligado, a notícia fica salva mas não aparece no app.",
+  "newsVisibleOnHint": "A notícia aparece no feed do app.",
+  "newsPreview": "Pré-visualizar",
+  "newsPreviewTitle": "Como vai aparecer no feed",
+  "newsDiscardTitle": "Descartar alterações?",
+  "newsDiscardMessage": "O que você preencheu será perdido.",
+  "newsDiscardKeep": "Continuar editando",
+  "newsDiscardConfirm": "Descartar",
+  "newsPublish": "Publicar notícia",
+  "newsSave": "Salvar alterações",
   "newsDescriptionLabel": "Descrição",
-  "newsTagLabel": "Tag",
   "newsLinkLabel": "Link",
-  "newsVisibleLabel": "Exibir notícia",
-  "newsAttachPhotos": "ANEXAR FOTOS",
-  "newsRegisterButton": "CADASTRAR",
-  "newsUpdateButton": "ATUALIZAR",
-  "newsTitleRequired": "A notícia precisa de um título!!!",
+  "newsVisibleLabel": "Visível no app",
+  "newsTitleRequired": "Informe o título da notícia",
   "newsTitleTooShort": "O título da notícia deve conter no mínimo 3 caracteres",
-  "newsCreated": "Notícia Cadastrada com Sucesso!!!",
-  "newsUpdated": "Notícia Atualizada com Sucesso!!!",
+  "newsCreated": "Notícia publicada!",
+  "newsUpdated": "Notícia atualizada!",
   "newsRegionLabel": "Região:",
-  "newsGoalTitle": "Cadastrar Card de Gol:",
-  "newsHomeTeamLabel": "Time da Casa:",
-  "newsAwayTeamLabel": "Time Visitante:",
-  "newsScoreLabel": "Placar:",
+  "newsGoalTitle": "Card de gol",
   "newsPublishButton": "Publicar",
-  "newsGoalCreated": "Gol registrado com Sucesso!!!",
-  "newsGoalTeamsRequired": "Selecione os dois times!",
-  "newsAdTitle": "Cadastrar Card de Publicidade:",
-  "newsAdCreated": "Publicidade registrada com Sucesso!!!",
-  "highlightFormTitle": "CADASTRAR DESTAQUE",
+  "newsGoalCreated": "Gol publicado!",
+  "goalTodayMatches": "Jogos de hoje",
+  "goalTodayMatchesHint": "Toque para preencher os times e o placar.",
+  "goalScoreboard": "Placar",
+  "goalPickTeam": "Escolher time",
+  "goalHome": "Mandante",
+  "goalAway": "Visitante",
+  "goalSameTeam": "Escolha dois times diferentes.",
+  "goalNoTeams": "Nenhum time cadastrado nesta região.",
+  "goalSearchTeam": "Buscar time",
+  "goalUpdateMatch": "Atualizar placar da partida",
+  "goalUpdateMatchHint": "Grava o mesmo placar na partida da tabela.",
+  "goalPreview": "Prévia no feed",
+  "goalPublish": "Publicar gol",
+  "goalConfirmTitle": "Publicar card de gol?",
+  "goalConfirmMessage": "{home} {homeGoals} × {awayGoals} {away}",
+  "@goalConfirmMessage": {
+    "placeholders": {
+      "home": {
+        "type": "String"
+      },
+      "homeGoals": {
+        "type": "int"
+      },
+      "awayGoals": {
+        "type": "int"
+      },
+      "away": {
+        "type": "String"
+      }
+    }
+  },
+  "goalMatchUpdated": "Gol publicado e placar da partida atualizado!",
+  "goalMatchUpdateFailed": "Gol publicado, mas não foi possível atualizar o placar da partida.",
+  "goalOfTeam": "Gol do {team}",
+  "@goalOfTeam": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "goalWhoScoredQ": "Quem fez o gol?",
+  "goalWhoAssistedQ": "Quem deu o passe para {scorer}?",
+  "@goalWhoAssistedQ": {
+    "placeholders": {
+      "scorer": {
+        "type": "String"
+      }
+    }
+  },
+  "goalSkip": "Pular",
+  "goalNoAssist": "Sem assistência",
+  "goalBack": "Voltar",
+  "goalEditScorer": "Editar",
+  "goalSearchPlayer": "Buscar jogador",
+  "goalClear": "Limpar",
+  "goalScorerLine": "⚽ {scorer}",
+  "@goalScorerLine": {
+    "placeholders": {
+      "scorer": {
+        "type": "String"
+      }
+    }
+  },
+  "goalScorerAssistLine": "⚽ {scorer} · assist. {assistant}",
+  "@goalScorerAssistLine": {
+    "placeholders": {
+      "scorer": {
+        "type": "String"
+      },
+      "assistant": {
+        "type": "String"
+      }
+    }
+  },
+  "goalStatsSaved": "Gol publicado! {scorer} +1 gol.",
+  "@goalStatsSaved": {
+    "placeholders": {
+      "scorer": {
+        "type": "String"
+      }
+    }
+  },
+  "goalStatsSavedWithAssist": "Gol publicado! {scorer} +1 gol, {assistant} +1 assistência.",
+  "@goalStatsSavedWithAssist": {
+    "placeholders": {
+      "scorer": {
+        "type": "String"
+      },
+      "assistant": {
+        "type": "String"
+      }
+    }
+  },
+  "goalStatsFailed": "Gol publicado, mas não foi possível somar nos números dos jogadores.",
+  "goalIncrease": "Aumentar",
+  "goalDecrease": "Diminuir",
+  "newsAdCreated": "Publicidade publicada!",
   "highlightTitleLabel": "Título",
   "highlightLinkLabel": "Link",
-  "highlightVisibleLabel": "Exibir destaque",
-  "highlightRegisterButton": "CADASTRAR",
-  "highlightTitleRequired": "Preencha o campo TÍTULO!!!",
-  "highlightCreated": "Destaque Cadastrado!!!",
-  "highlightNoNews": "Nenhuma notícia disponível!",
+  "highlightVisibleLabel": "Exibir no carrossel",
+  "highlightTitleRequired": "Informe o título do destaque.",
+  "highlightCreated": "Destaque publicado!",
   "teamsEmpty": "Equipes ainda não registradas",
   "teamsLoadError": "Não foi possível carregar os times.",
-  "teamsFormTitle": "CADASTRAR TIME",
-  "teamsRegionLabel": "Região:",
-  "teamsNameLabel": "Time",
-  "teamsDescriptionLabel": "Descrição",
-  "teamsRegisterButton": "CADASTRAR",
-  "teamsCreated": "Time registrado com Sucesso!!!",
-  "teamsNameRequired": "Preencha os campos obrigatórios!!!",
+  "teamsFormTitle": "Novo time",
+  "teamsNameLabel": "Nome do time",
+  "teamsDescriptionLabel": "Descrição (opcional)",
+  "teamsCreated": "Time cadastrado!",
+  "teamsNameRequired": "Informe o nome do time (mínimo 3 letras).",
+  "teamsCrestAdd": "Adicionar escudo",
+  "teamsSectionData": "Dados do time",
+  "teamsDescriptionHint": "Ex.: bairro, fundação, apelido",
+  "teamsPreview": "Prévia na aba Times",
+  "teamsInRegion": "Times na região · {count}",
+  "teamsDuplicate": "Já existe um time \"{name}\" nesta região.",
+  "teamsSubmit": "Cadastrar time",
+  "@teamsInRegion": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@teamsDuplicate": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "playersEmpty": "Jogadores ainda não registrados!",
   "playersLoadError": "Não foi possível carregar os jogadores.",
   "playersGoalsCount": "Gols: {count}",
@@ -113,15 +249,40 @@
       }
     }
   },
-  "playersNameRequired": "Preencha o campo NOME!!!",
-  "playersTeamRequired": "Informe um Time!!!",
-  "playersFormTitle": "CADASTRAR JOGADOR",
-  "playersNameLabel": "Nome",
+  "playersNameRequired": "Informe o nome (mínimo 3 letras).",
+  "playersTeamRequired": "Escolha o time do jogador.",
+  "playersFormTitle": "Novo jogador",
+  "playersNameLabel": "Nome do jogador",
   "playersGoalsLabel": "Gols",
-  "playersAssistsLabel": "Assistencias",
-  "playersTeamLabel": "Time:",
-  "playersRegisterButton": "CADASTRAR",
-  "playersCreated": "Jogador Cadastrado!!!",
+  "playersAssistsLabel": "Assistências",
+  "playersCreated": "Jogador cadastrado!",
+  "playersPhotoAdd": "Adicionar foto (opcional)",
+  "playersSectionData": "Dados do jogador",
+  "playersTeam": "Time",
+  "playersPreview": "Prévia no elenco",
+  "playersSquadOf": "Elenco do {team} · {count}",
+  "playersDuplicate": "Já existe \"{name}\" no {team}.",
+  "playersSubmit": "Cadastrar jogador",
+  "@playersSquadOf": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@playersDuplicate": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "team": {
+        "type": "String"
+      }
+    }
+  },
   "playersPhotoBack": "Voltar",
   "playersPhotoSave": "Salvar",
   "statsEmptyGoals": "Nenhum gol marcado ainda",
@@ -186,16 +347,46 @@
   "matchesEditScoreTitle": "Alterar Placar:",
   "matchesHomeLabel": "Casa",
   "matchesAwayLabel": "Fora",
-  "matchesFormTitle": "CADASTRAR PARTIDA",
-  "matchesRegionLabel": "Região:",
-  "matchesHomeTeamLabel": "Time Casa:",
-  "matchesAwayTeamLabel": "Time Fora:",
-  "matchesDateLabel": "Data",
-  "matchesTimeLabel": "Hora",
-  "matchesVenueLabel": "Local",
-  "matchesRegisterButton": "CADASTRAR",
-  "matchesCreated": "Partida Cadastrada com Sucesso!!!",
-  "matchesFieldsRequired": "Preencha todos os campos!!!",
+  "matchesFormTitle": "Nova partida",
+  "matchesCreated": "Partida cadastrada!",
+  "matchFormMatchup": "Confronto",
+  "matchFormSwap": "Inverter mando",
+  "matchFormWhen": "Quando",
+  "matchFormWhere": "Onde",
+  "matchFormToday": "Hoje",
+  "matchFormTomorrow": "Amanhã",
+  "matchFormOtherDate": "Outra data",
+  "matchFormOtherTime": "Outro horário",
+  "matchFormNewVenue": "Novo local",
+  "matchFormVenueHint": "Nome do local",
+  "matchFormPreview": "Prévia",
+  "matchFormSubmit": "Cadastrar partida",
+  "matchFormMissingTeams": "Escolha os dois times.",
+  "matchFormMissingDate": "Escolha a data da partida.",
+  "matchFormMissingTime": "Escolha o horário da partida.",
+  "matchFormConflictTeam": "{team} já tem jogo nesta data ({times}).",
+  "@matchFormConflictTeam": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      },
+      "times": {
+        "type": "String"
+      }
+    }
+  },
+  "matchFormConflictVenue": "{venue} já tem jogo nesta data às {time}.",
+  "@matchFormConflictVenue": {
+    "placeholders": {
+      "venue": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "matchFormSaved": "Partida cadastrada! Escolha os times da próxima.",
   "championshipsEmpty": "Nenhuma competição registrada",
   "championshipsLoadError": "Não foi possível carregar as competições.",
   "championshipsDetailsTitle": "Sobre a Competição:",
@@ -327,12 +518,28 @@
     }
   },
   "votingLoadError": "Não foi possível apurar a votação.",
-  "globalResultsTitle": "RESULTADOS PELO MUNDO",
+  "globalResultsTitle": "Resultados pelo mundo",
   "globalResultsYesterday": "Ontem",
   "globalResultsToday": "Hoje",
   "globalResultsTomorrow": "Amanhã",
-  "globalResultsEmpty": "Nenhum jogo encontrado.",
-  "globalResultsTomorrowUnavailable": "Os jogos de amanhã ainda não estão disponíveis.",
+  "globalResultsSubtitle": "Placares das principais ligas do mundo",
+  "globalResultsLive": "Ao vivo",
+  "globalResultsHalfTime": "Intervalo",
+  "globalResultsFinished": "Encerrado",
+  "globalResultsPostponed": "Adiado",
+  "globalResultsLiveFilter": "Ao vivo ({count})",
+  "@globalResultsLiveFilter": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "globalResultsSearchHint": "Buscar time ou liga",
+  "globalResultsNoMatches": "Nenhum jogo encontrado",
+  "globalResultsPenalty": "pênalti",
+  "globalResultsOwnGoal": "contra",
+  "globalResultsGoalsError": "Não foi possível carregar os gols. Toque para tentar de novo.",
   "loginWelcomeTitle": "Bem-vindo de volta 👋",
   "loginWelcomeSubtitle": "Entre para acompanhar seu time, os jogos e a tabela.",
   "loginForgotPassword": "Esqueci minha senha",
@@ -474,5 +681,174 @@
   "standingsGoalsFor": "Gols feitos",
   "standingsGoalsAgainst": "Gols sofridos",
   "standingsPerformance": "Aproveitamento",
-  "standingsYourTeam": "Seu time"
+  "standingsYourTeam": "Seu time",
+  "athleteTitle": "Atleta",
+  "athleteScored": "Fez o gol",
+  "athleteAssisted": "Deu o passe",
+  "athleteRankGoals": "{position}º na artilharia",
+  "@athleteRankGoals": {
+    "placeholders": {
+      "position": {
+        "type": "int"
+      }
+    }
+  },
+  "athleteRankAssists": "{position}º em assistências",
+  "@athleteRankAssists": {
+    "placeholders": {
+      "position": {
+        "type": "int"
+      }
+    }
+  },
+  "athleteNoRank": "Fora do ranking",
+  "athleteParticipations": "Participações em gols",
+  "athleteNoParticipations": "Ainda sem gols registrados no feed.",
+  "athleteNotFound": "Jogador não encontrado.",
+  "athleteLoadError": "Não foi possível carregar o jogador.",
+  "athleteEdit": "Editar (admin)",
+  "athleteShare": "Compartilhar",
+  "athleteShareText": "{name} ({team}): {goals} gols e {assists} assistências · via Arena Football",
+  "@athleteShareText": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "team": {
+        "type": "String"
+      },
+      "goals": {
+        "type": "int"
+      },
+      "assists": {
+        "type": "int"
+      }
+    }
+  },
+  "athleteSeason": "Temporada {season}",
+  "@athleteSeason": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "adCreateTitle": "Nova publicidade",
+  "adEditTitle": "Editar publicidade",
+  "adPublish": "Publicar anúncio",
+  "adUpdated": "Publicidade atualizada!",
+  "adBannerAdd": "Adicionar banner",
+  "adBannerHint": "Use uma imagem horizontal 2:1 (ex.: 1200×600). É assim que ela aparece no feed.",
+  "adSectionAd": "Anúncio",
+  "adNameLabel": "Anunciante (opcional)",
+  "adNameHint": "Só para você identificar o anúncio",
+  "adLinkHint": "Site, Instagram ou WhatsApp do anunciante",
+  "adLinkInvalid": "Link inválido. Ex.: https://loja.com.br",
+  "adTestLink": "Testar",
+  "adImageRequired": "Escolha a imagem do anúncio.",
+  "highlightCreateTitle": "Novo destaque",
+  "highlightPhotoAdd": "Adicionar foto",
+  "highlightPhotoHint": "Aparece no círculo do carrossel. Prefira uma imagem quadrada.",
+  "highlightPreview": "Prévia no carrossel",
+  "highlightSection": "Destaque",
+  "highlightTitleHint": "Notícias marcadas com este destaque aparecem nele",
+  "highlightTitleTooShort": "Use pelo menos 3 letras.",
+  "highlightDuplicate": "Já existe um destaque com esse nome.",
+  "highlightVisibleOnHint": "Aparece no topo da home para todos.",
+  "highlightVisibleHint": "Fica oculto até você ativar.",
+  "highlightPublish": "Publicar destaque",
+  "highlightNewsCount": "{count, plural, =0{Nenhuma notícia} =1{1 notícia} other{{count} notícias}}",
+  "@highlightNewsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "highlightOpenLink": "Abrir link",
+  "highlightEmpty": "Ainda não há notícias neste destaque.",
+  "highlightLoadError": "Não foi possível carregar as notícias.",
+  "highlightAddNews": "Notícia",
+  "highlightShareText": "{title} · Arena Football",
+  "@highlightShareText": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "highlightsManageTitle": "Destaques",
+  "highlightsReorderHint": "Arraste pela alça para definir a ordem do carrossel.",
+  "highlightsEmpty": "Nenhum destaque cadastrado. Toque em + para criar.",
+  "highlightHidden": "Oculto",
+  "highlightView": "Ver",
+  "highlightEditTitle": "Editar destaque",
+  "highlightUpdated": "Destaque atualizado!",
+  "highlightRenameHint": "As notícias marcadas com \"{old}\" passam para o novo nome.",
+  "@highlightRenameHint": {
+    "placeholders": {
+      "old": {
+        "type": "String"
+      }
+    }
+  },
+  "highlightDeleteTitle": "Excluir \"{title}\"?",
+  "@highlightDeleteTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "highlightDeleteMessage": "As notícias marcadas continuam no feed, só perdem a marcação deste destaque.",
+  "highlightDeleted": "\"{title}\" excluído.",
+  "@highlightDeleted": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "pushPanelTitle": "Notificações",
+  "pushTabActions": "Ações",
+  "pushTabHistory": "Histórico",
+  "pushTabSend": "Enviar aviso",
+  "pushActionsIntro": "Escolha quais ações enviam push. Cada usuário recebe da região escolhida no app; os jogos também chegam para quem torce pelos times.",
+  "pushActionGoal": "Gol",
+  "pushActionGoalHint": "Card de gol publicado · \"⚽ GOL! Lava Jato 2 × 1 Volta\"",
+  "pushActionNews": "Notícia publicada",
+  "pushActionNewsHint": "Notícia visível no feed (sem anúncios) · título da notícia",
+  "pushActionMatch": "Nova partida",
+  "pushActionMatchHint": "Partida cadastrada · data, horário e local",
+  "pushActionVotingOpen": "Votação aberta",
+  "pushActionVotingOpenHint": "Votação do melhor da partida liberada",
+  "pushActionVotingClosed": "Votação encerrada",
+  "pushActionVotingClosedHint": "Votação fechada · convida a ver o eleito",
+  "pushActionDailyGame": "Jogo do seu time",
+  "pushActionDailyGameHint": "Todo dia às 9h, para quem torce por um time que joga hoje",
+  "pushActionNotice": "Aviso manual",
+  "pushActionNoticeHint": "Avisos enviados pela aba \"Enviar aviso\"",
+  "pushHistoryEmpty": "Nenhuma notificação enviada ainda.",
+  "pushStatusSent": "Enviada",
+  "pushStatusDisabled": "Desligada",
+  "pushStatusError": "Erro",
+  "pushAllRegions": "Todas as regiões",
+  "pushAudienceTeams": "Torcedores dos times",
+  "pushNoticeSection": "Aviso",
+  "pushNoticeTitle": "Título",
+  "pushNoticeBody": "Mensagem",
+  "pushNoticeAudience": "Para quem",
+  "pushNoticePreview": "Prévia",
+  "pushNoticeHint": "O envio leva alguns segundos e aparece no Histórico.",
+  "pushSend": "Enviar",
+  "pushSendConfirmTitle": "Enviar notificação?",
+  "pushSendConfirmMessage": "Todos os usuários de \"{audience}\" vão receber este aviso agora.",
+  "@pushSendConfirmMessage": {
+    "placeholders": {
+      "audience": {
+        "type": "String"
+      }
+    }
+  },
+  "pushSent": "Aviso enviado!"
 }

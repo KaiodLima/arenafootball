@@ -74,4 +74,28 @@ class NewsDataSource {
       return Left(mapFirebaseError(e, fallbackMessage: _deleteFallback));
     }
   }
+
+  /// Cards de gol em que o jogador marcou ou deu o passe, mais recentes
+  /// primeiro. Duas consultas por igualdade (sem índice composto), juntadas
+  /// no app.
+  Future<Either<Failure, List<NewsDTO>>> getGoalCardsByPlayer(String playerId) async {
+    try {
+      final results = await Future.wait([
+        _news.where('autor_gol_id', isEqualTo: playerId).get(),
+        _news.where('assistencia_id', isEqualTo: playerId).get(),
+      ]);
+      final byId = <String, NewsDTO>{};
+      for (final result in results) {
+        for (final doc in result.docs) {
+          byId[doc.id] = NewsDTO.fromFirestore(doc);
+        }
+      }
+      final cards = byId.values.toList()
+        ..sort((a, b) => (b.date ?? DateTime(0)).compareTo(a.date ?? DateTime(0)));
+      return Right(cards);
+    } catch (e) {
+      AppLogger.e('getGoalCardsByPlayer id=$playerId', name: 'NewsDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _loadFallback));
+    }
+  }
 }

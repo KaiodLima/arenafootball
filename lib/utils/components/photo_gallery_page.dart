@@ -18,7 +18,8 @@ class PhotoGalleryPage extends StatefulWidget {
 
   const PhotoGalleryPage({super.key, required this.images, this.initialIndex = 0, this.heroTag});
 
-  static Future<void> open(BuildContext context, {required List<String> images, int initialIndex = 0, Object? heroTag}) {
+  static Future<void> open(BuildContext context,
+      {required List<String> images, int initialIndex = 0, Object? heroTag}) {
     return Navigator.of(context).push(
       PageRouteBuilder<void>(
         opaque: false,

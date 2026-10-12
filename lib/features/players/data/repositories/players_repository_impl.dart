@@ -14,6 +14,10 @@ class PlayersRepositoryImpl implements IPlayersRepository {
       _dataSource.watchTeamPlayers(teamName: teamName, season: season);
 
   @override
+  Stream<Either<Failure, PlayerDTO?>> watchPlayer({required String id, String? season}) =>
+      _dataSource.watchPlayer(id: id, season: season);
+
+  @override
   Future<Either<Failure, List<PlayerDTO>>> getPlayers({String? season}) => _dataSource.getPlayers(season: season);
 
   @override
@@ -23,4 +27,13 @@ class PlayersRepositoryImpl implements IPlayersRepository {
   @override
   Future<Either<Failure, void>> updatePlayer(PlayerDTO player, {String? season}) =>
       _dataSource.updatePlayer(player, season: season);
+
+  @override
+  Future<Either<Failure, void>> incrementStats({
+    required String playerId,
+    int goals = 0,
+    int assists = 0,
+    String? season,
+  }) =>
+      _dataSource.incrementStats(playerId: playerId, goals: goals, assists: assists, season: season);
 }
