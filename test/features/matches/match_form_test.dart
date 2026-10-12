@@ -1,6 +1,8 @@
 import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
+import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/get_region_championship_usecase.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/match_form_hints.dart';
 import 'package:arena_soccer/features/matches/domain/repositories/matches_repository_interface.dart';
@@ -46,6 +48,15 @@ class _FakeRepository implements IMatchesRepository {
   @override
   Future<Either<Failure, void>> setVotingOpen({required String matchId, required bool isOpen, String? season}) async =>
       const Right(null);
+}
+
+class _FakeChampionship implements GetRegionChampionshipUseCase {
+  /// Campeonato cadastrado da região (nulo = ainda não cadastrado).
+  ChampionshipDTO? registered;
+
+  @override
+  Future<Either<Failure, ChampionshipDTO?>> call({required String region, required String season}) async =>
+      Right(registered);
 }
 
 class _FakeRegions implements GetRegionsUseCase {
@@ -119,12 +130,14 @@ void main() {
 
   group('MatchFormCubit', () {
     late _FakeRepository repository;
+    late _FakeChampionship championship;
     late MatchFormCubit cubit;
 
     setUp(() async {
       repository = _FakeRepository();
+      championship = _FakeChampionship();
       cubit = MatchFormCubit(
-        CreateMatchUseCase(repository),
+        CreateMatchUseCase(repository, championship),
         _FakeRegions(),
         _FakeTeams(),
         GetRegionMatchesUseCase(repository),
@@ -164,6 +177,24 @@ void main() {
       cubit.changeVenue('Campo Novo');
       expect(cubit.state.form.customVenue, isTrue);
       expect(cubit.state.form.toMatch().venue, 'Campo Novo');
+    });
+  });
+
+  group('CreateMatchUseCase', () {
+    const match = MatchDTO(homeTeam: 'Lava Jato', awayTeam: 'Volta', region: 'Floresta');
+
+    test('usa o id do campeonato cadastrado da região', () async {
+      final repository = _FakeRepository();
+      final championship = _FakeChampionship()
+        ..registered = const ChampionshipDTO(id: 'c', championshipId: 7, region: 'Floresta');
+      await CreateMatchUseCase(repository, championship)(match);
+      expect(repository.created.single.championshipId, 7);
+    });
+
+    test('sem campeonato cadastrado, cai na tabela fixa', () async {
+      final repository = _FakeRepository();
+      await CreateMatchUseCase(repository, _FakeChampionship())(match);
+      expect(repository.created.single.championshipId, 1);
     });
   });
 }

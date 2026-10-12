@@ -1783,4 +1783,153 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get matchesNoGamesTomorrow => 'Nenhum jogo amanhã';
+
+  @override
+  String get championshipsManageTitle => 'Campeonatos';
+
+  @override
+  String get championshipsManageEmpty =>
+      'Nenhum campeonato cadastrado nesta região.';
+
+  @override
+  String championshipsManageTeamsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count times',
+      one: '1 time',
+      zero: 'Sem times',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String championshipsManageDeleteTitle(String title) {
+    return 'Excluir $title?';
+  }
+
+  @override
+  String get championshipsManageDeleteMessage =>
+      'O campeonato sai da lista. Partidas, grupos e classificação continuam salvos.';
+
+  @override
+  String get championshipsManageDeleted => 'Campeonato excluído.';
+
+  @override
+  String championshipsSeasonLabel(String region, String season) {
+    return '$region · temporada $season';
+  }
+
+  @override
+  String get championshipFormNewTitle => 'Novo campeonato';
+
+  @override
+  String get championshipFormEditTitle => 'Editar campeonato';
+
+  @override
+  String get championshipFormSectionData => 'Dados';
+
+  @override
+  String get championshipFormTitleLabel => 'Nome do campeonato';
+
+  @override
+  String get championshipFormTitleRequired =>
+      'Informe o nome (mínimo 3 letras).';
+
+  @override
+  String get championshipFormDescriptionLabel => 'Descrição (opcional)';
+
+  @override
+  String get championshipFormSeasonLabel => 'Temporada';
+
+  @override
+  String get championshipFormSectionTeams => 'Times participantes';
+
+  @override
+  String get championshipFormTeamsAll => 'Todos';
+
+  @override
+  String get championshipFormTeamsClear => 'Limpar';
+
+  @override
+  String get championshipFormTeamsRequired => 'Escolha ao menos um time.';
+
+  @override
+  String get championshipFormTeamsEmpty =>
+      'Nenhum time cadastrado nesta região.';
+
+  @override
+  String championshipFormTeamsSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count selecionados',
+      one: '1 selecionado',
+      zero: 'Nenhum selecionado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get championshipFormSectionRules => 'Regulamento';
+
+  @override
+  String get championshipFormRulesHint =>
+      'Anexe o regulamento em PDF: os usuários abrem na página do campeonato.';
+
+  @override
+  String get championshipFormRulesAttach => 'Anexar PDF';
+
+  @override
+  String get championshipFormRulesReplace => 'Trocar';
+
+  @override
+  String get championshipFormRulesRemove => 'Remover';
+
+  @override
+  String get championshipFormRulesTooBig => 'O PDF passa de 10 MB.';
+
+  @override
+  String get championshipFormRulesSummary => 'Resumo das regras (opcional)';
+
+  @override
+  String get championshipFormSectionPrizes => 'Premiação';
+
+  @override
+  String get championshipFormPrize1 => '1º lugar';
+
+  @override
+  String get championshipFormPrize2 => '2º lugar';
+
+  @override
+  String get championshipFormPrize3 => '3º lugar';
+
+  @override
+  String get championshipFormPrizeTopScorer => 'Artilheiro';
+
+  @override
+  String get championshipFormPrizeGoalkeeper => 'Melhor goleiro';
+
+  @override
+  String get championshipFormSubmitCreate => 'CADASTRAR CAMPEONATO';
+
+  @override
+  String get championshipFormCreated => 'Campeonato cadastrado!';
+
+  @override
+  String get championshipFormSaved => 'Campeonato atualizado!';
+
+  @override
+  String get championshipFormLoadError =>
+      'Não foi possível carregar as regiões e os times.';
+
+  @override
+  String get championshipRulesOpen => 'Abrir regulamento';
+
+  @override
+  String get championshipRulesOpenError =>
+      'Não foi possível abrir o regulamento.';
+
+  @override
+  String get homePublishChampionship => 'Campeonato';
 }

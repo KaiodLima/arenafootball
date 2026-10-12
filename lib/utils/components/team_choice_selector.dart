@@ -166,7 +166,7 @@ class _TeamChoiceSelectorState extends State<TeamChoiceSelector> {
                     physics: const NeverScrollableScrollPhysics(),
                     children: [
                       for (final team in pages[index])
-                        _TeamChoiceCard(
+                        TeamChoiceCard(
                           team: team,
                           selected: team.name == widget.selected,
                           onTap: () => _select(team.name),
@@ -230,12 +230,14 @@ class _PageDots extends StatelessWidget {
   }
 }
 
-class _TeamChoiceCard extends StatelessWidget {
+/// Card de time com escudo, nome e check quando escolhido (usado também na
+/// seleção múltipla de times do campeonato).
+class TeamChoiceCard extends StatelessWidget {
   final TeamDTO team;
   final bool selected;
   final VoidCallback onTap;
 
-  const _TeamChoiceCard({required this.team, required this.selected, required this.onTap});
+  const TeamChoiceCard({super.key, required this.team, required this.selected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

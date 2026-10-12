@@ -39,6 +39,8 @@ class AppRoutes {
   static const String notificationsPanelPage = '/notifications_panel_page';
   static const String goalNotificationPage = '/goal_notification_page';
   static const String playerRequestsPanelPage = '/player_requests_panel_page';
+  static const String manageChampionshipsPage = '/manage_championships_page';
+  static const String championshipFormPage = '/championship_form_page';
 }
 
 class AppSession {

@@ -78,6 +78,9 @@ class _FakeStorage implements StorageUploadService {
   @override
   Future<Either<Failure, String>> uploadImage({required File file, required String folder, String? fileName}) async =>
       const Right('https://img/h.png');
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 HighlightFormCubit _formCubit(_FakeRepository repository) => HighlightFormCubit(

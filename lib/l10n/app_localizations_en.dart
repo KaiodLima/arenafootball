@@ -1769,4 +1769,149 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get matchesNoGamesTomorrow => 'No games tomorrow';
+
+  @override
+  String get championshipsManageTitle => 'Championships';
+
+  @override
+  String get championshipsManageEmpty => 'No championships in this region yet.';
+
+  @override
+  String championshipsManageTeamsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count teams',
+      one: '1 team',
+      zero: 'No teams',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String championshipsManageDeleteTitle(String title) {
+    return 'Delete $title?';
+  }
+
+  @override
+  String get championshipsManageDeleteMessage =>
+      'The championship leaves the list. Matches, groups and standings are kept.';
+
+  @override
+  String get championshipsManageDeleted => 'Championship deleted.';
+
+  @override
+  String championshipsSeasonLabel(String region, String season) {
+    return '$region · $season season';
+  }
+
+  @override
+  String get championshipFormNewTitle => 'New championship';
+
+  @override
+  String get championshipFormEditTitle => 'Edit championship';
+
+  @override
+  String get championshipFormSectionData => 'Details';
+
+  @override
+  String get championshipFormTitleLabel => 'Championship name';
+
+  @override
+  String get championshipFormTitleRequired =>
+      'Enter the name (at least 3 letters).';
+
+  @override
+  String get championshipFormDescriptionLabel => 'Description (optional)';
+
+  @override
+  String get championshipFormSeasonLabel => 'Season';
+
+  @override
+  String get championshipFormSectionTeams => 'Participating teams';
+
+  @override
+  String get championshipFormTeamsAll => 'All';
+
+  @override
+  String get championshipFormTeamsClear => 'Clear';
+
+  @override
+  String get championshipFormTeamsRequired => 'Choose at least one team.';
+
+  @override
+  String get championshipFormTeamsEmpty => 'No teams in this region yet.';
+
+  @override
+  String championshipFormTeamsSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count selected',
+      one: '1 selected',
+      zero: 'None selected',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get championshipFormSectionRules => 'Rules';
+
+  @override
+  String get championshipFormRulesHint =>
+      'Attach the rules as a PDF: users open it on the championship page.';
+
+  @override
+  String get championshipFormRulesAttach => 'Attach PDF';
+
+  @override
+  String get championshipFormRulesReplace => 'Replace';
+
+  @override
+  String get championshipFormRulesRemove => 'Remove';
+
+  @override
+  String get championshipFormRulesTooBig => 'The PDF is larger than 10 MB.';
+
+  @override
+  String get championshipFormRulesSummary => 'Rules summary (optional)';
+
+  @override
+  String get championshipFormSectionPrizes => 'Prizes';
+
+  @override
+  String get championshipFormPrize1 => '1st place';
+
+  @override
+  String get championshipFormPrize2 => '2nd place';
+
+  @override
+  String get championshipFormPrize3 => '3rd place';
+
+  @override
+  String get championshipFormPrizeTopScorer => 'Top scorer';
+
+  @override
+  String get championshipFormPrizeGoalkeeper => 'Best goalkeeper';
+
+  @override
+  String get championshipFormSubmitCreate => 'CREATE CHAMPIONSHIP';
+
+  @override
+  String get championshipFormCreated => 'Championship created!';
+
+  @override
+  String get championshipFormSaved => 'Championship updated!';
+
+  @override
+  String get championshipFormLoadError => 'Couldn\'t load regions and teams.';
+
+  @override
+  String get championshipRulesOpen => 'Open rules';
+
+  @override
+  String get championshipRulesOpenError => 'Couldn\'t open the rules.';
+
+  @override
+  String get homePublishChampionship => 'Championship';
 }

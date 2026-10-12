@@ -11,10 +11,15 @@ import 'package:arena_soccer/features/auth/presentation/page/choose_team_page.da
 import 'package:arena_soccer/features/auth/presentation/page/login_page.dart';
 import 'package:arena_soccer/features/auth/presentation/page/register_user_page.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/championships/presentation/bloc/championship_details_cubit.dart';
+import 'package:arena_soccer/features/championships/presentation/bloc/championship_form_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/groups_cubit.dart';
+import 'package:arena_soccer/features/championships/presentation/bloc/manage_championships_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/standings_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/page/championship_details_page.dart';
+import 'package:arena_soccer/features/championships/presentation/page/championship_form_page.dart';
 import 'package:arena_soccer/features/championships/presentation/page/groups_page.dart';
+import 'package:arena_soccer/features/championships/presentation/page/manage_championships_page.dart';
 import 'package:arena_soccer/features/championships/presentation/page/standings_page.dart';
 import 'package:arena_soccer/features/home/presentation/bloc/home_cubit.dart';
 import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
@@ -229,7 +234,22 @@ class ArenaApp extends StatelessWidget {
         // Campeonatos, grupos e classificação
         AppRoutes.championshipDetailsPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-          return ChampionshipDetailsPage(championship: args?['championship'] as ChampionshipDTO);
+          return BlocProvider<ChampionshipDetailsCubit>(
+            create: (_) => ChampionshipDetailsCubit(sl()),
+            child: ChampionshipDetailsPage(championship: args?['championship'] as ChampionshipDTO),
+          );
+        },
+        AppRoutes.manageChampionshipsPage: (_) => BlocProvider<ManageChampionshipsCubit>(
+              create: (_) => ManageChampionshipsCubit(sl(), sl()),
+              child: const ManageChampionshipsPage(),
+            ),
+        // `championship` opcional: campeonato a editar (sem ele, cadastra um novo).
+        AppRoutes.championshipFormPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          return BlocProvider<ChampionshipFormCubit>(
+            create: (_) => ChampionshipFormCubit(sl(), sl(), sl()),
+            child: ChampionshipFormPage(championship: args?['championship'] as ChampionshipDTO?),
+          );
         },
         AppRoutes.groupsPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;

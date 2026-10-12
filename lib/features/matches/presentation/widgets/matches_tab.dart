@@ -55,13 +55,10 @@ class _ChampionshipMatches extends StatelessWidget {
           return ArenaEmptyState(message: l10n.matchesNoChampionship, icon: Icons.emoji_events_outlined);
         }
 
-        ChampionshipDTO? championship;
-        for (final item in state.championships) {
-          if (item.region == region.selectedRegion) {
-            championship = item;
-            break;
-          }
-        }
+        // O da temporada selecionada; sem ele, o primeiro da região (dados antigos).
+        final inRegion = state.championships.where((c) => c.region == region.selectedRegion).toList();
+        final ChampionshipDTO? championship =
+            inRegion.where((c) => c.season == region.selectedSeason).firstOrNull ?? inRegion.firstOrNull;
         if (championship == null) {
           return ArenaEmptyState(message: l10n.matchesNoChampionship, icon: Icons.emoji_events_outlined);
         }
