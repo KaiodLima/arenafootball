@@ -6,6 +6,9 @@ import 'package:arena_soccer/features/news/presentation/bloc/goal_notification_c
 import 'package:arena_soccer/features/news/presentation/bloc/goal_notification_state.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/goal_card.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/goal_scoreboard.dart';
+import 'package:arena_soccer/features/news/presentation/widgets/goal_scorer_sheet.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
+import 'package:arena_soccer/features/players/presentation/widgets/player_card.dart';
 import 'package:arena_soccer/utils/components/team_picker_sheet.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/today_matches_strip.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
@@ -69,6 +72,40 @@ class _GoalNotificationPageState extends State<GoalNotificationPage> {
     home ? _cubit.selectHomeTeam(picked) : _cubit.selectAwayTeam(picked);
   }
 
+  /// Gol marcado no "+" de um time: soma no placar e abre o painel para
+  /// escolher quem fez e quem deu o passe (só o elenco desse time). Sem
+  /// elenco cadastrado, só soma.
+  Future<void> _goalFor({required bool home}) async {
+    home ? _cubit.incrementHome() : _cubit.incrementAway();
+    await _askScorer(home ? _cubit.state.form.homeTeam : _cubit.state.form.awayTeam);
+  }
+
+  Future<void> _askScorer(String? team) async {
+    final form = _cubit.state.form;
+    final squad = form.squadOf(team);
+    if (team == null || squad.isEmpty) return;
+    final result = await showGoalScorerSheet(
+      context,
+      team: team,
+      crest: form.crestOf(team),
+      squad: squad,
+      initialScorer: form.scorer,
+      initialAssistant: form.assistant,
+    );
+    // Fechar sem concluir mantém só o placar (e o que já havia).
+    if (result == null || !mounted) return;
+    _cubit.setScorer(result.scorer, result.assistant);
+  }
+
+  String? _scorerLine(GoalFormData form, AppLocalizations l10n) {
+    final scorer = form.scorer;
+    if (scorer == null) return null;
+    final assistant = form.assistant;
+    return assistant == null
+        ? l10n.goalScorerLine(scorer.name)
+        : l10n.goalScorerAssistLine(scorer.name, assistant.name);
+  }
+
   Future<void> _confirmAndSubmit(GoalFormData form) async {
     if (!form.canSubmit) return;
     final l10n = AppLocalizations.of(context);
@@ -76,9 +113,19 @@ class _GoalNotificationPageState extends State<GoalNotificationPage> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(l10n.goalConfirmTitle),
-        content: Text(
-          l10n.goalConfirmMessage(form.homeTeam!, form.homeGoals, form.awayGoals, form.awayTeam!),
-          style: AppTypography.title().copyWith(fontSize: AppSizes.s18),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.goalConfirmMessage(form.homeTeam!, form.homeGoals, form.awayGoals, form.awayTeam!),
+              style: AppTypography.title().copyWith(fontSize: AppSizes.s18),
+            ),
+            if (_scorerLine(form, l10n) != null) ...[
+              const SizedBox(height: AppSizes.s8),
+              Text(_scorerLine(form, l10n)!, style: AppTypography.body()),
+            ],
+          ],
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.commonCancel)),
@@ -100,10 +147,24 @@ class _GoalNotificationPageState extends State<GoalNotificationPage> {
     return BlocConsumer<GoalNotificationCubit, GoalNotificationState>(
       listener: (context, state) {
         if (state is SuccessGoalNotificationState) {
-          showSnackBar(context: context, message: state.matchUpdated ? l10n.goalMatchUpdated : l10n.newsGoalCreated);
+          final scorer = state.scorer;
+          final assistant = state.assistant;
+          final String message;
+          if (scorer != null && assistant != null) {
+            message = l10n.goalStatsSavedWithAssist(scorer.name, assistant.name);
+          } else if (scorer != null) {
+            message = l10n.goalStatsSaved(scorer.name);
+          } else {
+            message = state.matchUpdated ? l10n.goalMatchUpdated : l10n.newsGoalCreated;
+          }
+          showSnackBar(context: context, message: message);
         }
         if (state is PartialGoalNotificationState) {
-          showSnackBar(context: context, message: l10n.goalMatchUpdateFailed, isSuccess: false);
+          showSnackBar(
+            context: context,
+            message: state.failure == GoalPartialFailure.stats ? l10n.goalStatsFailed : l10n.goalMatchUpdateFailed,
+            isSuccess: false,
+          );
         }
         if (state is ErrorGoalNotificationState) {
           showSnackBar(context: context, message: state.errorMessage, isSuccess: false);
@@ -163,7 +224,7 @@ class _GoalNotificationPageState extends State<GoalNotificationPage> {
                   crest: form.crestOf(form.homeTeam),
                   goals: form.homeGoals,
                   onPickTeam: () => _pickTeam(form, home: true),
-                  onIncrement: _cubit.incrementHome,
+                  onIncrement: () => _goalFor(home: true),
                   onDecrement: _cubit.decrementHome,
                 ),
                 away: GoalSide(
@@ -172,7 +233,7 @@ class _GoalNotificationPageState extends State<GoalNotificationPage> {
                   crest: form.crestOf(form.awayTeam),
                   goals: form.awayGoals,
                   onPickTeam: () => _pickTeam(form, home: false),
-                  onIncrement: _cubit.incrementAway,
+                  onIncrement: () => _goalFor(home: false),
                   onDecrement: _cubit.decrementAway,
                 ),
               ),
@@ -185,6 +246,15 @@ class _GoalNotificationPageState extends State<GoalNotificationPage> {
                   onChanged: _cubit.toggleUpdateMatch,
                 ),
               ],
+              if (form.scorer != null) ...[
+                const SizedBox(height: AppSizes.s12),
+                _ScorerSummary(
+                  line: _scorerLine(form, l10n)!,
+                  scorer: form.scorer!,
+                  onEdit: () => _askScorer(form.scorer!.team),
+                  onClear: () => _cubit.setScorer(null, null),
+                ),
+              ],
               const SizedBox(height: AppSizes.s24),
               if (form.canSubmit) ...[
                 _Label(l10n.goalPreview),
@@ -195,6 +265,12 @@ class _GoalNotificationPageState extends State<GoalNotificationPage> {
                     awayTeam: form.awayTeam!,
                     homeGoals: '${form.homeGoals}',
                     awayGoals: '${form.awayGoals}',
+                    scorerId: form.scorer?.id ?? '',
+                    scorerName: form.scorer?.name ?? '',
+                    assistantId: form.assistant?.id ?? '',
+                    assistantName: form.assistant?.name ?? '',
+                    scoringTeam: form.scoringTeam ?? '',
+                    scoringTeamCrest: form.crestOf(form.scoringTeam) ?? '',
                   ),
                 ),
               ],
@@ -267,6 +343,47 @@ class _UpdateMatchSwitch extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Resumo de quem marcou, abaixo do placar: "⚽ Arineto · assist. Ariel",
+/// com Editar (reabre o painel do time) e ✕ (limpa).
+class _ScorerSummary extends StatelessWidget {
+  final String line;
+  final PlayerDTO scorer;
+  final VoidCallback onEdit;
+  final VoidCallback onClear;
+
+  const _ScorerSummary({required this.line, required this.scorer, required this.onEdit, required this.onClear});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(AppSizes.s12, AppSizes.s6, AppSizes.s4, AppSizes.s6),
+      decoration: BoxDecoration(color: AppColors.primarySoft, borderRadius: BorderRadius.circular(AppSizes.cardRadius)),
+      child: Row(
+        children: [
+          PlayerAvatar(player: scorer, size: AppSizes.s36),
+          const SizedBox(width: AppSizes.s10),
+          Expanded(
+            child: Text(
+              line,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s14),
+            ),
+          ),
+          TextButton(onPressed: onEdit, child: Text(l10n.goalEditScorer)),
+          IconButton(
+            tooltip: l10n.goalClear,
+            onPressed: onClear,
+            icon: const Icon(Icons.close_rounded, color: AppColors.textSecondary, size: AppSizes.s20),
+          ),
+        ],
       ),
     );
   }

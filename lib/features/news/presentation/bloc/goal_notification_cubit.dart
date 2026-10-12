@@ -5,19 +5,29 @@ import 'package:arena_soccer/features/matches/domain/usecases/update_match_score
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/features/news/domain/usecases/create_news_usecase.dart';
 import 'package:arena_soccer/features/news/presentation/bloc/goal_notification_state.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
+import 'package:arena_soccer/features/players/domain/usecases/add_player_stats_usecase.dart';
+import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
 import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
 
 /// Publica um card de gol (notícia com tag "gol") com o placar da partida e,
-/// opcionalmente, grava o mesmo placar na partida de hoje correspondente.
+/// opcionalmente, grava o mesmo placar na partida de hoje correspondente e
+/// soma o gol/a assistência nos jogadores informados.
 class GoalNotificationCubit extends Cubit<GoalNotificationState> {
   final CreateNewsUseCase createNewsUseCase;
   final GetRegionsUseCase getRegionsUseCase;
   final GetTeamsUseCase getTeamsUseCase;
   final GetTodayMatchesUseCase getTodayMatchesUseCase;
   final UpdateMatchScoreUseCase updateMatchScoreUseCase;
+  final WatchTeamPlayersUseCase watchTeamPlayersUseCase;
+  final AddPlayerStatsUseCase addPlayerStatsUseCase;
   String? _season;
+
+  /// Confronto cujos elencos estão carregados (ou carregando).
+  String? _squadHome;
+  String? _squadAway;
 
   /// Card de gol de partida (feed): usado só no primeiro carregamento.
   NewsDTO? _initial;
@@ -31,9 +41,61 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
     this.getTeamsUseCase,
     this.getTodayMatchesUseCase,
     this.updateMatchScoreUseCase,
+    this.watchTeamPlayersUseCase,
+    this.addPlayerStatsUseCase,
   ) : super(const EditingGoalNotificationState());
 
-  void _edit(GoalFormData form) => emit(EditingGoalNotificationState(form: form));
+  /// Toda edição passa por aqui: se o confronto mudou, autor e assistência
+  /// deixam de valer e os elencos do novo confronto são carregados.
+  void _edit(GoalFormData form) {
+    if (isClosed) return;
+    final changed = form.homeTeam != _squadHome || form.awayTeam != _squadAway;
+    if (changed) {
+      form = form.copyWith(homeSquad: const [], awaySquad: const [], clearScorer: true, clearScoringTeam: true);
+    }
+    emit(EditingGoalNotificationState(form: form));
+    if (changed) _loadSquads(form.homeTeam, form.awayTeam);
+  }
+
+  /// Elencos do mandante e do visitante. Falhar só deixa a escolha vazia.
+  Future<void> _loadSquads(String? home, String? away) async {
+    _squadHome = home;
+    _squadAway = away;
+    if (home == null || away == null) return;
+    final homeFuture = watchTeamPlayersUseCase(teamName: home, season: _season).first;
+    final awayFuture = watchTeamPlayersUseCase(teamName: away, season: _season).first;
+    final homeResponse = await homeFuture;
+    final awayResponse = await awayFuture;
+    // Descarta se o confronto mudou enquanto carregava.
+    if (isClosed || home != _squadHome || away != _squadAway) return;
+    List<PlayerDTO> sorted(List<PlayerDTO> list) =>
+        [...list]..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    emit(EditingGoalNotificationState(
+      form: state.form.copyWith(
+        homeSquad: homeResponse.fold((_) => const [], sorted),
+        awaySquad: awayResponse.fold((_) => const [], sorted),
+      ),
+    ));
+  }
+
+  /// Autor do gol e quem deu o passe, escolhidos no painel aberto pelo "+"
+  /// (nulos = não informado). Um novo gol substitui os anteriores: o card
+  /// registra um gol só.
+  void setScorer(PlayerDTO? scorer, PlayerDTO? assistant) {
+    final form = state.form;
+    if (scorer == null) {
+      _edit(form.copyWith(clearScorer: true));
+      return;
+    }
+    // A assistência só vale se for outro jogador do mesmo time.
+    final valid = assistant != null && assistant.id != scorer.id && assistant.team == scorer.team;
+    _edit(form.copyWith(
+      scorer: scorer,
+      assistant: valid ? assistant : null,
+      clearAssistant: !valid,
+      scoringTeam: scorer.team,
+    ));
+  }
 
   Future<void> load({
     required String initialRegion,
@@ -124,13 +186,28 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
 
   void selectAwayTeam(String team) => _edit(state.form.copyWith(awayTeam: team));
 
-  void incrementHome() => _setGoals(home: state.form.homeGoals + 1);
+  void incrementHome() {
+    _setGoals(home: state.form.homeGoals + 1);
+    _edit(state.form.copyWith(scoringTeam: state.form.homeTeam));
+  }
 
-  void decrementHome() => _setGoals(home: state.form.homeGoals - 1);
+  /// Desfazer o gol do time do autor desfaz também autor e assistência.
+  void decrementHome() {
+    _setGoals(home: state.form.homeGoals - 1);
+    if (state.form.scorer?.team == state.form.homeTeam) setScorer(null, null);
+    if (state.form.scoringTeam == state.form.homeTeam) _edit(state.form.copyWith(clearScoringTeam: true));
+  }
 
-  void incrementAway() => _setGoals(away: state.form.awayGoals + 1);
+  void incrementAway() {
+    _setGoals(away: state.form.awayGoals + 1);
+    _edit(state.form.copyWith(scoringTeam: state.form.awayTeam));
+  }
 
-  void decrementAway() => _setGoals(away: state.form.awayGoals - 1);
+  void decrementAway() {
+    _setGoals(away: state.form.awayGoals - 1);
+    if (state.form.scorer?.team == state.form.awayTeam) setScorer(null, null);
+    if (state.form.scoringTeam == state.form.awayTeam) _edit(state.form.copyWith(clearScoringTeam: true));
+  }
 
   void _setGoals({int? home, int? away}) => _edit(state.form.copyWith(
         homeGoals: home?.clamp(0, GoalFormData.maxGoals),
@@ -163,6 +240,14 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
         awayTeam: form.awayTeam!,
         homeGoals: '${form.homeGoals}',
         awayGoals: '${form.awayGoals}',
+        // Quem marcou fica no card (o feed mostra e leva à tela do atleta).
+        scorerId: form.scorer?.id ?? '',
+        scorerName: form.scorer?.name ?? '',
+        assistantId: form.assistant != null && form.assistant!.id != form.scorer?.id ? form.assistant!.id : '',
+        assistantName: form.assistant != null && form.assistant!.id != form.scorer?.id ? form.assistant!.name : '',
+        season: form.scorer != null ? (_season ?? '') : '',
+        scoringTeam: form.scoringTeam ?? '',
+        scoringTeamCrest: form.crestOf(form.scoringTeam) ?? '',
       ),
     );
     if (isClosed) return;
@@ -171,29 +256,62 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
       return;
     }
 
+    var next = form;
+    var matchUpdated = false;
     final match = form.updateMatch ? form.linkedMatch : null;
-    if (match == null) {
-      emit(SuccessGoalNotificationState(form: form));
-      return;
+    if (match != null) {
+      final update = await updateMatchScoreUseCase(
+        match: match,
+        homeGoals: '${form.homeGoals}',
+        awayGoals: '${form.awayGoals}',
+        season: _season,
+      );
+      if (isClosed) return;
+      if (update.isLeft) {
+        emit(PartialGoalNotificationState(form: form, errorMessage: update.left.toString()));
+        return;
+      }
+      // A lista local passa a ter o placar novo.
+      final updated = update.right;
+      next = next.copyWith(
+        todayMatches: [for (final m in next.todayMatches) m.id == updated.id ? updated : m],
+        pinnedMatch: next.pinnedMatch?.id == updated.id ? updated : next.pinnedMatch,
+      );
+      matchUpdated = true;
     }
-    final update = await updateMatchScoreUseCase(
-      match: match,
-      homeGoals: '${form.homeGoals}',
-      awayGoals: '${form.awayGoals}',
-      season: _season,
-    );
-    if (isClosed) return;
-    update.fold(
-      (failure) => emit(PartialGoalNotificationState(form: form, errorMessage: failure.toString())),
-      (updated) {
-        // A lista local passa a ter o placar novo.
-        final matches = [for (final m in form.todayMatches) m.id == updated.id ? updated : m];
-        final pinned = form.pinnedMatch?.id == updated.id ? updated : form.pinnedMatch;
-        emit(SuccessGoalNotificationState(
-          form: form.copyWith(todayMatches: matches, pinnedMatch: pinned),
-          matchUpdated: true,
+
+    // O próximo gol escolhe o time de novo.
+    next = next.copyWith(clearScoringTeam: true);
+    final scorer = form.scorer;
+    final assistant = form.assistant;
+    if (scorer != null || assistant != null) {
+      final stats = await addPlayerStatsUseCase(scorer: scorer, assistant: assistant, season: _season);
+      if (isClosed) return;
+      if (stats.isLeft) {
+        emit(PartialGoalNotificationState(
+          form: next,
+          errorMessage: stats.left.toString(),
+          failure: GoalPartialFailure.stats,
         ));
-      },
-    );
+        return;
+      }
+      // Elencos locais com os números novos; autor e assistência ficam
+      // livres para o próximo gol.
+      PlayerDTO bump(PlayerDTO p) => p.copyWith(
+            goals: p.goals + (p.id == scorer?.id ? 1 : 0),
+            assists: p.assists + (p.id == assistant?.id && p.id != scorer?.id ? 1 : 0),
+          );
+      next = next.copyWith(
+        homeSquad: next.homeSquad.map(bump).toList(),
+        awaySquad: next.awaySquad.map(bump).toList(),
+        clearScorer: true,
+      );
+    }
+    emit(SuccessGoalNotificationState(
+      form: next,
+      matchUpdated: matchUpdated,
+      scorer: scorer,
+      assistant: assistant?.id == scorer?.id ? null : assistant,
+    ));
   }
 }

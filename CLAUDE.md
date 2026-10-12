@@ -86,7 +86,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | Coleção | Campos principais |
 |---------|-------------------|
 | `usuarios` | idUsuario, nome, email, time, admin (bool). Contas antigas têm `senha` em texto puro — não gravar mais |
-| `noticias` | id, data (Timestamp), titulo, descricao, urlImagem, link, exibir ("true"/"false" **string**), fk_competicao, time_casa, time_fora, gol_time_casa, gol_time_fora, tag ("gol", "publicidade", título de destaque...), images[] |
+| `noticias` | id, data (Timestamp), titulo, descricao, urlImagem, link, exibir ("true"/"false" **string**), fk_competicao, time_casa, time_fora, gol_time_casa, gol_time_fora, tag ("gol", "publicidade", título de destaque...), images[]. Cards de gol, opcionais: autor_gol_id, autor_gol, assistencia_id, assistencia (id/nome em `jogadores{ano}`), temporada, time_marcador, escudo_marcador (URL) |
 | `destaques` | id, title, link, urlImagem, exibir (string), priority |
 | `competicao` | nome (as "regiões": Floresta, Santo inacio...) |
 | `times{ano}` | id_partida (é o id do **time**, nome errado), nome, descricao, fk_competicao, urlImagem |

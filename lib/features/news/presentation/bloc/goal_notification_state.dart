@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 
 /// Dados do formulário de card de gol.
@@ -24,6 +25,18 @@ class GoalFormData extends Equatable {
   /// vínculo mesmo que não seja de hoje.
   final MatchDTO? pinnedMatch;
 
+  /// Elencos do mandante e do visitante (para escolher autor/assistência).
+  final List<PlayerDTO> homeSquad;
+  final List<PlayerDTO> awaySquad;
+
+  /// Autor do gol e quem deu o passe (opcionais): ao publicar, somam +1 gol
+  /// e +1 assistência nos números deles.
+  final PlayerDTO? scorer;
+  final PlayerDTO? assistant;
+
+  /// Time do gol deste card: o do último "+" (ou o do autor escolhido).
+  final String? scoringTeam;
+
   const GoalFormData({
     this.regions = const [],
     this.selectedRegion,
@@ -35,7 +48,18 @@ class GoalFormData extends Equatable {
     this.todayMatches = const [],
     this.updateMatch = false,
     this.pinnedMatch,
+    this.homeSquad = const [],
+    this.awaySquad = const [],
+    this.scorer,
+    this.assistant,
+    this.scoringTeam,
   });
+
+  /// Elenco do mandante ou do visitante pelo nome do time.
+  List<PlayerDTO> squadOf(String? team) {
+    if (team == null) return const [];
+    return team == homeTeam ? homeSquad : (team == awayTeam ? awaySquad : const []);
+  }
 
   bool get hasTeams => homeTeam != null && awayTeam != null;
 
@@ -75,6 +99,14 @@ class GoalFormData extends Equatable {
     MatchDTO? pinnedMatch,
     bool clearPinned = false,
     bool clearTeams = false,
+    List<PlayerDTO>? homeSquad,
+    List<PlayerDTO>? awaySquad,
+    PlayerDTO? scorer,
+    PlayerDTO? assistant,
+    bool clearScorer = false,
+    bool clearAssistant = false,
+    String? scoringTeam,
+    bool clearScoringTeam = false,
   }) {
     return GoalFormData(
       regions: regions ?? this.regions,
@@ -87,6 +119,11 @@ class GoalFormData extends Equatable {
       todayMatches: todayMatches ?? this.todayMatches,
       updateMatch: updateMatch ?? this.updateMatch,
       pinnedMatch: clearPinned ? null : (pinnedMatch ?? this.pinnedMatch),
+      homeSquad: homeSquad ?? this.homeSquad,
+      awaySquad: awaySquad ?? this.awaySquad,
+      scorer: clearScorer ? null : (scorer ?? this.scorer),
+      assistant: clearAssistant || clearScorer ? null : (assistant ?? this.assistant),
+      scoringTeam: clearScoringTeam ? null : (scoringTeam ?? this.scoringTeam),
     );
   }
 
@@ -101,7 +138,12 @@ class GoalFormData extends Equatable {
         awayGoals,
         todayMatches,
         updateMatch,
-        pinnedMatch
+        pinnedMatch,
+        homeSquad,
+        awaySquad,
+        scorer,
+        assistant,
+        scoringTeam,
       ];
 }
 
@@ -126,20 +168,38 @@ class SuccessGoalNotificationState extends GoalNotificationState {
   /// O placar da partida também foi atualizado.
   final bool matchUpdated;
 
-  const SuccessGoalNotificationState({required super.form, this.matchUpdated = false});
+  /// Jogadores que receberam o gol/a assistência (nulo = não informado).
+  final PlayerDTO? scorer;
+  final PlayerDTO? assistant;
+
+  const SuccessGoalNotificationState({
+    required super.form,
+    this.matchUpdated = false,
+    this.scorer,
+    this.assistant,
+  });
 
   @override
-  List<Object?> get props => [form, matchUpdated];
+  List<Object?> get props => [form, matchUpdated, scorer, assistant];
 }
 
-/// Card publicado, mas a atualização da partida falhou.
+/// O que falhou depois de o card já ter sido publicado.
+enum GoalPartialFailure { match, stats }
+
+/// Card publicado, mas a atualização da partida ou a soma nos jogadores
+/// falhou.
 class PartialGoalNotificationState extends GoalNotificationState {
   final String errorMessage;
+  final GoalPartialFailure failure;
 
-  const PartialGoalNotificationState({required super.form, required this.errorMessage});
+  const PartialGoalNotificationState({
+    required super.form,
+    required this.errorMessage,
+    this.failure = GoalPartialFailure.match,
+  });
 
   @override
-  List<Object?> get props => [form, errorMessage];
+  List<Object?> get props => [form, errorMessage, failure];
 }
 
 class ErrorGoalNotificationState extends GoalNotificationState {

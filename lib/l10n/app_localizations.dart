@@ -717,6 +717,90 @@ abstract class AppLocalizations {
   /// **'Gol publicado, mas não foi possível atualizar o placar da partida.'**
   String get goalMatchUpdateFailed;
 
+  /// No description provided for @goalOfTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol do {team}'**
+  String goalOfTeam(String team);
+
+  /// No description provided for @goalWhoScoredQ.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem fez o gol?'**
+  String get goalWhoScoredQ;
+
+  /// No description provided for @goalWhoAssistedQ.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem deu o passe para {scorer}?'**
+  String goalWhoAssistedQ(String scorer);
+
+  /// No description provided for @goalSkip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pular'**
+  String get goalSkip;
+
+  /// No description provided for @goalNoAssist.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem assistência'**
+  String get goalNoAssist;
+
+  /// No description provided for @goalBack.
+  ///
+  /// In pt, this message translates to:
+  /// **'Voltar'**
+  String get goalBack;
+
+  /// No description provided for @goalEditScorer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar'**
+  String get goalEditScorer;
+
+  /// No description provided for @goalSearchPlayer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Buscar jogador'**
+  String get goalSearchPlayer;
+
+  /// No description provided for @goalClear.
+  ///
+  /// In pt, this message translates to:
+  /// **'Limpar'**
+  String get goalClear;
+
+  /// No description provided for @goalScorerLine.
+  ///
+  /// In pt, this message translates to:
+  /// **'⚽ {scorer}'**
+  String goalScorerLine(String scorer);
+
+  /// No description provided for @goalScorerAssistLine.
+  ///
+  /// In pt, this message translates to:
+  /// **'⚽ {scorer} · assist. {assistant}'**
+  String goalScorerAssistLine(String scorer, String assistant);
+
+  /// No description provided for @goalStatsSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol publicado! {scorer} +1 gol.'**
+  String goalStatsSaved(String scorer);
+
+  /// No description provided for @goalStatsSavedWithAssist.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol publicado! {scorer} +1 gol, {assistant} +1 assistência.'**
+  String goalStatsSavedWithAssist(String scorer, String assistant);
+
+  /// No description provided for @goalStatsFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol publicado, mas não foi possível somar nos números dos jogadores.'**
+  String get goalStatsFailed;
+
   /// No description provided for @goalIncrease.
   ///
   /// In pt, this message translates to:
@@ -2127,6 +2211,90 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Seu time'**
   String get standingsYourTeam;
+
+  /// No description provided for @athleteTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atleta'**
+  String get athleteTitle;
+
+  /// No description provided for @athleteScored.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fez o gol'**
+  String get athleteScored;
+
+  /// No description provided for @athleteAssisted.
+  ///
+  /// In pt, this message translates to:
+  /// **'Deu o passe'**
+  String get athleteAssisted;
+
+  /// No description provided for @athleteRankGoals.
+  ///
+  /// In pt, this message translates to:
+  /// **'{position}º na artilharia'**
+  String athleteRankGoals(int position);
+
+  /// No description provided for @athleteRankAssists.
+  ///
+  /// In pt, this message translates to:
+  /// **'{position}º em assistências'**
+  String athleteRankAssists(int position);
+
+  /// No description provided for @athleteNoRank.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fora do ranking'**
+  String get athleteNoRank;
+
+  /// No description provided for @athleteParticipations.
+  ///
+  /// In pt, this message translates to:
+  /// **'Participações em gols'**
+  String get athleteParticipations;
+
+  /// No description provided for @athleteNoParticipations.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ainda sem gols registrados no feed.'**
+  String get athleteNoParticipations;
+
+  /// No description provided for @athleteNotFound.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogador não encontrado.'**
+  String get athleteNotFound;
+
+  /// No description provided for @athleteLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar o jogador.'**
+  String get athleteLoadError;
+
+  /// No description provided for @athleteEdit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar (admin)'**
+  String get athleteEdit;
+
+  /// No description provided for @athleteShare.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compartilhar'**
+  String get athleteShare;
+
+  /// No description provided for @athleteShareText.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} ({team}): {goals} gols e {assists} assistências · via Arena Football'**
+  String athleteShareText(String name, String team, int goals, int assists);
+
+  /// No description provided for @athleteSeason.
+  ///
+  /// In pt, this message translates to:
+  /// **'Temporada {season}'**
+  String athleteSeason(String season);
 }
 
 class _AppLocalizationsDelegate

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/team_players_cubit.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/team_players_state.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/player_card.dart';
-import 'package:arena_soccer/features/players/presentation/widgets/player_details_sheet.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/squad_summary.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/team_header.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
@@ -19,7 +19,7 @@ import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
 /// Elenco de um time na temporada selecionada: topo com o escudo, resumo,
-/// busca, ordenação e a lista. Tocar num jogador abre o painel de detalhes
+/// busca, ordenação e a lista. Tocar num jogador abre a tela do atleta
 /// (o admin edita nome, foto, gols e assistências por lá).
 class TeamPlayersPage extends StatefulWidget {
   final TeamDTO team;
@@ -194,7 +194,11 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
               return PlayerCard(
                 player: player,
                 isTopScorer: player.id == topScorerId,
-                onTap: () => PlayerDetailsSheet.show(context, player),
+                onTap: () => Navigator.pushNamed(
+                  context,
+                  AppRoutes.playerProfilePage,
+                  arguments: {'playerId': player.id, 'season': _season, 'name': player.name, 'player': player},
+                ),
               );
             },
           ),

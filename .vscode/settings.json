@@ -1,4 +1,5 @@
 {
     "java.configuration.updateBuildConfiguration": "interactive",
-    "dart.flutterSdkPath": "C:\\Users\\kaio_\\fvm\\versions\\3.3.10"
+    "dart.flutterSdkPath": "C:\\Users\\kaio_\\fvm\\versions\\3.3.10",
+    "cmake.sourceDirectory": "C:/arena_app/arenafootball/windows"
 }

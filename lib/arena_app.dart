@@ -37,6 +37,9 @@ import 'package:arena_soccer/features/news/presentation/page/news_details_page.d
 import 'package:arena_soccer/features/news/presentation/page/news_form_page.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/player_form_cubit.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/team_players_cubit.dart';
+import 'package:arena_soccer/features/players/presentation/bloc/player_profile_cubit.dart';
+import 'package:arena_soccer/features/players/presentation/page/player_profile_page.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/presentation/page/player_form_page.dart';
 import 'package:arena_soccer/features/players/presentation/page/team_players_page.dart';
 import 'package:arena_soccer/features/splash/presentation/page/splash_page.dart';
@@ -109,7 +112,7 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.goalNotificationPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<GoalNotificationCubit>(
-            create: (_) => GoalNotificationCubit(sl(), sl(), sl(), sl(), sl()),
+            create: (_) => GoalNotificationCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl()),
             child: GoalNotificationPage(
               initial: args?['news'] as NewsDTO?,
               initialMatch: args?['match'] as MatchDTO?,
@@ -139,8 +142,21 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.teamPlayersPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<TeamPlayersCubit>(
-            create: (_) => TeamPlayersCubit(sl(), sl()),
+            create: (_) => TeamPlayersCubit(sl()),
             child: TeamPlayersPage(team: args?['team'] as TeamDTO),
+          );
+        },
+        // `playerId` obrigatório; `season` nulo = corrente; `player` (opcional) aparece na hora.
+        AppRoutes.playerProfilePage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+          return BlocProvider<PlayerProfileCubit>(
+            create: (_) => PlayerProfileCubit(sl(), sl(), sl(), sl(), sl()),
+            child: PlayerProfilePage(
+              playerId: args['playerId'] as String,
+              season: args['season'] as String?,
+              name: args['name'] as String?,
+              initial: args['player'] as PlayerDTO?,
+            ),
           );
         },
         AppRoutes.registerPlayerPage: (_) => BlocProvider<PlayerFormCubit>(

@@ -154,6 +154,16 @@ class _NewsItem extends StatelessWidget {
     if (confirmed == true) await cubit.delete(news.id);
   }
 
+  /// Tela do atleta, na temporada gravada no card (os jogadores são por
+  /// temporada).
+  void _openAthlete(BuildContext context, String playerId, String name) {
+    Navigator.pushNamed(
+      context,
+      AppRoutes.playerProfilePage,
+      arguments: {'playerId': playerId, 'season': news.season.isEmpty ? null : news.season, 'name': name},
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (news.isGoal) {
@@ -164,6 +174,8 @@ class _NewsItem extends StatelessWidget {
         onTap: isAdmin
             ? () => Navigator.pushNamed(context, AppRoutes.goalNotificationPage, arguments: {'news': news})
             : null,
+        onScorerTap: news.hasScorer ? () => _openAthlete(context, news.scorerId, news.scorerName) : null,
+        onAssistantTap: news.hasAssistant ? () => _openAthlete(context, news.assistantId, news.assistantName) : null,
       );
     }
     if (news.isAd) {

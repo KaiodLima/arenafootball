@@ -341,6 +341,61 @@ class AppLocalizationsEn extends AppLocalizations {
       'Goal published, but the match score could not be updated.';
 
   @override
+  String goalOfTeam(String team) {
+    return '$team goal';
+  }
+
+  @override
+  String get goalWhoScoredQ => 'Who scored?';
+
+  @override
+  String goalWhoAssistedQ(String scorer) {
+    return 'Who assisted $scorer?';
+  }
+
+  @override
+  String get goalSkip => 'Skip';
+
+  @override
+  String get goalNoAssist => 'No assist';
+
+  @override
+  String get goalBack => 'Back';
+
+  @override
+  String get goalEditScorer => 'Edit';
+
+  @override
+  String get goalSearchPlayer => 'Search player';
+
+  @override
+  String get goalClear => 'Clear';
+
+  @override
+  String goalScorerLine(String scorer) {
+    return '⚽ $scorer';
+  }
+
+  @override
+  String goalScorerAssistLine(String scorer, String assistant) {
+    return '⚽ $scorer · assist $assistant';
+  }
+
+  @override
+  String goalStatsSaved(String scorer) {
+    return 'Goal published! $scorer +1 goal.';
+  }
+
+  @override
+  String goalStatsSavedWithAssist(String scorer, String assistant) {
+    return 'Goal published! $scorer +1 goal, $assistant +1 assist.';
+  }
+
+  @override
+  String get goalStatsFailed =>
+      'Goal published, but the players\' numbers could not be updated.';
+
+  @override
   String get goalIncrease => 'Increase';
 
   @override
@@ -1152,4 +1207,54 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get standingsYourTeam => 'Your team';
+
+  @override
+  String get athleteTitle => 'Athlete';
+
+  @override
+  String get athleteScored => 'Scored';
+
+  @override
+  String get athleteAssisted => 'Assisted';
+
+  @override
+  String athleteRankGoals(int position) {
+    return '#$position top scorer';
+  }
+
+  @override
+  String athleteRankAssists(int position) {
+    return '#$position in assists';
+  }
+
+  @override
+  String get athleteNoRank => 'Not ranked';
+
+  @override
+  String get athleteParticipations => 'Goal involvements';
+
+  @override
+  String get athleteNoParticipations => 'No goals registered in the feed yet.';
+
+  @override
+  String get athleteNotFound => 'Player not found.';
+
+  @override
+  String get athleteLoadError => 'Could not load the player.';
+
+  @override
+  String get athleteEdit => 'Edit (admin)';
+
+  @override
+  String get athleteShare => 'Share';
+
+  @override
+  String athleteShareText(String name, String team, int goals, int assists) {
+    return '$name ($team): $goals goals and $assists assists · via Arena Football';
+  }
+
+  @override
+  String athleteSeason(String season) {
+    return 'Season $season';
+  }
 }

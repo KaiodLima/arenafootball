@@ -133,6 +133,68 @@
   },
   "goalMatchUpdated": "Gol publicado e placar da partida atualizado!",
   "goalMatchUpdateFailed": "Gol publicado, mas não foi possível atualizar o placar da partida.",
+  "goalOfTeam": "Gol do {team}",
+  "@goalOfTeam": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "goalWhoScoredQ": "Quem fez o gol?",
+  "goalWhoAssistedQ": "Quem deu o passe para {scorer}?",
+  "@goalWhoAssistedQ": {
+    "placeholders": {
+      "scorer": {
+        "type": "String"
+      }
+    }
+  },
+  "goalSkip": "Pular",
+  "goalNoAssist": "Sem assistência",
+  "goalBack": "Voltar",
+  "goalEditScorer": "Editar",
+  "goalSearchPlayer": "Buscar jogador",
+  "goalClear": "Limpar",
+  "goalScorerLine": "⚽ {scorer}",
+  "@goalScorerLine": {
+    "placeholders": {
+      "scorer": {
+        "type": "String"
+      }
+    }
+  },
+  "goalScorerAssistLine": "⚽ {scorer} · assist. {assistant}",
+  "@goalScorerAssistLine": {
+    "placeholders": {
+      "scorer": {
+        "type": "String"
+      },
+      "assistant": {
+        "type": "String"
+      }
+    }
+  },
+  "goalStatsSaved": "Gol publicado! {scorer} +1 gol.",
+  "@goalStatsSaved": {
+    "placeholders": {
+      "scorer": {
+        "type": "String"
+      }
+    }
+  },
+  "goalStatsSavedWithAssist": "Gol publicado! {scorer} +1 gol, {assistant} +1 assistência.",
+  "@goalStatsSavedWithAssist": {
+    "placeholders": {
+      "scorer": {
+        "type": "String"
+      },
+      "assistant": {
+        "type": "String"
+      }
+    }
+  },
+  "goalStatsFailed": "Gol publicado, mas não foi possível somar nos números dos jogadores.",
   "goalIncrease": "Aumentar",
   "goalDecrease": "Diminuir",
   "newsAdTitle": "Cadastrar Card de Publicidade:",
@@ -623,5 +685,56 @@
   "standingsGoalsFor": "Gols feitos",
   "standingsGoalsAgainst": "Gols sofridos",
   "standingsPerformance": "Aproveitamento",
-  "standingsYourTeam": "Seu time"
+  "standingsYourTeam": "Seu time",
+  "athleteTitle": "Atleta",
+  "athleteScored": "Fez o gol",
+  "athleteAssisted": "Deu o passe",
+  "athleteRankGoals": "{position}º na artilharia",
+  "@athleteRankGoals": {
+    "placeholders": {
+      "position": {
+        "type": "int"
+      }
+    }
+  },
+  "athleteRankAssists": "{position}º em assistências",
+  "@athleteRankAssists": {
+    "placeholders": {
+      "position": {
+        "type": "int"
+      }
+    }
+  },
+  "athleteNoRank": "Fora do ranking",
+  "athleteParticipations": "Participações em gols",
+  "athleteNoParticipations": "Ainda sem gols registrados no feed.",
+  "athleteNotFound": "Jogador não encontrado.",
+  "athleteLoadError": "Não foi possível carregar o jogador.",
+  "athleteEdit": "Editar (admin)",
+  "athleteShare": "Compartilhar",
+  "athleteShareText": "{name} ({team}): {goals} gols e {assists} assistências · via Arena Football",
+  "@athleteShareText": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "team": {
+        "type": "String"
+      },
+      "goals": {
+        "type": "int"
+      },
+      "assists": {
+        "type": "int"
+      }
+    }
+  },
+  "athleteSeason": "Temporada {season}",
+  "@athleteSeason": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  }
 }

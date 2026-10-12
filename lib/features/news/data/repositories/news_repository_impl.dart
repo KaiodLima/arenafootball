@@ -23,4 +23,8 @@ class NewsRepositoryImpl implements INewsRepository {
 
   @override
   Future<Either<Failure, void>> deleteNews(String id) => _dataSource.deleteNews(id);
+
+  @override
+  Future<Either<Failure, List<NewsDTO>>> getGoalCardsByPlayer(String playerId) =>
+      _dataSource.getGoalCardsByPlayer(playerId);
 }

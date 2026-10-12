@@ -33,10 +33,23 @@ class _FakeRepository implements IPlayersRepository {
       Stream.value(Right(_squads[teamName] ?? const []));
 
   @override
+  Stream<Either<Failure, PlayerDTO?>> watchPlayer({required String id, String? season}) =>
+      const Stream.empty();
+
+  @override
   Future<Either<Failure, List<PlayerDTO>>> getPlayers({String? season}) async => const Right([]);
 
   @override
   Future<Either<Failure, void>> updatePlayer(PlayerDTO player, {String? season}) async => const Right(null);
+
+  @override
+  Future<Either<Failure, void>> incrementStats({
+    required String playerId,
+    int goals = 0,
+    int assists = 0,
+    String? season,
+  }) async =>
+      const Right(null);
 }
 
 class _FakeStorage implements StorageUploadService {
