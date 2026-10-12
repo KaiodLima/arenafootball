@@ -119,7 +119,10 @@ class PushService implements TopicClient {
             'Arena Football',
             importance: Importance.high,
             priority: Priority.high,
+            // Barra de status: silhueta do estádio da logo; ao lado do texto,
+            // a logo colorida (ícone do app).
             icon: 'ic_stat_arena',
+            largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
           ),
         ),
         payload: message.data['aba']?.toString(),
