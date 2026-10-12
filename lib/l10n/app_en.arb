@@ -290,6 +290,7 @@
   "drawerNavigation": "Navigation",
   "drawerAdmin": "Administration",
   "drawerLogout": "Sign out",
+  "drawerChooseTeam": "Choose my team",
   "drawerSignIn": "Sign in or create account",
   "drawerGuestSubtitle": "Sign in to save your team and vote for the best player.",
   "homeGreeting": "Hi, {name} 👋",

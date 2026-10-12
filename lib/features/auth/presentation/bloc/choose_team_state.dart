@@ -1,11 +1,14 @@
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 
 /// Etapa 2 do cadastro (região e time do coração). O estado base carrega as
 /// listas e a seleção, para sobreviverem às transições.
 class ChooseTeamState extends Equatable {
   final List<String> regions;
   final String? selectedRegion;
-  final List<String> teams;
+  final List<TeamDTO> teams;
+
+  /// Nome do time escolhido (é o que vai para `usuarios.time`).
   final String? selectedTeam;
 
   /// Times da região selecionada ainda carregando.

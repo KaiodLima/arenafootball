@@ -12,9 +12,16 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 class HomeDrawer extends StatelessWidget {
   final UserDTO? user;
   final String? favoriteTeamImage;
+  final VoidCallback onChooseTeam;
   final VoidCallback onLogout;
 
-  const HomeDrawer({super.key, this.user, this.favoriteTeamImage, required this.onLogout});
+  const HomeDrawer({
+    super.key,
+    this.user,
+    this.favoriteTeamImage,
+    required this.onChooseTeam,
+    required this.onLogout,
+  });
 
   void _open(BuildContext context, String route) {
     Navigator.pop(context);
@@ -35,7 +42,14 @@ class HomeDrawer extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
-          _ProfileHeader(user: user, favoriteTeamImage: favoriteTeamImage),
+          _ProfileHeader(
+            user: user,
+            favoriteTeamImage: favoriteTeamImage,
+            onChooseTeam: () {
+              Navigator.pop(context);
+              onChooseTeam();
+            },
+          ),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.fromLTRB(AppSizes.s12, AppSizes.s16, AppSizes.s12, AppSizes.s16),
@@ -112,11 +126,18 @@ class HomeDrawer extends StatelessWidget {
   }
 }
 
+final _headerButtonStyle = FilledButton.styleFrom(
+  backgroundColor: AppColors.white,
+  foregroundColor: AppColors.primaryDark,
+  shape: const StadiumBorder(),
+);
+
 class _ProfileHeader extends StatelessWidget {
   final UserDTO? user;
   final String? favoriteTeamImage;
+  final VoidCallback onChooseTeam;
 
-  const _ProfileHeader({this.user, this.favoriteTeamImage});
+  const _ProfileHeader({this.user, this.favoriteTeamImage, required this.onChooseTeam});
 
   @override
   Widget build(BuildContext context) {
@@ -157,15 +178,18 @@ class _ProfileHeader extends StatelessWidget {
                 Text(l10n.drawerGuestSubtitle, style: AppTypography.subtitle(color: AppColors.whiteSoft)),
                 const SizedBox(height: AppSizes.s14),
                 FilledButton(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.white,
-                    foregroundColor: AppColors.primaryDark,
-                    shape: const StadiumBorder(),
-                  ),
+                  style: _headerButtonStyle,
                   onPressed: () => Navigator.pushNamedAndRemoveUntil(context, AppRoutes.loginPage, (_) => false),
                   child: Text(l10n.drawerSignIn),
                 ),
-              ] else if (user!.hasFavoriteTeam)
+              ] else if (!user!.hasFavoriteTeam)
+                FilledButton.icon(
+                  style: _headerButtonStyle,
+                  onPressed: onChooseTeam,
+                  icon: const Icon(Icons.shield_outlined, size: AppSizes.s18),
+                  label: Text(l10n.drawerChooseTeam),
+                )
+              else
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: AppSizes.s12, vertical: AppSizes.s4),
                   decoration: BoxDecoration(

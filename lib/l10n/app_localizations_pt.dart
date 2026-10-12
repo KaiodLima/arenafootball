@@ -1017,6 +1017,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get drawerLogout => 'Sair da conta';
 
   @override
+  String get drawerChooseTeam => 'Escolher meu time';
+
+  @override
   String get drawerSignIn => 'Entrar ou criar conta';
 
   @override

@@ -1840,6 +1840,12 @@ abstract class AppLocalizations {
   /// **'Sair da conta'**
   String get drawerLogout;
 
+  /// No description provided for @drawerChooseTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolher meu time'**
+  String get drawerChooseTeam;
+
   /// No description provided for @drawerSignIn.
   ///
   /// In pt, this message translates to:

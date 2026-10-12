@@ -54,7 +54,7 @@ class ChooseTeamCubit extends Cubit<ChooseTeamState> {
         LoadErrorChooseTeamState(errorMessage: failure.toString(), regions: regions, selectedRegion: region),
       ),
       (teams) => emit(
-        ReadyChooseTeamState(regions: regions, selectedRegion: region, teams: teams.map((t) => t.name).toList()),
+        ReadyChooseTeamState(regions: regions, selectedRegion: region, teams: teams),
       ),
     );
   }

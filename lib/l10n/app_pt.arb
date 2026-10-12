@@ -569,6 +569,7 @@
   "drawerNavigation": "Navegação",
   "drawerAdmin": "Administração",
   "drawerLogout": "Sair da conta",
+  "drawerChooseTeam": "Escolher meu time",
   "drawerSignIn": "Entrar ou criar conta",
   "drawerGuestSubtitle": "Entre para salvar seu time e votar no melhor da partida.",
   "homeGreeting": "Olá, {name} 👋",

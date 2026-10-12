@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/core/services/push_service.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
+import 'package:arena_soccer/features/auth/presentation/page/choose_team_page.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/championships_tab.dart';
 import 'package:arena_soccer/features/highlights/presentation/widgets/highlights_carousel.dart';
 import 'package:arena_soccer/features/home/presentation/bloc/home_cubit.dart';
@@ -67,6 +68,15 @@ class _HomePageState extends State<HomePage> {
     _homeCubit.selectTab(tab == 'tabelas' ? HomeTab.tables : HomeTab.news);
   }
 
+  /// Escolha do time pelo menu (quem pulou a etapa no cadastro). Na volta,
+  /// carrega o escudo do time escolhido no header e no menu.
+  Future<void> _chooseTeam() async {
+    await Navigator.pushNamed(context, AppRoutes.chooseTeamPage, arguments: const ChooseTeamArgs(canGoBack: true));
+    if (!mounted) return;
+    final user = BlocProvider.of<SessionCubit>(context).state.user;
+    if (user != null && user.hasFavoriteTeam) _homeCubit.loadFavoriteTeam(user.favoriteTeam);
+  }
+
   Future<void> _logout() async {
     await BlocProvider.of<SessionCubit>(context).signOut();
     if (!mounted) return;
@@ -112,7 +122,12 @@ class _HomePageState extends State<HomePage> {
           child: Scaffold(
             key: _scaffoldKey,
             backgroundColor: AppColors.background,
-            drawer: HomeDrawer(user: session.user, favoriteTeamImage: home.favoriteTeamImage, onLogout: _logout),
+            drawer: HomeDrawer(
+              user: session.user,
+              favoriteTeamImage: home.favoriteTeamImage,
+              onChooseTeam: _chooseTeam,
+              onLogout: _logout,
+            ),
             body: Column(
               children: [
                 HomeHeader(

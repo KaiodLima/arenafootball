@@ -1008,6 +1008,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get drawerLogout => 'Sign out';
 
   @override
+  String get drawerChooseTeam => 'Choose my team';
+
+  @override
   String get drawerSignIn => 'Sign in or create account';
 
   @override
