@@ -24,6 +24,21 @@ class AppColors {
   static const Color googleYellow = Color(0xFFFBBC05);
   static const Color googleGreen = Color(0xFF34A853);
 
+  /// Paleta de cores de time (cadastro de time: cor principal e secundária).
+  /// Uma cor por família; vinho e azul-marinho são clássicas de time.
+  static const Color teamWhite = Color(0xFFFFFFFF);
+  static const Color teamBlack = Color(0xFF111111);
+  static const Color teamGrey = Color(0xFF9E9E9E);
+  static const Color teamRed = Color(0xFFD32F2F);
+  static const Color teamWine = Color(0xFF7B1E2E);
+  static const Color teamOrange = Color(0xFFF57C00);
+  static const Color teamYellow = Color(0xFFFBC02D);
+  static const Color teamGreen = Color(0xFF2E7D32);
+  static const Color teamBlue = Color(0xFF1E88E5);
+  static const Color teamNavy = Color(0xFF1A237E);
+  static const Color teamPurple = Color(0xFF6A1B9A);
+  static const Color teamPink = Color(0xFFEC407A);
+
   static const Color white = Colors.white;
   static const Color whiteMuted = Colors.white24;
   static const Color whiteSoft = Colors.white70;

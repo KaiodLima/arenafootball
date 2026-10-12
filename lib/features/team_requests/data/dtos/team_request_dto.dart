@@ -17,6 +17,10 @@ class TeamRequestDTO extends Equatable {
   final String description;
   final String imageUrl;
 
+  /// Cores do time (hex; vazio = sem cor).
+  final String primaryColor;
+  final String secondaryColor;
+
   /// WhatsApp do dono (só ele e o admin leem).
   final String contact;
   final String message;
@@ -36,6 +40,8 @@ class TeamRequestDTO extends Equatable {
     required this.region,
     this.description = '',
     this.imageUrl = '',
+    this.primaryColor = '',
+    this.secondaryColor = '',
     this.contact = '',
     this.message = '',
     this.season = '',
@@ -60,6 +66,8 @@ class TeamRequestDTO extends Equatable {
       region: text('regiao'),
       description: text('descricao'),
       imageUrl: text('urlImagem'),
+      primaryColor: text('corPrimaria'),
+      secondaryColor: text('corSecundaria'),
       contact: text('contato'),
       message: text('mensagem'),
       season: text('temporada'),
@@ -79,6 +87,8 @@ class TeamRequestDTO extends Equatable {
         'regiao': region,
         'descricao': description,
         'urlImagem': imageUrl,
+        'corPrimaria': primaryColor,
+        'corSecundaria': secondaryColor,
         'contato': contact,
         'mensagem': message,
         'temporada': season,
@@ -98,6 +108,8 @@ class TeamRequestDTO extends Equatable {
     String? region,
     String? description,
     String? imageUrl,
+    String? primaryColor,
+    String? secondaryColor,
     String? contact,
     String? message,
     String? season,
@@ -113,6 +125,8 @@ class TeamRequestDTO extends Equatable {
       region: region ?? this.region,
       description: description ?? this.description,
       imageUrl: imageUrl ?? this.imageUrl,
+      primaryColor: primaryColor ?? this.primaryColor,
+      secondaryColor: secondaryColor ?? this.secondaryColor,
       contact: contact ?? this.contact,
       message: message ?? this.message,
       season: season ?? this.season,
@@ -132,6 +146,8 @@ class TeamRequestDTO extends Equatable {
         region,
         description,
         imageUrl,
+        primaryColor,
+        secondaryColor,
         contact,
         message,
         season,

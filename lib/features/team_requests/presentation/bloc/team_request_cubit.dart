@@ -93,6 +93,8 @@ class TeamRequestCubit extends Cubit<TeamRequestState> {
         contact: request.contact,
         message: request.message,
         crest: () => null,
+        primaryColor: request.primaryColor,
+        secondaryColor: request.secondaryColor,
         imageUrl: request.imageUrl,
       );
 
@@ -140,6 +142,10 @@ class TeamRequestCubit extends Cubit<TeamRequestState> {
 
   void clearCrest() => _updateForm(state.form.copyWith(crest: () => null, imageUrl: ''));
 
+  void setPrimaryColor(String hex) => _updateForm(state.form.copyWith(primaryColor: hex));
+
+  void setSecondaryColor(String hex) => _updateForm(state.form.copyWith(secondaryColor: hex));
+
   Future<void> submit() async {
     final form = state.form;
     if (form.error != null || state is SubmittingTeamRequestState) return;
@@ -153,6 +159,8 @@ class TeamRequestCubit extends Cubit<TeamRequestState> {
       region: form.selectedRegion ?? '',
       description: form.description,
       imageUrl: form.imageUrl,
+      primaryColor: form.primaryColor,
+      secondaryColor: form.secondaryColor,
       contact: form.contact,
       message: form.message,
     );

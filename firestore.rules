@@ -54,7 +54,7 @@ service cloud.firestore {
     // - cada usuário logado grava/atualiza só o próprio voto (doc id = uid);
     // - o dono de time cadastra, edita e tira jogadores do próprio elenco
     //   (`time` antes e depois = time dele, ou '' ao tirar do elenco) e troca
-    //   só escudo/descrição do próprio time (`idDono` = uid).
+    //   só escudo/descrição/cores do próprio time (`idDono` = uid).
     match /{collection}/{docId} {
       function writable() {
         return !(collection in ['config', 'notificacoes_envios', 'push_avisos', 'solicitacoes_jogador',
@@ -83,7 +83,8 @@ service cloud.firestore {
           && (ownsTeam(resource.data.time) || resource.data.time == '')
           && (ownsTeam(request.resource.data.time) || request.resource.data.time == ''))
         || (isTeamDoc() && signedIn() && resource.data.idDono == request.auth.uid
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['descricao', 'urlImagem'])));
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['descricao', 'urlImagem', 'corPrimaria', 'corSecundaria'])));
       allow delete: if writable() && (isAdmin() || isOwnVote() || (isPlayers() && ownsTeam(resource.data.time)));
     }
 
@@ -141,7 +142,9 @@ service cloud.firestore {
         return data.uid == request.auth.uid
           && data.status == 'pendente'
           && data.keys().hasOnly(['uid', 'nome_usuario', 'email', 'nome', 'regiao', 'descricao', 'urlImagem',
-            'contato', 'mensagem', 'temporada', 'status', 'data', 'atualizado_em'])
+            'corPrimaria', 'corSecundaria', 'contato', 'mensagem', 'temporada', 'status', 'data', 'atualizado_em'])
+          && (!('corPrimaria' in data) || (data.corPrimaria is string && data.corPrimaria.size() <= 9))
+          && (!('corSecundaria' in data) || (data.corSecundaria is string && data.corSecundaria.size() <= 9))
           && data.nome is string && data.nome.size() >= 3 && data.nome.size() <= 40
           && data.regiao is string && data.regiao.size() > 0
           && data.contato is string && data.contato.size() >= 10 && data.contato.size() <= 30

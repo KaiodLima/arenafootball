@@ -15,6 +15,7 @@ import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/arena_input_decoration.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
+import 'package:arena_soccer/utils/components/team_color_selector.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
@@ -221,7 +222,13 @@ class _RequestCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: AppTypography.body().copyWith(fontWeight: FontWeight.w700),
                     ),
-                    Text(request.region, style: AppTypography.subtitle()),
+                    Row(
+                      children: [
+                        Flexible(child: Text(request.region, style: AppTypography.subtitle())),
+                        const SizedBox(width: AppSizes.s6),
+                        TeamColorsBadge(primary: request.primaryColor, secondary: request.secondaryColor),
+                      ],
+                    ),
                   ],
                 ),
               ),

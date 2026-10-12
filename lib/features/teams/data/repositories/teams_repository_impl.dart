@@ -36,9 +36,18 @@ class TeamsRepositoryImpl implements ITeamsRepository {
     required String id,
     required String description,
     required String imageUrl,
+    String primaryColor = '',
+    String secondaryColor = '',
     String? season,
   }) =>
-      _dataSource.updateTeamDetails(id: id, description: description, imageUrl: imageUrl, season: season);
+      _dataSource.updateTeamDetails(
+        id: id,
+        description: description,
+        imageUrl: imageUrl,
+        primaryColor: primaryColor,
+        secondaryColor: secondaryColor,
+        season: season,
+      );
 
   @override
   Future<Either<Failure, void>> deleteTeam(TeamDTO team, {String? season}) =>

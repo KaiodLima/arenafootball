@@ -26,6 +26,8 @@ class ApproveTeamRequestUseCase {
       region: request.region,
       imageUrl: request.imageUrl,
       ownerId: request.userId,
+      primaryColor: request.primaryColor,
+      secondaryColor: request.secondaryColor,
     );
     final response = await _repository.approve(request: request, team: team);
     return response.map((_) => team);

@@ -6,7 +6,8 @@ import 'package:arena_soccer/core/services/storage_upload_service.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/repositories/teams_repository_interface.dart';
 
-/// Dono (ou admin) troca o escudo e a descrição do time na temporada atual.
+/// Dono (ou admin) troca o escudo, a descrição e as cores do time na
+/// temporada atual.
 /// Com [crest], envia o escudo novo para `times/` antes.
 class UpdateTeamDetailsUseCase {
   final ITeamsRepository _repository;
@@ -26,6 +27,8 @@ class UpdateTeamDetailsUseCase {
       id: updated.id,
       description: updated.description,
       imageUrl: updated.imageUrl,
+      primaryColor: updated.primaryColor,
+      secondaryColor: updated.secondaryColor,
     );
     return response.map((_) => updated);
   }

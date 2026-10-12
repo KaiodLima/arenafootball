@@ -18,6 +18,7 @@ import 'package:arena_soccer/utils/components/arena_hero_background.dart';
 import 'package:arena_soccer/utils/components/arena_input_decoration.dart';
 import 'package:arena_soccer/utils/components/circle_photo_picker.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
+import 'package:arena_soccer/utils/components/team_color_selector.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
@@ -270,7 +271,12 @@ class _RequestsTab extends StatelessWidget {
 
 class _EditTab extends StatefulWidget {
   final MyTeamState state;
-  final Future<void> Function({required String description, File? crest}) onSave;
+  final Future<void> Function({
+    required String description,
+    required String primaryColor,
+    required String secondaryColor,
+    File? crest,
+  }) onSave;
 
   const _EditTab({required this.state, required this.onSave});
 
@@ -281,6 +287,10 @@ class _EditTab extends StatefulWidget {
 class _EditTabState extends State<_EditTab> {
   late final _description = TextEditingController(text: widget.state.team?.description);
   File? _crest;
+
+  /// Nulas = ainda não mexeu (vale a do time).
+  String? _primary;
+  String? _secondary;
 
   @override
   void didUpdateWidget(covariant _EditTab oldWidget) {
@@ -324,6 +334,13 @@ class _EditTabState extends State<_EditTab> {
           textCapitalization: TextCapitalization.sentences,
           decoration: arenaInputDecoration(label: l10n.teamRequestDescriptionLabel, icon: Icons.notes_rounded),
         ),
+        TeamColorsPicker(
+          primary: _primary ?? team?.primaryColor ?? '',
+          secondary: _secondary ?? team?.secondaryColor ?? '',
+          onPrimaryChanged: (hex) => setState(() => _primary = hex),
+          onSecondaryChanged: (hex) => setState(() => _secondary = hex),
+        ),
+        const SizedBox(height: AppSizes.s16),
         Row(
           children: [
             const Icon(Icons.info_outline_rounded, size: AppSizes.s18, color: AppColors.textSecondary),
@@ -341,7 +358,12 @@ class _EditTabState extends State<_EditTab> {
               ? null
               : () async {
                   FocusManager.instance.primaryFocus?.unfocus();
-                  await widget.onSave(description: _description.text, crest: _crest);
+                  await widget.onSave(
+                    description: _description.text,
+                    primaryColor: _primary ?? team.primaryColor,
+                    secondaryColor: _secondary ?? team.secondaryColor,
+                    crest: _crest,
+                  );
                   if (mounted) setState(() => _crest = null);
                 },
         ),

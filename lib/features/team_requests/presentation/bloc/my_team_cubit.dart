@@ -67,11 +67,19 @@ class MyTeamCubit extends Cubit<MyTeamState> {
     emit(state.copyWith(team: team.fold((_) => null, (t) => t) ?? fallback, loading: false));
   }
 
-  Future<void> saveDetails({required String description, File? crest}) async {
+  Future<void> saveDetails({
+    required String description,
+    required String primaryColor,
+    required String secondaryColor,
+    File? crest,
+  }) async {
     final team = state.team;
     if (team == null || state.saving) return;
     emit(state.copyWith(saving: true));
-    final response = await updateTeamDetailsUseCase(team.copyWith(description: description), crest: crest);
+    final response = await updateTeamDetailsUseCase(
+      team.copyWith(description: description, primaryColor: primaryColor, secondaryColor: secondaryColor),
+      crest: crest,
+    );
     if (isClosed) return;
     response.fold(
       (failure) => emit(ErrorMyTeamState(state, errorMessage: failure.toString())),

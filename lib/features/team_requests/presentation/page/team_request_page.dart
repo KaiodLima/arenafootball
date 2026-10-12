@@ -17,6 +17,7 @@ import 'package:arena_soccer/utils/components/arena_submit_bar.dart';
 import 'package:arena_soccer/utils/components/circle_photo_picker.dart';
 import 'package:arena_soccer/utils/components/form_section.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
+import 'package:arena_soccer/utils/components/team_color_selector.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
@@ -279,6 +280,16 @@ class _TeamRequestPageState extends State<TeamRequestPage> {
                 ),
               ),
             ],
+          ),
+        ),
+        const SizedBox(height: AppSizes.s16),
+        FormSection(
+          title: l10n.teamColorsSection,
+          child: TeamColorsPicker(
+            primary: form.primaryColor,
+            secondary: form.secondaryColor,
+            onPrimaryChanged: _cubit.setPrimaryColor,
+            onSecondaryChanged: _cubit.setSecondaryColor,
           ),
         ),
         if (state.editing && state.request != null)

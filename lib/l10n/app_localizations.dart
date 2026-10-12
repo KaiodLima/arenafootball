@@ -3915,6 +3915,108 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Meu perfil de jogador'**
   String get drawerMyPlayerProfile;
+
+  /// No description provided for @teamColorsSection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cores do time'**
+  String get teamColorsSection;
+
+  /// No description provided for @teamColorPrimary.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cor principal'**
+  String get teamColorPrimary;
+
+  /// No description provided for @teamColorSecondary.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cor secundária'**
+  String get teamColorSecondary;
+
+  /// No description provided for @teamColorNone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem cor'**
+  String get teamColorNone;
+
+  /// No description provided for @teamColorPreview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Assim fica o uniforme'**
+  String get teamColorPreview;
+
+  /// No description provided for @colorWhite.
+  ///
+  /// In pt, this message translates to:
+  /// **'Branco'**
+  String get colorWhite;
+
+  /// No description provided for @colorBlack.
+  ///
+  /// In pt, this message translates to:
+  /// **'Preto'**
+  String get colorBlack;
+
+  /// No description provided for @colorGrey.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cinza'**
+  String get colorGrey;
+
+  /// No description provided for @colorRed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vermelho'**
+  String get colorRed;
+
+  /// No description provided for @colorWine.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vinho'**
+  String get colorWine;
+
+  /// No description provided for @colorOrange.
+  ///
+  /// In pt, this message translates to:
+  /// **'Laranja'**
+  String get colorOrange;
+
+  /// No description provided for @colorYellow.
+  ///
+  /// In pt, this message translates to:
+  /// **'Amarelo'**
+  String get colorYellow;
+
+  /// No description provided for @colorGreen.
+  ///
+  /// In pt, this message translates to:
+  /// **'Verde'**
+  String get colorGreen;
+
+  /// No description provided for @colorBlue.
+  ///
+  /// In pt, this message translates to:
+  /// **'Azul'**
+  String get colorBlue;
+
+  /// No description provided for @colorNavy.
+  ///
+  /// In pt, this message translates to:
+  /// **'Azul-marinho'**
+  String get colorNavy;
+
+  /// No description provided for @colorPurple.
+  ///
+  /// In pt, this message translates to:
+  /// **'Roxo'**
+  String get colorPurple;
+
+  /// No description provided for @colorPink.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rosa'**
+  String get colorPink;
 }
 
 class _AppLocalizationsDelegate

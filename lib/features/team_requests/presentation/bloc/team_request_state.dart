@@ -25,6 +25,10 @@ class TeamRequestForm extends Equatable {
   final String message;
   final File? crest;
 
+  /// Cores do time (hex; vazio = sem cor).
+  final String primaryColor;
+  final String secondaryColor;
+
   /// Escudo que já estava no pedido (mantido se não trocar).
   final String imageUrl;
 
@@ -37,6 +41,8 @@ class TeamRequestForm extends Equatable {
     this.contact = '',
     this.message = '',
     this.crest,
+    this.primaryColor = '',
+    this.secondaryColor = '',
     this.imageUrl = '',
   });
 
@@ -66,6 +72,8 @@ class TeamRequestForm extends Equatable {
     String? contact,
     String? message,
     File? Function()? crest,
+    String? primaryColor,
+    String? secondaryColor,
     String? imageUrl,
   }) {
     return TeamRequestForm(
@@ -77,13 +85,16 @@ class TeamRequestForm extends Equatable {
       contact: contact ?? this.contact,
       message: message ?? this.message,
       crest: crest != null ? crest() : this.crest,
+      primaryColor: primaryColor ?? this.primaryColor,
+      secondaryColor: secondaryColor ?? this.secondaryColor,
       imageUrl: imageUrl ?? this.imageUrl,
     );
   }
 
   @override
   List<Object?> get props =>
-      [regions, selectedRegion, existingTeams, name, description, contact, message, crest, imageUrl];
+      [regions, selectedRegion, existingTeams, name, description, contact, message, crest, primaryColor, secondaryColor,
+        imageUrl];
 }
 
 /// Tela "Sou dono de time". O estado base carrega o pedido atual (ou nulo),

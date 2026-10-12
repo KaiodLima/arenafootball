@@ -635,5 +635,22 @@
   "teamDeleted": "{team} was deleted.",
   "drawerPlayerOf": "Plays for {team}",
   "drawerOwnerOf": "Owner/coach of {team}",
-  "drawerMyPlayerProfile": "My player profile"
+  "drawerMyPlayerProfile": "My player profile",
+  "teamColorsSection": "Team colors",
+  "teamColorPrimary": "Primary color",
+  "teamColorSecondary": "Secondary color",
+  "teamColorNone": "No color",
+  "teamColorPreview": "This is how the kit looks",
+  "colorWhite": "White",
+  "colorBlack": "Black",
+  "colorGrey": "Grey",
+  "colorRed": "Red",
+  "colorWine": "Wine",
+  "colorOrange": "Orange",
+  "colorYellow": "Yellow",
+  "colorGreen": "Green",
+  "colorBlue": "Blue",
+  "colorNavy": "Navy",
+  "colorPurple": "Purple",
+  "colorPink": "Pink"
 }

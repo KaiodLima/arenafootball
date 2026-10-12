@@ -1352,5 +1352,22 @@
       }
     }
   },
-  "drawerMyPlayerProfile": "Meu perfil de jogador"
+  "drawerMyPlayerProfile": "Meu perfil de jogador",
+  "teamColorsSection": "Cores do time",
+  "teamColorPrimary": "Cor principal",
+  "teamColorSecondary": "Cor secundária",
+  "teamColorNone": "Sem cor",
+  "teamColorPreview": "Assim fica o uniforme",
+  "colorWhite": "Branco",
+  "colorBlack": "Preto",
+  "colorGrey": "Cinza",
+  "colorRed": "Vermelho",
+  "colorWine": "Vinho",
+  "colorOrange": "Laranja",
+  "colorYellow": "Amarelo",
+  "colorGreen": "Verde",
+  "colorBlue": "Azul",
+  "colorNavy": "Azul-marinho",
+  "colorPurple": "Roxo",
+  "colorPink": "Rosa"
 }

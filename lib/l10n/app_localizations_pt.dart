@@ -2234,4 +2234,55 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get drawerMyPlayerProfile => 'Meu perfil de jogador';
+
+  @override
+  String get teamColorsSection => 'Cores do time';
+
+  @override
+  String get teamColorPrimary => 'Cor principal';
+
+  @override
+  String get teamColorSecondary => 'Cor secundária';
+
+  @override
+  String get teamColorNone => 'Sem cor';
+
+  @override
+  String get teamColorPreview => 'Assim fica o uniforme';
+
+  @override
+  String get colorWhite => 'Branco';
+
+  @override
+  String get colorBlack => 'Preto';
+
+  @override
+  String get colorGrey => 'Cinza';
+
+  @override
+  String get colorRed => 'Vermelho';
+
+  @override
+  String get colorWine => 'Vinho';
+
+  @override
+  String get colorOrange => 'Laranja';
+
+  @override
+  String get colorYellow => 'Amarelo';
+
+  @override
+  String get colorGreen => 'Verde';
+
+  @override
+  String get colorBlue => 'Azul';
+
+  @override
+  String get colorNavy => 'Azul-marinho';
+
+  @override
+  String get colorPurple => 'Roxo';
+
+  @override
+  String get colorPink => 'Rosa';
 }

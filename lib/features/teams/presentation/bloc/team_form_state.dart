@@ -15,6 +15,10 @@ class TeamFormData extends Equatable {
   final String? selectedRegion;
   final File? crest;
 
+  /// Cores do time (hex; vazio = sem cor).
+  final String primaryColor;
+  final String secondaryColor;
+
   /// Times já cadastrados na região (lista e aviso de duplicado).
   final List<TeamDTO> existing;
 
@@ -25,6 +29,8 @@ class TeamFormData extends Equatable {
     this.regions = const [],
     this.selectedRegion,
     this.crest,
+    this.primaryColor = '',
+    this.secondaryColor = '',
     this.existing = const [],
   });
 
@@ -47,10 +53,22 @@ class TeamFormData extends Equatable {
   static String _key(String text) => foldForSearch(text.trim().replaceAll(RegExp(r'\s+'), ' '));
 
   /// Há algo que se perderia ao sair.
-  bool get isDirty => name.trim().isNotEmpty || description.trim().isNotEmpty || crest != null;
+  bool get isDirty =>
+      name.trim().isNotEmpty ||
+      description.trim().isNotEmpty ||
+      crest != null ||
+      primaryColor.isNotEmpty ||
+      secondaryColor.isNotEmpty;
 
   /// Time pronto para o UseCase (o id é montado lá).
-  TeamDTO toTeam() => TeamDTO(id: '', name: name.trim(), description: description, region: selectedRegion ?? '');
+  TeamDTO toTeam() => TeamDTO(
+        id: '',
+        name: name.trim(),
+        description: description,
+        region: selectedRegion ?? '',
+        primaryColor: primaryColor,
+        secondaryColor: secondaryColor,
+      );
 
   /// Formulário limpo para o próximo cadastro, mantendo região e times.
   TeamFormData cleared() =>
@@ -64,6 +82,8 @@ class TeamFormData extends Equatable {
     String? selectedRegion,
     File? crest,
     bool clearCrest = false,
+    String? primaryColor,
+    String? secondaryColor,
     List<TeamDTO>? existing,
   }) {
     return TeamFormData(
@@ -73,12 +93,15 @@ class TeamFormData extends Equatable {
       regions: regions ?? this.regions,
       selectedRegion: selectedRegion ?? this.selectedRegion,
       crest: clearCrest ? null : (crest ?? this.crest),
+      primaryColor: primaryColor ?? this.primaryColor,
+      secondaryColor: secondaryColor ?? this.secondaryColor,
       existing: existing ?? this.existing,
     );
   }
 
   @override
-  List<Object?> get props => [nextNumber, name, description, regions, selectedRegion, crest?.path, existing];
+  List<Object?> get props =>
+      [nextNumber, name, description, regions, selectedRegion, crest?.path, primaryColor, secondaryColor, existing];
 }
 
 class TeamFormState extends Equatable {

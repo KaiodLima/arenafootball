@@ -90,16 +90,23 @@ class TeamsDataSource {
     }
   }
 
-  /// Escudo e descrição (o que o dono pode mudar), no time e na linha da
-  /// classificação, juntos.
+  /// Escudo, descrição e cores (o que o dono pode mudar), no time e na linha
+  /// da classificação, juntos.
   Future<Either<Failure, void>> updateTeamDetails({
     required String id,
     required String description,
     required String imageUrl,
+    String primaryColor = '',
+    String secondaryColor = '',
     String? season,
   }) async {
     try {
-      final data = {'descricao': description, 'urlImagem': imageUrl};
+      final data = {
+        'descricao': description,
+        'urlImagem': imageUrl,
+        'corPrimaria': primaryColor,
+        'corSecundaria': secondaryColor,
+      };
       final batch = _firestore.batch()
         ..update(_firestore.collection(SeasonCollection.name('times', season)).doc(id), data)
         ..update(_firestore.collection(SeasonCollection.name('classificacao', season)).doc(id), data);

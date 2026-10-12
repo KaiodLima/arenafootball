@@ -35,6 +35,8 @@ const _request = TeamRequestDTO(
   region: 'Floresta',
   description: 'Desde 2010',
   imageUrl: 'https://img/escudo.png',
+  primaryColor: '#2E7D32',
+  secondaryColor: '#FFFFFF',
   contact: '(89) 99999-1234',
 );
 
@@ -49,6 +51,7 @@ void main() {
     expect(team.ownerId, 'dono1');
     expect(team.toMap()['idDono'], 'dono1');
     expect(team.toStandingsMap()['pontos'], 0);
+    expect([team.primaryColor, team.secondaryColor], ['#2E7D32', '#FFFFFF']);
   });
 
   test('time sem dono não grava idDono', () {
