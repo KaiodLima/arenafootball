@@ -40,9 +40,29 @@ service cloud.firestore {
     // Leitura pública (inclui o modo convidado); escrita só do admin.
     // Exceção: cada usuário logado grava/atualiza só o próprio voto (doc id = uid).
     match /{collection}/{docId} {
-      allow read: if collection != 'usuarios';
-      allow write: if isAdmin()
-        || (collection.matches('melhorjogador.*') && signedIn() && docId == request.auth.uid);
+      allow read: if !(collection in ['usuarios', 'config', 'notificacoes_envios', 'push_avisos']);
+      allow write: if !(collection in ['config', 'notificacoes_envios', 'push_avisos']) && (isAdmin()
+        || (collection.matches('melhorjogador.*') && signedIn() && docId == request.auth.uid));
+    }
+
+    // Notificações push (Cloud Functions em functions/).
+    // Liga/desliga por ação: só o admin lê e altera.
+    match /config/notificacoes {
+      allow read, write: if isAdmin();
+    }
+
+    // Histórico de envios: gravado pelas functions (Admin SDK), lido pelo admin.
+    match /notificacoes_envios/{logId} {
+      allow read: if isAdmin();
+    }
+
+    // Aviso manual: o admin só cria; a function envia e registra.
+    match /push_avisos/{noticeId} {
+      allow create: if isAdmin()
+        && request.resource.data.titulo is string && request.resource.data.titulo.size() > 0
+        && request.resource.data.titulo.size() <= 80
+        && request.resource.data.corpo is string && request.resource.data.corpo.size() > 0
+        && request.resource.data.corpo.size() <= 240;
     }
   }
 }

@@ -34,7 +34,7 @@ Clean Architecture por feature (`data/` -> `domain/` -> `presentation/`), detalh
 UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Auth/Storage
 ```
 
-## Features (14 módulos em `lib/features/`)
+## Features (15 módulos em `lib/features/`)
 
 | Feature | Conteúdo |
 |---------|----------|
@@ -51,6 +51,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | `matches` | Aba TABELAS, lista de partidas (hoje/todas), cadastro, placar, votação on/off |
 | `voting` | Votar no melhor jogador, contagem de votos, jogador eleito |
 | `global_results` | Resultados pelo mundo (scraping do soccerstats.com; parser em `data/parsers/`) |
+| `notifications` | Painel de push do admin (liga/desliga por ação, histórico, aviso manual) + sincronia de tópicos |
 
 ## Fluxo para feature ou tela nova
 
@@ -96,9 +97,19 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | `campeonatos` | titulo, descricao, urlImagem, premio1-3, premioArtilheiro, premioGoleiro, regras, fk_competicao, id_campeonato |
 | `grupos{ano}` | descricao, fk_competicao |
 | `melhorjogador{timeC}{timeF}` | um doc por votante (id = uid): nome, time |
+| `config/notificacoes` | liga/desliga por ação de push: gol, noticia, partida, votacao_aberta, votacao_encerrada, jogo_do_dia, aviso (bool; ausente = padrão das functions) |
+| `notificacoes_envios` | histórico gravado pelas Cloud Functions (id = evento): tipo, titulo, corpo, alvo, regiao, data, status (enviado/desligado/erro), erro, origem |
+| `push_avisos` | aviso manual do admin (titulo, corpo, regiao vazia = todos, data); a function envia |
 
 `{ano}`: a temporada corrente (`SeasonCollection.currentSeason`, hoje **2023**) fica nas coleções sem sufixo; as anteriores usam o ano como sufixo (`times2022`). Não comparar com o ano do relógio. Para abrir uma temporada nova: copiar as coleções sem sufixo para `<nome><ano>`, limpar as sem sufixo e atualizar `currentSeason`/`seasons`.
 Storage: `noticias/`, `destaques/`, `times/`, `jogadores/` (ver `StorageFolder`).
+
+## Notificações push (FCM)
+
+- **Envio:** Cloud Functions em `functions/` (TypeScript, região `us-central1`, a mesma do Firestore `nam5`). Gatilhos em `noticias`, `partidas` (temporada corrente) e `push_avisos`, mais o agendamento diário `dailyGames` (9h, Brasília). Mensagens e alvos em `functions/src/messages.ts` (funções puras, `npm test`).
+- **Tópicos:** `todos`, `regiao_<slug>`, `time_<slug>`. O slug de `lib/core/utils/push_topics.dart` e o de `messages.ts` precisam ser iguais.
+- **App:** `PushService` (`lib/core/services/push_service.dart`) faz permissão, exibição em primeiro plano e toque (abre a aba do `data.aba`). O `PushTopicsListener` (em `blocs_load.dart`) mantém os tópicos de acordo com a região e o time do coração.
+- **Deploy das functions:** `cd functions && npm install`, depois `firebase deploy --only functions`.
 
 ## Security Rules
 

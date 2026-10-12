@@ -2517,6 +2517,216 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'\"{title}\" excluído.'**
   String highlightDeleted(String title);
+
+  /// No description provided for @pushPanelTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notificações'**
+  String get pushPanelTitle;
+
+  /// No description provided for @pushTabActions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ações'**
+  String get pushTabActions;
+
+  /// No description provided for @pushTabHistory.
+  ///
+  /// In pt, this message translates to:
+  /// **'Histórico'**
+  String get pushTabHistory;
+
+  /// No description provided for @pushTabSend.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar aviso'**
+  String get pushTabSend;
+
+  /// No description provided for @pushActionsIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha quais ações enviam push. Cada usuário recebe da região escolhida no app; os jogos também chegam para quem torce pelos times.'**
+  String get pushActionsIntro;
+
+  /// No description provided for @pushActionGoal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol'**
+  String get pushActionGoal;
+
+  /// No description provided for @pushActionGoalHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Card de gol publicado · \"⚽ GOL! Lava Jato 2 × 1 Volta\"'**
+  String get pushActionGoalHint;
+
+  /// No description provided for @pushActionNews.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícia publicada'**
+  String get pushActionNews;
+
+  /// No description provided for @pushActionNewsHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícia visível no feed (sem anúncios) · título da notícia'**
+  String get pushActionNewsHint;
+
+  /// No description provided for @pushActionMatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nova partida'**
+  String get pushActionMatch;
+
+  /// No description provided for @pushActionMatchHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Partida cadastrada · data, horário e local'**
+  String get pushActionMatchHint;
+
+  /// No description provided for @pushActionVotingOpen.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votação aberta'**
+  String get pushActionVotingOpen;
+
+  /// No description provided for @pushActionVotingOpenHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votação do melhor da partida liberada'**
+  String get pushActionVotingOpenHint;
+
+  /// No description provided for @pushActionVotingClosed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votação encerrada'**
+  String get pushActionVotingClosed;
+
+  /// No description provided for @pushActionVotingClosedHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votação fechada · convida a ver o eleito'**
+  String get pushActionVotingClosedHint;
+
+  /// No description provided for @pushActionDailyGame.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogo do seu time'**
+  String get pushActionDailyGame;
+
+  /// No description provided for @pushActionDailyGameHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todo dia às 9h, para quem torce por um time que joga hoje'**
+  String get pushActionDailyGameHint;
+
+  /// No description provided for @pushActionNotice.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aviso manual'**
+  String get pushActionNotice;
+
+  /// No description provided for @pushActionNoticeHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Avisos enviados pela aba \"Enviar aviso\"'**
+  String get pushActionNoticeHint;
+
+  /// No description provided for @pushHistoryEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma notificação enviada ainda.'**
+  String get pushHistoryEmpty;
+
+  /// No description provided for @pushStatusSent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviada'**
+  String get pushStatusSent;
+
+  /// No description provided for @pushStatusDisabled.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desligada'**
+  String get pushStatusDisabled;
+
+  /// No description provided for @pushStatusError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Erro'**
+  String get pushStatusError;
+
+  /// No description provided for @pushAllRegions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todas as regiões'**
+  String get pushAllRegions;
+
+  /// No description provided for @pushAudienceTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Torcedores dos times'**
+  String get pushAudienceTeams;
+
+  /// No description provided for @pushNoticeSection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aviso'**
+  String get pushNoticeSection;
+
+  /// No description provided for @pushNoticeTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Título'**
+  String get pushNoticeTitle;
+
+  /// No description provided for @pushNoticeBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mensagem'**
+  String get pushNoticeBody;
+
+  /// No description provided for @pushNoticeAudience.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para quem'**
+  String get pushNoticeAudience;
+
+  /// No description provided for @pushNoticePreview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prévia'**
+  String get pushNoticePreview;
+
+  /// No description provided for @pushNoticeHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'O envio leva alguns segundos e aparece no Histórico.'**
+  String get pushNoticeHint;
+
+  /// No description provided for @pushSend.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar'**
+  String get pushSend;
+
+  /// No description provided for @pushSendConfirmTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar notificação?'**
+  String get pushSendConfirmTitle;
+
+  /// No description provided for @pushSendConfirmMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos os usuários de \"{audience}\" vão receber este aviso agora.'**
+  String pushSendConfirmMessage(String audience);
+
+  /// No description provided for @pushSent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aviso enviado!'**
+  String get pushSent;
 }
 
 class _AppLocalizationsDelegate

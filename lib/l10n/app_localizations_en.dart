@@ -1391,4 +1391,118 @@ class AppLocalizationsEn extends AppLocalizations {
   String highlightDeleted(String title) {
     return '\"$title\" deleted.';
   }
+
+  @override
+  String get pushPanelTitle => 'Notifications';
+
+  @override
+  String get pushTabActions => 'Actions';
+
+  @override
+  String get pushTabHistory => 'History';
+
+  @override
+  String get pushTabSend => 'Send notice';
+
+  @override
+  String get pushActionsIntro =>
+      'Choose which actions send a push. Users get the ones from the region chosen in the app; games also reach the fans of both teams.';
+
+  @override
+  String get pushActionGoal => 'Goal';
+
+  @override
+  String get pushActionGoalHint =>
+      'Goal card published · \"⚽ GOAL! Lava Jato 2 × 1 Volta\"';
+
+  @override
+  String get pushActionNews => 'News published';
+
+  @override
+  String get pushActionNewsHint =>
+      'News visible in the feed (no ads) · news title';
+
+  @override
+  String get pushActionMatch => 'New match';
+
+  @override
+  String get pushActionMatchHint => 'Match registered · date, time and place';
+
+  @override
+  String get pushActionVotingOpen => 'Voting open';
+
+  @override
+  String get pushActionVotingOpenHint => 'Best player voting opened';
+
+  @override
+  String get pushActionVotingClosed => 'Voting closed';
+
+  @override
+  String get pushActionVotingClosedHint =>
+      'Voting closed · invites to see the winner';
+
+  @override
+  String get pushActionDailyGame => 'Your team plays today';
+
+  @override
+  String get pushActionDailyGameHint =>
+      'Every day at 9am, to fans of teams playing today';
+
+  @override
+  String get pushActionNotice => 'Manual notice';
+
+  @override
+  String get pushActionNoticeHint =>
+      'Notices sent from the \"Send notice\" tab';
+
+  @override
+  String get pushHistoryEmpty => 'No notifications sent yet.';
+
+  @override
+  String get pushStatusSent => 'Sent';
+
+  @override
+  String get pushStatusDisabled => 'Disabled';
+
+  @override
+  String get pushStatusError => 'Error';
+
+  @override
+  String get pushAllRegions => 'All regions';
+
+  @override
+  String get pushAudienceTeams => 'Teams\' fans';
+
+  @override
+  String get pushNoticeSection => 'Notice';
+
+  @override
+  String get pushNoticeTitle => 'Title';
+
+  @override
+  String get pushNoticeBody => 'Message';
+
+  @override
+  String get pushNoticeAudience => 'Audience';
+
+  @override
+  String get pushNoticePreview => 'Preview';
+
+  @override
+  String get pushNoticeHint =>
+      'Sending takes a few seconds and shows up in History.';
+
+  @override
+  String get pushSend => 'Send';
+
+  @override
+  String get pushSendConfirmTitle => 'Send notification?';
+
+  @override
+  String pushSendConfirmMessage(String audience) {
+    return 'Every user in \"$audience\" will get this notice now.';
+  }
+
+  @override
+  String get pushSent => 'Notice sent!';
 }

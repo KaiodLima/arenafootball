@@ -1,0 +1,23 @@
+{
+  "name": "arena-football-functions",
+  "private": true,
+  "description": "Notifica\u00e7\u00f5es push do Arena Football (FCM por t\u00f3picos).",
+  "main": "lib/index.js",
+  "engines": {
+    "node": "22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "tsc && node --test \"lib/test/**/*.test.js\"",
+    "deploy": "firebase deploy --only functions"
+  },
+  "dependencies": {
+    "@google-cloud/firestore": "^9.1.0",
+    "firebase-admin": "^14.5.0",
+    "firebase-functions": "^7.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.6.3"
+  }
+}

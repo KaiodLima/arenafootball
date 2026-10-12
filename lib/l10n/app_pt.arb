@@ -808,5 +808,47 @@
         "type": "String"
       }
     }
-  }
+  },
+  "pushPanelTitle": "Notificações",
+  "pushTabActions": "Ações",
+  "pushTabHistory": "Histórico",
+  "pushTabSend": "Enviar aviso",
+  "pushActionsIntro": "Escolha quais ações enviam push. Cada usuário recebe da região escolhida no app; os jogos também chegam para quem torce pelos times.",
+  "pushActionGoal": "Gol",
+  "pushActionGoalHint": "Card de gol publicado · \"⚽ GOL! Lava Jato 2 × 1 Volta\"",
+  "pushActionNews": "Notícia publicada",
+  "pushActionNewsHint": "Notícia visível no feed (sem anúncios) · título da notícia",
+  "pushActionMatch": "Nova partida",
+  "pushActionMatchHint": "Partida cadastrada · data, horário e local",
+  "pushActionVotingOpen": "Votação aberta",
+  "pushActionVotingOpenHint": "Votação do melhor da partida liberada",
+  "pushActionVotingClosed": "Votação encerrada",
+  "pushActionVotingClosedHint": "Votação fechada · convida a ver o eleito",
+  "pushActionDailyGame": "Jogo do seu time",
+  "pushActionDailyGameHint": "Todo dia às 9h, para quem torce por um time que joga hoje",
+  "pushActionNotice": "Aviso manual",
+  "pushActionNoticeHint": "Avisos enviados pela aba \"Enviar aviso\"",
+  "pushHistoryEmpty": "Nenhuma notificação enviada ainda.",
+  "pushStatusSent": "Enviada",
+  "pushStatusDisabled": "Desligada",
+  "pushStatusError": "Erro",
+  "pushAllRegions": "Todas as regiões",
+  "pushAudienceTeams": "Torcedores dos times",
+  "pushNoticeSection": "Aviso",
+  "pushNoticeTitle": "Título",
+  "pushNoticeBody": "Mensagem",
+  "pushNoticeAudience": "Para quem",
+  "pushNoticePreview": "Prévia",
+  "pushNoticeHint": "O envio leva alguns segundos e aparece no Histórico.",
+  "pushSend": "Enviar",
+  "pushSendConfirmTitle": "Enviar notificação?",
+  "pushSendConfirmMessage": "Todos os usuários de \"{audience}\" vão receber este aviso agora.",
+  "@pushSendConfirmMessage": {
+    "placeholders": {
+      "audience": {
+        "type": "String"
+      }
+    }
+  },
+  "pushSent": "Aviso enviado!"
 }

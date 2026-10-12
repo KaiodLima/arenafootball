@@ -1400,4 +1400,120 @@ class AppLocalizationsPt extends AppLocalizations {
   String highlightDeleted(String title) {
     return '\"$title\" excluído.';
   }
+
+  @override
+  String get pushPanelTitle => 'Notificações';
+
+  @override
+  String get pushTabActions => 'Ações';
+
+  @override
+  String get pushTabHistory => 'Histórico';
+
+  @override
+  String get pushTabSend => 'Enviar aviso';
+
+  @override
+  String get pushActionsIntro =>
+      'Escolha quais ações enviam push. Cada usuário recebe da região escolhida no app; os jogos também chegam para quem torce pelos times.';
+
+  @override
+  String get pushActionGoal => 'Gol';
+
+  @override
+  String get pushActionGoalHint =>
+      'Card de gol publicado · \"⚽ GOL! Lava Jato 2 × 1 Volta\"';
+
+  @override
+  String get pushActionNews => 'Notícia publicada';
+
+  @override
+  String get pushActionNewsHint =>
+      'Notícia visível no feed (sem anúncios) · título da notícia';
+
+  @override
+  String get pushActionMatch => 'Nova partida';
+
+  @override
+  String get pushActionMatchHint =>
+      'Partida cadastrada · data, horário e local';
+
+  @override
+  String get pushActionVotingOpen => 'Votação aberta';
+
+  @override
+  String get pushActionVotingOpenHint =>
+      'Votação do melhor da partida liberada';
+
+  @override
+  String get pushActionVotingClosed => 'Votação encerrada';
+
+  @override
+  String get pushActionVotingClosedHint =>
+      'Votação fechada · convida a ver o eleito';
+
+  @override
+  String get pushActionDailyGame => 'Jogo do seu time';
+
+  @override
+  String get pushActionDailyGameHint =>
+      'Todo dia às 9h, para quem torce por um time que joga hoje';
+
+  @override
+  String get pushActionNotice => 'Aviso manual';
+
+  @override
+  String get pushActionNoticeHint =>
+      'Avisos enviados pela aba \"Enviar aviso\"';
+
+  @override
+  String get pushHistoryEmpty => 'Nenhuma notificação enviada ainda.';
+
+  @override
+  String get pushStatusSent => 'Enviada';
+
+  @override
+  String get pushStatusDisabled => 'Desligada';
+
+  @override
+  String get pushStatusError => 'Erro';
+
+  @override
+  String get pushAllRegions => 'Todas as regiões';
+
+  @override
+  String get pushAudienceTeams => 'Torcedores dos times';
+
+  @override
+  String get pushNoticeSection => 'Aviso';
+
+  @override
+  String get pushNoticeTitle => 'Título';
+
+  @override
+  String get pushNoticeBody => 'Mensagem';
+
+  @override
+  String get pushNoticeAudience => 'Para quem';
+
+  @override
+  String get pushNoticePreview => 'Prévia';
+
+  @override
+  String get pushNoticeHint =>
+      'O envio leva alguns segundos e aparece no Histórico.';
+
+  @override
+  String get pushSend => 'Enviar';
+
+  @override
+  String get pushSendConfirmTitle => 'Enviar notificação?';
+
+  @override
+  String pushSendConfirmMessage(String audience) {
+    return 'Todos os usuários de \"$audience\" vão receber este aviso agora.';
+  }
+
+  @override
+  String get pushSent => 'Aviso enviado!';
 }

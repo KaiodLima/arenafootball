@@ -66,6 +66,11 @@ class HomeDrawer extends StatelessWidget {
                     onTap: () => _open(context, AppRoutes.manageHighlightsPage),
                   ),
                   _DrawerItem(
+                    icon: Icons.notifications_active_outlined,
+                    title: l10n.pushPanelTitle,
+                    onTap: () => _open(context, AppRoutes.notificationsPanelPage),
+                  ),
+                  _DrawerItem(
                     icon: Icons.scoreboard_outlined,
                     title: l10n.drawerRegisterMatch,
                     onTap: () => _open(context, AppRoutes.registerMatchPage),
