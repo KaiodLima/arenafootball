@@ -93,4 +93,40 @@ class PlayersDataSource {
       return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
     }
   }
+
+  /// Exclui o jogador (só os sem conta vinculada; os vinculados saem do
+  /// elenco com [removeFromSquad]).
+  Future<Either<Failure, void>> deletePlayer(PlayerDTO player, {String? season}) async {
+    try {
+      await _players(season).doc(player.id).delete();
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('deletePlayer id=${player.id}', name: 'PlayersDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível excluir o jogador.'));
+    }
+  }
+
+  /// Tira o jogador vinculado a uma conta do elenco: fica sem time e mantém
+  /// gols e assistências. O pedido "Sou jogador" dele vira "removido" (na
+  /// mesma escrita), o que libera pedir outro time.
+  Future<Either<Failure, void>> removeFromSquad(PlayerDTO player, {String? season}) async {
+    try {
+      final batch = _firestore.batch()..update(_players(season).doc(player.id), {'time': ''});
+      if (player.userId.isNotEmpty) {
+        final request = await _firestore.collection('solicitacoes_jogador').doc(player.userId).get();
+        if (request.exists && request.data()?['idJogador'] == player.id) {
+          batch.update(request.reference, {
+            'status': 'removido',
+            'motivo': '',
+            'atualizado_em': FieldValue.serverTimestamp(),
+          });
+        }
+      }
+      await batch.commit();
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('removeFromSquad id=${player.id}', name: 'PlayersDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível tirar o jogador do elenco.'));
+    }
+  }
 }

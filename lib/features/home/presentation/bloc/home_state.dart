@@ -9,15 +9,19 @@ class HomeState extends Equatable {
   /// Escudo do time do coração, exibido no drawer.
   final String? favoriteTeamImage;
 
-  const HomeState({this.tab = HomeTab.news, this.favoriteTeamImage});
+  /// Pedidos "Sou jogador" aguardando resposta (só para o admin).
+  final int pendingPlayerRequests;
 
-  HomeState copyWith({HomeTab? tab, String? favoriteTeamImage}) {
+  const HomeState({this.tab = HomeTab.news, this.favoriteTeamImage, this.pendingPlayerRequests = 0});
+
+  HomeState copyWith({HomeTab? tab, String? favoriteTeamImage, int? pendingPlayerRequests}) {
     return HomeState(
       tab: tab ?? this.tab,
       favoriteTeamImage: favoriteTeamImage ?? this.favoriteTeamImage,
+      pendingPlayerRequests: pendingPlayerRequests ?? this.pendingPlayerRequests,
     );
   }
 
   @override
-  List<Object?> get props => [tab, favoriteTeamImage];
+  List<Object?> get props => [tab, favoriteTeamImage, pendingPlayerRequests];
 }

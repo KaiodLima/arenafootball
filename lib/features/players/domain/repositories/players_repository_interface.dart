@@ -13,6 +13,10 @@ abstract class IPlayersRepository {
 
   Future<Either<Failure, void>> updatePlayer(PlayerDTO player, {String? season});
 
+  Future<Either<Failure, void>> deletePlayer(PlayerDTO player, {String? season});
+
+  Future<Either<Failure, void>> removeFromSquad(PlayerDTO player, {String? season});
+
   /// Soma gols/assistências ao jogador (atômico).
   Future<Either<Failure, void>> incrementStats({
     required String playerId,

@@ -165,6 +165,16 @@ class _NotificationsPanelPageState extends State<NotificationsPanelPage> {
         name: l10n.pushActionNotice,
         description: l10n.pushActionNoticeHint
       ),
+    PushAction.playerRequest => (
+        icon: Icons.how_to_reg_outlined,
+        name: l10n.pushActionPlayerRequest,
+        description: l10n.pushActionPlayerRequestHint
+      ),
+    PushAction.playerRequestAnswer => (
+        icon: Icons.mark_email_read_outlined,
+        name: l10n.pushActionPlayerRequestAnswer,
+        description: l10n.pushActionPlayerRequestAnswerHint
+      ),
   };
 }
 

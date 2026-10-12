@@ -7,7 +7,16 @@
  */
 
 /** Ações que podem emitir push (chaves de `config/notificacoes`). */
-export type ActionKey = 'gol' | 'noticia' | 'partida' | 'votacao_aberta' | 'votacao_encerrada' | 'jogo_do_dia' | 'aviso';
+export type ActionKey =
+  | 'gol'
+  | 'noticia'
+  | 'partida'
+  | 'votacao_aberta'
+  | 'votacao_encerrada'
+  | 'jogo_do_dia'
+  | 'aviso'
+  | 'solicitacao_jogador'
+  | 'solicitacao_resposta';
 
 /** Sem configuração gravada, vale este padrão (notícia vem desligada). */
 export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
@@ -18,6 +27,8 @@ export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
   votacao_encerrada: true,
   jogo_do_dia: true,
   aviso: true,
+  solicitacao_jogador: true,
+  solicitacao_resposta: true,
 };
 
 export type Target = { topic: string } | { condition: string };
@@ -26,8 +37,11 @@ export interface PushMessage {
   tipo: ActionKey;
   titulo: string;
   corpo: string;
-  /** Aba aberta ao tocar: feed ou tabelas. */
-  aba: 'home' | 'tabelas';
+  /**
+   * O que abre ao tocar: feed, tabelas, painel de pedidos de jogador (admin)
+   * ou a situação do pedido do usuário.
+   */
+  aba: 'home' | 'tabelas' | 'solicitacoes' | 'sou_jogador';
   regiao: string;
   alvo: Target;
 }
@@ -48,6 +62,10 @@ export function topicSlug(value: string): string {
 export const ALL_TOPIC = 'todos';
 export const regionTopic = (region: string): string => `regiao_${topicSlug(region)}`;
 export const teamTopic = (team: string): string => `time_${topicSlug(team)}`;
+/** Administradores (o app assina quando a conta é admin). */
+export const ADMINS_TOPIC = 'admins';
+/** Um usuário só. O uid já é alfanumérico: vai sem slug, igual ao app. */
+export const userTopic = (uid: string): string => `usuario_${uid}`;
 
 /** Um tópico vira `topic`; vários, uma condition com OR (cada aparelho recebe uma vez). */
 export function targetFor(topics: string[]): Target | null {
@@ -198,6 +216,59 @@ export function manualMessage(notice: Doc): PushMessage | null {
     aba: 'home',
     regiao: region,
     alvo: { topic: region ? regionTopic(region) : ALL_TOPIC },
+  };
+}
+
+/**
+ * Pedido "Sou jogador" chegou para análise: criado, ou reenviado depois de
+ * rejeitado. Correções num pedido já pendente não avisam de novo.
+ */
+export function playerRequestMessage(uid: string, before: Doc | undefined, after: Doc | undefined): PushMessage | null {
+  if (!after || text(after.status) !== 'pendente' || text(before?.status) === 'pendente') return null;
+  const name = text(after.nome);
+  const team = text(after.time);
+  if (!name || !team || !uid) return null;
+  return {
+    tipo: 'solicitacao_jogador',
+    titulo: 'Nova solicitação de jogador',
+    corpo: shorten(`${name} quer jogar no ${team}`, 240),
+    aba: 'solicitacoes',
+    regiao: text(after.regiao),
+    alvo: { topic: ADMINS_TOPIC },
+  };
+}
+
+/** Admin respondeu o pedido, ou tirou o atleta do elenco: avisa só quem pediu. */
+export function playerRequestAnswerMessage(uid: string, before: Doc | undefined, after: Doc | undefined): PushMessage | null {
+  if (!before || !after || !uid) return null;
+  const status = text(after.status);
+  if (text(before.status) === 'aprovada' && status === 'removido') {
+    return {
+      tipo: 'solicitacao_resposta',
+      titulo: 'Você saiu do elenco',
+      corpo: `Você não faz mais parte do ${text(after.time)}. Suas estatísticas continuam salvas.`,
+      aba: 'sou_jogador',
+      regiao: text(after.regiao),
+      alvo: { topic: userTopic(uid) },
+    };
+  }
+  if (text(before.status) !== 'pendente') return null;
+  if (status !== 'aprovada' && status !== 'rejeitada') return null;
+  const team = text(after.time);
+  const reason = text(after.motivo);
+  const approved = status === 'aprovada';
+  return {
+    tipo: 'solicitacao_resposta',
+    titulo: approved ? '✅ Você está no elenco!' : 'Solicitação de jogador',
+    corpo: shorten(
+      approved
+        ? `Sua solicitação para jogar no ${team} foi aprovada.`
+        : `Sua solicitação para jogar no ${team} não foi aprovada.${reason ? ` Motivo: ${reason}` : ''}`,
+      240,
+    ),
+    aba: 'sou_jogador',
+    regiao: text(after.regiao),
+    alvo: { topic: userTopic(uid) },
   };
 }
 

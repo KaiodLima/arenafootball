@@ -72,6 +72,12 @@ void main() {
       expect(desiredTopics(region: 'Floresta', favoriteTeam: ''), {'todos', 'regiao_floresta'});
     });
 
+    test('logado: tópico do usuário; admin: também o dos admins', () {
+      expect(desiredTopics(region: 'Floresta', userId: 'AbC123'), {'todos', 'regiao_floresta', 'usuario_AbC123'});
+      expect(desiredTopics(region: 'Floresta', userId: 'AbC123', isAdmin: true),
+          {'todos', 'regiao_floresta', 'usuario_AbC123', 'admins'});
+    });
+
     test('trocar de região assina a nova e cancela a antiga', () async {
       SharedPreferences.setMockInitialValues({});
       final client = _FakeTopics();

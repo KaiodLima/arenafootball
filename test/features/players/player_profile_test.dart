@@ -9,7 +9,9 @@ import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/features/news/domain/usecases/get_player_goal_cards_usecase.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/domain/repositories/players_repository_interface.dart';
+import 'package:arena_soccer/features/players/domain/usecases/delete_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/get_players_usecase.dart';
+import 'package:arena_soccer/features/players/domain/usecases/remove_player_from_squad_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/update_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_player_usecase.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/player_profile_cubit.dart';
@@ -32,6 +34,20 @@ const _all = [
 class _FakePlayers implements IPlayersRepository {
   final controller = StreamController<Either<Failure, PlayerDTO?>>();
   final updated = <PlayerDTO>[];
+  final deleted = <PlayerDTO>[];
+  final removed = <PlayerDTO>[];
+
+  @override
+  Future<Either<Failure, void>> removeFromSquad(PlayerDTO player, {String? season}) async {
+    removed.add(player);
+    return const Right(null);
+  }
+
+  @override
+  Future<Either<Failure, void>> deletePlayer(PlayerDTO player, {String? season}) async {
+    deleted.add(player);
+    return const Right(null);
+  }
 
   @override
   Stream<Either<Failure, PlayerDTO?>> watchPlayer({required String id, String? season}) => controller.stream;
@@ -101,6 +117,8 @@ void main() {
       GetStatsRankingUseCase(teams, GetPlayersUseCase(players)),
       _FakeGoalCards(),
       UpdatePlayerUseCase(players, _FakeStorage()),
+      DeletePlayerUseCase(players),
+      RemovePlayerFromSquadUseCase(players),
     );
   });
 
@@ -163,6 +181,36 @@ void main() {
     await cubit.changePhoto(File('foto.png'));
     expect(players.updated.last.imageUrl, 'https://img/nova.png');
     expect(cubit.state.saving, isFalse);
+  });
+
+  test('excluir apaga o jogador e avisa com nome e time', () async {
+    cubit.watch(playerId: 'dudu');
+    players.controller.add(const Right(_dudu));
+    await settle();
+    await cubit.delete();
+    expect(players.deleted.single.id, _dudu.id);
+    expect(
+      cubit.state,
+      isA<DeletedPlayerProfileState>().having((s) => s.name, 'name', _dudu.name).having((s) => s.teamName, 'team', _dudu.team),
+    );
+  });
+
+  test('vinculado: remover do elenco mantém o jogador e avisa', () async {
+    const linked = PlayerDTO(id: 'kaio', name: 'Kaio', team: 'Lava Jato', goals: 7, userId: 'AbC1');
+    cubit.watch(playerId: 'kaio');
+    players.controller.add(const Right(linked));
+    await settle();
+    await cubit.removeFromSquad();
+    expect(players.removed.single.id, 'kaio');
+    expect(players.deleted, isEmpty);
+    expect(cubit.state, isA<RemovedFromSquadPlayerProfileState>());
+
+    // O stream chega sem time: some o time e as posições, ficam os gols.
+    players.controller.add(Right(linked.copyWith(team: '')));
+    await settle();
+    expect(cubit.state.team, isNull);
+    expect(cubit.state.goalsRank, isNull);
+    expect(cubit.state.player?.goals, 7);
   });
 
   test('falha do stream sem jogador → estado de erro', () async {

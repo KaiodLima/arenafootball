@@ -7,6 +7,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/news/domain/usecases/get_player_goal_cards_usecase.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
+import 'package:arena_soccer/features/players/domain/usecases/delete_player_usecase.dart';
+import 'package:arena_soccer/features/players/domain/usecases/remove_player_from_squad_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/update_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_player_usecase.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/player_profile_state.dart';
@@ -18,13 +20,16 @@ import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.da
 
 /// Tela do atleta: o jogador em tempo real, o time dele, a posição na
 /// artilharia/assistências da região e os cards de gol em que participou.
-/// Para o admin, edita nome, foto e números.
+/// Para o admin, edita nome, foto e números; exclui o jogador, ou, se ele
+/// tem conta vinculada, só o tira do elenco.
 class PlayerProfileCubit extends Cubit<PlayerProfileState> {
   final WatchPlayerUseCase watchPlayerUseCase;
   final GetTeamsUseCase getTeamsUseCase;
   final GetStatsRankingUseCase getStatsRankingUseCase;
   final GetPlayerGoalCardsUseCase getPlayerGoalCardsUseCase;
   final UpdatePlayerUseCase updatePlayerUseCase;
+  final DeletePlayerUseCase deletePlayerUseCase;
+  final RemovePlayerFromSquadUseCase removePlayerFromSquadUseCase;
   StreamSubscription<Either<Failure, PlayerDTO?>>? _subscription;
   String? _season;
 
@@ -37,6 +42,8 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
     this.getStatsRankingUseCase,
     this.getPlayerGoalCardsUseCase,
     this.updatePlayerUseCase,
+    this.deletePlayerUseCase,
+    this.removePlayerFromSquadUseCase,
   ) : super(const PlayerProfileState());
 
   /// [initial] (opcional) aparece enquanto o stream não chega.
@@ -72,6 +79,12 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
     final key = (goals: player.goals, assists: player.assists, team: player.team);
     if (_rankedFor == key) return;
     _rankedFor = key;
+
+    // Sem time (tirado do elenco): sem escudo e fora dos rankings da região.
+    if (player.team.isEmpty) {
+      emit(state.copyWith(clearTeam: true, clearRanks: true));
+      return;
+    }
 
     var team = state.team;
     if (team == null || team.name != player.team) {
@@ -143,6 +156,42 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
     response.fold(
       (failure) => emit(ErrorPlayerProfileState(state.copyWith(saving: false), failure.toString())),
       (saved) => emit(state.copyWith(player: saved, saving: false)),
+    );
+  }
+
+  Future<void> delete() async {
+    final player = state.player;
+    if (player == null || state.saving) return;
+    emit(state.copyWith(saving: true));
+    // Sem isso, o stream avisa "não encontrado" antes do aviso de excluído.
+    await _subscription?.cancel();
+    _subscription = null;
+    final response = await deletePlayerUseCase(player, season: _season);
+    if (isClosed) return;
+    response.fold(
+      (failure) {
+        emit(ErrorPlayerProfileState(state.copyWith(saving: false), failure.toString()));
+        // Volta a acompanhar o jogador, que continua existindo.
+        watch(playerId: player.id, season: _season, initial: player);
+      },
+      (_) => emit(DeletedPlayerProfileState(name: player.name, teamName: player.team)),
+    );
+  }
+
+  /// Só para jogador com conta vinculada; o stream mostra ele sem time.
+  Future<void> removeFromSquad() async {
+    final player = state.player;
+    if (player == null || state.saving || player.team.isEmpty) return;
+    emit(state.copyWith(saving: true));
+    final response = await removePlayerFromSquadUseCase(player, season: _season);
+    if (isClosed) return;
+    response.fold(
+      (failure) => emit(ErrorPlayerProfileState(state.copyWith(saving: false), failure.toString())),
+      (_) => emit(RemovedFromSquadPlayerProfileState(
+        state.copyWith(saving: false),
+        name: player.name,
+        teamName: player.team,
+      )),
     );
   }
 

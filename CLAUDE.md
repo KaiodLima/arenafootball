@@ -34,7 +34,7 @@ Clean Architecture por feature (`data/` -> `domain/` -> `presentation/`), detalh
 UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Auth/Storage
 ```
 
-## Features (15 módulos em `lib/features/`)
+## Features (16 módulos em `lib/features/`)
 
 | Feature | Conteúdo |
 |---------|----------|
@@ -46,6 +46,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | `highlights` | Carrossel de destaques, detalhe, cadastro |
 | `teams` | Aba TIMES, cadastro de time (+ linha na classificação) |
 | `players` | Elenco do time, edição de gols/assistências/foto, cadastro de jogador |
+| `player_requests` | "Sou jogador": usuário pede para entrar num time; painel do admin aprova (cria o jogador vinculado), rejeita ou edita |
 | `stats` | Ranking de artilharia/assistências (uma tela, `StatsRankingType`) |
 | `championships` | Aba CAMPEONATOS, detalhe, grupos, classificação |
 | `matches` | Aba TABELAS, lista de partidas (hoje/todas), cadastro, placar, votação on/off |
@@ -92,13 +93,14 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | `competicao` | nome (as "regiões": Floresta, Santo inacio...) |
 | `times{ano}` | id_partida (é o id do **time**, nome errado), nome, descricao, fk_competicao, urlImagem |
 | `classificacao{ano}` | campos do time + vitorias, derrotas, empates, gols_feitos, gols_sofridos, pontos, saldo_gols, fk_grupo |
-| `jogadores{ano}` | idJogador, nome, time, urlImagem, nGols, nAssistencias |
+| `jogadores{ano}` | idJogador, nome, time, urlImagem, nGols, nAssistencias. Opcionais: idUsuario (conta vinculada pelo "Sou jogador"), posicao (goleiro/zagueiro/lateral/meia/atacante) |
 | `partidas{ano}` | id_partida, dataRegistro, timeC, timeF, horario, data, local, id_campeonato, fk_competicao, golTimeCasa, golTimeFora, votacao (string), tituloVotacao, melhorJogador, quantidadeVotos |
 | `campeonatos` | titulo, descricao, urlImagem, premio1-3, premioArtilheiro, premioGoleiro, regras, fk_competicao, id_campeonato |
 | `grupos{ano}` | descricao, fk_competicao |
 | `melhorjogador{timeC}{timeF}` | um doc por votante (id = uid): nome, time |
 | `config/notificacoes` | liga/desliga por ação de push: gol, noticia, partida, votacao_aberta, votacao_encerrada, jogo_do_dia, aviso (bool; ausente = padrão das functions) |
 | `notificacoes_envios` | histórico gravado pelas Cloud Functions (id = evento): tipo, titulo, corpo, alvo, regiao, data, status (enviado/desligado/erro), erro, origem |
+| `solicitacoes_jogador` | pedido "Sou jogador", id = uid (um por usuário): uid, nome_usuario, email, nome, time, regiao, temporada, posicao, mensagem, urlImagem, status (pendente/aprovada/rejeitada/removido), motivo, idJogador, data, atualizado_em. Aprovar = batch que cria o jogador (ou reaproveita o atleta da conta, mantendo os números) e marca o pedido. Atleta vinculado não é excluído: "remover do elenco" zera o `time` e o pedido vira `removido` |
 | `push_avisos` | aviso manual do admin (titulo, corpo, regiao vazia = todos, data); a function envia |
 
 `{ano}`: a temporada corrente (`SeasonCollection.currentSeason`, hoje **2023**) fica nas coleções sem sufixo; as anteriores usam o ano como sufixo (`times2022`). Não comparar com o ano do relógio. Para abrir uma temporada nova: copiar as coleções sem sufixo para `<nome><ano>`, limpar as sem sufixo e atualizar `currentSeason`/`seasons`.
@@ -106,8 +108,8 @@ Storage: `noticias/`, `destaques/`, `times/`, `jogadores/` (ver `StorageFolder`)
 
 ## Notificações push (FCM)
 
-- **Envio:** Cloud Functions em `functions/` (TypeScript, região `us-central1`, a mesma do Firestore `nam5`). Gatilhos em `noticias`, `partidas` (temporada corrente) e `push_avisos`, mais o agendamento diário `dailyGames` (9h, Brasília). Mensagens e alvos em `functions/src/messages.ts` (funções puras, `npm test`).
-- **Tópicos:** `todos`, `regiao_<slug>`, `time_<slug>`. O slug de `lib/core/utils/push_topics.dart` e o de `messages.ts` precisam ser iguais.
+- **Envio:** Cloud Functions em `functions/` (TypeScript, região `us-central1`, a mesma do Firestore `nam5`). Gatilhos em `noticias`, `partidas` (temporada corrente), `push_avisos` e `solicitacoes_jogador`, mais o agendamento diário `dailyGames` (9h, Brasília). Mensagens e alvos em `functions/src/messages.ts` (funções puras, `npm test`).
+- **Tópicos:** `todos`, `regiao_<slug>`, `time_<slug>`, `usuario_<uid>` (logado) e `admins` (conta admin). O slug de `lib/core/utils/push_topics.dart` e o de `messages.ts` precisam ser iguais.
 - **App:** `PushService` (`lib/core/services/push_service.dart`) faz permissão, exibição em primeiro plano e toque (abre a aba do `data.aba`). O `PushTopicsListener` (em `blocs_load.dart`) mantém os tópicos de acordo com a região e o time do coração.
 - **Deploy das functions:** `cd functions && npm install`, depois `firebase deploy --only functions`.
 
@@ -122,6 +124,7 @@ firebase deploy --only firestore:rules,storage
 - Leitura pública do conteúdo (inclui o modo convidado); `usuarios` só pelo dono ou admin.
 - Escrita de conteúdo só do admin (`usuarios/{uid}.admin == true`); o usuário não consegue gravar `admin` no próprio perfil.
 - Votos (`melhorjogador*`): cada usuário logado grava só o doc com o próprio uid.
+- `solicitacoes_jogador`: o dono cria/corrige/reenvia o próprio pedido sempre como `pendente` (campos limitados), nunca se aprova; o admin lê e responde.
 - Erro `PERMISSION_DENIED` no logcat = regra negando; ajuste as regras, não o app.
 
 ## Débito técnico conhecido

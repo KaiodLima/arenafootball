@@ -47,6 +47,7 @@ class _HomePageState extends State<HomePage> {
     _homeCubit = BlocProvider.of<HomeCubit>(context);
     final user = BlocProvider.of<SessionCubit>(context).state.user;
     if (user != null) _homeCubit.loadFavoriteTeam(user.favoriteTeam);
+    if (user != null && user.isAdmin) _homeCubit.watchPendingPlayerRequests();
 
     // Push: pede a permissão (Android 13+) e abre a aba da notificação tocada.
     final push = sl<PushService>();
@@ -62,9 +63,24 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  /// `aba` do payload: "tabelas" abre a aba de partidas; o resto, o feed.
+  /// `aba` do payload: "tabelas" abre a aba de partidas; "solicitacoes" o
+  /// painel de pedidos de jogador (admin); "sou_jogador" a situação do pedido
+  /// do usuário; o resto, o feed.
   void _openPushTab(String? tab) {
     if (tab == null) return;
+    final user = BlocProvider.of<SessionCubit>(context).state.user;
+    final route = switch (tab) {
+      'solicitacoes' when user != null && user.isAdmin => AppRoutes.playerRequestsPanelPage,
+      'sou_jogador' when user != null => AppRoutes.playerRequestPage,
+      _ => null,
+    };
+    if (route != null) {
+      // Pode vir do initState (push que abriu o app): navega depois do frame.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) Navigator.pushNamed(context, route);
+      });
+      return;
+    }
     _homeCubit.selectTab(tab == 'tabelas' ? HomeTab.tables : HomeTab.news);
   }
 
@@ -125,6 +141,7 @@ class _HomePageState extends State<HomePage> {
             drawer: HomeDrawer(
               user: session.user,
               favoriteTeamImage: home.favoriteTeamImage,
+              pendingPlayerRequests: home.pendingPlayerRequests,
               onChooseTeam: _chooseTeam,
               onLogout: _logout,
             ),

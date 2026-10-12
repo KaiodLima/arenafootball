@@ -137,6 +137,12 @@ class _FakePlayersRepository implements IPlayersRepository {
 
   @override
   Future<Either<Failure, void>> updatePlayer(PlayerDTO player, {String? season}) async => const Right(null);
+
+  @override
+  Future<Either<Failure, void>> deletePlayer(PlayerDTO player, {String? season}) async => const Right(null);
+
+  @override
+  Future<Either<Failure, void>> removeFromSquad(PlayerDTO player, {String? season}) async => const Right(null);
 }
 
 void main() {

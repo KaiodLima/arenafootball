@@ -40,9 +40,36 @@ service cloud.firestore {
     // Leitura pública (inclui o modo convidado); escrita só do admin.
     // Exceção: cada usuário logado grava/atualiza só o próprio voto (doc id = uid).
     match /{collection}/{docId} {
-      allow read: if !(collection in ['usuarios', 'config', 'notificacoes_envios', 'push_avisos']);
-      allow write: if !(collection in ['config', 'notificacoes_envios', 'push_avisos']) && (isAdmin()
+      allow read: if !(collection in ['usuarios', 'config', 'notificacoes_envios', 'push_avisos', 'solicitacoes_jogador']);
+      allow write: if !(collection in ['config', 'notificacoes_envios', 'push_avisos', 'solicitacoes_jogador']) && (isAdmin()
         || (collection.matches('melhorjogador.*') && signedIn() && docId == request.auth.uid));
+    }
+
+    // "Sou jogador": pedido para entrar no elenco de um time (id do doc = uid).
+    // O usuário cria, corrige enquanto pendente e reenvia depois de rejeitado
+    // ou de removido do elenco,
+    // sempre como "pendente" e só com os próprios campos; nunca se autoaprova.
+    // O admin lê tudo e responde (aprovar cria o jogador, pelo app).
+    match /solicitacoes_jogador/{userId} {
+      function isRequester() {
+        return signedIn() && userId == request.auth.uid;
+      }
+
+      function validSubmit() {
+        let data = request.resource.data;
+        return data.uid == request.auth.uid
+          && data.status == 'pendente'
+          && data.keys().hasOnly(['uid', 'nome_usuario', 'email', 'nome', 'time', 'regiao', 'temporada',
+            'posicao', 'mensagem', 'urlImagem', 'status', 'data', 'atualizado_em'])
+          && data.nome is string && data.nome.size() >= 3 && data.nome.size() <= 40
+          && data.time is string && data.time.size() > 0
+          && data.mensagem is string && data.mensagem.size() <= 200;
+      }
+
+      allow read: if isRequester() || isAdmin();
+      allow create: if isRequester() && validSubmit();
+      allow update: if (isRequester() && resource.data.status != 'aprovada' && validSubmit()) || isAdmin();
+      allow delete: if (isRequester() && resource.data.status == 'pendente') || isAdmin();
     }
 
     // Notificações push (Cloud Functions em functions/).

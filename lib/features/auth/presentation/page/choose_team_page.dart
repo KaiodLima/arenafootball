@@ -5,7 +5,7 @@ import 'package:arena_soccer/features/auth/presentation/bloc/choose_team_cubit.d
 import 'package:arena_soccer/features/auth/presentation/bloc/choose_team_state.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/auth/presentation/widgets/auth_scaffold.dart';
-import 'package:arena_soccer/features/auth/presentation/widgets/team_choice_selector.dart';
+import 'package:arena_soccer/utils/components/team_choice_selector.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';

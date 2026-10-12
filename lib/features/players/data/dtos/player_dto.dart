@@ -12,6 +12,12 @@ class PlayerDTO extends Equatable {
   final int goals;
   final int assists;
 
+  /// Conta vinculada (jogador aprovado pelo "Sou jogador"); vazio nos demais.
+  final String userId;
+
+  /// Chave de `PlayerPosition` (goleiro, zagueiro...); vazio se não informada.
+  final String position;
+
   const PlayerDTO({
     this.id = '',
     required this.name,
@@ -19,6 +25,8 @@ class PlayerDTO extends Equatable {
     this.imageUrl = '',
     this.goals = 0,
     this.assists = 0,
+    this.userId = '',
+    this.position = '',
   });
 
   factory PlayerDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -31,6 +39,8 @@ class PlayerDTO extends Equatable {
       imageUrl: data['urlImagem']?.toString() ?? '',
       goals: (data['nGols'] as num?)?.toInt() ?? 0,
       assists: (data['nAssistencias'] as num?)?.toInt() ?? 0,
+      userId: data['idUsuario']?.toString() ?? '',
+      position: data['posicao']?.toString() ?? '',
     );
   }
 
@@ -41,9 +51,21 @@ class PlayerDTO extends Equatable {
         'urlImagem': imageUrl,
         'nGols': goals,
         'nAssistencias': assists,
+        // Opcionais: só gravados quando existem (jogadores antigos não têm).
+        if (userId.isNotEmpty) 'idUsuario': userId,
+        if (position.isNotEmpty) 'posicao': position,
       };
 
-  PlayerDTO copyWith({String? id, String? name, String? team, String? imageUrl, int? goals, int? assists}) {
+  PlayerDTO copyWith({
+    String? id,
+    String? name,
+    String? team,
+    String? imageUrl,
+    int? goals,
+    int? assists,
+    String? userId,
+    String? position,
+  }) {
     return PlayerDTO(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -51,9 +73,11 @@ class PlayerDTO extends Equatable {
       imageUrl: imageUrl ?? this.imageUrl,
       goals: goals ?? this.goals,
       assists: assists ?? this.assists,
+      userId: userId ?? this.userId,
+      position: position ?? this.position,
     );
   }
 
   @override
-  List<Object?> get props => [id, name, team, imageUrl, goals, assists];
+  List<Object?> get props => [id, name, team, imageUrl, goals, assists, userId, position];
 }

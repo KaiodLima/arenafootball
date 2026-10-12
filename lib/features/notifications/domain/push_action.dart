@@ -8,7 +8,9 @@ enum PushAction {
   votingOpen('votacao_aberta', true),
   votingClosed('votacao_encerrada', true),
   dailyGame('jogo_do_dia', true),
-  notice('aviso', true);
+  notice('aviso', true),
+  playerRequest('solicitacao_jogador', true),
+  playerRequestAnswer('solicitacao_resposta', true);
 
   final String key;
   final bool defaultEnabled;

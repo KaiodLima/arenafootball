@@ -12,6 +12,9 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 class HomeDrawer extends StatelessWidget {
   final UserDTO? user;
   final String? favoriteTeamImage;
+
+  /// Pedidos "Sou jogador" pendentes (contador do item do admin).
+  final int pendingPlayerRequests;
   final VoidCallback onChooseTeam;
   final VoidCallback onLogout;
 
@@ -19,6 +22,7 @@ class HomeDrawer extends StatelessWidget {
     super.key,
     this.user,
     this.favoriteTeamImage,
+    this.pendingPlayerRequests = 0,
     required this.onChooseTeam,
     required this.onLogout,
   });
@@ -66,9 +70,21 @@ class HomeDrawer extends StatelessWidget {
                   title: l10n.drawerResults,
                   onTap: () => _open(context, AppRoutes.globalResultsPage),
                 ),
+                if (user != null)
+                  _DrawerItem(
+                    icon: Icons.sports_soccer_rounded,
+                    title: l10n.playerRequestMenu,
+                    onTap: () => _open(context, AppRoutes.playerRequestPage),
+                  ),
                 if (isAdmin) ...[
                   const SizedBox(height: AppSizes.s12),
                   _SectionLabel(l10n.drawerAdmin),
+                  _DrawerItem(
+                    icon: Icons.how_to_reg_outlined,
+                    title: l10n.playerRequestsPanelTitle,
+                    badge: pendingPlayerRequests,
+                    onTap: () => _open(context, AppRoutes.playerRequestsPanelPage),
+                  ),
                   _DrawerItem(
                     icon: Icons.article_outlined,
                     title: l10n.drawerRegisterNews,
@@ -234,6 +250,9 @@ class _DrawerItem extends StatelessWidget {
   final bool showChevron;
   final Color color;
 
+  /// Contador ao lado do título (0 = sem contador).
+  final int badge;
+
   const _DrawerItem({
     required this.icon,
     required this.title,
@@ -241,6 +260,7 @@ class _DrawerItem extends StatelessWidget {
     this.selected = false,
     this.showChevron = true,
     this.color = AppColors.primaryDark,
+    this.badge = 0,
   });
 
   @override
@@ -274,6 +294,19 @@ class _DrawerItem extends StatelessWidget {
                         .copyWith(fontSize: AppSizes.s16),
                   ),
                 ),
+                if (badge > 0)
+                  Container(
+                    margin: const EdgeInsets.only(left: AppSizes.s8),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s2),
+                    decoration: BoxDecoration(
+                      color: AppColors.danger,
+                      borderRadius: BorderRadius.circular(AppSizes.s10),
+                    ),
+                    child: Text(
+                      '$badge',
+                      style: AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s12),
+                    ),
+                  ),
                 if (showChevron)
                   const Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary, size: AppSizes.s20),
               ],

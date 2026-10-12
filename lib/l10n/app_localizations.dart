@@ -2739,6 +2739,396 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Aviso enviado!'**
   String get pushSent;
+
+  /// No description provided for @playerRequestMenu.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sou jogador'**
+  String get playerRequestMenu;
+
+  /// No description provided for @playerRequestTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sou jogador'**
+  String get playerRequestTitle;
+
+  /// No description provided for @playerRequestIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogue pelo seu time da região: envie a solicitação e um administrador vai analisar.'**
+  String get playerRequestIntro;
+
+  /// No description provided for @playerRequestTeamRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha o time em que você joga.'**
+  String get playerRequestTeamRequired;
+
+  /// No description provided for @playerRequestNameLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome de jogador'**
+  String get playerRequestNameLabel;
+
+  /// No description provided for @playerRequestPositionLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Posição'**
+  String get playerRequestPositionLabel;
+
+  /// No description provided for @playerRequestPositionRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha sua posição.'**
+  String get playerRequestPositionRequired;
+
+  /// No description provided for @playerRequestMessageLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mensagem para o admin (opcional)'**
+  String get playerRequestMessageLabel;
+
+  /// No description provided for @playerRequestMessageHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ex.: jogo de lateral no time desde 2022'**
+  String get playerRequestMessageHint;
+
+  /// No description provided for @playerRequestSubmit.
+  ///
+  /// In pt, this message translates to:
+  /// **'ENVIAR SOLICITAÇÃO'**
+  String get playerRequestSubmit;
+
+  /// No description provided for @playerRequestResubmit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar nova solicitação'**
+  String get playerRequestResubmit;
+
+  /// No description provided for @playerRequestSent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Solicitação enviada! Você será avisado quando o admin responder.'**
+  String get playerRequestSent;
+
+  /// No description provided for @playerRequestCancelled.
+  ///
+  /// In pt, this message translates to:
+  /// **'Solicitação cancelada.'**
+  String get playerRequestCancelled;
+
+  /// No description provided for @playerRequestStatusPending.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aguardando aprovação'**
+  String get playerRequestStatusPending;
+
+  /// No description provided for @playerRequestStatusApproved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aprovada'**
+  String get playerRequestStatusApproved;
+
+  /// No description provided for @playerRequestStatusRejected.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rejeitada'**
+  String get playerRequestStatusRejected;
+
+  /// No description provided for @playerRequestPendingInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Um administrador vai analisar seu pedido. Enquanto isso, você ainda pode corrigir os dados.'**
+  String get playerRequestPendingInfo;
+
+  /// No description provided for @playerRequestApprovedInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você é jogador do {team}!'**
+  String playerRequestApprovedInfo(String team);
+
+  /// No description provided for @playerRequestRejectedInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua solicitação não foi aprovada. Você pode enviar uma nova.'**
+  String get playerRequestRejectedInfo;
+
+  /// No description provided for @playerRequestReason.
+  ///
+  /// In pt, this message translates to:
+  /// **'Motivo: {reason}'**
+  String playerRequestReason(String reason);
+
+  /// No description provided for @playerRequestSentOn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviada em {date}'**
+  String playerRequestSentOn(String date);
+
+  /// No description provided for @playerRequestEdit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar solicitação'**
+  String get playerRequestEdit;
+
+  /// No description provided for @playerRequestCancel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cancelar solicitação'**
+  String get playerRequestCancel;
+
+  /// No description provided for @playerRequestCancelTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cancelar solicitação?'**
+  String get playerRequestCancelTitle;
+
+  /// No description provided for @playerRequestCancelMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu pedido para entrar no {team} será apagado.'**
+  String playerRequestCancelMessage(String team);
+
+  /// No description provided for @playerRequestKeep.
+  ///
+  /// In pt, this message translates to:
+  /// **'Manter'**
+  String get playerRequestKeep;
+
+  /// No description provided for @playerRequestDiscardEdit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Descartar alterações'**
+  String get playerRequestDiscardEdit;
+
+  /// No description provided for @playerRequestViewProfile.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver meu perfil de jogador'**
+  String get playerRequestViewProfile;
+
+  /// No description provided for @playerRequestLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar sua solicitação.'**
+  String get playerRequestLoadError;
+
+  /// No description provided for @playerPositionGoalkeeper.
+  ///
+  /// In pt, this message translates to:
+  /// **'Goleiro'**
+  String get playerPositionGoalkeeper;
+
+  /// No description provided for @playerPositionDefender.
+  ///
+  /// In pt, this message translates to:
+  /// **'Zagueiro'**
+  String get playerPositionDefender;
+
+  /// No description provided for @playerPositionFullBack.
+  ///
+  /// In pt, this message translates to:
+  /// **'Lateral'**
+  String get playerPositionFullBack;
+
+  /// No description provided for @playerPositionMidfielder.
+  ///
+  /// In pt, this message translates to:
+  /// **'Meia'**
+  String get playerPositionMidfielder;
+
+  /// No description provided for @playerPositionForward.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atacante'**
+  String get playerPositionForward;
+
+  /// No description provided for @playerRequestsPanelTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Solicitações de jogadores'**
+  String get playerRequestsPanelTitle;
+
+  /// No description provided for @playerRequestsTabPending.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pendentes'**
+  String get playerRequestsTabPending;
+
+  /// No description provided for @playerRequestsTabAnswered.
+  ///
+  /// In pt, this message translates to:
+  /// **'Respondidas'**
+  String get playerRequestsTabAnswered;
+
+  /// No description provided for @playerRequestsEmptyPending.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma solicitação pendente.'**
+  String get playerRequestsEmptyPending;
+
+  /// No description provided for @playerRequestsEmptyAnswered.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma solicitação respondida ainda.'**
+  String get playerRequestsEmptyAnswered;
+
+  /// No description provided for @playerRequestsLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar as solicitações.'**
+  String get playerRequestsLoadError;
+
+  /// No description provided for @playerRequestsApprove.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aprovar'**
+  String get playerRequestsApprove;
+
+  /// No description provided for @playerRequestsReject.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rejeitar'**
+  String get playerRequestsReject;
+
+  /// No description provided for @playerRequestsApproveTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aprovar {name}?'**
+  String playerRequestsApproveTitle(String name);
+
+  /// No description provided for @playerRequestsApproveMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} entra no elenco do {team}.'**
+  String playerRequestsApproveMessage(String name, String team);
+
+  /// No description provided for @playerRequestsRejectTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rejeitar a solicitação de {name}?'**
+  String playerRequestsRejectTitle(String name);
+
+  /// No description provided for @playerRequestsRejectReason.
+  ///
+  /// In pt, this message translates to:
+  /// **'Motivo (opcional)'**
+  String get playerRequestsRejectReason;
+
+  /// No description provided for @playerRequestsApproved.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} agora é jogador do {team}.'**
+  String playerRequestsApproved(String name, String team);
+
+  /// No description provided for @playerRequestsRejected.
+  ///
+  /// In pt, this message translates to:
+  /// **'Solicitação rejeitada.'**
+  String get playerRequestsRejected;
+
+  /// No description provided for @playerRequestsUpdated.
+  ///
+  /// In pt, this message translates to:
+  /// **'Solicitação atualizada.'**
+  String get playerRequestsUpdated;
+
+  /// No description provided for @playerRequestsAccount.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conta: {name}'**
+  String playerRequestsAccount(String name);
+
+  /// No description provided for @pushActionPlayerRequest.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nova solicitação de jogador'**
+  String get pushActionPlayerRequest;
+
+  /// No description provided for @pushActionPlayerRequestHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para os admins · \"Fulano quer jogar no Lava Jato\"'**
+  String get pushActionPlayerRequestHint;
+
+  /// No description provided for @pushActionPlayerRequestAnswer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resposta da solicitação'**
+  String get pushActionPlayerRequestAnswer;
+
+  /// No description provided for @pushActionPlayerRequestAnswerHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para quem pediu · aprovada ou rejeitada'**
+  String get pushActionPlayerRequestAnswerHint;
+
+  /// No description provided for @athleteDelete.
+  ///
+  /// In pt, this message translates to:
+  /// **'Excluir atleta'**
+  String get athleteDelete;
+
+  /// No description provided for @athleteDeleteTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Excluir {name}?'**
+  String athleteDeleteTitle(String name);
+
+  /// No description provided for @athleteDeleteMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} sai do elenco do {team}. Gols e assistências dele deixam de contar no ranking. Essa ação não pode ser desfeita.'**
+  String athleteDeleteMessage(String name, String team);
+
+  /// No description provided for @athleteDeleted.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} foi excluído do {team}.'**
+  String athleteDeleted(String name, String team);
+
+  /// No description provided for @athleteRemoveFromSquad.
+  ///
+  /// In pt, this message translates to:
+  /// **'Remover do elenco'**
+  String get athleteRemoveFromSquad;
+
+  /// No description provided for @athleteRemoveTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Remover {name} do elenco?'**
+  String athleteRemoveTitle(String name);
+
+  /// No description provided for @athleteRemoveMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} sai do elenco do {team}. Os gols e assistências continuam na conta dele, e ele pode pedir para entrar em outro time.'**
+  String athleteRemoveMessage(String name, String team);
+
+  /// No description provided for @athleteRemoved.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} saiu do elenco do {team}.'**
+  String athleteRemoved(String name, String team);
+
+  /// No description provided for @playerRequestStatusRemoved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fora do elenco'**
+  String get playerRequestStatusRemoved;
+
+  /// No description provided for @playerRequestRemovedInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você saiu do elenco do {team}. Suas estatísticas continuam salvas e você pode pedir para entrar em outro time.'**
+  String playerRequestRemovedInfo(String team);
+
+  /// No description provided for @playerRequestJoinAnother.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedir para entrar em outro time'**
+  String get playerRequestJoinAnother;
 }
 
 class _AppLocalizationsDelegate

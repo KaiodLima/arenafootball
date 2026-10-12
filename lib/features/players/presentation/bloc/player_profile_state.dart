@@ -38,6 +38,7 @@ class PlayerProfileState extends Equatable {
   PlayerProfileState copyWith({
     PlayerDTO? player,
     TeamDTO? team,
+    bool clearTeam = false,
     int? goalsRank,
     int? assistsRank,
     bool clearRanks = false,
@@ -47,7 +48,7 @@ class PlayerProfileState extends Equatable {
   }) {
     return PlayerProfileState(
       player: player ?? this.player,
-      team: team ?? this.team,
+      team: clearTeam ? null : (team ?? this.team),
       goalsRank: clearRanks ? null : (goalsRank ?? this.goalsRank),
       assistsRank: clearRanks ? null : (assistsRank ?? this.assistsRank),
       participations: participations ?? this.participations,
@@ -77,4 +78,35 @@ class ErrorPlayerProfileState extends PlayerProfileState {
 
   @override
   List<Object?> get props => [...super.props, errorMessage];
+}
+
+/// Jogador excluído pelo admin: a tela avisa e fecha.
+class DeletedPlayerProfileState extends PlayerProfileState {
+  final String name;
+  final String teamName;
+
+  const DeletedPlayerProfileState({required this.name, required this.teamName});
+
+  @override
+  List<Object?> get props => [...super.props, name, teamName];
+}
+
+/// Jogador vinculado tirado do elenco pelo admin: a tela avisa e continua
+/// mostrando o atleta (agora sem time).
+class RemovedFromSquadPlayerProfileState extends PlayerProfileState {
+  final String name;
+  final String teamName;
+
+  RemovedFromSquadPlayerProfileState(PlayerProfileState base, {required this.name, required this.teamName})
+      : super(
+          player: base.player,
+          team: base.team,
+          goalsRank: base.goalsRank,
+          assistsRank: base.assistsRank,
+          participations: base.participations,
+          notFound: base.notFound,
+        );
+
+  @override
+  List<Object?> get props => [...super.props, name, teamName];
 }

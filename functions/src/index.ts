@@ -16,7 +16,7 @@
 import type { FieldValue as FieldValueType, Firestore } from 'firebase-admin/firestore';
 import type { Messaging } from 'firebase-admin/messaging';
 import { logger, setGlobalOptions } from 'firebase-functions/v2';
-import { onDocumentCreated, onDocumentUpdated } from 'firebase-functions/v2/firestore';
+import { onDocumentCreated, onDocumentUpdated, onDocumentWritten } from 'firebase-functions/v2/firestore';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import {
   PushMessage,
@@ -27,6 +27,8 @@ import {
   manualMessage,
   matchCreatedMessage,
   newsMessage,
+  playerRequestAnswerMessage,
+  playerRequestMessage,
   todayKey,
   votingMessage,
 } from './messages';
@@ -124,6 +126,18 @@ export const onNoticeCreated = onDocumentCreated('push_avisos/{noticeId}', async
 });
 
 /** Todo dia às 9h: lembra os torcedores dos times que jogam hoje. */
+/** Pedido "Sou jogador": novo/reenviado avisa os admins; resposta avisa quem pediu. */
+export const onPlayerRequestWritten = onDocumentWritten('solicitacoes_jogador/{uid}', async (event) => {
+  const uid = event.params.uid;
+  const before = event.data?.before.data();
+  const after = event.data?.after.data();
+  const origem = `solicitacoes_jogador/${uid}`;
+  const toAdmins = playerRequestMessage(uid, before, after);
+  if (toAdmins) await deliver(`solicitacao_${event.id}`, toAdmins, origem);
+  const toUser = playerRequestAnswerMessage(uid, before, after);
+  if (toUser) await deliver(`resposta_${event.id}`, toUser, origem);
+});
+
 export const dailyGames = onSchedule({ schedule: '0 9 * * *', timeZone: 'America/Sao_Paulo' }, async () => {
   const today = todayKey();
   const { db } = await admin();

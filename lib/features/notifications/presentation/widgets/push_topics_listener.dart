@@ -8,8 +8,8 @@ import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dar
 import 'package:arena_soccer/features/regions/presentation/bloc/region_state.dart';
 import 'package:arena_soccer/injection_container.dart';
 
-/// Mantém os tópicos de push do aparelho iguais à região escolhida e ao time
-/// do coração: trocar um deles troca a inscrição.
+/// Mantém os tópicos de push do aparelho iguais à região escolhida, ao time
+/// do coração e à conta logada (usuário/admin): trocar um deles troca a inscrição.
 class PushTopicsListener extends StatelessWidget {
   final Widget child;
 
@@ -18,8 +18,13 @@ class PushTopicsListener extends StatelessWidget {
   /// Assina os tópicos atuais (a home chama ao abrir; depois, só mudanças).
   static void syncNow(BuildContext context) {
     final region = BlocProvider.of<RegionCubit>(context).state.selectedRegion;
-    final team = BlocProvider.of<SessionCubit>(context).state.user?.favoriteTeam;
-    sl<PushTopicSync>().sync(desiredTopics(region: region, favoriteTeam: team));
+    final user = BlocProvider.of<SessionCubit>(context).state.user;
+    sl<PushTopicSync>().sync(desiredTopics(
+      region: region,
+      favoriteTeam: user?.favoriteTeam,
+      userId: user?.id,
+      isAdmin: user?.isAdmin ?? false,
+    ));
   }
 
   @override
@@ -32,7 +37,10 @@ class PushTopicsListener extends StatelessWidget {
         ),
         BlocListener<SessionCubit, SessionState>(
           listenWhen: (previous, current) =>
-              current is! CheckingSessionState && previous.user?.favoriteTeam != current.user?.favoriteTeam,
+              current is! CheckingSessionState &&
+              (previous.user?.favoriteTeam != current.user?.favoriteTeam ||
+                  previous.user?.id != current.user?.id ||
+                  previous.isAdmin != current.isAdmin),
           listener: (context, _) => syncNow(context),
         ),
       ],

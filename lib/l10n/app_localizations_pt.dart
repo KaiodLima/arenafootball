@@ -1522,4 +1522,241 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get pushSent => 'Aviso enviado!';
+
+  @override
+  String get playerRequestMenu => 'Sou jogador';
+
+  @override
+  String get playerRequestTitle => 'Sou jogador';
+
+  @override
+  String get playerRequestIntro =>
+      'Jogue pelo seu time da região: envie a solicitação e um administrador vai analisar.';
+
+  @override
+  String get playerRequestTeamRequired => 'Escolha o time em que você joga.';
+
+  @override
+  String get playerRequestNameLabel => 'Nome de jogador';
+
+  @override
+  String get playerRequestPositionLabel => 'Posição';
+
+  @override
+  String get playerRequestPositionRequired => 'Escolha sua posição.';
+
+  @override
+  String get playerRequestMessageLabel => 'Mensagem para o admin (opcional)';
+
+  @override
+  String get playerRequestMessageHint =>
+      'Ex.: jogo de lateral no time desde 2022';
+
+  @override
+  String get playerRequestSubmit => 'ENVIAR SOLICITAÇÃO';
+
+  @override
+  String get playerRequestResubmit => 'Enviar nova solicitação';
+
+  @override
+  String get playerRequestSent =>
+      'Solicitação enviada! Você será avisado quando o admin responder.';
+
+  @override
+  String get playerRequestCancelled => 'Solicitação cancelada.';
+
+  @override
+  String get playerRequestStatusPending => 'Aguardando aprovação';
+
+  @override
+  String get playerRequestStatusApproved => 'Aprovada';
+
+  @override
+  String get playerRequestStatusRejected => 'Rejeitada';
+
+  @override
+  String get playerRequestPendingInfo =>
+      'Um administrador vai analisar seu pedido. Enquanto isso, você ainda pode corrigir os dados.';
+
+  @override
+  String playerRequestApprovedInfo(String team) {
+    return 'Você é jogador do $team!';
+  }
+
+  @override
+  String get playerRequestRejectedInfo =>
+      'Sua solicitação não foi aprovada. Você pode enviar uma nova.';
+
+  @override
+  String playerRequestReason(String reason) {
+    return 'Motivo: $reason';
+  }
+
+  @override
+  String playerRequestSentOn(String date) {
+    return 'Enviada em $date';
+  }
+
+  @override
+  String get playerRequestEdit => 'Editar solicitação';
+
+  @override
+  String get playerRequestCancel => 'Cancelar solicitação';
+
+  @override
+  String get playerRequestCancelTitle => 'Cancelar solicitação?';
+
+  @override
+  String playerRequestCancelMessage(String team) {
+    return 'Seu pedido para entrar no $team será apagado.';
+  }
+
+  @override
+  String get playerRequestKeep => 'Manter';
+
+  @override
+  String get playerRequestDiscardEdit => 'Descartar alterações';
+
+  @override
+  String get playerRequestViewProfile => 'Ver meu perfil de jogador';
+
+  @override
+  String get playerRequestLoadError =>
+      'Não foi possível carregar sua solicitação.';
+
+  @override
+  String get playerPositionGoalkeeper => 'Goleiro';
+
+  @override
+  String get playerPositionDefender => 'Zagueiro';
+
+  @override
+  String get playerPositionFullBack => 'Lateral';
+
+  @override
+  String get playerPositionMidfielder => 'Meia';
+
+  @override
+  String get playerPositionForward => 'Atacante';
+
+  @override
+  String get playerRequestsPanelTitle => 'Solicitações de jogadores';
+
+  @override
+  String get playerRequestsTabPending => 'Pendentes';
+
+  @override
+  String get playerRequestsTabAnswered => 'Respondidas';
+
+  @override
+  String get playerRequestsEmptyPending => 'Nenhuma solicitação pendente.';
+
+  @override
+  String get playerRequestsEmptyAnswered =>
+      'Nenhuma solicitação respondida ainda.';
+
+  @override
+  String get playerRequestsLoadError =>
+      'Não foi possível carregar as solicitações.';
+
+  @override
+  String get playerRequestsApprove => 'Aprovar';
+
+  @override
+  String get playerRequestsReject => 'Rejeitar';
+
+  @override
+  String playerRequestsApproveTitle(String name) {
+    return 'Aprovar $name?';
+  }
+
+  @override
+  String playerRequestsApproveMessage(String name, String team) {
+    return '$name entra no elenco do $team.';
+  }
+
+  @override
+  String playerRequestsRejectTitle(String name) {
+    return 'Rejeitar a solicitação de $name?';
+  }
+
+  @override
+  String get playerRequestsRejectReason => 'Motivo (opcional)';
+
+  @override
+  String playerRequestsApproved(String name, String team) {
+    return '$name agora é jogador do $team.';
+  }
+
+  @override
+  String get playerRequestsRejected => 'Solicitação rejeitada.';
+
+  @override
+  String get playerRequestsUpdated => 'Solicitação atualizada.';
+
+  @override
+  String playerRequestsAccount(String name) {
+    return 'Conta: $name';
+  }
+
+  @override
+  String get pushActionPlayerRequest => 'Nova solicitação de jogador';
+
+  @override
+  String get pushActionPlayerRequestHint =>
+      'Para os admins · \"Fulano quer jogar no Lava Jato\"';
+
+  @override
+  String get pushActionPlayerRequestAnswer => 'Resposta da solicitação';
+
+  @override
+  String get pushActionPlayerRequestAnswerHint =>
+      'Para quem pediu · aprovada ou rejeitada';
+
+  @override
+  String get athleteDelete => 'Excluir atleta';
+
+  @override
+  String athleteDeleteTitle(String name) {
+    return 'Excluir $name?';
+  }
+
+  @override
+  String athleteDeleteMessage(String name, String team) {
+    return '$name sai do elenco do $team. Gols e assistências dele deixam de contar no ranking. Essa ação não pode ser desfeita.';
+  }
+
+  @override
+  String athleteDeleted(String name, String team) {
+    return '$name foi excluído do $team.';
+  }
+
+  @override
+  String get athleteRemoveFromSquad => 'Remover do elenco';
+
+  @override
+  String athleteRemoveTitle(String name) {
+    return 'Remover $name do elenco?';
+  }
+
+  @override
+  String athleteRemoveMessage(String name, String team) {
+    return '$name sai do elenco do $team. Os gols e assistências continuam na conta dele, e ele pode pedir para entrar em outro time.';
+  }
+
+  @override
+  String athleteRemoved(String name, String team) {
+    return '$name saiu do elenco do $team.';
+  }
+
+  @override
+  String get playerRequestStatusRemoved => 'Fora do elenco';
+
+  @override
+  String playerRequestRemovedInfo(String team) {
+    return 'Você saiu do elenco do $team. Suas estatísticas continuam salvas e você pode pedir para entrar em outro time.';
+  }
+
+  @override
+  String get playerRequestJoinAnother => 'Pedir para entrar em outro time';
 }
