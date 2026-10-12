@@ -34,7 +34,7 @@ Clean Architecture por feature (`data/` -> `domain/` -> `presentation/`), detalh
 UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Auth/Storage
 ```
 
-## Features (16 módulos em `lib/features/`)
+## Features (18 módulos em `lib/features/`)
 
 | Feature | Conteúdo |
 |---------|----------|
@@ -44,9 +44,11 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | `home` | Casca: AppBar, drawer, barra inferior com as 4 abas, atalhos do admin |
 | `news` | Feed (aba HOME), detalhe, cadastro/edição, notificação de gol, anúncio |
 | `highlights` | Carrossel de destaques, detalhe, cadastro |
-| `teams` | Aba TIMES, cadastro de time (+ linha na classificação) |
+| `teams` | Aba TIMES, cadastro de time (+ linha na classificação), exclusão pelo admin (no elenco do time: jogadores com conta ficam sem time, os sem vínculo saem junto; partidas ficam) |
 | `players` | Elenco do time, edição de gols/assistências/foto, cadastro de jogador |
 | `player_requests` | "Sou jogador": usuário pede para entrar num time; painel do admin aprova (cria o jogador vinculado), rejeita ou edita |
+| `team_requests` | "Sou dono de time": usuário pede para criar o time; admin aprova (cria o time com `idDono`). Aprovado, "Meu time": elenco, pedidos "Sou jogador" do time e edição de escudo/descrição. `OwnedTeamCubit` (global) diz de qual time a conta é dono |
+| `seasons` | Temporada atual/lista em `config/temporadas`; painel do admin "Temporadas" (iniciar a próxima) |
 | `stats` | Ranking de artilharia/assistências (uma tela, `StatsRankingType`) |
 | `championships` | Aba CAMPEONATOS, detalhe (regulamento PDF, times, premiação), grupos, classificação, cadastro/edição do admin |
 | `matches` | Aba TABELAS, lista de partidas (hoje/todas), cadastro, placar, votação on/off |
@@ -91,7 +93,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | `noticias` | id, data (Timestamp), titulo, descricao, urlImagem, link, exibir ("true"/"false" **string**), fk_competicao, time_casa, time_fora, gol_time_casa, gol_time_fora, tag ("gol", "publicidade", título de destaque...), images[]. Cards de gol, opcionais: autor_gol_id, autor_gol, assistencia_id, assistencia (id/nome em `jogadores{ano}`), temporada, time_marcador, escudo_marcador (URL) |
 | `destaques` | id, title, link, urlImagem, exibir (string), priority |
 | `competicao` | nome (as "regiões": Floresta, Santo inacio...) |
-| `times{ano}` | id_partida (é o id do **time**, nome errado), nome, descricao, fk_competicao, urlImagem |
+| `times{ano}` | id_partida (é o id do **time**, nome errado), nome, descricao, fk_competicao, urlImagem, idDono (opcional: uid do dono, times do "Sou dono de time") |
 | `classificacao{ano}` | campos do time + vitorias, derrotas, empates, gols_feitos, gols_sofridos, pontos, saldo_gols, fk_grupo |
 | `jogadores{ano}` | idJogador, nome, time, urlImagem, nGols, nAssistencias. Opcionais: idUsuario (conta vinculada pelo "Sou jogador"), posicao (goleiro/zagueiro/lateral/meia/atacante) |
 | `partidas{ano}` | id_partida, dataRegistro, timeC, timeF, horario, data, local, id_campeonato, fk_competicao, golTimeCasa, golTimeFora, votacao (string), tituloVotacao, melhorJogador, quantidadeVotos |
@@ -102,6 +104,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | `config/notificacoes` | liga/desliga por ação de push: gol, noticia, partida, votacao_aberta, votacao_encerrada, jogo_do_dia, aviso (bool; ausente = padrão das functions) |
 | `notificacoes_envios` | histórico gravado pelas Cloud Functions (id = evento): tipo, titulo, corpo, alvo, regiao, data, status (enviado/desligado/erro), erro, origem |
 | `solicitacoes_jogador` | pedido "Sou jogador", id = uid (um por usuário): uid, nome_usuario, email, nome, time, regiao, temporada, posicao, mensagem, urlImagem, status (pendente/aprovada/rejeitada/removido), motivo, idJogador, data, atualizado_em. Aprovar = batch que cria o jogador (ou reaproveita o atleta da conta, mantendo os números) e marca o pedido. Atleta vinculado não é excluído: "remover do elenco" zera o `time` e o pedido vira `removido` |
+| `solicitacoes_time` | pedido "Sou dono de time", id = uid (um por usuário): uid, nome_usuario, email, nome (do time), regiao, descricao, urlImagem, contato (WhatsApp), mensagem, temporada, status (pendente/aprovada/rejeitada), motivo, idTime, data, atualizado_em. Aprovado = registro de dono que as regras consultam (`ownedTeam()`); o nome do time só o admin muda |
 | `push_avisos` | aviso manual do admin (titulo, corpo, regiao vazia = todos, data); a function envia |
 
 `{ano}`: **2023 é a única temporada sem sufixo** (legado: `times`, `partidas`...); todas as outras usam o ano (`times2022`, `times2024`). A temporada **atual** fica em `config/temporadas` (`atual`, `lista`; leitura pública, escrita do admin), carregada no `RegionCubit.load()` e aplicada em `SeasonCollection.configure`. Sem a config, vale 2023. Para abrir a temporada nova: admin → **Temporadas** → "Iniciar temporada" (opcionalmente copia os times com a classificação zerada); nada é copiado à mão nem renomeado, e os cadastros passam a ir para as coleções do ano novo. Não comparar com o ano do relógio.
@@ -109,7 +112,7 @@ Storage: `noticias/`, `destaques/`, `times/`, `jogadores/`, `campeonatos/` (bann
 
 ## Notificações push (FCM)
 
-- **Envio:** Cloud Functions em `functions/` (TypeScript, região `us-central1`, a mesma do Firestore `nam5`). Gatilhos em `noticias`, `partidas` da temporada atual (gatilho em `{colecao}/{id}` filtrando a coleção de partidas da `config/temporadas`), `push_avisos` e `solicitacoes_jogador`, mais o agendamento diário `dailyGames` (9h, Brasília). Mensagens e alvos em `functions/src/messages.ts` (funções puras, `npm test`).
+- **Envio:** Cloud Functions em `functions/` (TypeScript, região `us-central1`, a mesma do Firestore `nam5`). Gatilhos em `noticias`, `partidas` da temporada atual (gatilho em `{colecao}/{id}` filtrando a coleção de partidas da `config/temporadas`), `push_avisos`, `solicitacoes_jogador` (avisa admins, quem pediu e o dono do time) e `solicitacoes_time`, mais o agendamento diário `dailyGames` (9h, Brasília). Mensagens e alvos em `functions/src/messages.ts` (funções puras, `npm test`).
 - **Tópicos:** `todos`, `regiao_<slug>`, `time_<slug>`, `usuario_<uid>` (logado) e `admins` (conta admin). O slug de `lib/core/utils/push_topics.dart` e o de `messages.ts` precisam ser iguais.
 - **App:** `PushService` (`lib/core/services/push_service.dart`) faz permissão, exibição em primeiro plano e toque (abre a aba do `data.aba`). O `PushTopicsListener` (em `blocs_load.dart`) mantém os tópicos de acordo com a região e o time do coração.
 - **Deploy das functions:** `cd functions && npm install`, depois `firebase deploy --only functions`.
@@ -125,7 +128,8 @@ firebase deploy --only firestore:rules,storage
 - Leitura pública do conteúdo (inclui o modo convidado); `usuarios` só pelo dono ou admin.
 - Escrita de conteúdo só do admin (`usuarios/{uid}.admin == true`); o usuário não consegue gravar `admin` no próprio perfil.
 - Votos (`melhorjogador*`): cada usuário logado grava só o doc com o próprio uid.
-- `solicitacoes_jogador`: o dono cria/corrige/reenvia o próprio pedido sempre como `pendente` (campos limitados), nunca se aprova; o admin lê e responde.
+- `solicitacoes_jogador` / `solicitacoes_time`: o dono cria/corrige/reenvia o próprio pedido sempre como `pendente` (campos limitados), nunca se aprova; o admin lê e responde.
+- Dono de time (`ownedTeam()` = `solicitacoes_time/{uid}` aprovado): cria/edita/apaga `jogadores*` do próprio time (ou sem time), troca só `descricao`/`urlImagem` do time com `idDono` = uid, e responde (status/motivo/idJogador) os pedidos "Sou jogador" do time. Casos cobertos testados no emulador do Firestore.
 - Erro `PERMISSION_DENIED` no logcat = regra negando; ajuste as regras, não o app.
 
 ## Débito técnico conhecido

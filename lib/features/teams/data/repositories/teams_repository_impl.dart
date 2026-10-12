@@ -26,4 +26,21 @@ class TeamsRepositoryImpl implements ITeamsRepository {
   @override
   Future<Either<Failure, void>> createTeam(TeamDTO team, {String? season}) =>
       _dataSource.createTeam(team, season: season);
+
+  @override
+  Future<Either<Failure, TeamDTO?>> getTeam({required String id, String? season}) =>
+      _dataSource.getTeam(id: id, season: season);
+
+  @override
+  Future<Either<Failure, void>> updateTeamDetails({
+    required String id,
+    required String description,
+    required String imageUrl,
+    String? season,
+  }) =>
+      _dataSource.updateTeamDetails(id: id, description: description, imageUrl: imageUrl, season: season);
+
+  @override
+  Future<Either<Failure, void>> deleteTeam(TeamDTO team, {String? season}) =>
+      _dataSource.deleteTeam(team, season: season);
 }

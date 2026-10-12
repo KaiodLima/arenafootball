@@ -2027,4 +2027,198 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get matchFormChampionship => 'Campeonato';
+
+  @override
+  String get teamRequestMenu => 'Sou dono de time';
+
+  @override
+  String get teamRequestTitle => 'Sou dono de time';
+
+  @override
+  String get teamRequestIntro =>
+      'Cadastre o seu time: um administrador analisa o pedido e, aprovado, você gerencia o elenco.';
+
+  @override
+  String get teamRequestNameLabel => 'Nome do time';
+
+  @override
+  String get teamRequestNameRequired =>
+      'Informe o nome do time (mínimo 3 letras).';
+
+  @override
+  String teamRequestNameTaken(String name) {
+    return 'Já existe um time chamado $name nesta região.';
+  }
+
+  @override
+  String get teamRequestCrestAdd => 'Adicionar escudo (opcional)';
+
+  @override
+  String get teamRequestDescriptionLabel => 'Descrição / história (opcional)';
+
+  @override
+  String get teamRequestContactLabel => 'WhatsApp do responsável';
+
+  @override
+  String get teamRequestContactHint => '(89) 99999-9999';
+
+  @override
+  String get teamRequestContactRequired => 'Informe um WhatsApp com DDD.';
+
+  @override
+  String get teamRequestContactInfo => 'Só o administrador vê o seu contato.';
+
+  @override
+  String get teamRequestSubmit => 'ENVIAR PEDIDO';
+
+  @override
+  String get teamRequestSent =>
+      'Pedido enviado! Você será avisado quando o admin responder.';
+
+  @override
+  String get teamRequestCancelled => 'Pedido cancelado.';
+
+  @override
+  String get teamRequestPendingInfo =>
+      'Um administrador vai analisar o seu time. Enquanto isso, você ainda pode corrigir os dados.';
+
+  @override
+  String get teamRequestRejectedInfo =>
+      'Seu pedido não foi aprovado. Você pode enviar um novo.';
+
+  @override
+  String get teamRequestEdit => 'Editar pedido';
+
+  @override
+  String get teamRequestCancel => 'Cancelar pedido';
+
+  @override
+  String get teamRequestCancelTitle => 'Cancelar pedido?';
+
+  @override
+  String teamRequestCancelMessage(String team) {
+    return 'O pedido do time $team será apagado.';
+  }
+
+  @override
+  String get teamRequestResubmit => 'Enviar novo pedido';
+
+  @override
+  String get teamRequestLoadError => 'Não foi possível carregar o seu pedido.';
+
+  @override
+  String get myTeamTitle => 'Meu time';
+
+  @override
+  String get myTeamOwnerBadge => 'Você é o dono';
+
+  @override
+  String get myTeamTabSquad => 'Elenco';
+
+  @override
+  String get myTeamTabRequests => 'Pedidos';
+
+  @override
+  String get myTeamTabEdit => 'Editar';
+
+  @override
+  String get myTeamAddPlayer => 'Adicionar jogador';
+
+  @override
+  String get myTeamSquadEmpty => 'Nenhum jogador no elenco ainda.';
+
+  @override
+  String get myTeamRequestsEmpty => 'Nenhum pedido para entrar no time.';
+
+  @override
+  String myTeamPlayerAdded(String name) {
+    return '$name entrou no elenco.';
+  }
+
+  @override
+  String get myTeamSaved => 'Time atualizado!';
+
+  @override
+  String get myTeamNameLocked =>
+      'Para trocar o nome do time, fale com o administrador.';
+
+  @override
+  String get myTeamLoadError => 'Não foi possível carregar o seu time.';
+
+  @override
+  String get teamRequestsPanelTitle => 'Solicitações de times';
+
+  @override
+  String get teamRequestsEmptyPending => 'Nenhum pedido de time pendente.';
+
+  @override
+  String get teamRequestsEmptyAnswered =>
+      'Nenhum pedido de time respondido ainda.';
+
+  @override
+  String get teamRequestsLoadError =>
+      'Não foi possível carregar os pedidos de time.';
+
+  @override
+  String teamRequestsApproveTitle(String name) {
+    return 'Aprovar o time $name?';
+  }
+
+  @override
+  String teamRequestsApproveMessage(String region, String owner) {
+    return 'O time entra em $region na temporada atual, com $owner como dono.';
+  }
+
+  @override
+  String teamRequestsApproved(String name) {
+    return 'Time $name criado!';
+  }
+
+  @override
+  String teamRequestsRejectTitle(String name) {
+    return 'Rejeitar o time $name?';
+  }
+
+  @override
+  String teamRequestsOwner(String name) {
+    return 'Dono: $name';
+  }
+
+  @override
+  String get teamRequestsWhatsApp => 'Chamar no WhatsApp';
+
+  @override
+  String get teamRequestsWhatsAppError => 'Não foi possível abrir o WhatsApp.';
+
+  @override
+  String get pushActionTeamRequest => 'Novo pedido de time';
+
+  @override
+  String get pushActionTeamRequestHint =>
+      'Para os admins · \"Fulano quer cadastrar o time X\"';
+
+  @override
+  String get pushActionTeamRequestAnswer => 'Resposta do pedido de time';
+
+  @override
+  String get pushActionTeamRequestAnswerHint =>
+      'Para quem pediu · aprovado ou rejeitado';
+
+  @override
+  String get teamDelete => 'Excluir time';
+
+  @override
+  String teamDeleteTitle(String team) {
+    return 'Excluir $team?';
+  }
+
+  @override
+  String teamDeleteMessage(String season) {
+    return 'O time sai da temporada $season. Jogadores com conta no app ficam sem time e mantêm os números; os demais jogadores do elenco são excluídos. As partidas já cadastradas continuam no histórico. Não dá para desfazer.';
+  }
+
+  @override
+  String teamDeleted(String team) {
+    return '$team foi excluído.';
+  }
 }

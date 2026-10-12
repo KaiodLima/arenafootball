@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
+import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/team_players_cubit.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/team_players_state.dart';
@@ -13,6 +14,7 @@ import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/arena_search_field.dart';
+import 'package:arena_soccer/utils/components/card_menu_button.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
@@ -56,10 +58,29 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
     if (collapsed != _collapsed) setState(() => _collapsed = collapsed);
   }
 
+  Future<void> _confirmDelete(AppLocalizations l10n) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.teamDeleteTitle(widget.team.name)),
+        content: Text(l10n.teamDeleteMessage(_season)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.commonCancel)),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(l10n.commonDelete, style: const TextStyle(color: AppColors.danger)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && mounted) await BlocProvider.of<TeamPlayersCubit>(context).deleteTeam(widget.team);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final cubit = BlocProvider.of<TeamPlayersCubit>(context);
+    final isAdmin = context.watch<SessionCubit>().state.isAdmin;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
@@ -67,6 +88,11 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
         backgroundColor: AppColors.background,
         body: BlocConsumer<TeamPlayersCubit, TeamPlayersState>(
           listener: (context, state) {
+            if (state is DeletedTeamPlayersState) {
+              showSnackBar(context: context, message: l10n.teamDeleted(state.teamName));
+              Navigator.pop(context);
+              return;
+            }
             if (state is ErrorTeamPlayersState && state.players.isNotEmpty) {
               showSnackBar(context: context, message: state.errorMessage, isSuccess: false);
             }
@@ -74,6 +100,7 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
           builder: (context, state) {
             final visible = state.visiblePlayers;
             final topScorerId = state.topScorerId;
+            final deleting = state is DeletingTeamPlayersState;
 
             // Quando a busca encolhe a lista, a posição volta ao topo sem evento de
             // rolagem: as métricas avisam, e o título da barra é recalculado.
@@ -105,6 +132,28 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
                         style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s18),
                       ),
                     ),
+                    actions: [
+                      if (isAdmin)
+                        deleting
+                            ? const Padding(
+                                padding: EdgeInsets.all(AppSizes.s14),
+                                child: SizedBox.square(
+                                  dimension: AppSizes.s20,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.white),
+                                ),
+                              )
+                            : CardMenuButton(
+                                onImage: true,
+                                actions: [
+                                  CardMenuAction(
+                                    icon: Icons.delete_outline_rounded,
+                                    label: l10n.teamDelete,
+                                    destructive: true,
+                                    onSelected: () => _confirmDelete(l10n),
+                                  ),
+                                ],
+                              ),
+                    ],
                     flexibleSpace: FlexibleSpaceBar(
                       collapseMode: CollapseMode.parallax,
                       background: TeamHeader(team: widget.team, season: _season),

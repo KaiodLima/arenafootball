@@ -15,6 +15,9 @@ class HomeDrawer extends StatelessWidget {
 
   /// Pedidos "Sou jogador" pendentes (contador do item do admin).
   final int pendingPlayerRequests;
+
+  /// Pedidos "Sou dono de time" pendentes (contador do item do admin).
+  final int pendingTeamRequests;
   final VoidCallback onChooseTeam;
   final VoidCallback onLogout;
 
@@ -23,6 +26,7 @@ class HomeDrawer extends StatelessWidget {
     this.user,
     this.favoriteTeamImage,
     this.pendingPlayerRequests = 0,
+    this.pendingTeamRequests = 0,
     required this.onChooseTeam,
     required this.onLogout,
   });
@@ -76,6 +80,12 @@ class HomeDrawer extends StatelessWidget {
                     title: l10n.playerRequestMenu,
                     onTap: () => _open(context, AppRoutes.playerRequestPage),
                   ),
+                if (user != null)
+                  _DrawerItem(
+                    icon: Icons.shield_rounded,
+                    title: l10n.teamRequestMenu,
+                    onTap: () => _open(context, AppRoutes.teamRequestPage),
+                  ),
                 if (isAdmin) ...[
                   const SizedBox(height: AppSizes.s12),
                   _SectionLabel(l10n.drawerAdmin),
@@ -84,6 +94,12 @@ class HomeDrawer extends StatelessWidget {
                     title: l10n.playerRequestsPanelTitle,
                     badge: pendingPlayerRequests,
                     onTap: () => _open(context, AppRoutes.playerRequestsPanelPage),
+                  ),
+                  _DrawerItem(
+                    icon: Icons.add_moderator_outlined,
+                    title: l10n.teamRequestsPanelTitle,
+                    badge: pendingTeamRequests,
+                    onTap: () => _open(context, AppRoutes.teamRequestsPanelPage),
                   ),
                   _DrawerItem(
                     icon: Icons.article_outlined,

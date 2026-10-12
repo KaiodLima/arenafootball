@@ -1201,5 +1201,139 @@
       }
     }
   },
-  "matchFormChampionship": "Campeonato"
+  "matchFormChampionship": "Campeonato",
+  "teamRequestMenu": "Sou dono de time",
+  "teamRequestTitle": "Sou dono de time",
+  "teamRequestIntro": "Cadastre o seu time: um administrador analisa o pedido e, aprovado, você gerencia o elenco.",
+  "teamRequestNameLabel": "Nome do time",
+  "teamRequestNameRequired": "Informe o nome do time (mínimo 3 letras).",
+  "teamRequestNameTaken": "Já existe um time chamado {name} nesta região.",
+  "@teamRequestNameTaken": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "teamRequestCrestAdd": "Adicionar escudo (opcional)",
+  "teamRequestDescriptionLabel": "Descrição / história (opcional)",
+  "teamRequestContactLabel": "WhatsApp do responsável",
+  "teamRequestContactHint": "(89) 99999-9999",
+  "teamRequestContactRequired": "Informe um WhatsApp com DDD.",
+  "teamRequestContactInfo": "Só o administrador vê o seu contato.",
+  "teamRequestSubmit": "ENVIAR PEDIDO",
+  "teamRequestSent": "Pedido enviado! Você será avisado quando o admin responder.",
+  "teamRequestCancelled": "Pedido cancelado.",
+  "teamRequestPendingInfo": "Um administrador vai analisar o seu time. Enquanto isso, você ainda pode corrigir os dados.",
+  "teamRequestRejectedInfo": "Seu pedido não foi aprovado. Você pode enviar um novo.",
+  "teamRequestEdit": "Editar pedido",
+  "teamRequestCancel": "Cancelar pedido",
+  "teamRequestCancelTitle": "Cancelar pedido?",
+  "teamRequestCancelMessage": "O pedido do time {team} será apagado.",
+  "@teamRequestCancelMessage": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "teamRequestResubmit": "Enviar novo pedido",
+  "teamRequestLoadError": "Não foi possível carregar o seu pedido.",
+  "myTeamTitle": "Meu time",
+  "myTeamOwnerBadge": "Você é o dono",
+  "myTeamTabSquad": "Elenco",
+  "myTeamTabRequests": "Pedidos",
+  "myTeamTabEdit": "Editar",
+  "myTeamAddPlayer": "Adicionar jogador",
+  "myTeamSquadEmpty": "Nenhum jogador no elenco ainda.",
+  "myTeamRequestsEmpty": "Nenhum pedido para entrar no time.",
+  "myTeamPlayerAdded": "{name} entrou no elenco.",
+  "@myTeamPlayerAdded": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "myTeamSaved": "Time atualizado!",
+  "myTeamNameLocked": "Para trocar o nome do time, fale com o administrador.",
+  "myTeamLoadError": "Não foi possível carregar o seu time.",
+  "teamRequestsPanelTitle": "Solicitações de times",
+  "teamRequestsEmptyPending": "Nenhum pedido de time pendente.",
+  "teamRequestsEmptyAnswered": "Nenhum pedido de time respondido ainda.",
+  "teamRequestsLoadError": "Não foi possível carregar os pedidos de time.",
+  "teamRequestsApproveTitle": "Aprovar o time {name}?",
+  "@teamRequestsApproveTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "teamRequestsApproveMessage": "O time entra em {region} na temporada atual, com {owner} como dono.",
+  "@teamRequestsApproveMessage": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      },
+      "owner": {
+        "type": "String"
+      }
+    }
+  },
+  "teamRequestsApproved": "Time {name} criado!",
+  "@teamRequestsApproved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "teamRequestsRejectTitle": "Rejeitar o time {name}?",
+  "@teamRequestsRejectTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "teamRequestsOwner": "Dono: {name}",
+  "@teamRequestsOwner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "teamRequestsWhatsApp": "Chamar no WhatsApp",
+  "teamRequestsWhatsAppError": "Não foi possível abrir o WhatsApp.",
+  "pushActionTeamRequest": "Novo pedido de time",
+  "pushActionTeamRequestHint": "Para os admins · \"Fulano quer cadastrar o time X\"",
+  "pushActionTeamRequestAnswer": "Resposta do pedido de time",
+  "pushActionTeamRequestAnswerHint": "Para quem pediu · aprovado ou rejeitado",
+  "teamDelete": "Excluir time",
+  "teamDeleteTitle": "Excluir {team}?",
+  "@teamDeleteTitle": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "teamDeleteMessage": "O time sai da temporada {season}. Jogadores com conta no app ficam sem time e mantêm os números; os demais jogadores do elenco são excluídos. As partidas já cadastradas continuam no histórico. Não dá para desfazer.",
+  "@teamDeleteMessage": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "teamDeleted": "{team} foi excluído.",
+  "@teamDeleted": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  }
 }

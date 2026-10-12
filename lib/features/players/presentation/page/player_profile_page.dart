@@ -11,6 +11,7 @@ import 'package:arena_soccer/features/players/presentation/bloc/player_profile_s
 import 'package:arena_soccer/features/players/presentation/widgets/count_stepper.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/player_card.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/player_photo_dialog.dart';
+import 'package:arena_soccer/features/team_requests/presentation/bloc/owned_team_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_card.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
@@ -65,6 +66,7 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isAdmin = context.watch<SessionCubit>().state.isAdmin;
+    final ownedTeam = context.watch<OwnedTeamCubit>().state;
 
     return BlocConsumer<PlayerProfileCubit, PlayerProfileState>(
       listenWhen: (_, current) =>
@@ -106,7 +108,13 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
             _ when state.notFound => ArenaEmptyState(message: l10n.athleteNotFound, icon: Icons.person_off_outlined),
             ErrorPlayerProfileState() when player == null => ArenaEmptyState.error(message: l10n.athleteLoadError),
             _ when player == null => _Loading(name: widget.name),
-            _ => _Content(state: state, player: player, isAdmin: isAdmin, season: widget.season),
+            // O dono do time edita os jogadores do próprio elenco, como o admin.
+            _ => _Content(
+                state: state,
+                player: player,
+                isAdmin: isAdmin || ownedTeam.owns(player.team),
+                season: widget.season,
+              ),
           },
         );
       },

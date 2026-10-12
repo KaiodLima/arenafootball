@@ -9,12 +9,16 @@ class TeamDTO extends Equatable {
   final String region;
   final String imageUrl;
 
+  /// `idDono`: uid do dono (time criado pelo "Sou dono de time"); vazio nos demais.
+  final String ownerId;
+
   const TeamDTO({
     required this.id,
     required this.name,
     this.description = '',
     this.region = '',
     this.imageUrl = '',
+    this.ownerId = '',
   });
 
   factory TeamDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -26,6 +30,7 @@ class TeamDTO extends Equatable {
       description: data['descricao']?.toString() ?? '',
       region: data['fk_competicao']?.toString() ?? '',
       imageUrl: data['urlImagem']?.toString() ?? '',
+      ownerId: data['idDono']?.toString() ?? '',
     );
   }
 
@@ -35,6 +40,8 @@ class TeamDTO extends Equatable {
         'descricao': description,
         'fk_competicao': region,
         'urlImagem': imageUrl,
+        // Só nos times com dono (os antigos não têm o campo).
+        if (ownerId.isNotEmpty) 'idDono': ownerId,
       };
 
   /// Linha inicial do time na `classificacao`: os campos do time + as
@@ -52,16 +59,24 @@ class TeamDTO extends Equatable {
         'fk_grupo': '',
       };
 
-  TeamDTO copyWith({String? id, String? name, String? description, String? region, String? imageUrl}) {
+  TeamDTO copyWith({
+    String? id,
+    String? name,
+    String? description,
+    String? region,
+    String? imageUrl,
+    String? ownerId,
+  }) {
     return TeamDTO(
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
       region: region ?? this.region,
       imageUrl: imageUrl ?? this.imageUrl,
+      ownerId: ownerId ?? this.ownerId,
     );
   }
 
   @override
-  List<Object?> get props => [id, name, description, region, imageUrl];
+  List<Object?> get props => [id, name, description, region, imageUrl, ownerId];
 }

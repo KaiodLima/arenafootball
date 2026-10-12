@@ -3573,6 +3573,330 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Campeonato'**
   String get matchFormChampionship;
+
+  /// No description provided for @teamRequestMenu.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sou dono de time'**
+  String get teamRequestMenu;
+
+  /// No description provided for @teamRequestTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sou dono de time'**
+  String get teamRequestTitle;
+
+  /// No description provided for @teamRequestIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cadastre o seu time: um administrador analisa o pedido e, aprovado, você gerencia o elenco.'**
+  String get teamRequestIntro;
+
+  /// No description provided for @teamRequestNameLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome do time'**
+  String get teamRequestNameLabel;
+
+  /// No description provided for @teamRequestNameRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Informe o nome do time (mínimo 3 letras).'**
+  String get teamRequestNameRequired;
+
+  /// No description provided for @teamRequestNameTaken.
+  ///
+  /// In pt, this message translates to:
+  /// **'Já existe um time chamado {name} nesta região.'**
+  String teamRequestNameTaken(String name);
+
+  /// No description provided for @teamRequestCrestAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar escudo (opcional)'**
+  String get teamRequestCrestAdd;
+
+  /// No description provided for @teamRequestDescriptionLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Descrição / história (opcional)'**
+  String get teamRequestDescriptionLabel;
+
+  /// No description provided for @teamRequestContactLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'WhatsApp do responsável'**
+  String get teamRequestContactLabel;
+
+  /// No description provided for @teamRequestContactHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'(89) 99999-9999'**
+  String get teamRequestContactHint;
+
+  /// No description provided for @teamRequestContactRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Informe um WhatsApp com DDD.'**
+  String get teamRequestContactRequired;
+
+  /// No description provided for @teamRequestContactInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Só o administrador vê o seu contato.'**
+  String get teamRequestContactInfo;
+
+  /// No description provided for @teamRequestSubmit.
+  ///
+  /// In pt, this message translates to:
+  /// **'ENVIAR PEDIDO'**
+  String get teamRequestSubmit;
+
+  /// No description provided for @teamRequestSent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedido enviado! Você será avisado quando o admin responder.'**
+  String get teamRequestSent;
+
+  /// No description provided for @teamRequestCancelled.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedido cancelado.'**
+  String get teamRequestCancelled;
+
+  /// No description provided for @teamRequestPendingInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Um administrador vai analisar o seu time. Enquanto isso, você ainda pode corrigir os dados.'**
+  String get teamRequestPendingInfo;
+
+  /// No description provided for @teamRequestRejectedInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu pedido não foi aprovado. Você pode enviar um novo.'**
+  String get teamRequestRejectedInfo;
+
+  /// No description provided for @teamRequestEdit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar pedido'**
+  String get teamRequestEdit;
+
+  /// No description provided for @teamRequestCancel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cancelar pedido'**
+  String get teamRequestCancel;
+
+  /// No description provided for @teamRequestCancelTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cancelar pedido?'**
+  String get teamRequestCancelTitle;
+
+  /// No description provided for @teamRequestCancelMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'O pedido do time {team} será apagado.'**
+  String teamRequestCancelMessage(String team);
+
+  /// No description provided for @teamRequestResubmit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar novo pedido'**
+  String get teamRequestResubmit;
+
+  /// No description provided for @teamRequestLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar o seu pedido.'**
+  String get teamRequestLoadError;
+
+  /// No description provided for @myTeamTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Meu time'**
+  String get myTeamTitle;
+
+  /// No description provided for @myTeamOwnerBadge.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você é o dono'**
+  String get myTeamOwnerBadge;
+
+  /// No description provided for @myTeamTabSquad.
+  ///
+  /// In pt, this message translates to:
+  /// **'Elenco'**
+  String get myTeamTabSquad;
+
+  /// No description provided for @myTeamTabRequests.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedidos'**
+  String get myTeamTabRequests;
+
+  /// No description provided for @myTeamTabEdit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar'**
+  String get myTeamTabEdit;
+
+  /// No description provided for @myTeamAddPlayer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar jogador'**
+  String get myTeamAddPlayer;
+
+  /// No description provided for @myTeamSquadEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum jogador no elenco ainda.'**
+  String get myTeamSquadEmpty;
+
+  /// No description provided for @myTeamRequestsEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum pedido para entrar no time.'**
+  String get myTeamRequestsEmpty;
+
+  /// No description provided for @myTeamPlayerAdded.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} entrou no elenco.'**
+  String myTeamPlayerAdded(String name);
+
+  /// No description provided for @myTeamSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Time atualizado!'**
+  String get myTeamSaved;
+
+  /// No description provided for @myTeamNameLocked.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para trocar o nome do time, fale com o administrador.'**
+  String get myTeamNameLocked;
+
+  /// No description provided for @myTeamLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar o seu time.'**
+  String get myTeamLoadError;
+
+  /// No description provided for @teamRequestsPanelTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Solicitações de times'**
+  String get teamRequestsPanelTitle;
+
+  /// No description provided for @teamRequestsEmptyPending.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum pedido de time pendente.'**
+  String get teamRequestsEmptyPending;
+
+  /// No description provided for @teamRequestsEmptyAnswered.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum pedido de time respondido ainda.'**
+  String get teamRequestsEmptyAnswered;
+
+  /// No description provided for @teamRequestsLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar os pedidos de time.'**
+  String get teamRequestsLoadError;
+
+  /// No description provided for @teamRequestsApproveTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aprovar o time {name}?'**
+  String teamRequestsApproveTitle(String name);
+
+  /// No description provided for @teamRequestsApproveMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'O time entra em {region} na temporada atual, com {owner} como dono.'**
+  String teamRequestsApproveMessage(String region, String owner);
+
+  /// No description provided for @teamRequestsApproved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Time {name} criado!'**
+  String teamRequestsApproved(String name);
+
+  /// No description provided for @teamRequestsRejectTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rejeitar o time {name}?'**
+  String teamRequestsRejectTitle(String name);
+
+  /// No description provided for @teamRequestsOwner.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dono: {name}'**
+  String teamRequestsOwner(String name);
+
+  /// No description provided for @teamRequestsWhatsApp.
+  ///
+  /// In pt, this message translates to:
+  /// **'Chamar no WhatsApp'**
+  String get teamRequestsWhatsApp;
+
+  /// No description provided for @teamRequestsWhatsAppError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível abrir o WhatsApp.'**
+  String get teamRequestsWhatsAppError;
+
+  /// No description provided for @pushActionTeamRequest.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novo pedido de time'**
+  String get pushActionTeamRequest;
+
+  /// No description provided for @pushActionTeamRequestHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para os admins · \"Fulano quer cadastrar o time X\"'**
+  String get pushActionTeamRequestHint;
+
+  /// No description provided for @pushActionTeamRequestAnswer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resposta do pedido de time'**
+  String get pushActionTeamRequestAnswer;
+
+  /// No description provided for @pushActionTeamRequestAnswerHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para quem pediu · aprovado ou rejeitado'**
+  String get pushActionTeamRequestAnswerHint;
+
+  /// No description provided for @teamDelete.
+  ///
+  /// In pt, this message translates to:
+  /// **'Excluir time'**
+  String get teamDelete;
+
+  /// No description provided for @teamDeleteTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Excluir {team}?'**
+  String teamDeleteTitle(String team);
+
+  /// No description provided for @teamDeleteMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'O time sai da temporada {season}. Jogadores com conta no app ficam sem time e mantêm os números; os demais jogadores do elenco são excluídos. As partidas já cadastradas continuam no histórico. Não dá para desfazer.'**
+  String teamDeleteMessage(String season);
+
+  /// No description provided for @teamDeleted.
+  ///
+  /// In pt, this message translates to:
+  /// **'{team} foi excluído.'**
+  String teamDeleted(String team);
 }
 
 class _AppLocalizationsDelegate

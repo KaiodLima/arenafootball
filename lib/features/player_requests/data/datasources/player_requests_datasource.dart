@@ -64,6 +64,18 @@ class PlayerRequestsDataSource {
         );
   }
 
+  /// Pedidos para entrar no time [team] (aba "Pedidos" do dono), mais
+  /// recentes primeiro. Ordena em memória: com `where` + `orderBy` em campos
+  /// diferentes seria preciso um índice composto.
+  Stream<Either<Failure, List<PlayerRequestDTO>>> watchTeamRequests(String team) {
+    return _requests.where('time', isEqualTo: team).snapshots().toEither(
+          (snapshot) => snapshot.docs.map(PlayerRequestDTO.fromFirestore).toList()
+            ..sort((a, b) => (b.createdAt ?? DateTime(0)).compareTo(a.createdAt ?? DateTime(0))),
+          fallbackMessage: _loadFallback,
+          logName: _logName,
+        );
+  }
+
   /// Quantos pedidos aguardam resposta (contador do menu do admin).
   Stream<Either<Failure, int>> watchPendingCount() {
     return _requests.where('status', isEqualTo: PlayerRequestStatus.pending.key).snapshots().toEither(

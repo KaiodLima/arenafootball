@@ -61,6 +61,11 @@ import 'package:arena_soccer/features/seasons/presentation/page/seasons_panel_pa
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
 import 'package:arena_soccer/features/stats/presentation/bloc/stats_ranking_cubit.dart';
 import 'package:arena_soccer/features/stats/presentation/page/stats_ranking_page.dart';
+import 'package:arena_soccer/features/team_requests/presentation/bloc/my_team_cubit.dart';
+import 'package:arena_soccer/features/team_requests/presentation/bloc/team_request_cubit.dart';
+import 'package:arena_soccer/features/team_requests/presentation/bloc/team_requests_panel_cubit.dart';
+import 'package:arena_soccer/features/team_requests/presentation/page/team_request_page.dart';
+import 'package:arena_soccer/features/team_requests/presentation/page/team_requests_panel_page.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/presentation/bloc/team_form_cubit.dart';
 import 'package:arena_soccer/features/teams/presentation/page/team_form_page.dart';
@@ -101,7 +106,7 @@ class ArenaApp extends StatelessWidget {
               child: const ChooseTeamPage(),
             ),
         AppRoutes.home: (_) => BlocProvider<HomeCubit>(
-              create: (_) => HomeCubit(sl(), sl()),
+              create: (_) => HomeCubit(sl(), sl(), sl()),
               child: const HomePage(),
             ),
 
@@ -173,7 +178,7 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.teamPlayersPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<TeamPlayersCubit>(
-            create: (_) => TeamPlayersCubit(sl()),
+            create: (_) => TeamPlayersCubit(sl(), sl()),
             child: TeamPlayersPage(team: args?['team'] as TeamDTO),
           );
         },
@@ -197,6 +202,18 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.playerRequestsPanelPage: (_) => BlocProvider<PlayerRequestsPanelCubit>(
               create: (_) => PlayerRequestsPanelCubit(sl(), sl(), sl(), sl(), sl(), sl()),
               child: const PlayerRequestsPanelPage(),
+            ),
+        // Pedido de time e, aprovado, a área "Meu time" do dono (mesma rota).
+        AppRoutes.teamRequestPage: (_) => MultiBlocProvider(
+              providers: [
+                BlocProvider<TeamRequestCubit>(create: (_) => TeamRequestCubit(sl(), sl(), sl(), sl(), sl())),
+                BlocProvider<MyTeamCubit>(create: (_) => MyTeamCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl())),
+              ],
+              child: const TeamRequestPage(),
+            ),
+        AppRoutes.teamRequestsPanelPage: (_) => BlocProvider<TeamRequestsPanelCubit>(
+              create: (_) => TeamRequestsPanelCubit(sl(), sl(), sl(), sl(), sl()),
+              child: const TeamRequestsPanelPage(),
             ),
         AppRoutes.registerPlayerPage: (_) => BlocProvider<PlayerFormCubit>(
               create: (_) => PlayerFormCubit(sl(), sl(), sl(), sl()),

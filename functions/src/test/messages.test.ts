@@ -10,7 +10,10 @@ import {
   newsMessage,
   playerRequestAnswerMessage,
   playerRequestMessage,
+  playerRequestToOwnerMessage,
   seasonCollection,
+  teamRequestAnswerMessage,
+  teamRequestMessage,
   targetFor,
   todayKey,
   topicSlug,
@@ -121,4 +124,28 @@ test('coleção por temporada: 2023 sem sufixo, as outras com o ano', () => {
   assert.equal(seasonCollection('partidas', '2022'), 'partidas2022');
   assert.equal(currentSeasonOf(undefined), '2023');
   assert.equal(currentSeasonOf({ atual: '2024' }), '2024');
+});
+
+test('pedido de time: novo avisa admins; resposta avisa quem pediu', () => {
+  const pending = { nome: 'Riacho', nome_usuario: 'Kaio', regiao: 'Floresta', status: 'pendente' };
+  const created = teamRequestMessage('AbC1', undefined, pending);
+  assert.equal(created?.corpo, 'Kaio quer cadastrar o time Riacho');
+  assert.deepEqual(created?.alvo, { topic: 'admins' });
+  assert.equal(created?.aba, 'solicitacoes_time');
+  assert.equal(teamRequestMessage('AbC1', pending, { ...pending, descricao: 'x' }), null);
+
+  const approved = teamRequestAnswerMessage('AbC1', pending, { ...pending, status: 'aprovada' });
+  assert.deepEqual(approved?.alvo, { topic: 'usuario_AbC1' });
+  assert.equal(approved?.aba, 'meu_time');
+  const rejected = teamRequestAnswerMessage('AbC1', pending, { ...pending, status: 'rejeitada', motivo: 'Nome repetido' });
+  assert.equal(rejected?.corpo, 'O pedido do time Riacho não foi aprovado. Motivo: Nome repetido');
+});
+
+test('pedido "Sou jogador" também avisa o dono do time', () => {
+  const pending = { nome: 'Kaio', time: 'Riacho', regiao: 'Floresta', status: 'pendente' };
+  const toOwner = playerRequestToOwnerMessage('Dono1', undefined, pending);
+  assert.deepEqual(toOwner?.alvo, { topic: 'usuario_Dono1' });
+  assert.equal(toOwner?.aba, 'meu_time');
+  assert.equal(toOwner?.corpo, 'Kaio quer jogar no Riacho');
+  assert.equal(playerRequestToOwnerMessage('Dono1', pending, pending), null);
 });

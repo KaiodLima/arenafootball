@@ -13,6 +13,8 @@ abstract class IPlayerRequestsRepository {
 
   Stream<Either<Failure, int>> watchPendingCount();
 
+  Stream<Either<Failure, List<PlayerRequestDTO>>> watchTeamRequests(String team);
+
   Future<Either<Failure, void>> update(PlayerRequestDTO request);
 
   /// Devolve o id do jogador criado.

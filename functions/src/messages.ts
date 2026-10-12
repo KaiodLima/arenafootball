@@ -16,7 +16,9 @@ export type ActionKey =
   | 'jogo_do_dia'
   | 'aviso'
   | 'solicitacao_jogador'
-  | 'solicitacao_resposta';
+  | 'solicitacao_resposta'
+  | 'solicitacao_time'
+  | 'solicitacao_time_resposta';
 
 /** Sem configuração gravada, vale este padrão (notícia vem desligada). */
 export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
@@ -29,6 +31,8 @@ export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
   aviso: true,
   solicitacao_jogador: true,
   solicitacao_resposta: true,
+  solicitacao_time: true,
+  solicitacao_time_resposta: true,
 };
 
 export type Target = { topic: string } | { condition: string };
@@ -41,7 +45,7 @@ export interface PushMessage {
    * O que abre ao tocar: feed, tabelas, painel de pedidos de jogador (admin)
    * ou a situação do pedido do usuário.
    */
-  aba: 'home' | 'tabelas' | 'solicitacoes' | 'sou_jogador';
+  aba: 'home' | 'tabelas' | 'solicitacoes' | 'sou_jogador' | 'solicitacoes_time' | 'meu_time';
   regiao: string;
   alvo: Target;
 }
@@ -252,6 +256,61 @@ export function playerRequestMessage(uid: string, before: Doc | undefined, after
     aba: 'solicitacoes',
     regiao: text(after.regiao),
     alvo: { topic: ADMINS_TOPIC },
+  };
+}
+
+/** Pedido "Sou jogador" chegou para o time de um dono: avisa o dono também. */
+export function playerRequestToOwnerMessage(
+  ownerUid: string,
+  before: Doc | undefined,
+  after: Doc | undefined,
+): PushMessage | null {
+  const forAdmins = playerRequestMessage('-', before, after);
+  if (!forAdmins || !ownerUid) return null;
+  return {
+    ...forAdmins,
+    titulo: 'Pedido para entrar no seu time',
+    aba: 'meu_time',
+    alvo: { topic: userTopic(ownerUid) },
+  };
+}
+
+/** Pedido "Sou dono de time" novo ou reenviado: avisa os admins. */
+export function teamRequestMessage(uid: string, before: Doc | undefined, after: Doc | undefined): PushMessage | null {
+  if (!after || !uid || text(after.status) !== 'pendente' || text(before?.status) === 'pendente') return null;
+  const owner = text(after.nome_usuario);
+  const team = text(after.nome);
+  if (!team) return null;
+  return {
+    tipo: 'solicitacao_time',
+    titulo: 'Novo pedido de time',
+    corpo: shorten(owner ? `${owner} quer cadastrar o time ${team}` : `Pedido para cadastrar o time ${team}`, 240),
+    aba: 'solicitacoes_time',
+    regiao: text(after.regiao),
+    alvo: { topic: ADMINS_TOPIC },
+  };
+}
+
+/** Admin respondeu o pedido de time: avisa só quem pediu. */
+export function teamRequestAnswerMessage(uid: string, before: Doc | undefined, after: Doc | undefined): PushMessage | null {
+  if (!before || !after || !uid || text(before.status) !== 'pendente') return null;
+  const status = text(after.status);
+  if (status !== 'aprovada' && status !== 'rejeitada') return null;
+  const team = text(after.nome);
+  const reason = text(after.motivo);
+  const approved = status === 'aprovada';
+  return {
+    tipo: 'solicitacao_time_resposta',
+    titulo: approved ? '✅ Seu time foi aprovado!' : 'Pedido de time',
+    corpo: shorten(
+      approved
+        ? `O ${team} já está no app. Agora é só montar o elenco.`
+        : `O pedido do time ${team} não foi aprovado.${reason ? ` Motivo: ${reason}` : ''}`,
+      240,
+    ),
+    aba: 'meu_time',
+    regiao: text(after.regiao),
+    alvo: { topic: userTopic(uid) },
   };
 }
 

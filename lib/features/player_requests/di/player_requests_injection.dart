@@ -10,6 +10,7 @@ import 'package:arena_soccer/features/player_requests/domain/usecases/update_pla
 import 'package:arena_soccer/features/player_requests/domain/usecases/watch_my_player_request_usecase.dart';
 import 'package:arena_soccer/features/player_requests/domain/usecases/watch_pending_player_requests_count_usecase.dart';
 import 'package:arena_soccer/features/player_requests/domain/usecases/watch_player_requests_usecase.dart';
+import 'package:arena_soccer/features/player_requests/domain/usecases/watch_team_player_requests_usecase.dart';
 
 final _sl = GetIt.instance;
 
@@ -29,4 +30,5 @@ void registerPlayerRequestsDependencies() {
   _sl.registerLazySingleton(() => UpdatePlayerRequestUseCase(_sl()));
   _sl.registerLazySingleton(() => ApprovePlayerRequestUseCase(_sl()));
   _sl.registerLazySingleton(() => RejectPlayerRequestUseCase(_sl()));
+  _sl.registerLazySingleton(() => WatchTeamPlayerRequestsUseCase(_sl()));
 }

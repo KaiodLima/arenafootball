@@ -8,6 +8,18 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    // Dono de time ("Sou dono de time"): o pedido aprovado em
+    // `solicitacoes_time/{uid}` diz o nome do time; '' = não é dono.
+    function ownedTeam() {
+      let path = /databases/$(database)/documents/solicitacoes_time/$(request.auth.uid);
+      return signedIn() && exists(path) && get(path).data.status == 'aprovada' ? get(path).data.nome : '';
+    }
+
+    function ownsTeam(team) {
+      let owned = ownedTeam();
+      return owned != '' && team == owned;
+    }
+
     // Admin = flag `admin` no próprio documento de `usuarios/{uid}`.
     function isAdmin() {
       return signedIn()
@@ -37,12 +49,42 @@ service cloud.firestore {
     // Conteúdo do app: noticias, destaques, competicao, campeonatos,
     // times{ano}, jogadores{ano}, partidas{ano}, classificacao{ano}, grupos{ano}
     // e os votos melhorjogador{timeC}{timeF}.
-    // Leitura pública (inclui o modo convidado); escrita só do admin.
-    // Exceção: cada usuário logado grava/atualiza só o próprio voto (doc id = uid).
+    // Leitura pública (inclui o modo convidado); escrita do admin.
+    // Exceções:
+    // - cada usuário logado grava/atualiza só o próprio voto (doc id = uid);
+    // - o dono de time cadastra, edita e tira jogadores do próprio elenco
+    //   (`time` antes e depois = time dele, ou '' ao tirar do elenco) e troca
+    //   só escudo/descrição do próprio time (`idDono` = uid).
     match /{collection}/{docId} {
-      allow read: if !(collection in ['usuarios', 'config', 'notificacoes_envios', 'push_avisos', 'solicitacoes_jogador']);
-      allow write: if !(collection in ['config', 'notificacoes_envios', 'push_avisos', 'solicitacoes_jogador']) && (isAdmin()
-        || (collection.matches('melhorjogador.*') && signedIn() && docId == request.auth.uid));
+      function writable() {
+        return !(collection in ['config', 'notificacoes_envios', 'push_avisos', 'solicitacoes_jogador',
+          'solicitacoes_time']);
+      }
+
+      function isOwnVote() {
+        return collection.matches('melhorjogador.*') && signedIn() && docId == request.auth.uid;
+      }
+
+      function isPlayers() {
+        return collection.matches('jogadores([0-9]{4})?');
+      }
+
+      function isTeamDoc() {
+        return collection.matches('(times|classificacao)([0-9]{4})?');
+      }
+
+      allow read: if !(collection in ['usuarios', 'config', 'notificacoes_envios', 'push_avisos', 'solicitacoes_jogador',
+        'solicitacoes_time']);
+      allow create: if writable() && (isAdmin() || isOwnVote()
+        || (isPlayers() && ownsTeam(request.resource.data.time)));
+      // Atleta sem time ('') pode entrar no elenco do dono (aprovação do "Sou jogador").
+      allow update: if writable() && (isAdmin() || isOwnVote()
+        || (isPlayers()
+          && (ownsTeam(resource.data.time) || resource.data.time == '')
+          && (ownsTeam(request.resource.data.time) || request.resource.data.time == ''))
+        || (isTeamDoc() && signedIn() && resource.data.idDono == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['descricao', 'urlImagem'])));
+      allow delete: if writable() && (isAdmin() || isOwnVote() || (isPlayers() && ownsTeam(resource.data.time)));
     }
 
     // "Sou jogador": pedido para entrar no elenco de um time (id do doc = uid).
@@ -63,6 +105,47 @@ service cloud.firestore {
             'posicao', 'mensagem', 'urlImagem', 'status', 'data', 'atualizado_em'])
           && data.nome is string && data.nome.size() >= 3 && data.nome.size() <= 40
           && data.time is string && data.time.size() > 0
+          && data.mensagem is string && data.mensagem.size() <= 200;
+      }
+
+      // Dono do time do pedido: lê e responde (aprovar/rejeitar/tirar do
+      // elenco); nome, time e posição continuam só do admin.
+      function isTeamOwner() {
+        return ownsTeam(resource.data.time);
+      }
+
+      function ownerAnswer() {
+        return request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status', 'motivo', 'idJogador', 'atualizado_em'])
+          && request.resource.data.status in ['aprovada', 'rejeitada', 'removido'];
+      }
+
+      allow read: if isRequester() || isAdmin() || isTeamOwner();
+      allow create: if isRequester() && validSubmit();
+      allow update: if (isRequester() && resource.data.status != 'aprovada' && validSubmit()) || isAdmin()
+        || (isTeamOwner() && ownerAnswer());
+      allow delete: if (isRequester() && resource.data.status == 'pendente') || isAdmin();
+    }
+
+    // "Sou dono de time": pedido para criar o próprio time (id do doc = uid).
+    // Mesmas regras do "Sou jogador": o usuário cria/corrige/reenvia como
+    // "pendente" com os próprios campos e nunca se aprova. Aprovado, este doc
+    // é o registro de dono que `ownedTeam()` consulta (o dono não altera mais).
+    match /solicitacoes_time/{userId} {
+      function isRequester() {
+        return signedIn() && userId == request.auth.uid;
+      }
+
+      function validSubmit() {
+        let data = request.resource.data;
+        return data.uid == request.auth.uid
+          && data.status == 'pendente'
+          && data.keys().hasOnly(['uid', 'nome_usuario', 'email', 'nome', 'regiao', 'descricao', 'urlImagem',
+            'contato', 'mensagem', 'temporada', 'status', 'data', 'atualizado_em'])
+          && data.nome is string && data.nome.size() >= 3 && data.nome.size() <= 40
+          && data.regiao is string && data.regiao.size() > 0
+          && data.contato is string && data.contato.size() >= 10 && data.contato.size() <= 30
+          && data.descricao is string && data.descricao.size() <= 300
           && data.mensagem is string && data.mensagem.size() <= 200;
       }
 

@@ -2009,4 +2009,196 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get matchFormChampionship => 'Championship';
+
+  @override
+  String get teamRequestMenu => 'I own a team';
+
+  @override
+  String get teamRequestTitle => 'I own a team';
+
+  @override
+  String get teamRequestIntro =>
+      'Register your team: an admin reviews it and, once approved, you manage the squad.';
+
+  @override
+  String get teamRequestNameLabel => 'Team name';
+
+  @override
+  String get teamRequestNameRequired =>
+      'Enter the team name (at least 3 letters).';
+
+  @override
+  String teamRequestNameTaken(String name) {
+    return 'There\'s already a team called $name in this region.';
+  }
+
+  @override
+  String get teamRequestCrestAdd => 'Add crest (optional)';
+
+  @override
+  String get teamRequestDescriptionLabel => 'Description / history (optional)';
+
+  @override
+  String get teamRequestContactLabel => 'Owner\'s WhatsApp';
+
+  @override
+  String get teamRequestContactHint => '(89) 99999-9999';
+
+  @override
+  String get teamRequestContactRequired =>
+      'Enter a WhatsApp number with area code.';
+
+  @override
+  String get teamRequestContactInfo => 'Only the admin sees your contact.';
+
+  @override
+  String get teamRequestSubmit => 'SEND REQUEST';
+
+  @override
+  String get teamRequestSent =>
+      'Request sent! You\'ll be notified when an admin replies.';
+
+  @override
+  String get teamRequestCancelled => 'Request cancelled.';
+
+  @override
+  String get teamRequestPendingInfo =>
+      'An admin will review your team. Meanwhile, you can still edit it.';
+
+  @override
+  String get teamRequestRejectedInfo =>
+      'Your request wasn\'t approved. You can send a new one.';
+
+  @override
+  String get teamRequestEdit => 'Edit request';
+
+  @override
+  String get teamRequestCancel => 'Cancel request';
+
+  @override
+  String get teamRequestCancelTitle => 'Cancel request?';
+
+  @override
+  String teamRequestCancelMessage(String team) {
+    return 'The request for $team will be deleted.';
+  }
+
+  @override
+  String get teamRequestResubmit => 'Send a new request';
+
+  @override
+  String get teamRequestLoadError => 'Couldn\'t load your request.';
+
+  @override
+  String get myTeamTitle => 'My team';
+
+  @override
+  String get myTeamOwnerBadge => 'You\'re the owner';
+
+  @override
+  String get myTeamTabSquad => 'Squad';
+
+  @override
+  String get myTeamTabRequests => 'Requests';
+
+  @override
+  String get myTeamTabEdit => 'Edit';
+
+  @override
+  String get myTeamAddPlayer => 'Add player';
+
+  @override
+  String get myTeamSquadEmpty => 'No players in the squad yet.';
+
+  @override
+  String get myTeamRequestsEmpty => 'No requests to join the team.';
+
+  @override
+  String myTeamPlayerAdded(String name) {
+    return '$name joined the squad.';
+  }
+
+  @override
+  String get myTeamSaved => 'Team updated!';
+
+  @override
+  String get myTeamNameLocked => 'To rename the team, contact the admin.';
+
+  @override
+  String get myTeamLoadError => 'Couldn\'t load your team.';
+
+  @override
+  String get teamRequestsPanelTitle => 'Team requests';
+
+  @override
+  String get teamRequestsEmptyPending => 'No pending team requests.';
+
+  @override
+  String get teamRequestsEmptyAnswered => 'No answered team requests yet.';
+
+  @override
+  String get teamRequestsLoadError => 'Couldn\'t load the team requests.';
+
+  @override
+  String teamRequestsApproveTitle(String name) {
+    return 'Approve $name?';
+  }
+
+  @override
+  String teamRequestsApproveMessage(String region, String owner) {
+    return 'The team joins $region in the current season, with $owner as owner.';
+  }
+
+  @override
+  String teamRequestsApproved(String name) {
+    return 'Team $name created!';
+  }
+
+  @override
+  String teamRequestsRejectTitle(String name) {
+    return 'Reject $name?';
+  }
+
+  @override
+  String teamRequestsOwner(String name) {
+    return 'Owner: $name';
+  }
+
+  @override
+  String get teamRequestsWhatsApp => 'Message on WhatsApp';
+
+  @override
+  String get teamRequestsWhatsAppError => 'Couldn\'t open WhatsApp.';
+
+  @override
+  String get pushActionTeamRequest => 'New team request';
+
+  @override
+  String get pushActionTeamRequestHint =>
+      'To admins · \"John wants to register team X\"';
+
+  @override
+  String get pushActionTeamRequestAnswer => 'Team request answered';
+
+  @override
+  String get pushActionTeamRequestAnswerHint =>
+      'To the requester · approved or rejected';
+
+  @override
+  String get teamDelete => 'Delete team';
+
+  @override
+  String teamDeleteTitle(String team) {
+    return 'Delete $team?';
+  }
+
+  @override
+  String teamDeleteMessage(String season) {
+    return 'The team leaves the $season season. Players with an app account become free agents and keep their stats; the other squad players are deleted. Matches already registered stay in the history. This can\'t be undone.';
+  }
+
+  @override
+  String teamDeleted(String team) {
+    return '$team was deleted.';
+  }
 }

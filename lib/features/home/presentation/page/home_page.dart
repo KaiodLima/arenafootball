@@ -72,6 +72,8 @@ class _HomePageState extends State<HomePage> {
     final route = switch (tab) {
       'solicitacoes' when user != null && user.isAdmin => AppRoutes.playerRequestsPanelPage,
       'sou_jogador' when user != null => AppRoutes.playerRequestPage,
+      'solicitacoes_time' when user != null && user.isAdmin => AppRoutes.teamRequestsPanelPage,
+      'meu_time' when user != null => AppRoutes.teamRequestPage,
       _ => null,
     };
     if (route != null) {
@@ -142,6 +144,7 @@ class _HomePageState extends State<HomePage> {
               user: session.user,
               favoriteTeamImage: home.favoriteTeamImage,
               pendingPlayerRequests: home.pendingPlayerRequests,
+              pendingTeamRequests: home.pendingTeamRequests,
               onChooseTeam: _chooseTeam,
               onLogout: _logout,
             ),

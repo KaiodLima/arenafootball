@@ -30,6 +30,9 @@ import {
   newsMessage,
   playerRequestAnswerMessage,
   playerRequestMessage,
+  playerRequestToOwnerMessage,
+  teamRequestAnswerMessage,
+  teamRequestMessage,
   seasonCollection,
   todayKey,
   votingMessage,
@@ -162,6 +165,33 @@ export const onPlayerRequestWritten = onDocumentWritten('solicitacoes_jogador/{u
   if (toAdmins) await deliver(`solicitacao_${event.id}`, toAdmins, origem);
   const toUser = playerRequestAnswerMessage(uid, before, after);
   if (toUser) await deliver(`resposta_${event.id}`, toUser, origem);
+
+  // Dono do time do pedido (se o time tiver dono aprovado).
+  const team = typeof after?.time === 'string' ? after.time : '';
+  if (toAdmins && team) {
+    const { db } = await admin();
+    const owners = await db
+      .collection('solicitacoes_time')
+      .where('nome', '==', team)
+      .where('status', '==', 'aprovada')
+      .limit(1)
+      .get();
+    const owner = owners.docs[0]?.id;
+    const toOwner = owner ? playerRequestToOwnerMessage(owner, before, after) : null;
+    if (toOwner) await deliver(`dono_${event.id}`, toOwner, origem);
+  }
+});
+
+/** Pedido "Sou dono de time": novo/reenviado avisa os admins; resposta avisa quem pediu. */
+export const onTeamRequestWritten = onDocumentWritten('solicitacoes_time/{uid}', async (event) => {
+  const uid = event.params.uid;
+  const before = event.data?.before.data();
+  const after = event.data?.after.data();
+  const origem = `solicitacoes_time/${uid}`;
+  const toAdmins = teamRequestMessage(uid, before, after);
+  if (toAdmins) await deliver(`pedido_time_${event.id}`, toAdmins, origem);
+  const toUser = teamRequestAnswerMessage(uid, before, after);
+  if (toUser) await deliver(`resposta_time_${event.id}`, toUser, origem);
 });
 
 /** Todo dia às 9h: lembra os torcedores dos times que jogam hoje (temporada atual). */
