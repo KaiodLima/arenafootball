@@ -63,7 +63,7 @@ class HomeDrawer extends StatelessWidget {
                   _DrawerItem(
                     icon: Icons.star_outline_rounded,
                     title: l10n.drawerRegisterHighlight,
-                    onTap: () => _open(context, AppRoutes.registerHighlightPage),
+                    onTap: () => _open(context, AppRoutes.manageHighlightsPage),
                   ),
                   _DrawerItem(
                     icon: Icons.scoreboard_outlined,

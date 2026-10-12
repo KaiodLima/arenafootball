@@ -305,7 +305,7 @@ abstract class AppLocalizations {
   /// No description provided for @drawerRegisterHighlight.
   ///
   /// In pt, this message translates to:
-  /// **'Cadastrar destaque'**
+  /// **'Destaques'**
   String get drawerRegisterHighlight;
 
   /// No description provided for @drawerRegisterPlayer.
@@ -2451,6 +2451,72 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'{title} · Arena Football'**
   String highlightShareText(String title);
+
+  /// No description provided for @highlightsManageTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Destaques'**
+  String get highlightsManageTitle;
+
+  /// No description provided for @highlightsReorderHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arraste pela alça para definir a ordem do carrossel.'**
+  String get highlightsReorderHint;
+
+  /// No description provided for @highlightsEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum destaque cadastrado. Toque em + para criar.'**
+  String get highlightsEmpty;
+
+  /// No description provided for @highlightHidden.
+  ///
+  /// In pt, this message translates to:
+  /// **'Oculto'**
+  String get highlightHidden;
+
+  /// No description provided for @highlightView.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver'**
+  String get highlightView;
+
+  /// No description provided for @highlightEditTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar destaque'**
+  String get highlightEditTitle;
+
+  /// No description provided for @highlightUpdated.
+  ///
+  /// In pt, this message translates to:
+  /// **'Destaque atualizado!'**
+  String get highlightUpdated;
+
+  /// No description provided for @highlightRenameHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'As notícias marcadas com \"{old}\" passam para o novo nome.'**
+  String highlightRenameHint(String old);
+
+  /// No description provided for @highlightDeleteTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Excluir \"{title}\"?'**
+  String highlightDeleteTitle(String title);
+
+  /// No description provided for @highlightDeleteMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'As notícias marcadas continuam no feed, só perdem a marcação deste destaque.'**
+  String get highlightDeleteMessage;
+
+  /// No description provided for @highlightDeleted.
+  ///
+  /// In pt, this message translates to:
+  /// **'\"{title}\" excluído.'**
+  String highlightDeleted(String title);
 }
 
 class _AppLocalizationsDelegate

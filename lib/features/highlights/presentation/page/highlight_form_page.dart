@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:arena_soccer/core/utils/web_link.dart';
+import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
 import 'package:arena_soccer/features/highlights/presentation/bloc/highlight_form_cubit.dart';
 import 'package:arena_soccer/features/highlights/presentation/bloc/highlight_form_state.dart';
 import 'package:arena_soccer/features/highlights/presentation/widgets/highlight_avatar.dart';
@@ -20,7 +21,10 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 /// título curto (a tag que agrupa as notícias), link opcional e visibilidade,
 /// com a prévia do carrossel ao vivo.
 class HighlightFormPage extends StatefulWidget {
-  const HighlightFormPage({super.key});
+  /// Destaque a editar (nulo = novo).
+  final HighlightDTO? highlight;
+
+  const HighlightFormPage({super.key, this.highlight});
 
   @override
   State<HighlightFormPage> createState() => _HighlightFormPageState();
@@ -28,6 +32,10 @@ class HighlightFormPage extends StatefulWidget {
 
 class _HighlightFormPageState extends State<HighlightFormPage> {
   late final HighlightFormCubit _cubit;
+  late final TextEditingController _titleController;
+  late final TextEditingController _linkController;
+
+  bool get _isEditing => widget.highlight != null;
 
   /// Erros de título só aparecem depois da primeira tentativa (exceto o
   /// duplicado, que avisa na hora).
@@ -39,8 +47,17 @@ class _HighlightFormPageState extends State<HighlightFormPage> {
   @override
   void initState() {
     super.initState();
+    _titleController = TextEditingController(text: widget.highlight?.title);
+    _linkController = TextEditingController(text: widget.highlight?.link);
     _cubit = BlocProvider.of<HighlightFormCubit>(context);
-    _cubit.load();
+    _cubit.load(highlight: widget.highlight);
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _linkController.dispose();
+    super.dispose();
   }
 
   void _submit(HighlightFormData form) {
@@ -107,7 +124,7 @@ class _HighlightFormPageState extends State<HighlightFormPage> {
     return BlocConsumer<HighlightFormCubit, HighlightFormState>(
       listener: (context, state) {
         if (state is SuccessHighlightFormState) {
-          showSnackBar(context: context, message: l10n.highlightCreated);
+          showSnackBar(context: context, message: _isEditing ? l10n.highlightUpdated : l10n.highlightCreated);
           _closeAfterRebuild();
         }
         if (state is ErrorHighlightFormState) {
@@ -135,12 +152,12 @@ class _HighlightFormPageState extends State<HighlightFormPage> {
               ),
               titleSpacing: 0,
               title: Text(
-                l10n.highlightCreateTitle,
+                _isEditing ? l10n.highlightEditTitle : l10n.highlightCreateTitle,
                 style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s20),
               ),
             ),
             bottomNavigationBar: ArenaSubmitBar(
-              title: l10n.highlightPublish,
+              title: _isEditing ? l10n.newsSave : l10n.highlightPublish,
               loading: submitting,
               onPressed: () => _submit(form),
             ),
@@ -151,6 +168,7 @@ class _HighlightFormPageState extends State<HighlightFormPage> {
                 Center(
                   child: CirclePhotoPicker(
                     file: form.image,
+                    currentUrl: form.currentImageUrl,
                     addLabel: l10n.highlightPhotoAdd,
                     onPicked: _cubit.setImage,
                     onRemove: _cubit.clearImage,
@@ -173,6 +191,7 @@ class _HighlightFormPageState extends State<HighlightFormPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       TextField(
+                        controller: _titleController,
                         onChanged: _cubit.changeTitle,
                         maxLength: HighlightFormData.titleMaxLength,
                         textCapitalization: TextCapitalization.sentences,
@@ -185,8 +204,25 @@ class _HighlightFormPageState extends State<HighlightFormPage> {
                           errorText: _titleError(form, l10n),
                         ),
                       ),
+                      if (form.isRenamed && form.titleError == null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: AppSizes.s8),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.info_outline_rounded, size: AppSizes.s16, color: AppColors.primaryDark),
+                              const SizedBox(width: AppSizes.s6),
+                              Expanded(
+                                child: Text(
+                                  l10n.highlightRenameHint(form.original!.title),
+                                  style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       const SizedBox(height: AppSizes.s6),
                       TextField(
+                        controller: _linkController,
                         onChanged: _cubit.changeLink,
                         keyboardType: TextInputType.url,
                         autocorrect: false,
@@ -234,20 +270,28 @@ class _CarouselPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final visible = form.existing.where((item) => item.isVisible).toList();
     final title = form.title.trim().isEmpty ? l10n.highlightTitleLabel : form.title.trim();
+    final current = Opacity(
+      opacity: form.isVisible ? 1 : 0.4,
+      child: HighlightAvatar(imageUrl: form.currentImageUrl, imageFile: form.image, title: title),
+    );
+    final editingId = form.original?.id;
+    final others = form.existing.where((item) => item.isVisible && item.id != editingId).toList();
+    final position = editingId == null
+        ? others.length
+        : form.existing.where((item) => item.isVisible || item.id == editingId).toList().indexWhere(
+              (item) => item.id == editingId,
+            );
+    final insertAt = position < 0 ? others.length : position.clamp(0, others.length);
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      reverse: true,
       clipBehavior: Clip.none,
       child: Row(
         children: [
-          for (final item in visible) HighlightAvatar(imageUrl: item.imageUrl, title: item.title),
-          Opacity(
-            opacity: form.isVisible ? 1 : 0.4,
-            child: HighlightAvatar(imageUrl: '', imageFile: form.image, title: title),
-          ),
+          for (final item in others.take(insertAt)) HighlightAvatar(imageUrl: item.imageUrl, title: item.title),
+          current,
+          for (final item in others.skip(insertAt)) HighlightAvatar(imageUrl: item.imageUrl, title: item.title),
         ],
       ),
     );

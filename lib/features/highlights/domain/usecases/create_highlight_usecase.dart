@@ -8,9 +8,6 @@ import 'package:arena_soccer/features/highlights/domain/repositories/highlights_
 
 /// Cadastra um destaque: envia a imagem e grava o documento.
 class CreateHighlightUseCase {
-  /// Prioridade usada quando ainda não há nenhum destaque cadastrado.
-  static const String defaultPriority = '1';
-
   final IHighlightsRepository _repository;
   final StorageUploadService _storage;
 
@@ -24,12 +21,12 @@ class CreateHighlightUseCase {
       imageUrl = upload.right;
     }
 
-    // Como no app antigo: o novo destaque herda a prioridade do primeiro
-    // destaque da coleção.
+    // O novo destaque entra no fim do carrossel.
     final existing = await _repository.getHighlights();
     if (existing.isLeft) return Left(existing.left);
-    final priorities = existing.right.map((item) => item.priority).where((p) => p.isNotEmpty);
-    final priority = priorities.isEmpty ? defaultPriority : priorities.first;
+    final numbers = existing.right.map((item) => int.tryParse(item.priority.trim())).whereType<int>();
+    final last = numbers.isEmpty ? -1 : numbers.reduce((a, b) => a > b ? a : b);
+    final priority = highlightPriorityAt(last + 1);
 
     return _repository.createHighlight(highlight.copyWith(imageUrl: imageUrl, priority: priority));
   }

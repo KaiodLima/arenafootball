@@ -115,7 +115,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get drawerResults => 'Results around the world';
 
   @override
-  String get drawerRegisterHighlight => 'Add highlight';
+  String get drawerRegisterHighlight => 'Highlights';
 
   @override
   String get drawerRegisterPlayer => 'Add player';
@@ -1349,5 +1349,46 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String highlightShareText(String title) {
     return '$title · Arena Football';
+  }
+
+  @override
+  String get highlightsManageTitle => 'Highlights';
+
+  @override
+  String get highlightsReorderHint =>
+      'Drag by the handle to set the carousel order.';
+
+  @override
+  String get highlightsEmpty => 'No highlights yet. Tap + to create one.';
+
+  @override
+  String get highlightHidden => 'Hidden';
+
+  @override
+  String get highlightView => 'View';
+
+  @override
+  String get highlightEditTitle => 'Edit highlight';
+
+  @override
+  String get highlightUpdated => 'Highlight updated!';
+
+  @override
+  String highlightRenameHint(String old) {
+    return 'News tagged \"$old\" move to the new name.';
+  }
+
+  @override
+  String highlightDeleteTitle(String title) {
+    return 'Delete \"$title\"?';
+  }
+
+  @override
+  String get highlightDeleteMessage =>
+      'Tagged news stay in the feed, they just lose this highlight.';
+
+  @override
+  String highlightDeleted(String title) {
+    return '\"$title\" deleted.';
   }
 }

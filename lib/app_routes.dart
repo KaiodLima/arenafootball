@@ -34,6 +34,7 @@ class AppRoutes {
   static const String registerNewsPage = '/register_news_page';
   static const String registerTeamPage = '/register_team_page';
   static const String publishAdPage = '/publish_ad_page';
+  static const String manageHighlightsPage = '/manage_highlights_page';
   static const String goalNotificationPage = '/goal_notification_page';
 }
 

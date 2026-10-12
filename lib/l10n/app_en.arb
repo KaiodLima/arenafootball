@@ -34,7 +34,7 @@
   "homeTabTables": "Tables",
   "drawerHome": "Home",
   "drawerResults": "Results around the world",
-  "drawerRegisterHighlight": "Add highlight",
+  "drawerRegisterHighlight": "Highlights",
   "drawerRegisterPlayer": "Add player",
   "drawerRegisterMatch": "Add match",
   "drawerRegisterNews": "Add news",
@@ -391,5 +391,16 @@
   "highlightEmpty": "No news in this highlight yet.",
   "highlightLoadError": "Could not load the news.",
   "highlightAddNews": "News",
-  "highlightShareText": "{title} · Arena Football"
+  "highlightShareText": "{title} · Arena Football",
+  "highlightsManageTitle": "Highlights",
+  "highlightsReorderHint": "Drag by the handle to set the carousel order.",
+  "highlightsEmpty": "No highlights yet. Tap + to create one.",
+  "highlightHidden": "Hidden",
+  "highlightView": "View",
+  "highlightEditTitle": "Edit highlight",
+  "highlightUpdated": "Highlight updated!",
+  "highlightRenameHint": "News tagged \"{old}\" move to the new name.",
+  "highlightDeleteTitle": "Delete \"{title}\"?",
+  "highlightDeleteMessage": "Tagged news stay in the feed, they just lose this highlight.",
+  "highlightDeleted": "\"{title}\" deleted."
 }

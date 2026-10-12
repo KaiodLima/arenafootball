@@ -115,7 +115,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get drawerResults => 'Resultados pelo mundo';
 
   @override
-  String get drawerRegisterHighlight => 'Cadastrar destaque';
+  String get drawerRegisterHighlight => 'Destaques';
 
   @override
   String get drawerRegisterPlayer => 'Cadastrar jogador';
@@ -1357,5 +1357,47 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String highlightShareText(String title) {
     return '$title · Arena Football';
+  }
+
+  @override
+  String get highlightsManageTitle => 'Destaques';
+
+  @override
+  String get highlightsReorderHint =>
+      'Arraste pela alça para definir a ordem do carrossel.';
+
+  @override
+  String get highlightsEmpty =>
+      'Nenhum destaque cadastrado. Toque em + para criar.';
+
+  @override
+  String get highlightHidden => 'Oculto';
+
+  @override
+  String get highlightView => 'Ver';
+
+  @override
+  String get highlightEditTitle => 'Editar destaque';
+
+  @override
+  String get highlightUpdated => 'Destaque atualizado!';
+
+  @override
+  String highlightRenameHint(String old) {
+    return 'As notícias marcadas com \"$old\" passam para o novo nome.';
+  }
+
+  @override
+  String highlightDeleteTitle(String title) {
+    return 'Excluir \"$title\"?';
+  }
+
+  @override
+  String get highlightDeleteMessage =>
+      'As notícias marcadas continuam no feed, só perdem a marcação deste destaque.';
+
+  @override
+  String highlightDeleted(String title) {
+    return '\"$title\" excluído.';
   }
 }

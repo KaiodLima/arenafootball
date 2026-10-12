@@ -17,4 +17,21 @@ class HighlightsRepositoryImpl implements IHighlightsRepository {
 
   @override
   Future<Either<Failure, void>> createHighlight(HighlightDTO highlight) => _dataSource.createHighlight(highlight);
+
+  @override
+  Stream<Either<Failure, List<HighlightDTO>>> watchAllHighlights() => _dataSource.watchAllHighlights();
+
+  @override
+  Future<Either<Failure, void>> updateHighlight(HighlightDTO highlight, {String? oldTitle}) =>
+      _dataSource.updateHighlight(highlight, oldTitle: oldTitle);
+
+  @override
+  Future<Either<Failure, void>> deleteHighlight(HighlightDTO highlight) => _dataSource.deleteHighlight(highlight);
+
+  @override
+  Future<Either<Failure, void>> reorderHighlights(List<String> ids) => _dataSource.reorderHighlights(ids);
+
+  @override
+  Future<Either<Failure, void>> setHighlightVisible({required String id, required bool visible}) =>
+      _dataSource.setHighlightVisible(id: id, visible: visible);
 }

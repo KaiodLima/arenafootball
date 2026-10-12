@@ -34,7 +34,7 @@
   "homeTabTables": "Tabelas",
   "drawerHome": "Início",
   "drawerResults": "Resultados pelo mundo",
-  "drawerRegisterHighlight": "Cadastrar destaque",
+  "drawerRegisterHighlight": "Destaques",
   "drawerRegisterPlayer": "Cadastrar jogador",
   "drawerRegisterMatch": "Cadastrar partida",
   "drawerRegisterNews": "Cadastrar notícia",
@@ -771,6 +771,38 @@
   "highlightAddNews": "Notícia",
   "highlightShareText": "{title} · Arena Football",
   "@highlightShareText": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "highlightsManageTitle": "Destaques",
+  "highlightsReorderHint": "Arraste pela alça para definir a ordem do carrossel.",
+  "highlightsEmpty": "Nenhum destaque cadastrado. Toque em + para criar.",
+  "highlightHidden": "Oculto",
+  "highlightView": "Ver",
+  "highlightEditTitle": "Editar destaque",
+  "highlightUpdated": "Destaque atualizado!",
+  "highlightRenameHint": "As notícias marcadas com \"{old}\" passam para o novo nome.",
+  "@highlightRenameHint": {
+    "placeholders": {
+      "old": {
+        "type": "String"
+      }
+    }
+  },
+  "highlightDeleteTitle": "Excluir \"{title}\"?",
+  "@highlightDeleteTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "highlightDeleteMessage": "As notícias marcadas continuam no feed, só perdem a marcação deste destaque.",
+  "highlightDeleted": "\"{title}\" excluído.",
+  "@highlightDeleted": {
     "placeholders": {
       "title": {
         "type": "String"

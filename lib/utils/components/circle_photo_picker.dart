@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:io';
 import 'dart:math' as math;
 
@@ -14,6 +15,9 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 /// e "Remover" embaixo.
 class CirclePhotoPicker extends StatelessWidget {
   final File? file;
+
+  /// Foto já salva (edição), mostrada enquanto não há [file].
+  final String currentUrl;
   final String addLabel;
   final IconData emptyIcon;
   final double size;
@@ -23,6 +27,7 @@ class CirclePhotoPicker extends StatelessWidget {
   const CirclePhotoPicker({
     super.key,
     required this.file,
+    this.currentUrl = '',
     required this.addLabel,
     required this.onPicked,
     required this.onRemove,
@@ -41,11 +46,12 @@ class CirclePhotoPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final hasImage = file != null || currentUrl.isNotEmpty;
 
     return Column(
       children: [
         Material(
-          color: file == null ? AppColors.surface : AppColors.background,
+          color: hasImage ? AppColors.background : AppColors.surface,
           shape: const CircleBorder(),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
@@ -53,10 +59,14 @@ class CirclePhotoPicker extends StatelessWidget {
             child: SizedBox(
               width: size,
               height: size,
-              child: file != null
+              child: hasImage
                   ? Padding(
                       padding: const EdgeInsets.all(AppSizes.s8),
-                      child: ClipOval(child: Image.file(file!, fit: BoxFit.cover)),
+                      child: ClipOval(
+                        child: file != null
+                            ? Image.file(file!, fit: BoxFit.cover)
+                            : CachedNetworkImage(imageUrl: currentUrl, fit: BoxFit.cover),
+                      ),
                     )
                   : CustomPaint(
                       painter: _DashedCirclePainter(),
@@ -68,7 +78,7 @@ class CirclePhotoPicker extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSizes.s10),
-        if (file == null)
+        if (!hasImage)
           Text(addLabel, style: AppTypography.label(color: AppColors.primaryDark))
         else
           Row(

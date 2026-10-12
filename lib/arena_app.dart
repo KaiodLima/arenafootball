@@ -19,6 +19,8 @@ import 'package:arena_soccer/features/championships/presentation/page/standings_
 import 'package:arena_soccer/features/home/presentation/bloc/home_cubit.dart';
 import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
 import 'package:arena_soccer/features/highlights/presentation/bloc/highlight_form_cubit.dart';
+import 'package:arena_soccer/features/highlights/presentation/bloc/manage_highlights_cubit.dart';
+import 'package:arena_soccer/features/highlights/presentation/page/manage_highlights_page.dart';
 import 'package:arena_soccer/features/highlights/presentation/bloc/highlight_news_cubit.dart';
 import 'package:arena_soccer/features/highlights/presentation/page/highlight_details_page.dart';
 import 'package:arena_soccer/features/highlights/presentation/page/highlight_form_page.dart';
@@ -133,9 +135,17 @@ class ArenaApp extends StatelessWidget {
             child: HighlightDetailsPage(highlight: args?['highlight'] as HighlightDTO),
           );
         },
-        AppRoutes.registerHighlightPage: (_) => BlocProvider<HighlightFormCubit>(
-              create: (_) => HighlightFormCubit(sl(), sl()),
-              child: const HighlightFormPage(),
+        // `highlight` opcional: destaque a editar.
+        AppRoutes.registerHighlightPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          return BlocProvider<HighlightFormCubit>(
+            create: (_) => HighlightFormCubit(sl(), sl(), sl()),
+            child: HighlightFormPage(highlight: args?['highlight'] as HighlightDTO?),
+          );
+        },
+        AppRoutes.manageHighlightsPage: (_) => BlocProvider<ManageHighlightsCubit>(
+              create: (_) => ManageHighlightsCubit(sl(), sl(), sl(), sl()),
+              child: const ManageHighlightsPage(),
             ),
 
         // Times e jogadores
