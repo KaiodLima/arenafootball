@@ -1511,4 +1511,191 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pushSent => 'Notice sent!';
+
+  @override
+  String get playerRequestMenu => 'I\'m a player';
+
+  @override
+  String get playerRequestTitle => 'I\'m a player';
+
+  @override
+  String get playerRequestIntro =>
+      'Play for a team in your region: send a request and an admin will review it.';
+
+  @override
+  String get playerRequestTeamRequired => 'Choose the team you play for.';
+
+  @override
+  String get playerRequestNameLabel => 'Player name';
+
+  @override
+  String get playerRequestPositionLabel => 'Position';
+
+  @override
+  String get playerRequestPositionRequired => 'Choose your position.';
+
+  @override
+  String get playerRequestMessageLabel => 'Message to the admin (optional)';
+
+  @override
+  String get playerRequestMessageHint =>
+      'E.g.: I\'ve played full-back for the team since 2022';
+
+  @override
+  String get playerRequestSubmit => 'SEND REQUEST';
+
+  @override
+  String get playerRequestResubmit => 'Send a new request';
+
+  @override
+  String get playerRequestSent =>
+      'Request sent! You\'ll be notified when an admin replies.';
+
+  @override
+  String get playerRequestCancelled => 'Request cancelled.';
+
+  @override
+  String get playerRequestStatusPending => 'Awaiting approval';
+
+  @override
+  String get playerRequestStatusApproved => 'Approved';
+
+  @override
+  String get playerRequestStatusRejected => 'Rejected';
+
+  @override
+  String get playerRequestPendingInfo =>
+      'An admin will review your request. Meanwhile, you can still edit it.';
+
+  @override
+  String playerRequestApprovedInfo(String team) {
+    return 'You play for $team!';
+  }
+
+  @override
+  String get playerRequestRejectedInfo =>
+      'Your request wasn\'t approved. You can send a new one.';
+
+  @override
+  String playerRequestReason(String reason) {
+    return 'Reason: $reason';
+  }
+
+  @override
+  String playerRequestSentOn(String date) {
+    return 'Sent on $date';
+  }
+
+  @override
+  String get playerRequestEdit => 'Edit request';
+
+  @override
+  String get playerRequestCancel => 'Cancel request';
+
+  @override
+  String get playerRequestCancelTitle => 'Cancel request?';
+
+  @override
+  String playerRequestCancelMessage(String team) {
+    return 'Your request to join $team will be deleted.';
+  }
+
+  @override
+  String get playerRequestKeep => 'Keep';
+
+  @override
+  String get playerRequestDiscardEdit => 'Discard changes';
+
+  @override
+  String get playerRequestViewProfile => 'View my player profile';
+
+  @override
+  String get playerRequestLoadError => 'Couldn\'t load your request.';
+
+  @override
+  String get playerPositionGoalkeeper => 'Goalkeeper';
+
+  @override
+  String get playerPositionDefender => 'Defender';
+
+  @override
+  String get playerPositionFullBack => 'Full-back';
+
+  @override
+  String get playerPositionMidfielder => 'Midfielder';
+
+  @override
+  String get playerPositionForward => 'Forward';
+
+  @override
+  String get playerRequestsPanelTitle => 'Player requests';
+
+  @override
+  String get playerRequestsTabPending => 'Pending';
+
+  @override
+  String get playerRequestsTabAnswered => 'Answered';
+
+  @override
+  String get playerRequestsEmptyPending => 'No pending requests.';
+
+  @override
+  String get playerRequestsEmptyAnswered => 'No answered requests yet.';
+
+  @override
+  String get playerRequestsLoadError => 'Couldn\'t load the requests.';
+
+  @override
+  String get playerRequestsApprove => 'Approve';
+
+  @override
+  String get playerRequestsReject => 'Reject';
+
+  @override
+  String playerRequestsApproveTitle(String name) {
+    return 'Approve $name?';
+  }
+
+  @override
+  String playerRequestsApproveMessage(String name, String team) {
+    return '$name joins the $team squad.';
+  }
+
+  @override
+  String playerRequestsRejectTitle(String name) {
+    return 'Reject $name\'s request?';
+  }
+
+  @override
+  String get playerRequestsRejectReason => 'Reason (optional)';
+
+  @override
+  String playerRequestsApproved(String name, String team) {
+    return '$name now plays for $team.';
+  }
+
+  @override
+  String get playerRequestsRejected => 'Request rejected.';
+
+  @override
+  String get playerRequestsUpdated => 'Request updated.';
+
+  @override
+  String playerRequestsAccount(String name) {
+    return 'Account: $name';
+  }
+
+  @override
+  String get pushActionPlayerRequest => 'New player request';
+
+  @override
+  String get pushActionPlayerRequestHint =>
+      'To admins · \"John wants to play for Lava Jato\"';
+
+  @override
+  String get pushActionPlayerRequestAnswer => 'Request answered';
+
+  @override
+  String get pushActionPlayerRequestAnswerHint =>
+      'To the requester · approved or rejected';
 }

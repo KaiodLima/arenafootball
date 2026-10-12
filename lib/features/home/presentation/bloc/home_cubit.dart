@@ -1,11 +1,18 @@
+import 'dart:async';
+
+import 'package:either_dart/either.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/home/presentation/bloc/home_state.dart';
+import 'package:arena_soccer/features/player_requests/domain/usecases/watch_pending_player_requests_count_usecase.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_team_by_name_usecase.dart';
 
 class HomeCubit extends Cubit<HomeState> {
   final GetTeamByNameUseCase getTeamByNameUseCase;
+  final WatchPendingPlayerRequestsCountUseCase watchPendingPlayerRequestsCountUseCase;
+  StreamSubscription<Either<Failure, int>>? _pendingRequests;
 
-  HomeCubit(this.getTeamByNameUseCase) : super(const HomeState());
+  HomeCubit(this.getTeamByNameUseCase, this.watchPendingPlayerRequestsCountUseCase) : super(const HomeState());
 
   void selectTab(HomeTab tab) => emit(state.copyWith(tab: tab));
 
@@ -19,5 +26,19 @@ class HomeCubit extends Cubit<HomeState> {
         if (team != null && team.imageUrl.isNotEmpty) emit(state.copyWith(favoriteTeamImage: team.imageUrl));
       },
     );
+  }
+
+  /// Contador do menu do admin. Falha só deixa o contador como está.
+  void watchPendingPlayerRequests() {
+    _pendingRequests?.cancel();
+    _pendingRequests = watchPendingPlayerRequestsCountUseCase().listen((response) {
+      if (response.isRight) emit(state.copyWith(pendingPlayerRequests: response.right));
+    });
+  }
+
+  @override
+  Future<void> close() {
+    _pendingRequests?.cancel();
+    return super.close();
   }
 }

@@ -39,6 +39,10 @@ import 'package:arena_soccer/features/news/presentation/page/ad_form_page.dart';
 import 'package:arena_soccer/features/news/presentation/page/goal_notification_page.dart';
 import 'package:arena_soccer/features/news/presentation/page/news_details_page.dart';
 import 'package:arena_soccer/features/news/presentation/page/news_form_page.dart';
+import 'package:arena_soccer/features/player_requests/presentation/bloc/player_request_cubit.dart';
+import 'package:arena_soccer/features/player_requests/presentation/bloc/player_requests_panel_cubit.dart';
+import 'package:arena_soccer/features/player_requests/presentation/page/player_request_page.dart';
+import 'package:arena_soccer/features/player_requests/presentation/page/player_requests_panel_page.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/player_form_cubit.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/team_players_cubit.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/player_profile_cubit.dart';
@@ -90,7 +94,7 @@ class ArenaApp extends StatelessWidget {
               child: const ChooseTeamPage(),
             ),
         AppRoutes.home: (_) => BlocProvider<HomeCubit>(
-              create: (_) => HomeCubit(sl()),
+              create: (_) => HomeCubit(sl(), sl()),
               child: const HomePage(),
             ),
 
@@ -179,6 +183,14 @@ class ArenaApp extends StatelessWidget {
             ),
           );
         },
+        AppRoutes.playerRequestPage: (_) => BlocProvider<PlayerRequestCubit>(
+              create: (_) => PlayerRequestCubit(sl(), sl(), sl(), sl(), sl()),
+              child: const PlayerRequestPage(),
+            ),
+        AppRoutes.playerRequestsPanelPage: (_) => BlocProvider<PlayerRequestsPanelCubit>(
+              create: (_) => PlayerRequestsPanelCubit(sl(), sl(), sl(), sl(), sl(), sl()),
+              child: const PlayerRequestsPanelPage(),
+            ),
         AppRoutes.registerPlayerPage: (_) => BlocProvider<PlayerFormCubit>(
               create: (_) => PlayerFormCubit(sl(), sl(), sl(), sl()),
               child: const PlayerFormPage(),

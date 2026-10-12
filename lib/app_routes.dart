@@ -18,6 +18,7 @@ class AppRoutes {
   static const String teamPlayersPage = '/team_players_page';
   static const String playerProfilePage = '/player_profile_page';
   static const String statsRankingPage = '/stats_ranking_page';
+  static const String playerRequestPage = '/player_request_page';
 
   // Partidas, campeonatos e votação
   static const String matchesPage = '/matches_page';
@@ -37,6 +38,7 @@ class AppRoutes {
   static const String manageHighlightsPage = '/manage_highlights_page';
   static const String notificationsPanelPage = '/notifications_panel_page';
   static const String goalNotificationPage = '/goal_notification_page';
+  static const String playerRequestsPanelPage = '/player_requests_panel_page';
 }
 
 class AppSession {

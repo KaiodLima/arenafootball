@@ -7,6 +7,8 @@ import {
   manualMessage,
   matchCreatedMessage,
   newsMessage,
+  playerRequestAnswerMessage,
+  playerRequestMessage,
   targetFor,
   todayKey,
   topicSlug,
@@ -79,4 +81,26 @@ test('config: valor gravado vence o padrão (notícia desligada por padrão)', (
 test('hoje no fuso de Brasília', () => {
   // 02:00 UTC de 12/10 ainda é 11/10 em Brasília.
   assert.equal(todayKey(new Date(Date.UTC(2026, 9, 12, 2, 0))), '11/10');
+});
+
+test('pedido de jogador: novo ou reenviado avisa os admins; correção não', () => {
+  const pending = { nome: 'Kaio', time: 'Lava Jato', regiao: 'Floresta', status: 'pendente' };
+  const created = playerRequestMessage('AbC1', undefined, pending);
+  assert.equal(created?.corpo, 'Kaio quer jogar no Lava Jato');
+  assert.deepEqual(created?.alvo, { topic: 'admins' });
+  assert.equal(created?.aba, 'solicitacoes');
+  assert.ok(playerRequestMessage('AbC1', { ...pending, status: 'rejeitada' }, pending));
+  assert.equal(playerRequestMessage('AbC1', pending, { ...pending, nome: 'Kaio L.' }), null);
+  assert.equal(playerRequestMessage('AbC1', pending, undefined), null);
+});
+
+test('resposta do pedido: só para quem pediu, com motivo na rejeição', () => {
+  const pending = { nome: 'Kaio', time: 'Lava Jato', regiao: 'Floresta', status: 'pendente' };
+  const approved = playerRequestAnswerMessage('AbC1', pending, { ...pending, status: 'aprovada' });
+  assert.deepEqual(approved?.alvo, { topic: 'usuario_AbC1' });
+  assert.equal(approved?.aba, 'sou_jogador');
+  const rejected = playerRequestAnswerMessage('AbC1', pending, { ...pending, status: 'rejeitada', motivo: 'Elenco cheio' });
+  assert.equal(rejected?.corpo, 'Sua solicitação para jogar no Lava Jato não foi aprovada. Motivo: Elenco cheio');
+  assert.equal(playerRequestAnswerMessage('AbC1', undefined, pending), null);
+  assert.equal(playerRequestAnswerMessage('AbC1', { ...pending, status: 'aprovada' }, { ...pending, status: 'aprovada' }), null);
 });

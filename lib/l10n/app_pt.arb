@@ -852,5 +852,128 @@
       }
     }
   },
-  "pushSent": "Aviso enviado!"
+  "pushSent": "Aviso enviado!",
+  "playerRequestMenu": "Sou jogador",
+  "playerRequestTitle": "Sou jogador",
+  "playerRequestIntro": "Jogue pelo seu time da região: envie a solicitação e um administrador vai analisar.",
+  "playerRequestTeamRequired": "Escolha o time em que você joga.",
+  "playerRequestNameLabel": "Nome de jogador",
+  "playerRequestPositionLabel": "Posição",
+  "playerRequestPositionRequired": "Escolha sua posição.",
+  "playerRequestMessageLabel": "Mensagem para o admin (opcional)",
+  "playerRequestMessageHint": "Ex.: jogo de lateral no time desde 2022",
+  "playerRequestSubmit": "ENVIAR SOLICITAÇÃO",
+  "playerRequestResubmit": "Enviar nova solicitação",
+  "playerRequestSent": "Solicitação enviada! Você será avisado quando o admin responder.",
+  "playerRequestCancelled": "Solicitação cancelada.",
+  "playerRequestStatusPending": "Aguardando aprovação",
+  "playerRequestStatusApproved": "Aprovada",
+  "playerRequestStatusRejected": "Rejeitada",
+  "playerRequestPendingInfo": "Um administrador vai analisar seu pedido. Enquanto isso, você ainda pode corrigir os dados.",
+  "playerRequestApprovedInfo": "Você é jogador do {team}!",
+  "@playerRequestApprovedInfo": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "playerRequestRejectedInfo": "Sua solicitação não foi aprovada. Você pode enviar uma nova.",
+  "playerRequestReason": "Motivo: {reason}",
+  "@playerRequestReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "playerRequestSentOn": "Enviada em {date}",
+  "@playerRequestSentOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "playerRequestEdit": "Editar solicitação",
+  "playerRequestCancel": "Cancelar solicitação",
+  "playerRequestCancelTitle": "Cancelar solicitação?",
+  "playerRequestCancelMessage": "Seu pedido para entrar no {team} será apagado.",
+  "@playerRequestCancelMessage": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "playerRequestKeep": "Manter",
+  "playerRequestDiscardEdit": "Descartar alterações",
+  "playerRequestViewProfile": "Ver meu perfil de jogador",
+  "playerRequestLoadError": "Não foi possível carregar sua solicitação.",
+  "playerPositionGoalkeeper": "Goleiro",
+  "playerPositionDefender": "Zagueiro",
+  "playerPositionFullBack": "Lateral",
+  "playerPositionMidfielder": "Meia",
+  "playerPositionForward": "Atacante",
+  "playerRequestsPanelTitle": "Solicitações de jogadores",
+  "playerRequestsTabPending": "Pendentes",
+  "playerRequestsTabAnswered": "Respondidas",
+  "playerRequestsEmptyPending": "Nenhuma solicitação pendente.",
+  "playerRequestsEmptyAnswered": "Nenhuma solicitação respondida ainda.",
+  "playerRequestsLoadError": "Não foi possível carregar as solicitações.",
+  "playerRequestsApprove": "Aprovar",
+  "playerRequestsReject": "Rejeitar",
+  "playerRequestsApproveTitle": "Aprovar {name}?",
+  "@playerRequestsApproveTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playerRequestsApproveMessage": "{name} entra no elenco do {team}.",
+  "@playerRequestsApproveMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "playerRequestsRejectTitle": "Rejeitar a solicitação de {name}?",
+  "@playerRequestsRejectTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playerRequestsRejectReason": "Motivo (opcional)",
+  "playerRequestsApproved": "{name} agora é jogador do {team}.",
+  "@playerRequestsApproved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "playerRequestsRejected": "Solicitação rejeitada.",
+  "playerRequestsUpdated": "Solicitação atualizada.",
+  "playerRequestsAccount": "Conta: {name}",
+  "@playerRequestsAccount": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "pushActionPlayerRequest": "Nova solicitação de jogador",
+  "pushActionPlayerRequestHint": "Para os admins · \"Fulano quer jogar no Lava Jato\"",
+  "pushActionPlayerRequestAnswer": "Resposta da solicitação",
+  "pushActionPlayerRequestAnswerHint": "Para quem pediu · aprovada ou rejeitada"
 }
