@@ -405,13 +405,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get goalDecrease => 'Diminuir';
 
   @override
-  String get newsAdTitle => 'Cadastrar Card de Publicidade:';
-
-  @override
-  String get newsAdCreated => 'Publicidade registrada com Sucesso!!!';
-
-  @override
-  String get highlightFormTitle => 'CADASTRAR DESTAQUE';
+  String get newsAdCreated => 'Publicidade publicada!';
 
   @override
   String get highlightTitleLabel => 'Título';
@@ -420,19 +414,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get highlightLinkLabel => 'Link';
 
   @override
-  String get highlightVisibleLabel => 'Exibir destaque';
+  String get highlightVisibleLabel => 'Exibir no carrossel';
 
   @override
-  String get highlightRegisterButton => 'CADASTRAR';
+  String get highlightTitleRequired => 'Informe o título do destaque.';
 
   @override
-  String get highlightTitleRequired => 'Preencha o campo TÍTULO!!!';
-
-  @override
-  String get highlightCreated => 'Destaque Cadastrado!!!';
-
-  @override
-  String get highlightNoNews => 'Nenhuma notícia disponível!';
+  String get highlightCreated => 'Destaque publicado!';
 
   @override
   String get teamsEmpty => 'Equipes ainda não registradas';
@@ -1265,5 +1253,109 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String athleteSeason(String season) {
     return 'Temporada $season';
+  }
+
+  @override
+  String get adCreateTitle => 'Nova publicidade';
+
+  @override
+  String get adEditTitle => 'Editar publicidade';
+
+  @override
+  String get adPublish => 'Publicar anúncio';
+
+  @override
+  String get adUpdated => 'Publicidade atualizada!';
+
+  @override
+  String get adBannerAdd => 'Adicionar banner';
+
+  @override
+  String get adBannerHint =>
+      'Use uma imagem horizontal 2:1 (ex.: 1200×600). É assim que ela aparece no feed.';
+
+  @override
+  String get adSectionAd => 'Anúncio';
+
+  @override
+  String get adNameLabel => 'Anunciante (opcional)';
+
+  @override
+  String get adNameHint => 'Só para você identificar o anúncio';
+
+  @override
+  String get adLinkHint => 'Site, Instagram ou WhatsApp do anunciante';
+
+  @override
+  String get adLinkInvalid => 'Link inválido. Ex.: https://loja.com.br';
+
+  @override
+  String get adTestLink => 'Testar';
+
+  @override
+  String get adImageRequired => 'Escolha a imagem do anúncio.';
+
+  @override
+  String get highlightCreateTitle => 'Novo destaque';
+
+  @override
+  String get highlightPhotoAdd => 'Adicionar foto';
+
+  @override
+  String get highlightPhotoHint =>
+      'Aparece no círculo do carrossel. Prefira uma imagem quadrada.';
+
+  @override
+  String get highlightPreview => 'Prévia no carrossel';
+
+  @override
+  String get highlightSection => 'Destaque';
+
+  @override
+  String get highlightTitleHint =>
+      'Notícias marcadas com este destaque aparecem nele';
+
+  @override
+  String get highlightTitleTooShort => 'Use pelo menos 3 letras.';
+
+  @override
+  String get highlightDuplicate => 'Já existe um destaque com esse nome.';
+
+  @override
+  String get highlightVisibleOnHint => 'Aparece no topo da home para todos.';
+
+  @override
+  String get highlightVisibleHint => 'Fica oculto até você ativar.';
+
+  @override
+  String get highlightPublish => 'Publicar destaque';
+
+  @override
+  String highlightNewsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count notícias',
+      one: '1 notícia',
+      zero: 'Nenhuma notícia',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get highlightOpenLink => 'Abrir link';
+
+  @override
+  String get highlightEmpty => 'Ainda não há notícias neste destaque.';
+
+  @override
+  String get highlightLoadError => 'Não foi possível carregar as notícias.';
+
+  @override
+  String get highlightAddNews => 'Notícia';
+
+  @override
+  String highlightShareText(String title) {
+    return '$title · Arena Football';
   }
 }

@@ -197,16 +197,12 @@
   "goalStatsFailed": "Gol publicado, mas não foi possível somar nos números dos jogadores.",
   "goalIncrease": "Aumentar",
   "goalDecrease": "Diminuir",
-  "newsAdTitle": "Cadastrar Card de Publicidade:",
-  "newsAdCreated": "Publicidade registrada com Sucesso!!!",
-  "highlightFormTitle": "CADASTRAR DESTAQUE",
+  "newsAdCreated": "Publicidade publicada!",
   "highlightTitleLabel": "Título",
   "highlightLinkLabel": "Link",
-  "highlightVisibleLabel": "Exibir destaque",
-  "highlightRegisterButton": "CADASTRAR",
-  "highlightTitleRequired": "Preencha o campo TÍTULO!!!",
-  "highlightCreated": "Destaque Cadastrado!!!",
-  "highlightNoNews": "Nenhuma notícia disponível!",
+  "highlightVisibleLabel": "Exibir no carrossel",
+  "highlightTitleRequired": "Informe o título do destaque.",
+  "highlightCreated": "Destaque publicado!",
   "teamsEmpty": "Equipes ainda não registradas",
   "teamsLoadError": "Não foi possível carregar os times.",
   "teamsFormTitle": "Novo time",
@@ -733,6 +729,50 @@
   "@athleteSeason": {
     "placeholders": {
       "season": {
+        "type": "String"
+      }
+    }
+  },
+  "adCreateTitle": "Nova publicidade",
+  "adEditTitle": "Editar publicidade",
+  "adPublish": "Publicar anúncio",
+  "adUpdated": "Publicidade atualizada!",
+  "adBannerAdd": "Adicionar banner",
+  "adBannerHint": "Use uma imagem horizontal 2:1 (ex.: 1200×600). É assim que ela aparece no feed.",
+  "adSectionAd": "Anúncio",
+  "adNameLabel": "Anunciante (opcional)",
+  "adNameHint": "Só para você identificar o anúncio",
+  "adLinkHint": "Site, Instagram ou WhatsApp do anunciante",
+  "adLinkInvalid": "Link inválido. Ex.: https://loja.com.br",
+  "adTestLink": "Testar",
+  "adImageRequired": "Escolha a imagem do anúncio.",
+  "highlightCreateTitle": "Novo destaque",
+  "highlightPhotoAdd": "Adicionar foto",
+  "highlightPhotoHint": "Aparece no círculo do carrossel. Prefira uma imagem quadrada.",
+  "highlightPreview": "Prévia no carrossel",
+  "highlightSection": "Destaque",
+  "highlightTitleHint": "Notícias marcadas com este destaque aparecem nele",
+  "highlightTitleTooShort": "Use pelo menos 3 letras.",
+  "highlightDuplicate": "Já existe um destaque com esse nome.",
+  "highlightVisibleOnHint": "Aparece no topo da home para todos.",
+  "highlightVisibleHint": "Fica oculto até você ativar.",
+  "highlightPublish": "Publicar destaque",
+  "highlightNewsCount": "{count, plural, =0{Nenhuma notícia} =1{1 notícia} other{{count} notícias}}",
+  "@highlightNewsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "highlightOpenLink": "Abrir link",
+  "highlightEmpty": "Ainda não há notícias neste destaque.",
+  "highlightLoadError": "Não foi possível carregar as notícias.",
+  "highlightAddNews": "Notícia",
+  "highlightShareText": "{title} · Arena Football",
+  "@highlightShareText": {
+    "placeholders": {
+      "title": {
         "type": "String"
       }
     }

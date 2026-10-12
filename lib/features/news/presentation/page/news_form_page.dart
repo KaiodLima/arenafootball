@@ -16,6 +16,7 @@ import 'package:arena_soccer/utils/components/arena_input_decoration.dart';
 import 'package:arena_soccer/utils/components/arena_submit_bar.dart';
 import 'package:arena_soccer/utils/components/form_section.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
+import 'package:arena_soccer/utils/components/visible_switch.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
@@ -27,7 +28,10 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 class NewsFormPage extends StatefulWidget {
   final NewsDTO? news;
 
-  const NewsFormPage({super.key, this.news});
+  /// Destaque pré-selecionado (nova notícia aberta a partir do destaque).
+  final String? tag;
+
+  const NewsFormPage({super.key, this.news, this.tag});
 
   @override
   State<NewsFormPage> createState() => _NewsFormPageState();
@@ -59,7 +63,11 @@ class _NewsFormPageState extends State<NewsFormPage> {
     _descriptionController = TextEditingController(text: news?.description);
     _linkController = TextEditingController(text: news?.link);
     _cubit = BlocProvider.of<NewsFormCubit>(context);
-    _cubit.load(news: news, initialRegion: BlocProvider.of<RegionCubit>(context).state.selectedRegion);
+    _cubit.load(
+      news: news,
+      initialRegion: BlocProvider.of<RegionCubit>(context).state.selectedRegion,
+      tag: widget.tag ?? '',
+    );
   }
 
   @override
@@ -308,7 +316,7 @@ class _NewsFormPageState extends State<NewsFormPage> {
                         ),
                       ),
                       const SizedBox(height: AppSizes.s12),
-                      _VisibleSwitch(
+                      VisibleSwitch(
                         label: l10n.newsVisibleLabel,
                         hint: form.isVisible ? l10n.newsVisibleOnHint : l10n.newsVisibleHint,
                         value: form.isVisible,
@@ -388,47 +396,6 @@ class _HighlightChips extends StatelessWidget {
             ),
           ],
         ],
-      ),
-    );
-  }
-}
-
-class _VisibleSwitch extends StatelessWidget {
-  final String label;
-  final String hint;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  const _VisibleSwitch({required this.label, required this.hint, required this.value, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(AppSizes.s12),
-      onTap: () => onChanged(!value),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: AppSizes.s6),
-        child: Row(
-          children: [
-            Icon(
-              value ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-              color: value ? AppColors.primaryDark : AppColors.textSecondary,
-            ),
-            const SizedBox(width: AppSizes.s12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(label,
-                      style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s14)),
-                  const SizedBox(height: AppSizes.s2),
-                  Text(hint, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
-                ],
-              ),
-            ),
-            Switch(value: value, onChanged: onChanged, activeTrackColor: AppColors.primary),
-          ],
-        ),
       ),
     );
   }

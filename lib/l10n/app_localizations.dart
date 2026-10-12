@@ -813,23 +813,11 @@ abstract class AppLocalizations {
   /// **'Diminuir'**
   String get goalDecrease;
 
-  /// No description provided for @newsAdTitle.
-  ///
-  /// In pt, this message translates to:
-  /// **'Cadastrar Card de Publicidade:'**
-  String get newsAdTitle;
-
   /// No description provided for @newsAdCreated.
   ///
   /// In pt, this message translates to:
-  /// **'Publicidade registrada com Sucesso!!!'**
+  /// **'Publicidade publicada!'**
   String get newsAdCreated;
-
-  /// No description provided for @highlightFormTitle.
-  ///
-  /// In pt, this message translates to:
-  /// **'CADASTRAR DESTAQUE'**
-  String get highlightFormTitle;
 
   /// No description provided for @highlightTitleLabel.
   ///
@@ -846,32 +834,20 @@ abstract class AppLocalizations {
   /// No description provided for @highlightVisibleLabel.
   ///
   /// In pt, this message translates to:
-  /// **'Exibir destaque'**
+  /// **'Exibir no carrossel'**
   String get highlightVisibleLabel;
-
-  /// No description provided for @highlightRegisterButton.
-  ///
-  /// In pt, this message translates to:
-  /// **'CADASTRAR'**
-  String get highlightRegisterButton;
 
   /// No description provided for @highlightTitleRequired.
   ///
   /// In pt, this message translates to:
-  /// **'Preencha o campo TÍTULO!!!'**
+  /// **'Informe o título do destaque.'**
   String get highlightTitleRequired;
 
   /// No description provided for @highlightCreated.
   ///
   /// In pt, this message translates to:
-  /// **'Destaque Cadastrado!!!'**
+  /// **'Destaque publicado!'**
   String get highlightCreated;
-
-  /// No description provided for @highlightNoNews.
-  ///
-  /// In pt, this message translates to:
-  /// **'Nenhuma notícia disponível!'**
-  String get highlightNoNews;
 
   /// No description provided for @teamsEmpty.
   ///
@@ -2295,6 +2271,186 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Temporada {season}'**
   String athleteSeason(String season);
+
+  /// No description provided for @adCreateTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nova publicidade'**
+  String get adCreateTitle;
+
+  /// No description provided for @adEditTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar publicidade'**
+  String get adEditTitle;
+
+  /// No description provided for @adPublish.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publicar anúncio'**
+  String get adPublish;
+
+  /// No description provided for @adUpdated.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publicidade atualizada!'**
+  String get adUpdated;
+
+  /// No description provided for @adBannerAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar banner'**
+  String get adBannerAdd;
+
+  /// No description provided for @adBannerHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Use uma imagem horizontal 2:1 (ex.: 1200×600). É assim que ela aparece no feed.'**
+  String get adBannerHint;
+
+  /// No description provided for @adSectionAd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Anúncio'**
+  String get adSectionAd;
+
+  /// No description provided for @adNameLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Anunciante (opcional)'**
+  String get adNameLabel;
+
+  /// No description provided for @adNameHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Só para você identificar o anúncio'**
+  String get adNameHint;
+
+  /// No description provided for @adLinkHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Site, Instagram ou WhatsApp do anunciante'**
+  String get adLinkHint;
+
+  /// No description provided for @adLinkInvalid.
+  ///
+  /// In pt, this message translates to:
+  /// **'Link inválido. Ex.: https://loja.com.br'**
+  String get adLinkInvalid;
+
+  /// No description provided for @adTestLink.
+  ///
+  /// In pt, this message translates to:
+  /// **'Testar'**
+  String get adTestLink;
+
+  /// No description provided for @adImageRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha a imagem do anúncio.'**
+  String get adImageRequired;
+
+  /// No description provided for @highlightCreateTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novo destaque'**
+  String get highlightCreateTitle;
+
+  /// No description provided for @highlightPhotoAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar foto'**
+  String get highlightPhotoAdd;
+
+  /// No description provided for @highlightPhotoHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aparece no círculo do carrossel. Prefira uma imagem quadrada.'**
+  String get highlightPhotoHint;
+
+  /// No description provided for @highlightPreview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prévia no carrossel'**
+  String get highlightPreview;
+
+  /// No description provided for @highlightSection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Destaque'**
+  String get highlightSection;
+
+  /// No description provided for @highlightTitleHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícias marcadas com este destaque aparecem nele'**
+  String get highlightTitleHint;
+
+  /// No description provided for @highlightTitleTooShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'Use pelo menos 3 letras.'**
+  String get highlightTitleTooShort;
+
+  /// No description provided for @highlightDuplicate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Já existe um destaque com esse nome.'**
+  String get highlightDuplicate;
+
+  /// No description provided for @highlightVisibleOnHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aparece no topo da home para todos.'**
+  String get highlightVisibleOnHint;
+
+  /// No description provided for @highlightVisibleHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fica oculto até você ativar.'**
+  String get highlightVisibleHint;
+
+  /// No description provided for @highlightPublish.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publicar destaque'**
+  String get highlightPublish;
+
+  /// No description provided for @highlightNewsCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{Nenhuma notícia} =1{1 notícia} other{{count} notícias}}'**
+  String highlightNewsCount(int count);
+
+  /// No description provided for @highlightOpenLink.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abrir link'**
+  String get highlightOpenLink;
+
+  /// No description provided for @highlightEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ainda não há notícias neste destaque.'**
+  String get highlightEmpty;
+
+  /// No description provided for @highlightLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar as notícias.'**
+  String get highlightLoadError;
+
+  /// No description provided for @highlightAddNews.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícia'**
+  String get highlightAddNews;
+
+  /// No description provided for @highlightShareText.
+  ///
+  /// In pt, this message translates to:
+  /// **'{title} · Arena Football'**
+  String highlightShareText(String title);
 }
 
 class _AppLocalizationsDelegate

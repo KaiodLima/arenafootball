@@ -100,13 +100,17 @@ class ArenaApp extends StatelessWidget {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<NewsFormCubit>(
             create: (_) => NewsFormCubit(sl(), sl(), sl(), sl()),
-            child: NewsFormPage(news: args?['news'] as NewsDTO?),
+            child: NewsFormPage(news: args?['news'] as NewsDTO?, tag: args?['tag'] as String?),
           );
         },
-        AppRoutes.publishAdPage: (_) => BlocProvider<NewsFormCubit>(
-              create: (_) => NewsFormCubit(sl(), sl(), sl(), sl()),
-              child: const AdFormPage(),
-            ),
+        // `news` opcional: anúncio a editar.
+        AppRoutes.publishAdPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          return BlocProvider<NewsFormCubit>(
+            create: (_) => NewsFormCubit(sl(), sl(), sl(), sl()),
+            child: AdFormPage(news: args?['news'] as NewsDTO?),
+          );
+        },
         // Opcionais: `news` (card de gol tocado pelo admin) ou `match` + `season`
         // (card de partida tocado pelo admin) preenchem times e placar.
         AppRoutes.goalNotificationPage: (context) {
@@ -130,7 +134,7 @@ class ArenaApp extends StatelessWidget {
           );
         },
         AppRoutes.registerHighlightPage: (_) => BlocProvider<HighlightFormCubit>(
-              create: (_) => HighlightFormCubit(sl()),
+              create: (_) => HighlightFormCubit(sl(), sl()),
               child: const HighlightFormPage(),
             ),
 

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/core/utils/web_link.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 
 /// Erro de validação do título, traduzido na página via l10n.
@@ -72,8 +73,18 @@ class NewsFormData extends Equatable {
     return null;
   }
 
-  /// Como no app antigo, título curto mostra aviso mas não bloqueia.
-  bool get canSubmit => titleError != NewsTitleError.required && selectedRegion != null;
+  /// Link como será gravado: sem esquema, ganha "https://".
+  String get normalizedLink => normalizeWebLink(link);
+
+  /// Link preenchido que não é um endereço web (ex.: "abc").
+  bool get linkInvalid => !isValidWebLink(link);
+
+  /// Como no app antigo, título curto mostra aviso mas não bloqueia. O
+  /// anúncio precisa do banner e de um link válido (se houver).
+  bool get canSubmit =>
+      titleError != NewsTitleError.required &&
+      selectedRegion != null &&
+      (!isAd || (hasCover && !linkInvalid));
 
   /// Há algo que se perderia ao sair (para o aviso de descartar).
   bool get isDirty {
@@ -98,7 +109,7 @@ class NewsFormData extends Equatable {
       title: title.trim(),
       description: description,
       tag: tag,
-      link: link.trim(),
+      link: normalizedLink,
       isVisible: isVisible,
       region: selectedRegion,
       imageUrl: currentCoverUrl,

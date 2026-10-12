@@ -402,13 +402,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get goalDecrease => 'Decrease';
 
   @override
-  String get newsAdTitle => 'New Advertisement Card:';
-
-  @override
-  String get newsAdCreated => 'Advertisement posted successfully!';
-
-  @override
-  String get highlightFormTitle => 'ADD HIGHLIGHT';
+  String get newsAdCreated => 'Ad published!';
 
   @override
   String get highlightTitleLabel => 'Title';
@@ -417,19 +411,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get highlightLinkLabel => 'Link';
 
   @override
-  String get highlightVisibleLabel => 'Show highlight';
+  String get highlightVisibleLabel => 'Show in carousel';
 
   @override
-  String get highlightRegisterButton => 'SAVE';
+  String get highlightTitleRequired => 'Enter the highlight title.';
 
   @override
-  String get highlightTitleRequired => 'Fill in the TITLE field!';
-
-  @override
-  String get highlightCreated => 'Highlight created!';
-
-  @override
-  String get highlightNoNews => 'No news available!';
+  String get highlightCreated => 'Highlight published!';
 
   @override
   String get teamsEmpty => 'No teams registered yet';
@@ -1256,5 +1244,110 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String athleteSeason(String season) {
     return 'Season $season';
+  }
+
+  @override
+  String get adCreateTitle => 'New ad';
+
+  @override
+  String get adEditTitle => 'Edit ad';
+
+  @override
+  String get adPublish => 'Publish ad';
+
+  @override
+  String get adUpdated => 'Ad updated!';
+
+  @override
+  String get adBannerAdd => 'Add banner';
+
+  @override
+  String get adBannerHint =>
+      'Use a 2:1 horizontal image (e.g. 1200×600). This is how it shows in the feed.';
+
+  @override
+  String get adSectionAd => 'Ad';
+
+  @override
+  String get adNameLabel => 'Advertiser (optional)';
+
+  @override
+  String get adNameHint => 'Only for you to identify the ad';
+
+  @override
+  String get adLinkHint => 'Advertiser\'s website, Instagram or WhatsApp';
+
+  @override
+  String get adLinkInvalid => 'Invalid link. E.g. https://store.com';
+
+  @override
+  String get adTestLink => 'Test';
+
+  @override
+  String get adImageRequired => 'Choose the ad image.';
+
+  @override
+  String get highlightCreateTitle => 'New highlight';
+
+  @override
+  String get highlightPhotoAdd => 'Add photo';
+
+  @override
+  String get highlightPhotoHint =>
+      'Shown in the carousel circle. A square image works best.';
+
+  @override
+  String get highlightPreview => 'Carousel preview';
+
+  @override
+  String get highlightSection => 'Highlight';
+
+  @override
+  String get highlightTitleHint =>
+      'News tagged with this highlight show up in it';
+
+  @override
+  String get highlightTitleTooShort => 'Use at least 3 letters.';
+
+  @override
+  String get highlightDuplicate => 'A highlight with this name already exists.';
+
+  @override
+  String get highlightVisibleOnHint =>
+      'Shown at the top of the home for everyone.';
+
+  @override
+  String get highlightVisibleHint => 'Hidden until you turn it on.';
+
+  @override
+  String get highlightPublish => 'Publish highlight';
+
+  @override
+  String highlightNewsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count news',
+      one: '1 news',
+      zero: 'No news',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get highlightOpenLink => 'Open link';
+
+  @override
+  String get highlightEmpty => 'No news in this highlight yet.';
+
+  @override
+  String get highlightLoadError => 'Could not load the news.';
+
+  @override
+  String get highlightAddNews => 'News';
+
+  @override
+  String highlightShareText(String title) {
+    return '$title · Arena Football';
   }
 }

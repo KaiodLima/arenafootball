@@ -109,7 +109,11 @@ class _NewsItem extends StatelessWidget {
           CardMenuAction(
             icon: Icons.edit_outlined,
             label: l10n.commonEdit,
-            onSelected: () => Navigator.pushNamed(context, AppRoutes.registerNewsPage, arguments: {'news': news}),
+            onSelected: () => Navigator.pushNamed(
+              context,
+              news.isAd ? AppRoutes.publishAdPage : AppRoutes.registerNewsPage,
+              arguments: {'news': news},
+            ),
           ),
         CardMenuAction(
           icon: Icons.delete_outline_rounded,
@@ -182,7 +186,7 @@ class _NewsItem extends StatelessWidget {
       return AdCard(
         news: news,
         onTap: news.link.isNotEmpty ? _openLink : null,
-        trailing: _adminMenu(context, onImage: true, canEdit: false),
+        trailing: _adminMenu(context, onImage: true, canEdit: true),
       );
     }
     return NewsCard(

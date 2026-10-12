@@ -17,12 +17,24 @@ class NewsCoverPicker extends StatelessWidget {
   final ValueChanged<File> onPicked;
   final VoidCallback onRemove;
 
+  /// Proporção do quadro (anúncio usa 2, a mesma do card do feed).
+  final double aspectRatio;
+
+  /// Texto do quadro vazio (padrão: "Adicionar capa").
+  final String? addLabel;
+
+  /// Selo no canto da imagem (ex.: "Publicidade"), como aparece no feed.
+  final String? badge;
+
   const NewsCoverPicker({
     super.key,
     required this.file,
     required this.currentUrl,
     required this.onPicked,
     required this.onRemove,
+    this.aspectRatio = 16 / 9,
+    this.addLabel,
+    this.badge,
   });
 
   Future<void> _pick(BuildContext context) async {
@@ -39,7 +51,7 @@ class NewsCoverPicker extends StatelessWidget {
     final radius = BorderRadius.circular(AppSizes.cardRadius);
 
     return AspectRatio(
-      aspectRatio: 16 / 9,
+      aspectRatio: aspectRatio,
       child: Material(
         color: hasImage ? AppColors.black : AppColors.surface,
         borderRadius: radius,
@@ -54,6 +66,22 @@ class NewsCoverPicker extends StatelessWidget {
                       Image.file(file!, fit: BoxFit.cover)
                     else
                       CachedNetworkImage(imageUrl: currentUrl, fit: BoxFit.cover),
+                    if (badge != null)
+                      Positioned(
+                        top: AppSizes.s10,
+                        left: AppSizes.s10,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s2),
+                          decoration: BoxDecoration(
+                            color: AppColors.black.withValues(alpha: 0.55),
+                            borderRadius: BorderRadius.circular(AppSizes.s8),
+                          ),
+                          child: Text(
+                            badge!,
+                            style: AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s12),
+                          ),
+                        ),
+                      ),
                     Positioned(
                       right: AppSizes.s10,
                       bottom: AppSizes.s10,
@@ -85,7 +113,7 @@ class NewsCoverPicker extends StatelessWidget {
                           child: const Icon(Icons.add_photo_alternate_outlined, color: AppColors.primaryDark),
                         ),
                         const SizedBox(height: AppSizes.s10),
-                        Text(l10n.newsCoverAdd, style: AppTypography.label(color: AppColors.textPrimary)),
+                        Text(addLabel ?? l10n.newsCoverAdd, style: AppTypography.label(color: AppColors.textPrimary)),
                         const SizedBox(height: AppSizes.s2),
                         Text(l10n.newsCoverHint, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
                       ],

@@ -6,7 +6,12 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/services/storage_upload_service.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/features/news/domain/repositories/news_repository_interface.dart';
+import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
+import 'package:arena_soccer/features/highlights/domain/usecases/watch_highlights_usecase.dart';
+import 'package:arena_soccer/features/news/domain/usecases/create_news_usecase.dart';
 import 'package:arena_soccer/features/news/domain/usecases/update_news_usecase.dart';
+import 'package:arena_soccer/features/news/presentation/bloc/news_form_cubit.dart';
+import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
 import 'package:arena_soccer/features/news/presentation/bloc/news_form_state.dart';
 
 class _FakeStorage implements StorageUploadService {
@@ -100,6 +105,28 @@ void main() {
       expect(const NewsFormData(title: 'Oi', selectedRegion: 'F').canSubmit, isTrue);
       expect(const NewsFormData(tag: NewsDTO.adTag).titleError, isNull);
     });
+
+    test('anúncio: exige banner e link válido (se houver)', () {
+      const ad = NewsFormData(tag: NewsDTO.adTag, selectedRegion: 'F');
+      expect(ad.canSubmit, isFalse);
+      final withBanner = ad.copyWith(cover: File('banner.jpg'));
+      expect(withBanner.canSubmit, isTrue);
+      expect(withBanner.copyWith(link: 'abc').canSubmit, isFalse);
+      expect(withBanner.copyWith(link: 'loja.com.br').canSubmit, isTrue);
+      // Edição: o banner já salvo vale.
+      const saved = NewsFormData(
+        tag: NewsDTO.adTag,
+        selectedRegion: 'F',
+        original: NewsDTO(id: 'a1', tag: NewsDTO.adTag, imageUrl: 'https://img/a.png'),
+      );
+      expect(saved.canSubmit, isTrue);
+    });
+
+    test('link sem esquema ganha https:// ao gravar', () {
+      expect(const NewsFormData(link: ' loja.com.br ').toNews().link, 'https://loja.com.br');
+      expect(const NewsFormData(link: 'http://x.com').toNews().link, 'http://x.com');
+      expect(const NewsFormData().toNews().link, '');
+    });
   });
 
   group('UpdateNewsUseCase', () {
@@ -135,4 +162,29 @@ void main() {
       expect(repository.updated!.imageUrl, 'https://storage/nova.jpg');
     });
   });
+
+  test('nova notícia aberta pelo destaque já vem marcada com ele', () async {
+    final repository = _FakeRepository();
+    final cubit = NewsFormCubit(
+      CreateNewsUseCase(repository, _FakeStorage()),
+      UpdateNewsUseCase(repository, _FakeStorage()),
+      _FakeRegions(),
+      _FakeHighlights(),
+    );
+    await cubit.load(initialRegion: 'Floresta', tag: 'Seleção Floresta');
+    expect(cubit.state.form.tag, 'Seleção Floresta');
+    expect(cubit.state.form.isEditing, isFalse);
+    await cubit.close();
+  });
+}
+
+class _FakeRegions implements GetRegionsUseCase {
+  @override
+  Future<Either<Failure, List<String>>> call() async => const Right(['Floresta']);
+}
+
+class _FakeHighlights implements WatchHighlightsUseCase {
+  @override
+  Stream<Either<Failure, List<HighlightDTO>>> call() =>
+      Stream.value(const Right([HighlightDTO(id: '1', title: 'Seleção Floresta', isVisible: true)]));
 }
