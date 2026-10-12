@@ -2,7 +2,7 @@
 
 App de futebol amador regional: notícias, destaques, times, jogadores, partidas, tabelas de classificação, artilharia, votação de melhor jogador e resultados globais (web scraping).
 
-- **Pacote Dart:** `arena_soccer` — **Application ID:** `com.cdevel.arena_football`
+- **Pacote Dart:** `arena_soccer` — **Application ID:** `com.caiolima.arenafootball` (namespace/pacote Kotlin seguem `com.cdevel.arena_football`)
 - **Versão:** ver `version:` no `pubspec.yaml`
 - **Backend:** Firebase (Auth, Firestore, Storage). Não há API REST própria.
 - **Plataforma alvo:** Android (iOS/Windows existem mas não são mantidos)

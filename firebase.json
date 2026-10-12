@@ -5,6 +5,11 @@
   "storage": {
     "rules": "storage.rules"
   },
+  "hosting": {
+    "public": "hosting/public",
+    "cleanUrls": true,
+    "ignore": ["firebase.json", "**/.*"]
+  },
   "functions": [
     {
       "source": "functions",
