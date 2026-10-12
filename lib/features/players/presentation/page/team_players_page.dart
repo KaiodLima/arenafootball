@@ -19,6 +19,7 @@ import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/constants/team_colors.dart';
 
 /// Elenco de um time na temporada selecionada: topo com o escudo, resumo,
 /// busca, ordenação e a lista. Tocar num jogador abre a tela do atleta
@@ -81,9 +82,17 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
     final l10n = AppLocalizations.of(context);
     final cubit = BlocProvider.of<TeamPlayersCubit>(context);
     final isAdmin = context.watch<SessionCubit>().state.isAdmin;
+    final palette = TeamPalette.fromHex(widget.team.primaryColor, widget.team.secondaryColor);
+    final barColor = palette?.bar ?? AppColors.primaryDark;
+    final barForeground = palette?.onAccent ?? AppColors.white;
+    // Expandido, a status bar fica sobre o fundo do cabeçalho; recolhido, sobre a barra.
+    final topColor = _collapsed ? palette?.bar : palette?.background;
+    final overlay = topColor != null && readableOn(topColor) != AppColors.white
+        ? SystemUiOverlayStyle.dark
+        : SystemUiOverlayStyle.light;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
+      value: overlay,
       child: Scaffold(
         backgroundColor: AppColors.background,
         body: BlocConsumer<TeamPlayersCubit, TeamPlayersState>(
@@ -118,10 +127,10 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
                   SliverAppBar(
                     pinned: true,
                     expandedHeight: _expandedHeight,
-                    backgroundColor: AppColors.primaryDark,
-                    foregroundColor: AppColors.white,
+                    backgroundColor: barColor,
+                    foregroundColor: barForeground,
                     surfaceTintColor: AppColors.transparent,
-                    systemOverlayStyle: SystemUiOverlayStyle.light,
+                    systemOverlayStyle: overlay,
                     title: AnimatedOpacity(
                       opacity: _collapsed ? 1 : 0,
                       duration: const Duration(milliseconds: 200),
@@ -129,17 +138,17 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
                         widget.team.name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s18),
+                        style: AppTypography.title(color: barForeground).copyWith(fontSize: AppSizes.s18),
                       ),
                     ),
                     actions: [
                       if (isAdmin)
                         deleting
-                            ? const Padding(
-                                padding: EdgeInsets.all(AppSizes.s14),
+                            ? Padding(
+                                padding: const EdgeInsets.all(AppSizes.s14),
                                 child: SizedBox.square(
                                   dimension: AppSizes.s20,
-                                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.white),
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: barForeground),
                                 ),
                               )
                             : CardMenuButton(
