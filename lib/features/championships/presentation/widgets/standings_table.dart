@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/features/championships/data/dtos/standing_dto.dart';
-import 'package:arena_soccer/features/championships/presentation/bloc/groups_state.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_card.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
@@ -17,9 +16,10 @@ class StandingsTable extends StatefulWidget {
   final int qualifiedCount;
 
   /// Time do coração do usuário logado (nome normalizado).
-  final String? favoriteTeam;
+  /// Linha do time do coração (destacada).
+  final bool Function(StandingDTO standing)? isFavorite;
 
-  const StandingsTable({super.key, required this.standings, required this.qualifiedCount, this.favoriteTeam});
+  const StandingsTable({super.key, required this.standings, required this.qualifiedCount, this.isFavorite});
 
   @override
   State<StandingsTable> createState() => _StandingsTableState();
@@ -65,8 +65,7 @@ class _StandingsTableState extends State<StandingsTable> {
               position: i + 1,
               standing: widget.standings[i],
               qualified: i < widget.qualifiedCount,
-              isFavorite:
-                  widget.favoriteTeam != null && normalizeTeamName(widget.standings[i].teamName) == widget.favoriteTeam,
+              isFavorite: widget.isFavorite?.call(widget.standings[i]) ?? false,
               expanded: _expandedId == widget.standings[i].id,
               statWidth: _statWidth,
               positionWidth: _positionWidth,

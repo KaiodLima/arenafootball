@@ -49,8 +49,7 @@ class _GroupsPageState extends State<GroupsPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final favorite = context.watch<SessionCubit>().state.user?.favoriteTeam;
-    final favoriteKey = (favorite == null || favorite.trim().isEmpty) ? null : normalizeTeamName(favorite);
+    final user = context.watch<SessionCubit>().state.user;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -77,7 +76,7 @@ class _GroupsPageState extends State<GroupsPage> {
               return GroupCard(
                 group: group,
                 crestOf: state.crestOf,
-                favoriteTeam: favoriteKey,
+                isFavorite: (id, name) => user?.isFavorite(id: id, name: name) ?? false,
                 onTap: () => Navigator.pushNamed(
                   context,
                   AppRoutes.standingsPage,

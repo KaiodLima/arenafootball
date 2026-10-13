@@ -22,6 +22,7 @@ class PushTopicsListener extends StatelessWidget {
     sl<PushTopicSync>().sync(desiredTopics(
       region: region,
       favoriteTeam: user?.favoriteTeam,
+      favoriteTeamId: user?.favoriteTeamId,
       userId: user?.id,
       isAdmin: user?.isAdmin ?? false,
     ));
@@ -39,6 +40,7 @@ class PushTopicsListener extends StatelessWidget {
           listenWhen: (previous, current) =>
               current is! CheckingSessionState &&
               (previous.user?.favoriteTeam != current.user?.favoriteTeam ||
+                  previous.user?.favoriteTeamId != current.user?.favoriteTeamId ||
                   previous.user?.id != current.user?.id ||
                   previous.isAdmin != current.isAdmin),
           listener: (context, _) => syncNow(context),

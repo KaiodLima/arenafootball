@@ -13,7 +13,7 @@ abstract class IPlayerRequestsRepository {
 
   Stream<Either<Failure, int>> watchPendingCount();
 
-  Stream<Either<Failure, List<PlayerRequestDTO>>> watchTeamRequests(String team);
+  Stream<Either<Failure, List<PlayerRequestDTO>>> watchTeamRequests({String teamId = '', required String teamName});
 
   Future<Either<Failure, void>> update(PlayerRequestDTO request);
 

@@ -59,7 +59,7 @@ class PlayerFormCubit extends Cubit<PlayerFormState> {
     final team = state.form.selectedTeam;
     _edit(state.form.copyWith(squad: const []));
     if (team == null) return;
-    final response = await watchTeamPlayersUseCase(teamName: team).first;
+    final response = await watchTeamPlayersUseCase(teamId: state.form.selectedTeamId, teamName: team).first;
     if (isClosed || state.form.selectedTeam != team) return;
     _edit(state.form.copyWith(squad: response.fold((_) => const <PlayerDTO>[], (list) => list)));
   }

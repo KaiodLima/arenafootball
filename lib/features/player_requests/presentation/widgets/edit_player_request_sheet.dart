@@ -40,6 +40,7 @@ class _EditSheet extends StatefulWidget {
 class _EditSheetState extends State<_EditSheet> {
   late final TextEditingController _name = TextEditingController(text: widget.request.name);
   late String _team = widget.request.team;
+  late String _teamId = widget.request.teamId;
   late PlayerPosition? _position = widget.request.position;
 
   @override
@@ -56,8 +57,19 @@ class _EditSheetState extends State<_EditSheet> {
   }
 
   Future<void> _pickTeam(AppLocalizations l10n) async {
-    final picked = await showTeamPickerSheet(context, title: l10n.playersTeam, teams: widget.teams, selected: _team);
-    if (picked != null) setState(() => _team = picked);
+    final picked = await showTeamPickerSheet(
+      context,
+      title: l10n.playersTeam,
+      teams: widget.teams,
+      selected: _team,
+      selectedId: _teamId,
+    );
+    if (picked != null) {
+      setState(() {
+        _team = picked.name;
+        _teamId = picked.id;
+      });
+    }
   }
 
   @override
@@ -118,7 +130,7 @@ class _EditSheetState extends State<_EditSheet> {
               function: nameValid
                   ? () => Navigator.pop(
                         context,
-                        widget.request.copyWith(name: _name.text.trim(), team: _team, position: _position),
+                        widget.request.copyWith(name: _name.text.trim(), team: _team, teamId: _teamId, position: _position),
                       )
                   : null,
             ),

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/core/utils/search_text.dart';
+import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 
@@ -71,7 +72,16 @@ class PlayerFormData extends Equatable {
     return null;
   }
 
-  PlayerDTO toPlayer() => PlayerDTO(name: name.trim(), team: selectedTeam ?? '', goals: goals, assists: assists);
+  /// Id do time escolhido ('' se não achar na lista).
+  String get selectedTeamId => TeamDirectory(teams).idOf(name: selectedTeam ?? '');
+
+  PlayerDTO toPlayer() => PlayerDTO(
+        name: name.trim(),
+        team: selectedTeam ?? '',
+        teamId: selectedTeamId,
+        goals: goals,
+        assists: assists,
+      );
 
   /// Troca a lista de times; seleciona o primeiro (como o app antigo).
   PlayerFormData withTeams(List<TeamDTO> teams) => PlayerFormData(

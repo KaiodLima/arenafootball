@@ -178,12 +178,16 @@ class AuthDataSource {
     }
   }
 
-  Future<Either<Failure, void>> updateFavoriteTeam({required String userId, required String team}) async {
+  Future<Either<Failure, void>> updateFavoriteTeam({
+    required String userId,
+    required String team,
+    required String teamId,
+  }) async {
     const fallback = 'Não foi possível salvar o seu time.';
     try {
       final doc = await _findUserDoc(userId);
       if (doc == null) return Left(ErrorWithMessage(fallback, code: _userDataNotFound));
-      await doc.reference.update({'time': team});
+      await doc.reference.update({'time': team, 'idTime': teamId});
       return const Right(null);
     } catch (e) {
       AppLogger.e('updateFavoriteTeam id=$userId', name: 'AuthDataSource', error: e);

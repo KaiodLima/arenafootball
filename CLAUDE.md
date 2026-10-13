@@ -48,7 +48,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | `players` | Elenco do time, edição de gols/assistências/foto, cadastro de jogador |
 | `player_requests` | "Sou jogador": usuário pede para entrar num time; painel do admin aprova (cria o jogador vinculado), rejeita ou edita |
 | `team_requests` | "Sou dono de time": usuário pede para criar o time; admin aprova (cria o time com `idDono`). Aprovado, "Meu time": elenco, pedidos "Sou jogador" do time e edição de escudo/descrição. `OwnedTeamCubit` (global) diz de qual time a conta é dono |
-| `seasons` | Temporada atual/lista em `config/temporadas`; painel do admin "Temporadas" (iniciar a próxima) |
+| `seasons` | Temporada atual/lista em `config/temporadas`; painel do admin "Temporadas" (iniciar a próxima) e a manutenção "Vincular times por id" (completa os ids de time nos docs antigos e copia os votos antigos; pode rodar de novo) |
 | `stats` | Ranking de artilharia/assistências (uma tela, `StatsRankingType`) |
 | `championships` | Aba CAMPEONATOS, detalhe (regulamento PDF, times, premiação), grupos, classificação, cadastro/edição do admin |
 | `matches` | Aba TABELAS, lista de partidas (hoje/todas), cadastro, placar, votação on/off |
@@ -72,6 +72,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 - Erros sempre em `Either<Failure, T>` — nunca `throw`. DataSource captura e converte com `mapFirebaseError` (`lib/core/errors/firebase_error.dart`)
 - Streams do Firestore: `.toEither(...)` de `lib/core/firebase/either_stream.dart` (nunca deixar o erro do stream escapar)
 - Coleções por temporada: **sempre** `SeasonCollection.name('partidas', season)` — nunca montar `"partidas$ano"` na mão
+- Vínculo com time é pelo **id** (doc de `times{ano}`); o nome gravado ao lado é só cópia para exibir. Gravar sempre os dois; buscar/comparar pelo id com fallback no nome para docs antigos (`sameTeam`/`TeamDirectory` em `lib/core/utils/team_key.dart`)
 - Firestore só dentro de DataSource. Widget e Cubit nunca importam `cloud_firestore`
 - Sessão (usuário/admin) vem do `SessionCubit`; região/temporada do `RegionCubit`. Não passar por construtor
 - `async/await`, nunca `.then()` em cascata
@@ -89,21 +90,21 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 
 | Coleção | Campos principais |
 |---------|-------------------|
-| `usuarios` | idUsuario, nome, email, time, admin (bool), urlImagem (opcional: foto da carteirinha; conta Google usa a foto do Google até trocar). Contas antigas têm `senha` em texto puro — não gravar mais |
-| `noticias` | id, data (Timestamp), titulo, descricao, urlImagem, link, exibir ("true"/"false" **string**), fk_competicao, time_casa, time_fora, gol_time_casa, gol_time_fora, tag ("gol", "publicidade", título de destaque...), images[]. Cards de gol, opcionais: autor_gol_id, autor_gol, assistencia_id, assistencia (id/nome em `jogadores{ano}`), temporada, time_marcador, escudo_marcador (URL) |
+| `usuarios` | idUsuario, nome, email, time (nome, cópia), idTime (time do coração), admin (bool), urlImagem (opcional: foto da carteirinha; conta Google usa a foto do Google até trocar). Contas antigas têm `senha` em texto puro — não gravar mais |
+| `noticias` | id, data (Timestamp), titulo, descricao, urlImagem, link, exibir ("true"/"false" **string**), fk_competicao, time_casa, time_fora, gol_time_casa, gol_time_fora, tag ("gol", "publicidade", título de destaque...), images[]. Cards de gol, opcionais: autor_gol_id, autor_gol, assistencia_id, assistencia (id/nome em `jogadores{ano}`), temporada, time_marcador, escudo_marcador (URL), id_time_casa, id_time_fora, id_time_marcador |
 | `destaques` | id, title, link, urlImagem, exibir (string), priority |
 | `competicao` | nome (as "regiões": Floresta, Santo inacio...) |
 | `times{ano}` | id_partida (é o id do **time**, nome errado), nome, descricao, fk_competicao, urlImagem, idDono (opcional: uid do dono, times do "Sou dono de time"), corPrimaria/corSecundaria (opcionais, hex "#RRGGBB"; paleta em `lib/utils/constants/team_colors.dart`) |
 | `classificacao{ano}` | campos do time + vitorias, derrotas, empates, gols_feitos, gols_sofridos, pontos, saldo_gols, fk_grupo |
-| `jogadores{ano}` | idJogador, nome, time, urlImagem, nGols, nAssistencias. Opcionais: idUsuario (conta vinculada pelo "Sou jogador"), posicao (goleiro/zagueiro/lateral/meia/atacante) |
-| `partidas{ano}` | id_partida, dataRegistro, timeC, timeF, horario, data, local, id_campeonato, fk_competicao, golTimeCasa, golTimeFora, votacao (string), tituloVotacao, melhorJogador, quantidadeVotos |
-| `campeonatos` | titulo, descricao, urlImagem, premio1-3, premioArtilheiro, premioGoleiro, regras (resumo em texto), fk_competicao, id_campeonato (int; novo = maior + 1), ano, times[] (nomes dos participantes), regulamentoUrl, regulamentoNome (PDF no Storage). Cadastro pelo admin em "Campeonatos"; partidas pegam o id_campeonato do campeonato da região na temporada corrente (senão, a tabela fixa do `CreateMatchUseCase`) |
-| `grupos{ano}` | descricao, fk_competicao, time1-4, fk_campeonato (opcional: `id_campeonato`; sem ele = grupo antigo, mostrado no campeonato que não tiver grupos próprios) |
-| `melhorjogador{timeC}{timeF}` | um doc por votante (id = uid): nome, time |
+| `jogadores{ano}` | idJogador, nome, time (nome, cópia), idTime, urlImagem, nGols, nAssistencias. Opcionais: idUsuario (conta vinculada pelo "Sou jogador"), posicao (goleiro/zagueiro/lateral/meia/atacante) |
+| `partidas{ano}` | id_partida, dataRegistro, timeC, timeF (nomes, cópia), idTimeC, idTimeF, horario, data, local, id_campeonato, fk_competicao, golTimeCasa, golTimeFora, votacao (string), tituloVotacao, melhorJogador, quantidadeVotos. Subcoleção `votos/{uid}` (melhor jogador): nome, time, idTime |
+| `campeonatos` | titulo, descricao, urlImagem, premio1-3, premioArtilheiro, premioGoleiro, regras (resumo em texto), fk_competicao, id_campeonato (int; novo = maior + 1), ano, times[] (nomes, cópia), ids_times[] (ids, mesma ordem; '' = sem id), regulamentoUrl, regulamentoNome (PDF no Storage). Cadastro pelo admin em "Campeonatos"; partidas pegam o id_campeonato do campeonato da região na temporada corrente (senão, a tabela fixa do `CreateMatchUseCase`) |
+| `grupos{ano}` | descricao, fk_competicao, time1-4 (nomes), idTime1-4, fk_campeonato (opcional: `id_campeonato`; sem ele = grupo antigo, mostrado no campeonato que não tiver grupos próprios) |
+| `melhorjogador{timeC}{timeF}` | **legado** (votos antigos, sem temporada): um doc por votante (id = uid): nome, time. Ainda lido como fallback; votos novos vão para `partidas{ano}/{id}/votos` |
 | `config/temporadas` | atual (temporada em andamento), lista (seletor) |
 | `config/notificacoes` | liga/desliga por ação de push: gol, noticia, partida, votacao_aberta, votacao_encerrada, jogo_do_dia, aviso (bool; ausente = padrão das functions) |
 | `notificacoes_envios` | histórico gravado pelas Cloud Functions (id = evento): tipo, titulo, corpo, alvo, regiao, data, status (enviado/desligado/erro), erro, origem |
-| `solicitacoes_jogador` | pedido "Sou jogador", id = uid (um por usuário): uid, nome_usuario, email, nome, time, regiao, temporada, posicao, mensagem, urlImagem, status (pendente/aprovada/rejeitada/removido), motivo, idJogador, data, atualizado_em. Aprovar = batch que cria o jogador (ou reaproveita o atleta da conta, mantendo os números) e marca o pedido. Atleta vinculado não é excluído: "remover do elenco" zera o `time` e o pedido vira `removido` |
+| `solicitacoes_jogador` | pedido "Sou jogador", id = uid (um por usuário): uid, nome_usuario, email, nome, time, idTime, regiao, temporada, posicao, mensagem, urlImagem, status (pendente/aprovada/rejeitada/removido), motivo, idJogador, data, atualizado_em. Aprovar = batch que cria o jogador (ou reaproveita o atleta da conta, mantendo os números) e marca o pedido. Atleta vinculado não é excluído: "remover do elenco" zera o `time` e o pedido vira `removido` |
 | `solicitacoes_time` | pedido "Sou dono de time", id = uid (um por usuário): uid, nome_usuario, email, nome (do time), regiao, descricao, urlImagem, corPrimaria, corSecundaria, contato (WhatsApp), mensagem, temporada, status (pendente/aprovada/rejeitada), motivo, idTime, data, atualizado_em. Aprovado = registro de dono que as regras consultam (`ownedTeam()`); o nome do time só o admin muda |
 | `push_avisos` | aviso manual do admin (titulo, corpo, regiao vazia = todos, data); a function envia |
 
@@ -113,7 +114,7 @@ Storage: `noticias/`, `destaques/`, `times/`, `jogadores/`, `campeonatos/` (bann
 ## Notificações push (FCM)
 
 - **Envio:** Cloud Functions em `functions/` (TypeScript, região `us-central1`, a mesma do Firestore `nam5`). Gatilhos em `noticias`, `partidas` da temporada atual (gatilho em `{colecao}/{id}` filtrando a coleção de partidas da `config/temporadas`), `push_avisos`, `solicitacoes_jogador` (avisa admins, quem pediu e o dono do time) e `solicitacoes_time`, mais o agendamento diário `dailyGames` (9h, Brasília). Mensagens e alvos em `functions/src/messages.ts` (funções puras, `npm test`).
-- **Tópicos:** `todos`, `regiao_<slug>`, `time_<slug>`, `usuario_<uid>` (logado) e `admins` (conta admin). O slug de `lib/core/utils/push_topics.dart` e o de `messages.ts` precisam ser iguais.
+- **Tópicos:** `todos`, `regiao_<slug>`, `timeid_<idTime>` (time do coração pelo id), `usuario_<uid>` (logado) e `admins` (conta admin). `time_<slug do nome>` é o tópico antigo: o app novo só assina quando a conta ainda não tem `idTime`, e as functions mandam para os dois na transição. O slug/`teamIdTopic` de `lib/core/utils/push_topics.dart` e o de `messages.ts` precisam ser iguais.
 - **App:** `PushService` (`lib/core/services/push_service.dart`) faz permissão, exibição em primeiro plano e toque (abre a aba do `data.aba`). O `PushTopicsListener` (em `blocs_load.dart`) mantém os tópicos de acordo com a região e o time do coração.
 - **Deploy das functions:** `cd functions && npm install`, depois `firebase deploy --only functions`.
 
@@ -129,7 +130,8 @@ firebase deploy --only firestore:rules,storage
 - Escrita de conteúdo só do admin (`usuarios/{uid}.admin == true`); o usuário não consegue gravar `admin` no próprio perfil.
 - Votos (`melhorjogador*`): cada usuário logado grava só o doc com o próprio uid.
 - `solicitacoes_jogador` / `solicitacoes_time`: o dono cria/corrige/reenvia o próprio pedido sempre como `pendente` (campos limitados), nunca se aprova; o admin lê e responde.
-- Dono de time (`ownedTeam()` = `solicitacoes_time/{uid}` aprovado): cria/edita/apaga `jogadores*` do próprio time (ou sem time), troca só `descricao`/`urlImagem`/cores do time com `idDono` = uid, e responde (status/motivo/idJogador) os pedidos "Sou jogador" do time. Casos cobertos testados no emulador do Firestore.
+- Votos: `partidas{ano}/{id}/votos/{uid}` (leitura pública; cada logado grava só o próprio, campos nome/time/idTime). Os antigos `melhorjogador*` seguem as regras do conteúdo.
+- Dono de time (`ownedTeam()` = `solicitacoes_time/{uid}` aprovado; compara pelo `idTime`, e pelo nome em doc antigo sem id): cria/edita/apaga `jogadores*` do próprio time (ou sem time), troca só `descricao`/`urlImagem`/cores do time com `idDono` = uid, e responde (status/motivo/idJogador) os pedidos "Sou jogador" do time. Casos cobertos testados no emulador do Firestore.
 - Erro `PERMISSION_DENIED` no logcat = regra negando; ajuste as regras, não o app.
 
 ## Débito técnico conhecido

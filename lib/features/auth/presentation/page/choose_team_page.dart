@@ -67,7 +67,9 @@ class _ChooseTeamPageState extends State<ChooseTeamPage> {
   void _onSaved(SavedChooseTeamState state) {
     final session = BlocProvider.of<SessionCubit>(context);
     final user = session.state.user;
-    if (user != null) session.updateUser(user.copyWith(favoriteTeam: state.selectedTeam));
+    if (user != null) {
+      session.updateUser(user.copyWith(favoriteTeam: state.selectedTeam, favoriteTeamId: state.selectedTeamId));
+    }
     BlocProvider.of<RegionCubit>(context).selectRegion(state.selectedRegion!);
     _leave();
   }
@@ -127,6 +129,7 @@ class _ChooseTeamPageState extends State<ChooseTeamPage> {
                       key: ValueKey(state.selectedRegion),
                       teams: state.teams,
                       selected: state.selectedTeam,
+                      selectedId: state.selectedTeamId,
                       loading: state.loadingTeams,
                       placeholder: l10n.registerTeamLabel,
                       onSelected: _cubit.selectTeam,

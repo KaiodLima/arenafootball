@@ -14,7 +14,7 @@ class _FakeWatch implements WatchTeamPlayersUseCase {
   int calls = 0;
 
   @override
-  Stream<Either<Failure, List<PlayerDTO>>> call({required String teamName, String? season}) {
+  Stream<Either<Failure, List<PlayerDTO>>> call({String teamId = '', required String teamName, String? season}) {
     calls++;
     return Stream.value(const Right([PlayerDTO(id: 'p1', name: 'Kaio', team: 'Volta')]));
   }

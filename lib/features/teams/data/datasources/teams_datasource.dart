@@ -137,19 +137,26 @@ class TeamsDataSource {
       final seasonKey = (season == null || season.isEmpty) ? SeasonCollection.currentSeason : season;
       final writes = <void Function(WriteBatch batch)>[];
 
-      final players = await _firestore
-          .collection(SeasonCollection.name('jogadores', season))
-          .where('time', isEqualTo: team.name)
-          .get();
-      for (final doc in players.docs) {
-        final linked = (doc.data()['idUsuario']?.toString() ?? '').isNotEmpty;
-        writes.add((batch) => linked ? batch.update(doc.reference, {'time': ''}) : batch.delete(doc.reference));
+      // Vínculo pelo id; docs antigos (sem `idTime`) pelo nome. Quem tem o id
+      // de outro time com o mesmo nome fica de fora.
+      bool ofTeam(Map<String, dynamic> data) {
+        final id = data['idTime']?.toString() ?? '';
+        return id.isEmpty || id == team.id;
       }
 
-      final requests = await _firestore.collection('solicitacoes_jogador').where('time', isEqualTo: team.name).get();
+      final byTeam = Filter.or(Filter('idTime', isEqualTo: team.id), Filter('time', isEqualTo: team.name));
+      final players = await _firestore.collection(SeasonCollection.name('jogadores', season)).where(byTeam).get();
+      for (final doc in players.docs) {
+        if (!ofTeam(doc.data())) continue;
+        final linked = (doc.data()['idUsuario']?.toString() ?? '').isNotEmpty;
+        writes.add((batch) =>
+            linked ? batch.update(doc.reference, {'time': '', 'idTime': ''}) : batch.delete(doc.reference));
+      }
+
+      final requests = await _firestore.collection('solicitacoes_jogador').where(byTeam).get();
       for (final doc in requests.docs) {
         final data = doc.data();
-        if (data['temporada']?.toString() != seasonKey) continue;
+        if (!ofTeam(data) || data['temporada']?.toString() != seasonKey) continue;
         final status = data['status']?.toString();
         if (status == 'aprovada') {
           writes.add((batch) => batch.update(doc.reference, {
@@ -174,12 +181,20 @@ class TeamsDataSource {
         }
       }
 
-      final championships =
-          await _firestore.collection('campeonatos').where('times', arrayContains: team.name).get();
-      for (final doc in championships.docs) {
+      // Campeonatos: pelo id (`ids_times`) e, nos antigos, pelo nome. Um
+      // `array-contains` por consulta: duas consultas, sem repetir o doc.
+      final championships = {
+        for (final query in [
+          _firestore.collection('campeonatos').where('ids_times', arrayContains: team.id),
+          _firestore.collection('campeonatos').where('times', arrayContains: team.name),
+        ])
+          for (final doc in (await query.get()).docs) doc.id: doc,
+      };
+      for (final doc in championships.values) {
         if (doc.data()['ano']?.toString() != seasonKey) continue;
         writes.add((batch) => batch.update(doc.reference, {
               'times': FieldValue.arrayRemove([team.name]),
+              'ids_times': FieldValue.arrayRemove([team.id]),
             }));
       }
 

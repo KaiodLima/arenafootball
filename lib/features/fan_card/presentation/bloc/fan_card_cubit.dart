@@ -17,13 +17,13 @@ class FanCardCubit extends Cubit<FanCardState> {
       : super(const FanCardState());
 
   /// Sem time (ou falha ao buscar): a carteirinha usa as cores do app.
-  Future<void> load({required String favoriteTeam}) async {
+  Future<void> load({required String favoriteTeam, String favoriteTeamId = ''}) async {
     final memberSince = getAccountCreatedAtUseCase()?.year;
-    if (favoriteTeam.trim().isEmpty) {
+    if (favoriteTeam.trim().isEmpty && favoriteTeamId.isEmpty) {
       emit(state.copyWith(memberSince: memberSince, loading: false));
       return;
     }
-    final response = await getTeamByNameUseCase(favoriteTeam);
+    final response = await getTeamByNameUseCase(favoriteTeam, id: favoriteTeamId);
     if (isClosed) return;
     emit(FanCardState(team: response.fold((_) => null, (team) => team), memberSince: memberSince, loading: false));
   }

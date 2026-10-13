@@ -48,14 +48,14 @@ class MyTeamCubit extends Cubit<MyTeamState> {
     emit(state.copyWith(team: fallback, loading: true));
 
     _players?.cancel();
-    _players = watchTeamPlayersUseCase(teamName: teamName).listen((response) {
+    _players = watchTeamPlayersUseCase(teamId: teamId, teamName: teamName).listen((response) {
       response.fold(
         (failure) => emit(ErrorMyTeamState(state, errorMessage: failure.toString())),
         (players) => emit(state.copyWith(players: [...players]..sort((a, b) => a.name.compareTo(b.name)))),
       );
     });
     _requests?.cancel();
-    _requests = watchTeamPlayerRequestsUseCase(teamName).listen((response) {
+    _requests = watchTeamPlayerRequestsUseCase(teamId: teamId, teamName: teamName).listen((response) {
       response.fold(
         (failure) => emit(ErrorMyTeamState(state, errorMessage: failure.toString())),
         (requests) => emit(state.copyWith(requests: requests)),
@@ -92,7 +92,10 @@ class MyTeamCubit extends Cubit<MyTeamState> {
     final team = state.team;
     if (team == null || state.saving || name.trim().length < 3) return;
     emit(state.copyWith(saving: true));
-    final response = await createPlayerUseCase(PlayerDTO(name: name, team: team.name, position: position), photo: photo);
+    final response = await createPlayerUseCase(
+      PlayerDTO(name: name, team: team.name, teamId: team.id, position: position),
+      photo: photo,
+    );
     if (isClosed) return;
     response.fold(
       (failure) => emit(ErrorMyTeamState(state, errorMessage: failure.toString())),

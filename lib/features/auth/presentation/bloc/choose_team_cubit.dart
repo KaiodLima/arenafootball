@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/update_favorite_team_usecase.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/choose_team_state.dart';
 import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
 
 /// Etapa 2 do cadastro. Roda já com o usuário logado: só assim o Firestore
@@ -59,13 +60,14 @@ class ChooseTeamCubit extends Cubit<ChooseTeamState> {
     );
   }
 
-  void selectTeam(String team) {
+  void selectTeam(TeamDTO team) {
     emit(
       ReadyChooseTeamState(
         regions: state.regions,
         selectedRegion: state.selectedRegion,
         teams: state.teams,
-        selectedTeam: team,
+        selectedTeam: team.name,
+        selectedTeamId: team.id,
       ),
     );
   }
@@ -74,10 +76,18 @@ class ChooseTeamCubit extends Cubit<ChooseTeamState> {
     if (!state.canSave || state is SavingChooseTeamState) return;
     final current = state;
     emit(SavingChooseTeamState(current));
-    final response = await updateFavoriteTeamUseCase(userId: userId, team: current.selectedTeam!);
+    final response = await updateFavoriteTeamUseCase(
+      userId: userId,
+      team: current.selectedTeam!,
+      teamId: current.selectedTeamId,
+    );
     response.fold(
       (failure) => emit(SaveErrorChooseTeamState(current, errorMessage: failure.toString())),
-      (_) => emit(SavedChooseTeamState(region: current.selectedRegion!, team: current.selectedTeam!)),
+      (_) => emit(SavedChooseTeamState(
+        region: current.selectedRegion!,
+        team: current.selectedTeam!,
+        teamId: current.selectedTeamId,
+      )),
     );
   }
 }

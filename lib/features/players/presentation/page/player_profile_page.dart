@@ -131,7 +131,7 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
             _ => _Content(
                 state: state,
                 player: player,
-                isAdmin: isAdmin || ownedTeam.owns(player.team),
+                isAdmin: isAdmin || ownedTeam.owns(id: player.teamId, name: player.team),
                 season: widget.season,
               ),
           },

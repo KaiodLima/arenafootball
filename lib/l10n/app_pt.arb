@@ -1455,5 +1455,44 @@
   "votingShareTitle": "Compartilhar craque",
   "votingCardLabel": "CRAQUE DA PARTIDA",
   "votingCardTopVotes": "Mais votados",
-  "votingCardSeasonStats": "Na temporada"
+  "votingCardSeasonStats": "Na temporada",
+  "teamLinksTitle": "Vincular times por id",
+  "teamLinksInfo": "Grava o id do time ao lado do nome em jogadores, partidas, grupos, campeonatos, pedidos \"Sou jogador\" e cards de gol da temporada (na atual, também no time do coração das contas) e copia os votos antigos para as partidas. Só completa o que falta: pode rodar de novo.",
+  "teamLinksRun": "Vincular {season}",
+  "teamLinksDone": "{season}: {count, plural, =0{nada a atualizar} =1{1 documento atualizado} other{{count} documentos atualizados}}",
+  "teamLinksVotes": "{count, plural, =1{1 voto copiado para a partida} other{{count} votos copiados para as partidas}}",
+  "teamLinksUnmatched": "Nomes sem time na temporada (não vinculados):",
+  "teamLinksAmbiguous": "Nomes usados por mais de um time (não vinculados):",
+  "teamLinksSkippedVotes": "Votos não copiados (confronto repetido na temporada):",
+  "teamLinksPlayers": "Jogadores",
+  "teamLinksMatches": "Partidas",
+  "teamLinksGroups": "Grupos",
+  "teamLinksChampionships": "Campeonatos",
+  "teamLinksPlayerRequests": "Pedidos \"Sou jogador\"",
+  "teamLinksGoalCards": "Cards de gol",
+  "teamLinksUsers": "Time do coração",
+  "@teamLinksRun": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "@teamLinksDone": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@teamLinksVotes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

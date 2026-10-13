@@ -15,6 +15,7 @@ import {
   teamRequestAnswerMessage,
   teamRequestMessage,
   targetFor,
+  teamIdTopic,
   todayKey,
   topicSlug,
   votingMessage,
@@ -67,6 +68,31 @@ test('partida, votação e jogo do dia', () => {
   assert.equal(votingMessage({ ...match, votacao: 'true' }, match)?.tipo, 'votacao_encerrada');
   assert.equal(votingMessage(match, { ...match, golTimeCasa: 1 }), null);
   assert.deepEqual(dailyGameMessage(match)?.alvo, { condition: "'time_a' in topics || 'time_b' in topics" });
+});
+
+test('com os ids dos times: tópico do id (app novo) e do nome (app antigo)', () => {
+  assert.equal(teamIdTopic('aB3/dE9'), 'timeid_aB3_dE9');
+  const match = {
+    timeC: 'A',
+    timeF: 'B',
+    idTimeC: 'id1',
+    idTimeF: 'id2',
+    data: '11/10',
+    fk_competicao: 'Floresta',
+    votacao: 'false',
+  };
+  // Região + 2 tópicos por time = 5, o limite da condition do FCM.
+  assert.deepEqual(matchCreatedMessage(match)?.alvo, {
+    condition:
+      "'regiao_floresta' in topics || 'timeid_id1' in topics || 'time_a' in topics || 'timeid_id2' in topics || 'time_b' in topics",
+  });
+  assert.deepEqual(dailyGameMessage(match)?.alvo, {
+    condition: "'timeid_id1' in topics || 'time_a' in topics || 'timeid_id2' in topics || 'time_b' in topics",
+  });
+  const goal = goalMessage({ time_casa: 'A', time_fora: 'B', id_time_casa: 'id1', fk_competicao: 'Floresta' });
+  assert.deepEqual(goal?.alvo, {
+    condition: "'regiao_floresta' in topics || 'timeid_id1' in topics || 'time_a' in topics || 'time_b' in topics",
+  });
 });
 
 test('aviso manual: região ou todos', () => {

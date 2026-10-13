@@ -8,5 +8,13 @@ class GetTeamByNameUseCase {
 
   GetTeamByNameUseCase(this._repository);
 
-  Future<Either<Failure, TeamDTO?>> call(String name) => _repository.getTeamByName(name);
+  /// Time da temporada atual pelo [id] (o vínculo); sem id (conta ou doc
+  /// antigo) ou id que não existe mais, pelo nome.
+  Future<Either<Failure, TeamDTO?>> call(String name, {String id = ''}) async {
+    if (id.isNotEmpty) {
+      final byId = await _repository.getTeam(id: id);
+      if (byId.isRight && byId.right != null) return byId;
+    }
+    return _repository.getTeamByName(name);
+  }
 }

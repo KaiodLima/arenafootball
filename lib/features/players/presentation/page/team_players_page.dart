@@ -47,7 +47,7 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
   void initState() {
     super.initState();
     _season = BlocProvider.of<RegionCubit>(context).state.selectedSeason;
-    BlocProvider.of<TeamPlayersCubit>(context).watch(teamName: widget.team.name, season: _season);
+    BlocProvider.of<TeamPlayersCubit>(context).watch(teamId: widget.team.id, teamName: widget.team.name, season: _season);
     _scroll.addListener(_onScroll);
   }
 

@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:arena_soccer/features/championships/presentation/bloc/groups_state.dart';
+import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/match_day.dart';
 

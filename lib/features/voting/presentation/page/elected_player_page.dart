@@ -37,11 +37,7 @@ class _ElectedPlayerPageState extends State<ElectedPlayerPage> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<ElectedPlayerCubit>(context).load(
-      homeTeam: widget.match.homeTeam,
-      awayTeam: widget.match.awayTeam,
-      season: widget.season,
-    );
+    BlocProvider.of<ElectedPlayerCubit>(context).load(match: widget.match, season: widget.season);
   }
 
   /// Card com o placar, o eleito, o percentual de votos e os mais votados (o

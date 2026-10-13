@@ -2389,4 +2389,72 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get votingCardSeasonStats => 'This season';
+
+  @override
+  String get teamLinksTitle => 'Link teams by id';
+
+  @override
+  String get teamLinksInfo =>
+      'Saves the team id next to the name in the season\'s players, matches, groups, championships, \"I\'m a player\" requests and goal cards (in the current season, also in users\' favorite team) and copies old votes into the matches. Only fills what is missing: safe to run again.';
+
+  @override
+  String teamLinksRun(String season) {
+    return 'Link $season';
+  }
+
+  @override
+  String teamLinksDone(String season, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count documents updated',
+      one: '1 document updated',
+      zero: 'nothing to update',
+    );
+    return '$season: $_temp0';
+  }
+
+  @override
+  String teamLinksVotes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count votes copied to the matches',
+      one: '1 vote copied to the match',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get teamLinksUnmatched =>
+      'Names with no team in the season (not linked):';
+
+  @override
+  String get teamLinksAmbiguous =>
+      'Names used by more than one team (not linked):';
+
+  @override
+  String get teamLinksSkippedVotes =>
+      'Votes not copied (same fixture repeated in the season):';
+
+  @override
+  String get teamLinksPlayers => 'Players';
+
+  @override
+  String get teamLinksMatches => 'Matches';
+
+  @override
+  String get teamLinksGroups => 'Groups';
+
+  @override
+  String get teamLinksChampionships => 'Championships';
+
+  @override
+  String get teamLinksPlayerRequests => '\"I\'m a player\" requests';
+
+  @override
+  String get teamLinksGoalCards => 'Goal cards';
+
+  @override
+  String get teamLinksUsers => 'Favorite team';
 }

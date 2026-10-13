@@ -12,6 +12,9 @@ class MyPlayerState extends Equatable {
   /// Time em que a conta joga (nulo se não é jogador aprovado de nenhum).
   String? get teamName => _approved && request!.team.isNotEmpty ? request!.team : null;
 
+  /// Id do time em que a conta joga ('' se não é jogador ou pedido antigo).
+  String get teamId => teamName != null ? request!.teamId : '';
+
   /// Atleta criado na aprovação (para abrir o perfil).
   String? get playerId => _approved && request!.playerId.isNotEmpty ? request!.playerId : null;
 

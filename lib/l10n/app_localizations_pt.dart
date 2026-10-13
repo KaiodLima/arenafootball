@@ -2410,4 +2410,72 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get votingCardSeasonStats => 'Na temporada';
+
+  @override
+  String get teamLinksTitle => 'Vincular times por id';
+
+  @override
+  String get teamLinksInfo =>
+      'Grava o id do time ao lado do nome em jogadores, partidas, grupos, campeonatos, pedidos \"Sou jogador\" e cards de gol da temporada (na atual, também no time do coração das contas) e copia os votos antigos para as partidas. Só completa o que falta: pode rodar de novo.';
+
+  @override
+  String teamLinksRun(String season) {
+    return 'Vincular $season';
+  }
+
+  @override
+  String teamLinksDone(String season, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count documentos atualizados',
+      one: '1 documento atualizado',
+      zero: 'nada a atualizar',
+    );
+    return '$season: $_temp0';
+  }
+
+  @override
+  String teamLinksVotes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count votos copiados para as partidas',
+      one: '1 voto copiado para a partida',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get teamLinksUnmatched =>
+      'Nomes sem time na temporada (não vinculados):';
+
+  @override
+  String get teamLinksAmbiguous =>
+      'Nomes usados por mais de um time (não vinculados):';
+
+  @override
+  String get teamLinksSkippedVotes =>
+      'Votos não copiados (confronto repetido na temporada):';
+
+  @override
+  String get teamLinksPlayers => 'Jogadores';
+
+  @override
+  String get teamLinksMatches => 'Partidas';
+
+  @override
+  String get teamLinksGroups => 'Grupos';
+
+  @override
+  String get teamLinksChampionships => 'Campeonatos';
+
+  @override
+  String get teamLinksPlayerRequests => 'Pedidos \"Sou jogador\"';
+
+  @override
+  String get teamLinksGoalCards => 'Cards de gol';
+
+  @override
+  String get teamLinksUsers => 'Time do coração';
 }

@@ -20,12 +20,12 @@ class TeamPlayersCubit extends Cubit<TeamPlayersState> {
 
   TeamPlayersCubit(this.watchTeamPlayersUseCase, this.deleteTeamUseCase) : super(const LoadingTeamPlayersState());
 
-  void watch({required String teamName, required String season}) {
+  void watch({String teamId = '', required String teamName, required String season}) {
     _teamName = teamName;
     _season = season;
     _subscription?.cancel();
     emit(LoadingTeamPlayersState(players: state.players, sort: state.sort, query: state.query));
-    _subscription = watchTeamPlayersUseCase(teamName: teamName, season: season).listen((response) {
+    _subscription = watchTeamPlayersUseCase(teamId: teamId, teamName: teamName, season: season).listen((response) {
       response.fold(
         (failure) => emit(ErrorTeamPlayersState(
           errorMessage: failure.toString(),

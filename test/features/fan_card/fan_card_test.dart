@@ -16,7 +16,7 @@ import 'package:arena_soccer/utils/constants/team_colors.dart';
 
 class _FakeTeam implements GetTeamByNameUseCase {
   @override
-  Future<Either<Failure, TeamDTO?>> call(String name) async => Right(
+  Future<Either<Failure, TeamDTO?>> call(String name, {String id = ''}) async => Right(
         TeamDTO(id: '1', name: name, region: 'Floresta', primaryColor: TeamColor.navy.hex),
       );
 }

@@ -76,12 +76,25 @@ void main() {
   test('dono só do time do pedido aprovado', () {
     const pending = OwnedTeamState(request: TeamRequestDTO(userId: 'u', name: 'Volta', region: 'Floresta'));
     expect(pending.teamName, isNull);
-    expect(pending.owns('Volta'), isFalse);
+    expect(pending.owns(name: 'Volta'), isFalse);
 
     final approved = OwnedTeamState(request: pending.request!.copyWith(status: PlayerRequestStatus.approved));
     expect(approved.teamName, 'Volta');
-    expect(approved.owns('Volta'), isTrue);
-    expect(approved.owns('Lava Jato'), isFalse);
-    expect(approved.owns(''), isFalse);
+    expect(approved.owns(name: 'Volta'), isTrue);
+    expect(approved.owns(name: 'Lava Jato'), isFalse);
+    expect(approved.owns(), isFalse);
+  });
+
+  test('dono por id: vale o id quando os dois lados têm; doc antigo cai no nome', () {
+    final approved = OwnedTeamState(
+      request: const TeamRequestDTO(userId: 'u', name: 'Volta', region: 'Floresta', teamId: 't1')
+          .copyWith(status: PlayerRequestStatus.approved),
+    );
+    expect(approved.teamId, 't1');
+    expect(approved.owns(id: 't1', name: 'Outro nome'), isTrue);
+    // Outro time com o mesmo nome (outra região): o id decide.
+    expect(approved.owns(id: 't2', name: 'Volta'), isFalse);
+    // Jogador antigo, sem idTime: pelo nome.
+    expect(approved.owns(name: 'Volta'), isTrue);
   });
 }

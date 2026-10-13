@@ -72,6 +72,21 @@ void main() {
       expect(desiredTopics(region: 'Floresta', favoriteTeam: ''), {'todos', 'regiao_floresta'});
     });
 
+    test('time pelo id quando a conta tem (troca o tópico do nome pelo do id)', () async {
+      expect(desiredTopics(region: 'Floresta', favoriteTeam: 'Lava Jato', favoriteTeamId: 'aB3dE9'),
+          {'todos', 'regiao_floresta', 'timeid_aB3dE9'});
+      expect(teamIdTopic('a/b c'), 'timeid_a_b_c');
+
+      SharedPreferences.setMockInitialValues({});
+      final client = _FakeTopics();
+      final sync = PushTopicSync(client);
+      await sync.sync(desiredTopics(region: 'Floresta', favoriteTeam: 'Lava Jato'));
+      client.log.clear();
+      // Migrada (conta ganhou o id): sai do tópico do nome, entra no do id.
+      await sync.sync(desiredTopics(region: 'Floresta', favoriteTeam: 'Lava Jato', favoriteTeamId: 'aB3dE9'));
+      expect(client.log, unorderedEquals(['+timeid_aB3dE9', '-time_lava_jato']));
+    });
+
     test('logado: tópico do usuário; admin: também o dos admins', () {
       expect(desiredTopics(region: 'Floresta', userId: 'AbC123'), {'todos', 'regiao_floresta', 'usuario_AbC123'});
       expect(desiredTopics(region: 'Floresta', userId: 'AbC123', isAdmin: true),

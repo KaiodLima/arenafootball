@@ -44,12 +44,7 @@ class _VoteBestPlayerPageState extends State<VoteBestPlayerPage> {
   void initState() {
     super.initState();
     _cubit = BlocProvider.of<VoteBestPlayerCubit>(context);
-    _cubit.watch(
-      homeTeam: widget.match.homeTeam,
-      awayTeam: widget.match.awayTeam,
-      season: widget.season,
-      voterId: _voterId,
-    );
+    _cubit.watch(match: widget.match, season: widget.season, voterId: _voterId);
   }
 
   String _errorText(ErrorVoteBestPlayerState state, AppLocalizations l10n) {

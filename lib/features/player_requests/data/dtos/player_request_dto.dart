@@ -53,8 +53,11 @@ class PlayerRequestDTO extends Equatable {
   /// Nome de jogador (pode ser apelido).
   final String name;
 
-  /// Nome do time, como em `jogadores.time`.
+  /// Nome do time (cópia para exibir).
   final String team;
+
+  /// `idTime`: id do time pedido; vazio em pedidos antigos (vale o nome).
+  final String teamId;
   final String region;
   final String season;
   final PlayerPosition? position;
@@ -75,6 +78,7 @@ class PlayerRequestDTO extends Equatable {
     this.email = '',
     required this.name,
     required this.team,
+    this.teamId = '',
     required this.region,
     required this.season,
     this.position,
@@ -97,6 +101,7 @@ class PlayerRequestDTO extends Equatable {
       email: text('email'),
       name: text('nome'),
       team: text('time'),
+      teamId: text('idTime'),
       region: text('regiao'),
       season: text('temporada'),
       position: PlayerPosition.fromKey(text('posicao')),
@@ -117,6 +122,7 @@ class PlayerRequestDTO extends Equatable {
         'email': email,
         'nome': name,
         'time': team,
+        'idTime': teamId,
         'regiao': region,
         'temporada': season,
         'posicao': position?.key ?? '',
@@ -128,6 +134,7 @@ class PlayerRequestDTO extends Equatable {
   PlayerRequestDTO copyWith({
     String? name,
     String? team,
+    String? teamId,
     String? region,
     String? season,
     PlayerPosition? position,
@@ -143,6 +150,7 @@ class PlayerRequestDTO extends Equatable {
       email: email,
       name: name ?? this.name,
       team: team ?? this.team,
+      teamId: teamId ?? this.teamId,
       region: region ?? this.region,
       season: season ?? this.season,
       position: position ?? this.position,
@@ -162,6 +170,7 @@ class PlayerRequestDTO extends Equatable {
         email,
         name,
         team,
+        teamId,
         region,
         season,
         position,

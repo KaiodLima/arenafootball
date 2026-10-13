@@ -166,13 +166,15 @@ export const onPlayerRequestWritten = onDocumentWritten('solicitacoes_jogador/{u
   const toUser = playerRequestAnswerMessage(uid, before, after);
   if (toUser) await deliver(`resposta_${event.id}`, toUser, origem);
 
-  // Dono do time do pedido (se o time tiver dono aprovado).
+  // Dono do time do pedido (se o time tiver dono aprovado): pelo id do time;
+  // pedido antigo (sem `idTime`), pelo nome.
   const team = typeof after?.time === 'string' ? after.time : '';
-  if (toAdmins && team) {
+  const teamId = typeof after?.idTime === 'string' ? after.idTime : '';
+  if (toAdmins && (team || teamId)) {
     const { db } = await admin();
     const owners = await db
       .collection('solicitacoes_time')
-      .where('nome', '==', team)
+      .where(teamId ? 'idTime' : 'nome', '==', teamId || team)
       .where('status', '==', 'aprovada')
       .limit(1)
       .get();

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/match_form_hints.dart';
@@ -63,7 +64,7 @@ class MatchFormData extends Equatable {
   List<TeamDTO> teamsFor(int? id) {
     final championship = championships.where((c) => c.championshipId == id).firstOrNull;
     if (championship == null || championship.teams.isEmpty) return regionTeams;
-    return regionTeams.where((t) => championship.teams.contains(t.name)).toList();
+    return regionTeams.where((t) => championship.hasTeam(id: t.id, name: t.name)).toList();
   }
 
   MatchFormMissing? get missing {
@@ -77,6 +78,9 @@ class MatchFormData extends Equatable {
   }
 
   bool get canSubmit => selectedRegion != null && missing == null;
+
+  /// Id do time de nome [teamName] na lista carregada ('' se não achar).
+  String teamIdOf(String? teamName) => TeamDirectory(teams).idOf(name: teamName ?? '');
 
   String? crestOf(String? teamName) {
     if (teamName == null) return null;
@@ -103,6 +107,8 @@ class MatchFormData extends Equatable {
   MatchDTO toMatch() => MatchDTO(
         homeTeam: homeTeam ?? '',
         awayTeam: awayTeam ?? '',
+        homeTeamId: teamIdOf(homeTeam),
+        awayTeamId: teamIdOf(awayTeam),
         date: date,
         time: time,
         venue: venue.trim(),

@@ -29,7 +29,7 @@ class _FakeRepository implements IPlayersRepository {
   }
 
   @override
-  Stream<Either<Failure, List<PlayerDTO>>> watchTeamPlayers({required String teamName, String? season}) =>
+  Stream<Either<Failure, List<PlayerDTO>>> watchTeamPlayers({String teamId = '', required String teamName, String? season}) =>
       Stream.value(Right(_squads[teamName] ?? const []));
 
   @override

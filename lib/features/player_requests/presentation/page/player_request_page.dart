@@ -209,7 +209,7 @@ class _PlayerRequestPageState extends State<PlayerRequestPage> {
           selected: form.selectedTeam,
           loading: form.loadingTeams,
           placeholder: l10n.playersTeam,
-          onSelected: _cubit.selectTeam,
+          onSelected: (team) => _cubit.selectTeam(team.name),
         ),
         if (error == PlayerRequestFormError.team) _ErrorText(l10n.playerRequestTeamRequired),
         const SizedBox(height: AppSizes.s20),

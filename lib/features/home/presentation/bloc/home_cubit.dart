@@ -23,9 +23,9 @@ class HomeCubit extends Cubit<HomeState> {
 
   void selectTab(HomeTab tab) => emit(state.copyWith(tab: tab));
 
-  Future<void> loadFavoriteTeam(String teamName) async {
-    if (teamName.isEmpty) return;
-    final response = await getTeamByNameUseCase(teamName);
+  Future<void> loadFavoriteTeam(String teamName, {String teamId = ''}) async {
+    if (teamName.isEmpty && teamId.isEmpty) return;
+    final response = await getTeamByNameUseCase(teamName, id: teamId);
     response.fold(
       // O escudo é só decorativo; sem ele o drawer mostra o avatar vazio.
       (_) => null,

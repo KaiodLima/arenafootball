@@ -9,5 +9,7 @@ class WatchTeamPlayerRequestsUseCase {
 
   WatchTeamPlayerRequestsUseCase(this._repository);
 
-  Stream<Either<Failure, List<PlayerRequestDTO>>> call(String team) => _repository.watchTeamRequests(team);
+  /// Pelo id do time (com fallback no nome para pedidos antigos).
+  Stream<Either<Failure, List<PlayerRequestDTO>>> call({String teamId = '', required String teamName}) =>
+      _repository.watchTeamRequests(teamId: teamId, teamName: teamName);
 }

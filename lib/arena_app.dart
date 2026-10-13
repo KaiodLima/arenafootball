@@ -59,6 +59,7 @@ import 'package:arena_soccer/features/players/presentation/page/player_form_page
 import 'package:arena_soccer/features/players/presentation/page/team_players_page.dart';
 import 'package:arena_soccer/features/splash/presentation/page/splash_page.dart';
 import 'package:arena_soccer/features/seasons/presentation/bloc/seasons_panel_cubit.dart';
+import 'package:arena_soccer/features/seasons/presentation/bloc/team_links_cubit.dart';
 import 'package:arena_soccer/features/seasons/presentation/page/seasons_panel_page.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
 import 'package:arena_soccer/features/stats/presentation/bloc/stats_ranking_cubit.dart';
@@ -274,8 +275,11 @@ class ArenaApp extends StatelessWidget {
             child: ChampionshipDetailsPage(championship: args?['championship'] as ChampionshipDTO),
           );
         },
-        AppRoutes.seasonsPanelPage: (_) => BlocProvider<SeasonsPanelCubit>(
-              create: (_) => SeasonsPanelCubit(sl(), sl()),
+        AppRoutes.seasonsPanelPage: (_) => MultiBlocProvider(
+              providers: [
+                BlocProvider<SeasonsPanelCubit>(create: (_) => SeasonsPanelCubit(sl(), sl())),
+                BlocProvider<TeamLinksCubit>(create: (_) => TeamLinksCubit(sl())),
+              ],
               child: const SeasonsPanelPage(),
             ),
         AppRoutes.manageChampionshipsPage: (_) => BlocProvider<ManageChampionshipsCubit>(

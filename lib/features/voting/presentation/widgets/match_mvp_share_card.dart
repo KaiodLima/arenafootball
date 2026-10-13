@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/player_card.dart';
@@ -35,11 +36,12 @@ class MatchMvpShareCard extends StatelessWidget {
     final home = TeamPalette.orDefault(result.homePrimaryColor, result.homeSecondaryColor);
     final away = TeamPalette.orDefault(result.awayPrimaryColor, result.awaySecondaryColor);
     // Barra de cada votado na cor do time dele.
-    Color teamColor(String team) => team == match.homeTeam
-        ? home.accent
-        : team == match.awayTeam
-            ? away.accent
-            : AppColors.textSecondary;
+    Color teamColor(VoteTally tally) =>
+        sameTeam(idA: tally.teamId, nameA: tally.team, idB: match.homeTeamId, nameB: match.homeTeam)
+            ? home.accent
+            : sameTeam(idA: tally.teamId, nameA: tally.team, idB: match.awayTeamId, nameB: match.awayTeam)
+                ? away.accent
+                : AppColors.textSecondary;
 
     return AspectRatio(
       aspectRatio: 4 / 5,
@@ -169,7 +171,7 @@ class MatchMvpShareCard extends StatelessWidget {
                                         tally: top[i],
                                         share: result.shareOf(top[i].votes),
                                         isWinner: top[i].playerName == elected.playerName,
-                                        color: teamColor(top[i].team),
+                                        color: teamColor(top[i]),
                                       ),
                                   ],
                                 ),

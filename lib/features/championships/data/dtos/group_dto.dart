@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
 /// Documento das coleções `grupos` / `grupos{ano}`. Cada grupo tem até quatro
-/// times, gravados como `time1`..`time4` (nomes dos times).
+/// times, gravados como `time1`..`time4` (nomes, cópia para exibir) e
+/// `idTime1`..`idTime4` (ids; vazios em grupos antigos, quando vale o nome).
 class GroupDTO extends Equatable {
   final String id;
 
@@ -10,6 +11,9 @@ class GroupDTO extends Equatable {
   final String description;
   final String region;
   final List<String> teams;
+
+  /// Ids dos times, na mesma ordem de [teams] ('' = sem id).
+  final List<String> teamIds;
 
   /// `fk_campeonato` (`id_campeonato`); 0 = grupo antigo, sem campeonato.
   final int championshipId;
@@ -21,8 +25,12 @@ class GroupDTO extends Equatable {
     required this.description,
     this.region = '',
     this.teams = const [],
+    this.teamIds = const [],
     this.championshipId = 0,
   });
+
+  /// Id do time na posição [index] ('' se não houver).
+  String teamIdAt(int index) => index < teamIds.length ? teamIds[index] : '';
 
   /// Grupos do campeonato [id]: os marcados com ele; se nenhum estiver
   /// marcado, os antigos (sem campeonato). [id] nulo = todos.
@@ -42,6 +50,9 @@ class GroupDTO extends Equatable {
       teams: [
         for (var i = 1; i <= maxTeams; i++) data['time$i']?.toString() ?? '',
       ],
+      teamIds: [
+        for (var i = 1; i <= maxTeams; i++) data['idTime$i']?.toString() ?? '',
+      ],
     );
   }
 
@@ -50,17 +61,20 @@ class GroupDTO extends Equatable {
         'fk_competicao': region,
         if (championshipId > 0) 'fk_campeonato': championshipId,
         for (var i = 0; i < maxTeams; i++) 'time${i + 1}': i < teams.length ? teams[i] : '',
+        for (var i = 0; i < maxTeams; i++) 'idTime${i + 1}': teamIdAt(i),
       };
 
-  GroupDTO copyWith({String? id, String? description, String? region, List<String>? teams}) {
+  GroupDTO copyWith({String? id, String? description, String? region, List<String>? teams, List<String>? teamIds}) {
     return GroupDTO(
       id: id ?? this.id,
       description: description ?? this.description,
       region: region ?? this.region,
       teams: teams ?? this.teams,
+      teamIds: teamIds ?? this.teamIds,
+      championshipId: championshipId,
     );
   }
 
   @override
-  List<Object?> get props => [id, description, region, teams, championshipId];
+  List<Object?> get props => [id, description, region, teams, teamIds, championshipId];
 }

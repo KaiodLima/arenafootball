@@ -39,7 +39,12 @@ class _FanCardPageState extends State<FanCardPage> {
   void initState() {
     super.initState();
     _cubit = BlocProvider.of<FanCardCubit>(context);
-    _cubit.load(favoriteTeam: BlocProvider.of<SessionCubit>(context).state.user?.favoriteTeam ?? '');
+    _loadTeam();
+  }
+
+  void _loadTeam() {
+    final user = BlocProvider.of<SessionCubit>(context).state.user;
+    _cubit.load(favoriteTeam: user?.favoriteTeam ?? '', favoriteTeamId: user?.favoriteTeamId ?? '');
   }
 
   Future<void> _pickPhoto(String userId) async {
@@ -53,7 +58,7 @@ class _FanCardPageState extends State<FanCardPage> {
   Future<void> _chooseTeam() async {
     await Navigator.pushNamed(context, AppRoutes.chooseTeamPage, arguments: const ChooseTeamArgs(canGoBack: true));
     if (!mounted) return;
-    _cubit.load(favoriteTeam: BlocProvider.of<SessionCubit>(context).state.user?.favoriteTeam ?? '');
+    _loadTeam();
   }
 
   /// Mesma carteirinha da tela, para a prévia e a imagem compartilhada.

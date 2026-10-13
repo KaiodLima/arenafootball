@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
-import 'package:arena_soccer/features/championships/presentation/bloc/groups_state.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/matches_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/matches_state.dart';
@@ -90,9 +89,13 @@ class MatchesList extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final session = context.watch<SessionCubit>().state;
     final isAdmin = session.isAdmin;
-    final favorite = session.user?.favoriteTeam;
-    final favoriteKey = (favorite == null || favorite.trim().isEmpty) ? null : normalizeTeamName(favorite);
-    bool isFavoriteTeam(String team) => favoriteKey != null && normalizeTeamName(team) == favoriteKey;
+    final user = session.user;
+    // Chips de time (só o nome); a partida usa os ids quando tem.
+    bool isFavoriteTeam(String team) => user?.isFavorite(name: team) ?? false;
+    bool isFavoriteMatch(MatchDTO match) =>
+        user != null &&
+        (user.isFavorite(id: match.homeTeamId, name: match.homeTeam) ||
+            user.isFavorite(id: match.awayTeamId, name: match.awayTeam));
 
     return BlocConsumer<MatchesCubit, MatchesState>(
       listener: (context, state) {
@@ -123,7 +126,7 @@ class MatchesList extends StatelessWidget {
               isAdmin: isAdmin,
               homeCrest: state.crestOf(match.homeTeam),
               awayCrest: state.crestOf(match.awayTeam),
-              isFavorite: isFavoriteTeam(match.homeTeam) || isFavoriteTeam(match.awayTeam),
+              isFavorite: isFavoriteMatch(match),
               isFavoriteTeam: isFavoriteTeam,
               onVotingTap: () => _openVoting(context, match),
               onToggleVoting: () => BlocProvider.of<MatchesCubit>(context).toggleVoting(match),

@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:either_dart/either.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
-import 'package:arena_soccer/features/championships/presentation/bloc/groups_state.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/matches_filter.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/delete_match_usecase.dart';

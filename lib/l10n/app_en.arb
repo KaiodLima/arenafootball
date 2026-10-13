@@ -686,5 +686,20 @@
   "votingShareTitle": "Share player of the match",
   "votingCardLabel": "PLAYER OF THE MATCH",
   "votingCardTopVotes": "Most voted",
-  "votingCardSeasonStats": "This season"
+  "votingCardSeasonStats": "This season",
+  "teamLinksTitle": "Link teams by id",
+  "teamLinksInfo": "Saves the team id next to the name in the season's players, matches, groups, championships, \"I'm a player\" requests and goal cards (in the current season, also in users' favorite team) and copies old votes into the matches. Only fills what is missing: safe to run again.",
+  "teamLinksRun": "Link {season}",
+  "teamLinksDone": "{season}: {count, plural, =0{nothing to update} =1{1 document updated} other{{count} documents updated}}",
+  "teamLinksVotes": "{count, plural, =1{1 vote copied to the match} other{{count} votes copied to the matches}}",
+  "teamLinksUnmatched": "Names with no team in the season (not linked):",
+  "teamLinksAmbiguous": "Names used by more than one team (not linked):",
+  "teamLinksSkippedVotes": "Votes not copied (same fixture repeated in the season):",
+  "teamLinksPlayers": "Players",
+  "teamLinksMatches": "Matches",
+  "teamLinksGroups": "Groups",
+  "teamLinksChampionships": "Championships",
+  "teamLinksPlayerRequests": "\"I'm a player\" requests",
+  "teamLinksGoalCards": "Goal cards",
+  "teamLinksUsers": "Favorite team"
 }

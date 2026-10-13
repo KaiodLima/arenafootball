@@ -4221,6 +4221,96 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Na temporada'**
   String get votingCardSeasonStats;
+
+  /// No description provided for @teamLinksTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vincular times por id'**
+  String get teamLinksTitle;
+
+  /// No description provided for @teamLinksInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grava o id do time ao lado do nome em jogadores, partidas, grupos, campeonatos, pedidos \"Sou jogador\" e cards de gol da temporada (na atual, também no time do coração das contas) e copia os votos antigos para as partidas. Só completa o que falta: pode rodar de novo.'**
+  String get teamLinksInfo;
+
+  /// No description provided for @teamLinksRun.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vincular {season}'**
+  String teamLinksRun(String season);
+
+  /// No description provided for @teamLinksDone.
+  ///
+  /// In pt, this message translates to:
+  /// **'{season}: {count, plural, =0{nada a atualizar} =1{1 documento atualizado} other{{count} documentos atualizados}}'**
+  String teamLinksDone(String season, int count);
+
+  /// No description provided for @teamLinksVotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 voto copiado para a partida} other{{count} votos copiados para as partidas}}'**
+  String teamLinksVotes(int count);
+
+  /// No description provided for @teamLinksUnmatched.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nomes sem time na temporada (não vinculados):'**
+  String get teamLinksUnmatched;
+
+  /// No description provided for @teamLinksAmbiguous.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nomes usados por mais de um time (não vinculados):'**
+  String get teamLinksAmbiguous;
+
+  /// No description provided for @teamLinksSkippedVotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votos não copiados (confronto repetido na temporada):'**
+  String get teamLinksSkippedVotes;
+
+  /// No description provided for @teamLinksPlayers.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogadores'**
+  String get teamLinksPlayers;
+
+  /// No description provided for @teamLinksMatches.
+  ///
+  /// In pt, this message translates to:
+  /// **'Partidas'**
+  String get teamLinksMatches;
+
+  /// No description provided for @teamLinksGroups.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grupos'**
+  String get teamLinksGroups;
+
+  /// No description provided for @teamLinksChampionships.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeonatos'**
+  String get teamLinksChampionships;
+
+  /// No description provided for @teamLinksPlayerRequests.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedidos \"Sou jogador\"'**
+  String get teamLinksPlayerRequests;
+
+  /// No description provided for @teamLinksGoalCards.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cards de gol'**
+  String get teamLinksGoalCards;
+
+  /// No description provided for @teamLinksUsers.
+  ///
+  /// In pt, this message translates to:
+  /// **'Time do coração'**
+  String get teamLinksUsers;
 }
 
 class _AppLocalizationsDelegate

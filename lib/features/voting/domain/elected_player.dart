@@ -4,8 +4,9 @@ import 'package:equatable/equatable.dart';
 class ElectedPlayer extends Equatable {
   final String playerName;
 
-  /// Time do jogador (vem dos votos).
+  /// Time do jogador (vem dos votos) e o id dele ('' em votos antigos).
   final String team;
+  final String teamId;
   final int votes;
 
   /// Foto do jogador e escudo do time; vazios quando não encontrados.
@@ -20,6 +21,7 @@ class ElectedPlayer extends Equatable {
   const ElectedPlayer({
     required this.playerName,
     required this.team,
+    this.teamId = '',
     required this.votes,
     this.playerImageUrl = '',
     this.teamImageUrl = '',
@@ -31,6 +33,7 @@ class ElectedPlayer extends Equatable {
     return ElectedPlayer(
       playerName: playerName,
       team: team,
+      teamId: teamId,
       votes: votes,
       playerImageUrl: playerImageUrl ?? this.playerImageUrl,
       teamImageUrl: teamImageUrl ?? this.teamImageUrl,
@@ -40,19 +43,22 @@ class ElectedPlayer extends Equatable {
   }
 
   @override
-  List<Object?> get props => [playerName, team, votes, playerImageUrl, teamImageUrl, goals, assists];
+  List<Object?> get props => [playerName, team, teamId, votes, playerImageUrl, teamImageUrl, goals, assists];
 }
 
 /// Votos de um jogador na apuração.
 class VoteTally extends Equatable {
   final String playerName;
   final String team;
+
+  /// Id do time ('' em votos antigos).
+  final String teamId;
   final int votes;
 
-  const VoteTally({required this.playerName, required this.team, required this.votes});
+  const VoteTally({required this.playerName, required this.team, this.teamId = '', required this.votes});
 
   @override
-  List<Object?> get props => [playerName, team, votes];
+  List<Object?> get props => [playerName, team, teamId, votes];
 }
 
 /// Apuração completa de uma partida, para a tela do eleito: o eleito (null sem

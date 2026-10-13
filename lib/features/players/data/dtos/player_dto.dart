@@ -6,8 +6,12 @@ class PlayerDTO extends Equatable {
   final String id;
   final String name;
 
-  /// Nome do time (o vínculo com o time é pelo nome, não pelo id).
+  /// Nome do time (cópia para exibir; o vínculo é [teamId]).
   final String team;
+
+  /// `idTime`: id do time (doc de `times{ano}`). Vazio em jogadores antigos
+  /// (antes da migração) e em quem está sem time: aí vale o nome.
+  final String teamId;
   final String imageUrl;
   final int goals;
   final int assists;
@@ -22,6 +26,7 @@ class PlayerDTO extends Equatable {
     this.id = '',
     required this.name,
     required this.team,
+    this.teamId = '',
     this.imageUrl = '',
     this.goals = 0,
     this.assists = 0,
@@ -36,6 +41,7 @@ class PlayerDTO extends Equatable {
       id: doc.id,
       name: data['nome']?.toString() ?? '',
       team: data['time']?.toString() ?? '',
+      teamId: data['idTime']?.toString() ?? '',
       imageUrl: data['urlImagem']?.toString() ?? '',
       goals: (data['nGols'] as num?)?.toInt() ?? 0,
       assists: (data['nAssistencias'] as num?)?.toInt() ?? 0,
@@ -48,6 +54,7 @@ class PlayerDTO extends Equatable {
         'idJogador': id,
         'nome': name,
         'time': team,
+        'idTime': teamId,
         'urlImagem': imageUrl,
         'nGols': goals,
         'nAssistencias': assists,
@@ -60,6 +67,7 @@ class PlayerDTO extends Equatable {
     String? id,
     String? name,
     String? team,
+    String? teamId,
     String? imageUrl,
     int? goals,
     int? assists,
@@ -70,6 +78,7 @@ class PlayerDTO extends Equatable {
       id: id ?? this.id,
       name: name ?? this.name,
       team: team ?? this.team,
+      teamId: teamId ?? this.teamId,
       imageUrl: imageUrl ?? this.imageUrl,
       goals: goals ?? this.goals,
       assists: assists ?? this.assists,
@@ -79,5 +88,5 @@ class PlayerDTO extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, name, team, imageUrl, goals, assists, userId, position];
+  List<Object?> get props => [id, name, team, teamId, imageUrl, goals, assists, userId, position];
 }
