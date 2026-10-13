@@ -21,6 +21,7 @@ abstract class ITeamsRepository {
     required String imageUrl,
     String primaryColor = '',
     String secondaryColor = '',
+    String? region,
     String? season,
   });
 

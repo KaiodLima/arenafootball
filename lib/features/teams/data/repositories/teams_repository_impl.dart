@@ -38,6 +38,7 @@ class TeamsRepositoryImpl implements ITeamsRepository {
     required String imageUrl,
     String primaryColor = '',
     String secondaryColor = '',
+    String? region,
     String? season,
   }) =>
       _dataSource.updateTeamDetails(
@@ -46,6 +47,7 @@ class TeamsRepositoryImpl implements ITeamsRepository {
         imageUrl: imageUrl,
         primaryColor: primaryColor,
         secondaryColor: secondaryColor,
+        region: region,
         season: season,
       );
 

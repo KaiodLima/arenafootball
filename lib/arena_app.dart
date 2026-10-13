@@ -69,7 +69,9 @@ import 'package:arena_soccer/features/team_requests/presentation/bloc/team_reque
 import 'package:arena_soccer/features/team_requests/presentation/page/team_request_page.dart';
 import 'package:arena_soccer/features/team_requests/presentation/page/team_requests_panel_page.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
+import 'package:arena_soccer/features/teams/presentation/bloc/edit_team_cubit.dart';
 import 'package:arena_soccer/features/teams/presentation/bloc/team_form_cubit.dart';
+import 'package:arena_soccer/features/teams/presentation/page/edit_team_page.dart';
 import 'package:arena_soccer/features/teams/presentation/page/team_form_page.dart';
 import 'package:arena_soccer/features/voting/presentation/bloc/elected_player_cubit.dart';
 import 'package:arena_soccer/features/voting/presentation/bloc/vote_best_player_cubit.dart';
@@ -181,6 +183,14 @@ class ArenaApp extends StatelessWidget {
               create: (_) => TeamFormCubit(sl(), sl(), sl(), sl()),
               child: const TeamFormPage(),
             ),
+        // `team` obrigatório; `season` nulo = atual. Devolve o time salvo.
+        AppRoutes.editTeamPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+          return BlocProvider<EditTeamCubit>(
+            create: (_) => EditTeamCubit(sl(), team: args['team'] as TeamDTO, season: args['season'] as String?),
+            child: const EditTeamPage(),
+          );
+        },
         AppRoutes.teamPlayersPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<TeamPlayersCubit>(

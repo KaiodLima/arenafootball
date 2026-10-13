@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:arena_soccer/core/services/share_service.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/page_title_bar.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/voting/domain/elected_player.dart';
 import 'package:arena_soccer/features/voting/presentation/bloc/elected_player_cubit.dart';
 import 'package:arena_soccer/features/voting/presentation/bloc/elected_player_state.dart';
 import 'package:arena_soccer/features/voting/presentation/widgets/elected_player_card.dart';
+import 'package:arena_soccer/features/voting/presentation/widgets/match_mvp_share_card.dart';
 import 'package:arena_soccer/features/voting/presentation/widgets/match_score_header.dart';
 import 'package:arena_soccer/features/voting/presentation/widgets/vote_ranking_card.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
+import 'package:arena_soccer/utils/components/share_image_frame.dart';
+import 'package:arena_soccer/utils/components/share_image_sheet.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
@@ -42,15 +44,21 @@ class _ElectedPlayerPageState extends State<ElectedPlayerPage> {
     );
   }
 
-  void _share(AppLocalizations l10n, ElectedPlayer elected) {
+  /// Card com o placar, o eleito, o percentual de votos e os mais votados (o
+  /// texto vira a legenda).
+  void _share(AppLocalizations l10n, VotingResult result, ElectedPlayer elected) {
     final match = widget.match;
-    ShareService.shareText(
-      l10n.votingShareText(
+    final slug = '${match.homeTeam}_${match.awayTeam}'.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '_');
+    showShareImageSheet(
+      context,
+      title: l10n.votingShareTitle,
+      fileName: 'craque_$slug',
+      preview: ShareImageFrame(date: DateTime.now(), card: MatchMvpShareCard(match: match, result: result)),
+      shareText: l10n.votingShareText(
         elected.playerName,
         '${match.homeTeam} ${match.homeGoals} x ${match.awayGoals} ${match.awayTeam}',
         l10n.votingVotes(elected.votes),
       ),
-      subject: l10n.votingElectedTitle,
     );
   }
 
@@ -69,11 +77,11 @@ class _ElectedPlayerPageState extends State<ElectedPlayerPage> {
             title: l10n.votingElectedTitle,
             subtitle: l10n.votingMatchSubtitle(widget.match.homeTeam, widget.match.awayTeam),
             actions: [
-              if (elected != null)
+              if (result != null && elected != null)
                 IconButton(
                   tooltip: l10n.newsShare,
                   icon: const Icon(Icons.share_rounded),
-                  onPressed: () => _share(l10n, elected),
+                  onPressed: () => _share(l10n, result, elected),
                 ),
             ],
           ),

@@ -2374,4 +2374,40 @@ class AppLocalizationsPt extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get teamEdit => 'Editar time';
+
+  @override
+  String get teamEditTitle => 'Editar time';
+
+  @override
+  String get teamEditSaved => 'Time atualizado.';
+
+  @override
+  String get teamEditRegionLabel => 'Região';
+
+  @override
+  String get teamEditRegionChangeTitle => 'Trocar a região?';
+
+  @override
+  String teamEditRegionChangeMessage(String team, String region) {
+    return '$team passa a aparecer na aba Times e na classificação de $region. Os grupos da região antiga não mudam.';
+  }
+
+  @override
+  String get teamEditNameLocked =>
+      'O nome do time não pode ser alterado (ele está nas partidas, no elenco e na votação).';
+
+  @override
+  String get votingShareTitle => 'Compartilhar craque';
+
+  @override
+  String get votingCardLabel => 'CRAQUE DA PARTIDA';
+
+  @override
+  String get votingCardTopVotes => 'Mais votados';
+
+  @override
+  String get votingCardSeasonStats => 'Na temporada';
 }

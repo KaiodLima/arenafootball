@@ -44,7 +44,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | `home` | Casca: AppBar, drawer, barra inferior com as 4 abas, atalhos do admin |
 | `news` | Feed (aba HOME), detalhe, cadastro/edição, notificação de gol, anúncio |
 | `highlights` | Carrossel de destaques, detalhe, cadastro |
-| `teams` | Aba TIMES, cadastro de time (+ linha na classificação), exclusão pelo admin (no elenco do time: jogadores com conta ficam sem time, os sem vínculo saem junto; partidas ficam) |
+| `teams` | Aba TIMES, cadastro de time (+ linha na classificação), edição pelo admin (escudo, descrição, cores e região; o nome é fixo), exclusão pelo admin (no elenco do time: jogadores com conta ficam sem time, os sem vínculo saem junto; partidas ficam) |
 | `players` | Elenco do time, edição de gols/assistências/foto, cadastro de jogador |
 | `player_requests` | "Sou jogador": usuário pede para entrar num time; painel do admin aprova (cria o jogador vinculado), rejeita ou edita |
 | `team_requests` | "Sou dono de time": usuário pede para criar o time; admin aprova (cria o time com `idDono`). Aprovado, "Meu time": elenco, pedidos "Sou jogador" do time e edição de escudo/descrição. `OwnedTeamCubit` (global) diz de qual time a conta é dono |

@@ -2353,4 +2353,40 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get teamEdit => 'Edit team';
+
+  @override
+  String get teamEditTitle => 'Edit team';
+
+  @override
+  String get teamEditSaved => 'Team updated.';
+
+  @override
+  String get teamEditRegionLabel => 'Region';
+
+  @override
+  String get teamEditRegionChangeTitle => 'Change the region?';
+
+  @override
+  String teamEditRegionChangeMessage(String team, String region) {
+    return '$team will show up in the Teams tab and standings of $region. Groups from the old region don\'t change.';
+  }
+
+  @override
+  String get teamEditNameLocked =>
+      'The team name can\'t be changed (it\'s used in matches, squad and voting).';
+
+  @override
+  String get votingShareTitle => 'Share player of the match';
+
+  @override
+  String get votingCardLabel => 'PLAYER OF THE MATCH';
+
+  @override
+  String get votingCardTopVotes => 'Most voted';
+
+  @override
+  String get votingCardSeasonStats => 'This season';
 }

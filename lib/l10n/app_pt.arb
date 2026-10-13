@@ -1434,5 +1434,26 @@
         "type": "int"
       }
     }
-  }
+  },
+  "teamEdit": "Editar time",
+  "teamEditTitle": "Editar time",
+  "teamEditSaved": "Time atualizado.",
+  "teamEditRegionLabel": "Região",
+  "teamEditRegionChangeTitle": "Trocar a região?",
+  "teamEditRegionChangeMessage": "{team} passa a aparecer na aba Times e na classificação de {region}. Os grupos da região antiga não mudam.",
+  "teamEditNameLocked": "O nome do time não pode ser alterado (ele está nas partidas, no elenco e na votação).",
+  "@teamEditRegionChangeMessage": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      },
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "votingShareTitle": "Compartilhar craque",
+  "votingCardLabel": "CRAQUE DA PARTIDA",
+  "votingCardTopVotes": "Mais votados",
+  "votingCardSeasonStats": "Na temporada"
 }

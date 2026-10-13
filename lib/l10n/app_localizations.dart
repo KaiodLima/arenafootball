@@ -4155,6 +4155,72 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'{count, plural, =0{Nenhuma participação em gol} =1{1 participação em gol} other{{count} participações em gols}}'**
   String athleteCardParticipations(int count);
+
+  /// No description provided for @teamEdit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar time'**
+  String get teamEdit;
+
+  /// No description provided for @teamEditTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar time'**
+  String get teamEditTitle;
+
+  /// No description provided for @teamEditSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Time atualizado.'**
+  String get teamEditSaved;
+
+  /// No description provided for @teamEditRegionLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Região'**
+  String get teamEditRegionLabel;
+
+  /// No description provided for @teamEditRegionChangeTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar a região?'**
+  String get teamEditRegionChangeTitle;
+
+  /// No description provided for @teamEditRegionChangeMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'{team} passa a aparecer na aba Times e na classificação de {region}. Os grupos da região antiga não mudam.'**
+  String teamEditRegionChangeMessage(String team, String region);
+
+  /// No description provided for @teamEditNameLocked.
+  ///
+  /// In pt, this message translates to:
+  /// **'O nome do time não pode ser alterado (ele está nas partidas, no elenco e na votação).'**
+  String get teamEditNameLocked;
+
+  /// No description provided for @votingShareTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compartilhar craque'**
+  String get votingShareTitle;
+
+  /// No description provided for @votingCardLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'CRAQUE DA PARTIDA'**
+  String get votingCardLabel;
+
+  /// No description provided for @votingCardTopVotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mais votados'**
+  String get votingCardTopVotes;
+
+  /// No description provided for @votingCardSeasonStats.
+  ///
+  /// In pt, this message translates to:
+  /// **'Na temporada'**
+  String get votingCardSeasonStats;
 }
 
 class _AppLocalizationsDelegate

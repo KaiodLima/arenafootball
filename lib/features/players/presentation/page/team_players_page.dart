@@ -38,6 +38,9 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
 
   final _scroll = ScrollController();
   late final String _season;
+
+  /// Time exibido; trocado pelo que volta da edição do admin.
+  late TeamDTO _team = widget.team;
   bool _collapsed = false;
 
   @override
@@ -59,11 +62,20 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
     if (collapsed != _collapsed) setState(() => _collapsed = collapsed);
   }
 
+  Future<void> _edit() async {
+    final updated = await Navigator.pushNamed(
+      context,
+      AppRoutes.editTeamPage,
+      arguments: {'team': _team, 'season': _season},
+    );
+    if (updated is TeamDTO && mounted) setState(() => _team = updated);
+  }
+
   Future<void> _confirmDelete(AppLocalizations l10n) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.teamDeleteTitle(widget.team.name)),
+        title: Text(l10n.teamDeleteTitle(_team.name)),
         content: Text(l10n.teamDeleteMessage(_season)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.commonCancel)),
@@ -74,7 +86,7 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
         ],
       ),
     );
-    if (confirmed == true && mounted) await BlocProvider.of<TeamPlayersCubit>(context).deleteTeam(widget.team);
+    if (confirmed == true && mounted) await BlocProvider.of<TeamPlayersCubit>(context).deleteTeam(_team);
   }
 
   @override
@@ -82,7 +94,7 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
     final l10n = AppLocalizations.of(context);
     final cubit = BlocProvider.of<TeamPlayersCubit>(context);
     final isAdmin = context.watch<SessionCubit>().state.isAdmin;
-    final palette = TeamPalette.fromHex(widget.team.primaryColor, widget.team.secondaryColor);
+    final palette = TeamPalette.fromHex(_team.primaryColor, _team.secondaryColor);
     final barColor = palette?.bar ?? AppColors.primaryDark;
     final barForeground = palette?.onAccent ?? AppColors.white;
     // Expandido, a status bar fica sobre o fundo do cabeçalho; recolhido, sobre a barra.
@@ -135,7 +147,7 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
                       opacity: _collapsed ? 1 : 0,
                       duration: const Duration(milliseconds: 200),
                       child: Text(
-                        widget.team.name,
+                        _team.name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppTypography.title(color: barForeground).copyWith(fontSize: AppSizes.s18),
@@ -155,6 +167,11 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
                                 onImage: true,
                                 actions: [
                                   CardMenuAction(
+                                    icon: Icons.edit_outlined,
+                                    label: l10n.teamEdit,
+                                    onSelected: _edit,
+                                  ),
+                                  CardMenuAction(
                                     icon: Icons.delete_outline_rounded,
                                     label: l10n.teamDelete,
                                     destructive: true,
@@ -165,7 +182,7 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
                     ],
                     flexibleSpace: FlexibleSpaceBar(
                       collapseMode: CollapseMode.parallax,
-                      background: TeamHeader(team: widget.team, season: _season),
+                      background: TeamHeader(team: _team, season: _season),
                     ),
                   ),
                   ..._body(context, state, visible, topScorerId, cubit, l10n),

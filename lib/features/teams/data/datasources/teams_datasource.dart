@@ -91,13 +91,14 @@ class TeamsDataSource {
   }
 
   /// Escudo, descrição e cores (o que o dono pode mudar), no time e na linha
-  /// da classificação, juntos.
+  /// da classificação, juntos. [region] (só o admin) muda também a região.
   Future<Either<Failure, void>> updateTeamDetails({
     required String id,
     required String description,
     required String imageUrl,
     String primaryColor = '',
     String secondaryColor = '',
+    String? region,
     String? season,
   }) async {
     try {
@@ -106,6 +107,7 @@ class TeamsDataSource {
         'urlImagem': imageUrl,
         'corPrimaria': primaryColor,
         'corSecundaria': secondaryColor,
+        if (region != null) 'fk_competicao': region,
       };
       final batch = _firestore.batch()
         ..update(_firestore.collection(SeasonCollection.name('times', season)).doc(id), data)

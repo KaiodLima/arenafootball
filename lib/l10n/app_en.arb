@@ -675,5 +675,16 @@
   "athleteShareTitle": "Share athlete",
   "athleteCardLabel": "ATHLETE",
   "athleteCardSeason": "{season} season",
-  "athleteCardParticipations": "{count, plural, =0{No goal involvements} =1{1 goal involvement} other{{count} goal involvements}}"
+  "athleteCardParticipations": "{count, plural, =0{No goal involvements} =1{1 goal involvement} other{{count} goal involvements}}",
+  "teamEdit": "Edit team",
+  "teamEditTitle": "Edit team",
+  "teamEditSaved": "Team updated.",
+  "teamEditRegionLabel": "Region",
+  "teamEditRegionChangeTitle": "Change the region?",
+  "teamEditRegionChangeMessage": "{team} will show up in the Teams tab and standings of {region}. Groups from the old region don't change.",
+  "teamEditNameLocked": "The team name can't be changed (it's used in matches, squad and voting).",
+  "votingShareTitle": "Share player of the match",
+  "votingCardLabel": "PLAYER OF THE MATCH",
+  "votingCardTopVotes": "Most voted",
+  "votingCardSeasonStats": "This season"
 }
