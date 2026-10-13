@@ -25,8 +25,8 @@ class AuthRepositoryImpl implements IAuthRepository {
       _dataSource.signUp(name: name, email: email, password: password);
 
   @override
-  Future<Either<Failure, void>> updateFavoriteTeam({required String userId, required String team}) =>
-      _dataSource.updateFavoriteTeam(userId: userId, team: team);
+  Future<Either<Failure, void>> updateFavoriteTeam({required String userId, required String team, required String teamId}) =>
+      _dataSource.updateFavoriteTeam(userId: userId, team: team, teamId: teamId);
 
   @override
   Future<Either<Failure, void>> signOut() => _dataSource.signOut();
@@ -41,4 +41,11 @@ class AuthRepositoryImpl implements IAuthRepository {
     final result = await _dataSource.getUser(userId);
     return result.fold((failure) => Left(failure), (user) => Right(user));
   }
+
+  @override
+  Future<Either<Failure, void>> updatePhoto({required String userId, required String photoUrl}) =>
+      _dataSource.updatePhoto(userId: userId, photoUrl: photoUrl);
+
+  @override
+  DateTime? get accountCreatedAt => _dataSource.accountCreatedAt;
 }

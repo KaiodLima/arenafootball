@@ -1,9 +1,6 @@
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/championships/data/dtos/group_dto.dart';
-
-/// Nome de time normalizado: chave do mapa de escudos e da comparação com o
-/// time do coração do usuário.
-String normalizeTeamName(String name) => name.trim().toLowerCase();
 
 /// O estado base carrega os grupos e os escudos dos times (nome normalizado →
 /// URL), preservados entre as transições.

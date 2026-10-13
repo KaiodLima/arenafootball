@@ -18,10 +18,22 @@ class PlayersDataSource {
   CollectionReference<Map<String, dynamic>> _players(String? season) =>
       _firestore.collection(SeasonCollection.name('jogadores', season));
 
-  /// Elenco de um time (o campo `time` guarda o nome do time).
-  Stream<Either<Failure, List<PlayerDTO>>> watchTeamPlayers({required String teamName, String? season}) {
-    return _players(season).where('time', isEqualTo: teamName).snapshots().toEither(
-          (snapshot) => snapshot.docs.map(PlayerDTO.fromFirestore).toList(),
+  /// Elenco de um time: pelo `idTime` e, nos jogadores antigos (sem id),
+  /// pelo nome. A consulta traz os dois e o filtro descarta quem tem o id de
+  /// outro time com o mesmo nome. Sem [teamId], só pelo nome.
+  Stream<Either<Failure, List<PlayerDTO>>> watchTeamPlayers({
+    String teamId = '',
+    required String teamName,
+    String? season,
+  }) {
+    final query = teamId.isEmpty
+        ? _players(season).where('time', isEqualTo: teamName)
+        : _players(season).where(Filter.or(Filter('idTime', isEqualTo: teamId), Filter('time', isEqualTo: teamName)));
+    return query.snapshots().toEither(
+          (snapshot) => snapshot.docs
+              .map(PlayerDTO.fromFirestore)
+              .where((p) => teamId.isEmpty || p.teamId.isEmpty || p.teamId == teamId)
+              .toList(),
           fallbackMessage: _loadFallback,
           logName: 'PlayersDataSource',
         );
@@ -111,7 +123,7 @@ class PlayersDataSource {
   /// mesma escrita), o que libera pedir outro time.
   Future<Either<Failure, void>> removeFromSquad(PlayerDTO player, {String? season}) async {
     try {
-      final batch = _firestore.batch()..update(_players(season).doc(player.id), {'time': ''});
+      final batch = _firestore.batch()..update(_players(season).doc(player.id), {'time': '', 'idTime': ''});
       if (player.userId.isNotEmpty) {
         final request = await _firestore.collection('solicitacoes_jogador').doc(player.userId).get();
         if (request.exists && request.data()?['idJogador'] == player.id) {

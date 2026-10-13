@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
-import 'package:arena_soccer/features/championships/presentation/bloc/groups_state.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/page_title_bar.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/stats/domain/ranking_entry.dart';
@@ -47,9 +46,9 @@ class _StatsRankingPageState extends State<StatsRankingPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final favorite = context.watch<SessionCubit>().state.user?.favoriteTeam;
-    final favoriteKey = (favorite == null || favorite.trim().isEmpty) ? null : normalizeTeamName(favorite);
-    bool isFavorite(RankingEntry entry) => favoriteKey != null && normalizeTeamName(entry.player.team) == favoriteKey;
+    final user = context.watch<SessionCubit>().state.user;
+    bool isFavorite(RankingEntry entry) =>
+        user?.isFavorite(id: entry.player.teamId, name: entry.player.team) ?? false;
 
     return BlocBuilder<StatsRankingCubit, StatsRankingState>(
       builder: (context, state) {

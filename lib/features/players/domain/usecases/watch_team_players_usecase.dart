@@ -8,6 +8,7 @@ class WatchTeamPlayersUseCase {
 
   WatchTeamPlayersUseCase(this._repository);
 
-  Stream<Either<Failure, List<PlayerDTO>>> call({required String teamName, String? season}) =>
-      _repository.watchTeamPlayers(teamName: teamName, season: season);
+  /// Pelo id do time (com fallback no nome para jogadores antigos).
+  Stream<Either<Failure, List<PlayerDTO>>> call({String teamId = '', required String teamName, String? season}) =>
+      _repository.watchTeamPlayers(teamId: teamId, teamName: teamName, season: season);
 }

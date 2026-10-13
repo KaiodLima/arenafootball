@@ -2027,4 +2027,455 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get matchFormChampionship => 'Campeonato';
+
+  @override
+  String get teamRequestMenu => 'Sou dono de time';
+
+  @override
+  String get teamRequestTitle => 'Sou dono de time';
+
+  @override
+  String get teamRequestIntro =>
+      'Cadastre o seu time: um administrador analisa o pedido e, aprovado, você gerencia o elenco.';
+
+  @override
+  String get teamRequestNameLabel => 'Nome do time';
+
+  @override
+  String get teamRequestNameRequired =>
+      'Informe o nome do time (mínimo 3 letras).';
+
+  @override
+  String teamRequestNameTaken(String name) {
+    return 'Já existe um time chamado $name nesta região.';
+  }
+
+  @override
+  String get teamRequestCrestAdd => 'Adicionar escudo (opcional)';
+
+  @override
+  String get teamRequestDescriptionLabel => 'Descrição / história (opcional)';
+
+  @override
+  String get teamRequestContactLabel => 'WhatsApp do responsável';
+
+  @override
+  String get teamRequestContactHint => '(89) 99999-9999';
+
+  @override
+  String get teamRequestContactRequired => 'Informe um WhatsApp com DDD.';
+
+  @override
+  String get teamRequestContactInfo => 'Só o administrador vê o seu contato.';
+
+  @override
+  String get teamRequestSubmit => 'ENVIAR PEDIDO';
+
+  @override
+  String get teamRequestSent =>
+      'Pedido enviado! Você será avisado quando o admin responder.';
+
+  @override
+  String get teamRequestCancelled => 'Pedido cancelado.';
+
+  @override
+  String get teamRequestPendingInfo =>
+      'Um administrador vai analisar o seu time. Enquanto isso, você ainda pode corrigir os dados.';
+
+  @override
+  String get teamRequestRejectedInfo =>
+      'Seu pedido não foi aprovado. Você pode enviar um novo.';
+
+  @override
+  String get teamRequestEdit => 'Editar pedido';
+
+  @override
+  String get teamRequestCancel => 'Cancelar pedido';
+
+  @override
+  String get teamRequestCancelTitle => 'Cancelar pedido?';
+
+  @override
+  String teamRequestCancelMessage(String team) {
+    return 'O pedido do time $team será apagado.';
+  }
+
+  @override
+  String get teamRequestResubmit => 'Enviar novo pedido';
+
+  @override
+  String get teamRequestLoadError => 'Não foi possível carregar o seu pedido.';
+
+  @override
+  String get myTeamTitle => 'Meu time';
+
+  @override
+  String get myTeamOwnerBadge => 'Você é o dono';
+
+  @override
+  String get myTeamTabSquad => 'Elenco';
+
+  @override
+  String get myTeamTabRequests => 'Pedidos';
+
+  @override
+  String get myTeamTabEdit => 'Editar';
+
+  @override
+  String get myTeamAddPlayer => 'Adicionar jogador';
+
+  @override
+  String get myTeamSquadEmpty => 'Nenhum jogador no elenco ainda.';
+
+  @override
+  String get myTeamRequestsEmpty => 'Nenhum pedido para entrar no time.';
+
+  @override
+  String myTeamPlayerAdded(String name) {
+    return '$name entrou no elenco.';
+  }
+
+  @override
+  String get myTeamSaved => 'Time atualizado!';
+
+  @override
+  String get myTeamNameLocked =>
+      'Para trocar o nome do time, fale com o administrador.';
+
+  @override
+  String get myTeamLoadError => 'Não foi possível carregar o seu time.';
+
+  @override
+  String get teamRequestsPanelTitle => 'Solicitações de times';
+
+  @override
+  String get teamRequestsEmptyPending => 'Nenhum pedido de time pendente.';
+
+  @override
+  String get teamRequestsEmptyAnswered =>
+      'Nenhum pedido de time respondido ainda.';
+
+  @override
+  String get teamRequestsLoadError =>
+      'Não foi possível carregar os pedidos de time.';
+
+  @override
+  String teamRequestsApproveTitle(String name) {
+    return 'Aprovar o time $name?';
+  }
+
+  @override
+  String teamRequestsApproveMessage(String region, String owner) {
+    return 'O time entra em $region na temporada atual, com $owner como dono.';
+  }
+
+  @override
+  String teamRequestsApproved(String name) {
+    return 'Time $name criado!';
+  }
+
+  @override
+  String teamRequestsRejectTitle(String name) {
+    return 'Rejeitar o time $name?';
+  }
+
+  @override
+  String teamRequestsOwner(String name) {
+    return 'Dono: $name';
+  }
+
+  @override
+  String get teamRequestsWhatsApp => 'Chamar no WhatsApp';
+
+  @override
+  String get teamRequestsWhatsAppError => 'Não foi possível abrir o WhatsApp.';
+
+  @override
+  String get pushActionTeamRequest => 'Novo pedido de time';
+
+  @override
+  String get pushActionTeamRequestHint =>
+      'Para os admins · \"Fulano quer cadastrar o time X\"';
+
+  @override
+  String get pushActionTeamRequestAnswer => 'Resposta do pedido de time';
+
+  @override
+  String get pushActionTeamRequestAnswerHint =>
+      'Para quem pediu · aprovado ou rejeitado';
+
+  @override
+  String get teamDelete => 'Excluir time';
+
+  @override
+  String teamDeleteTitle(String team) {
+    return 'Excluir $team?';
+  }
+
+  @override
+  String teamDeleteMessage(String season) {
+    return 'O time sai da temporada $season. Jogadores com conta no app ficam sem time e mantêm os números; os demais jogadores do elenco são excluídos. As partidas já cadastradas continuam no histórico. Não dá para desfazer.';
+  }
+
+  @override
+  String teamDeleted(String team) {
+    return '$team foi excluído.';
+  }
+
+  @override
+  String drawerPlayerOf(String team) {
+    return 'Jogador do $team';
+  }
+
+  @override
+  String drawerOwnerOf(String team) {
+    return 'Dono/treinador do $team';
+  }
+
+  @override
+  String get drawerMyPlayerProfile => 'Meu perfil de jogador';
+
+  @override
+  String get teamColorsSection => 'Cores do time';
+
+  @override
+  String get teamColorPrimary => 'Cor principal';
+
+  @override
+  String get teamColorSecondary => 'Cor secundária';
+
+  @override
+  String get teamColorNone => 'Sem cor';
+
+  @override
+  String get teamColorPreview => 'Assim fica o uniforme';
+
+  @override
+  String get colorWhite => 'Branco';
+
+  @override
+  String get colorBlack => 'Preto';
+
+  @override
+  String get colorGrey => 'Cinza';
+
+  @override
+  String get colorRed => 'Vermelho';
+
+  @override
+  String get colorWine => 'Vinho';
+
+  @override
+  String get colorOrange => 'Laranja';
+
+  @override
+  String get colorYellow => 'Amarelo';
+
+  @override
+  String get colorGreen => 'Verde';
+
+  @override
+  String get colorBlue => 'Azul';
+
+  @override
+  String get colorNavy => 'Azul-marinho';
+
+  @override
+  String get colorPurple => 'Roxo';
+
+  @override
+  String get colorPink => 'Rosa';
+
+  @override
+  String get fanCardMenu => 'Minha carteirinha';
+
+  @override
+  String get fanCardTitle => 'Carteirinha de torcedor';
+
+  @override
+  String get fanCardLabel => 'CARTEIRINHA DE TORCEDOR';
+
+  @override
+  String fanCardFanOf(String team) {
+    return 'Torcedor do $team';
+  }
+
+  @override
+  String get fanCardNoTeam => 'Sem time do coração';
+
+  @override
+  String fanCardSince(String year) {
+    return 'Torcedor desde $year';
+  }
+
+  @override
+  String fanCardNumber(String number) {
+    return 'Nº $number';
+  }
+
+  @override
+  String get fanCardChangePhoto => 'Trocar foto';
+
+  @override
+  String get fanCardAddPhoto => 'Adicionar foto';
+
+  @override
+  String get fanCardPhotoSaved => 'Foto atualizada!';
+
+  @override
+  String get fanCardHint => 'Mostre a sua carteirinha nos jogos do seu time.';
+
+  @override
+  String get fanCardShare => 'COMPARTILHAR CARTEIRINHA';
+
+  @override
+  String get fanCardShareTitle => 'Compartilhar carteirinha';
+
+  @override
+  String get shareInstagramStories => 'Instagram Stories';
+
+  @override
+  String get shareWhatsApp => 'WhatsApp';
+
+  @override
+  String get shareMoreOptions => 'Mais opções';
+
+  @override
+  String fanCardShareText(String team) {
+    return 'Sou torcedor do $team no Arena Football! ⚽';
+  }
+
+  @override
+  String get fanCardShareTextNoTeam =>
+      'Minha carteirinha de torcedor no Arena Football! ⚽';
+
+  @override
+  String get shareFooter => 'Arena Football · o futebol amador da sua região';
+
+  @override
+  String get athleteShareTitle => 'Compartilhar atleta';
+
+  @override
+  String get athleteCardLabel => 'ATLETA';
+
+  @override
+  String athleteCardSeason(String season) {
+    return 'Temporada $season';
+  }
+
+  @override
+  String athleteCardParticipations(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count participações em gols',
+      one: '1 participação em gol',
+      zero: 'Nenhuma participação em gol',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get teamEdit => 'Editar time';
+
+  @override
+  String get teamEditTitle => 'Editar time';
+
+  @override
+  String get teamEditSaved => 'Time atualizado.';
+
+  @override
+  String get teamEditRegionLabel => 'Região';
+
+  @override
+  String get teamEditRegionChangeTitle => 'Trocar a região?';
+
+  @override
+  String teamEditRegionChangeMessage(String team, String region) {
+    return '$team passa a aparecer na aba Times e na classificação de $region. Os grupos da região antiga não mudam.';
+  }
+
+  @override
+  String get teamEditNameLocked =>
+      'O nome do time não pode ser alterado (ele está nas partidas, no elenco e na votação).';
+
+  @override
+  String get votingShareTitle => 'Compartilhar craque';
+
+  @override
+  String get votingCardLabel => 'CRAQUE DA PARTIDA';
+
+  @override
+  String get votingCardTopVotes => 'Mais votados';
+
+  @override
+  String get votingCardSeasonStats => 'Na temporada';
+
+  @override
+  String get teamLinksTitle => 'Vincular times por id';
+
+  @override
+  String get teamLinksInfo =>
+      'Grava o id do time ao lado do nome em jogadores, partidas, grupos, campeonatos, pedidos \"Sou jogador\" e cards de gol da temporada (na atual, também no time do coração das contas) e copia os votos antigos para as partidas. Só completa o que falta: pode rodar de novo.';
+
+  @override
+  String teamLinksRun(String season) {
+    return 'Vincular $season';
+  }
+
+  @override
+  String teamLinksDone(String season, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count documentos atualizados',
+      one: '1 documento atualizado',
+      zero: 'nada a atualizar',
+    );
+    return '$season: $_temp0';
+  }
+
+  @override
+  String teamLinksVotes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count votos copiados para as partidas',
+      one: '1 voto copiado para a partida',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get teamLinksUnmatched =>
+      'Nomes sem time na temporada (não vinculados):';
+
+  @override
+  String get teamLinksAmbiguous =>
+      'Nomes usados por mais de um time (não vinculados):';
+
+  @override
+  String get teamLinksSkippedVotes =>
+      'Votos não copiados (confronto repetido na temporada):';
+
+  @override
+  String get teamLinksPlayers => 'Jogadores';
+
+  @override
+  String get teamLinksMatches => 'Partidas';
+
+  @override
+  String get teamLinksGroups => 'Grupos';
+
+  @override
+  String get teamLinksChampionships => 'Campeonatos';
+
+  @override
+  String get teamLinksPlayerRequests => 'Pedidos \"Sou jogador\"';
+
+  @override
+  String get teamLinksGoalCards => 'Cards de gol';
+
+  @override
+  String get teamLinksUsers => 'Time do coração';
 }

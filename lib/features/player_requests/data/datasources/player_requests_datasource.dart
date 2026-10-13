@@ -64,6 +64,25 @@ class PlayerRequestsDataSource {
         );
   }
 
+  /// Pedidos para entrar no time (aba "Pedidos" do dono), mais recentes
+  /// primeiro: pelo `idTime` e, nos pedidos antigos (sem id), pelo nome; quem
+  /// tem o id de outro time com o mesmo nome fica de fora. Ordena em memória:
+  /// com `where` + `orderBy` em campos diferentes seria preciso um índice.
+  Stream<Either<Failure, List<PlayerRequestDTO>>> watchTeamRequests({String teamId = '', required String teamName}) {
+    final query = teamId.isEmpty
+        ? _requests.where('time', isEqualTo: teamName)
+        : _requests.where(Filter.or(Filter('idTime', isEqualTo: teamId), Filter('time', isEqualTo: teamName)));
+    return query.snapshots().toEither(
+          (snapshot) => snapshot.docs
+              .map(PlayerRequestDTO.fromFirestore)
+              .where((r) => teamId.isEmpty || r.teamId.isEmpty || r.teamId == teamId)
+              .toList()
+            ..sort((a, b) => (b.createdAt ?? DateTime(0)).compareTo(a.createdAt ?? DateTime(0))),
+          fallbackMessage: _loadFallback,
+          logName: _logName,
+        );
+  }
+
   /// Quantos pedidos aguardam resposta (contador do menu do admin).
   Stream<Either<Failure, int>> watchPendingCount() {
     return _requests.where('status', isEqualTo: PlayerRequestStatus.pending.key).snapshots().toEither(
@@ -79,6 +98,7 @@ class PlayerRequestsDataSource {
       await _requests.doc(request.userId).update({
         'nome': request.name,
         'time': request.team,
+        'idTime': request.teamId,
         'posicao': request.position?.key ?? '',
         'atualizado_em': FieldValue.serverTimestamp(),
       });
@@ -89,12 +109,25 @@ class PlayerRequestsDataSource {
     }
   }
 
+  /// Id do time do pedido; pedido antigo (sem id) busca o time pelo nome na
+  /// temporada do pedido ('' se não achar).
+  Future<String> _teamIdOf(PlayerRequestDTO request) async {
+    if (request.teamId.isNotEmpty) return request.teamId;
+    final teams = await _firestore
+        .collection(SeasonCollection.name('times', request.season))
+        .where('nome', isEqualTo: request.team)
+        .limit(1)
+        .get();
+    return teams.docs.isEmpty ? '' : teams.docs.first.id;
+  }
+
   /// Aprova o pedido, numa escrita só com a marcação do pedido. Se a conta já
   /// tem atleta na temporada (saiu de outro elenco), reaproveita ele: troca
   /// time, nome, posição e foto e mantém gols e assistências. Senão, cria.
   Future<Either<Failure, String>> approve(PlayerRequestDTO request) async {
     try {
       final players = _firestore.collection(SeasonCollection.name('jogadores', request.season));
+      final teamId = await _teamIdOf(request);
       final existing = await players.where('idUsuario', isEqualTo: request.userId).limit(1).get();
       final batch = _firestore.batch();
       final DocumentReference<Map<String, dynamic>> playerRef;
@@ -103,6 +136,7 @@ class PlayerRequestsDataSource {
         batch.update(playerRef, {
           'nome': request.name,
           'time': request.team,
+          'idTime': teamId,
           'posicao': request.position?.key ?? '',
           if (request.imageUrl.isNotEmpty) 'urlImagem': request.imageUrl,
         });
@@ -112,6 +146,7 @@ class PlayerRequestsDataSource {
           id: playerRef.id,
           name: request.name,
           team: request.team,
+          teamId: teamId,
           imageUrl: request.imageUrl,
           userId: request.userId,
           position: request.position?.key ?? '',

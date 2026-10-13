@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:either_dart/either.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/data/dtos/standing_dto.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/watch_standings_usecase.dart';
-import 'package:arena_soccer/features/championships/presentation/bloc/groups_state.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/standings_state.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
 

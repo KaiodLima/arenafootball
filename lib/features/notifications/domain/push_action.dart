@@ -10,7 +10,9 @@ enum PushAction {
   dailyGame('jogo_do_dia', true),
   notice('aviso', true),
   playerRequest('solicitacao_jogador', true),
-  playerRequestAnswer('solicitacao_resposta', true);
+  playerRequestAnswer('solicitacao_resposta', true),
+  teamRequest('solicitacao_time', true),
+  teamRequestAnswer('solicitacao_time_resposta', true);
 
   final String key;
   final bool defaultEnabled;

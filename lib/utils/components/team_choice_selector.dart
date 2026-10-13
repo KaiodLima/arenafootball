@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/utils/components/arena_input_decoration.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
@@ -8,11 +9,13 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 
 /// Seletor do time do coração. Fechado, parece um campo (escudo + nome do
 /// escolhido); ao tocar, abre um carrossel de páginas 3x3 com os escudos.
-/// Escolher um time fecha o painel.
+/// Escolher um time fecha o painel. O marcado é o de [selectedId] (ou, sem
+/// id, o de nome [selected]).
 class TeamChoiceSelector extends StatefulWidget {
   final List<TeamDTO> teams;
   final String? selected;
-  final ValueChanged<String> onSelected;
+  final String selectedId;
+  final ValueChanged<TeamDTO> onSelected;
   final String placeholder;
   final bool loading;
 
@@ -20,6 +23,7 @@ class TeamChoiceSelector extends StatefulWidget {
     super.key,
     required this.teams,
     required this.selected,
+    this.selectedId = '',
     required this.onSelected,
     required this.placeholder,
     this.loading = false,
@@ -51,9 +55,12 @@ class _TeamChoiceSelectorState extends State<TeamChoiceSelector> {
           widget.teams.sublist(i, (i + _pageSize).clamp(0, widget.teams.length)),
       ];
 
+  bool _isSelected(TeamDTO team) =>
+      sameTeam(idA: team.id, nameA: team.name, idB: widget.selectedId, nameB: widget.selected ?? '');
+
   TeamDTO? get _selectedTeam {
     for (final team in widget.teams) {
-      if (team.name == widget.selected) return team;
+      if (_isSelected(team)) return team;
     }
     return null;
   }
@@ -62,7 +69,7 @@ class _TeamChoiceSelectorState extends State<TeamChoiceSelector> {
     if (widget.loading || widget.teams.isEmpty) return;
     if (!_expanded) {
       // Abre na página do time já escolhido.
-      final index = widget.teams.indexWhere((t) => t.name == widget.selected);
+      final index = widget.teams.indexWhere(_isSelected);
       _page = index < 0 ? 0 : index ~/ _pageSize;
       _pageController?.dispose();
       _pageController = PageController(initialPage: _page);
@@ -70,7 +77,7 @@ class _TeamChoiceSelectorState extends State<TeamChoiceSelector> {
     setState(() => _expanded = !_expanded);
   }
 
-  void _select(String team) {
+  void _select(TeamDTO team) {
     widget.onSelected(team);
     setState(() => _expanded = false);
   }
@@ -168,8 +175,8 @@ class _TeamChoiceSelectorState extends State<TeamChoiceSelector> {
                       for (final team in pages[index])
                         TeamChoiceCard(
                           team: team,
-                          selected: team.name == widget.selected,
-                          onTap: () => _select(team.name),
+                          selected: _isSelected(team),
+                          onTap: () => _select(team),
                         ),
                     ],
                   ),

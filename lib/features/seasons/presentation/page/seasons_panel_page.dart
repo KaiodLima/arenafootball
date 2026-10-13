@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/seasons/presentation/bloc/seasons_panel_cubit.dart';
 import 'package:arena_soccer/features/seasons/presentation/bloc/seasons_panel_state.dart';
+import 'package:arena_soccer/features/seasons/presentation/widgets/team_links_section.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
 import 'package:arena_soccer/utils/components/arena_hero_background.dart';
@@ -11,7 +12,8 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// Painel do admin: temporada atual, as disponíveis e "Iniciar temporada".
+/// Painel do admin: temporada atual, as disponíveis, "Iniciar temporada" e a
+/// manutenção "Vincular times por id".
 class SeasonsPanelPage extends StatefulWidget {
   const SeasonsPanelPage({super.key});
 
@@ -163,6 +165,14 @@ class _SeasonsPanelPageState extends State<SeasonsPanelPage> {
                   ],
                 ),
               ),
+              const SizedBox(height: AppSizes.s16),
+              if (state.seasons.isNotEmpty)
+                TeamLinksSection(
+                  // Nova temporada iniciada: recomeça na atual.
+                  key: ValueKey(state.current),
+                  seasons: state.seasons,
+                  current: state.current,
+                ),
             ],
           );
         },

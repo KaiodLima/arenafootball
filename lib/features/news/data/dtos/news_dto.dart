@@ -38,6 +38,12 @@ class NewsDTO extends Equatable {
   final String scoringTeam;
   final String scoringTeamCrest;
 
+  /// Ids dos times (`id_time_casa`, `id_time_fora`, `id_time_marcador`);
+  /// vazios em cards antigos, quando valem os nomes.
+  final String homeTeamId;
+  final String awayTeamId;
+  final String scoringTeamId;
+
   const NewsDTO({
     this.id = '',
     this.date,
@@ -60,6 +66,9 @@ class NewsDTO extends Equatable {
     this.season = '',
     this.scoringTeam = '',
     this.scoringTeamCrest = '',
+    this.homeTeamId = '',
+    this.awayTeamId = '',
+    this.scoringTeamId = '',
   });
 
   bool get hasScorer => scorerId.isNotEmpty && scorerName.isNotEmpty;
@@ -98,6 +107,9 @@ class NewsDTO extends Equatable {
       season: data['temporada']?.toString() ?? '',
       scoringTeam: data['time_marcador']?.toString() ?? '',
       scoringTeamCrest: data['escudo_marcador']?.toString() ?? '',
+      homeTeamId: data['id_time_casa']?.toString() ?? '',
+      awayTeamId: data['id_time_fora']?.toString() ?? '',
+      scoringTeamId: data['id_time_marcador']?.toString() ?? '',
     );
   }
 
@@ -127,6 +139,9 @@ class NewsDTO extends Equatable {
         if (season.isNotEmpty) 'temporada': season,
         if (scoringTeam.isNotEmpty) 'time_marcador': scoringTeam,
         if (scoringTeamCrest.isNotEmpty) 'escudo_marcador': scoringTeamCrest,
+        if (homeTeamId.isNotEmpty) 'id_time_casa': homeTeamId,
+        if (awayTeamId.isNotEmpty) 'id_time_fora': awayTeamId,
+        if (scoringTeamId.isNotEmpty) 'id_time_marcador': scoringTeamId,
       };
 
   NewsDTO copyWith({
@@ -151,6 +166,9 @@ class NewsDTO extends Equatable {
     String? season,
     String? scoringTeam,
     String? scoringTeamCrest,
+    String? homeTeamId,
+    String? awayTeamId,
+    String? scoringTeamId,
   }) {
     return NewsDTO(
       id: id ?? this.id,
@@ -174,6 +192,9 @@ class NewsDTO extends Equatable {
       season: season ?? this.season,
       scoringTeam: scoringTeam ?? this.scoringTeam,
       scoringTeamCrest: scoringTeamCrest ?? this.scoringTeamCrest,
+      homeTeamId: homeTeamId ?? this.homeTeamId,
+      awayTeamId: awayTeamId ?? this.awayTeamId,
+      scoringTeamId: scoringTeamId ?? this.scoringTeamId,
     );
   }
 
@@ -200,5 +221,8 @@ class NewsDTO extends Equatable {
         season,
         scoringTeam,
         scoringTeamCrest,
+        homeTeamId,
+        awayTeamId,
+        scoringTeamId,
       ];
 }

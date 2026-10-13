@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:either_dart/either.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/news/domain/usecases/get_player_goal_cards_usecase.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
@@ -15,7 +16,6 @@ import 'package:arena_soccer/features/players/presentation/bloc/player_profile_s
 import 'package:arena_soccer/features/stats/domain/ranking_entry.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
 import 'package:arena_soccer/features/stats/domain/usecases/get_stats_ranking_usecase.dart';
-import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
 
 /// Tela do atleta: o jogador em tempo real, o time dele, a posição na
@@ -34,7 +34,7 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
   String? _season;
 
   /// Números com que as posições foram calculadas (recalcula se mudarem).
-  ({int goals, int assists, String team})? _rankedFor;
+  ({int goals, int assists, String team, String teamId})? _rankedFor;
 
   PlayerProfileCubit(
     this.watchPlayerUseCase,
@@ -76,7 +76,7 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
   /// Time (para escudo e região) e posições nos rankings. Só refaz quando
   /// os números ou o time mudam.
   Future<void> _refreshTeamAndRanks(PlayerDTO player) async {
-    final key = (goals: player.goals, assists: player.assists, team: player.team);
+    final key = (goals: player.goals, assists: player.assists, team: player.team, teamId: player.teamId);
     if (_rankedFor == key) return;
     _rankedFor = key;
 
@@ -87,10 +87,10 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
     }
 
     var team = state.team;
-    if (team == null || team.name != player.team) {
+    if (team == null || !sameTeam(idA: team.id, nameA: team.name, idB: player.teamId, nameB: player.team)) {
       final teams = await getTeamsUseCase(season: _season);
       if (isClosed) return;
-      team = teams.fold((_) => null, (list) => _byName(list, player.team));
+      team = teams.fold((_) => null, (list) => TeamDirectory(list).resolve(id: player.teamId, name: player.team));
       if (team != null) emit(state.copyWith(team: team));
     }
     if (team == null || team.region.isEmpty) return;
@@ -106,12 +106,6 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
     ));
   }
 
-  static TeamDTO? _byName(List<TeamDTO> teams, String name) {
-    for (final team in teams) {
-      if (team.name == name) return team;
-    }
-    return null;
-  }
 
   /// Posição do jogador no ranking (empates dividem a posição); nulo se não
   /// está nele.

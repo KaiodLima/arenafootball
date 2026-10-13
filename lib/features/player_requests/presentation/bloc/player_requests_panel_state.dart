@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/core/utils/search_text.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
@@ -41,7 +42,9 @@ class PlayerRequestsPanelState extends Equatable {
     final key = foldForSearch(request.name.trim());
     if (key.isEmpty) return null;
     for (final player in players) {
-      if (player.team == request.team && player.userId != request.userId && foldForSearch(player.name.trim()) == key) {
+      if (sameTeam(idA: player.teamId, nameA: player.team, idB: request.teamId, nameB: request.team) &&
+          player.userId != request.userId &&
+          foldForSearch(player.name.trim()) == key) {
         return player;
       }
     }

@@ -25,6 +25,10 @@ class PlayerRequestsRepositoryImpl implements IPlayerRequestsRepository {
   Stream<Either<Failure, int>> watchPendingCount() => _dataSource.watchPendingCount();
 
   @override
+  Stream<Either<Failure, List<PlayerRequestDTO>>> watchTeamRequests({String teamId = '', required String teamName}) =>
+      _dataSource.watchTeamRequests(teamId: teamId, teamName: teamName);
+
+  @override
   Future<Either<Failure, void>> update(PlayerRequestDTO request) => _dataSource.update(request);
 
   @override

@@ -22,8 +22,16 @@ class ChampionshipDTO extends Equatable {
   /// Campo `ano`: temporada do campeonato (usada para abrir os grupos).
   final String season;
 
-  /// Nomes dos times participantes (mesmo nome gravado nas partidas).
+  /// Nomes dos times participantes (cópia para exibir).
   final List<String> teams;
+
+  /// Participa? Pelo id; o nome cobre campeonatos antigos (sem ids).
+  bool hasTeam({required String id, required String name}) =>
+      (id.isNotEmpty && teamIds.contains(id)) || teams.any((t) => t.trim().toLowerCase() == name.trim().toLowerCase());
+
+  /// `ids_times`: ids dos participantes (vínculo), na ordem de [teams] (''
+  /// = sem id). Vazio em campeonatos antigos (antes da migração).
+  final List<String> teamIds;
 
   /// Regulamento em PDF (Storage `campeonatos/`); vazio se não houver.
   final String rulesUrl;
@@ -44,6 +52,7 @@ class ChampionshipDTO extends Equatable {
     this.region = '',
     this.season = '',
     this.teams = const [],
+    this.teamIds = const [],
     this.rulesUrl = '',
     this.rulesFileName = '',
   });
@@ -66,6 +75,7 @@ class ChampionshipDTO extends Equatable {
       region: data['fk_competicao']?.toString() ?? '',
       season: data['ano']?.toString() ?? '',
       teams: (data['times'] as List?)?.map((t) => t.toString()).toList() ?? const [],
+      teamIds: (data['ids_times'] as List?)?.map((t) => t.toString()).toList() ?? const [],
       rulesUrl: data['regulamentoUrl']?.toString() ?? '',
       rulesFileName: data['regulamentoNome']?.toString() ?? '',
     );
@@ -85,6 +95,7 @@ class ChampionshipDTO extends Equatable {
         'fk_competicao': region,
         'ano': season,
         'times': teams,
+        'ids_times': teamIds,
         'regulamentoUrl': rulesUrl,
         'regulamentoNome': rulesFileName,
       };
@@ -104,6 +115,7 @@ class ChampionshipDTO extends Equatable {
     String? region,
     String? season,
     List<String>? teams,
+    List<String>? teamIds,
     String? rulesUrl,
     String? rulesFileName,
   }) {
@@ -122,6 +134,7 @@ class ChampionshipDTO extends Equatable {
       region: region ?? this.region,
       season: season ?? this.season,
       teams: teams ?? this.teams,
+      teamIds: teamIds ?? this.teamIds,
       rulesUrl: rulesUrl ?? this.rulesUrl,
       rulesFileName: rulesFileName ?? this.rulesFileName,
     );
@@ -143,6 +156,7 @@ class ChampionshipDTO extends Equatable {
         region,
         season,
         teams,
+        teamIds,
         rulesUrl,
         rulesFileName,
       ];

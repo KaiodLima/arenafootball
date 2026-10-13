@@ -4,13 +4,17 @@ import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/presentation/widgets/team_crest_hero.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_hero_background.dart';
+import 'package:arena_soccer/utils/components/team_colors_background.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/constants/team_colors.dart';
 
 /// Topo do elenco: escudo (Hero vindo do card do time), nome, região e
-/// temporada. A borda arredondada da folha de conteúdo é desenhada aqui,
-/// porque a barra fixa do CustomScrollView fica por cima dos slivers seguintes.
+/// temporada. Com as cores do time, o fundo é o padrão de cantos recortados
+/// ([TeamColorsBackground]); sem cores, o verde do app. A borda arredondada
+/// da folha de conteúdo é desenhada aqui, porque a barra fixa do
+/// CustomScrollView fica por cima dos slivers seguintes.
 class TeamHeader extends StatelessWidget {
   final TeamDTO team;
   final String season;
@@ -20,10 +24,10 @@ class TeamHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final palette = TeamPalette.fromHex(team.primaryColor, team.secondaryColor);
+    final foreground = palette?.onBackground ?? AppColors.white;
 
-    return ArenaHeroBackground(
-      watermarkFactor: 0.7,
-      child: Stack(
+    final content = Stack(
         children: [
           SafeArea(
             bottom: false,
@@ -39,7 +43,12 @@ class TeamHeader extends StatelessWidget {
                         width: AppSizes.s100,
                         height: AppSizes.s100,
                         padding: const EdgeInsets.all(AppSizes.s10),
-                        decoration: const BoxDecoration(color: AppColors.white, shape: BoxShape.circle),
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          shape: BoxShape.circle,
+                          // Anel na cor do time.
+                          border: palette == null ? null : Border.all(color: palette.ring, width: 3),
+                        ),
                         child: ClipOval(
                           child: team.imageUrl.isNotEmpty
                               ? CachedNetworkImage(imageUrl: team.imageUrl, fit: BoxFit.cover)
@@ -55,7 +64,7 @@ class TeamHeader extends StatelessWidget {
                         textAlign: TextAlign.center,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: AppTypography.display(color: AppColors.white).copyWith(fontSize: AppSizes.s24),
+                        style: AppTypography.display(color: foreground).copyWith(fontSize: AppSizes.s24),
                       ),
                     ),
                     const SizedBox(height: AppSizes.s8),
@@ -63,8 +72,13 @@ class TeamHeader extends StatelessWidget {
                       spacing: AppSizes.s8,
                       alignment: WrapAlignment.center,
                       children: [
-                        if (team.region.isNotEmpty) _HeaderChip(icon: Icons.place_outlined, label: team.region),
-                        _HeaderChip(icon: Icons.calendar_today_rounded, label: l10n.homeSeasonChip(season)),
+                        if (team.region.isNotEmpty)
+                          _HeaderChip(icon: Icons.place_outlined, label: team.region, palette: palette),
+                        _HeaderChip(
+                          icon: Icons.calendar_today_rounded,
+                          label: l10n.homeSeasonChip(season),
+                          palette: palette,
+                        ),
                       ],
                     ),
                   ],
@@ -85,8 +99,12 @@ class TeamHeader extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
+      );
+
+    return palette == null
+        ? ArenaHeroBackground(watermarkFactor: 0.7, child: content)
+        // A folha arredondada do elenco cobre a faixa de baixo.
+        : TeamColorsBackground(palette: palette, bottomInset: AppSizes.s24, child: content);
   }
 }
 
@@ -94,22 +112,27 @@ class _HeaderChip extends StatelessWidget {
   final IconData icon;
   final String label;
 
-  const _HeaderChip({required this.icon, required this.label});
+  /// Cores do time (nulo = verde do app).
+  final TeamPalette? palette;
+
+  const _HeaderChip({required this.icon, required this.label, this.palette});
 
   @override
   Widget build(BuildContext context) {
+    final foreground = palette?.onAccent ?? AppColors.white;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSizes.s10, vertical: AppSizes.s4),
       decoration: BoxDecoration(
-        color: AppColors.white.withValues(alpha: 0.15),
+        // Com cores do time, uma pílula sólida na cor principal (como no fundo).
+        color: palette?.accent ?? AppColors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(AppSizes.s20),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: AppSizes.s14, color: AppColors.white),
+          Icon(icon, size: AppSizes.s14, color: foreground),
           const SizedBox(width: AppSizes.s4),
-          Text(label, style: AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s12)),
+          Text(label, style: AppTypography.label(color: foreground).copyWith(fontSize: AppSizes.s12)),
         ],
       ),
     );

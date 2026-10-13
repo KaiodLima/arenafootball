@@ -172,6 +172,7 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
       email: _email,
       name: form.name,
       team: form.selectedTeam!,
+      teamId: form.selectedTeamId,
       region: form.selectedRegion ?? '',
       season: SeasonCollection.currentSeason,
       position: form.position,

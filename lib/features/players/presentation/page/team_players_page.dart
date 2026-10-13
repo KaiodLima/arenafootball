@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
+import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/team_players_cubit.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/team_players_state.dart';
@@ -13,10 +14,12 @@ import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/arena_search_field.dart';
+import 'package:arena_soccer/utils/components/card_menu_button.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/constants/team_colors.dart';
 
 /// Elenco de um time na temporada selecionada: topo com o escudo, resumo,
 /// busca, ordenação e a lista. Tocar num jogador abre a tela do atleta
@@ -35,13 +38,16 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
 
   final _scroll = ScrollController();
   late final String _season;
+
+  /// Time exibido; trocado pelo que volta da edição do admin.
+  late TeamDTO _team = widget.team;
   bool _collapsed = false;
 
   @override
   void initState() {
     super.initState();
     _season = BlocProvider.of<RegionCubit>(context).state.selectedSeason;
-    BlocProvider.of<TeamPlayersCubit>(context).watch(teamName: widget.team.name, season: _season);
+    BlocProvider.of<TeamPlayersCubit>(context).watch(teamId: widget.team.id, teamName: widget.team.name, season: _season);
     _scroll.addListener(_onScroll);
   }
 
@@ -56,17 +62,58 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
     if (collapsed != _collapsed) setState(() => _collapsed = collapsed);
   }
 
+  Future<void> _edit() async {
+    final updated = await Navigator.pushNamed(
+      context,
+      AppRoutes.editTeamPage,
+      arguments: {'team': _team, 'season': _season},
+    );
+    if (updated is TeamDTO && mounted) setState(() => _team = updated);
+  }
+
+  Future<void> _confirmDelete(AppLocalizations l10n) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.teamDeleteTitle(_team.name)),
+        content: Text(l10n.teamDeleteMessage(_season)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.commonCancel)),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(l10n.commonDelete, style: const TextStyle(color: AppColors.danger)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && mounted) await BlocProvider.of<TeamPlayersCubit>(context).deleteTeam(_team);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final cubit = BlocProvider.of<TeamPlayersCubit>(context);
+    final isAdmin = context.watch<SessionCubit>().state.isAdmin;
+    final palette = TeamPalette.fromHex(_team.primaryColor, _team.secondaryColor);
+    final barColor = palette?.bar ?? AppColors.primaryDark;
+    final barForeground = palette?.onAccent ?? AppColors.white;
+    // Expandido, a status bar fica sobre o fundo do cabeçalho; recolhido, sobre a barra.
+    final topColor = _collapsed ? palette?.bar : palette?.background;
+    final overlay = topColor != null && readableOn(topColor) != AppColors.white
+        ? SystemUiOverlayStyle.dark
+        : SystemUiOverlayStyle.light;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
+      value: overlay,
       child: Scaffold(
         backgroundColor: AppColors.background,
         body: BlocConsumer<TeamPlayersCubit, TeamPlayersState>(
           listener: (context, state) {
+            if (state is DeletedTeamPlayersState) {
+              showSnackBar(context: context, message: l10n.teamDeleted(state.teamName));
+              Navigator.pop(context);
+              return;
+            }
             if (state is ErrorTeamPlayersState && state.players.isNotEmpty) {
               showSnackBar(context: context, message: state.errorMessage, isSuccess: false);
             }
@@ -74,6 +121,7 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
           builder: (context, state) {
             final visible = state.visiblePlayers;
             final topScorerId = state.topScorerId;
+            final deleting = state is DeletingTeamPlayersState;
 
             // Quando a busca encolhe a lista, a posição volta ao topo sem evento de
             // rolagem: as métricas avisam, e o título da barra é recalculado.
@@ -91,23 +139,50 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
                   SliverAppBar(
                     pinned: true,
                     expandedHeight: _expandedHeight,
-                    backgroundColor: AppColors.primaryDark,
-                    foregroundColor: AppColors.white,
+                    backgroundColor: barColor,
+                    foregroundColor: barForeground,
                     surfaceTintColor: AppColors.transparent,
-                    systemOverlayStyle: SystemUiOverlayStyle.light,
+                    systemOverlayStyle: overlay,
                     title: AnimatedOpacity(
                       opacity: _collapsed ? 1 : 0,
                       duration: const Duration(milliseconds: 200),
                       child: Text(
-                        widget.team.name,
+                        _team.name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s18),
+                        style: AppTypography.title(color: barForeground).copyWith(fontSize: AppSizes.s18),
                       ),
                     ),
+                    actions: [
+                      if (isAdmin)
+                        deleting
+                            ? Padding(
+                                padding: const EdgeInsets.all(AppSizes.s14),
+                                child: SizedBox.square(
+                                  dimension: AppSizes.s20,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: barForeground),
+                                ),
+                              )
+                            : CardMenuButton(
+                                onImage: true,
+                                actions: [
+                                  CardMenuAction(
+                                    icon: Icons.edit_outlined,
+                                    label: l10n.teamEdit,
+                                    onSelected: _edit,
+                                  ),
+                                  CardMenuAction(
+                                    icon: Icons.delete_outline_rounded,
+                                    label: l10n.teamDelete,
+                                    destructive: true,
+                                    onSelected: () => _confirmDelete(l10n),
+                                  ),
+                                ],
+                              ),
+                    ],
                     flexibleSpace: FlexibleSpaceBar(
                       collapseMode: CollapseMode.parallax,
-                      background: TeamHeader(team: widget.team, season: _season),
+                      background: TeamHeader(team: _team, season: _season),
                     ),
                   ),
                   ..._body(context, state, visible, topScorerId, cubit, l10n),

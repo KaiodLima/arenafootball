@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 
@@ -16,6 +17,9 @@ class PlayerRequestForm extends Equatable {
   final List<String> regions;
   final String? selectedRegion;
   final List<TeamDTO> teams;
+
+  /// Id do time escolhido ('' se não achar na lista).
+  String get selectedTeamId => TeamDirectory(teams).idOf(name: selectedTeam ?? '');
   final bool loadingTeams;
   final String? selectedTeam;
   final String name;

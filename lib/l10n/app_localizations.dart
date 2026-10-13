@@ -3573,6 +3573,744 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Campeonato'**
   String get matchFormChampionship;
+
+  /// No description provided for @teamRequestMenu.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sou dono de time'**
+  String get teamRequestMenu;
+
+  /// No description provided for @teamRequestTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sou dono de time'**
+  String get teamRequestTitle;
+
+  /// No description provided for @teamRequestIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cadastre o seu time: um administrador analisa o pedido e, aprovado, você gerencia o elenco.'**
+  String get teamRequestIntro;
+
+  /// No description provided for @teamRequestNameLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome do time'**
+  String get teamRequestNameLabel;
+
+  /// No description provided for @teamRequestNameRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Informe o nome do time (mínimo 3 letras).'**
+  String get teamRequestNameRequired;
+
+  /// No description provided for @teamRequestNameTaken.
+  ///
+  /// In pt, this message translates to:
+  /// **'Já existe um time chamado {name} nesta região.'**
+  String teamRequestNameTaken(String name);
+
+  /// No description provided for @teamRequestCrestAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar escudo (opcional)'**
+  String get teamRequestCrestAdd;
+
+  /// No description provided for @teamRequestDescriptionLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Descrição / história (opcional)'**
+  String get teamRequestDescriptionLabel;
+
+  /// No description provided for @teamRequestContactLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'WhatsApp do responsável'**
+  String get teamRequestContactLabel;
+
+  /// No description provided for @teamRequestContactHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'(89) 99999-9999'**
+  String get teamRequestContactHint;
+
+  /// No description provided for @teamRequestContactRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Informe um WhatsApp com DDD.'**
+  String get teamRequestContactRequired;
+
+  /// No description provided for @teamRequestContactInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Só o administrador vê o seu contato.'**
+  String get teamRequestContactInfo;
+
+  /// No description provided for @teamRequestSubmit.
+  ///
+  /// In pt, this message translates to:
+  /// **'ENVIAR PEDIDO'**
+  String get teamRequestSubmit;
+
+  /// No description provided for @teamRequestSent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedido enviado! Você será avisado quando o admin responder.'**
+  String get teamRequestSent;
+
+  /// No description provided for @teamRequestCancelled.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedido cancelado.'**
+  String get teamRequestCancelled;
+
+  /// No description provided for @teamRequestPendingInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Um administrador vai analisar o seu time. Enquanto isso, você ainda pode corrigir os dados.'**
+  String get teamRequestPendingInfo;
+
+  /// No description provided for @teamRequestRejectedInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu pedido não foi aprovado. Você pode enviar um novo.'**
+  String get teamRequestRejectedInfo;
+
+  /// No description provided for @teamRequestEdit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar pedido'**
+  String get teamRequestEdit;
+
+  /// No description provided for @teamRequestCancel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cancelar pedido'**
+  String get teamRequestCancel;
+
+  /// No description provided for @teamRequestCancelTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cancelar pedido?'**
+  String get teamRequestCancelTitle;
+
+  /// No description provided for @teamRequestCancelMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'O pedido do time {team} será apagado.'**
+  String teamRequestCancelMessage(String team);
+
+  /// No description provided for @teamRequestResubmit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar novo pedido'**
+  String get teamRequestResubmit;
+
+  /// No description provided for @teamRequestLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar o seu pedido.'**
+  String get teamRequestLoadError;
+
+  /// No description provided for @myTeamTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Meu time'**
+  String get myTeamTitle;
+
+  /// No description provided for @myTeamOwnerBadge.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você é o dono'**
+  String get myTeamOwnerBadge;
+
+  /// No description provided for @myTeamTabSquad.
+  ///
+  /// In pt, this message translates to:
+  /// **'Elenco'**
+  String get myTeamTabSquad;
+
+  /// No description provided for @myTeamTabRequests.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedidos'**
+  String get myTeamTabRequests;
+
+  /// No description provided for @myTeamTabEdit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar'**
+  String get myTeamTabEdit;
+
+  /// No description provided for @myTeamAddPlayer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar jogador'**
+  String get myTeamAddPlayer;
+
+  /// No description provided for @myTeamSquadEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum jogador no elenco ainda.'**
+  String get myTeamSquadEmpty;
+
+  /// No description provided for @myTeamRequestsEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum pedido para entrar no time.'**
+  String get myTeamRequestsEmpty;
+
+  /// No description provided for @myTeamPlayerAdded.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} entrou no elenco.'**
+  String myTeamPlayerAdded(String name);
+
+  /// No description provided for @myTeamSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Time atualizado!'**
+  String get myTeamSaved;
+
+  /// No description provided for @myTeamNameLocked.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para trocar o nome do time, fale com o administrador.'**
+  String get myTeamNameLocked;
+
+  /// No description provided for @myTeamLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar o seu time.'**
+  String get myTeamLoadError;
+
+  /// No description provided for @teamRequestsPanelTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Solicitações de times'**
+  String get teamRequestsPanelTitle;
+
+  /// No description provided for @teamRequestsEmptyPending.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum pedido de time pendente.'**
+  String get teamRequestsEmptyPending;
+
+  /// No description provided for @teamRequestsEmptyAnswered.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum pedido de time respondido ainda.'**
+  String get teamRequestsEmptyAnswered;
+
+  /// No description provided for @teamRequestsLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar os pedidos de time.'**
+  String get teamRequestsLoadError;
+
+  /// No description provided for @teamRequestsApproveTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aprovar o time {name}?'**
+  String teamRequestsApproveTitle(String name);
+
+  /// No description provided for @teamRequestsApproveMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'O time entra em {region} na temporada atual, com {owner} como dono.'**
+  String teamRequestsApproveMessage(String region, String owner);
+
+  /// No description provided for @teamRequestsApproved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Time {name} criado!'**
+  String teamRequestsApproved(String name);
+
+  /// No description provided for @teamRequestsRejectTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rejeitar o time {name}?'**
+  String teamRequestsRejectTitle(String name);
+
+  /// No description provided for @teamRequestsOwner.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dono: {name}'**
+  String teamRequestsOwner(String name);
+
+  /// No description provided for @teamRequestsWhatsApp.
+  ///
+  /// In pt, this message translates to:
+  /// **'Chamar no WhatsApp'**
+  String get teamRequestsWhatsApp;
+
+  /// No description provided for @teamRequestsWhatsAppError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível abrir o WhatsApp.'**
+  String get teamRequestsWhatsAppError;
+
+  /// No description provided for @pushActionTeamRequest.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novo pedido de time'**
+  String get pushActionTeamRequest;
+
+  /// No description provided for @pushActionTeamRequestHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para os admins · \"Fulano quer cadastrar o time X\"'**
+  String get pushActionTeamRequestHint;
+
+  /// No description provided for @pushActionTeamRequestAnswer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resposta do pedido de time'**
+  String get pushActionTeamRequestAnswer;
+
+  /// No description provided for @pushActionTeamRequestAnswerHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para quem pediu · aprovado ou rejeitado'**
+  String get pushActionTeamRequestAnswerHint;
+
+  /// No description provided for @teamDelete.
+  ///
+  /// In pt, this message translates to:
+  /// **'Excluir time'**
+  String get teamDelete;
+
+  /// No description provided for @teamDeleteTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Excluir {team}?'**
+  String teamDeleteTitle(String team);
+
+  /// No description provided for @teamDeleteMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'O time sai da temporada {season}. Jogadores com conta no app ficam sem time e mantêm os números; os demais jogadores do elenco são excluídos. As partidas já cadastradas continuam no histórico. Não dá para desfazer.'**
+  String teamDeleteMessage(String season);
+
+  /// No description provided for @teamDeleted.
+  ///
+  /// In pt, this message translates to:
+  /// **'{team} foi excluído.'**
+  String teamDeleted(String team);
+
+  /// No description provided for @drawerPlayerOf.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogador do {team}'**
+  String drawerPlayerOf(String team);
+
+  /// No description provided for @drawerOwnerOf.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dono/treinador do {team}'**
+  String drawerOwnerOf(String team);
+
+  /// No description provided for @drawerMyPlayerProfile.
+  ///
+  /// In pt, this message translates to:
+  /// **'Meu perfil de jogador'**
+  String get drawerMyPlayerProfile;
+
+  /// No description provided for @teamColorsSection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cores do time'**
+  String get teamColorsSection;
+
+  /// No description provided for @teamColorPrimary.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cor principal'**
+  String get teamColorPrimary;
+
+  /// No description provided for @teamColorSecondary.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cor secundária'**
+  String get teamColorSecondary;
+
+  /// No description provided for @teamColorNone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem cor'**
+  String get teamColorNone;
+
+  /// No description provided for @teamColorPreview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Assim fica o uniforme'**
+  String get teamColorPreview;
+
+  /// No description provided for @colorWhite.
+  ///
+  /// In pt, this message translates to:
+  /// **'Branco'**
+  String get colorWhite;
+
+  /// No description provided for @colorBlack.
+  ///
+  /// In pt, this message translates to:
+  /// **'Preto'**
+  String get colorBlack;
+
+  /// No description provided for @colorGrey.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cinza'**
+  String get colorGrey;
+
+  /// No description provided for @colorRed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vermelho'**
+  String get colorRed;
+
+  /// No description provided for @colorWine.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vinho'**
+  String get colorWine;
+
+  /// No description provided for @colorOrange.
+  ///
+  /// In pt, this message translates to:
+  /// **'Laranja'**
+  String get colorOrange;
+
+  /// No description provided for @colorYellow.
+  ///
+  /// In pt, this message translates to:
+  /// **'Amarelo'**
+  String get colorYellow;
+
+  /// No description provided for @colorGreen.
+  ///
+  /// In pt, this message translates to:
+  /// **'Verde'**
+  String get colorGreen;
+
+  /// No description provided for @colorBlue.
+  ///
+  /// In pt, this message translates to:
+  /// **'Azul'**
+  String get colorBlue;
+
+  /// No description provided for @colorNavy.
+  ///
+  /// In pt, this message translates to:
+  /// **'Azul-marinho'**
+  String get colorNavy;
+
+  /// No description provided for @colorPurple.
+  ///
+  /// In pt, this message translates to:
+  /// **'Roxo'**
+  String get colorPurple;
+
+  /// No description provided for @colorPink.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rosa'**
+  String get colorPink;
+
+  /// No description provided for @fanCardMenu.
+  ///
+  /// In pt, this message translates to:
+  /// **'Minha carteirinha'**
+  String get fanCardMenu;
+
+  /// No description provided for @fanCardTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Carteirinha de torcedor'**
+  String get fanCardTitle;
+
+  /// No description provided for @fanCardLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'CARTEIRINHA DE TORCEDOR'**
+  String get fanCardLabel;
+
+  /// No description provided for @fanCardFanOf.
+  ///
+  /// In pt, this message translates to:
+  /// **'Torcedor do {team}'**
+  String fanCardFanOf(String team);
+
+  /// No description provided for @fanCardNoTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem time do coração'**
+  String get fanCardNoTeam;
+
+  /// No description provided for @fanCardSince.
+  ///
+  /// In pt, this message translates to:
+  /// **'Torcedor desde {year}'**
+  String fanCardSince(String year);
+
+  /// No description provided for @fanCardNumber.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nº {number}'**
+  String fanCardNumber(String number);
+
+  /// No description provided for @fanCardChangePhoto.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar foto'**
+  String get fanCardChangePhoto;
+
+  /// No description provided for @fanCardAddPhoto.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar foto'**
+  String get fanCardAddPhoto;
+
+  /// No description provided for @fanCardPhotoSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Foto atualizada!'**
+  String get fanCardPhotoSaved;
+
+  /// No description provided for @fanCardHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mostre a sua carteirinha nos jogos do seu time.'**
+  String get fanCardHint;
+
+  /// No description provided for @fanCardShare.
+  ///
+  /// In pt, this message translates to:
+  /// **'COMPARTILHAR CARTEIRINHA'**
+  String get fanCardShare;
+
+  /// No description provided for @fanCardShareTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compartilhar carteirinha'**
+  String get fanCardShareTitle;
+
+  /// No description provided for @shareInstagramStories.
+  ///
+  /// In pt, this message translates to:
+  /// **'Instagram Stories'**
+  String get shareInstagramStories;
+
+  /// No description provided for @shareWhatsApp.
+  ///
+  /// In pt, this message translates to:
+  /// **'WhatsApp'**
+  String get shareWhatsApp;
+
+  /// No description provided for @shareMoreOptions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mais opções'**
+  String get shareMoreOptions;
+
+  /// No description provided for @fanCardShareText.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sou torcedor do {team} no Arena Football! ⚽'**
+  String fanCardShareText(String team);
+
+  /// No description provided for @fanCardShareTextNoTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Minha carteirinha de torcedor no Arena Football! ⚽'**
+  String get fanCardShareTextNoTeam;
+
+  /// No description provided for @shareFooter.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arena Football · o futebol amador da sua região'**
+  String get shareFooter;
+
+  /// No description provided for @athleteShareTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compartilhar atleta'**
+  String get athleteShareTitle;
+
+  /// No description provided for @athleteCardLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'ATLETA'**
+  String get athleteCardLabel;
+
+  /// No description provided for @athleteCardSeason.
+  ///
+  /// In pt, this message translates to:
+  /// **'Temporada {season}'**
+  String athleteCardSeason(String season);
+
+  /// No description provided for @athleteCardParticipations.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{Nenhuma participação em gol} =1{1 participação em gol} other{{count} participações em gols}}'**
+  String athleteCardParticipations(int count);
+
+  /// No description provided for @teamEdit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar time'**
+  String get teamEdit;
+
+  /// No description provided for @teamEditTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar time'**
+  String get teamEditTitle;
+
+  /// No description provided for @teamEditSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Time atualizado.'**
+  String get teamEditSaved;
+
+  /// No description provided for @teamEditRegionLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Região'**
+  String get teamEditRegionLabel;
+
+  /// No description provided for @teamEditRegionChangeTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar a região?'**
+  String get teamEditRegionChangeTitle;
+
+  /// No description provided for @teamEditRegionChangeMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'{team} passa a aparecer na aba Times e na classificação de {region}. Os grupos da região antiga não mudam.'**
+  String teamEditRegionChangeMessage(String team, String region);
+
+  /// No description provided for @teamEditNameLocked.
+  ///
+  /// In pt, this message translates to:
+  /// **'O nome do time não pode ser alterado (ele está nas partidas, no elenco e na votação).'**
+  String get teamEditNameLocked;
+
+  /// No description provided for @votingShareTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compartilhar craque'**
+  String get votingShareTitle;
+
+  /// No description provided for @votingCardLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'CRAQUE DA PARTIDA'**
+  String get votingCardLabel;
+
+  /// No description provided for @votingCardTopVotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mais votados'**
+  String get votingCardTopVotes;
+
+  /// No description provided for @votingCardSeasonStats.
+  ///
+  /// In pt, this message translates to:
+  /// **'Na temporada'**
+  String get votingCardSeasonStats;
+
+  /// No description provided for @teamLinksTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vincular times por id'**
+  String get teamLinksTitle;
+
+  /// No description provided for @teamLinksInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grava o id do time ao lado do nome em jogadores, partidas, grupos, campeonatos, pedidos \"Sou jogador\" e cards de gol da temporada (na atual, também no time do coração das contas) e copia os votos antigos para as partidas. Só completa o que falta: pode rodar de novo.'**
+  String get teamLinksInfo;
+
+  /// No description provided for @teamLinksRun.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vincular {season}'**
+  String teamLinksRun(String season);
+
+  /// No description provided for @teamLinksDone.
+  ///
+  /// In pt, this message translates to:
+  /// **'{season}: {count, plural, =0{nada a atualizar} =1{1 documento atualizado} other{{count} documentos atualizados}}'**
+  String teamLinksDone(String season, int count);
+
+  /// No description provided for @teamLinksVotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 voto copiado para a partida} other{{count} votos copiados para as partidas}}'**
+  String teamLinksVotes(int count);
+
+  /// No description provided for @teamLinksUnmatched.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nomes sem time na temporada (não vinculados):'**
+  String get teamLinksUnmatched;
+
+  /// No description provided for @teamLinksAmbiguous.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nomes usados por mais de um time (não vinculados):'**
+  String get teamLinksAmbiguous;
+
+  /// No description provided for @teamLinksSkippedVotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votos não copiados (confronto repetido na temporada):'**
+  String get teamLinksSkippedVotes;
+
+  /// No description provided for @teamLinksPlayers.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogadores'**
+  String get teamLinksPlayers;
+
+  /// No description provided for @teamLinksMatches.
+  ///
+  /// In pt, this message translates to:
+  /// **'Partidas'**
+  String get teamLinksMatches;
+
+  /// No description provided for @teamLinksGroups.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grupos'**
+  String get teamLinksGroups;
+
+  /// No description provided for @teamLinksChampionships.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeonatos'**
+  String get teamLinksChampionships;
+
+  /// No description provided for @teamLinksPlayerRequests.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedidos \"Sou jogador\"'**
+  String get teamLinksPlayerRequests;
+
+  /// No description provided for @teamLinksGoalCards.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cards de gol'**
+  String get teamLinksGoalCards;
+
+  /// No description provided for @teamLinksUsers.
+  ///
+  /// In pt, this message translates to:
+  /// **'Time do coração'**
+  String get teamLinksUsers;
 }
 
 class _AppLocalizationsDelegate

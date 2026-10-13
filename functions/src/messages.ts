@@ -16,7 +16,9 @@ export type ActionKey =
   | 'jogo_do_dia'
   | 'aviso'
   | 'solicitacao_jogador'
-  | 'solicitacao_resposta';
+  | 'solicitacao_resposta'
+  | 'solicitacao_time'
+  | 'solicitacao_time_resposta';
 
 /** Sem configuração gravada, vale este padrão (notícia vem desligada). */
 export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
@@ -29,6 +31,8 @@ export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
   aviso: true,
   solicitacao_jogador: true,
   solicitacao_resposta: true,
+  solicitacao_time: true,
+  solicitacao_time_resposta: true,
 };
 
 export type Target = { topic: string } | { condition: string };
@@ -41,7 +45,7 @@ export interface PushMessage {
    * O que abre ao tocar: feed, tabelas, painel de pedidos de jogador (admin)
    * ou a situação do pedido do usuário.
    */
-  aba: 'home' | 'tabelas' | 'solicitacoes' | 'sou_jogador';
+  aba: 'home' | 'tabelas' | 'solicitacoes' | 'sou_jogador' | 'solicitacoes_time' | 'meu_time';
   regiao: string;
   alvo: Target;
 }
@@ -78,7 +82,21 @@ export function currentSeasonOf(config: Doc | undefined): string {
   return value || LEGACY_SEASON;
 }
 export const regionTopic = (region: string): string => `regiao_${topicSlug(region)}`;
+/** Tópico antigo do time, pelo nome (app antigo / conta sem o id). */
 export const teamTopic = (team: string): string => `time_${topicSlug(team)}`;
+/**
+ * Tópico do time pelo id (o vínculo), igual ao `teamIdTopic` do app
+ * (lib/core/utils/push_topics.dart). Prefixo próprio: não colide com o do nome.
+ */
+export const teamIdTopic = (id: string): string => `timeid_${id.replace(/[^A-Za-z0-9_-]/g, '_')}`;
+
+/**
+ * Tópicos de um time durante a transição: o do id (app novo) e o do nome
+ * (app antigo). Cada aparelho assina só um deles, então ninguém recebe duas vezes.
+ */
+export function teamTopics(name: string, id: string): string[] {
+  return [...(id ? [teamIdTopic(id)] : []), ...(name ? [teamTopic(name)] : [])];
+}
 /** Administradores (o app assina quando a conta é admin). */
 export const ADMINS_TOPIC = 'admins';
 /** Um usuário só. O uid já é alfanumérico: vai sem slug, igual ao app. */
@@ -92,12 +110,12 @@ export function targetFor(topics: string[]): Target | null {
   return { condition: unique.slice(0, 5).map((t) => `'${t}' in topics`).join(' || ') };
 }
 
-/** Região do jogo + torcedores dos dois times. */
-function gameTarget(region: string, home: string, away: string): Target | null {
+/** Região do jogo + torcedores dos dois times (id e nome: até 5 tópicos, o limite da condition). */
+function gameTarget(region: string, home: string, away: string, homeId = '', awayId = ''): Target | null {
   return targetFor([
     ...(region ? [regionTopic(region)] : []),
-    ...(home ? [teamTopic(home)] : []),
-    ...(away ? [teamTopic(away)] : []),
+    ...teamTopics(home, homeId),
+    ...teamTopics(away, awayId),
   ]);
 }
 
@@ -119,7 +137,7 @@ export function goalMessage(news: Doc): PushMessage | null {
   const home = text(news.time_casa);
   const away = text(news.time_fora);
   const region = text(news.fk_competicao);
-  const alvo = gameTarget(region, home, away);
+  const alvo = gameTarget(region, home, away, text(news.id_time_casa), text(news.id_time_fora));
   if (!home || !away || !alvo) return null;
   const scorer = text(news.autor_gol);
   const assist = text(news.assistencia);
@@ -157,13 +175,19 @@ export function newsMessage(news: Doc): PushMessage | null {
 }
 
 function matchTeams(match: Doc) {
-  return { home: text(match.timeC), away: text(match.timeF), region: text(match.fk_competicao) };
+  return {
+    home: text(match.timeC),
+    away: text(match.timeF),
+    homeId: text(match.idTimeC),
+    awayId: text(match.idTimeF),
+    region: text(match.fk_competicao),
+  };
 }
 
 /** Partida cadastrada. */
 export function matchCreatedMessage(match: Doc): PushMessage | null {
-  const { home, away, region } = matchTeams(match);
-  const alvo = gameTarget(region, home, away);
+  const { home, away, homeId, awayId, region } = matchTeams(match);
+  const alvo = gameTarget(region, home, away, homeId, awayId);
   if (!home || !away || !alvo) return null;
   const when = [text(match.data), text(match.horario) && `às ${text(match.horario)}`].filter(Boolean).join(' ');
   const place = text(match.local);
@@ -182,8 +206,8 @@ export function votingMessage(before: Doc, after: Doc): PushMessage | null {
   const was = text(before.votacao) === 'true';
   const is = text(after.votacao) === 'true';
   if (was === is) return null;
-  const { home, away, region } = matchTeams(after);
-  const alvo = gameTarget(region, home, away);
+  const { home, away, homeId, awayId, region } = matchTeams(after);
+  const alvo = gameTarget(region, home, away, homeId, awayId);
   if (!home || !away || !alvo) return null;
   return is
     ? {
@@ -206,8 +230,8 @@ export function votingMessage(before: Doc, after: Doc): PushMessage | null {
 
 /** Lembrete do dia: só para os torcedores dos dois times. */
 export function dailyGameMessage(match: Doc): PushMessage | null {
-  const { home, away, region } = matchTeams(match);
-  const alvo = targetFor([...(home ? [teamTopic(home)] : []), ...(away ? [teamTopic(away)] : [])]);
+  const { home, away, homeId, awayId, region } = matchTeams(match);
+  const alvo = targetFor([...teamTopics(home, homeId), ...teamTopics(away, awayId)]);
   if (!home || !away || !alvo) return null;
   const time = text(match.horario);
   return {
@@ -252,6 +276,61 @@ export function playerRequestMessage(uid: string, before: Doc | undefined, after
     aba: 'solicitacoes',
     regiao: text(after.regiao),
     alvo: { topic: ADMINS_TOPIC },
+  };
+}
+
+/** Pedido "Sou jogador" chegou para o time de um dono: avisa o dono também. */
+export function playerRequestToOwnerMessage(
+  ownerUid: string,
+  before: Doc | undefined,
+  after: Doc | undefined,
+): PushMessage | null {
+  const forAdmins = playerRequestMessage('-', before, after);
+  if (!forAdmins || !ownerUid) return null;
+  return {
+    ...forAdmins,
+    titulo: 'Pedido para entrar no seu time',
+    aba: 'meu_time',
+    alvo: { topic: userTopic(ownerUid) },
+  };
+}
+
+/** Pedido "Sou dono de time" novo ou reenviado: avisa os admins. */
+export function teamRequestMessage(uid: string, before: Doc | undefined, after: Doc | undefined): PushMessage | null {
+  if (!after || !uid || text(after.status) !== 'pendente' || text(before?.status) === 'pendente') return null;
+  const owner = text(after.nome_usuario);
+  const team = text(after.nome);
+  if (!team) return null;
+  return {
+    tipo: 'solicitacao_time',
+    titulo: 'Novo pedido de time',
+    corpo: shorten(owner ? `${owner} quer cadastrar o time ${team}` : `Pedido para cadastrar o time ${team}`, 240),
+    aba: 'solicitacoes_time',
+    regiao: text(after.regiao),
+    alvo: { topic: ADMINS_TOPIC },
+  };
+}
+
+/** Admin respondeu o pedido de time: avisa só quem pediu. */
+export function teamRequestAnswerMessage(uid: string, before: Doc | undefined, after: Doc | undefined): PushMessage | null {
+  if (!before || !after || !uid || text(before.status) !== 'pendente') return null;
+  const status = text(after.status);
+  if (status !== 'aprovada' && status !== 'rejeitada') return null;
+  const team = text(after.nome);
+  const reason = text(after.motivo);
+  const approved = status === 'aprovada';
+  return {
+    tipo: 'solicitacao_time_resposta',
+    titulo: approved ? '✅ Seu time foi aprovado!' : 'Pedido de time',
+    corpo: shorten(
+      approved
+        ? `O ${team} já está no app. Agora é só montar o elenco.`
+        : `O pedido do time ${team} não foi aprovado.${reason ? ` Motivo: ${reason}` : ''}`,
+      240,
+    ),
+    aba: 'meu_time',
+    regiao: text(after.regiao),
+    alvo: { topic: userTopic(uid) },
   };
 }
 

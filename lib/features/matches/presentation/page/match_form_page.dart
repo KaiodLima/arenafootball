@@ -61,7 +61,7 @@ class _MatchFormPageState extends State<MatchFormPage> {
       selected: home ? form.homeTeam : form.awayTeam,
     );
     if (picked == null) return;
-    home ? _cubit.selectHomeTeam(picked) : _cubit.selectAwayTeam(picked);
+    home ? _cubit.selectHomeTeam(picked.name) : _cubit.selectAwayTeam(picked.name);
   }
 
   void _submit(MatchFormData form) {

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
@@ -77,6 +78,9 @@ class GoalFormData extends Equatable {
     }
     return null;
   }
+
+  /// Id do time de nome [teamName] na lista carregada ('' se não achar).
+  String teamIdOf(String? teamName) => TeamDirectory(teams).idOf(name: teamName ?? '');
 
   String? crestOf(String? teamName) {
     if (teamName == null) return null;

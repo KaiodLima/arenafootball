@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/core/utils/search_text.dart';
+import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
@@ -9,18 +10,20 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// Lista de times com escudo e busca; devolve o nome escolhido.
-Future<String?> showTeamPickerSheet(
+/// Lista de times com escudo e busca; devolve o time escolhido. O marcado é
+/// o de [selectedId] (ou, sem id, o de nome [selected]).
+Future<TeamDTO?> showTeamPickerSheet(
   BuildContext context, {
   required String title,
   required List<TeamDTO> teams,
   String? selected,
+  String selectedId = '',
 }) {
-  return showModalBottomSheet<String>(
+  return showModalBottomSheet<TeamDTO>(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
-    builder: (_) => _TeamPicker(title: title, teams: teams, selected: selected),
+    builder: (_) => _TeamPicker(title: title, teams: teams, selected: selected, selectedId: selectedId),
   );
 }
 
@@ -28,8 +31,9 @@ class _TeamPicker extends StatefulWidget {
   final String title;
   final List<TeamDTO> teams;
   final String? selected;
+  final String selectedId;
 
-  const _TeamPicker({required this.title, required this.teams, required this.selected});
+  const _TeamPicker({required this.title, required this.teams, required this.selected, this.selectedId = ''});
 
   @override
   State<_TeamPicker> createState() => _TeamPickerState();
@@ -69,7 +73,8 @@ class _TeamPickerState extends State<_TeamPicker> {
                       itemCount: teams.length,
                       itemBuilder: (context, index) {
                         final team = teams[index];
-                        final selected = team.name == widget.selected;
+                        final selected =
+                            sameTeam(idA: team.id, nameA: team.name, idB: widget.selectedId, nameB: widget.selected ?? '');
                         return ListTile(
                           contentPadding: const EdgeInsets.symmetric(horizontal: AppSizes.s20),
                           leading: TeamCrest(imageUrl: team.imageUrl, size: AppSizes.s40),
@@ -80,7 +85,7 @@ class _TeamPickerState extends State<_TeamPicker> {
                             ),
                           ),
                           trailing: selected ? const Icon(Icons.check_circle_rounded, color: AppColors.primary) : null,
-                          onTap: () => Navigator.pop(context, team.name),
+                          onTap: () => Navigator.pop(context, team),
                         );
                       },
                     ),

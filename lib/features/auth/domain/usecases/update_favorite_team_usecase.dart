@@ -7,6 +7,7 @@ class UpdateFavoriteTeamUseCase {
 
   UpdateFavoriteTeamUseCase(this._repository);
 
-  Future<Either<Failure, void>> call({required String userId, required String team}) =>
-      _repository.updateFavoriteTeam(userId: userId, team: team);
+  /// Grava o nome (cópia) e o id do time (vínculo).
+  Future<Either<Failure, void>> call({required String userId, required String team, required String teamId}) =>
+      _repository.updateFavoriteTeam(userId: userId, team: team, teamId: teamId);
 }

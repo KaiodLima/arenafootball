@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
+import 'package:arena_soccer/features/fan_card/presentation/bloc/fan_card_cubit.dart';
+import 'package:arena_soccer/features/fan_card/presentation/page/fan_card_page.dart';
 import 'package:arena_soccer/features/global_results/presentation/bloc/global_results_cubit.dart';
 import 'package:arena_soccer/features/global_results/presentation/bloc/match_goals_cubit.dart';
 import 'package:arena_soccer/features/global_results/presentation/page/global_results_page.dart';
@@ -57,12 +59,20 @@ import 'package:arena_soccer/features/players/presentation/page/player_form_page
 import 'package:arena_soccer/features/players/presentation/page/team_players_page.dart';
 import 'package:arena_soccer/features/splash/presentation/page/splash_page.dart';
 import 'package:arena_soccer/features/seasons/presentation/bloc/seasons_panel_cubit.dart';
+import 'package:arena_soccer/features/seasons/presentation/bloc/team_links_cubit.dart';
 import 'package:arena_soccer/features/seasons/presentation/page/seasons_panel_page.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
 import 'package:arena_soccer/features/stats/presentation/bloc/stats_ranking_cubit.dart';
 import 'package:arena_soccer/features/stats/presentation/page/stats_ranking_page.dart';
+import 'package:arena_soccer/features/team_requests/presentation/bloc/my_team_cubit.dart';
+import 'package:arena_soccer/features/team_requests/presentation/bloc/team_request_cubit.dart';
+import 'package:arena_soccer/features/team_requests/presentation/bloc/team_requests_panel_cubit.dart';
+import 'package:arena_soccer/features/team_requests/presentation/page/team_request_page.dart';
+import 'package:arena_soccer/features/team_requests/presentation/page/team_requests_panel_page.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
+import 'package:arena_soccer/features/teams/presentation/bloc/edit_team_cubit.dart';
 import 'package:arena_soccer/features/teams/presentation/bloc/team_form_cubit.dart';
+import 'package:arena_soccer/features/teams/presentation/page/edit_team_page.dart';
 import 'package:arena_soccer/features/teams/presentation/page/team_form_page.dart';
 import 'package:arena_soccer/features/voting/presentation/bloc/elected_player_cubit.dart';
 import 'package:arena_soccer/features/voting/presentation/bloc/vote_best_player_cubit.dart';
@@ -100,8 +110,12 @@ class ArenaApp extends StatelessWidget {
               create: (_) => ChooseTeamCubit(sl(), sl(), sl()),
               child: const ChooseTeamPage(),
             ),
+        AppRoutes.fanCardPage: (_) => BlocProvider<FanCardCubit>(
+              create: (_) => FanCardCubit(sl(), sl(), sl()),
+              child: const FanCardPage(),
+            ),
         AppRoutes.home: (_) => BlocProvider<HomeCubit>(
-              create: (_) => HomeCubit(sl(), sl()),
+              create: (_) => HomeCubit(sl(), sl(), sl()),
               child: const HomePage(),
             ),
 
@@ -170,10 +184,18 @@ class ArenaApp extends StatelessWidget {
               create: (_) => TeamFormCubit(sl(), sl(), sl(), sl()),
               child: const TeamFormPage(),
             ),
+        // `team` obrigatório; `season` nulo = atual. Devolve o time salvo.
+        AppRoutes.editTeamPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+          return BlocProvider<EditTeamCubit>(
+            create: (_) => EditTeamCubit(sl(), team: args['team'] as TeamDTO, season: args['season'] as String?),
+            child: const EditTeamPage(),
+          );
+        },
         AppRoutes.teamPlayersPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<TeamPlayersCubit>(
-            create: (_) => TeamPlayersCubit(sl()),
+            create: (_) => TeamPlayersCubit(sl(), sl()),
             child: TeamPlayersPage(team: args?['team'] as TeamDTO),
           );
         },
@@ -197,6 +219,18 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.playerRequestsPanelPage: (_) => BlocProvider<PlayerRequestsPanelCubit>(
               create: (_) => PlayerRequestsPanelCubit(sl(), sl(), sl(), sl(), sl(), sl()),
               child: const PlayerRequestsPanelPage(),
+            ),
+        // Pedido de time e, aprovado, a área "Meu time" do dono (mesma rota).
+        AppRoutes.teamRequestPage: (_) => MultiBlocProvider(
+              providers: [
+                BlocProvider<TeamRequestCubit>(create: (_) => TeamRequestCubit(sl(), sl(), sl(), sl(), sl())),
+                BlocProvider<MyTeamCubit>(create: (_) => MyTeamCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl())),
+              ],
+              child: const TeamRequestPage(),
+            ),
+        AppRoutes.teamRequestsPanelPage: (_) => BlocProvider<TeamRequestsPanelCubit>(
+              create: (_) => TeamRequestsPanelCubit(sl(), sl(), sl(), sl(), sl()),
+              child: const TeamRequestsPanelPage(),
             ),
         AppRoutes.registerPlayerPage: (_) => BlocProvider<PlayerFormCubit>(
               create: (_) => PlayerFormCubit(sl(), sl(), sl(), sl()),
@@ -241,8 +275,11 @@ class ArenaApp extends StatelessWidget {
             child: ChampionshipDetailsPage(championship: args?['championship'] as ChampionshipDTO),
           );
         },
-        AppRoutes.seasonsPanelPage: (_) => BlocProvider<SeasonsPanelCubit>(
-              create: (_) => SeasonsPanelCubit(sl(), sl()),
+        AppRoutes.seasonsPanelPage: (_) => MultiBlocProvider(
+              providers: [
+                BlocProvider<SeasonsPanelCubit>(create: (_) => SeasonsPanelCubit(sl(), sl())),
+                BlocProvider<TeamLinksCubit>(create: (_) => TeamLinksCubit(sl())),
+              ],
               child: const SeasonsPanelPage(),
             ),
         AppRoutes.manageChampionshipsPage: (_) => BlocProvider<ManageChampionshipsCubit>(

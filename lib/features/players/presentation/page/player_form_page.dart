@@ -66,7 +66,7 @@ class _PlayerFormPageState extends State<PlayerFormPage> {
       teams: form.teams,
       selected: form.selectedTeam,
     );
-    if (picked != null) _cubit.selectTeam(picked);
+    if (picked != null) _cubit.selectTeam(picked.name);
   }
 
   void _submit(PlayerFormData form) {

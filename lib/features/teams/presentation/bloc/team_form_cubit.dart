@@ -70,6 +70,10 @@ class TeamFormCubit extends Cubit<TeamFormState> {
 
   void clearCrest() => _edit(state.form.copyWith(clearCrest: true));
 
+  void setPrimaryColor(String hex) => _edit(state.form.copyWith(primaryColor: hex));
+
+  void setSecondaryColor(String hex) => _edit(state.form.copyWith(secondaryColor: hex));
+
   Future<void> submit() async {
     final form = state.form;
     if (!form.canSubmit || state is SubmittingTeamFormState) return;

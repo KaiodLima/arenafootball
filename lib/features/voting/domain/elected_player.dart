@@ -4,8 +4,9 @@ import 'package:equatable/equatable.dart';
 class ElectedPlayer extends Equatable {
   final String playerName;
 
-  /// Time do jogador (vem dos votos).
+  /// Time do jogador (vem dos votos) e o id dele ('' em votos antigos).
   final String team;
+  final String teamId;
   final int votes;
 
   /// Foto do jogador e escudo do time; vazios quando não encontrados.
@@ -20,6 +21,7 @@ class ElectedPlayer extends Equatable {
   const ElectedPlayer({
     required this.playerName,
     required this.team,
+    this.teamId = '',
     required this.votes,
     this.playerImageUrl = '',
     this.teamImageUrl = '',
@@ -31,6 +33,7 @@ class ElectedPlayer extends Equatable {
     return ElectedPlayer(
       playerName: playerName,
       team: team,
+      teamId: teamId,
       votes: votes,
       playerImageUrl: playerImageUrl ?? this.playerImageUrl,
       teamImageUrl: teamImageUrl ?? this.teamImageUrl,
@@ -40,30 +43,47 @@ class ElectedPlayer extends Equatable {
   }
 
   @override
-  List<Object?> get props => [playerName, team, votes, playerImageUrl, teamImageUrl, goals, assists];
+  List<Object?> get props => [playerName, team, teamId, votes, playerImageUrl, teamImageUrl, goals, assists];
 }
 
 /// Votos de um jogador na apuração.
 class VoteTally extends Equatable {
   final String playerName;
   final String team;
+
+  /// Id do time ('' em votos antigos).
+  final String teamId;
   final int votes;
 
-  const VoteTally({required this.playerName, required this.team, required this.votes});
+  const VoteTally({required this.playerName, required this.team, this.teamId = '', required this.votes});
 
   @override
-  List<Object?> get props => [playerName, team, votes];
+  List<Object?> get props => [playerName, team, teamId, votes];
 }
 
 /// Apuração completa de uma partida, para a tela do eleito: o eleito (null sem
-/// votos), o ranking de todos os votados e os escudos dos dois times.
+/// votos), o ranking de todos os votados e os escudos e cores (hex, vazio =
+/// sem cor) dos dois times.
 class VotingResult extends Equatable {
   final ElectedPlayer? elected;
   final List<VoteTally> ranking;
   final String homeCrest;
   final String awayCrest;
+  final String homePrimaryColor;
+  final String homeSecondaryColor;
+  final String awayPrimaryColor;
+  final String awaySecondaryColor;
 
-  const VotingResult({this.elected, this.ranking = const [], this.homeCrest = '', this.awayCrest = ''});
+  const VotingResult({
+    this.elected,
+    this.ranking = const [],
+    this.homeCrest = '',
+    this.awayCrest = '',
+    this.homePrimaryColor = '',
+    this.homeSecondaryColor = '',
+    this.awayPrimaryColor = '',
+    this.awaySecondaryColor = '',
+  });
 
   int get totalVotes => ranking.fold(0, (sum, tally) => sum + tally.votes);
 
@@ -71,5 +91,14 @@ class VotingResult extends Equatable {
   double shareOf(int votes) => totalVotes == 0 ? 0 : votes / totalVotes;
 
   @override
-  List<Object?> get props => [elected, ranking, homeCrest, awayCrest];
+  List<Object?> get props => [
+        elected,
+        ranking,
+        homeCrest,
+        awayCrest,
+        homePrimaryColor,
+        homeSecondaryColor,
+        awayPrimaryColor,
+        awaySecondaryColor,
+      ];
 }

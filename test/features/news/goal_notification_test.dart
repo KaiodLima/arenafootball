@@ -110,7 +110,7 @@ class _FakePlayersRepository implements IPlayersRepository {
   bool fail = false;
 
   @override
-  Stream<Either<Failure, List<PlayerDTO>>> watchTeamPlayers({required String teamName, String? season}) =>
+  Stream<Either<Failure, List<PlayerDTO>>> watchTeamPlayers({String teamId = '', required String teamName, String? season}) =>
       Stream.value(Right(_squads[teamName] ?? const []));
 
   @override

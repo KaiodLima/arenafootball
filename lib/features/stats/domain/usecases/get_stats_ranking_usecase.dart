@@ -1,5 +1,6 @@
 import 'package:either_dart/either.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
+import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/players/domain/usecases/get_players_usecase.dart';
 import 'package:arena_soccer/features/stats/domain/ranking_entry.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
@@ -29,9 +30,12 @@ class GetStatsRankingUseCase {
     final players = await _getPlayers(season: season);
     if (players.isLeft) return Left(players.left);
 
-    final teamNames = teams.right.map((team) => team.name).toSet();
-    final ranked =
-        players.right.where((player) => teamNames.contains(player.team) && type.valueOf(player) > 0).toList();
+    // Jogadores dos times da região: pelo id e, nos antigos (sem id), pelo nome.
+    final directory = TeamDirectory(teams.right);
+    final ranked = players.right
+        .where((player) =>
+            directory.resolve(id: player.teamId, name: player.team) != null && type.valueOf(player) > 0)
+        .toList();
 
     // Ordenação estável: o índice original desempata.
     final indexed = ranked.asMap().entries.toList()

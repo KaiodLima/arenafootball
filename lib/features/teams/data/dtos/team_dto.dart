@@ -9,12 +9,22 @@ class TeamDTO extends Equatable {
   final String region;
   final String imageUrl;
 
+  /// `idDono`: uid do dono (time criado pelo "Sou dono de time"); vazio nos demais.
+  final String ownerId;
+
+  /// `corPrimaria` / `corSecundaria`: hex ("#2E7D32"); vazio = não informada.
+  final String primaryColor;
+  final String secondaryColor;
+
   const TeamDTO({
     required this.id,
     required this.name,
     this.description = '',
     this.region = '',
     this.imageUrl = '',
+    this.ownerId = '',
+    this.primaryColor = '',
+    this.secondaryColor = '',
   });
 
   factory TeamDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -26,6 +36,9 @@ class TeamDTO extends Equatable {
       description: data['descricao']?.toString() ?? '',
       region: data['fk_competicao']?.toString() ?? '',
       imageUrl: data['urlImagem']?.toString() ?? '',
+      ownerId: data['idDono']?.toString() ?? '',
+      primaryColor: data['corPrimaria']?.toString() ?? '',
+      secondaryColor: data['corSecundaria']?.toString() ?? '',
     );
   }
 
@@ -35,6 +48,10 @@ class TeamDTO extends Equatable {
         'descricao': description,
         'fk_competicao': region,
         'urlImagem': imageUrl,
+        // Só nos times com dono (os antigos não têm o campo).
+        if (ownerId.isNotEmpty) 'idDono': ownerId,
+        if (primaryColor.isNotEmpty) 'corPrimaria': primaryColor,
+        if (secondaryColor.isNotEmpty) 'corSecundaria': secondaryColor,
       };
 
   /// Linha inicial do time na `classificacao`: os campos do time + as
@@ -52,16 +69,28 @@ class TeamDTO extends Equatable {
         'fk_grupo': '',
       };
 
-  TeamDTO copyWith({String? id, String? name, String? description, String? region, String? imageUrl}) {
+  TeamDTO copyWith({
+    String? id,
+    String? name,
+    String? description,
+    String? region,
+    String? imageUrl,
+    String? ownerId,
+    String? primaryColor,
+    String? secondaryColor,
+  }) {
     return TeamDTO(
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
       region: region ?? this.region,
       imageUrl: imageUrl ?? this.imageUrl,
+      ownerId: ownerId ?? this.ownerId,
+      primaryColor: primaryColor ?? this.primaryColor,
+      secondaryColor: secondaryColor ?? this.secondaryColor,
     );
   }
 
   @override
-  List<Object?> get props => [id, name, description, region, imageUrl];
+  List<Object?> get props => [id, name, description, region, imageUrl, ownerId, primaryColor, secondaryColor];
 }

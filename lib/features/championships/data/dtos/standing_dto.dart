@@ -4,8 +4,13 @@ import 'package:equatable/equatable.dart';
 /// Linha da classificação (`classificacao` / `classificacao{ano}`): os campos
 /// do time + as estatísticas dele no grupo.
 class StandingDTO extends Equatable {
+  /// Id do doc = id do time (a linha é criada junto com o time).
   final String id;
+
+  /// Nome do time (cópia para exibir).
   final String teamName;
+
+  String get teamId => id;
   final String region;
 
   /// Escudo do time (`urlImagem`, copiado do time ao cadastrá-lo).

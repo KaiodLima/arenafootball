@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
-import 'package:arena_soccer/core/services/share_service.dart';
 import 'package:arena_soccer/core/utils/relative_time.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/player_profile_cubit.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/player_profile_state.dart';
+import 'package:arena_soccer/features/players/presentation/widgets/athlete_share_card.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/count_stepper.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/player_card.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/player_photo_dialog.dart';
+import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
+import 'package:arena_soccer/features/team_requests/presentation/bloc/owned_team_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_card.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/arena_hero_background.dart';
 import 'package:arena_soccer/utils/components/photo_gallery_page.dart';
+import 'package:arena_soccer/utils/components/share_image_frame.dart';
+import 'package:arena_soccer/utils/components/share_image_sheet.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
@@ -52,12 +56,28 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
     _cubit.watch(playerId: widget.playerId, season: widget.season, initial: widget.initial);
   }
 
+  /// Card do atleta com as estatísticas (o texto vira a legenda).
   void _share(PlayerProfileState state, AppLocalizations l10n) {
     final player = state.player;
     if (player == null) return;
-    ShareService.shareText(
-      l10n.athleteShareText(player.name, player.team, player.goals, player.assists),
-      subject: player.name,
+    final slug = player.name.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '_');
+    showShareImageSheet(
+      context,
+      title: l10n.athleteShareTitle,
+      fileName: 'atleta_$slug',
+      preview: ShareImageFrame(
+        date: DateTime.now(),
+        card: AthleteShareCard(
+          player: player,
+          // Time só se o jogador ainda está nele.
+          team: player.team.isEmpty ? null : state.team,
+          season: widget.season ?? BlocProvider.of<RegionCubit>(context).state.selectedSeason,
+          goalsRank: state.goalsRank,
+          assistsRank: state.assistsRank,
+          participations: state.participations.length,
+        ),
+      ),
+      shareText: l10n.athleteShareText(player.name, player.team, player.goals, player.assists),
     );
   }
 
@@ -65,6 +85,7 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isAdmin = context.watch<SessionCubit>().state.isAdmin;
+    final ownedTeam = context.watch<OwnedTeamCubit>().state;
 
     return BlocConsumer<PlayerProfileCubit, PlayerProfileState>(
       listenWhen: (_, current) =>
@@ -106,7 +127,13 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
             _ when state.notFound => ArenaEmptyState(message: l10n.athleteNotFound, icon: Icons.person_off_outlined),
             ErrorPlayerProfileState() when player == null => ArenaEmptyState.error(message: l10n.athleteLoadError),
             _ when player == null => _Loading(name: widget.name),
-            _ => _Content(state: state, player: player, isAdmin: isAdmin, season: widget.season),
+            // O dono do time edita os jogadores do próprio elenco, como o admin.
+            _ => _Content(
+                state: state,
+                player: player,
+                isAdmin: isAdmin || ownedTeam.owns(id: player.teamId, name: player.team),
+                season: widget.season,
+              ),
           },
         );
       },

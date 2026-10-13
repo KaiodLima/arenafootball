@@ -10,8 +10,12 @@ import {
   newsMessage,
   playerRequestAnswerMessage,
   playerRequestMessage,
+  playerRequestToOwnerMessage,
   seasonCollection,
+  teamRequestAnswerMessage,
+  teamRequestMessage,
   targetFor,
+  teamIdTopic,
   todayKey,
   topicSlug,
   votingMessage,
@@ -64,6 +68,31 @@ test('partida, votação e jogo do dia', () => {
   assert.equal(votingMessage({ ...match, votacao: 'true' }, match)?.tipo, 'votacao_encerrada');
   assert.equal(votingMessage(match, { ...match, golTimeCasa: 1 }), null);
   assert.deepEqual(dailyGameMessage(match)?.alvo, { condition: "'time_a' in topics || 'time_b' in topics" });
+});
+
+test('com os ids dos times: tópico do id (app novo) e do nome (app antigo)', () => {
+  assert.equal(teamIdTopic('aB3/dE9'), 'timeid_aB3_dE9');
+  const match = {
+    timeC: 'A',
+    timeF: 'B',
+    idTimeC: 'id1',
+    idTimeF: 'id2',
+    data: '11/10',
+    fk_competicao: 'Floresta',
+    votacao: 'false',
+  };
+  // Região + 2 tópicos por time = 5, o limite da condition do FCM.
+  assert.deepEqual(matchCreatedMessage(match)?.alvo, {
+    condition:
+      "'regiao_floresta' in topics || 'timeid_id1' in topics || 'time_a' in topics || 'timeid_id2' in topics || 'time_b' in topics",
+  });
+  assert.deepEqual(dailyGameMessage(match)?.alvo, {
+    condition: "'timeid_id1' in topics || 'time_a' in topics || 'timeid_id2' in topics || 'time_b' in topics",
+  });
+  const goal = goalMessage({ time_casa: 'A', time_fora: 'B', id_time_casa: 'id1', fk_competicao: 'Floresta' });
+  assert.deepEqual(goal?.alvo, {
+    condition: "'regiao_floresta' in topics || 'timeid_id1' in topics || 'time_a' in topics || 'time_b' in topics",
+  });
 });
 
 test('aviso manual: região ou todos', () => {
@@ -121,4 +150,28 @@ test('coleção por temporada: 2023 sem sufixo, as outras com o ano', () => {
   assert.equal(seasonCollection('partidas', '2022'), 'partidas2022');
   assert.equal(currentSeasonOf(undefined), '2023');
   assert.equal(currentSeasonOf({ atual: '2024' }), '2024');
+});
+
+test('pedido de time: novo avisa admins; resposta avisa quem pediu', () => {
+  const pending = { nome: 'Riacho', nome_usuario: 'Kaio', regiao: 'Floresta', status: 'pendente' };
+  const created = teamRequestMessage('AbC1', undefined, pending);
+  assert.equal(created?.corpo, 'Kaio quer cadastrar o time Riacho');
+  assert.deepEqual(created?.alvo, { topic: 'admins' });
+  assert.equal(created?.aba, 'solicitacoes_time');
+  assert.equal(teamRequestMessage('AbC1', pending, { ...pending, descricao: 'x' }), null);
+
+  const approved = teamRequestAnswerMessage('AbC1', pending, { ...pending, status: 'aprovada' });
+  assert.deepEqual(approved?.alvo, { topic: 'usuario_AbC1' });
+  assert.equal(approved?.aba, 'meu_time');
+  const rejected = teamRequestAnswerMessage('AbC1', pending, { ...pending, status: 'rejeitada', motivo: 'Nome repetido' });
+  assert.equal(rejected?.corpo, 'O pedido do time Riacho não foi aprovado. Motivo: Nome repetido');
+});
+
+test('pedido "Sou jogador" também avisa o dono do time', () => {
+  const pending = { nome: 'Kaio', time: 'Riacho', regiao: 'Floresta', status: 'pendente' };
+  const toOwner = playerRequestToOwnerMessage('Dono1', undefined, pending);
+  assert.deepEqual(toOwner?.alvo, { topic: 'usuario_Dono1' });
+  assert.equal(toOwner?.aba, 'meu_time');
+  assert.equal(toOwner?.corpo, 'Kaio quer jogar no Riacho');
+  assert.equal(playerRequestToOwnerMessage('Dono1', pending, pending), null);
 });

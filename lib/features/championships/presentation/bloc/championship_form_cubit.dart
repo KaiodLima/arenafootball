@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
+import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/domain/championship_rules_file.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/save_championship_usecase.dart';
@@ -126,8 +127,14 @@ class ChampionshipFormCubit extends Cubit<ChampionshipFormState> {
     final form = _form;
     if (form.error != null || state is SubmittingChampionshipFormState) return;
     emit(SubmittingChampionshipFormState(form));
+    // Ids dos participantes (vínculo) na mesma ordem dos nomes.
+    final directory = TeamDirectory(form.teams);
     final response = await saveChampionshipUseCase(
-      form.base.copyWith(teams: form.selectedTeams),
+      form.base.copyWith(
+        teams: form.selectedTeams,
+        // Alinhado com os nomes ('' = time não achado na lista).
+        teamIds: [for (final name in form.selectedTeams) directory.idOf(name: name)],
+      ),
       banner: form.banner,
       rules: form.rulesFile,
     );

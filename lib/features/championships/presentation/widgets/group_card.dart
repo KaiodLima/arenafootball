@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/features/championships/data/dtos/group_dto.dart';
-import 'package:arena_soccer/features/championships/presentation/bloc/groups_state.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_card.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
@@ -14,11 +13,11 @@ class GroupCard extends StatelessWidget {
   final GroupDTO group;
   final String? Function(String teamName) crestOf;
 
-  /// Time do coração do usuário logado (nome normalizado), para o destaque.
-  final String? favoriteTeam;
+  /// Time do coração? Recebe (id, nome) do time no grupo.
+  final bool Function(String id, String name)? isFavorite;
   final VoidCallback onTap;
 
-  const GroupCard({super.key, required this.group, required this.crestOf, required this.onTap, this.favoriteTeam});
+  const GroupCard({super.key, required this.group, required this.crestOf, required this.onTap, this.isFavorite});
 
   @override
   Widget build(BuildContext context) {
@@ -49,13 +48,14 @@ class GroupCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSizes.s12),
           // Grupos com menos de 4 times guardam as vagas restantes vazias.
-          for (final team in group.teams.where((name) => name.trim().isNotEmpty))
-            _TeamRow(
-              name: team,
-              crest: crestOf(team),
-              isFavorite: favoriteTeam != null && normalizeTeamName(team) == favoriteTeam,
-              yourTeamLabel: l10n.standingsYourTeam,
-            ),
+          for (var i = 0; i < group.teams.length; i++)
+            if (group.teams[i].trim().isNotEmpty)
+              _TeamRow(
+                name: group.teams[i],
+                crest: crestOf(group.teams[i]),
+                isFavorite: isFavorite?.call(group.teamIdAt(i), group.teams[i]) ?? false,
+                yourTeamLabel: l10n.standingsYourTeam,
+              ),
           const SizedBox(height: AppSizes.s4),
           Text(l10n.groupsSeeStandings, style: AppTypography.label()),
         ],

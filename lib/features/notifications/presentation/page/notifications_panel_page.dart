@@ -175,6 +175,16 @@ class _NotificationsPanelPageState extends State<NotificationsPanelPage> {
         name: l10n.pushActionPlayerRequestAnswer,
         description: l10n.pushActionPlayerRequestAnswerHint
       ),
+    PushAction.teamRequest => (
+        icon: Icons.add_moderator_outlined,
+        name: l10n.pushActionTeamRequest,
+        description: l10n.pushActionTeamRequestHint
+      ),
+    PushAction.teamRequestAnswer => (
+        icon: Icons.verified_outlined,
+        name: l10n.pushActionTeamRequestAnswer,
+        description: l10n.pushActionTeamRequestAnswerHint
+      ),
   };
 }
 

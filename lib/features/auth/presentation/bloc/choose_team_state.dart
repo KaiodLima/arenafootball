@@ -8,8 +8,11 @@ class ChooseTeamState extends Equatable {
   final String? selectedRegion;
   final List<TeamDTO> teams;
 
-  /// Nome do time escolhido (é o que vai para `usuarios.time`).
+  /// Nome do time escolhido (`usuarios.time`, cópia para exibir).
   final String? selectedTeam;
+
+  /// Id do time escolhido (`usuarios.idTime`, o vínculo).
+  final String selectedTeamId;
 
   /// Times da região selecionada ainda carregando.
   final bool loadingTeams;
@@ -19,13 +22,14 @@ class ChooseTeamState extends Equatable {
     this.selectedRegion,
     this.teams = const [],
     this.selectedTeam,
+    this.selectedTeamId = '',
     this.loadingTeams = false,
   });
 
   bool get canSave => selectedRegion != null && selectedTeam != null && !loadingTeams;
 
   @override
-  List<Object?> get props => [regions, selectedRegion, teams, selectedTeam, loadingTeams];
+  List<Object?> get props => [regions, selectedRegion, teams, selectedTeam, selectedTeamId, loadingTeams];
 }
 
 class LoadingChooseTeamState extends ChooseTeamState {
@@ -38,6 +42,7 @@ class ReadyChooseTeamState extends ChooseTeamState {
     required super.selectedRegion,
     super.teams,
     super.selectedTeam,
+    super.selectedTeamId,
     super.loadingTeams,
   });
 }
@@ -58,12 +63,13 @@ class SavingChooseTeamState extends ChooseTeamState {
           selectedRegion: from.selectedRegion,
           teams: from.teams,
           selectedTeam: from.selectedTeam,
+          selectedTeamId: from.selectedTeamId,
         );
 }
 
 class SavedChooseTeamState extends ChooseTeamState {
-  const SavedChooseTeamState({required String region, required String team})
-      : super(selectedRegion: region, selectedTeam: team);
+  const SavedChooseTeamState({required String region, required String team, required String teamId})
+      : super(selectedRegion: region, selectedTeam: team, selectedTeamId: teamId);
 }
 
 class SaveErrorChooseTeamState extends ChooseTeamState {
@@ -75,6 +81,7 @@ class SaveErrorChooseTeamState extends ChooseTeamState {
           selectedRegion: from.selectedRegion,
           teams: from.teams,
           selectedTeam: from.selectedTeam,
+          selectedTeamId: from.selectedTeamId,
         );
 
   @override

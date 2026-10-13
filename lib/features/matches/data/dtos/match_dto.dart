@@ -5,8 +5,14 @@ import 'package:equatable/equatable.dart';
 class MatchDTO extends Equatable {
   /// Id do documento (gravado também em `id_partida`).
   final String id;
+  /// Nomes dos times (cópia para exibir; o vínculo é pelos ids).
   final String homeTeam;
   final String awayTeam;
+
+  /// `idTimeC` / `idTimeF`: ids dos times; vazios em partidas antigas (antes
+  /// da migração), quando vale o nome.
+  final String homeTeamId;
+  final String awayTeamId;
 
   /// Data no formato "dd/MM" digitado pelo admin (é texto, não Timestamp).
   final String date;
@@ -34,6 +40,8 @@ class MatchDTO extends Equatable {
     this.id = '',
     required this.homeTeam,
     required this.awayTeam,
+    this.homeTeamId = '',
+    this.awayTeamId = '',
     this.date = '',
     this.time = '',
     this.venue = '',
@@ -58,6 +66,8 @@ class MatchDTO extends Equatable {
       id: doc.id,
       homeTeam: data['timeC']?.toString() ?? '',
       awayTeam: data['timeF']?.toString() ?? '',
+      homeTeamId: data['idTimeC']?.toString() ?? '',
+      awayTeamId: data['idTimeF']?.toString() ?? '',
       date: data['data']?.toString() ?? '',
       time: data['horario']?.toString() ?? '',
       venue: data['local']?.toString() ?? '',
@@ -79,6 +89,8 @@ class MatchDTO extends Equatable {
         'id_partida': id,
         'timeC': homeTeam,
         'timeF': awayTeam,
+        'idTimeC': homeTeamId,
+        'idTimeF': awayTeamId,
         'data': date,
         'horario': time,
         'local': venue,
@@ -97,6 +109,8 @@ class MatchDTO extends Equatable {
     String? id,
     String? homeTeam,
     String? awayTeam,
+    String? homeTeamId,
+    String? awayTeamId,
     String? date,
     String? time,
     String? venue,
@@ -114,6 +128,8 @@ class MatchDTO extends Equatable {
       id: id ?? this.id,
       homeTeam: homeTeam ?? this.homeTeam,
       awayTeam: awayTeam ?? this.awayTeam,
+      homeTeamId: homeTeamId ?? this.homeTeamId,
+      awayTeamId: awayTeamId ?? this.awayTeamId,
       date: date ?? this.date,
       time: time ?? this.time,
       venue: venue ?? this.venue,
@@ -134,6 +150,8 @@ class MatchDTO extends Equatable {
         id,
         homeTeam,
         awayTeam,
+        homeTeamId,
+        awayTeamId,
         date,
         time,
         venue,

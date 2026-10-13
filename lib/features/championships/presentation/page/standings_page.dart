@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
-import 'package:arena_soccer/features/championships/presentation/bloc/groups_state.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/standings_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/standings_state.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/page_title_bar.dart';
@@ -39,8 +38,7 @@ class _StandingsPageState extends State<StandingsPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final favorite = context.watch<SessionCubit>().state.user?.favoriteTeam;
-    final favoriteKey = (favorite == null || favorite.trim().isEmpty) ? null : normalizeTeamName(favorite);
+    final user = context.watch<SessionCubit>().state.user;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -65,7 +63,11 @@ class _StandingsPageState extends State<StandingsPage> {
             physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
             padding: const EdgeInsets.fromLTRB(AppSizes.s12, AppSizes.s20, AppSizes.s12, AppSizes.s24),
             children: [
-              StandingsTable(standings: state.standings, qualifiedCount: _qualifiedCount, favoriteTeam: favoriteKey),
+              StandingsTable(
+                standings: state.standings,
+                qualifiedCount: _qualifiedCount,
+                isFavorite: (s) => user?.isFavorite(id: s.teamId, name: s.teamName) ?? false,
+              ),
               const SizedBox(height: AppSizes.s14),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8),

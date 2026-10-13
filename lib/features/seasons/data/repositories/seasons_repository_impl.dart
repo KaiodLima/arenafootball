@@ -3,6 +3,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/seasons/data/datasources/seasons_datasource.dart';
 import 'package:arena_soccer/features/seasons/data/dtos/seasons_config_dto.dart';
 import 'package:arena_soccer/features/seasons/domain/repositories/seasons_repository_interface.dart';
+import 'package:arena_soccer/features/seasons/domain/team_links.dart';
 
 class SeasonsRepositoryImpl implements ISeasonsRepository {
   final SeasonsDataSource _dataSource;
@@ -19,4 +20,7 @@ class SeasonsRepositoryImpl implements ISeasonsRepository {
     String? copyTeamsFrom,
   }) =>
       _dataSource.startSeason(season: season, seasons: seasons, copyTeamsFrom: copyTeamsFrom);
+
+  @override
+  Future<Either<Failure, TeamLinkReport>> linkTeams(String season) => _dataSource.linkTeams(season);
 }

@@ -2,6 +2,7 @@ import 'package:either_dart/either.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/voting/data/dtos/vote_dto.dart';
 import 'package:arena_soccer/features/voting/domain/elected_player.dart';
+import 'package:arena_soccer/features/voting/domain/match_vote_ref.dart';
 import 'package:arena_soccer/features/voting/domain/repositories/voting_repository_interface.dart';
 
 /// Apura a votação de uma partida: conta os votos por nome de jogador e
@@ -18,9 +19,12 @@ class CalculateBestPlayerUseCase {
     // O Map preserva a ordem de inserção: é o critério de desempate.
     final counts = <String, int>{};
     final teams = <String, String>{};
+    final teamIds = <String, String>{};
     for (final vote in votes) {
       counts[vote.playerName] = (counts[vote.playerName] ?? 0) + 1;
       teams.putIfAbsent(vote.playerName, () => vote.team);
+      // Votos antigos não têm o id: fica o primeiro que tiver.
+      if (vote.teamId.isNotEmpty) teamIds.putIfAbsent(vote.playerName, () => vote.teamId);
     }
 
     final indexed = counts.entries.toList().asMap().entries.toList()
@@ -30,7 +34,12 @@ class CalculateBestPlayerUseCase {
       });
     return [
       for (final entry in indexed)
-        VoteTally(playerName: entry.value.key, team: teams[entry.value.key] ?? '', votes: entry.value.value),
+        VoteTally(
+          playerName: entry.value.key,
+          team: teams[entry.value.key] ?? '',
+          teamId: teamIds[entry.value.key] ?? '',
+          votes: entry.value.value,
+        ),
     ];
   }
 
@@ -39,11 +48,11 @@ class CalculateBestPlayerUseCase {
     final ranking = tallyVotes(votes);
     if (ranking.isEmpty) return null;
     final winner = ranking.first;
-    return ElectedPlayer(playerName: winner.playerName, team: winner.team, votes: winner.votes);
+    return ElectedPlayer(playerName: winner.playerName, team: winner.team, teamId: winner.teamId, votes: winner.votes);
   }
 
-  Future<Either<Failure, List<VoteTally>>> call({required String homeTeam, required String awayTeam}) async {
-    final response = await _repository.getVotes(homeTeam: homeTeam, awayTeam: awayTeam);
+  Future<Either<Failure, List<VoteTally>>> call(MatchVoteRef ref) async {
+    final response = await _repository.getVotes(ref: ref);
     return response.map(tallyVotes);
   }
 }

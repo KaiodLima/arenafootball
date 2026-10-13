@@ -1201,5 +1201,298 @@
       }
     }
   },
-  "matchFormChampionship": "Campeonato"
+  "matchFormChampionship": "Campeonato",
+  "teamRequestMenu": "Sou dono de time",
+  "teamRequestTitle": "Sou dono de time",
+  "teamRequestIntro": "Cadastre o seu time: um administrador analisa o pedido e, aprovado, você gerencia o elenco.",
+  "teamRequestNameLabel": "Nome do time",
+  "teamRequestNameRequired": "Informe o nome do time (mínimo 3 letras).",
+  "teamRequestNameTaken": "Já existe um time chamado {name} nesta região.",
+  "@teamRequestNameTaken": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "teamRequestCrestAdd": "Adicionar escudo (opcional)",
+  "teamRequestDescriptionLabel": "Descrição / história (opcional)",
+  "teamRequestContactLabel": "WhatsApp do responsável",
+  "teamRequestContactHint": "(89) 99999-9999",
+  "teamRequestContactRequired": "Informe um WhatsApp com DDD.",
+  "teamRequestContactInfo": "Só o administrador vê o seu contato.",
+  "teamRequestSubmit": "ENVIAR PEDIDO",
+  "teamRequestSent": "Pedido enviado! Você será avisado quando o admin responder.",
+  "teamRequestCancelled": "Pedido cancelado.",
+  "teamRequestPendingInfo": "Um administrador vai analisar o seu time. Enquanto isso, você ainda pode corrigir os dados.",
+  "teamRequestRejectedInfo": "Seu pedido não foi aprovado. Você pode enviar um novo.",
+  "teamRequestEdit": "Editar pedido",
+  "teamRequestCancel": "Cancelar pedido",
+  "teamRequestCancelTitle": "Cancelar pedido?",
+  "teamRequestCancelMessage": "O pedido do time {team} será apagado.",
+  "@teamRequestCancelMessage": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "teamRequestResubmit": "Enviar novo pedido",
+  "teamRequestLoadError": "Não foi possível carregar o seu pedido.",
+  "myTeamTitle": "Meu time",
+  "myTeamOwnerBadge": "Você é o dono",
+  "myTeamTabSquad": "Elenco",
+  "myTeamTabRequests": "Pedidos",
+  "myTeamTabEdit": "Editar",
+  "myTeamAddPlayer": "Adicionar jogador",
+  "myTeamSquadEmpty": "Nenhum jogador no elenco ainda.",
+  "myTeamRequestsEmpty": "Nenhum pedido para entrar no time.",
+  "myTeamPlayerAdded": "{name} entrou no elenco.",
+  "@myTeamPlayerAdded": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "myTeamSaved": "Time atualizado!",
+  "myTeamNameLocked": "Para trocar o nome do time, fale com o administrador.",
+  "myTeamLoadError": "Não foi possível carregar o seu time.",
+  "teamRequestsPanelTitle": "Solicitações de times",
+  "teamRequestsEmptyPending": "Nenhum pedido de time pendente.",
+  "teamRequestsEmptyAnswered": "Nenhum pedido de time respondido ainda.",
+  "teamRequestsLoadError": "Não foi possível carregar os pedidos de time.",
+  "teamRequestsApproveTitle": "Aprovar o time {name}?",
+  "@teamRequestsApproveTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "teamRequestsApproveMessage": "O time entra em {region} na temporada atual, com {owner} como dono.",
+  "@teamRequestsApproveMessage": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      },
+      "owner": {
+        "type": "String"
+      }
+    }
+  },
+  "teamRequestsApproved": "Time {name} criado!",
+  "@teamRequestsApproved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "teamRequestsRejectTitle": "Rejeitar o time {name}?",
+  "@teamRequestsRejectTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "teamRequestsOwner": "Dono: {name}",
+  "@teamRequestsOwner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "teamRequestsWhatsApp": "Chamar no WhatsApp",
+  "teamRequestsWhatsAppError": "Não foi possível abrir o WhatsApp.",
+  "pushActionTeamRequest": "Novo pedido de time",
+  "pushActionTeamRequestHint": "Para os admins · \"Fulano quer cadastrar o time X\"",
+  "pushActionTeamRequestAnswer": "Resposta do pedido de time",
+  "pushActionTeamRequestAnswerHint": "Para quem pediu · aprovado ou rejeitado",
+  "teamDelete": "Excluir time",
+  "teamDeleteTitle": "Excluir {team}?",
+  "@teamDeleteTitle": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "teamDeleteMessage": "O time sai da temporada {season}. Jogadores com conta no app ficam sem time e mantêm os números; os demais jogadores do elenco são excluídos. As partidas já cadastradas continuam no histórico. Não dá para desfazer.",
+  "@teamDeleteMessage": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "teamDeleted": "{team} foi excluído.",
+  "@teamDeleted": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "drawerPlayerOf": "Jogador do {team}",
+  "@drawerPlayerOf": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "drawerOwnerOf": "Dono/treinador do {team}",
+  "@drawerOwnerOf": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "drawerMyPlayerProfile": "Meu perfil de jogador",
+  "teamColorsSection": "Cores do time",
+  "teamColorPrimary": "Cor principal",
+  "teamColorSecondary": "Cor secundária",
+  "teamColorNone": "Sem cor",
+  "teamColorPreview": "Assim fica o uniforme",
+  "colorWhite": "Branco",
+  "colorBlack": "Preto",
+  "colorGrey": "Cinza",
+  "colorRed": "Vermelho",
+  "colorWine": "Vinho",
+  "colorOrange": "Laranja",
+  "colorYellow": "Amarelo",
+  "colorGreen": "Verde",
+  "colorBlue": "Azul",
+  "colorNavy": "Azul-marinho",
+  "colorPurple": "Roxo",
+  "colorPink": "Rosa",
+  "fanCardMenu": "Minha carteirinha",
+  "fanCardTitle": "Carteirinha de torcedor",
+  "fanCardLabel": "CARTEIRINHA DE TORCEDOR",
+  "fanCardFanOf": "Torcedor do {team}",
+  "@fanCardFanOf": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "fanCardNoTeam": "Sem time do coração",
+  "fanCardSince": "Torcedor desde {year}",
+  "@fanCardSince": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "fanCardNumber": "Nº {number}",
+  "@fanCardNumber": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "fanCardChangePhoto": "Trocar foto",
+  "fanCardAddPhoto": "Adicionar foto",
+  "fanCardPhotoSaved": "Foto atualizada!",
+  "fanCardHint": "Mostre a sua carteirinha nos jogos do seu time.",
+  "fanCardShare": "COMPARTILHAR CARTEIRINHA",
+  "fanCardShareTitle": "Compartilhar carteirinha",
+  "shareInstagramStories": "Instagram Stories",
+  "shareWhatsApp": "WhatsApp",
+  "shareMoreOptions": "Mais opções",
+  "fanCardShareText": "Sou torcedor do {team} no Arena Football! ⚽",
+  "@fanCardShareText": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "fanCardShareTextNoTeam": "Minha carteirinha de torcedor no Arena Football! ⚽",
+  "shareFooter": "Arena Football · o futebol amador da sua região",
+  "athleteShareTitle": "Compartilhar atleta",
+  "athleteCardLabel": "ATLETA",
+  "athleteCardSeason": "Temporada {season}",
+  "athleteCardParticipations": "{count, plural, =0{Nenhuma participação em gol} =1{1 participação em gol} other{{count} participações em gols}}",
+  "@athleteCardSeason": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "@athleteCardParticipations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "teamEdit": "Editar time",
+  "teamEditTitle": "Editar time",
+  "teamEditSaved": "Time atualizado.",
+  "teamEditRegionLabel": "Região",
+  "teamEditRegionChangeTitle": "Trocar a região?",
+  "teamEditRegionChangeMessage": "{team} passa a aparecer na aba Times e na classificação de {region}. Os grupos da região antiga não mudam.",
+  "teamEditNameLocked": "O nome do time não pode ser alterado (ele está nas partidas, no elenco e na votação).",
+  "@teamEditRegionChangeMessage": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      },
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "votingShareTitle": "Compartilhar craque",
+  "votingCardLabel": "CRAQUE DA PARTIDA",
+  "votingCardTopVotes": "Mais votados",
+  "votingCardSeasonStats": "Na temporada",
+  "teamLinksTitle": "Vincular times por id",
+  "teamLinksInfo": "Grava o id do time ao lado do nome em jogadores, partidas, grupos, campeonatos, pedidos \"Sou jogador\" e cards de gol da temporada (na atual, também no time do coração das contas) e copia os votos antigos para as partidas. Só completa o que falta: pode rodar de novo.",
+  "teamLinksRun": "Vincular {season}",
+  "teamLinksDone": "{season}: {count, plural, =0{nada a atualizar} =1{1 documento atualizado} other{{count} documentos atualizados}}",
+  "teamLinksVotes": "{count, plural, =1{1 voto copiado para a partida} other{{count} votos copiados para as partidas}}",
+  "teamLinksUnmatched": "Nomes sem time na temporada (não vinculados):",
+  "teamLinksAmbiguous": "Nomes usados por mais de um time (não vinculados):",
+  "teamLinksSkippedVotes": "Votos não copiados (confronto repetido na temporada):",
+  "teamLinksPlayers": "Jogadores",
+  "teamLinksMatches": "Partidas",
+  "teamLinksGroups": "Grupos",
+  "teamLinksChampionships": "Campeonatos",
+  "teamLinksPlayerRequests": "Pedidos \"Sou jogador\"",
+  "teamLinksGoalCards": "Cards de gol",
+  "teamLinksUsers": "Time do coração",
+  "@teamLinksRun": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "@teamLinksDone": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@teamLinksVotes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

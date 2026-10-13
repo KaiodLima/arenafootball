@@ -67,3 +67,18 @@ class ErrorTeamPlayersState extends TeamPlayersState {
   @override
   List<Object?> get props => [...super.props, errorMessage];
 }
+
+/// Excluindo o time (admin): a página bloqueia as ações.
+class DeletingTeamPlayersState extends TeamPlayersState {
+  const DeletingTeamPlayersState({super.players, super.sort, super.query});
+}
+
+/// Time excluído: a página avisa e fecha.
+class DeletedTeamPlayersState extends TeamPlayersState {
+  final String teamName;
+
+  const DeletedTeamPlayersState({required this.teamName});
+
+  @override
+  List<Object?> get props => [...super.props, teamName];
+}

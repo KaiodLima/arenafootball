@@ -15,6 +15,17 @@ class HomeDrawer extends StatelessWidget {
 
   /// Pedidos "Sou jogador" pendentes (contador do item do admin).
   final int pendingPlayerRequests;
+
+  /// Pedidos "Sou dono de time" pendentes (contador do item do admin).
+  final int pendingTeamRequests;
+
+  /// Time em que a conta joga ("Sou jogador" aprovado) e o atleta dela.
+  final String? playerTeam;
+  final String? playerId;
+  final String? playerSeason;
+
+  /// Time do qual a conta é dona/treinadora ("Sou dono de time" aprovado).
+  final String? ownedTeam;
   final VoidCallback onChooseTeam;
   final VoidCallback onLogout;
 
@@ -23,6 +34,11 @@ class HomeDrawer extends StatelessWidget {
     this.user,
     this.favoriteTeamImage,
     this.pendingPlayerRequests = 0,
+    this.pendingTeamRequests = 0,
+    this.playerTeam,
+    this.playerId,
+    this.playerSeason,
+    this.ownedTeam,
     required this.onChooseTeam,
     required this.onLogout,
   });
@@ -49,6 +65,19 @@ class HomeDrawer extends StatelessWidget {
           _ProfileHeader(
             user: user,
             favoriteTeamImage: favoriteTeamImage,
+            playerTeam: playerTeam,
+            ownedTeam: ownedTeam,
+            onOpenPlayer: playerId == null
+                ? null
+                : () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.playerProfilePage,
+                      arguments: {'playerId': playerId, 'season': playerSeason},
+                    );
+                  },
+            onOpenOwnedTeam: () => _open(context, AppRoutes.teamRequestPage),
             onChooseTeam: () {
               Navigator.pop(context);
               onChooseTeam();
@@ -72,9 +101,21 @@ class HomeDrawer extends StatelessWidget {
                 ),
                 if (user != null)
                   _DrawerItem(
+                    icon: Icons.badge_outlined,
+                    title: l10n.fanCardMenu,
+                    onTap: () => _open(context, AppRoutes.fanCardPage),
+                  ),
+                if (user != null)
+                  _DrawerItem(
                     icon: Icons.sports_soccer_rounded,
-                    title: l10n.playerRequestMenu,
+                    title: playerTeam != null ? l10n.drawerMyPlayerProfile : l10n.playerRequestMenu,
                     onTap: () => _open(context, AppRoutes.playerRequestPage),
+                  ),
+                if (user != null)
+                  _DrawerItem(
+                    icon: Icons.shield_rounded,
+                    title: ownedTeam != null ? l10n.myTeamTitle : l10n.teamRequestMenu,
+                    onTap: () => _open(context, AppRoutes.teamRequestPage),
                   ),
                 if (isAdmin) ...[
                   const SizedBox(height: AppSizes.s12),
@@ -84,6 +125,12 @@ class HomeDrawer extends StatelessWidget {
                     title: l10n.playerRequestsPanelTitle,
                     badge: pendingPlayerRequests,
                     onTap: () => _open(context, AppRoutes.playerRequestsPanelPage),
+                  ),
+                  _DrawerItem(
+                    icon: Icons.add_moderator_outlined,
+                    title: l10n.teamRequestsPanelTitle,
+                    badge: pendingTeamRequests,
+                    onTap: () => _open(context, AppRoutes.teamRequestsPanelPage),
                   ),
                   _DrawerItem(
                     icon: Icons.article_outlined,
@@ -161,9 +208,21 @@ final _headerButtonStyle = FilledButton.styleFrom(
 class _ProfileHeader extends StatelessWidget {
   final UserDTO? user;
   final String? favoriteTeamImage;
+  final String? playerTeam;
+  final String? ownedTeam;
   final VoidCallback onChooseTeam;
+  final VoidCallback? onOpenPlayer;
+  final VoidCallback onOpenOwnedTeam;
 
-  const _ProfileHeader({this.user, this.favoriteTeamImage, required this.onChooseTeam});
+  const _ProfileHeader({
+    this.user,
+    this.favoriteTeamImage,
+    this.playerTeam,
+    this.ownedTeam,
+    required this.onChooseTeam,
+    this.onOpenPlayer,
+    required this.onOpenOwnedTeam,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -208,25 +267,41 @@ class _ProfileHeader extends StatelessWidget {
                   onPressed: () => Navigator.pushNamedAndRemoveUntil(context, AppRoutes.loginPage, (_) => false),
                   child: Text(l10n.drawerSignIn),
                 ),
-              ] else if (!user!.hasFavoriteTeam)
-                FilledButton.icon(
-                  style: _headerButtonStyle,
-                  onPressed: onChooseTeam,
-                  icon: const Icon(Icons.shield_outlined, size: AppSizes.s18),
-                  label: Text(l10n.drawerChooseTeam),
-                )
-              else
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSizes.s12, vertical: AppSizes.s4),
-                  decoration: BoxDecoration(
-                    color: AppColors.white.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(AppSizes.s20),
+              ] else ...[
+                // Papéis da conta: dono/treinador, jogador e torcedor.
+                if (ownedTeam != null || playerTeam != null || user!.hasFavoriteTeam)
+                  Wrap(
+                    spacing: AppSizes.s6,
+                    runSpacing: AppSizes.s6,
+                    children: [
+                      if (ownedTeam != null)
+                        _RoleBadge(
+                          icon: Icons.shield_rounded,
+                          label: l10n.drawerOwnerOf(ownedTeam!),
+                          highlighted: true,
+                          onTap: onOpenOwnedTeam,
+                        ),
+                      if (playerTeam != null)
+                        _RoleBadge(
+                          icon: Icons.sports_soccer_rounded,
+                          label: l10n.drawerPlayerOf(playerTeam!),
+                          highlighted: true,
+                          onTap: onOpenPlayer,
+                        ),
+                      if (user!.hasFavoriteTeam)
+                        _RoleBadge(icon: Icons.favorite_rounded, label: l10n.drawerFanOf(user!.favoriteTeam)),
+                    ],
                   ),
-                  child: Text(
-                    l10n.drawerFanOf(user!.favoriteTeam),
-                    style: AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s12),
+                if (!user!.hasFavoriteTeam) ...[
+                  if (ownedTeam != null || playerTeam != null) const SizedBox(height: AppSizes.s10),
+                  FilledButton.icon(
+                    style: _headerButtonStyle,
+                    onPressed: onChooseTeam,
+                    icon: const Icon(Icons.shield_outlined, size: AppSizes.s18),
+                    label: Text(l10n.drawerChooseTeam),
                   ),
-                ),
+                ],
+              ],
             ],
           ),
         ),
@@ -319,6 +394,52 @@ class _DrawerItem extends StatelessWidget {
                   ),
                 if (showChevron)
                   const Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary, size: AppSizes.s20),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Selo do cabeçalho (papel da conta). Destacado = verde (jogador, dono).
+class _RoleBadge extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool highlighted;
+  final VoidCallback? onTap;
+
+  const _RoleBadge({required this.icon, required this.label, this.highlighted = false, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(AppSizes.s20);
+    return Semantics(
+      button: onTap != null,
+      label: label,
+      excludeSemantics: true,
+      child: Material(
+        color: highlighted ? AppColors.primary : AppColors.white.withValues(alpha: 0.15),
+        borderRadius: radius,
+        child: InkWell(
+          borderRadius: radius,
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSizes.s10, vertical: AppSizes.s4),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: AppSizes.s14, color: AppColors.white),
+                const SizedBox(width: AppSizes.s4),
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s12),
+                  ),
+                ),
               ],
             ),
           ),

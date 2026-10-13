@@ -69,7 +69,7 @@ class _GoalNotificationPageState extends State<GoalNotificationPage> {
       selected: home ? form.homeTeam : form.awayTeam,
     );
     if (picked == null) return;
-    home ? _cubit.selectHomeTeam(picked) : _cubit.selectAwayTeam(picked);
+    home ? _cubit.selectHomeTeam(picked.name) : _cubit.selectAwayTeam(picked.name);
   }
 
   /// Gol marcado no "+" de um time: soma no placar e abre o painel para

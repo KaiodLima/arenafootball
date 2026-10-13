@@ -18,8 +18,10 @@ import 'package:arena_soccer/features/home/presentation/widgets/home_header.dart
 import 'package:arena_soccer/features/matches/presentation/widgets/matches_tab.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/news_tab.dart';
 import 'package:arena_soccer/features/notifications/presentation/widgets/push_topics_listener.dart';
+import 'package:arena_soccer/features/player_requests/presentation/bloc/my_player_cubit.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_state.dart';
+import 'package:arena_soccer/features/team_requests/presentation/bloc/owned_team_cubit.dart';
 import 'package:arena_soccer/features/teams/presentation/widgets/teams_tab.dart';
 import 'package:arena_soccer/injection_container.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
@@ -46,7 +48,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _homeCubit = BlocProvider.of<HomeCubit>(context);
     final user = BlocProvider.of<SessionCubit>(context).state.user;
-    if (user != null) _homeCubit.loadFavoriteTeam(user.favoriteTeam);
+    if (user != null) _homeCubit.loadFavoriteTeam(user.favoriteTeam, teamId: user.favoriteTeamId);
     if (user != null && user.isAdmin) _homeCubit.watchPendingPlayerRequests();
 
     // Push: pede a permissão (Android 13+) e abre a aba da notificação tocada.
@@ -72,6 +74,8 @@ class _HomePageState extends State<HomePage> {
     final route = switch (tab) {
       'solicitacoes' when user != null && user.isAdmin => AppRoutes.playerRequestsPanelPage,
       'sou_jogador' when user != null => AppRoutes.playerRequestPage,
+      'solicitacoes_time' when user != null && user.isAdmin => AppRoutes.teamRequestsPanelPage,
+      'meu_time' when user != null => AppRoutes.teamRequestPage,
       _ => null,
     };
     if (route != null) {
@@ -90,7 +94,7 @@ class _HomePageState extends State<HomePage> {
     await Navigator.pushNamed(context, AppRoutes.chooseTeamPage, arguments: const ChooseTeamArgs(canGoBack: true));
     if (!mounted) return;
     final user = BlocProvider.of<SessionCubit>(context).state.user;
-    if (user != null && user.hasFavoriteTeam) _homeCubit.loadFavoriteTeam(user.favoriteTeam);
+    if (user != null && user.hasFavoriteTeam) _homeCubit.loadFavoriteTeam(user.favoriteTeam, teamId: user.favoriteTeamId);
   }
 
   Future<void> _logout() async {
@@ -124,6 +128,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // Papéis da conta no menu: jogador aprovado e dono/treinador de time.
+    final myPlayer = context.watch<MyPlayerCubit>().state;
+    final ownedTeam = context.watch<OwnedTeamCubit>().state;
     final l10n = AppLocalizations.of(context);
     final session = context.watch<SessionCubit>().state;
     final region = context.watch<RegionCubit>().state;
@@ -142,6 +149,11 @@ class _HomePageState extends State<HomePage> {
               user: session.user,
               favoriteTeamImage: home.favoriteTeamImage,
               pendingPlayerRequests: home.pendingPlayerRequests,
+              pendingTeamRequests: home.pendingTeamRequests,
+              playerTeam: myPlayer.teamName,
+              playerId: myPlayer.playerId,
+              playerSeason: myPlayer.season,
+              ownedTeam: ownedTeam.teamName,
               onChooseTeam: _chooseTeam,
               onLogout: _logout,
             ),
