@@ -42,8 +42,7 @@ class FanCard extends StatelessWidget {
 
   /// Cores do time, ou o verde e branco do app.
   static TeamPalette paletteFor(TeamDTO? team) =>
-      TeamPalette.fromHex(team?.primaryColor ?? '', team?.secondaryColor ?? '') ??
-      TeamPalette.fromHex(colorToHex(AppColors.primaryStrong), colorToHex(AppColors.white))!;
+      TeamPalette.orDefault(team?.primaryColor ?? '', team?.secondaryColor ?? '');
 
   @override
   Widget build(BuildContext context) {

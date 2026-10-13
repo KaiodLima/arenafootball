@@ -1416,5 +1416,23 @@
     }
   },
   "fanCardShareTextNoTeam": "Minha carteirinha de torcedor no Arena Football! ⚽",
-  "fanCardShareFooter": "Arena Football · o futebol amador da sua região"
+  "shareFooter": "Arena Football · o futebol amador da sua região",
+  "athleteShareTitle": "Compartilhar atleta",
+  "athleteCardLabel": "ATLETA",
+  "athleteCardSeason": "Temporada {season}",
+  "athleteCardParticipations": "{count, plural, =0{Nenhuma participação em gol} =1{1 participação em gol} other{{count} participações em gols}}",
+  "@athleteCardSeason": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "@athleteCardParticipations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

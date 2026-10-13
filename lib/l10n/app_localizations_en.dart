@@ -2329,6 +2329,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fanCardShareTextNoTeam => 'My fan card on Arena Football! ⚽';
 
   @override
-  String get fanCardShareFooter =>
-      'Arena Football · amateur football in your region';
+  String get shareFooter => 'Arena Football · amateur football in your region';
+
+  @override
+  String get athleteShareTitle => 'Share athlete';
+
+  @override
+  String get athleteCardLabel => 'ATHLETE';
+
+  @override
+  String athleteCardSeason(String season) {
+    return '$season season';
+  }
+
+  @override
+  String athleteCardParticipations(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count goal involvements',
+      one: '1 goal involvement',
+      zero: 'No goal involvements',
+    );
+    return '$_temp0';
+  }
 }

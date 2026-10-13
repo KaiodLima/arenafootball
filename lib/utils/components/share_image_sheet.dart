@@ -9,13 +9,16 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// Compartilhar a carteirinha (mesmo molde do card de dica do Relove):
-/// título com X, a prévia da imagem que será enviada e os destinos. Cada
-/// destino tira o "print" da prévia e abre o compartilhamento do sistema.
-Future<void> showShareFanCardSheet(
+/// Compartilhar uma imagem (carteirinha, card do atleta...), no molde do card
+/// de dica do Relove: título com X, a prévia da imagem que será enviada e os
+/// destinos. Cada destino tira o "print" da prévia e abre o compartilhamento
+/// do sistema com o PNG e o [shareText].
+Future<void> showShareImageSheet(
   BuildContext context, {
+  required String title,
   required Widget preview,
   required String shareText,
+  String fileName = 'arena_football',
 }) {
   return showModalBottomSheet<void>(
     context: context,
@@ -24,15 +27,17 @@ Future<void> showShareFanCardSheet(
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(AppSizes.radiusLarge)),
     ),
-    builder: (_) => _ShareSheet(preview: preview, shareText: shareText),
+    builder: (_) => _ShareSheet(title: title, preview: preview, shareText: shareText, fileName: fileName),
   );
 }
 
 class _ShareSheet extends StatefulWidget {
+  final String title;
   final Widget preview;
   final String shareText;
+  final String fileName;
 
-  const _ShareSheet({required this.preview, required this.shareText});
+  const _ShareSheet({required this.title, required this.preview, required this.shareText, required this.fileName});
 
   @override
   State<_ShareSheet> createState() => _ShareSheetState();
@@ -56,10 +61,10 @@ class _ShareSheetState extends State<_ShareSheet> {
       await ShareService.shareImage(
         bytes.buffer.asUint8List(),
         text: widget.shareText,
-        fileName: 'carteirinha_arena_${DateTime.now().millisecondsSinceEpoch}.png',
+        fileName: '${widget.fileName}_${DateTime.now().millisecondsSinceEpoch}.png',
       );
     } catch (e) {
-      AppLogger.e('captureAndShare', name: 'ShareFanCardSheet', error: e);
+      AppLogger.e('captureAndShare', name: 'ShareImageSheet', error: e);
     } finally {
       if (mounted) setState(() => _sharing = false);
     }
@@ -87,7 +92,7 @@ class _ShareSheetState extends State<_ShareSheet> {
                 children: [
                   Expanded(
                     child: Text(
-                      l10n.fanCardShareTitle,
+                      widget.title,
                       overflow: TextOverflow.ellipsis,
                       style: AppTypography.title().copyWith(fontSize: AppSizes.s20),
                     ),

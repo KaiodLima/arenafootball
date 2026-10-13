@@ -10,14 +10,14 @@ import 'package:arena_soccer/features/fan_card/domain/fan_card_number.dart';
 import 'package:arena_soccer/features/fan_card/presentation/bloc/fan_card_cubit.dart';
 import 'package:arena_soccer/features/fan_card/presentation/bloc/fan_card_state.dart';
 import 'package:arena_soccer/features/fan_card/presentation/widgets/fan_card.dart';
-import 'package:arena_soccer/features/fan_card/presentation/widgets/fan_card_share_image.dart';
-import 'package:arena_soccer/features/fan_card/presentation/widgets/share_fan_card_sheet.dart';
 import 'package:arena_soccer/features/player_requests/presentation/bloc/my_player_cubit.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/team_requests/presentation/bloc/owned_team_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
 import 'package:arena_soccer/utils/components/image_source_sheet.dart';
+import 'package:arena_soccer/utils/components/share_image_frame.dart';
+import 'package:arena_soccer/utils/components/share_image_sheet.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
@@ -77,9 +77,11 @@ class _FanCardPageState extends State<FanCardPage> {
     final l10n = AppLocalizations.of(context);
     final user = BlocProvider.of<SessionCubit>(context).state.user;
     if (user == null || _cubit.state.loading) return;
-    showShareFanCardSheet(
+    showShareImageSheet(
       context,
-      preview: FanCardShareImage(card: _buildCard(_cubit.state), date: DateTime.now()),
+      title: l10n.fanCardShareTitle,
+      fileName: 'carteirinha_arena',
+      preview: ShareImageFrame(card: _buildCard(_cubit.state), date: DateTime.now()),
       shareText: user.hasFavoriteTeam ? l10n.fanCardShareText(user.favoriteTeam) : l10n.fanCardShareTextNoTeam,
     );
   }

@@ -2350,6 +2350,28 @@ class AppLocalizationsPt extends AppLocalizations {
       'Minha carteirinha de torcedor no Arena Football! ⚽';
 
   @override
-  String get fanCardShareFooter =>
-      'Arena Football · o futebol amador da sua região';
+  String get shareFooter => 'Arena Football · o futebol amador da sua região';
+
+  @override
+  String get athleteShareTitle => 'Compartilhar atleta';
+
+  @override
+  String get athleteCardLabel => 'ATLETA';
+
+  @override
+  String athleteCardSeason(String season) {
+    return 'Temporada $season';
+  }
+
+  @override
+  String athleteCardParticipations(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count participações em gols',
+      one: '1 participação em gol',
+      zero: 'Nenhuma participação em gol',
+    );
+    return '$_temp0';
+  }
 }

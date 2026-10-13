@@ -4126,11 +4126,35 @@ abstract class AppLocalizations {
   /// **'Minha carteirinha de torcedor no Arena Football! ⚽'**
   String get fanCardShareTextNoTeam;
 
-  /// No description provided for @fanCardShareFooter.
+  /// No description provided for @shareFooter.
   ///
   /// In pt, this message translates to:
   /// **'Arena Football · o futebol amador da sua região'**
-  String get fanCardShareFooter;
+  String get shareFooter;
+
+  /// No description provided for @athleteShareTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compartilhar atleta'**
+  String get athleteShareTitle;
+
+  /// No description provided for @athleteCardLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'ATLETA'**
+  String get athleteCardLabel;
+
+  /// No description provided for @athleteCardSeason.
+  ///
+  /// In pt, this message translates to:
+  /// **'Temporada {season}'**
+  String athleteCardSeason(String season);
+
+  /// No description provided for @athleteCardParticipations.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{Nenhuma participação em gol} =1{1 participação em gol} other{{count} participações em gols}}'**
+  String athleteCardParticipations(int count);
 }
 
 class _AppLocalizationsDelegate

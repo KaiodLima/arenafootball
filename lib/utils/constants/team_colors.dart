@@ -109,6 +109,11 @@ class TeamPalette {
   ///   duas forem parecidas demais, o fundo vira um tom claro da principal);
   /// - só uma delas: ela é o acento e o fundo é um tom claro dela;
   /// - nenhuma: nulo (o cabeçalho usa o verde do app).
+  /// Como [fromHex], mas sem cores cai no verde e branco do app (cards que
+  /// sempre precisam de uma paleta: carteirinha, card do atleta).
+  static TeamPalette orDefault(String primary, String secondary) =>
+      fromHex(primary, secondary) ?? fromHex(colorToHex(AppColors.primaryStrong), colorToHex(AppColors.white))!;
+
   static TeamPalette? fromHex(String primary, String secondary) {
     final first = colorFromHex(primary);
     final second = colorFromHex(secondary);

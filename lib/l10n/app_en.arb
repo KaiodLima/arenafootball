@@ -671,5 +671,9 @@
   "shareMoreOptions": "More options",
   "fanCardShareText": "I support {team} on Arena Football! ⚽",
   "fanCardShareTextNoTeam": "My fan card on Arena Football! ⚽",
-  "fanCardShareFooter": "Arena Football · amateur football in your region"
+  "shareFooter": "Arena Football · amateur football in your region",
+  "athleteShareTitle": "Share athlete",
+  "athleteCardLabel": "ATHLETE",
+  "athleteCardSeason": "{season} season",
+  "athleteCardParticipations": "{count, plural, =0{No goal involvements} =1{1 goal involvement} other{{count} goal involvements}}"
 }

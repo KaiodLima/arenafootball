@@ -5,16 +5,16 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// Imagem que vai para as redes: logo do Arena, a data, a carteirinha e o
+/// Moldura da imagem que vai para as redes: logo do Arena, a data, o card e o
 /// rodapé com o nome do app (como o card de dica do Relove). Largura fixa
 /// para o "print" sair sempre igual, independente da tela.
-class FanCardShareImage extends StatelessWidget {
+class ShareImageFrame extends StatelessWidget {
   static const double width = 360;
 
   final Widget card;
   final DateTime date;
 
-  const FanCardShareImage({super.key, required this.card, required this.date});
+  const ShareImageFrame({super.key, required this.card, required this.date});
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +39,7 @@ class FanCardShareImage extends StatelessWidget {
           card,
           const SizedBox(height: AppSizes.s14),
           Text(
-            l10n.fanCardShareFooter,
+            l10n.shareFooter,
             textAlign: TextAlign.center,
             style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s12),
           ),
