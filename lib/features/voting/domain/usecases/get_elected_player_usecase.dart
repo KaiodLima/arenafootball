@@ -7,7 +7,7 @@ import 'package:arena_soccer/features/voting/domain/usecases/calculate_best_play
 
 /// Apuração de uma partida para a tela do eleito: o ranking dos votados, o
 /// eleito com foto, escudo, gols e assistências na temporada, e os escudos
-/// dos dois times da partida. Sem votos, `elected` é `null`. Falha ao buscar
+/// e as cores dos dois times da partida. Sem votos, `elected` é `null`. Falha ao buscar
 /// fotos/escudos/elenco não impede o resultado: a tela só fica sem o dado.
 class GetElectedPlayerUseCase {
   final CalculateBestPlayerUseCase _calculateBestPlayer;
@@ -26,10 +26,12 @@ class GetElectedPlayerUseCase {
     final ranking = response.right;
 
     final crests = <String, String>{};
+    final colors = <String, (String, String)>{};
     final teams = await _getTeams(season: season);
     if (teams.isRight) {
       for (final team in teams.right) {
         crests.putIfAbsent(team.name, () => team.imageUrl);
+        colors.putIfAbsent(team.name, () => (team.primaryColor, team.secondaryColor));
       }
     }
 
@@ -61,6 +63,10 @@ class GetElectedPlayerUseCase {
       ranking: ranking,
       homeCrest: crests[homeTeam] ?? '',
       awayCrest: crests[awayTeam] ?? '',
+      homePrimaryColor: colors[homeTeam]?.$1 ?? '',
+      homeSecondaryColor: colors[homeTeam]?.$2 ?? '',
+      awayPrimaryColor: colors[awayTeam]?.$1 ?? '',
+      awaySecondaryColor: colors[awayTeam]?.$2 ?? '',
     ));
   }
 }
