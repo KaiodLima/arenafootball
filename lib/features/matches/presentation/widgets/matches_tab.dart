@@ -177,7 +177,8 @@ class _DayMatchesState extends State<_DayMatches> {
   }
 }
 
-/// Atalhos para outras telas do campeonato, em 4 blocos iguais.
+/// Atalhos para outras telas do campeonato, em 3 blocos iguais (artilharia e
+/// assistências são a mesma tela, com o seletor lá dentro).
 class _Shortcuts extends StatelessWidget {
   final int championshipId;
   final String region;
@@ -217,14 +218,9 @@ class _Shortcuts extends StatelessWidget {
           ),
         ),
         ShortcutTile(
-          title: l10n.matchesTopScorers,
+          title: l10n.statsShortcut,
           icon: Icons.sports_soccer_rounded,
           onTap: () => _openStats(context, StatsRankingType.goals),
-        ),
-        ShortcutTile(
-          title: l10n.matchesAssists,
-          icon: Icons.assistant_rounded,
-          onTap: () => _openStats(context, StatsRankingType.assists),
         ),
       ],
     );

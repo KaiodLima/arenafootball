@@ -2631,4 +2631,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String regionsLinkUnmatched(String names) {
     return 'Names that match no region (left without id): $names';
   }
+
+  @override
+  String get statsShortcut => 'Top scorers & assists';
 }

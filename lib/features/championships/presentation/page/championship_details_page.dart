@@ -267,7 +267,7 @@ class _OverviewTab extends StatelessWidget {
         const SizedBox(height: AppSizes.s10),
         _ActionCard(
           icon: Icons.sports_soccer_rounded,
-          title: l10n.matchesTopScorers,
+          title: l10n.statsShortcut,
           onTap: () => Navigator.pushNamed(
             context,
             AppRoutes.statsRankingPage,

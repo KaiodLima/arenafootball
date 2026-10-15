@@ -168,7 +168,7 @@ class _Shortcuts extends StatelessWidget {
           ),
         ),
         ShortcutTile(
-          title: l10n.matchesTopScorers,
+          title: l10n.statsShortcut,
           icon: Icons.sports_soccer_rounded,
           onTap: () => Navigator.pushNamed(
             context,

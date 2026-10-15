@@ -4509,6 +4509,12 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Nomes que não batem com nenhuma região (ficaram sem id): {names}'**
   String regionsLinkUnmatched(String names);
+
+  /// No description provided for @statsShortcut.
+  ///
+  /// In pt, this message translates to:
+  /// **'Artilharia e assistências'**
+  String get statsShortcut;
 }
 
 class _AppLocalizationsDelegate

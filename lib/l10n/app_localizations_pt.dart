@@ -2652,4 +2652,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String regionsLinkUnmatched(String names) {
     return 'Nomes que não batem com nenhuma região (ficaram sem id): $names';
   }
+
+  @override
+  String get statsShortcut => 'Artilharia e assistências';
 }

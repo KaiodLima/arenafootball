@@ -6,8 +6,8 @@ import 'package:arena_soccer/utils/components/arena_chip_button.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 
-/// Rodapé de grupos/classificação com os atalhos para a artilharia e os
-/// líderes de assistência da região/temporada.
+/// Rodapé de grupos/classificação com o atalho para a artilharia e as
+/// assistências da região/temporada (mesma tela, com o seletor lá dentro).
 class StatsShortcutsBar extends StatelessWidget {
   final String region;
   final String season;
@@ -37,15 +37,9 @@ class StatsShortcutsBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ArenaChipButton(
-                title: l10n.matchesTopScorers,
+                title: l10n.statsShortcut,
                 icon: Icons.sports_soccer_rounded,
                 onPressed: () => _open(context, StatsRankingType.goals),
-              ),
-              const SizedBox(width: AppSizes.s10),
-              ArenaChipButton(
-                title: l10n.matchesAssists,
-                icon: Icons.assistant_rounded,
-                onPressed: () => _open(context, StatsRankingType.assists),
               ),
             ],
           ),
