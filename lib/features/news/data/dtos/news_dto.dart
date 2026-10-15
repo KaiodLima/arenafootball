@@ -44,6 +44,11 @@ class NewsDTO extends Equatable {
   final String awayTeamId;
   final String scoringTeamId;
 
+  /// Cores do time que marcou no momento do gol (`cor_marcador`,
+  /// `cor_marcador_secundaria`, hex): pintam o fundo do card. Vazias = verde.
+  final String scoringTeamPrimaryColor;
+  final String scoringTeamSecondaryColor;
+
   const NewsDTO({
     this.id = '',
     this.date,
@@ -69,6 +74,8 @@ class NewsDTO extends Equatable {
     this.homeTeamId = '',
     this.awayTeamId = '',
     this.scoringTeamId = '',
+    this.scoringTeamPrimaryColor = '',
+    this.scoringTeamSecondaryColor = '',
   });
 
   bool get hasScorer => scorerId.isNotEmpty && scorerName.isNotEmpty;
@@ -110,6 +117,8 @@ class NewsDTO extends Equatable {
       homeTeamId: data['id_time_casa']?.toString() ?? '',
       awayTeamId: data['id_time_fora']?.toString() ?? '',
       scoringTeamId: data['id_time_marcador']?.toString() ?? '',
+      scoringTeamPrimaryColor: data['cor_marcador']?.toString() ?? '',
+      scoringTeamSecondaryColor: data['cor_marcador_secundaria']?.toString() ?? '',
     );
   }
 
@@ -142,6 +151,8 @@ class NewsDTO extends Equatable {
         if (homeTeamId.isNotEmpty) 'id_time_casa': homeTeamId,
         if (awayTeamId.isNotEmpty) 'id_time_fora': awayTeamId,
         if (scoringTeamId.isNotEmpty) 'id_time_marcador': scoringTeamId,
+        if (scoringTeamPrimaryColor.isNotEmpty) 'cor_marcador': scoringTeamPrimaryColor,
+        if (scoringTeamSecondaryColor.isNotEmpty) 'cor_marcador_secundaria': scoringTeamSecondaryColor,
       };
 
   NewsDTO copyWith({
@@ -169,6 +180,8 @@ class NewsDTO extends Equatable {
     String? homeTeamId,
     String? awayTeamId,
     String? scoringTeamId,
+    String? scoringTeamPrimaryColor,
+    String? scoringTeamSecondaryColor,
   }) {
     return NewsDTO(
       id: id ?? this.id,
@@ -195,6 +208,8 @@ class NewsDTO extends Equatable {
       homeTeamId: homeTeamId ?? this.homeTeamId,
       awayTeamId: awayTeamId ?? this.awayTeamId,
       scoringTeamId: scoringTeamId ?? this.scoringTeamId,
+      scoringTeamPrimaryColor: scoringTeamPrimaryColor ?? this.scoringTeamPrimaryColor,
+      scoringTeamSecondaryColor: scoringTeamSecondaryColor ?? this.scoringTeamSecondaryColor,
     );
   }
 
@@ -224,5 +239,7 @@ class NewsDTO extends Equatable {
         homeTeamId,
         awayTeamId,
         scoringTeamId,
+        scoringTeamPrimaryColor,
+        scoringTeamSecondaryColor,
       ];
 }

@@ -82,7 +82,13 @@ class _FakeRegions implements GetRegionsUseCase {
 class _FakeTeams implements GetTeamsUseCase {
   @override
   Future<Either<Failure, List<TeamDTO>>> call({String? region, String? season}) async => const Right([
-        TeamDTO(id: '1', name: 'Lava Jato', imageUrl: 'https://img/lj.png'),
+        TeamDTO(
+          id: '1',
+          name: 'Lava Jato',
+          imageUrl: 'https://img/lj.png',
+          primaryColor: '#C62828',
+          secondaryColor: '#FFFFFF',
+        ),
         TeamDTO(id: '2', name: 'Volta'),
       ]);
 }
@@ -393,6 +399,9 @@ void main() {
       final map = createNews.created!.toMap();
       expect(map, containsPair('time_marcador', 'Lava Jato'));
       expect(map, containsPair('escudo_marcador', 'https://img/lj.png'));
+      // Cores do time que marcou: pintam o fundo do card.
+      expect(map, containsPair('cor_marcador', '#C62828'));
+      expect(map, containsPair('cor_marcador_secundaria', '#FFFFFF'));
       expect(cubit.state.form.scoringTeam, isNull);
     });
 

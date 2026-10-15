@@ -82,6 +82,15 @@ class GoalFormData extends Equatable {
   /// Id do time de nome [teamName] na lista carregada ('' se não achar).
   String teamIdOf(String? teamName) => TeamDirectory(teams).idOf(name: teamName ?? '');
 
+  /// Time de nome [teamName] na lista carregada (escudo e cores).
+  TeamDTO? teamOf(String? teamName) {
+    if (teamName == null) return null;
+    for (final team in teams) {
+      if (team.name == teamName) return team;
+    }
+    return null;
+  }
+
   String? crestOf(String? teamName) {
     if (teamName == null) return null;
     for (final team in teams) {

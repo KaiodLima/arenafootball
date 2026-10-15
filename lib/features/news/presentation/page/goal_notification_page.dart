@@ -271,6 +271,8 @@ class _GoalNotificationPageState extends State<GoalNotificationPage> {
                     assistantName: form.assistant?.name ?? '',
                     scoringTeam: form.scoringTeam ?? '',
                     scoringTeamCrest: form.crestOf(form.scoringTeam) ?? '',
+                    scoringTeamPrimaryColor: form.teamOf(form.scoringTeam)?.primaryColor ?? '',
+                    scoringTeamSecondaryColor: form.teamOf(form.scoringTeam)?.secondaryColor ?? '',
                   ),
                 ),
               ],

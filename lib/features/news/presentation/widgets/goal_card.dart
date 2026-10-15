@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
+import 'package:arena_soccer/features/news/presentation/widgets/goal_card_background.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
-import 'package:arena_soccer/utils/components/arena_card.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
-import 'package:arena_soccer/utils/constants/app_images.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/constants/team_colors.dart';
 
-/// Card de gol do feed: filete verde, selo "GOL" e o placar em destaque.
+/// Card de gol do feed, no molde da carteirinha e do card do melhor da
+/// partida: formato fixo 2,4:1 com fundo próprio ([GoalCardBackground]) nas
+/// cores do time que marcou (verde nos cards antigos, sem cor gravada), o
+/// escudo do time dentro do escudo desenhado e o conteúdo em proporção à
+/// largura.
 class GoalCard extends StatelessWidget {
   final NewsDTO news;
   final Widget? trailing;
@@ -30,99 +34,162 @@ class GoalCard extends StatelessWidget {
     this.onAssistantTap,
   });
 
+  /// Cores do card. O destaque (escudo, pinceladas, "GOL!") é a principal;
+  /// se ela for clara demais (ex.: branco) e a secundária não, os papéis se
+  /// invertem: escurecer o branco daria cinza, que não é cor do time. Com as
+  /// duas claras, o tom escuro vem da secundária. Sem cor, verde.
+  static TeamPalette paletteFor(String primary, String secondary) {
+    final first = colorFromHex(primary);
+    final second = colorFromHex(secondary);
+    if (first == null || second == null || !isLightColor(first)) return TeamPalette.orDefault(primary, secondary);
+    if (!isLightColor(second)) return TeamPalette.orDefault(secondary, primary);
+    final palette = TeamPalette.orDefault(primary, secondary);
+    return TeamPalette(
+      background: palette.background,
+      onBackground: palette.onBackground,
+      accent: palette.accent,
+      accentDark: Color.lerp(second, AppColors.black, 0.3)!,
+      onAccent: palette.onAccent,
+      bar: palette.bar,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final teamStyle = AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s16);
+    final palette = paletteFor(news.scoringTeamPrimaryColor, news.scoringTeamSecondaryColor);
+    final radius = BorderRadius.circular(AppSizes.cardRadius);
 
-    return ArenaCard(
-      onTap: onTap,
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(width: AppSizes.s6, color: AppColors.primary),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(AppSizes.s14, AppSizes.s12, AppSizes.s8, AppSizes.s14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s2),
-                          decoration: BoxDecoration(
-                            color: AppColors.primarySoft,
-                            borderRadius: BorderRadius.circular(AppSizes.s8),
-                          ),
-                          child: Text(
-                            '⚽ ${l10n.newsGoalLabel}',
-                            style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s12),
-                          ),
-                        ),
-                        // Escudo do time que marcou (cards novos).
-                        if (news.scoringTeamCrest.isNotEmpty) ...[
-                          const SizedBox(width: AppSizes.s8),
-                          Tooltip(
-                            message: news.scoringTeam,
-                            child: TeamCrest(imageUrl: news.scoringTeamCrest, size: AppSizes.s24),
-                          ),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: AppSizes.s10),
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(news.homeTeam, maxLines: 1, overflow: TextOverflow.ellipsis, style: teamStyle),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8),
-                          child: Text(
-                            '${news.homeGoals} × ${news.awayGoals}',
-                            style: AppTypography.title().copyWith(fontSize: AppSizes.s20),
-                          ),
-                        ),
-                        Flexible(
-                          child: Text(news.awayTeam, maxLines: 1, overflow: TextOverflow.ellipsis, style: teamStyle),
-                        ),
-                      ],
-                    ),
-                    if (news.hasScorer) ...[
-                      const SizedBox(height: AppSizes.s8),
-                      Wrap(
-                        spacing: AppSizes.s6,
-                        runSpacing: AppSizes.s6,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSizes.s14),
+      child: AspectRatio(
+        aspectRatio: 2.4,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            boxShadow: [
+              BoxShadow(color: AppColors.black.withValues(alpha: 0.14), blurRadius: 14, offset: const Offset(0, 6)),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: radius,
+            child: GoalCardBackground(
+              palette: palette,
+              child: Material(
+                color: AppColors.transparent,
+                child: InkWell(
+                  onTap: onTap,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final size = constraints.biggest;
+                      final width = size.width;
+                      final shield = GoalCardBackground.shieldRect(size);
+                      final crestCenter = GoalCardBackground.shieldCenter(size);
+                      final crestSize = shield.width * 0.62;
+                      final teamStyle = AppTypography.label(color: AppColors.textPrimary)
+                          .copyWith(fontSize: (width * 0.038).clamp(AppSizes.s12, AppSizes.s18), height: 1.15);
+
+                      return Stack(
                         children: [
-                          _PersonChip(
-                            icon: Icons.sports_soccer_rounded,
-                            name: news.scorerName,
-                            tooltip: l10n.athleteScored,
-                            onTap: onScorerTap,
-                          ),
-                          if (news.hasAssistant)
-                            _PersonChip(
-                              icon: Icons.assistant_rounded,
-                              name: news.assistantName,
-                              tooltip: l10n.athleteAssisted,
-                              onTap: onAssistantTap,
+                          // Escudo do time num círculo branco, dentro do escudo desenhado.
+                          Positioned(
+                            left: crestCenter.dx - crestSize / 2,
+                            top: crestCenter.dy - crestSize / 2,
+                            width: crestSize,
+                            height: crestSize,
+                            child: Tooltip(
+                              message: news.scoringTeam,
+                              child: Container(
+                                padding: EdgeInsets.all(crestSize * 0.1),
+                                decoration: const BoxDecoration(color: AppColors.white, shape: BoxShape.circle),
+                                child: news.scoringTeamCrest.isNotEmpty
+                                    ? TeamCrest(imageUrl: news.scoringTeamCrest, size: crestSize * 0.8)
+                                    : Icon(Icons.sports_soccer_rounded, size: crestSize * 0.6, color: palette.ring),
+                              ),
                             ),
+                          ),
+                          Positioned(
+                            left: GoalCardBackground.contentStart(size),
+                            right: width * 0.04,
+                            top: size.height * 0.08,
+                            bottom: size.height * 0.08,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${l10n.newsGoalLabel}!',
+                                  style: AppTypography.display(color: palette.ring).copyWith(
+                                    fontSize: size.height * 0.17,
+                                    fontStyle: FontStyle.italic,
+                                    height: 1,
+                                    letterSpacing: 1,
+                                  ),
+                                ),
+                                const Spacer(),
+                                // Placar no centro, times dos dois lados.
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        news.homeTeam,
+                                        textAlign: TextAlign.right,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: teamStyle,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: width * 0.025),
+                                      child: Text(
+                                        '${news.homeGoals} × ${news.awayGoals}',
+                                        style: AppTypography.display().copyWith(fontSize: width * 0.07, height: 1),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        news.awayTeam,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: teamStyle,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Spacer(),
+                                if (news.hasScorer)
+                                  Wrap(
+                                    spacing: AppSizes.s6,
+                                    runSpacing: AppSizes.s4,
+                                    children: [
+                                      _PersonChip(
+                                        icon: Icons.sports_soccer_rounded,
+                                        name: news.scorerName,
+                                        tooltip: l10n.athleteScored,
+                                        onTap: onScorerTap,
+                                      ),
+                                      if (news.hasAssistant)
+                                        _PersonChip(
+                                          icon: Icons.assistant_rounded,
+                                          name: news.assistantName,
+                                          tooltip: l10n.athleteAssisted,
+                                          onTap: onAssistantTap,
+                                        ),
+                                    ],
+                                  )
+                                else
+                                  SizedBox(height: size.height * 0.12),
+                              ],
+                            ),
+                          ),
+                          if (trailing != null) Positioned(top: AppSizes.s4, right: AppSizes.s4, child: trailing!),
                         ],
-                      ),
-                    ],
-                  ],
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
-            if (trailing != null)
-              Align(alignment: Alignment.topCenter, child: trailing!)
-            else
-              Padding(
-                padding: const EdgeInsets.all(AppSizes.s10),
-                child: Image.asset(AppImages.ballInNet, width: AppSizes.s48, fit: BoxFit.contain),
-              ),
-          ],
+          ),
         ),
       ),
     );

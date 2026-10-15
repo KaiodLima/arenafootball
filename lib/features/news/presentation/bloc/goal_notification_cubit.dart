@@ -254,6 +254,8 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
         homeTeamId: form.teamIdOf(form.homeTeam),
         awayTeamId: form.teamIdOf(form.awayTeam),
         scoringTeamId: form.teamIdOf(form.scoringTeam),
+        scoringTeamPrimaryColor: form.teamOf(form.scoringTeam)?.primaryColor ?? '',
+        scoringTeamSecondaryColor: form.teamOf(form.scoringTeam)?.secondaryColor ?? '',
       ),
     );
     if (isClosed) return;
