@@ -15,10 +15,8 @@ class VotingDataSource {
   static const String _logName = 'VotingDataSource';
 
   /// Votos da partida: subcoleção `votos` do doc em `partidas{ano}`.
-  CollectionReference<Map<String, dynamic>> _votes(MatchVoteRef ref) => _firestore
-      .collection(SeasonCollection.name('partidas', ref.season))
-      .doc(ref.matchId)
-      .collection('votos');
+  CollectionReference<Map<String, dynamic>> _votes(MatchVoteRef ref) =>
+      _firestore.collection(SeasonCollection.name('partidas', ref.season)).doc(ref.matchId).collection('votos');
 
   /// Coleção antiga, nomeada pelos dois times (sem temporada). Só leitura:
   /// votos de antes da mudança e de versões antigas do app.
@@ -59,9 +57,8 @@ class VotingDataSource {
   /// primeiro (desempate pelo primeiro voto, como no app antigo).
   Future<Either<Failure, List<VoteDTO>>> getVotes({required MatchVoteRef ref}) async {
     try {
-      final current = ref.matchId.isEmpty
-          ? const <VoteDTO>[]
-          : (await _votes(ref).get()).docs.map(VoteDTO.fromFirestore).toList();
+      final current =
+          ref.matchId.isEmpty ? const <VoteDTO>[] : (await _votes(ref).get()).docs.map(VoteDTO.fromFirestore).toList();
       final voters = {for (final vote in current) vote.voterId};
       final legacy = (await _legacyVotes(ref).get())
           .docs

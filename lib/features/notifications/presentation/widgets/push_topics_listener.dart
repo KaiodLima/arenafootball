@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/core/services/push_service.dart';
 import 'package:arena_soccer/core/utils/push_topics.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
@@ -21,6 +22,7 @@ class PushTopicsListener extends StatelessWidget {
     final user = BlocProvider.of<SessionCubit>(context).state.user;
     sl<PushTopicSync>().sync(desiredTopics(
       region: region,
+      regionId: RegionRegistry.idOf(region),
       favoriteTeam: user?.favoriteTeam,
       favoriteTeamId: user?.favoriteTeamId,
       userId: user?.id,

@@ -33,8 +33,7 @@ class GetStatsRankingUseCase {
     // Jogadores dos times da região: pelo id e, nos antigos (sem id), pelo nome.
     final directory = TeamDirectory(teams.right);
     final ranked = players.right
-        .where((player) =>
-            directory.resolve(id: player.teamId, name: player.team) != null && type.valueOf(player) > 0)
+        .where((player) => directory.resolve(id: player.teamId, name: player.team) != null && type.valueOf(player) > 0)
         .toList();
 
     // Ordenação estável: o índice original desempata.

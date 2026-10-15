@@ -1494,5 +1494,135 @@
         "type": "int"
       }
     }
+  },
+  "regionsManageTitle": "Regiões",
+  "regionsTeamsCount": "{count, plural, =0{Nenhum time nesta temporada} =1{1 time nesta temporada} other{{count} times nesta temporada}}",
+  "@regionsTeamsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "regionsCreate": "Nova região",
+  "regionsNameLabel": "Nome da região",
+  "regionsNameHint": "A região aparece para todos na hora, na home e nos cadastros.",
+  "regionsCreated": "Região \"{name}\" criada!",
+  "@regionsCreated": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "regionsDuplicate": "Já existe uma região com esse nome.",
+  "regionsNameTooShort": "Use pelo menos 3 letras.",
+  "regionsEmpty": "Nenhuma região cadastrada. Toque em + para criar.",
+  "regionsLoadError": "Não foi possível carregar as regiões.",
+  "commonOk": "Ok",
+  "regionsRename": "Renomear",
+  "regionsRenameTitle": "Renomear região",
+  "regionsRenameHint": "Times, partidas, notícias e campeonatos continuam na região e passam a mostrar o novo nome.",
+  "regionsRenamed": "\"{previous}\" agora é \"{name}\".",
+  "@regionsRenamed": {
+    "placeholders": {
+      "previous": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "regionsDeleteTitle": "Excluir \"{name}\"?",
+  "@regionsDeleteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "regionsDeleteMessage": "A região está vazia e sai da lista para todos.",
+  "regionsDeleted": "Região \"{name}\" excluída.",
+  "@regionsDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "regionsDeleteBlockedTitle": "Região com conteúdo",
+  "regionsDeleteBlockedMessage": "\"{name}\" ainda tem {usage}. Só dá para excluir uma região vazia; se quiser mudar o nome, use \"Renomear\".",
+  "@regionsDeleteBlockedMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "usage": {
+        "type": "String"
+      }
+    }
+  },
+  "regionsLastRegion": "Esta é a única região: não dá para excluir.",
+  "regionsUsageTeams": "{count, plural, =1{1 time} other{{count} times}}",
+  "@regionsUsageTeams": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "regionsUsageMatches": "{count, plural, =1{1 partida} other{{count} partidas}}",
+  "@regionsUsageMatches": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "regionsUsageNews": "{count, plural, =1{1 notícia} other{{count} notícias}}",
+  "@regionsUsageNews": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "regionsUsageChampionships": "{count, plural, =1{1 campeonato} other{{count} campeonatos}}",
+  "@regionsUsageChampionships": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "regionsUsageGroups": "{count, plural, =1{1 grupo} other{{count} grupos}}",
+  "@regionsUsageGroups": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "regionsLinkTitle": "Vincular regiões por id",
+  "regionsLinkHint": "Grava o id da região nos times, partidas, notícias, campeonatos, grupos e pedidos antigos, de todas as temporadas. Rode uma vez depois de atualizar o app; pode rodar de novo, só completa o que falta.",
+  "regionsLinkRun": "Vincular agora",
+  "regionsLinkConfirm": "Isso percorre a base inteira e pode levar alguns minutos. Continuar?",
+  "regionsLinkDone": "{count, plural, =1{1 documento vinculado.} other{{count} documentos vinculados.}}",
+  "@regionsLinkDone": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "regionsLinkNothing": "Tudo já estava vinculado.",
+  "regionsLinkUnmatched": "Nomes que não batem com nenhuma região (ficaram sem id): {names}",
+  "@regionsLinkUnmatched": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
   }
 }

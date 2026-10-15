@@ -239,8 +239,7 @@ class _RequestCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: AppTypography.body().copyWith(fontWeight: FontWeight.w700),
                     ),
-                    if (position != null)
-                      Text(playerPositionLabel(l10n, position), style: AppTypography.subtitle()),
+                    if (position != null) Text(playerPositionLabel(l10n, position), style: AppTypography.subtitle()),
                   ],
                 ),
               ),

@@ -350,11 +350,26 @@ class _ChampionshipFormPageState extends State<ChampionshipFormPage> {
 
         // Premiação (recolhível)
         _PrizesSection(
-          initiallyExpanded: [base.firstPrize, base.secondPrize, base.thirdPrize, base.topScorerPrize, base.goalkeeperPrize]
-              .any((p) => p.isNotEmpty),
+          initiallyExpanded: [
+            base.firstPrize,
+            base.secondPrize,
+            base.thirdPrize,
+            base.topScorerPrize,
+            base.goalkeeperPrize
+          ].any((p) => p.isNotEmpty),
           fields: [
-            (_prize1, l10n.championshipFormPrize1, Icons.looks_one_outlined, (String v) => _cubit.changePrizes(first: v)),
-            (_prize2, l10n.championshipFormPrize2, Icons.looks_two_outlined, (String v) => _cubit.changePrizes(second: v)),
+            (
+              _prize1,
+              l10n.championshipFormPrize1,
+              Icons.looks_one_outlined,
+              (String v) => _cubit.changePrizes(first: v)
+            ),
+            (
+              _prize2,
+              l10n.championshipFormPrize2,
+              Icons.looks_two_outlined,
+              (String v) => _cubit.changePrizes(second: v)
+            ),
             (_prize3, l10n.championshipFormPrize3, Icons.looks_3_outlined, (String v) => _cubit.changePrizes(third: v)),
             (
               _prizeTopScorer,

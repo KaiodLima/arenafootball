@@ -39,6 +39,7 @@ class AppRoutes {
   static const String editTeamPage = '/edit_team_page';
   static const String publishAdPage = '/publish_ad_page';
   static const String manageHighlightsPage = '/manage_highlights_page';
+  static const String manageRegionsPage = '/manage_regions_page';
   static const String notificationsPanelPage = '/notifications_panel_page';
   static const String goalNotificationPage = '/goal_notification_page';
   static const String playerRequestsPanelPage = '/player_requests_panel_page';

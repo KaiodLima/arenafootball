@@ -28,6 +28,8 @@ import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
 import 'package:arena_soccer/features/highlights/presentation/bloc/highlight_form_cubit.dart';
 import 'package:arena_soccer/features/highlights/presentation/bloc/manage_highlights_cubit.dart';
 import 'package:arena_soccer/features/highlights/presentation/page/manage_highlights_page.dart';
+import 'package:arena_soccer/features/regions/presentation/bloc/manage_regions_cubit.dart';
+import 'package:arena_soccer/features/regions/presentation/page/manage_regions_page.dart';
 import 'package:arena_soccer/features/notifications/presentation/bloc/notifications_panel_cubit.dart';
 import 'package:arena_soccer/features/notifications/presentation/page/notifications_panel_page.dart';
 import 'package:arena_soccer/features/highlights/presentation/bloc/highlight_news_cubit.dart';
@@ -173,6 +175,10 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.notificationsPanelPage: (_) => BlocProvider<NotificationsPanelCubit>(
               create: (_) => NotificationsPanelCubit(sl(), sl(), sl(), sl(), sl()),
               child: const NotificationsPanelPage(),
+            ),
+        AppRoutes.manageRegionsPage: (_) => BlocProvider<ManageRegionsCubit>(
+              create: (_) => ManageRegionsCubit(sl(), sl(), sl(), sl(), sl(), sl()),
+              child: const ManageRegionsPage(),
             ),
         AppRoutes.manageHighlightsPage: (_) => BlocProvider<ManageHighlightsCubit>(
               create: (_) => ManageHighlightsCubit(sl(), sl(), sl(), sl()),

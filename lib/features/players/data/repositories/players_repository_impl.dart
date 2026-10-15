@@ -10,7 +10,8 @@ class PlayersRepositoryImpl implements IPlayersRepository {
   PlayersRepositoryImpl(this._dataSource);
 
   @override
-  Stream<Either<Failure, List<PlayerDTO>>> watchTeamPlayers({String teamId = '', required String teamName, String? season}) =>
+  Stream<Either<Failure, List<PlayerDTO>>> watchTeamPlayers(
+          {String teamId = '', required String teamName, String? season}) =>
       _dataSource.watchTeamPlayers(teamId: teamId, teamName: teamName, season: season);
 
   @override

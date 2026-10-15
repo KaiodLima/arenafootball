@@ -130,7 +130,8 @@ class _EditSheetState extends State<_EditSheet> {
               function: nameValid
                   ? () => Navigator.pop(
                         context,
-                        widget.request.copyWith(name: _name.text.trim(), team: _team, teamId: _teamId, position: _position),
+                        widget.request
+                            .copyWith(name: _name.text.trim(), team: _team, teamId: _teamId, position: _position),
                       )
                   : null,
             ),

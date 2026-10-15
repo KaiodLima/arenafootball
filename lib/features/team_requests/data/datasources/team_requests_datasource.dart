@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/errors/firebase_error.dart';
 import 'package:arena_soccer/core/firebase/either_stream.dart';
@@ -75,7 +76,7 @@ class TeamRequestsDataSource {
     try {
       await _requests.doc(request.userId).update({
         'nome': request.name,
-        'regiao': request.region,
+        ...RegionRegistry.fieldsFor(request.region, nameKey: 'regiao'),
         'descricao': request.description,
         'atualizado_em': FieldValue.serverTimestamp(),
       });

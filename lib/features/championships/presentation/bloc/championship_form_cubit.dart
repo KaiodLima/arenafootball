@@ -24,8 +24,7 @@ class ChampionshipFormCubit extends Cubit<ChampionshipFormState> {
 
   /// [initial] = campeonato a editar; sem ele, um novo na região [initialRegion].
   Future<void> load({ChampionshipDTO? initial, required String initialRegion}) async {
-    final base = initial ??
-        ChampionshipDTO(id: '', region: initialRegion, season: SeasonCollection.currentSeason);
+    final base = initial ?? ChampionshipDTO(id: '', region: initialRegion, season: SeasonCollection.currentSeason);
     final seasons = {...SeasonCollection.seasons, if (base.season.isNotEmpty) base.season}.toList()..sort();
     final form = ChampionshipFormData(base: base, seasons: seasons, selectedTeams: [...base.teams]);
     emit(LoadingChampionshipFormState(form));

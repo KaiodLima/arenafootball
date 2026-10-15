@@ -40,8 +40,7 @@ class _MyTeamViewState extends State<MyTeamView> {
   @override
   void initState() {
     super.initState();
-    _cubit = BlocProvider.of<MyTeamCubit>(context)
-      ..load(teamId: widget.request.teamId, teamName: widget.request.name);
+    _cubit = BlocProvider.of<MyTeamCubit>(context)..load(teamId: widget.request.teamId, teamName: widget.request.name);
   }
 
   @override
@@ -188,7 +187,8 @@ class _SquadTab extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, AppSizes.s32),
       children: [
-        ArenaButton.primary(title: l10n.myTeamAddPlayer, isLoading: state.saving, function: state.saving ? null : onAdd),
+        ArenaButton.primary(
+            title: l10n.myTeamAddPlayer, isLoading: state.saving, function: state.saving ? null : onAdd),
         const SizedBox(height: AppSizes.s16),
         if (state.players.isEmpty && !state.loading)
           ArenaEmptyState(message: l10n.myTeamSquadEmpty, icon: Icons.groups_outlined)

@@ -160,7 +160,11 @@ class _Shortcuts extends StatelessWidget {
           onTap: () => Navigator.pushNamed(
             context,
             AppRoutes.groupsPage,
-            arguments: {'region': championship.region, 'season': _season, 'championshipId': championship.championshipId},
+            arguments: {
+              'region': championship.region,
+              'season': _season,
+              'championshipId': championship.championshipId
+            },
           ),
         ),
         ShortcutTile(

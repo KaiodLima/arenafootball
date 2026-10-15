@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/errors/firebase_error.dart';
 import 'package:arena_soccer/core/firebase/either_stream.dart';
@@ -20,7 +21,7 @@ class ChampionshipsDataSource {
   /// é separada por temporada.
   Stream<Either<Failure, List<ChampionshipDTO>>> watchChampionships({String? region}) {
     Query<Map<String, dynamic>> query = _firestore.collection('campeonatos');
-    if (region != null) query = query.where('fk_competicao', isEqualTo: region);
+    if (region != null) query = RegionRegistry.where(query, region);
     return query.snapshots().toEither(
           (snapshot) => snapshot.docs.map(ChampionshipDTO.fromFirestore).toList(),
           fallbackMessage: 'Não foi possível carregar as competições.',
@@ -29,9 +30,7 @@ class ChampionshipsDataSource {
   }
 
   Stream<Either<Failure, List<GroupDTO>>> watchGroups({required String region, String? season}) {
-    return _firestore
-        .collection(SeasonCollection.name('grupos', season))
-        .where('fk_competicao', isEqualTo: region)
+    return RegionRegistry.where(_firestore.collection(SeasonCollection.name('grupos', season)), region)
         .snapshots()
         .toEither(
           (snapshot) => snapshot.docs.map(GroupDTO.fromFirestore).toList(),
@@ -47,9 +46,7 @@ class ChampionshipsDataSource {
     required String group,
     String? season,
   }) {
-    return _firestore
-        .collection(SeasonCollection.name('classificacao', season))
-        .where('fk_competicao', isEqualTo: region)
+    return RegionRegistry.where(_firestore.collection(SeasonCollection.name('classificacao', season)), region)
         .where('fk_grupo', isEqualTo: group)
         .orderBy('pontos', descending: true)
         .orderBy('saldo_gols', descending: true)
@@ -113,7 +110,7 @@ class ChampionshipsDataSource {
     required String season,
   }) async {
     try {
-      final result = await _championships.where('fk_competicao', isEqualTo: region).get();
+      final result = await RegionRegistry.where(_championships, region).get();
       final list = result.docs.map(ChampionshipDTO.fromFirestore).where((c) => c.season == season).toList()
         ..sort((a, b) => a.championshipId.compareTo(b.championshipId));
       return Right(list);
@@ -129,7 +126,7 @@ class ChampionshipsDataSource {
     required String season,
   }) async {
     try {
-      final result = await _championships.where('fk_competicao', isEqualTo: region).get();
+      final result = await RegionRegistry.where(_championships, region).get();
       final list = result.docs.map(ChampionshipDTO.fromFirestore).toList();
       return Right(pickChampionshipForSeason(list, season));
     } catch (e) {

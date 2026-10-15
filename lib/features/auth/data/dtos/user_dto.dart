@@ -7,6 +7,7 @@ class UserDTO extends Equatable {
   final String id;
   final String name;
   final String email;
+
   /// Nome do time do coração (cópia para exibir; o vínculo é [favoriteTeamId]).
   final String favoriteTeam;
 

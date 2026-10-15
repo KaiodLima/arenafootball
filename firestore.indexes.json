@@ -1,0 +1,225 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "classificacao",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "fk_competicao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fk_grupo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "pontos",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "classificacao",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "fk_competicao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fk_grupo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "pontos",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "saldo_gols",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "destaques",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "exibir",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "priority",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "noticias",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "fk_competicao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "data",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "noticias",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "fk_competicao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "noticias",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "tag",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "id",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "noticias",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idRegiao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "data",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "classificacao2022",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idRegiao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fk_grupo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "pontos",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "saldo_gols",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "classificacao",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idRegiao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fk_grupo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "pontos",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "saldo_gols",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "classificacao2024",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idRegiao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fk_grupo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "pontos",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "saldo_gols",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "classificacao2025",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idRegiao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fk_grupo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "pontos",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "saldo_gols",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "classificacao2026",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idRegiao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fk_grupo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "pontos",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "saldo_gols",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

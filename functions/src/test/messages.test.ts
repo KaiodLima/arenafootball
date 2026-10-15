@@ -175,3 +175,14 @@ test('pedido "Sou jogador" também avisa o dono do time', () => {
   assert.equal(toOwner?.corpo, 'Kaio quer jogar no Riacho');
   assert.equal(playerRequestToOwnerMessage('Dono1', pending, pending), null);
 });
+
+test('região pelo id quando o doc tem idRegiao; senão pelo nome', () => {
+  const match = { timeC: 'A', timeF: 'B', data: '11/10', fk_competicao: 'Floresta', idRegiao: 'kv7h', votacao: 'false' };
+  assert.deepEqual(matchCreatedMessage(match)?.alvo, {
+    condition: "'regiaoid_kv7h' in topics || 'time_a' in topics || 'time_b' in topics",
+  });
+  assert.deepEqual(manualMessage({ titulo: 'Oi', corpo: 'x', regiao: 'Floresta', idRegiao: 'kv7h' })?.alvo, {
+    topic: 'regiaoid_kv7h',
+  });
+  assert.deepEqual(manualMessage({ titulo: 'Oi', corpo: 'x', regiao: 'Floresta' })?.alvo, { topic: 'regiao_floresta' });
+});

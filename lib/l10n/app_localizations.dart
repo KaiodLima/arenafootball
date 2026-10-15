@@ -4311,6 +4311,204 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Time do coração'**
   String get teamLinksUsers;
+
+  /// No description provided for @regionsManageTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Regiões'**
+  String get regionsManageTitle;
+
+  /// No description provided for @regionsTeamsCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{Nenhum time nesta temporada} =1{1 time nesta temporada} other{{count} times nesta temporada}}'**
+  String regionsTeamsCount(int count);
+
+  /// No description provided for @regionsCreate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nova região'**
+  String get regionsCreate;
+
+  /// No description provided for @regionsNameLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome da região'**
+  String get regionsNameLabel;
+
+  /// No description provided for @regionsNameHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'A região aparece para todos na hora, na home e nos cadastros.'**
+  String get regionsNameHint;
+
+  /// No description provided for @regionsCreated.
+  ///
+  /// In pt, this message translates to:
+  /// **'Região \"{name}\" criada!'**
+  String regionsCreated(String name);
+
+  /// No description provided for @regionsDuplicate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Já existe uma região com esse nome.'**
+  String get regionsDuplicate;
+
+  /// No description provided for @regionsNameTooShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'Use pelo menos 3 letras.'**
+  String get regionsNameTooShort;
+
+  /// No description provided for @regionsEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma região cadastrada. Toque em + para criar.'**
+  String get regionsEmpty;
+
+  /// No description provided for @regionsLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar as regiões.'**
+  String get regionsLoadError;
+
+  /// No description provided for @commonOk.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ok'**
+  String get commonOk;
+
+  /// No description provided for @regionsRename.
+  ///
+  /// In pt, this message translates to:
+  /// **'Renomear'**
+  String get regionsRename;
+
+  /// No description provided for @regionsRenameTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Renomear região'**
+  String get regionsRenameTitle;
+
+  /// No description provided for @regionsRenameHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Times, partidas, notícias e campeonatos continuam na região e passam a mostrar o novo nome.'**
+  String get regionsRenameHint;
+
+  /// No description provided for @regionsRenamed.
+  ///
+  /// In pt, this message translates to:
+  /// **'\"{previous}\" agora é \"{name}\".'**
+  String regionsRenamed(String previous, String name);
+
+  /// No description provided for @regionsDeleteTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Excluir \"{name}\"?'**
+  String regionsDeleteTitle(String name);
+
+  /// No description provided for @regionsDeleteMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'A região está vazia e sai da lista para todos.'**
+  String get regionsDeleteMessage;
+
+  /// No description provided for @regionsDeleted.
+  ///
+  /// In pt, this message translates to:
+  /// **'Região \"{name}\" excluída.'**
+  String regionsDeleted(String name);
+
+  /// No description provided for @regionsDeleteBlockedTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Região com conteúdo'**
+  String get regionsDeleteBlockedTitle;
+
+  /// No description provided for @regionsDeleteBlockedMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'\"{name}\" ainda tem {usage}. Só dá para excluir uma região vazia; se quiser mudar o nome, use \"Renomear\".'**
+  String regionsDeleteBlockedMessage(String name, String usage);
+
+  /// No description provided for @regionsLastRegion.
+  ///
+  /// In pt, this message translates to:
+  /// **'Esta é a única região: não dá para excluir.'**
+  String get regionsLastRegion;
+
+  /// No description provided for @regionsUsageTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 time} other{{count} times}}'**
+  String regionsUsageTeams(int count);
+
+  /// No description provided for @regionsUsageMatches.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 partida} other{{count} partidas}}'**
+  String regionsUsageMatches(int count);
+
+  /// No description provided for @regionsUsageNews.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 notícia} other{{count} notícias}}'**
+  String regionsUsageNews(int count);
+
+  /// No description provided for @regionsUsageChampionships.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 campeonato} other{{count} campeonatos}}'**
+  String regionsUsageChampionships(int count);
+
+  /// No description provided for @regionsUsageGroups.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 grupo} other{{count} grupos}}'**
+  String regionsUsageGroups(int count);
+
+  /// No description provided for @regionsLinkTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vincular regiões por id'**
+  String get regionsLinkTitle;
+
+  /// No description provided for @regionsLinkHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grava o id da região nos times, partidas, notícias, campeonatos, grupos e pedidos antigos, de todas as temporadas. Rode uma vez depois de atualizar o app; pode rodar de novo, só completa o que falta.'**
+  String get regionsLinkHint;
+
+  /// No description provided for @regionsLinkRun.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vincular agora'**
+  String get regionsLinkRun;
+
+  /// No description provided for @regionsLinkConfirm.
+  ///
+  /// In pt, this message translates to:
+  /// **'Isso percorre a base inteira e pode levar alguns minutos. Continuar?'**
+  String get regionsLinkConfirm;
+
+  /// No description provided for @regionsLinkDone.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 documento vinculado.} other{{count} documentos vinculados.}}'**
+  String regionsLinkDone(int count);
+
+  /// No description provided for @regionsLinkNothing.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tudo já estava vinculado.'**
+  String get regionsLinkNothing;
+
+  /// No description provided for @regionsLinkUnmatched.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nomes que não batem com nenhuma região (ficaram sem id): {names}'**
+  String regionsLinkUnmatched(String names);
 }
 
 class _AppLocalizationsDelegate

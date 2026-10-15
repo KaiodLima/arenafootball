@@ -98,14 +98,15 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
     final goals = await getStatsRankingUseCase(type: StatsRankingType.goals, region: team.region, season: _season);
     final assists = await getStatsRankingUseCase(type: StatsRankingType.assists, region: team.region, season: _season);
     if (isClosed || _rankedFor != key) return;
-    emit(state.copyWith(
-      clearRanks: true,
-    ).copyWith(
-      goalsRank: goals.fold((_) => null, (ranking) => positionOf(ranking.entries, player.id)),
-      assistsRank: assists.fold((_) => null, (ranking) => positionOf(ranking.entries, player.id)),
-    ));
+    emit(state
+        .copyWith(
+          clearRanks: true,
+        )
+        .copyWith(
+          goalsRank: goals.fold((_) => null, (ranking) => positionOf(ranking.entries, player.id)),
+          assistsRank: assists.fold((_) => null, (ranking) => positionOf(ranking.entries, player.id)),
+        ));
   }
-
 
   /// Posição do jogador no ranking (empates dividem a posição); nulo se não
   /// está nele.

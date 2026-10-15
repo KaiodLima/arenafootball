@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/errors/firebase_error.dart';
 import 'package:arena_soccer/core/firebase/either_stream.dart';
@@ -16,7 +17,7 @@ class TeamsDataSource {
 
   Query<Map<String, dynamic>> _teamsQuery({String? region, String? season}) {
     Query<Map<String, dynamic>> query = _firestore.collection(SeasonCollection.name('times', season));
-    if (region != null) query = query.where('fk_competicao', isEqualTo: region);
+    if (region != null) query = RegionRegistry.where(query, region);
     return query;
   }
 
@@ -32,7 +33,11 @@ class TeamsDataSource {
 
   Future<Either<Failure, TeamDTO?>> getTeamByName(String name) async {
     try {
-      final result = await _firestore.collection(SeasonCollection.name('times', null)).where('nome', isEqualTo: name).limit(1).get();
+      final result = await _firestore
+          .collection(SeasonCollection.name('times', null))
+          .where('nome', isEqualTo: name)
+          .limit(1)
+          .get();
       return Right(result.docs.isEmpty ? null : TeamDTO.fromFirestore(result.docs.first));
     } catch (e) {
       AppLogger.e('getTeamByName name=$name', name: 'TeamsDataSource', error: e);
@@ -107,7 +112,7 @@ class TeamsDataSource {
         'urlImagem': imageUrl,
         'corPrimaria': primaryColor,
         'corSecundaria': secondaryColor,
-        if (region != null) 'fk_competicao': region,
+        if (region != null) ...RegionRegistry.fieldsFor(region),
       };
       final batch = _firestore.batch()
         ..update(_firestore.collection(SeasonCollection.name('times', season)).doc(id), data)
@@ -149,8 +154,8 @@ class TeamsDataSource {
       for (final doc in players.docs) {
         if (!ofTeam(doc.data())) continue;
         final linked = (doc.data()['idUsuario']?.toString() ?? '').isNotEmpty;
-        writes.add((batch) =>
-            linked ? batch.update(doc.reference, {'time': '', 'idTime': ''}) : batch.delete(doc.reference));
+        writes.add(
+            (batch) => linked ? batch.update(doc.reference, {'time': '', 'idTime': ''}) : batch.delete(doc.reference));
       }
 
       final requests = await _firestore.collection('solicitacoes_jogador').where(byTeam).get();

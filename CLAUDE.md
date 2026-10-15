@@ -40,7 +40,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 |---------|----------|
 | `splash` | Restaura a sessão (auto-login) e decide entre home e login |
 | `auth` | Login, cadastro de usuário, `SessionCubit` (global) |
-| `regions` | Regiões (`competicao`) + região/temporada escolhidas, `RegionCubit` (global) |
+| `regions` | Regiões (`competicao`) + região/temporada escolhidas, `RegionCubit` (global); painel do admin "Regiões" (criar, renomear, excluir só vazia e a manutenção "Vincular regiões por id") |
 | `home` | Casca: AppBar, drawer, barra inferior com as 4 abas, atalhos do admin |
 | `news` | Feed (aba HOME), detalhe, cadastro/edição, notificação de gol, anúncio |
 | `highlights` | Carrossel de destaques, detalhe, cadastro |
@@ -72,6 +72,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 - Erros sempre em `Either<Failure, T>` — nunca `throw`. DataSource captura e converte com `mapFirebaseError` (`lib/core/errors/firebase_error.dart`)
 - Streams do Firestore: `.toEither(...)` de `lib/core/firebase/either_stream.dart` (nunca deixar o erro do stream escapar)
 - Coleções por temporada: **sempre** `SeasonCollection.name('partidas', season)` — nunca montar `"partidas$ano"` na mão
+- Vínculo com a região é pelo **id** (doc de `competicao`, campo `idRegiao`); `fk_competicao`/`regiao` é só cópia do nome. Tudo passa pelo `RegionRegistry` (`lib/core/firebase/region_registry.dart`): `fieldsFor` ao gravar, `nameFromDoc` ao ler (nome atual pelo id) e `where` nas consultas. Nunca filtrar/gravar `fk_competicao` na mão
 - Vínculo com time é pelo **id** (doc de `times{ano}`); o nome gravado ao lado é só cópia para exibir. Gravar sempre os dois; buscar/comparar pelo id com fallback no nome para docs antigos (`sameTeam`/`TeamDirectory` em `lib/core/utils/team_key.dart`)
 - Firestore só dentro de DataSource. Widget e Cubit nunca importam `cloud_firestore`
 - Sessão (usuário/admin) vem do `SessionCubit`; região/temporada do `RegionCubit`. Não passar por construtor
@@ -93,7 +94,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | `usuarios` | idUsuario, nome, email, time (nome, cópia), idTime (time do coração), admin (bool), urlImagem (opcional: foto da carteirinha; conta Google usa a foto do Google até trocar). Contas antigas têm `senha` em texto puro — não gravar mais |
 | `noticias` | id, data (Timestamp), titulo, descricao, urlImagem, link, exibir ("true"/"false" **string**), fk_competicao, time_casa, time_fora, gol_time_casa, gol_time_fora, tag ("gol", "publicidade", título de destaque...), images[]. Cards de gol, opcionais: autor_gol_id, autor_gol, assistencia_id, assistencia (id/nome em `jogadores{ano}`), temporada, time_marcador, escudo_marcador (URL), id_time_casa, id_time_fora, id_time_marcador, cor_marcador, cor_marcador_secundaria (hex do time que marcou: fundo do card) |
 | `destaques` | id, title, link, urlImagem, exibir (string), priority |
-| `competicao` | nome (as "regiões": Floresta, Santo inacio...) |
+| `competicao` | nome (as "regiões": Floresta, Santo inacio...). O **id do doc** é o vínculo: os docs de conteúdo e os pedidos gravam `idRegiao` ao lado do nome (`fk_competicao`/`regiao`, só cópia). Renomear = trocar só o `nome` |
 | `times{ano}` | id_partida (é o id do **time**, nome errado), nome, descricao, fk_competicao, urlImagem, idDono (opcional: uid do dono, times do "Sou dono de time"), corPrimaria/corSecundaria (opcionais, hex "#RRGGBB"; paleta em `lib/utils/constants/team_colors.dart`) |
 | `classificacao{ano}` | campos do time + vitorias, derrotas, empates, gols_feitos, gols_sofridos, pontos, saldo_gols, fk_grupo |
 | `jogadores{ano}` | idJogador, nome, time (nome, cópia), idTime, urlImagem, nGols, nAssistencias. Opcionais: idUsuario (conta vinculada pelo "Sou jogador"), posicao (goleiro/zagueiro/lateral/meia/atacante) |
@@ -111,6 +112,15 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 `{ano}`: **2023 é a única temporada sem sufixo** (legado: `times`, `partidas`...); todas as outras usam o ano (`times2022`, `times2024`). A temporada **atual** fica em `config/temporadas` (`atual`, `lista`; leitura pública, escrita do admin), carregada no `RegionCubit.load()` e aplicada em `SeasonCollection.configure`. Sem a config, vale 2023. Para abrir a temporada nova: admin → **Temporadas** → "Iniciar temporada" (opcionalmente copia os times com a classificação zerada); nada é copiado à mão nem renomeado, e os cadastros passam a ir para as coleções do ano novo. Não comparar com o ano do relógio.
 Storage: `noticias/`, `destaques/`, `times/`, `jogadores/`, `campeonatos/` (banner e regulamento em PDF), `usuarios/` (foto da conta) (ver `StorageFolder`).
 
+## Regiões por id (implantação)
+
+Índices compostos versionados em `firestore.indexes.json` (feed e classificação por `idRegiao`; a classificação precisa de um índice por coleção de temporada, então ao abrir uma temporada nova acrescente o `classificacao<ano>`). Ordem para publicar a mudança das regiões para id:
+1. `firebase deploy --only "firestore:rules,firestore:indexes,functions"` (esperar os índices ficarem prontos no console).
+2. Instalar o app novo no aparelho do admin e rodar **Regiões → Vincular regiões por id** (preenche o `idRegiao` nos docs antigos; pode repetir).
+3. Só então liberar o app para os usuários (até o passo 2, as consultas por id não acham o conteúdo antigo).
+
+Push: tópico `regiaoid_<id>` (o app assina também o `regiao_<slug>` do nome na transição; as functions mandam para o do id quando o doc tem `idRegiao`).
+
 ## Notificações push (FCM)
 
 - **Envio:** Cloud Functions em `functions/` (TypeScript, região `us-central1`, a mesma do Firestore `nam5`). Gatilhos em `noticias`, `partidas` da temporada atual (gatilho em `{colecao}/{id}` filtrando a coleção de partidas da `config/temporadas`), `push_avisos`, `solicitacoes_jogador` (avisa admins, quem pediu e o dono do time) e `solicitacoes_time`, mais o agendamento diário `dailyGames` (9h, Brasília). Mensagens e alvos em `functions/src/messages.ts` (funções puras, `npm test`).
@@ -123,7 +133,7 @@ Storage: `noticias/`, `destaques/`, `times/`, `jogadores/`, `campeonatos/` (bann
 Versionadas no repo: `firestore.rules` e `storage.rules` (projeto em `.firebaserc`). Qualquer mudança passa por esses arquivos e é publicada com:
 
 ```
-firebase deploy --only firestore:rules,storage
+firebase deploy --only "firestore:rules,firestore:indexes,storage"
 ```
 
 - Leitura pública do conteúdo (inclui o modo convidado); `usuarios` só pelo dono ou admin.

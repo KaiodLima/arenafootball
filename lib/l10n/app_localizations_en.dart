@@ -2457,4 +2457,178 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get teamLinksUsers => 'Favorite team';
+
+  @override
+  String get regionsManageTitle => 'Regions';
+
+  @override
+  String regionsTeamsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count teams this season',
+      one: '1 team this season',
+      zero: 'No teams this season',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get regionsCreate => 'New region';
+
+  @override
+  String get regionsNameLabel => 'Region name';
+
+  @override
+  String get regionsNameHint =>
+      'The region shows up for everyone right away, on the home and in the forms.';
+
+  @override
+  String regionsCreated(String name) {
+    return 'Region \"$name\" created!';
+  }
+
+  @override
+  String get regionsDuplicate => 'A region with this name already exists.';
+
+  @override
+  String get regionsNameTooShort => 'Use at least 3 letters.';
+
+  @override
+  String get regionsEmpty => 'No regions yet. Tap + to create one.';
+
+  @override
+  String get regionsLoadError => 'Could not load the regions.';
+
+  @override
+  String get commonOk => 'Ok';
+
+  @override
+  String get regionsRename => 'Rename';
+
+  @override
+  String get regionsRenameTitle => 'Rename region';
+
+  @override
+  String get regionsRenameHint =>
+      'Teams, matches, news and championships stay in the region and show the new name.';
+
+  @override
+  String regionsRenamed(String previous, String name) {
+    return '\"$previous\" is now \"$name\".';
+  }
+
+  @override
+  String regionsDeleteTitle(String name) {
+    return 'Delete \"$name\"?';
+  }
+
+  @override
+  String get regionsDeleteMessage =>
+      'The region is empty and leaves the list for everyone.';
+
+  @override
+  String regionsDeleted(String name) {
+    return 'Region \"$name\" deleted.';
+  }
+
+  @override
+  String get regionsDeleteBlockedTitle => 'Region in use';
+
+  @override
+  String regionsDeleteBlockedMessage(String name, String usage) {
+    return '\"$name\" still has $usage. Only an empty region can be deleted; to change its name, use \"Rename\".';
+  }
+
+  @override
+  String get regionsLastRegion =>
+      'This is the only region: it cannot be deleted.';
+
+  @override
+  String regionsUsageTeams(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count teams',
+      one: '1 team',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String regionsUsageMatches(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count matches',
+      one: '1 match',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String regionsUsageNews(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count news',
+      one: '1 news',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String regionsUsageChampionships(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count championships',
+      one: '1 championship',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String regionsUsageGroups(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count groups',
+      one: '1 group',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get regionsLinkTitle => 'Link regions by id';
+
+  @override
+  String get regionsLinkHint =>
+      'Writes the region id on old teams, matches, news, championships, groups and requests, in every season. Run it once after updating the app; it can run again and only fills what is missing.';
+
+  @override
+  String get regionsLinkRun => 'Link now';
+
+  @override
+  String get regionsLinkConfirm =>
+      'This goes through the whole database and may take a few minutes. Continue?';
+
+  @override
+  String regionsLinkDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count documents linked.',
+      one: '1 document linked.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get regionsLinkNothing => 'Everything was already linked.';
+
+  @override
+  String regionsLinkUnmatched(String names) {
+    return 'Names that match no region (left without id): $names';
+  }
 }

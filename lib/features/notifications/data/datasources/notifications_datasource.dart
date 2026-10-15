@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/errors/firebase_error.dart';
 import 'package:arena_soccer/core/firebase/either_stream.dart';
@@ -66,7 +67,7 @@ class NotificationsDataSource {
       await _firestore.collection('push_avisos').add({
         'titulo': title,
         'corpo': body,
-        'regiao': region,
+        ...RegionRegistry.fieldsFor(region, nameKey: 'regiao'),
         'data': FieldValue.serverTimestamp(),
       });
       return const Right(null);

@@ -14,6 +14,7 @@ enum MatchFormMissing { teams, sameTeam, date, time }
 class MatchFormData extends Equatable {
   final List<String> regions;
   final String? selectedRegion;
+
   /// Times oferecidos: os participantes do campeonato escolhido (ou todos da
   /// região, se ele não tiver times marcados).
   final List<TeamDTO> teams;
@@ -150,9 +151,21 @@ class MatchFormData extends Equatable {
   }
 
   @override
-  List<Object?> get props =>
-      [regions, selectedRegion, teams, regionTeams, championships, championshipId, homeTeam, awayTeam, date, time,
-        venue, customVenue, existing];
+  List<Object?> get props => [
+        regions,
+        selectedRegion,
+        teams,
+        regionTeams,
+        championships,
+        championshipId,
+        homeTeam,
+        awayTeam,
+        date,
+        time,
+        venue,
+        customVenue,
+        existing
+      ];
 }
 
 class MatchFormState extends Equatable {

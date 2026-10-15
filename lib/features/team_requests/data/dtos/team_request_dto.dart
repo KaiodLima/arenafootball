@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
 
 /// Documento de `solicitacoes_time/{uid}`: pedido de um usuário para criar o
@@ -63,7 +64,7 @@ class TeamRequestDTO extends Equatable {
       userName: text('nome_usuario'),
       email: text('email'),
       name: text('nome'),
-      region: text('regiao'),
+      region: RegionRegistry.nameFromDoc(data, nameKey: 'regiao'),
       description: text('descricao'),
       imageUrl: text('urlImagem'),
       primaryColor: text('corPrimaria'),
@@ -84,7 +85,7 @@ class TeamRequestDTO extends Equatable {
         'nome_usuario': userName,
         'email': email,
         'nome': name,
-        'regiao': region,
+        ...RegionRegistry.fieldsFor(region, nameKey: 'regiao'),
         'descricao': description,
         'urlImagem': imageUrl,
         'corPrimaria': primaryColor,

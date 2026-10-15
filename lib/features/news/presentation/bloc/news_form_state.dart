@@ -82,9 +82,7 @@ class NewsFormData extends Equatable {
   /// Como no app antigo, título curto mostra aviso mas não bloqueia. O
   /// anúncio precisa do banner e de um link válido (se houver).
   bool get canSubmit =>
-      titleError != NewsTitleError.required &&
-      selectedRegion != null &&
-      (!isAd || (hasCover && !linkInvalid));
+      titleError != NewsTitleError.required && selectedRegion != null && (!isAd || (hasCover && !linkInvalid));
 
   /// Há algo que se perderia ao sair (para o aviso de descartar).
   bool get isDirty {

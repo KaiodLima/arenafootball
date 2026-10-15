@@ -47,8 +47,7 @@ class _StatsRankingPageState extends State<StatsRankingPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final user = context.watch<SessionCubit>().state.user;
-    bool isFavorite(RankingEntry entry) =>
-        user?.isFavorite(id: entry.player.teamId, name: entry.player.team) ?? false;
+    bool isFavorite(RankingEntry entry) => user?.isFavorite(id: entry.player.teamId, name: entry.player.team) ?? false;
 
     return BlocBuilder<StatsRankingCubit, StatsRankingState>(
       builder: (context, state) {

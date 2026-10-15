@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/core/firebase/region_registry.dart';
 
 /// Documento das coleções `partidas` / `partidas{ano}`.
 class MatchDTO extends Equatable {
   /// Id do documento (gravado também em `id_partida`).
   final String id;
+
   /// Nomes dos times (cópia para exibir; o vínculo é pelos ids).
   final String homeTeam;
   final String awayTeam;
@@ -72,7 +74,7 @@ class MatchDTO extends Equatable {
       time: data['horario']?.toString() ?? '',
       venue: data['local']?.toString() ?? '',
       championshipId: _int(data['id_campeonato']),
-      region: data['fk_competicao']?.toString() ?? '',
+      region: RegionRegistry.nameFromDoc(data),
       homeGoals: _int(data['golTimeCasa']),
       awayGoals: _int(data['golTimeFora']),
       isVotingOpen: data['votacao'] == 'true',
@@ -95,7 +97,7 @@ class MatchDTO extends Equatable {
         'horario': time,
         'local': venue,
         'id_campeonato': championshipId,
-        'fk_competicao': region,
+        ...RegionRegistry.fieldsFor(region),
         'golTimeCasa': homeGoals,
         'golTimeFora': awayGoals,
         'votacao': isVotingOpen.toString(),

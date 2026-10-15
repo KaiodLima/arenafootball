@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/core/firebase/region_registry.dart';
 
 /// Documento da coleção `campeonatos` (sem temporada: um por região/ano).
 class ChampionshipDTO extends Equatable {
@@ -72,7 +73,7 @@ class ChampionshipDTO extends Equatable {
       topScorerPrize: data['premioArtilheiro']?.toString() ?? '',
       goalkeeperPrize: data['premioGoleiro']?.toString() ?? '',
       rules: data['regras']?.toString() ?? '',
-      region: data['fk_competicao']?.toString() ?? '',
+      region: RegionRegistry.nameFromDoc(data),
       season: data['ano']?.toString() ?? '',
       teams: (data['times'] as List?)?.map((t) => t.toString()).toList() ?? const [],
       teamIds: (data['ids_times'] as List?)?.map((t) => t.toString()).toList() ?? const [],
@@ -92,7 +93,7 @@ class ChampionshipDTO extends Equatable {
         'premioArtilheiro': topScorerPrize,
         'premioGoleiro': goalkeeperPrize,
         'regras': rules,
-        'fk_competicao': region,
+        ...RegionRegistry.fieldsFor(region),
         'ano': season,
         'times': teams,
         'ids_times': teamIds,

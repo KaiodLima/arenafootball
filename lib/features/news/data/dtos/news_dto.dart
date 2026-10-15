@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/core/firebase/region_registry.dart';
 
 /// Documento da coleção `noticias`. Notícias, cards de gol e anúncios
 /// usam o mesmo documento; o que muda é a [tag].
@@ -98,7 +99,7 @@ class NewsDTO extends Equatable {
       link: data['link']?.toString() ?? '',
       // `exibir` é gravado como string ("true"/"false").
       isVisible: data['exibir']?.toString() == 'true',
-      region: data['fk_competicao']?.toString() ?? '',
+      region: RegionRegistry.nameFromDoc(data),
       homeTeam: data['time_casa']?.toString() ?? '',
       awayTeam: data['time_fora']?.toString() ?? '',
       homeGoals: data['gol_time_casa']?.toString() ?? '',
@@ -133,7 +134,7 @@ class NewsDTO extends Equatable {
         'urlImagem': imageUrl,
         'link': link,
         'exibir': isVisible.toString(),
-        'fk_competicao': region,
+        ...RegionRegistry.fieldsFor(region),
         'time_casa': homeTeam,
         'time_fora': awayTeam,
         'gol_time_casa': homeGoals,

@@ -25,7 +25,8 @@ class AuthRepositoryImpl implements IAuthRepository {
       _dataSource.signUp(name: name, email: email, password: password);
 
   @override
-  Future<Either<Failure, void>> updateFavoriteTeam({required String userId, required String team, required String teamId}) =>
+  Future<Either<Failure, void>> updateFavoriteTeam(
+          {required String userId, required String team, required String teamId}) =>
       _dataSource.updateFavoriteTeam(userId: userId, team: team, teamId: teamId);
 
   @override

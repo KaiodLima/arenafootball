@@ -11,8 +11,7 @@ class ManageChampionshipsState extends Equatable {
   const ManageChampionshipsState({this.championships = const [], this.region = '', this.loading = true});
 
   List<ChampionshipDTO> get visible {
-    final list = championships.where((c) => c.region == region).toList()
-      ..sort((a, b) => b.season.compareTo(a.season));
+    final list = championships.where((c) => c.region == region).toList()..sort((a, b) => b.season.compareTo(a.season));
     return list;
   }
 

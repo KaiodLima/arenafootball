@@ -7,6 +7,9 @@ class PreferencesService {
   static const String _regionKey = 'regiaoPadrao';
   static const String _seasonKey = 'anoEscolhido';
 
+  /// Id da região escolhida (o nome pode mudar; o id não).
+  static const String _regionIdKey = 'regiaoPadraoId';
+
   Future<String?> getRegion() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_regionKey);
@@ -15,6 +18,16 @@ class PreferencesService {
   Future<void> setRegion(String region) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_regionKey, region);
+  }
+
+  Future<String?> getRegionId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_regionIdKey);
+  }
+
+  Future<void> setRegionId(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_regionIdKey, id);
   }
 
   Future<String?> getSeason() async {

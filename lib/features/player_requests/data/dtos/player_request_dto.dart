@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/core/firebase/region_registry.dart';
 
 /// Situação do pedido. A chave é o valor gravado em `status`.
 enum PlayerRequestStatus {
@@ -102,7 +103,7 @@ class PlayerRequestDTO extends Equatable {
       name: text('nome'),
       team: text('time'),
       teamId: text('idTime'),
-      region: text('regiao'),
+      region: RegionRegistry.nameFromDoc(data, nameKey: 'regiao'),
       season: text('temporada'),
       position: PlayerPosition.fromKey(text('posicao')),
       message: text('mensagem'),
@@ -123,7 +124,7 @@ class PlayerRequestDTO extends Equatable {
         'nome': name,
         'time': team,
         'idTime': teamId,
-        'regiao': region,
+        ...RegionRegistry.fieldsFor(region, nameKey: 'regiao'),
         'temporada': season,
         'posicao': position?.key ?? '',
         'mensagem': message,

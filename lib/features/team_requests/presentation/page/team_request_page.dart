@@ -150,7 +150,8 @@ class _TeamRequestPageState extends State<TeamRequestPage> {
               ),
             ),
             bottomNavigationBar: showForm
-                ? ArenaSubmitBar(title: l10n.teamRequestSubmit, loading: submitting, onPressed: () => _submit(state.form))
+                ? ArenaSubmitBar(
+                    title: l10n.teamRequestSubmit, loading: submitting, onPressed: () => _submit(state.form))
                 : null,
             body: switch (state) {
               LoadingTeamRequestState() => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
@@ -339,7 +340,8 @@ class _StatusView extends StatelessWidget {
               const SizedBox(height: AppSizes.s4),
               Text(request.region, style: AppTypography.subtitle()),
               if (sentOn.isNotEmpty)
-                Text(l10n.playerRequestSentOn(sentOn), style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+                Text(l10n.playerRequestSentOn(sentOn),
+                    style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
               const SizedBox(height: AppSizes.s16),
               Text(
                 rejected ? l10n.teamRequestRejectedInfo : l10n.teamRequestPendingInfo,

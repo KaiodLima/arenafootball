@@ -24,6 +24,9 @@ String topicSlug(String value) {
 
 String regionTopic(String region) => 'regiao_${topicSlug(region)}';
 
+/// Tópico da região pelo id (o vínculo). Igual ao `regionIdTopic` das functions.
+String regionIdTopic(String regionId) => 'regiaoid_${regionId.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_')}';
+
 /// Tópico antigo do time, pelo nome (contas sem o id do time do coração).
 String teamTopic(String team) => 'time_${topicSlug(team)}';
 
@@ -41,6 +44,7 @@ String userTopic(String userId) => 'usuario_$userId';
 /// O time vai pelo id quando a conta tem; senão, pelo nome (conta antiga).
 Set<String> desiredTopics({
   required String region,
+  String regionId = '',
   String? favoriteTeam,
   String? favoriteTeamId,
   String? userId,
@@ -48,6 +52,9 @@ Set<String> desiredTopics({
 }) {
   return {
     allTopic,
+    // Pelo id (docs novos) e pelo nome (docs antigos, sem id): as functions
+    // mandam para um ou outro, nunca os dois, então não chega repetido.
+    if (regionId.isNotEmpty) regionIdTopic(regionId),
     if (topicSlug(region).isNotEmpty) regionTopic(region),
     if (favoriteTeamId != null && favoriteTeamId.isNotEmpty)
       teamIdTopic(favoriteTeamId)

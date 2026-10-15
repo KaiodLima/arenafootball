@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/core/firebase/region_registry.dart';
 
 /// Documento das coleções `times` / `times{ano}`.
 class TeamDTO extends Equatable {
@@ -34,7 +35,7 @@ class TeamDTO extends Equatable {
       id: data['id_partida']?.toString() ?? doc.id,
       name: data['nome']?.toString() ?? '',
       description: data['descricao']?.toString() ?? '',
-      region: data['fk_competicao']?.toString() ?? '',
+      region: RegionRegistry.nameFromDoc(data),
       imageUrl: data['urlImagem']?.toString() ?? '',
       ownerId: data['idDono']?.toString() ?? '',
       primaryColor: data['corPrimaria']?.toString() ?? '',
@@ -46,7 +47,7 @@ class TeamDTO extends Equatable {
         'id_partida': id,
         'nome': name,
         'descricao': description,
-        'fk_competicao': region,
+        ...RegionRegistry.fieldsFor(region),
         'urlImagem': imageUrl,
         // Só nos times com dono (os antigos não têm o campo).
         if (ownerId.isNotEmpty) 'idDono': ownerId,

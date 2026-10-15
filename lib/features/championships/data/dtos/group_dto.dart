@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/core/firebase/region_registry.dart';
 
 /// Documento das coleções `grupos` / `grupos{ano}`. Cada grupo tem até quatro
 /// times, gravados como `time1`..`time4` (nomes, cópia para exibir) e
@@ -45,7 +46,7 @@ class GroupDTO extends Equatable {
     return GroupDTO(
       id: doc.id,
       description: data['descricao']?.toString() ?? '',
-      region: data['fk_competicao']?.toString() ?? '',
+      region: RegionRegistry.nameFromDoc(data),
       championshipId: (data['fk_campeonato'] as num?)?.toInt() ?? 0,
       teams: [
         for (var i = 1; i <= maxTeams; i++) data['time$i']?.toString() ?? '',
@@ -58,7 +59,7 @@ class GroupDTO extends Equatable {
 
   Map<String, dynamic> toMap() => {
         'descricao': description,
-        'fk_competicao': region,
+        ...RegionRegistry.fieldsFor(region),
         if (championshipId > 0) 'fk_campeonato': championshipId,
         for (var i = 0; i < maxTeams; i++) 'time${i + 1}': i < teams.length ? teams[i] : '',
         for (var i = 0; i < maxTeams; i++) 'idTime${i + 1}': teamIdAt(i),

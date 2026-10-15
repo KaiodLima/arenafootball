@@ -28,78 +28,78 @@ class TeamHeader extends StatelessWidget {
     final foreground = palette?.onBackground ?? AppColors.white;
 
     final content = Stack(
-        children: [
-          SafeArea(
-            bottom: false,
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: AppSizes.s24 + AppSizes.s8),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Hero(
-                      tag: teamCrestHeroTag(team.id),
-                      child: Container(
-                        width: AppSizes.s100,
-                        height: AppSizes.s100,
-                        padding: const EdgeInsets.all(AppSizes.s10),
-                        decoration: BoxDecoration(
-                          color: AppColors.white,
-                          shape: BoxShape.circle,
-                          // Anel na cor do time.
-                          border: palette == null ? null : Border.all(color: palette.ring, width: 3),
-                        ),
-                        child: ClipOval(
-                          child: team.imageUrl.isNotEmpty
-                              ? CachedNetworkImage(imageUrl: team.imageUrl, fit: BoxFit.cover)
-                              : const Icon(Icons.shield_outlined, color: AppColors.textSecondary, size: AppSizes.s40),
-                        ),
+      children: [
+        SafeArea(
+          bottom: false,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: AppSizes.s24 + AppSizes.s8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Hero(
+                    tag: teamCrestHeroTag(team.id),
+                    child: Container(
+                      width: AppSizes.s100,
+                      height: AppSizes.s100,
+                      padding: const EdgeInsets.all(AppSizes.s10),
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        shape: BoxShape.circle,
+                        // Anel na cor do time.
+                        border: palette == null ? null : Border.all(color: palette.ring, width: 3),
+                      ),
+                      child: ClipOval(
+                        child: team.imageUrl.isNotEmpty
+                            ? CachedNetworkImage(imageUrl: team.imageUrl, fit: BoxFit.cover)
+                            : const Icon(Icons.shield_outlined, color: AppColors.textSecondary, size: AppSizes.s40),
                       ),
                     ),
-                    const SizedBox(height: AppSizes.s12),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSizes.s24),
-                      child: Text(
-                        team.name,
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTypography.display(color: foreground).copyWith(fontSize: AppSizes.s24),
+                  ),
+                  const SizedBox(height: AppSizes.s12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: AppSizes.s24),
+                    child: Text(
+                      team.name,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.display(color: foreground).copyWith(fontSize: AppSizes.s24),
+                    ),
+                  ),
+                  const SizedBox(height: AppSizes.s8),
+                  Wrap(
+                    spacing: AppSizes.s8,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      if (team.region.isNotEmpty)
+                        _HeaderChip(icon: Icons.place_outlined, label: team.region, palette: palette),
+                      _HeaderChip(
+                        icon: Icons.calendar_today_rounded,
+                        label: l10n.homeSeasonChip(season),
+                        palette: palette,
                       ),
-                    ),
-                    const SizedBox(height: AppSizes.s8),
-                    Wrap(
-                      spacing: AppSizes.s8,
-                      alignment: WrapAlignment.center,
-                      children: [
-                        if (team.region.isNotEmpty)
-                          _HeaderChip(icon: Icons.place_outlined, label: team.region, palette: palette),
-                        _HeaderChip(
-                          icon: Icons.calendar_today_rounded,
-                          label: l10n.homeSeasonChip(season),
-                          palette: palette,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
-          const Positioned(
-            left: 0,
-            right: 0,
-            bottom: -1,
-            height: AppSizes.s24 + 1,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(AppSizes.radiusLarge)),
-              ),
+        ),
+        const Positioned(
+          left: 0,
+          right: 0,
+          bottom: -1,
+          height: AppSizes.s24 + 1,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(AppSizes.radiusLarge)),
             ),
           ),
-        ],
-      );
+        ),
+      ],
+    );
 
     return palette == null
         ? ArenaHeroBackground(watermarkFactor: 0.7, child: content)

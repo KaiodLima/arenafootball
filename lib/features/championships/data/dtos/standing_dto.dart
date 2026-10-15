@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/core/firebase/region_registry.dart';
 
 /// Linha da classificação (`classificacao` / `classificacao{ano}`): os campos
 /// do time + as estatísticas dele no grupo.
@@ -59,7 +60,7 @@ class StandingDTO extends Equatable {
     return StandingDTO(
       id: doc.id,
       teamName: data['nome']?.toString() ?? '',
-      region: data['fk_competicao']?.toString() ?? '',
+      region: RegionRegistry.nameFromDoc(data),
       imageUrl: data['urlImagem']?.toString() ?? '',
       group: data['fk_grupo']?.toString() ?? '',
       wins: _int(data['vitorias']),
@@ -74,7 +75,7 @@ class StandingDTO extends Equatable {
 
   Map<String, dynamic> toMap() => {
         'nome': teamName,
-        'fk_competicao': region,
+        ...RegionRegistry.fieldsFor(region),
         'urlImagem': imageUrl,
         'fk_grupo': group,
         'vitorias': wins,

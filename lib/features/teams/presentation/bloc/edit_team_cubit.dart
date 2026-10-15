@@ -11,8 +11,7 @@ class EditTeamCubit extends Cubit<EditTeamState> {
   final UpdateTeamDetailsUseCase updateTeamDetailsUseCase;
   final String? season;
 
-  EditTeamCubit(this.updateTeamDetailsUseCase, {required TeamDTO team, this.season})
-      : super(EditTeamState(team: team));
+  EditTeamCubit(this.updateTeamDetailsUseCase, {required TeamDTO team, this.season}) : super(EditTeamState(team: team));
 
   Future<void> save({
     required String description,

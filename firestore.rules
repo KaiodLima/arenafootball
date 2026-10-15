@@ -132,7 +132,7 @@ service cloud.firestore {
         let data = request.resource.data;
         return data.uid == request.auth.uid
           && data.status == 'pendente'
-          && data.keys().hasOnly(['uid', 'nome_usuario', 'email', 'nome', 'time', 'idTime', 'regiao', 'temporada',
+          && data.keys().hasOnly(['uid', 'nome_usuario', 'email', 'nome', 'time', 'idTime', 'regiao', 'idRegiao', 'temporada',
             'posicao', 'mensagem', 'urlImagem', 'status', 'data', 'atualizado_em'])
           && data.nome is string && data.nome.size() >= 3 && data.nome.size() <= 40
           && data.time is string && data.time.size() > 0
@@ -171,7 +171,7 @@ service cloud.firestore {
         let data = request.resource.data;
         return data.uid == request.auth.uid
           && data.status == 'pendente'
-          && data.keys().hasOnly(['uid', 'nome_usuario', 'email', 'nome', 'regiao', 'descricao', 'urlImagem',
+          && data.keys().hasOnly(['uid', 'nome_usuario', 'email', 'nome', 'regiao', 'idRegiao', 'descricao', 'urlImagem',
             'corPrimaria', 'corSecundaria', 'contato', 'mensagem', 'temporada', 'status', 'data', 'atualizado_em'])
           && (!('corPrimaria' in data) || (data.corPrimaria is string && data.corPrimaria.size() <= 9))
           && (!('corSecundaria' in data) || (data.corSecundaria is string && data.corSecundaria.size() <= 9))

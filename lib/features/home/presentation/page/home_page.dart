@@ -94,7 +94,9 @@ class _HomePageState extends State<HomePage> {
     await Navigator.pushNamed(context, AppRoutes.chooseTeamPage, arguments: const ChooseTeamArgs(canGoBack: true));
     if (!mounted) return;
     final user = BlocProvider.of<SessionCubit>(context).state.user;
-    if (user != null && user.hasFavoriteTeam) _homeCubit.loadFavoriteTeam(user.favoriteTeam, teamId: user.favoriteTeamId);
+    if (user != null && user.hasFavoriteTeam) {
+      _homeCubit.loadFavoriteTeam(user.favoriteTeam, teamId: user.favoriteTeamId);
+    }
   }
 
   Future<void> _logout() async {

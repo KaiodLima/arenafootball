@@ -92,9 +92,19 @@ class TeamRequestForm extends Equatable {
   }
 
   @override
-  List<Object?> get props =>
-      [regions, selectedRegion, existingTeams, name, description, contact, message, crest, primaryColor, secondaryColor,
-        imageUrl];
+  List<Object?> get props => [
+        regions,
+        selectedRegion,
+        existingTeams,
+        name,
+        description,
+        contact,
+        message,
+        crest,
+        primaryColor,
+        secondaryColor,
+        imageUrl
+      ];
 }
 
 /// Tela "Sou dono de time". O estado base carrega o pedido atual (ou nulo),

@@ -24,16 +24,25 @@ class RegionCubit extends Cubit<RegionState> {
   Future<void> load() async {
     // Temporadas primeiro: a salva pelo usuário pode não existir mais na lista.
     final seasons = await getSeasonsConfigUseCase();
+    // Regiões antes da escolha salva: carregam o vínculo id ↔ nome, que
+    // resolve a região salva pelo id (mesmo renomeada) e as consultas.
+    final response = await getRegionsUseCase();
+    final regions = response.fold((_) => const <String>[], (list) => list);
     final preferences = await getRegionPreferencesUseCase();
     final season = seasons.seasons.contains(preferences.season) ? preferences.season : seasons.current;
-    emit(state.copyWith(selectedRegion: preferences.region, selectedSeason: season, seasons: seasons.seasons));
 
-    final response = await getRegionsUseCase();
-    response.fold(
+    // Região salva que não existe mais (excluída): a primeira da lista.
+    var region = preferences.region;
+    if (regions.isNotEmpty && !regions.contains(region)) region = regions.first;
+    // Grava de novo: completa o id para quem só tinha o nome salvo.
+    if (regions.contains(region)) await saveRegionUseCase(region);
+    emit(state.copyWith(
+      selectedRegion: region,
+      selectedSeason: season,
+      seasons: seasons.seasons,
       // Sem a lista, o seletor mostra só a região salva; não bloqueia o app.
-      (_) => emit(state.copyWith(regions: [state.selectedRegion])),
-      (regions) => emit(state.copyWith(regions: regions.isEmpty ? [state.selectedRegion] : regions)),
-    );
+      regions: regions.isEmpty ? [region] : regions,
+    ));
   }
 
   Future<void> selectRegion(String region) async {

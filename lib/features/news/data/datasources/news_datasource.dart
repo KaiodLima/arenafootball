@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/errors/firebase_error.dart';
 import 'package:arena_soccer/core/firebase/either_stream.dart';
@@ -21,7 +22,7 @@ class NewsDataSource {
   /// Feed da região, mais recentes primeiro. Sem região, todas.
   Stream<Either<Failure, List<NewsDTO>>> watchNews({String? region}) {
     Query<Map<String, dynamic>> query = _news;
-    if (region != null) query = query.where('fk_competicao', isEqualTo: region);
+    if (region != null) query = RegionRegistry.where(query, region);
     return query.orderBy('data', descending: true).snapshots().toEither(
           (snapshot) => snapshot.docs.map(NewsDTO.fromFirestore).toList(),
           fallbackMessage: _loadFallback,
@@ -90,8 +91,7 @@ class NewsDataSource {
           byId[doc.id] = NewsDTO.fromFirestore(doc);
         }
       }
-      final cards = byId.values.toList()
-        ..sort((a, b) => (b.date ?? DateTime(0)).compareTo(a.date ?? DateTime(0)));
+      final cards = byId.values.toList()..sort((a, b) => (b.date ?? DateTime(0)).compareTo(a.date ?? DateTime(0)));
       return Right(cards);
     } catch (e) {
       AppLogger.e('getGoalCardsByPlayer id=$playerId', name: 'NewsDataSource', error: e);

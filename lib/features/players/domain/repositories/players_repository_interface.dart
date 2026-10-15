@@ -3,7 +3,8 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 
 abstract class IPlayersRepository {
-  Stream<Either<Failure, List<PlayerDTO>>> watchTeamPlayers({String teamId = '', required String teamName, String? season});
+  Stream<Either<Failure, List<PlayerDTO>>> watchTeamPlayers(
+      {String teamId = '', required String teamName, String? season});
 
   Future<Either<Failure, List<PlayerDTO>>> getPlayers({String? season});
 

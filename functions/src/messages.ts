@@ -82,6 +82,18 @@ export function currentSeasonOf(config: Doc | undefined): string {
   return value || LEGACY_SEASON;
 }
 export const regionTopic = (region: string): string => `regiao_${topicSlug(region)}`;
+/** Tópico da região pelo id (o vínculo), igual ao `regionIdTopic` do app. */
+export const regionIdTopic = (id: string): string => `regiaoid_${id.replace(/[^A-Za-z0-9_-]/g, '_')}`;
+/**
+ * Tópico da região de um doc: pelo `idRegiao` (app novo assina) e, em doc
+ * antigo sem id, pelo nome. Um só tópico: a condition dos jogos já usa 4 dos 5.
+ */
+export function regionTopicOf(doc: Doc, nameKey = 'fk_competicao'): string {
+  const id = text(doc.idRegiao);
+  if (id) return regionIdTopic(id);
+  const name = text(doc[nameKey]);
+  return name ? regionTopic(name) : '';
+}
 /** Tópico antigo do time, pelo nome (app antigo / conta sem o id). */
 export const teamTopic = (team: string): string => `time_${topicSlug(team)}`;
 /**
@@ -111,9 +123,9 @@ export function targetFor(topics: string[]): Target | null {
 }
 
 /** Região do jogo + torcedores dos dois times (id e nome: até 5 tópicos, o limite da condition). */
-function gameTarget(region: string, home: string, away: string, homeId = '', awayId = ''): Target | null {
+function gameTarget(regionTopicName: string, home: string, away: string, homeId = '', awayId = ''): Target | null {
   return targetFor([
-    ...(region ? [regionTopic(region)] : []),
+    ...(regionTopicName ? [regionTopicName] : []),
     ...teamTopics(home, homeId),
     ...teamTopics(away, awayId),
   ]);
@@ -137,7 +149,7 @@ export function goalMessage(news: Doc): PushMessage | null {
   const home = text(news.time_casa);
   const away = text(news.time_fora);
   const region = text(news.fk_competicao);
-  const alvo = gameTarget(region, home, away, text(news.id_time_casa), text(news.id_time_fora));
+  const alvo = gameTarget(regionTopicOf(news), home, away, text(news.id_time_casa), text(news.id_time_fora));
   if (!home || !away || !alvo) return null;
   const scorer = text(news.autor_gol);
   const assist = text(news.assistencia);
@@ -170,7 +182,7 @@ export function newsMessage(news: Doc): PushMessage | null {
     corpo: shorten(text(news.descricao).replace(/\s+/g, ' ') || 'Leia no Arena Football', 140),
     aba: 'home',
     regiao: region,
-    alvo: { topic: regionTopic(region) },
+    alvo: { topic: regionTopicOf(news) },
   };
 }
 
@@ -181,13 +193,14 @@ function matchTeams(match: Doc) {
     homeId: text(match.idTimeC),
     awayId: text(match.idTimeF),
     region: text(match.fk_competicao),
+    regionTopicName: regionTopicOf(match),
   };
 }
 
 /** Partida cadastrada. */
 export function matchCreatedMessage(match: Doc): PushMessage | null {
-  const { home, away, homeId, awayId, region } = matchTeams(match);
-  const alvo = gameTarget(region, home, away, homeId, awayId);
+  const { home, away, homeId, awayId, region, regionTopicName } = matchTeams(match);
+  const alvo = gameTarget(regionTopicName, home, away, homeId, awayId);
   if (!home || !away || !alvo) return null;
   const when = [text(match.data), text(match.horario) && `às ${text(match.horario)}`].filter(Boolean).join(' ');
   const place = text(match.local);
@@ -206,8 +219,8 @@ export function votingMessage(before: Doc, after: Doc): PushMessage | null {
   const was = text(before.votacao) === 'true';
   const is = text(after.votacao) === 'true';
   if (was === is) return null;
-  const { home, away, homeId, awayId, region } = matchTeams(after);
-  const alvo = gameTarget(region, home, away, homeId, awayId);
+  const { home, away, homeId, awayId, region, regionTopicName } = matchTeams(after);
+  const alvo = gameTarget(regionTopicName, home, away, homeId, awayId);
   if (!home || !away || !alvo) return null;
   return is
     ? {
@@ -256,7 +269,7 @@ export function manualMessage(notice: Doc): PushMessage | null {
     corpo: shorten(corpo, 240),
     aba: 'home',
     regiao: region,
-    alvo: { topic: region ? regionTopic(region) : ALL_TOPIC },
+    alvo: { topic: region ? regionTopicOf(notice, 'regiao') : ALL_TOPIC },
   };
 }
 

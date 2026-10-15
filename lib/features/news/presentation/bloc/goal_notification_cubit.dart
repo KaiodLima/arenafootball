@@ -63,10 +63,8 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
     _squadAway = away;
     if (home == null || away == null) return;
     final form = state.form;
-    final homeFuture =
-        watchTeamPlayersUseCase(teamId: form.teamIdOf(home), teamName: home, season: _season).first;
-    final awayFuture =
-        watchTeamPlayersUseCase(teamId: form.teamIdOf(away), teamName: away, season: _season).first;
+    final homeFuture = watchTeamPlayersUseCase(teamId: form.teamIdOf(home), teamName: home, season: _season).first;
+    final awayFuture = watchTeamPlayersUseCase(teamId: form.teamIdOf(away), teamName: away, season: _season).first;
     final homeResponse = await homeFuture;
     final awayResponse = await awayFuture;
     // Descarta se o confronto mudou enquanto carregava.

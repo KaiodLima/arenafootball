@@ -301,8 +301,10 @@ class _Header extends StatelessWidget {
                   children: [
                     TeamCrest(imageUrl: team?.imageUrl, size: AppSizes.s24),
                     const SizedBox(width: AppSizes.s6),
-                    Text(player.team, style: AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s14)),
-                    if (team != null) const Icon(Icons.chevron_right_rounded, size: AppSizes.s18, color: AppColors.white),
+                    Text(player.team,
+                        style: AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s14)),
+                    if (team != null)
+                      const Icon(Icons.chevron_right_rounded, size: AppSizes.s18, color: AppColors.white),
                   ],
                 ),
               ),

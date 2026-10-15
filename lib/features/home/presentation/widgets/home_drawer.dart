@@ -138,6 +138,11 @@ class HomeDrawer extends StatelessWidget {
                     onTap: () => _open(context, AppRoutes.registerNewsPage),
                   ),
                   _DrawerItem(
+                    icon: Icons.place_outlined,
+                    title: l10n.regionsManageTitle,
+                    onTap: () => _open(context, AppRoutes.manageRegionsPage),
+                  ),
+                  _DrawerItem(
                     icon: Icons.star_outline_rounded,
                     title: l10n.drawerRegisterHighlight,
                     onTap: () => _open(context, AppRoutes.manageHighlightsPage),
