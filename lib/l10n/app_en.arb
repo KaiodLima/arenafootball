@@ -735,5 +735,7 @@
   "regionsLinkDone": "{count, plural, =1{1 document linked.} other{{count} documents linked.}}",
   "regionsLinkNothing": "Everything was already linked.",
   "regionsLinkUnmatched": "Names that match no region (left without id): {names}",
-  "statsShortcut": "Top scorers & assists"
+  "statsShortcut": "Top scorers & assists",
+  "alertHeaderConfirm": "Confirm",
+  "alertHeaderNotice": "Notice"
 }

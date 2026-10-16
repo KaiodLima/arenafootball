@@ -15,6 +15,7 @@ import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 
 /// Painel de regiões (admin): as regiões cadastradas, com os times de cada
 /// uma na temporada atual; criar, renomear, excluir (só vazia) e a
@@ -63,60 +64,49 @@ class _ManageRegionsPageState extends State<ManageRegionsPage> {
 
   Future<void> _onDeleteChecked(DeleteCheckedManageRegionsState state, AppLocalizations l10n) async {
     if (!state.usage.isEmpty) {
-      await showDialog<void>(
-        context: context,
-        builder: (dialogContext) => AlertDialog(
-          title: Text(l10n.regionsDeleteBlockedTitle),
-          content: Text(l10n.regionsDeleteBlockedMessage(state.name, _usageText(state.usage, l10n))),
-          actions: [TextButton(onPressed: () => Navigator.pop(dialogContext), child: Text(l10n.commonOk))],
-        ),
+      await showArenaNotice(
+        context,
+        title: l10n.regionsDeleteBlockedTitle,
+        message: l10n.regionsDeleteBlockedMessage(state.name, _usageText(state.usage, l10n)),
+        icon: Icons.block_rounded,
+        tone: ArenaAlertTone.warning,
       );
       return;
     }
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.regionsDeleteTitle(state.name)),
-        content: Text(l10n.regionsDeleteMessage),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.commonCancel)),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text(l10n.commonDelete, style: const TextStyle(color: AppColors.danger)),
-          ),
-        ],
-      ),
+    final confirmed = await showArenaConfirm(
+      context,
+      title: l10n.regionsDeleteTitle(state.name),
+      message: l10n.regionsDeleteMessage,
+      confirmLabel: l10n.commonDelete,
+      icon: Icons.delete_outline_rounded,
+      tone: ArenaAlertTone.danger,
     );
-    if (confirmed == true) await _cubit.delete(state.name);
+    if (confirmed) await _cubit.delete(state.name);
   }
 
   Future<void> _confirmLink(AppLocalizations l10n) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.regionsLinkTitle),
-        content: Text(l10n.regionsLinkConfirm),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.commonCancel)),
-          TextButton(onPressed: () => Navigator.pop(dialogContext, true), child: Text(l10n.regionsLinkRun)),
-        ],
-      ),
+    final confirmed = await showArenaConfirm(
+      context,
+      title: l10n.regionsLinkTitle,
+      message: l10n.regionsLinkConfirm,
+      confirmLabel: l10n.regionsLinkRun,
+      icon: Icons.link_rounded,
+      tone: ArenaAlertTone.primary,
     );
-    if (confirmed == true) await _cubit.linkRegions();
+    if (confirmed) await _cubit.linkRegions();
   }
 
   Future<void> _showLinkReport(LinkedManageRegionsState state, AppLocalizations l10n) {
     final report = state.report;
-    return showDialog<void>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.regionsLinkTitle),
-        content: Text([
-          report.total == 0 ? l10n.regionsLinkNothing : l10n.regionsLinkDone(report.total),
-          if (report.unmatched.isNotEmpty) l10n.regionsLinkUnmatched(report.unmatched.join(', ')),
-        ].join('\n\n')),
-        actions: [TextButton(onPressed: () => Navigator.pop(dialogContext), child: Text(l10n.commonOk))],
-      ),
+    return showArenaNotice(
+      context,
+      title: l10n.regionsLinkTitle,
+      message: [
+        report.total == 0 ? l10n.regionsLinkNothing : l10n.regionsLinkDone(report.total),
+        if (report.unmatched.isNotEmpty) l10n.regionsLinkUnmatched(report.unmatched.join(', ')),
+      ].join('\n\n'),
+      icon: Icons.fact_check_outlined,
+      tone: ArenaAlertTone.primary,
     );
   }
 

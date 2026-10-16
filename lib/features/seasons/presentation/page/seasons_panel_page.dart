@@ -11,6 +11,7 @@ import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 
 /// Painel do admin: temporada atual, as disponíveis, "Iniciar temporada" e a
 /// manutenção "Vincular times por id".
@@ -31,18 +32,15 @@ class _SeasonsPanelPageState extends State<SeasonsPanelPage> {
   }
 
   Future<void> _confirmStart(SeasonsPanelState state, AppLocalizations l10n) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.seasonsConfirmTitle(state.next)),
-        content: Text(l10n.seasonsConfirmMessage(state.next)),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.commonCancel)),
-          TextButton(onPressed: () => Navigator.pop(dialogContext, true), child: Text(l10n.seasonsConfirmAction)),
-        ],
-      ),
+    final confirmed = await showArenaConfirm(
+      context,
+      title: l10n.seasonsConfirmTitle(state.next),
+      message: l10n.seasonsConfirmMessage(state.next),
+      confirmLabel: l10n.seasonsConfirmAction,
+      icon: Icons.event_repeat_rounded,
+      tone: ArenaAlertTone.warning,
     );
-    if (confirmed == true) await _cubit.startNext();
+    if (confirmed) await _cubit.startNext();
   }
 
   @override

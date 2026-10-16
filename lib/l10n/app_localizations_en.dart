@@ -2634,4 +2634,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statsShortcut => 'Top scorers & assists';
+
+  @override
+  String get alertHeaderConfirm => 'Confirm';
+
+  @override
+  String get alertHeaderNotice => 'Notice';
 }

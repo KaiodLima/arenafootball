@@ -19,6 +19,7 @@ import 'package:arena_soccer/utils/components/team_picker_sheet.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 
 /// Cadastro de jogador (admin): região, time (com escudo), foto opcional,
 /// nome e gols/assistências com − / +, prévia do card do elenco, aviso de
@@ -79,21 +80,16 @@ class _PlayerFormPageState extends State<PlayerFormPage> {
   }
 
   Future<void> _confirmDiscard(AppLocalizations l10n) async {
-    final discard = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.newsDiscardTitle),
-        content: Text(l10n.newsDiscardMessage),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.newsDiscardKeep)),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text(l10n.newsDiscardConfirm, style: const TextStyle(color: AppColors.danger)),
-          ),
-        ],
-      ),
+    final discard = await showArenaConfirm(
+      context,
+      title: l10n.newsDiscardTitle,
+      message: l10n.newsDiscardMessage,
+      confirmLabel: l10n.newsDiscardConfirm,
+      cancelLabel: l10n.newsDiscardKeep,
+      icon: Icons.delete_sweep_outlined,
+      tone: ArenaAlertTone.danger,
     );
-    if (discard != true || !mounted) return;
+    if (!discard || !mounted) return;
     // Sem isso o teclado do campo de nome continua aberto na tela anterior.
     FocusManager.instance.primaryFocus?.unfocus();
     // O PopScope só aceita depois de reconstruir com canPop verdadeiro.

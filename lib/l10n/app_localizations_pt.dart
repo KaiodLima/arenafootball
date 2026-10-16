@@ -2655,4 +2655,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statsShortcut => 'Artilharia e assistências';
+
+  @override
+  String get alertHeaderConfirm => 'Confirmação';
+
+  @override
+  String get alertHeaderNotice => 'Aviso';
 }

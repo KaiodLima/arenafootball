@@ -21,6 +21,7 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/constants/team_colors.dart';
+import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 
 /// Elenco de um time na temporada selecionada: topo com o escudo, resumo,
 /// busca, ordenação e a lista. Tocar num jogador abre a tela do atleta
@@ -74,21 +75,15 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
   }
 
   Future<void> _confirmDelete(AppLocalizations l10n) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.teamDeleteTitle(_team.name)),
-        content: Text(l10n.teamDeleteMessage(_season)),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.commonCancel)),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text(l10n.commonDelete, style: const TextStyle(color: AppColors.danger)),
-          ),
-        ],
-      ),
+    final confirmed = await showArenaConfirm(
+      context,
+      title: l10n.teamDeleteTitle(_team.name),
+      message: l10n.teamDeleteMessage(_season),
+      confirmLabel: l10n.commonDelete,
+      icon: Icons.delete_outline_rounded,
+      tone: ArenaAlertTone.danger,
     );
-    if (confirmed == true && mounted) await BlocProvider.of<TeamPlayersCubit>(context).deleteTeam(_team);
+    if (confirmed && mounted) await BlocProvider.of<TeamPlayersCubit>(context).deleteTeam(_team);
   }
 
   @override

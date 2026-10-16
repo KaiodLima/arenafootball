@@ -4515,6 +4515,18 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Artilharia e assistências'**
   String get statsShortcut;
+
+  /// No description provided for @alertHeaderConfirm.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confirmação'**
+  String get alertHeaderConfirm;
+
+  /// No description provided for @alertHeaderNotice.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aviso'**
+  String get alertHeaderNotice;
 }
 
 class _AppLocalizationsDelegate

@@ -1625,5 +1625,7 @@
       }
     }
   },
-  "statsShortcut": "Artilharia e assistências"
+  "statsShortcut": "Artilharia e assistências",
+  "alertHeaderConfirm": "Confirmação",
+  "alertHeaderNotice": "Aviso"
 }

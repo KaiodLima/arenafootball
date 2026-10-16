@@ -22,6 +22,7 @@ import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 
 /// "Sou jogador": o usuário pede para entrar no elenco de um time da região.
 /// Sem pedido (ou editando), mostra o formulário; com pedido, a situação
@@ -84,21 +85,16 @@ class _PlayerRequestPageState extends State<PlayerRequestPage> {
   }
 
   Future<void> _confirmCancel(PlayerRequestDTO request, AppLocalizations l10n) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.playerRequestCancelTitle),
-        content: Text(l10n.playerRequestCancelMessage(request.team)),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.playerRequestKeep)),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text(l10n.playerRequestCancel, style: const TextStyle(color: AppColors.danger)),
-          ),
-        ],
-      ),
+    final confirmed = await showArenaConfirm(
+      context,
+      title: l10n.playerRequestCancelTitle,
+      message: l10n.playerRequestCancelMessage(request.team),
+      confirmLabel: l10n.playerRequestCancel,
+      cancelLabel: l10n.playerRequestKeep,
+      icon: Icons.cancel_outlined,
+      tone: ArenaAlertTone.danger,
     );
-    if (confirmed == true) await _cubit.cancelRequest();
+    if (confirmed) await _cubit.cancelRequest();
   }
 
   void _openProfile(PlayerRequestDTO request) {

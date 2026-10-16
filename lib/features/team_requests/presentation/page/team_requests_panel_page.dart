@@ -20,6 +20,7 @@ import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 
 /// Painel do admin com os pedidos "Sou dono de time": pendentes (aprovar,
 /// rejeitar, editar, chamar no WhatsApp) e respondidos.
@@ -40,18 +41,15 @@ class _TeamRequestsPanelPageState extends State<TeamRequestsPanelPage> {
   }
 
   Future<void> _confirmApprove(TeamRequestDTO request, AppLocalizations l10n) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.teamRequestsApproveTitle(request.name)),
-        content: Text(l10n.teamRequestsApproveMessage(request.region, request.userName)),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.commonCancel)),
-          TextButton(onPressed: () => Navigator.pop(dialogContext, true), child: Text(l10n.playerRequestsApprove)),
-        ],
-      ),
+    final confirmed = await showArenaConfirm(
+      context,
+      title: l10n.teamRequestsApproveTitle(request.name),
+      message: l10n.teamRequestsApproveMessage(request.region, request.userName),
+      confirmLabel: l10n.playerRequestsApprove,
+      icon: Icons.how_to_reg_outlined,
+      tone: ArenaAlertTone.primary,
     );
-    if (confirmed == true) await _cubit.approve(request);
+    if (confirmed) await _cubit.approve(request);
   }
 
   Future<void> _reject(TeamRequestDTO request, AppLocalizations l10n) async {

@@ -10,12 +10,12 @@ import 'package:arena_soccer/features/matches/presentation/widgets/match_card.da
 import 'package:arena_soccer/features/matches/presentation/widgets/matches_summary_card.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/team_filter_chips.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
-import 'package:arena_soccer/utils/components/arena_button.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 
 /// Lista de partidas do [MatchesCubit] do contexto (usada pela aba de
 /// tabelas, com as partidas do dia, e pela tela "todos os jogos"). Com
@@ -52,36 +52,14 @@ class MatchesList extends StatelessWidget {
   Future<void> _confirmDelete(BuildContext context, MatchDTO match) async {
     final cubit = BlocProvider.of<MatchesCubit>(context);
     final l10n = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        content: Text(
-          l10n.matchesDeleteConfirm,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: AppSizes.s20, fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          Row(
-            children: [
-              Expanded(
-                child: ArenaButton.outlined(
-                  title: l10n.commonCancel,
-                  function: () => Navigator.pop(dialogContext, false),
-                ),
-              ),
-              const SizedBox(width: AppSizes.s8),
-              Expanded(
-                child: ArenaButton.primary(
-                  title: l10n.commonDelete,
-                  function: () => Navigator.pop(dialogContext, true),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+    final confirmed = await showArenaConfirm(
+      context,
+      title: l10n.matchesDeleteConfirm,
+      confirmLabel: l10n.commonDelete,
+      icon: Icons.delete_outline_rounded,
+      tone: ArenaAlertTone.danger,
     );
-    if (confirmed == true) await cubit.delete(match);
+    if (confirmed) await cubit.delete(match);
   }
 
   @override

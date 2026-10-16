@@ -19,6 +19,7 @@ import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 
 /// Publica um card de gol no feed: região, atalho com os jogos de hoje,
 /// placar com escudos e − / +, prévia ao vivo do card e confirmação antes de
@@ -109,35 +110,28 @@ class _GoalNotificationPageState extends State<GoalNotificationPage> {
   Future<void> _confirmAndSubmit(GoalFormData form) async {
     if (!form.canSubmit) return;
     final l10n = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.goalConfirmTitle),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l10n.goalConfirmMessage(form.homeTeam!, form.homeGoals, form.awayGoals, form.awayTeam!),
-              style: AppTypography.title().copyWith(fontSize: AppSizes.s18),
-            ),
-            if (_scorerLine(form, l10n) != null) ...[
-              const SizedBox(height: AppSizes.s8),
-              Text(_scorerLine(form, l10n)!, style: AppTypography.body()),
-            ],
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.commonCancel)),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text(l10n.goalPublish),
+    final confirmed = await showArenaConfirm(
+      context,
+      title: l10n.goalConfirmTitle,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.goalConfirmMessage(form.homeTeam!, form.homeGoals, form.awayGoals, form.awayTeam!),
+            style: AppTypography.title().copyWith(fontSize: AppSizes.s18),
           ),
+          if (_scorerLine(form, l10n) != null) ...[
+            const SizedBox(height: AppSizes.s8),
+            Text(_scorerLine(form, l10n)!, style: AppTypography.body()),
+          ],
         ],
       ),
+      confirmLabel: l10n.goalPublish,
+      icon: Icons.sports_soccer_rounded,
+      tone: ArenaAlertTone.primary,
     );
-    if (confirmed == true) _cubit.submit();
+    if (confirmed) _cubit.submit();
   }
 
   @override

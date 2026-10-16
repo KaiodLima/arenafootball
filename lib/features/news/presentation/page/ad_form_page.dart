@@ -16,6 +16,7 @@ import 'package:arena_soccer/utils/components/visible_switch.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 
 /// Cadastro/edição de publicidade (notícia com tag "publicidade"): o banner
 /// 2:1 já aparece como no feed, um nome para o admin identificar, o link
@@ -82,22 +83,17 @@ class _AdFormPageState extends State<AdFormPage> {
 
   Future<void> _confirmDiscard(AppLocalizations l10n) async {
     FocusManager.instance.primaryFocus?.unfocus();
-    final discard = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.newsDiscardTitle),
-        content: Text(l10n.newsDiscardMessage),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.newsDiscardKeep)),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text(l10n.newsDiscardConfirm, style: const TextStyle(color: AppColors.danger)),
-          ),
-        ],
-      ),
+    final discard = await showArenaConfirm(
+      context,
+      title: l10n.newsDiscardTitle,
+      message: l10n.newsDiscardMessage,
+      confirmLabel: l10n.newsDiscardConfirm,
+      cancelLabel: l10n.newsDiscardKeep,
+      icon: Icons.delete_sweep_outlined,
+      tone: ArenaAlertTone.danger,
     );
     FocusManager.instance.primaryFocus?.unfocus();
-    if (discard == true && mounted) _closeAfterRebuild();
+    if (discard && mounted) _closeAfterRebuild();
   }
 
   /// Libera o pop e fecha no frame seguinte: o `PopScope` só aceita depois

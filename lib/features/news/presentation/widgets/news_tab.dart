@@ -13,13 +13,12 @@ import 'package:arena_soccer/features/players/presentation/player_navigation.dar
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/injection_container.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
-import 'package:arena_soccer/utils/components/arena_button.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/card_menu_button.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
-import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 
 /// Aba Início da home: feed de notícias da região selecionada.
 /// [header] entra no topo da lista e rola junto (ex.: destaques).
@@ -129,34 +128,14 @@ class _NewsItem extends StatelessWidget {
   Future<void> _confirmDelete(BuildContext context) async {
     final cubit = BlocProvider.of<NewsFeedCubit>(context);
     final l10n = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        surfaceTintColor: AppColors.transparent,
-        content: Text(l10n.newsDeleteConfirm, textAlign: TextAlign.center, style: AppTypography.title()),
-        actions: [
-          Row(
-            children: [
-              Expanded(
-                child: ArenaButton.outlined(
-                  title: l10n.commonCancel,
-                  function: () => Navigator.pop(dialogContext, false),
-                ),
-              ),
-              const SizedBox(width: AppSizes.s8),
-              Expanded(
-                child: ArenaButton.primary(
-                  title: l10n.commonDelete,
-                  function: () => Navigator.pop(dialogContext, true),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+    final confirmed = await showArenaConfirm(
+      context,
+      title: l10n.newsDeleteConfirm,
+      confirmLabel: l10n.commonDelete,
+      icon: Icons.delete_outline_rounded,
+      tone: ArenaAlertTone.danger,
     );
-    if (confirmed == true) await cubit.delete(news.id);
+    if (confirmed) await cubit.delete(news.id);
   }
 
   /// Tela do atleta, na temporada gravada no card (os jogadores são por

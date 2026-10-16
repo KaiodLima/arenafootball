@@ -11,6 +11,7 @@ import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 
 /// Edição do time pelo admin (escudo, descrição, cores e região). Salvou,
 /// fecha devolvendo o time atualizado para quem abriu.
@@ -30,18 +31,15 @@ class EditTeamPage extends StatelessWidget {
     final cubit = BlocProvider.of<EditTeamCubit>(context);
     final team = cubit.state.team;
     if (region != null && region.isNotEmpty && region != team.region) {
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (dialogContext) => AlertDialog(
-          title: Text(l10n.teamEditRegionChangeTitle),
-          content: Text(l10n.teamEditRegionChangeMessage(team.name, region)),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.commonCancel)),
-            TextButton(onPressed: () => Navigator.pop(dialogContext, true), child: Text(l10n.commonSave)),
-          ],
-        ),
+      final confirmed = await showArenaConfirm(
+        context,
+        title: l10n.teamEditRegionChangeTitle,
+        message: l10n.teamEditRegionChangeMessage(team.name, region),
+        confirmLabel: l10n.commonSave,
+        icon: Icons.swap_horiz_rounded,
+        tone: ArenaAlertTone.warning,
       );
-      if (confirmed != true) return;
+      if (!confirmed) return;
     }
     await cubit.save(
       description: description,

@@ -22,6 +22,7 @@ import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 
 /// "Sou dono de time": sem pedido (ou editando), o formulário; pendente ou
 /// rejeitado, a situação; aprovado, a área "Meu time" do dono.
@@ -78,21 +79,16 @@ class _TeamRequestPageState extends State<TeamRequestPage> {
   }
 
   Future<void> _confirmCancel(TeamRequestDTO request, AppLocalizations l10n) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.teamRequestCancelTitle),
-        content: Text(l10n.teamRequestCancelMessage(request.name)),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.playerRequestKeep)),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text(l10n.teamRequestCancel, style: const TextStyle(color: AppColors.danger)),
-          ),
-        ],
-      ),
+    final confirmed = await showArenaConfirm(
+      context,
+      title: l10n.teamRequestCancelTitle,
+      message: l10n.teamRequestCancelMessage(request.name),
+      confirmLabel: l10n.teamRequestCancel,
+      cancelLabel: l10n.playerRequestKeep,
+      icon: Icons.cancel_outlined,
+      tone: ArenaAlertTone.danger,
     );
-    if (confirmed == true) await _cubit.cancelRequest();
+    if (confirmed) await _cubit.cancelRequest();
   }
 
   void _edit() {

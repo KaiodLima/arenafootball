@@ -25,6 +25,7 @@ import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 
 /// Tela do atleta: foto, nome e time no topo; gols e assistências com a
 /// posição nos rankings da região; os cards de gol em que participou. O
@@ -398,28 +399,17 @@ class _AdminEditorState extends State<_AdminEditor> {
     FocusManager.instance.primaryFocus?.unfocus();
     final player = widget.player;
     final linked = player.userId.isNotEmpty;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(linked ? l10n.athleteRemoveTitle(player.name) : l10n.athleteDeleteTitle(player.name)),
-        content: Text(
-          linked
-              ? l10n.athleteRemoveMessage(player.name, player.team)
-              : l10n.athleteDeleteMessage(player.name, player.team),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.commonCancel)),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text(
-              linked ? l10n.athleteRemoveFromSquad : l10n.commonDelete,
-              style: const TextStyle(color: AppColors.danger),
-            ),
-          ),
-        ],
-      ),
+    final confirmed = await showArenaConfirm(
+      context,
+      title: linked ? l10n.athleteRemoveTitle(player.name) : l10n.athleteDeleteTitle(player.name),
+      message: linked
+          ? l10n.athleteRemoveMessage(player.name, player.team)
+          : l10n.athleteDeleteMessage(player.name, player.team),
+      confirmLabel: linked ? l10n.athleteRemoveFromSquad : l10n.commonDelete,
+      icon: linked ? Icons.person_remove_outlined : Icons.delete_outline_rounded,
+      tone: ArenaAlertTone.danger,
     );
-    if (confirmed != true || !mounted) return;
+    if (!confirmed || !mounted) return;
     final cubit = BlocProvider.of<PlayerProfileCubit>(context);
     linked ? await cubit.removeFromSquad() : await cubit.delete();
   }
