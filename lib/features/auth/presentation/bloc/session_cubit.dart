@@ -1,7 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
 import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
+import 'package:arena_soccer/features/auth/domain/account_provider.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/clear_cache_usecase.dart';
+import 'package:arena_soccer/features/auth/domain/usecases/delete_account_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/delete_user_cache_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/get_cached_user_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/get_current_user_usecase.dart';
@@ -12,6 +15,7 @@ import 'package:arena_soccer/features/auth/presentation/bloc/session_state.dart'
 class SessionCubit extends Cubit<SessionState> {
   final GetCurrentUserUseCase getCurrentUserUseCase;
   final SignOutUseCase signOutUseCase;
+  final DeleteAccountUseCase deleteAccountUseCase;
   final GetCachedUserUseCase getCachedUserUseCase;
   final SaveUserCacheUseCase saveUserCacheUseCase;
   final DeleteUserCacheUseCase deleteUserCacheUseCase;
@@ -20,6 +24,7 @@ class SessionCubit extends Cubit<SessionState> {
   SessionCubit(
     this.getCurrentUserUseCase,
     this.signOutUseCase,
+    this.deleteAccountUseCase,
     this.getCachedUserUseCase,
     this.saveUserCacheUseCase,
     this.deleteUserCacheUseCase,
@@ -75,5 +80,19 @@ class SessionCubit extends Cubit<SessionState> {
     await signOutUseCase();
     await clearCacheUseCase();
     emit(const GuestSessionState());
+  }
+
+  AccountProvider get accountProvider => deleteAccountUseCase.provider;
+
+  /// Exclui a conta logada. Devolve a falha (nula = excluída; código
+  /// [deleteAccountCanceledCode] = o usuário desistiu na folha do Google/Apple).
+  /// O resultado vai direto para o sheet de confirmação, que mostra o erro nele.
+  Future<Failure?> deleteAccount({String? password}) async {
+    final response = await deleteAccountUseCase(password: password);
+    if (response.isLeft) return response.left;
+    // Conta excluída: nada dela fica no aparelho (como no logout).
+    await clearCacheUseCase();
+    emit(const GuestSessionState());
+    return null;
   }
 }

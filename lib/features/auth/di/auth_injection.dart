@@ -4,6 +4,7 @@ import 'package:arena_soccer/features/auth/data/repositories/auth_repository_imp
 import 'package:arena_soccer/features/auth/domain/repositories/auth_repository_interface.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/clear_cache_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/delete_user_cache_usecase.dart';
+import 'package:arena_soccer/features/auth/domain/usecases/delete_account_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/get_account_created_at_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/get_cached_user_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/save_user_cache_usecase.dart';
@@ -11,6 +12,7 @@ import 'package:arena_soccer/features/auth/domain/usecases/update_user_photo_use
 import 'package:arena_soccer/features/auth/domain/usecases/get_current_user_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/send_password_reset_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/sign_in_usecase.dart';
+import 'package:arena_soccer/features/auth/domain/usecases/sign_in_with_apple_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/sign_in_with_google_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/sign_out_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/sign_up_usecase.dart';
@@ -28,8 +30,10 @@ void registerAuthDependencies() {
   // UseCases
   _sl.registerLazySingleton(() => SignInUseCase(_sl()));
   _sl.registerLazySingleton(() => SignInWithGoogleUseCase(_sl()));
+  _sl.registerLazySingleton(() => SignInWithAppleUseCase(_sl()));
   _sl.registerLazySingleton(() => SignUpUseCase(_sl()));
   _sl.registerLazySingleton(() => SignOutUseCase(_sl()));
+  _sl.registerLazySingleton(() => DeleteAccountUseCase(_sl()));
   _sl.registerLazySingleton(() => GetCurrentUserUseCase(_sl()));
   _sl.registerLazySingleton(() => SendPasswordResetUseCase(_sl()));
   _sl.registerLazySingleton(() => UpdateFavoriteTeamUseCase(_sl()));

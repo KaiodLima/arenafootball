@@ -31,7 +31,7 @@ class BlocsLoad extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         // Sessão — global: usuário logado e flag de admin usados no app todo
-        BlocProvider<SessionCubit>(create: (_) => SessionCubit(sl(), sl(), sl(), sl(), sl(), sl())),
+        BlocProvider<SessionCubit>(create: (_) => SessionCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl())),
 
         // Região e temporada — global: filtram notícias, times, tabelas...
         BlocProvider<RegionCubit>(create: (_) => RegionCubit(sl(), sl(), sl(), sl(), sl())..load()),

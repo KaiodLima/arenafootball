@@ -6,6 +6,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/errors/firebase_error.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
 import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
+import 'package:arena_soccer/features/auth/domain/account_provider.dart';
 
 class AuthDataSource {
   final FirebaseAuth _auth;
@@ -56,15 +57,40 @@ class AuthDataSource {
     }
   }
 
+  /// Login nativo da Apple (só iOS). `Right(null)` quando o usuário fecha a folha
+  /// da Apple. O nome só vem no primeiro login, e a Apple não manda foto.
+  Future<Either<Failure, UserDTO?>> signInWithApple() async {
+    const fallback = 'Não foi possível entrar com a Apple. Tente novamente.';
+    try {
+      final provider = AppleAuthProvider()
+        ..addScope('email')
+        ..addScope('name');
+      final credential = await _auth.signInWithProvider(provider);
+      return await _loadOrCreateUser(credential.user!);
+    } on FirebaseAuthException catch (e) {
+      if (_appleCanceledCodes.contains(e.code)) return const Right(null);
+      AppLogger.e('signInWithApple', name: 'AuthDataSource', error: e);
+      if (_auth.currentUser != null) await signOut();
+      return Left(mapFirebaseError(e, fallbackMessage: fallback));
+    } catch (e) {
+      AppLogger.e('signInWithApple', name: 'AuthDataSource', error: e);
+      if (_auth.currentUser != null) await signOut();
+      return Left(mapFirebaseError(e, fallbackMessage: fallback));
+    }
+  }
+
+  /// Códigos do FlutterFire quando o usuário fecha a folha de login da Apple.
+  static const Set<String> _appleCanceledCodes = {'canceled', 'web-context-canceled'};
+
   /// Dados do usuário recém-autenticado. Sem documento (cadastro interrompido ou
-  /// primeiro acesso pelo Google), cria um com o time vazio.
+  /// primeiro acesso pelo Google ou pela Apple), cria um com o time vazio.
   Future<Either<Failure, UserDTO>> _loadOrCreateUser(User authUser) async {
     final result = await getUser(authUser.uid);
     if (result.isRight) return result;
 
     final failure = result.left;
     if (failure is ErrorWithMessage && failure.code == _userDataNotFound) {
-      // Primeiro acesso pelo Google: a foto da conta Google vira a foto do app.
+      // Primeiro acesso social: a foto da conta Google vira a foto do app (a Apple não tem).
       final user = UserDTO(
         id: authUser.uid,
         name: authUser.displayName ?? '',
@@ -138,6 +164,60 @@ class AuthDataSource {
       await _googleSignIn.signOut();
     } catch (e) {
       AppLogger.e('signOut google', name: 'AuthDataSource', error: e);
+    }
+  }
+
+  /// Provedor da conta logada. Conta com senha e Google ao mesmo tempo
+  /// reautentica pela senha.
+  AccountProvider get accountProvider {
+    final ids = _auth.currentUser?.providerData.map((info) => info.providerId).toSet() ?? const <String>{};
+    if (ids.contains(EmailAuthProvider.PROVIDER_ID)) return AccountProvider.password;
+    if (ids.contains(GoogleAuthProvider.PROVIDER_ID)) return AccountProvider.google;
+    if (ids.contains(AppleAuthProvider.PROVIDER_ID)) return AccountProvider.apple;
+    return AccountProvider.unknown;
+  }
+
+  /// Exclui a conta do Auth depois de reautenticar (o Firebase exige login
+  /// recente). Os dados no Firestore/Storage são apagados pela Cloud Function
+  /// `onUserDeleted`. Conta Apple: revoga o token na Apple (exigência da loja).
+  Future<Either<Failure, void>> deleteAccount({String? password}) async {
+    const fallback = 'Não foi possível excluir a conta. Tente novamente.';
+    final user = _auth.currentUser;
+    if (user == null) return Left(ErrorWithMessage(fallback));
+    try {
+      switch (accountProvider) {
+        case AccountProvider.password:
+          final credential = EmailAuthProvider.credential(email: user.email ?? '', password: password ?? '');
+          await user.reauthenticateWithCredential(credential);
+        case AccountProvider.google:
+          await (_googleInit ??= _googleSignIn.initialize());
+          final account = await _googleSignIn.authenticate();
+          final idToken = account.authentication.idToken;
+          if (idToken == null) return Left(ErrorWithMessage(fallback));
+          await user.reauthenticateWithCredential(GoogleAuthProvider.credential(idToken: idToken));
+        case AccountProvider.apple:
+          final credential = await user.reauthenticateWithProvider(AppleAuthProvider());
+          final code = credential.additionalUserInfo?.authorizationCode;
+          if (code != null) await _auth.revokeTokenWithAuthorizationCode(code);
+        case AccountProvider.unknown:
+          break;
+      }
+      await user.delete();
+      await _signOutGoogle();
+      return const Right(null);
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) {
+        return Left(ErrorWithMessage(fallback, code: deleteAccountCanceledCode));
+      }
+      AppLogger.e('deleteAccount google', name: 'AuthDataSource', error: e);
+      return Left(ErrorWithMessage(fallback));
+    } on FirebaseAuthException catch (e) {
+      if (_appleCanceledCodes.contains(e.code)) return Left(ErrorWithMessage(fallback, code: deleteAccountCanceledCode));
+      AppLogger.e('deleteAccount', name: 'AuthDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: fallback));
+    } catch (e) {
+      AppLogger.e('deleteAccount', name: 'AuthDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: fallback));
     }
   }
 

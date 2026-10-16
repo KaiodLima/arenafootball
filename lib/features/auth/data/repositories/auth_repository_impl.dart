@@ -4,6 +4,7 @@ import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/auth/data/datasources/auth_datasource.dart';
 import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
+import 'package:arena_soccer/features/auth/domain/account_provider.dart';
 import 'package:arena_soccer/features/auth/domain/repositories/auth_repository_interface.dart';
 
 class AuthRepositoryImpl implements IAuthRepository {
@@ -18,6 +19,15 @@ class AuthRepositoryImpl implements IAuthRepository {
 
   @override
   Future<Either<Failure, UserDTO?>> signInWithGoogle() => _dataSource.signInWithGoogle();
+
+  @override
+  Future<Either<Failure, UserDTO?>> signInWithApple() => _dataSource.signInWithApple();
+
+  @override
+  AccountProvider get accountProvider => _dataSource.accountProvider;
+
+  @override
+  Future<Either<Failure, void>> deleteAccount({String? password}) => _dataSource.deleteAccount(password: password);
 
   @override
   Future<Either<Failure, UserDTO>> signUp({

@@ -5,6 +5,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
 import 'package:arena_soccer/features/auth/domain/repositories/auth_repository_interface.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/clear_cache_usecase.dart';
+import 'package:arena_soccer/features/auth/domain/usecases/delete_account_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/delete_user_cache_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/get_cached_user_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/get_current_user_usecase.dart';
@@ -61,6 +62,7 @@ void main() {
   SessionCubit build() => SessionCubit(
         GetCurrentUserUseCase(auth),
         SignOutUseCase(auth),
+        DeleteAccountUseCase(auth),
         GetCachedUserUseCase(auth),
         SaveUserCacheUseCase(auth),
         DeleteUserCacheUseCase(auth),

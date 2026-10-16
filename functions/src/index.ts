@@ -13,8 +13,10 @@
  * o carregamento pesado (gRPC do Firestore) estoura o limite de 10s da
  * análise do deploy.
  */
-import type { FieldValue as FieldValueType, Firestore } from 'firebase-admin/firestore';
+import type { DocumentReference, FieldValue as FieldValueType, Firestore } from 'firebase-admin/firestore';
 import type { Messaging } from 'firebase-admin/messaging';
+import type { Storage } from 'firebase-admin/storage';
+import * as functionsV1 from 'firebase-functions/v1';
 import { logger, setGlobalOptions } from 'firebase-functions/v2';
 import { onDocumentCreated, onDocumentUpdated, onDocumentWritten } from 'firebase-functions/v2/firestore';
 import { onRequest } from 'firebase-functions/v2/https';
@@ -38,6 +40,7 @@ import {
   todayKey,
   votingMessage,
 } from './messages';
+import { isLegacyVoteCollection, seasonCollections, seasonsToSweep, userPhotoPath } from './account_cleanup';
 import {
   APP_PAGE,
   NOT_FOUND_PAGE,
@@ -54,6 +57,7 @@ setGlobalOptions({ region: 'us-central1', maxInstances: 5 });
 interface AdminServices {
   db: Firestore;
   messaging: Messaging;
+  storage: Storage;
   FieldValue: typeof FieldValueType;
 }
 
@@ -63,8 +67,9 @@ async function loadAdmin(): Promise<AdminServices> {
   const { initializeApp } = await import('firebase-admin/app');
   const { getFirestore, FieldValue } = await import('firebase-admin/firestore');
   const { getMessaging } = await import('firebase-admin/messaging');
+  const { getStorage } = await import('firebase-admin/storage');
   initializeApp();
-  return { db: getFirestore(), messaging: getMessaging(), FieldValue };
+  return { db: getFirestore(), messaging: getMessaging(), storage: getStorage(), FieldValue };
 }
 
 /** Firebase Admin inicializado uma vez, na primeira execução. */
@@ -262,3 +267,95 @@ export const sharePage = onRequest({ maxInstances: 3 }, async (req, res) => {
     res.status(500).send(renderSharePage(NOT_FOUND_PAGE, share, path));
   }
 });
+
+/** Lote de escrita do Firestore: no máximo 500 operações. */
+const BATCH_LIMIT = 400;
+
+/** Apaga os docs que existirem entre as referências (lidas em blocos). */
+async function deleteExisting(db: Firestore, refs: DocumentReference[]): Promise<number> {
+  let deleted = 0;
+  for (let i = 0; i < refs.length; i += BATCH_LIMIT) {
+    const chunk = refs.slice(i, i + BATCH_LIMIT);
+    const snaps = await db.getAll(...chunk);
+    const batch = db.batch();
+    let pending = 0;
+    for (const snap of snaps) {
+      if (!snap.exists) continue;
+      batch.delete(snap.ref);
+      pending++;
+    }
+    if (pending > 0) await batch.commit();
+    deleted += pending;
+  }
+  return deleted;
+}
+
+/**
+ * Conta excluída no app (Firebase Auth): apaga o perfil, a foto, os pedidos e
+ * os votos; o atleta vinculado fica no elenco sem a conta, e o time do dono
+ * fica sem dono. Contagens de votações já encerradas (`quantidadeVotos`) ficam,
+ * como diz a política de privacidade. Gatilho do Auth só existe na v1.
+ */
+export const onUserDeleted = functionsV1
+  .region('us-central1')
+  .auth.user()
+  .onDelete(async (user) => {
+    const uid = user.uid;
+    const { db, storage, FieldValue } = await admin();
+
+    // Perfil: doc pelo uid e contas antigas com id de doc diferente (idUsuario).
+    const profiles = await db.collection('usuarios').where('idUsuario', '==', uid).get();
+    const profileRefs = [db.collection('usuarios').doc(uid), ...profiles.docs.map((doc) => doc.ref)];
+    const profileSnaps = await db.getAll(...profileRefs);
+    const bucket = storage.bucket();
+    for (const snap of profileSnaps) {
+      const path = userPhotoPath(snap.get('urlImagem'), bucket.name);
+      if (!path) continue;
+      try {
+        await bucket.file(path).delete({ ignoreNotFound: true });
+      } catch (error) {
+        logger.error('Falha ao apagar a foto da conta', { uid, path, error });
+      }
+    }
+    const profilesDeleted = await deleteExisting(db, profileRefs);
+
+    const requestsDeleted = await deleteExisting(db, [
+      db.collection('solicitacoes_jogador').doc(uid),
+      db.collection('solicitacoes_time').doc(uid),
+    ]);
+
+    // Votos de cada temporada (partidas{ano}/{id}/votos/{uid}) e vínculos de atleta e dono.
+    const seasons = seasonsToSweep((await db.doc('config/temporadas').get()).data());
+    let votesDeleted = 0;
+    let playersUnlinked = 0;
+    let teamsUnlinked = 0;
+    for (const season of seasons) {
+      const { matches, players, teams } = seasonCollections(season);
+      const matchRefs = await db.collection(matches).listDocuments();
+      votesDeleted += await deleteExisting(db, matchRefs.map((ref) => ref.collection('votos').doc(uid)));
+
+      const linkedPlayers = await db.collection(players).where('idUsuario', '==', uid).get();
+      for (const doc of linkedPlayers.docs) await doc.ref.update({ idUsuario: FieldValue.delete() });
+      playersUnlinked += linkedPlayers.size;
+
+      for (const collection of teams) {
+        const ownedTeams = await db.collection(collection).where('idDono', '==', uid).get();
+        for (const doc of ownedTeams.docs) await doc.ref.update({ idDono: FieldValue.delete() });
+        teamsUnlinked += ownedTeams.size;
+      }
+    }
+
+    // Votos antigos, sem temporada.
+    const legacy = (await db.listCollections()).filter((col) => isLegacyVoteCollection(col.id));
+    votesDeleted += await deleteExisting(db, legacy.map((col) => col.doc(uid)));
+
+    logger.info('Conta excluída: dados apagados', {
+      uid,
+      seasons,
+      profilesDeleted,
+      requestsDeleted,
+      votesDeleted,
+      playersUnlinked,
+      teamsUnlinked,
+    });
+  });
