@@ -8,6 +8,9 @@ abstract class IAuthRepository {
   /// `Right(null)` quando o usuário cancela o seletor de contas do Google.
   Future<Either<Failure, UserDTO?>> signInWithGoogle();
 
+  /// `Right(null)` quando o usuário fecha a folha de login da Apple.
+  Future<Either<Failure, UserDTO?>> signInWithApple();
+
   Future<Either<Failure, UserDTO>> signUp({
     required String name,
     required String email,

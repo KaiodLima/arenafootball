@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
@@ -50,6 +51,11 @@ class _LoginPageState extends State<LoginPage> {
     BlocProvider.of<LoginCubit>(context).signInWithGoogle();
   }
 
+  void _signInWithApple() {
+    FocusScope.of(context).unfocus();
+    BlocProvider.of<LoginCubit>(context).signInWithApple();
+  }
+
   Future<void> _openForgotPassword() async {
     setState(() => _resetSheetOpen = true);
     await ForgotPasswordSheet.show(context, initialEmail: _emailController.text.trim());
@@ -90,7 +96,8 @@ class _LoginPageState extends State<LoginPage> {
     return BlocConsumer<LoginCubit, LoginState>(
       listener: (context, state) => _onStateChanged(context, state, l10n),
       builder: (context, state) {
-        final busy = state is LoadingLoginState || state is GoogleLoadingLoginState;
+        final busy =
+            state is LoadingLoginState || state is GoogleLoadingLoginState || state is AppleLoadingLoginState;
         return AuthScaffold(
           child: AutofillGroup(
             child: Column(
@@ -151,6 +158,22 @@ class _LoginPageState extends State<LoginPage> {
                   isLoading: state is GoogleLoadingLoginState,
                   function: busy ? null : _signInWithGoogle,
                 ),
+                // Login da Apple só no iOS (exigência da App Store junto do Google).
+                if (defaultTargetPlatform == TargetPlatform.iOS) ...[
+                  const SizedBox(height: AppSizes.s12),
+                  ArenaButton(
+                    title: l10n.loginWithAppleButton,
+                    height: AppSizes.buttonHeightLarge,
+                    borderRadius: AppSizes.fieldRadius,
+                    fontSize: AppSizes.s16,
+                    buttonColor: AppColors.black,
+                    buttonBorderColor: AppColors.black,
+                    textColor: AppColors.white,
+                    leading: const Icon(Icons.apple, size: AppSizes.s22, color: AppColors.white),
+                    isLoading: state is AppleLoadingLoginState,
+                    function: busy ? null : _signInWithApple,
+                  ),
+                ],
                 const SizedBox(height: AppSizes.s12),
                 ArenaButton(
                   title: l10n.loginCreateAccountButton,

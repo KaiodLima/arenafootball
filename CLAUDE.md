@@ -39,7 +39,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | Feature | Conteúdo |
 |---------|----------|
 | `splash` | Restaura a sessão (auto-login) e decide entre home e login |
-| `auth` | Login, cadastro de usuário, `SessionCubit` (global) |
+| `auth` | Login (e-mail, Google e Apple; Apple só no iOS), cadastro de usuário, `SessionCubit` (global) |
 | `regions` | Regiões (`competicao`) + região/temporada escolhidas, `RegionCubit` (global); painel do admin "Regiões" (criar, renomear, excluir só vazia e a manutenção "Vincular regiões por id") |
 | `home` | Casca: AppBar, drawer, barra inferior com as 4 abas, atalhos do admin |
 | `news` | Feed (aba HOME), detalhe, cadastro/edição, notificação de gol, anúncio |
@@ -91,7 +91,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 
 | Coleção | Campos principais |
 |---------|-------------------|
-| `usuarios` | idUsuario, nome, email, time (nome, cópia), idTime (time do coração), admin (bool), urlImagem (opcional: foto da carteirinha; conta Google usa a foto do Google até trocar). Contas antigas têm `senha` em texto puro — não gravar mais |
+| `usuarios` | idUsuario, nome, email, time (nome, cópia), idTime (time do coração), admin (bool), urlImagem (opcional: foto da carteirinha; conta Google usa a foto do Google até trocar; conta Apple não tem foto). Contas antigas têm `senha` em texto puro — não gravar mais |
 | `noticias` | id, data (Timestamp), titulo, descricao, urlImagem, link, exibir ("true"/"false" **string**), fk_competicao, time_casa, time_fora, gol_time_casa, gol_time_fora, tag ("gol", "publicidade", título de destaque...), images[]. Cards de gol, opcionais: autor_gol_id, autor_gol, assistencia_id, assistencia (id/nome em `jogadores{ano}`), temporada, time_marcador, escudo_marcador (URL), id_time_casa, id_time_fora, id_time_marcador, cor_marcador, cor_marcador_secundaria (hex do time que marcou: fundo do card) |
 | `destaques` | id, title, link, urlImagem, exibir (string), priority |
 | `competicao` | nome (as "regiões": Floresta, Santo inacio...). O **id do doc** é o vínculo: os docs de conteúdo e os pedidos gravam `idRegiao` ao lado do nome (`fk_competicao`/`regiao`, só cópia). Renomear = trocar só o `nome` |

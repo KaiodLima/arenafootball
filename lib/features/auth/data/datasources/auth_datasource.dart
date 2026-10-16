@@ -56,15 +56,40 @@ class AuthDataSource {
     }
   }
 
+  /// Login nativo da Apple (só iOS). `Right(null)` quando o usuário fecha a folha
+  /// da Apple. O nome só vem no primeiro login, e a Apple não manda foto.
+  Future<Either<Failure, UserDTO?>> signInWithApple() async {
+    const fallback = 'Não foi possível entrar com a Apple. Tente novamente.';
+    try {
+      final provider = AppleAuthProvider()
+        ..addScope('email')
+        ..addScope('name');
+      final credential = await _auth.signInWithProvider(provider);
+      return await _loadOrCreateUser(credential.user!);
+    } on FirebaseAuthException catch (e) {
+      if (_appleCanceledCodes.contains(e.code)) return const Right(null);
+      AppLogger.e('signInWithApple', name: 'AuthDataSource', error: e);
+      if (_auth.currentUser != null) await signOut();
+      return Left(mapFirebaseError(e, fallbackMessage: fallback));
+    } catch (e) {
+      AppLogger.e('signInWithApple', name: 'AuthDataSource', error: e);
+      if (_auth.currentUser != null) await signOut();
+      return Left(mapFirebaseError(e, fallbackMessage: fallback));
+    }
+  }
+
+  /// Códigos do FlutterFire quando o usuário fecha a folha de login da Apple.
+  static const Set<String> _appleCanceledCodes = {'canceled', 'web-context-canceled'};
+
   /// Dados do usuário recém-autenticado. Sem documento (cadastro interrompido ou
-  /// primeiro acesso pelo Google), cria um com o time vazio.
+  /// primeiro acesso pelo Google ou pela Apple), cria um com o time vazio.
   Future<Either<Failure, UserDTO>> _loadOrCreateUser(User authUser) async {
     final result = await getUser(authUser.uid);
     if (result.isRight) return result;
 
     final failure = result.left;
     if (failure is ErrorWithMessage && failure.code == _userDataNotFound) {
-      // Primeiro acesso pelo Google: a foto da conta Google vira a foto do app.
+      // Primeiro acesso social: a foto da conta Google vira a foto do app (a Apple não tem).
       final user = UserDTO(
         id: authUser.uid,
         name: authUser.displayName ?? '',
