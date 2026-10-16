@@ -1020,6 +1020,37 @@ class AppLocalizationsPt extends AppLocalizations {
   String get drawerLogout => 'Sair da conta';
 
   @override
+  String get drawerDeleteAccount => 'Excluir conta';
+
+  @override
+  String get deleteAccountTitle => 'Excluir sua conta?';
+
+  @override
+  String get deleteAccountMessage =>
+      'Apagamos a sua conta de login, o seu perfil (nome, e-mail, foto e time do coração), os seus votos e os seus pedidos de jogador ou de dono de time. Se você joga num time, os seus gols e assistências continuam no elenco, sem vínculo com a conta. Não dá para desfazer.';
+
+  @override
+  String get deleteAccountConfirmPassword =>
+      'Digite a sua senha para confirmar.';
+
+  @override
+  String get deleteAccountConfirmGoogle =>
+      'Para confirmar, entre de novo com a sua conta Google.';
+
+  @override
+  String get deleteAccountConfirmApple =>
+      'Para confirmar, entre de novo com a sua conta Apple.';
+
+  @override
+  String get deleteAccountPasswordRequired => 'Digite a sua senha.';
+
+  @override
+  String get deleteAccountButton => 'EXCLUIR CONTA';
+
+  @override
+  String get deleteAccountSuccess => 'Sua conta foi excluída.';
+
+  @override
   String get drawerChooseTeam => 'Escolher meu time';
 
   @override

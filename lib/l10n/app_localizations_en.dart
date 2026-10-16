@@ -1011,6 +1011,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get drawerLogout => 'Sign out';
 
   @override
+  String get drawerDeleteAccount => 'Delete account';
+
+  @override
+  String get deleteAccountTitle => 'Delete your account?';
+
+  @override
+  String get deleteAccountMessage =>
+      'We delete your login account, your profile (name, email, photo and favorite team), your votes and your player or team owner requests. If you play for a team, your goals and assists stay in the squad, no longer linked to the account. This can\'t be undone.';
+
+  @override
+  String get deleteAccountConfirmPassword => 'Enter your password to confirm.';
+
+  @override
+  String get deleteAccountConfirmGoogle =>
+      'To confirm, sign in again with your Google account.';
+
+  @override
+  String get deleteAccountConfirmApple =>
+      'To confirm, sign in again with your Apple account.';
+
+  @override
+  String get deleteAccountPasswordRequired => 'Enter your password.';
+
+  @override
+  String get deleteAccountButton => 'DELETE ACCOUNT';
+
+  @override
+  String get deleteAccountSuccess => 'Your account was deleted.';
+
+  @override
   String get drawerChooseTeam => 'Choose my team';
 
   @override

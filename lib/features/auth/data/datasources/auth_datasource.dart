@@ -6,6 +6,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/errors/firebase_error.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
 import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
+import 'package:arena_soccer/features/auth/domain/account_provider.dart';
 
 class AuthDataSource {
   final FirebaseAuth _auth;
@@ -163,6 +164,60 @@ class AuthDataSource {
       await _googleSignIn.signOut();
     } catch (e) {
       AppLogger.e('signOut google', name: 'AuthDataSource', error: e);
+    }
+  }
+
+  /// Provedor da conta logada. Conta com senha e Google ao mesmo tempo
+  /// reautentica pela senha.
+  AccountProvider get accountProvider {
+    final ids = _auth.currentUser?.providerData.map((info) => info.providerId).toSet() ?? const <String>{};
+    if (ids.contains(EmailAuthProvider.PROVIDER_ID)) return AccountProvider.password;
+    if (ids.contains(GoogleAuthProvider.PROVIDER_ID)) return AccountProvider.google;
+    if (ids.contains(AppleAuthProvider.PROVIDER_ID)) return AccountProvider.apple;
+    return AccountProvider.unknown;
+  }
+
+  /// Exclui a conta do Auth depois de reautenticar (o Firebase exige login
+  /// recente). Os dados no Firestore/Storage são apagados pela Cloud Function
+  /// `onUserDeleted`. Conta Apple: revoga o token na Apple (exigência da loja).
+  Future<Either<Failure, void>> deleteAccount({String? password}) async {
+    const fallback = 'Não foi possível excluir a conta. Tente novamente.';
+    final user = _auth.currentUser;
+    if (user == null) return Left(ErrorWithMessage(fallback));
+    try {
+      switch (accountProvider) {
+        case AccountProvider.password:
+          final credential = EmailAuthProvider.credential(email: user.email ?? '', password: password ?? '');
+          await user.reauthenticateWithCredential(credential);
+        case AccountProvider.google:
+          await (_googleInit ??= _googleSignIn.initialize());
+          final account = await _googleSignIn.authenticate();
+          final idToken = account.authentication.idToken;
+          if (idToken == null) return Left(ErrorWithMessage(fallback));
+          await user.reauthenticateWithCredential(GoogleAuthProvider.credential(idToken: idToken));
+        case AccountProvider.apple:
+          final credential = await user.reauthenticateWithProvider(AppleAuthProvider());
+          final code = credential.additionalUserInfo?.authorizationCode;
+          if (code != null) await _auth.revokeTokenWithAuthorizationCode(code);
+        case AccountProvider.unknown:
+          break;
+      }
+      await user.delete();
+      await _signOutGoogle();
+      return const Right(null);
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) {
+        return Left(ErrorWithMessage(fallback, code: deleteAccountCanceledCode));
+      }
+      AppLogger.e('deleteAccount google', name: 'AuthDataSource', error: e);
+      return Left(ErrorWithMessage(fallback));
+    } on FirebaseAuthException catch (e) {
+      if (_appleCanceledCodes.contains(e.code)) return Left(ErrorWithMessage(fallback, code: deleteAccountCanceledCode));
+      AppLogger.e('deleteAccount', name: 'AuthDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: fallback));
+    } catch (e) {
+      AppLogger.e('deleteAccount', name: 'AuthDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: fallback));
     }
   }
 

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
@@ -43,9 +44,10 @@ class PushTopicSync {
   }
 }
 
-/// Notificações push (FCM): permissão, exibição com o app aberto (o FCM só
-/// mostra sozinho em segundo plano), toque (abre a aba do `data.aba`) e
-/// tópicos. Nunca derruba o app: falhas só vão para o log.
+/// Notificações push (FCM): permissão, exibição com o app aberto (no Android
+/// o FCM só mostra sozinho em segundo plano; no iOS o sistema mostra também em
+/// primeiro plano), toque (abre a aba do `data.aba`) e tópicos. Nunca derruba
+/// o app: falhas só vão para o log.
 class PushService implements TopicClient {
   static const String channelId = 'arena_default';
 
@@ -54,6 +56,8 @@ class PushService implements TopicClient {
   final _tabRequests = StreamController<String>.broadcast();
   String? _pendingTab;
   int _nextId = 0;
+
+  static bool get _isIOS => defaultTargetPlatform == TargetPlatform.iOS;
 
   PushService(this._messaging, [FlutterLocalNotificationsPlugin? local])
       : _local = local ?? FlutterLocalNotificationsPlugin();
@@ -71,7 +75,15 @@ class PushService implements TopicClient {
   Future<void> init() async {
     try {
       await _local.initialize(
-        settings: const InitializationSettings(android: AndroidInitializationSettings('ic_stat_arena')),
+        settings: const InitializationSettings(
+          android: AndroidInitializationSettings('ic_stat_arena'),
+          // A permissão do iOS é pedida pelo FCM em [requestPermission].
+          iOS: DarwinInitializationSettings(
+            requestAlertPermission: false,
+            requestBadgePermission: false,
+            requestSoundPermission: false,
+          ),
+        ),
         onDidReceiveNotificationResponse: (response) => _openTab(response.payload),
       );
       await _local
@@ -82,6 +94,9 @@ class PushService implements TopicClient {
             description: 'Gols, partidas, votações e avisos',
             importance: Importance.high,
           ));
+      if (_isIOS) {
+        await _messaging.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true);
+      }
       FirebaseMessaging.onMessage.listen(_showForeground);
       FirebaseMessaging.onMessageOpenedApp.listen((message) => _openTab(message.data['aba']?.toString()));
       final initial = await _messaging.getInitialMessage();
@@ -91,8 +106,8 @@ class PushService implements TopicClient {
     }
   }
 
-  /// Android 13+: pede a permissão de notificação (nas versões antigas já
-  /// vem concedida).
+  /// Pede a permissão de notificação (iOS e Android 13+; nas versões antigas do
+  /// Android já vem concedida).
   Future<void> requestPermission() async {
     try {
       await _messaging.requestPermission();
@@ -107,7 +122,8 @@ class PushService implements TopicClient {
 
   Future<void> _showForeground(RemoteMessage message) async {
     final notification = message.notification;
-    if (notification == null) return;
+    // No iOS o próprio sistema mostra (setForegroundNotificationPresentationOptions).
+    if (notification == null || _isIOS) return;
     try {
       await _local.show(
         id: _nextId++,
@@ -133,8 +149,25 @@ class PushService implements TopicClient {
   }
 
   @override
-  Future<void> subscribe(String topic) => _messaging.subscribeToTopic(topic);
+  Future<void> subscribe(String topic) async {
+    await _waitApnsToken();
+    await _messaging.subscribeToTopic(topic);
+  }
 
   @override
-  Future<void> unsubscribe(String topic) => _messaging.unsubscribeFromTopic(topic);
+  Future<void> unsubscribe(String topic) async {
+    await _waitApnsToken();
+    await _messaging.unsubscribeFromTopic(topic);
+  }
+
+  /// No iOS o FCM só assina tópicos depois que a Apple entrega o token APNs,
+  /// que chega alguns segundos após a abertura. Sem token (sem permissão ou
+  /// simulador), o erro do FCM chega ao [PushTopicSync], que tenta de novo.
+  Future<void> _waitApnsToken() async {
+    if (!_isIOS) return;
+    for (var attempt = 0; attempt < 10; attempt++) {
+      if (await _messaging.getAPNSToken() != null) return;
+      await Future.delayed(const Duration(seconds: 1));
+    }
+  }
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/auth/presentation/widgets/delete_account_sheet.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/core/services/deep_link_service.dart';
@@ -153,6 +154,13 @@ class _HomePageState extends State<HomePage> {
     Navigator.pushNamedAndRemoveUntil(context, AppRoutes.loginPage, (_) => false);
   }
 
+  Future<void> _deleteAccount() async {
+    final deleted = await DeleteAccountSheet.show(context);
+    if (!deleted || !mounted) return;
+    showSnackBar(context: context, message: AppLocalizations.of(context).deleteAccountSuccess);
+    Navigator.pushNamedAndRemoveUntil(context, AppRoutes.loginPage, (_) => false);
+  }
+
   Widget _tabContent(HomeTab tab, RegionState region, AppLocalizations l10n) {
     final key = ValueKey('${tab.name}-${region.selectedRegion}-${region.selectedSeason}');
     switch (tab) {
@@ -206,6 +214,7 @@ class _HomePageState extends State<HomePage> {
               ownedTeam: ownedTeam.teamName,
               onChooseTeam: _chooseTeam,
               onLogout: _logout,
+              onDeleteAccount: _deleteAccount,
             ),
             body: Column(
               children: [

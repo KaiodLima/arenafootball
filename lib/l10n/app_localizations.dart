@@ -1846,6 +1846,60 @@ abstract class AppLocalizations {
   /// **'Sair da conta'**
   String get drawerLogout;
 
+  /// No description provided for @drawerDeleteAccount.
+  ///
+  /// In pt, this message translates to:
+  /// **'Excluir conta'**
+  String get drawerDeleteAccount;
+
+  /// No description provided for @deleteAccountTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Excluir sua conta?'**
+  String get deleteAccountTitle;
+
+  /// No description provided for @deleteAccountMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Apagamos a sua conta de login, o seu perfil (nome, e-mail, foto e time do coração), os seus votos e os seus pedidos de jogador ou de dono de time. Se você joga num time, os seus gols e assistências continuam no elenco, sem vínculo com a conta. Não dá para desfazer.'**
+  String get deleteAccountMessage;
+
+  /// No description provided for @deleteAccountConfirmPassword.
+  ///
+  /// In pt, this message translates to:
+  /// **'Digite a sua senha para confirmar.'**
+  String get deleteAccountConfirmPassword;
+
+  /// No description provided for @deleteAccountConfirmGoogle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para confirmar, entre de novo com a sua conta Google.'**
+  String get deleteAccountConfirmGoogle;
+
+  /// No description provided for @deleteAccountConfirmApple.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para confirmar, entre de novo com a sua conta Apple.'**
+  String get deleteAccountConfirmApple;
+
+  /// No description provided for @deleteAccountPasswordRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Digite a sua senha.'**
+  String get deleteAccountPasswordRequired;
+
+  /// No description provided for @deleteAccountButton.
+  ///
+  /// In pt, this message translates to:
+  /// **'EXCLUIR CONTA'**
+  String get deleteAccountButton;
+
+  /// No description provided for @deleteAccountSuccess.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua conta foi excluída.'**
+  String get deleteAccountSuccess;
+
   /// No description provided for @drawerChooseTeam.
   ///
   /// In pt, this message translates to:

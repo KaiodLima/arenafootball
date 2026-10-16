@@ -39,7 +39,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | Feature | Conteúdo |
 |---------|----------|
 | `splash` | Restaura a sessão (auto-login) e decide entre home e login |
-| `auth` | Login (e-mail, Google e Apple; Apple só no iOS), cadastro de usuário, `SessionCubit` (global) |
+| `auth` | Login (e-mail, Google e Apple; Apple só no iOS), cadastro de usuário, excluir conta (menu; reautentica e apaga no Auth, a function `onUserDeleted` limpa os dados), `SessionCubit` (global) |
 | `regions` | Regiões (`competicao`) + região/temporada escolhidas, `RegionCubit` (global); painel do admin "Regiões" (criar, renomear, excluir só vazia e a manutenção "Vincular regiões por id") |
 | `home` | Casca: AppBar, drawer, barra inferior com as 4 abas, atalhos do admin |
 | `news` | Feed (aba HOME), detalhe, cadastro/edição, notificação de gol, anúncio |
@@ -123,7 +123,7 @@ Push: tópico `regiaoid_<id>` (o app assina também o `regiao_<slug>` do nome na
 
 ## Notificações push (FCM)
 
-- **Envio:** Cloud Functions em `functions/` (TypeScript, região `us-central1`, a mesma do Firestore `nam5`). Gatilhos em `noticias`, `partidas` da temporada atual (gatilho em `{colecao}/{id}` filtrando a coleção de partidas da `config/temporadas`), `push_avisos`, `solicitacoes_jogador` (avisa admins, quem pediu e o dono do time) e `solicitacoes_time`, mais o agendamento diário `dailyGames` (9h, Brasília). Mensagens e alvos em `functions/src/messages.ts` (funções puras, `npm test`).
+- **Envio:** Cloud Functions em `functions/` (TypeScript, região `us-central1`, a mesma do Firestore `nam5`). Gatilhos em `noticias`, `partidas` da temporada atual (gatilho em `{colecao}/{id}` filtrando a coleção de partidas da `config/temporadas`), `push_avisos`, `solicitacoes_jogador` (avisa admins, quem pediu e o dono do time) e `solicitacoes_time`, mais o agendamento diário `dailyGames` (9h, Brasília). Fora do push, `onUserDeleted` (gatilho v1 do Auth) apaga perfil, foto, pedidos e votos da conta excluída e tira o `idUsuario`/`idDono` dos atletas e times (regras de varredura em `functions/src/account_cleanup.ts`). Mensagens e alvos em `functions/src/messages.ts` (funções puras, `npm test`).
 - **Tópicos:** `todos`, `regiao_<slug>`, `timeid_<idTime>` (time do coração pelo id), `usuario_<uid>` (logado) e `admins` (conta admin). `time_<slug do nome>` é o tópico antigo: o app novo só assina quando a conta ainda não tem `idTime`, e as functions mandam para os dois na transição. O slug/`teamIdTopic` de `lib/core/utils/push_topics.dart` e o de `messages.ts` precisam ser iguais.
 - **App:** `PushService` (`lib/core/services/push_service.dart`) faz permissão, exibição em primeiro plano e toque (abre a aba do `data.aba`). O `PushTopicsListener` (em `blocs_load.dart`) mantém os tópicos de acordo com a região e o time do coração.
 - **Deploy das functions:** `cd functions && npm install`, depois `firebase deploy --only functions`.
