@@ -29,6 +29,7 @@ class HomeDrawer extends StatelessWidget {
   final String? ownedTeam;
   final VoidCallback onChooseTeam;
   final VoidCallback onLogout;
+  final VoidCallback onDeleteAccount;
 
   const HomeDrawer({
     super.key,
@@ -41,6 +42,7 @@ class HomeDrawer extends StatelessWidget {
     this.playerSeason,
     this.ownedTeam,
     required this.onChooseTeam,
+    required this.onDeleteAccount,
     required this.onLogout,
   });
 
@@ -186,15 +188,30 @@ class HomeDrawer extends StatelessWidget {
               top: false,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(AppSizes.s12, 0, AppSizes.s12, AppSizes.s12),
-                child: _DrawerItem(
-                  icon: Icons.logout_rounded,
-                  title: l10n.drawerLogout,
-                  color: AppColors.danger,
-                  showChevron: false,
-                  onTap: () {
-                    Navigator.pop(context);
-                    onLogout();
-                  },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _DrawerItem(
+                      icon: Icons.person_remove_outlined,
+                      title: l10n.drawerDeleteAccount,
+                      color: AppColors.danger,
+                      showChevron: false,
+                      onTap: () {
+                        Navigator.pop(context);
+                        onDeleteAccount();
+                      },
+                    ),
+                    _DrawerItem(
+                      icon: Icons.logout_rounded,
+                      title: l10n.drawerLogout,
+                      color: AppColors.danger,
+                      showChevron: false,
+                      onTap: () {
+                        Navigator.pop(context);
+                        onLogout();
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),

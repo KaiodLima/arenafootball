@@ -1,6 +1,7 @@
 import 'package:either_dart/either.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
+import 'package:arena_soccer/features/auth/domain/account_provider.dart';
 
 abstract class IAuthRepository {
   Future<Either<Failure, UserDTO>> signIn({required String email, required String password});
@@ -10,6 +11,12 @@ abstract class IAuthRepository {
 
   /// `Right(null)` quando o usuário fecha a folha de login da Apple.
   Future<Either<Failure, UserDTO?>> signInWithApple();
+
+  AccountProvider get accountProvider;
+
+  /// Reautentica e exclui a conta. Folha do Google/Apple fechada = falha com
+  /// código [deleteAccountCanceledCode].
+  Future<Either<Failure, void>> deleteAccount({String? password});
 
   Future<Either<Failure, UserDTO>> signUp({
     required String name,
