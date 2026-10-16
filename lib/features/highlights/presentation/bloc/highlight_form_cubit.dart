@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/highlights/domain/usecases/create_highlight_usecase.dart';
 import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
-import 'package:arena_soccer/features/highlights/domain/usecases/get_highlights_usecase.dart';
+import 'package:arena_soccer/features/highlights/domain/usecases/get_highlights_cache_first_usecase.dart';
 import 'package:arena_soccer/features/highlights/domain/usecases/update_highlight_usecase.dart';
 import 'package:arena_soccer/features/highlights/presentation/bloc/highlight_form_state.dart';
 
@@ -11,10 +11,10 @@ import 'package:arena_soccer/features/highlights/presentation/bloc/highlight_for
 /// e publica ou salva.
 class HighlightFormCubit extends Cubit<HighlightFormState> {
   final CreateHighlightUseCase createHighlightUseCase;
-  final GetHighlightsUseCase getHighlightsUseCase;
+  final GetHighlightsCacheFirstUseCase getHighlightsCacheFirstUseCase;
   final UpdateHighlightUseCase updateHighlightUseCase;
 
-  HighlightFormCubit(this.createHighlightUseCase, this.getHighlightsUseCase, this.updateHighlightUseCase)
+  HighlightFormCubit(this.createHighlightUseCase, this.getHighlightsCacheFirstUseCase, this.updateHighlightUseCase)
       : super(const EditingHighlightFormState());
 
   void _edit(HighlightFormData form) {
@@ -24,8 +24,13 @@ class HighlightFormCubit extends Cubit<HighlightFormState> {
   /// Falhar só deixa a prévia sem os existentes (e sem checar duplicado).
   Future<void> load({HighlightDTO? highlight}) async {
     if (highlight != null) _edit(HighlightFormData.editing(highlight));
-    final response = await getHighlightsUseCase();
-    if (response.isRight) _edit(state.form.copyWith(existing: response.right));
+    // force: a checagem de duplicado precisa da lista atual (o cache só
+    // adianta a prévia enquanto o Firestore responde).
+    await for (final response in getHighlightsCacheFirstUseCase(force: true)) {
+      if (response.isRight && state is EditingHighlightFormState) {
+        _edit(state.form.copyWith(existing: response.right));
+      }
+    }
   }
 
   void changeTitle(String value) => _edit(state.form.copyWith(title: value));

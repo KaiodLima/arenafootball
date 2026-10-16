@@ -1,21 +1,23 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
-import 'package:arena_soccer/features/seasons/domain/usecases/get_seasons_config_usecase.dart';
+import 'package:arena_soccer/features/seasons/domain/usecases/get_seasons_config_cache_first_usecase.dart';
 import 'package:arena_soccer/features/seasons/domain/usecases/start_season_usecase.dart';
 import 'package:arena_soccer/features/seasons/presentation/bloc/seasons_panel_state.dart';
 
 class SeasonsPanelCubit extends Cubit<SeasonsPanelState> {
-  final GetSeasonsConfigUseCase getSeasonsConfigUseCase;
+  final GetSeasonsConfigCacheFirstUseCase getSeasonsConfigCacheFirstUseCase;
   final StartSeasonUseCase startSeasonUseCase;
 
-  SeasonsPanelCubit(this.getSeasonsConfigUseCase, this.startSeasonUseCase)
+  SeasonsPanelCubit(this.getSeasonsConfigCacheFirstUseCase, this.startSeasonUseCase)
       : super(ReadySeasonsPanelState(current: SeasonCollection.currentSeason, seasons: SeasonCollection.seasons));
 
-  /// Relê do Firestore (outro admin pode ter iniciado uma temporada).
+  /// Relê do Firestore ignorando a validade do cache (outro admin pode ter
+  /// iniciado uma temporada); o cache aparece antes, se houver.
   Future<void> load() async {
-    final config = await getSeasonsConfigUseCase();
-    if (isClosed) return;
-    emit(ReadySeasonsPanelState(current: config.current, seasons: config.seasons, copyTeams: state.copyTeams));
+    await for (final config in getSeasonsConfigCacheFirstUseCase(force: true)) {
+      if (isClosed) return;
+      emit(ReadySeasonsPanelState(current: config.current, seasons: config.seasons, copyTeams: state.copyTeams));
+    }
   }
 
   void setCopyTeams(bool value) => emit(ReadySeasonsPanelState(

@@ -3,6 +3,7 @@ import 'package:either_dart/either.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/errors/firebase_error.dart';
 import 'package:arena_soccer/core/firebase/either_stream.dart';
+import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
@@ -18,11 +19,14 @@ class MatchesDataSource {
   CollectionReference<Map<String, dynamic>> _matches(String? season) =>
       _firestore.collection(SeasonCollection.name('partidas', season));
 
-  /// Todas as partidas da temporada, das mais recentes para as mais antigas
-  /// (mesma consulta do app antigo; o filtro por campeonato/dia é feito no
-  /// UseCase).
-  Stream<Either<Failure, List<MatchDTO>>> watchMatches({String? season}) {
-    return _matches(season).orderBy('dataRegistro', descending: true).snapshots().toEither(
+  /// Partidas da temporada, das mais recentes para as mais antigas. Com
+  /// [region], só as daquela região (filtro no servidor: cada doc lido é
+  /// cobrado); sem ela, todas (admin/manutenção). O filtro por campeonato/dia
+  /// é feito no UseCase.
+  Stream<Either<Failure, List<MatchDTO>>> watchMatches({String? season, String? region}) {
+    Query<Map<String, dynamic>> query = _matches(season);
+    if (region != null && region.isNotEmpty) query = RegionRegistry.where(query, region);
+    return query.orderBy('dataRegistro', descending: true).snapshots().toEither(
           (snapshot) => snapshot.docs.map(MatchDTO.fromFirestore).toList(),
           fallbackMessage: 'Não foi possível carregar as partidas.',
           logName: _logName,

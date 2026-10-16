@@ -28,6 +28,9 @@ class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<SessionCubit, SessionState>(
+      // Só a primeira decisão navega: a sessão do cache pode ser revalidada
+      // logo depois (mais um estado) enquanto a home já está abrindo.
+      listenWhen: (previous, current) => previous is CheckingSessionState,
       listener: (context, state) {
         if (state is AuthenticatedSessionState) {
           Navigator.pushReplacementNamed(context, AppRoutes.home);

@@ -11,6 +11,15 @@ class RankingEntry extends Equatable {
 
   const RankingEntry({required this.player, required this.value, required this.position});
 
+  /// Cache local (ver `CacheStore`).
+  factory RankingEntry.fromCache(Map<String, dynamic> json) => RankingEntry(
+        player: PlayerDTO.fromCache(Map<String, dynamic>.from(json['player'] as Map)),
+        value: (json['value'] as num?)?.toInt() ?? 0,
+        position: (json['position'] as num?)?.toInt() ?? 0,
+      );
+
+  Map<String, dynamic> toCache() => {'player': player.toCache(), 'value': value, 'position': position};
+
   @override
   List<Object?> get props => [player, value, position];
 }
@@ -22,6 +31,23 @@ class StatsRanking extends Equatable {
   final Map<String, String> crests;
 
   const StatsRanking({this.entries = const [], this.crests = const {}});
+
+  /// Cache local (ver `CacheStore`).
+  factory StatsRanking.fromCache(Map<String, dynamic> json) => StatsRanking(
+        entries: [
+          for (final item in (json['entries'] as List?) ?? const [])
+            RankingEntry.fromCache(Map<String, dynamic>.from(item as Map)),
+        ],
+        crests: {
+          for (final entry in ((json['crests'] as Map?) ?? const {}).entries)
+            entry.key.toString(): entry.value.toString(),
+        },
+      );
+
+  Map<String, dynamic> toCache() => {
+        'entries': [for (final entry in entries) entry.toCache()],
+        'crests': crests,
+      };
 
   @override
   List<Object?> get props => [entries, crests];

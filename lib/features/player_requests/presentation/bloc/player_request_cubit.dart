@@ -11,7 +11,7 @@ import 'package:arena_soccer/features/player_requests/domain/usecases/submit_pla
 import 'package:arena_soccer/features/player_requests/domain/usecases/watch_my_player_request_usecase.dart';
 import 'package:arena_soccer/features/player_requests/presentation/bloc/player_request_state.dart';
 import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
 /// "Sou jogador": acompanha o pedido do usuário em tempo real e cuida do
 /// formulário (enviar, editar enquanto pendente, reenviar após rejeição).
@@ -20,7 +20,7 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
   final SubmitPlayerRequestUseCase submitPlayerRequestUseCase;
   final CancelPlayerRequestUseCase cancelPlayerRequestUseCase;
   final GetRegionsUseCase getRegionsUseCase;
-  final GetTeamsUseCase getTeamsUseCase;
+  final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
 
   StreamSubscription<Either<Failure, PlayerRequestDTO?>>? _subscription;
   late String _userId;
@@ -33,7 +33,7 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
     this.submitPlayerRequestUseCase,
     this.cancelPlayerRequestUseCase,
     this.getRegionsUseCase,
-    this.getTeamsUseCase,
+    this.getTeamsCacheFirstUseCase,
   ) : super(const LoadingPlayerRequestState());
 
   Future<void> start({
@@ -111,23 +111,24 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
 
   Future<void> _loadTeams(String region) async {
     _updateForm(state.form.copyWith(selectedRegion: region, loadingTeams: true));
-    final response = await getTeamsUseCase(region: region);
-    // Só aplica se a região não mudou enquanto carregava.
-    if (isClosed || state.form.selectedRegion != region) return;
-    response.fold(
-      (failure) {
-        _updateForm(state.form.copyWith(teams: const [], loadingTeams: false));
-        emit(ErrorPlayerRequestState(state, errorMessage: failure.toString()));
-      },
-      (teams) {
-        final keep = teams.any((t) => t.name == state.form.selectedTeam);
-        _updateForm(state.form.copyWith(
-          teams: teams,
-          loadingTeams: false,
-          selectedTeam: keep ? null : () => null,
-        ));
-      },
-    );
+    await for (final response in getTeamsCacheFirstUseCase(region: region)) {
+      // Só aplica se a região não mudou enquanto carregava.
+      if (isClosed || state.form.selectedRegion != region) return;
+      response.fold(
+        (failure) {
+          _updateForm(state.form.copyWith(teams: const [], loadingTeams: false));
+          emit(ErrorPlayerRequestState(state, errorMessage: failure.toString()));
+        },
+        (teams) {
+          final keep = teams.any((t) => t.name == state.form.selectedTeam);
+          _updateForm(state.form.copyWith(
+            teams: teams,
+            loadingTeams: false,
+            selectedTeam: keep ? null : () => null,
+          ));
+        },
+      );
+    }
   }
 
   /// Abre o formulário sobre o pedido atual (corrigir pendente ou reenviar).

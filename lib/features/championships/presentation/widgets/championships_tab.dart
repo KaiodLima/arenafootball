@@ -10,7 +10,6 @@ import 'package:arena_soccer/features/championships/presentation/widgets/champio
 import 'package:arena_soccer/features/championships/presentation/widgets/championship_rules_launcher.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
-import 'package:arena_soccer/injection_container.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/section_header.dart';
@@ -21,17 +20,25 @@ import 'package:arena_soccer/utils/constants/app_sizes.dart';
 /// Aba de campeonatos da home: os campeonatos da temporada num carrossel de
 /// destaque (com atalhos para grupos, artilharia e regulamento do que está na
 /// tela) e os anteriores da região numa lista compacta. A home recria a aba (key) quando a região muda.
-class ChampionshipsTab extends StatelessWidget {
+/// O [ChampionshipsCubit] é o da home (compartilhado com a aba de tabelas):
+/// voltar à aba na mesma região não reabre a consulta.
+class ChampionshipsTab extends StatefulWidget {
   const ChampionshipsTab({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<ChampionshipsTab> createState() => _ChampionshipsTabState();
+}
+
+class _ChampionshipsTabState extends State<ChampionshipsTab> {
+  @override
+  void initState() {
+    super.initState();
     final region = BlocProvider.of<RegionCubit>(context).state.selectedRegion;
-    return BlocProvider<ChampionshipsCubit>(
-      create: (_) => ChampionshipsCubit(sl())..watch(region: region),
-      child: const _ChampionshipsList(),
-    );
+    BlocProvider.of<ChampionshipsCubit>(context).watch(region: region);
   }
+
+  @override
+  Widget build(BuildContext context) => const _ChampionshipsList();
 }
 
 class _ChampionshipsList extends StatefulWidget {

@@ -8,6 +8,12 @@ class RegionRef {
 
   const RegionRef({required this.id, required this.name});
 
+  /// Cache local (lista de regiões, ver `CacheStore`).
+  factory RegionRef.fromCache(Map<String, dynamic> json) =>
+      RegionRef(id: json['id']?.toString() ?? '', name: json['name']?.toString() ?? '');
+
+  Map<String, dynamic> toCache() => {'id': id, 'name': name};
+
   @override
   bool operator ==(Object other) => other is RegionRef && other.id == id && other.name == name;
 

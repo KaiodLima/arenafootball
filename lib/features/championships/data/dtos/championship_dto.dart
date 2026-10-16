@@ -82,6 +82,55 @@ class ChampionshipDTO extends Equatable {
     );
   }
 
+  /// Cache local (ver `CacheStore`): região pelo id, com o nome atual na
+  /// leitura (como no `TeamDTO`).
+  factory ChampionshipDTO.fromCache(Map<String, dynamic> json) {
+    List<String> list(Object? value) => (value as List?)?.map((item) => item.toString()).toList() ?? const [];
+    return ChampionshipDTO(
+      id: json['id']?.toString() ?? '',
+      championshipId: (json['championshipId'] as num?)?.toInt() ?? 0,
+      title: json['title']?.toString() ?? '',
+      description: json['description']?.toString() ?? '',
+      imageUrl: json['imageUrl']?.toString() ?? '',
+      firstPrize: json['firstPrize']?.toString() ?? '',
+      secondPrize: json['secondPrize']?.toString() ?? '',
+      thirdPrize: json['thirdPrize']?.toString() ?? '',
+      topScorerPrize: json['topScorerPrize']?.toString() ?? '',
+      goalkeeperPrize: json['goalkeeperPrize']?.toString() ?? '',
+      rules: json['rules']?.toString() ?? '',
+      region: RegionRegistry.nameOf(
+        json[RegionRegistry.idField]?.toString() ?? '',
+        fallback: json['region']?.toString() ?? '',
+      ),
+      season: json['season']?.toString() ?? '',
+      teams: list(json['teams']),
+      teamIds: list(json['teamIds']),
+      rulesUrl: json['rulesUrl']?.toString() ?? '',
+      rulesFileName: json['rulesFileName']?.toString() ?? '',
+    );
+  }
+
+  Map<String, dynamic> toCache() => {
+        'id': id,
+        'championshipId': championshipId,
+        'title': title,
+        'description': description,
+        'imageUrl': imageUrl,
+        'firstPrize': firstPrize,
+        'secondPrize': secondPrize,
+        'thirdPrize': thirdPrize,
+        'topScorerPrize': topScorerPrize,
+        'goalkeeperPrize': goalkeeperPrize,
+        'rules': rules,
+        RegionRegistry.idField: RegionRegistry.idOf(region),
+        'region': region,
+        'season': season,
+        'teams': teams,
+        'teamIds': teamIds,
+        'rulesUrl': rulesUrl,
+        'rulesFileName': rulesFileName,
+      };
+
   Map<String, dynamic> toMap() => {
         'id_campeonato': championshipId,
         'titulo': title,

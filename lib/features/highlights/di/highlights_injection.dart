@@ -4,7 +4,11 @@ import 'package:arena_soccer/features/highlights/data/repositories/highlights_re
 import 'package:arena_soccer/features/highlights/domain/repositories/highlights_repository_interface.dart';
 import 'package:arena_soccer/features/highlights/domain/usecases/create_highlight_usecase.dart';
 import 'package:arena_soccer/features/highlights/domain/usecases/delete_highlight_usecase.dart';
+import 'package:arena_soccer/features/highlights/domain/usecases/delete_highlights_cache_usecase.dart';
+import 'package:arena_soccer/features/highlights/domain/usecases/get_cached_highlights_usecase.dart';
+import 'package:arena_soccer/features/highlights/domain/usecases/get_highlights_cache_first_usecase.dart';
 import 'package:arena_soccer/features/highlights/domain/usecases/get_highlights_usecase.dart';
+import 'package:arena_soccer/features/highlights/domain/usecases/save_highlights_cache_usecase.dart';
 import 'package:arena_soccer/features/highlights/domain/usecases/reorder_highlights_usecase.dart';
 import 'package:arena_soccer/features/highlights/domain/usecases/set_highlight_visible_usecase.dart';
 import 'package:arena_soccer/features/highlights/domain/usecases/update_highlight_usecase.dart';
@@ -18,7 +22,7 @@ void registerHighlightsDependencies() {
   _sl.registerLazySingleton<HighlightsDataSource>(() => HighlightsDataSource(_sl()));
 
   // Repository (interface -> impl)
-  _sl.registerLazySingleton<IHighlightsRepository>(() => HighlightsRepositoryImpl(_sl()));
+  _sl.registerLazySingleton<IHighlightsRepository>(() => HighlightsRepositoryImpl(_sl(), _sl()));
 
   // UseCases
   _sl.registerLazySingleton(() => WatchHighlightsUseCase(_sl()));
@@ -29,4 +33,10 @@ void registerHighlightsDependencies() {
   _sl.registerLazySingleton(() => DeleteHighlightUseCase(_sl()));
   _sl.registerLazySingleton(() => ReorderHighlightsUseCase(_sl()));
   _sl.registerLazySingleton(() => SetHighlightVisibleUseCase(_sl()));
+
+  // Cache local (ver `cacheFirst`)
+  _sl.registerLazySingleton(() => GetCachedHighlightsUseCase(_sl()));
+  _sl.registerLazySingleton(() => SaveHighlightsCacheUseCase(_sl()));
+  _sl.registerLazySingleton(() => DeleteHighlightsCacheUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetHighlightsCacheFirstUseCase(_sl(), _sl(), _sl()));
 }

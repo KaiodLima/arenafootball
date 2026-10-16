@@ -3,7 +3,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/voting/data/dtos/vote_dto.dart';
 import 'package:arena_soccer/features/voting/domain/elected_player.dart';
 import 'package:arena_soccer/features/voting/domain/match_vote_ref.dart';
-import 'package:arena_soccer/features/voting/domain/repositories/voting_repository_interface.dart';
+import 'package:arena_soccer/features/voting/domain/usecases/get_votes_cache_first_usecase.dart';
 
 /// Apura a votação de uma partida: conta os votos por nome de jogador e
 /// devolve o ranking, do mais votado ao menos votado (vazio sem votos).
@@ -11,9 +11,9 @@ import 'package:arena_soccer/features/voting/domain/repositories/voting_reposito
 /// documentos, como no app antigo (o eleito é o primeiro do ranking).
 /// Só lê; não grava o resultado na partida (o app antigo também não gravava).
 class CalculateBestPlayerUseCase {
-  final IVotingRepository _repository;
+  final GetVotesCacheFirstUseCase _getVotes;
 
-  CalculateBestPlayerUseCase(this._repository);
+  CalculateBestPlayerUseCase(this._getVotes);
 
   static List<VoteTally> tallyVotes(List<VoteDTO> votes) {
     // O Map preserva a ordem de inserção: é o critério de desempate.
@@ -52,7 +52,9 @@ class CalculateBestPlayerUseCase {
   }
 
   Future<Either<Failure, List<VoteTally>>> call(MatchVoteRef ref) async {
-    final response = await _repository.getVotes(ref: ref);
+    // Só apura votação encerrada: cache local curto, fica com a última
+    // emissão (o remoto quando revalidou).
+    final response = await _getVotes(ref).last;
     return response.map(tallyVotes);
   }
 }

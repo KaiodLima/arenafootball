@@ -1,4 +1,5 @@
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
 
@@ -18,4 +19,11 @@ abstract class IHighlightsRepository {
   Future<Either<Failure, void>> reorderHighlights(List<String> ids);
 
   Future<Either<Failure, void>> setHighlightVisible({required String id, required bool visible});
+
+  /// Cache local de todos os destaques. Nunca falha: sem cache = `Right(null)`.
+  Future<Either<Failure, CachedValue<List<HighlightDTO>>?>> getCachedHighlights();
+
+  Future<Either<Failure, void>> saveHighlightsCache(List<HighlightDTO> highlights);
+
+  Future<void> deleteHighlightsCache();
 }

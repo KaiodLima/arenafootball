@@ -2,13 +2,17 @@ import 'dart:io';
 
 import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/services/storage_upload_service.dart';
 import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
 import 'package:arena_soccer/features/highlights/domain/repositories/highlights_repository_interface.dart';
 import 'package:arena_soccer/features/highlights/domain/usecases/create_highlight_usecase.dart';
 import 'package:arena_soccer/features/highlights/domain/usecases/delete_highlight_usecase.dart';
+import 'package:arena_soccer/features/highlights/domain/usecases/get_cached_highlights_usecase.dart';
+import 'package:arena_soccer/features/highlights/domain/usecases/get_highlights_cache_first_usecase.dart';
 import 'package:arena_soccer/features/highlights/domain/usecases/get_highlights_usecase.dart';
+import 'package:arena_soccer/features/highlights/domain/usecases/save_highlights_cache_usecase.dart';
 import 'package:arena_soccer/features/highlights/domain/usecases/reorder_highlights_usecase.dart';
 import 'package:arena_soccer/features/highlights/domain/usecases/set_highlight_visible_usecase.dart';
 import 'package:arena_soccer/features/highlights/domain/usecases/update_highlight_usecase.dart';
@@ -17,6 +21,10 @@ import 'package:arena_soccer/features/highlights/presentation/bloc/highlight_for
 import 'package:arena_soccer/features/highlights/presentation/bloc/highlight_form_state.dart';
 import 'package:arena_soccer/features/highlights/presentation/bloc/manage_highlights_cubit.dart';
 import 'package:arena_soccer/features/highlights/presentation/bloc/manage_highlights_state.dart';
+import 'package:arena_soccer/features/home/presentation/bloc/home_cubit.dart';
+import 'package:arena_soccer/features/player_requests/domain/usecases/watch_pending_player_requests_count_usecase.dart';
+import 'package:arena_soccer/features/team_requests/domain/usecases/watch_pending_team_requests_count_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_team_by_name_cache_first_usecase.dart';
 
 const _existing = [
   HighlightDTO(id: '1', title: 'Seleção Floresta', isVisible: true, priority: '000'),
@@ -34,8 +42,28 @@ class _FakeRepository implements IHighlightsRepository {
 
   Either<Failure, void> get _result => fail ? Left(ErrorWithMessage('erro')) : const Right(null);
 
+  /// Cache local em memória (o real é o Hive).
+  CachedValue<List<HighlightDTO>>? cached;
+  List<HighlightDTO> remote = _existing;
+  int remoteCalls = 0;
+
   @override
-  Future<Either<Failure, List<HighlightDTO>>> getHighlights() async => const Right(_existing);
+  Future<Either<Failure, List<HighlightDTO>>> getHighlights() async {
+    remoteCalls++;
+    return Right(remote);
+  }
+
+  @override
+  Future<Either<Failure, CachedValue<List<HighlightDTO>>?>> getCachedHighlights() async => Right(cached);
+
+  @override
+  Future<Either<Failure, void>> saveHighlightsCache(List<HighlightDTO> highlights) async {
+    cached = CachedValue(highlights, DateTime.now());
+    return const Right(null);
+  }
+
+  @override
+  Future<void> deleteHighlightsCache() async => cached = null;
 
   @override
   Stream<Either<Failure, List<HighlightDTO>>> watchAllHighlights() => Stream.value(const Right(_existing));
@@ -83,11 +111,32 @@ class _FakeStorage implements StorageUploadService {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+GetHighlightsCacheFirstUseCase _cacheFirst(_FakeRepository repository) => GetHighlightsCacheFirstUseCase(
+      GetHighlightsUseCase(repository),
+      GetCachedHighlightsUseCase(repository),
+      SaveHighlightsCacheUseCase(repository),
+    );
+
 HighlightFormCubit _formCubit(_FakeRepository repository) => HighlightFormCubit(
       CreateHighlightUseCase(repository, _FakeStorage()),
-      GetHighlightsUseCase(repository),
+      _cacheFirst(repository),
       UpdateHighlightUseCase(repository, _FakeStorage()),
     );
+
+class _UnusedTeam implements GetTeamByNameCacheFirstUseCase {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _UnusedPlayerRequests implements WatchPendingPlayerRequestsCountUseCase {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _UnusedTeamRequests implements WatchPendingTeamRequestsCountUseCase {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
 
 void main() {
   group('HighlightFormData', () {
@@ -163,6 +212,48 @@ void main() {
       await editing.submit();
       expect(repository.updated, ['1:Seleção 2023<-Seleção Floresta']);
       expect(repository.created, isEmpty);
+    });
+  });
+
+  group('cache local', () {
+    test('formulário: mostra o cache e confere no Firestore (force, para o duplicado)', () async {
+      final repository = _FakeRepository()..cached = CachedValue([_existing.first], DateTime.now());
+      final cubit = _formCubit(repository);
+      final seen = <int>[];
+      final sub = cubit.stream.listen((s) => seen.add(s.form.existing.length));
+      await cubit.load();
+      await Future<void>.delayed(Duration.zero);
+      expect(seen, [1, 3]);
+      expect(repository.remoteCalls, 1);
+      expect(repository.cached!.data, _existing);
+      await sub.cancel();
+      await cubit.close();
+    });
+
+    test('deep link: cache válido não lê o Firestore; vencido, revalida', () async {
+      final repository = _FakeRepository()..cached = CachedValue(_existing, DateTime.now());
+      final home = HomeCubit(_UnusedTeam(), _UnusedPlayerRequests(), _UnusedTeamRequests(), _cacheFirst(repository));
+      expect((await home.findHighlight('3')).right?.title, 'Copa');
+      expect(repository.remoteCalls, 0);
+
+      // Vencido (validade de 15 min): mostra o cache e busca de novo.
+      repository
+        ..cached = CachedValue(_existing, DateTime.now().subtract(const Duration(hours: 1)))
+        ..remote = [_existing.first];
+      expect((await home.findHighlight('1')).right?.title, 'Seleção Floresta');
+      expect(repository.remoteCalls, 1);
+
+      // Destaque novo, ainda fora do cache válido: busca de novo (force).
+      repository.remote = [..._existing, const HighlightDTO(id: '9', title: 'Novo')];
+      expect((await home.findHighlight('9')).right?.title, 'Novo');
+      expect(repository.remoteCalls, 2);
+      await home.close();
+    });
+
+    test('gravar um destaque apaga o cache', () async {
+      final repository = _FakeRepository()..cached = CachedValue(_existing, DateTime.now());
+      await repository.deleteHighlightsCache();
+      expect(repository.cached, isNull);
     });
   });
 

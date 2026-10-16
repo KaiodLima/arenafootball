@@ -7,7 +7,7 @@ import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecas
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/create_team_usecase.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_next_team_number_usecase.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 import 'package:arena_soccer/features/teams/presentation/bloc/team_form_cubit.dart';
 import 'package:arena_soccer/features/teams/presentation/bloc/team_form_state.dart';
 
@@ -36,9 +36,12 @@ class _FakeRegions implements GetRegionsUseCase {
   Future<Either<Failure, List<String>>> call() async => const Right(['Floresta', 'Santo inacio']);
 }
 
-class _FakeTeams implements GetTeamsUseCase {
+class _FakeTeams implements GetTeamsCacheFirstUseCase {
   @override
-  Future<Either<Failure, List<TeamDTO>>> call({String? region, String? season}) async =>
+  Stream<Either<Failure, List<TeamDTO>>> call({String? region, String? season, bool force = false}) =>
+      Stream.fromFuture(_load(region: region, season: season));
+
+  Future<Either<Failure, List<TeamDTO>>> _load({String? region, String? season}) async =>
       Right(region == 'Floresta' ? _floresta : const []);
 }
 

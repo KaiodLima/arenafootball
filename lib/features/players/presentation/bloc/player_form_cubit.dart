@@ -6,20 +6,20 @@ import 'package:arena_soccer/features/players/domain/usecases/create_player_usec
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/player_form_state.dart';
 import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
 /// Cadastro de jogador (admin). O elenco atual do time escolhido alimenta a
 /// lista da tela e o aviso de nome duplicado.
 class PlayerFormCubit extends Cubit<PlayerFormState> {
   final CreatePlayerUseCase createPlayerUseCase;
   final GetRegionsUseCase getRegionsUseCase;
-  final GetTeamsUseCase getTeamsUseCase;
+  final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
   final WatchTeamPlayersUseCase watchTeamPlayersUseCase;
 
   PlayerFormCubit(
     this.createPlayerUseCase,
     this.getRegionsUseCase,
-    this.getTeamsUseCase,
+    this.getTeamsCacheFirstUseCase,
     this.watchTeamPlayersUseCase,
   ) : super(const EditingPlayerFormState());
 
@@ -44,7 +44,8 @@ class PlayerFormCubit extends Cubit<PlayerFormState> {
   /// Times da região na temporada corrente (coleção `times` sem sufixo),
   /// onde o jogador novo é gravado; já carrega o elenco do primeiro.
   Future<void> _loadTeams(String region) async {
-    final response = await getTeamsUseCase(region: region);
+    // Cache-first: fica com a última emissão (o remoto quando revalidou).
+    final response = await getTeamsCacheFirstUseCase(region: region).last;
     if (isClosed || state.form.selectedRegion != region) return;
     if (response.isLeft) {
       emit(ErrorPlayerFormState(form: state.form.withTeams(const []), errorMessage: response.left.toString()));

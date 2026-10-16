@@ -26,6 +26,16 @@ class VoteDTO extends Equatable {
     );
   }
 
+  /// Cache local (ver `CacheStore`).
+  factory VoteDTO.fromCache(Map<String, dynamic> json) => VoteDTO(
+        voterId: json['voterId']?.toString() ?? '',
+        playerName: json['playerName']?.toString() ?? '',
+        team: json['team']?.toString() ?? '',
+        teamId: json['teamId']?.toString() ?? '',
+      );
+
+  Map<String, dynamic> toCache() => {'voterId': voterId, 'playerName': playerName, 'team': team, 'teamId': teamId};
+
   /// O id do votante é o id do documento; não vai nos campos.
   Map<String, dynamic> toMap() => {'nome': playerName, 'time': team, 'idTime': teamId};
 

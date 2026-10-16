@@ -8,16 +8,16 @@ import 'package:arena_soccer/features/championships/domain/championship_rules_fi
 import 'package:arena_soccer/features/championships/domain/usecases/save_championship_usecase.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/championship_form_state.dart';
 import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
 /// Cadastro/edição de campeonato (admin): dados, times participantes da
 /// região, banner, regulamento em PDF e premiação.
 class ChampionshipFormCubit extends Cubit<ChampionshipFormState> {
   final GetRegionsUseCase getRegionsUseCase;
-  final GetTeamsUseCase getTeamsUseCase;
+  final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
   final SaveChampionshipUseCase saveChampionshipUseCase;
 
-  ChampionshipFormCubit(this.getRegionsUseCase, this.getTeamsUseCase, this.saveChampionshipUseCase)
+  ChampionshipFormCubit(this.getRegionsUseCase, this.getTeamsCacheFirstUseCase, this.saveChampionshipUseCase)
       : super(const LoadingChampionshipFormState(ChampionshipFormData(base: ChampionshipDTO(id: ''))));
 
   ChampionshipFormData get _form => state.form;
@@ -50,19 +50,20 @@ class ChampionshipFormCubit extends Cubit<ChampionshipFormState> {
     final region = _form.base.region;
     final season = _form.base.season;
     emit(EditingChampionshipFormState(_form.copyWith(loadingTeams: true)));
-    final response = await getTeamsUseCase(region: region, season: season);
-    // Só aplica se região/temporada não mudaram enquanto carregava.
-    if (isClosed || _form.base.region != region || _form.base.season != season) return;
-    response.fold(
-      (failure) => emit(ErrorChampionshipFormState(
-        _form.copyWith(teams: const [], loadingTeams: false),
-        errorMessage: failure.toString(),
-      )),
-      (teams) {
-        final sorted = [...teams]..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-        emit(EditingChampionshipFormState(_form.copyWith(teams: sorted, loadingTeams: false)));
-      },
-    );
+    await for (final response in getTeamsCacheFirstUseCase(region: region, season: season)) {
+      // Só aplica se região/temporada não mudaram enquanto carregava.
+      if (isClosed || _form.base.region != region || _form.base.season != season) return;
+      response.fold(
+        (failure) => emit(ErrorChampionshipFormState(
+          _form.copyWith(teams: const [], loadingTeams: false),
+          errorMessage: failure.toString(),
+        )),
+        (teams) {
+          final sorted = [...teams]..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+          emit(EditingChampionshipFormState(_form.copyWith(teams: sorted, loadingTeams: false)));
+        },
+      );
+    }
   }
 
   Future<void> selectRegion(String region) async {

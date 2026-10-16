@@ -1,5 +1,6 @@
 import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/features/regions/domain/region_usage.dart';
@@ -10,7 +11,7 @@ import 'package:arena_soccer/features/regions/domain/usecases/manage_region_usec
 import 'package:arena_soccer/features/regions/presentation/bloc/manage_regions_cubit.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/manage_regions_state.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
 /// Fake com o comportamento do datasource: lista em `competicao` (id → nome)
 /// e o [RegionRegistry] carregado a cada leitura.
@@ -45,8 +46,7 @@ class _FakeRepository implements IRegionsRepository {
   }
 
   @override
-  Future<Either<Failure, RegionUsage>> regionUsage({required String id, required String name}) async =>
-      Right(usage);
+  Future<Either<Failure, RegionUsage>> regionUsage({required String id, required String name}) async => Right(usage);
 
   @override
   Future<Either<Failure, RegionLinkReport>> linkRegions() async {
@@ -65,11 +65,29 @@ class _FakeRepository implements IRegionsRepository {
 
   @override
   Future<void> saveSeason(String season) async {}
+
+  @override
+  Future<Either<Failure, List<RegionRef>>> getRegionRefs() async {
+    await getRegions();
+    return Right(RegionRegistry.regions);
+  }
+
+  @override
+  Future<Either<Failure, CachedValue<List<RegionRef>>?>> getCachedRegions() async => const Right(null);
+
+  @override
+  Future<Either<Failure, void>> saveRegionsCache(List<RegionRef> regions) async => const Right(null);
+
+  @override
+  Future<Either<Failure, void>> deleteRegionsCache() async => const Right(null);
 }
 
-class _FakeTeams implements GetTeamsUseCase {
+class _FakeTeams implements GetTeamsCacheFirstUseCase {
   @override
-  Future<Either<Failure, List<TeamDTO>>> call({String? region, String? season}) async => const Right([
+  Stream<Either<Failure, List<TeamDTO>>> call({String? region, String? season, bool force = false}) =>
+      Stream.fromFuture(_load(region: region, season: season));
+
+  Future<Either<Failure, List<TeamDTO>>> _load({String? region, String? season}) async => const Right([
         TeamDTO(id: '1', name: 'Lava Jato', region: 'Floresta'),
         TeamDTO(id: '2', name: 'Volta', region: 'Floresta'),
         TeamDTO(id: '3', name: 'Riacho', region: 'Santo inacio'),

@@ -11,7 +11,8 @@ class GetRegionMatchesUseCase {
   GetRegionMatchesUseCase(this._repository);
 
   Future<Either<Failure, List<MatchDTO>>> call({required String region, String? season}) async {
-    final response = await _repository.watchMatches(season: season).first;
+    final response = await _repository.watchMatches(season: season, region: region).first;
+    // Região já filtrada no servidor; o filtro abaixo é só uma rede de segurança.
     return response.map((matches) => matches.where((m) => m.region == region).toList());
   }
 }

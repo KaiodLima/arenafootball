@@ -8,6 +8,15 @@ abstract class IPlayersRepository {
 
   Future<Either<Failure, List<PlayerDTO>>> getPlayers({String? season});
 
+  /// Os [limit] jogadores com mais [field] (`PlayerDTO.goalsField` ou
+  /// `assistsField`) entre os times [teamIds], em ordem decrescente.
+  Future<Either<Failure, List<PlayerDTO>>> getTopPlayers({
+    required List<String> teamIds,
+    required String field,
+    int limit = 50,
+    String? season,
+  });
+
   Stream<Either<Failure, PlayerDTO?>> watchPlayer({required String id, String? season});
 
   Future<Either<Failure, void>> createPlayer(PlayerDTO player, {String? season});

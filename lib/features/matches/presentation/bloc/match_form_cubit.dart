@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
-import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_usecase.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_cache_first_usecase.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/create_match_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_usecase.dart';
@@ -9,23 +9,23 @@ import 'package:arena_soccer/features/matches/domain/usecases/watch_matches_usec
 import 'package:arena_soccer/features/matches/presentation/bloc/match_form_state.dart';
 import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
 /// Cadastro de partida (admin). As partidas já cadastradas na região
 /// alimentam as sugestões (horários e locais) e o aviso de conflito.
 class MatchFormCubit extends Cubit<MatchFormState> {
   final CreateMatchUseCase createMatchUseCase;
   final GetRegionsUseCase getRegionsUseCase;
-  final GetTeamsUseCase getTeamsUseCase;
+  final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
   final GetRegionMatchesUseCase getRegionMatchesUseCase;
-  final GetRegionChampionshipsUseCase getRegionChampionshipsUseCase;
+  final GetRegionChampionshipsCacheFirstUseCase getRegionChampionshipsCacheFirstUseCase;
 
   MatchFormCubit(
     this.createMatchUseCase,
     this.getRegionsUseCase,
-    this.getTeamsUseCase,
+    this.getTeamsCacheFirstUseCase,
     this.getRegionMatchesUseCase,
-    this.getRegionChampionshipsUseCase,
+    this.getRegionChampionshipsCacheFirstUseCase,
   ) : super(const EditingMatchFormState());
 
   void _edit(MatchFormData form) {
@@ -69,9 +69,11 @@ class MatchFormCubit extends Cubit<MatchFormState> {
   /// mandante começa no primeiro time e o visitante no último (como no app
   /// antigo); o local começa no mais usado.
   Future<void> _loadRegionData(String region) async {
-    final teamsFuture = getTeamsUseCase(region: region);
+    // Cache-first: fica com a última emissão (o remoto quando revalidou).
+    final teamsFuture = getTeamsCacheFirstUseCase(region: region).last;
     final matchesFuture = getRegionMatchesUseCase(region: region);
-    final championshipsFuture = getRegionChampionshipsUseCase(region: region, season: SeasonCollection.currentSeason);
+    final championshipsFuture =
+        getRegionChampionshipsCacheFirstUseCase(region: region, season: SeasonCollection.currentSeason).last;
     final teamsResponse = await teamsFuture;
     final matchesResponse = await matchesFuture;
     final championshipsResponse = await championshipsFuture;

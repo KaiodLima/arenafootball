@@ -19,15 +19,54 @@ class NewsDataSource {
 
   CollectionReference<Map<String, dynamic>> get _news => _firestore.collection(_collection);
 
-  /// Feed da região, mais recentes primeiro. Sem região, todas.
-  Stream<Either<Failure, List<NewsDTO>>> watchNews({String? region}) {
+  /// Último doc de cada página entregue (feed ao vivo e páginas antigas),
+  /// pelo id. É o cursor do `startAfterDocument` de [getNewsPage]: os DTOs
+  /// não carregam o snapshot, então ele fica guardado aqui. Se o id não
+  /// estiver no cache, [getNewsPage] relê o doc (1 leitura a mais).
+  final Map<String, DocumentSnapshot<Map<String, dynamic>>> _cursors = {};
+  static const int _maxCursors = 100;
+
+  Query<Map<String, dynamic>> _feedQuery(String? region) {
     Query<Map<String, dynamic>> query = _news;
     if (region != null) query = RegionRegistry.where(query, region);
-    return query.orderBy('data', descending: true).snapshots().toEither(
-          (snapshot) => snapshot.docs.map(NewsDTO.fromFirestore).toList(),
+    return query.orderBy('data', descending: true);
+  }
+
+  /// Guarda o último doc do lote como cursor da próxima página.
+  List<NewsDTO> _mapPage(List<QueryDocumentSnapshot<Map<String, dynamic>>> docs) {
+    if (docs.isNotEmpty) {
+      if (_cursors.length >= _maxCursors) _cursors.clear();
+      _cursors[docs.last.id] = docs.last;
+    }
+    return docs.map(NewsDTO.fromFirestore).toList();
+  }
+
+  /// Primeira página do feed da região (ao vivo), mais recentes primeiro.
+  /// Sem região, todas. As mais antigas vêm por [getNewsPage].
+  Stream<Either<Failure, List<NewsDTO>>> watchNews({String? region, int limit = 20}) {
+    return _feedQuery(region).limit(limit).snapshots().toEither(
+          (snapshot) => _mapPage(snapshot.docs),
           fallbackMessage: _loadFallback,
           logName: 'NewsDataSource',
         );
+  }
+
+  /// Próxima página do feed (leitura única), começando depois da notícia
+  /// [afterNewsId] (o último item cru da página anterior).
+  Future<Either<Failure, List<NewsDTO>>> getNewsPage({
+    String? region,
+    required String afterNewsId,
+    int limit = 20,
+  }) async {
+    try {
+      final cursor = _cursors[afterNewsId] ?? await _news.doc(afterNewsId).get();
+      if (!cursor.exists) return const Right([]);
+      final result = await _feedQuery(region).startAfterDocument(cursor).limit(limit).get();
+      return Right(_mapPage(result.docs));
+    } catch (e) {
+      AppLogger.e('getNewsPage after=$afterNewsId', name: 'NewsDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _loadFallback));
+    }
   }
 
   /// Notícias com a [tag] informada (ex.: título de um destaque).

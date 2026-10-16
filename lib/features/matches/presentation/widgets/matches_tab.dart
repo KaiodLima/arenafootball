@@ -11,7 +11,6 @@ import 'package:arena_soccer/features/matches/presentation/bloc/matches_state.da
 import 'package:arena_soccer/features/matches/presentation/widgets/match_day_switch.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
-import 'package:arena_soccer/injection_container.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
@@ -25,17 +24,25 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 /// há mais de um ao mesmo tempo) e as partidas de ontem, hoje ou amanhã do
 /// escolhido, com atalhos para todos os jogos, grupos, artilharia e
 /// assistências. A home recria a aba (key) quando região/ano mudam.
-class MatchesTab extends StatelessWidget {
+/// [ChampionshipsCubit] e [MatchesCubit] são os da home: trocar de aba e
+/// voltar não reabre as consultas; região/ano/campeonato novos, sim.
+class MatchesTab extends StatefulWidget {
   const MatchesTab({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<MatchesTab> createState() => _MatchesTabState();
+}
+
+class _MatchesTabState extends State<MatchesTab> {
+  @override
+  void initState() {
+    super.initState();
     final region = BlocProvider.of<RegionCubit>(context).state.selectedRegion;
-    return BlocProvider<ChampionshipsCubit>(
-      create: (_) => ChampionshipsCubit(sl())..watch(region: region),
-      child: const _ChampionshipMatches(),
-    );
+    BlocProvider.of<ChampionshipsCubit>(context).watch(region: region);
   }
+
+  @override
+  Widget build(BuildContext context) => const _ChampionshipMatches();
 }
 
 class _ChampionshipMatches extends StatefulWidget {
@@ -100,20 +107,11 @@ class _ChampionshipMatchesState extends State<_ChampionshipMatches> {
                 ),
               ),
             Expanded(
-              child: BlocProvider<MatchesCubit>(
+              child: _DayMatches(
                 key: ValueKey(championshipId),
-                create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl())
-                  ..watch(
-                    championshipId: championshipId,
-                    filter: MatchesFilter.today,
-                    region: region.selectedRegion,
-                    season: region.selectedSeason,
-                  ),
-                child: _DayMatches(
-                  championshipId: championshipId,
-                  region: region.selectedRegion,
-                  season: region.selectedSeason,
-                ),
+                championshipId: championshipId,
+                region: region.selectedRegion,
+                season: region.selectedSeason,
               ),
             ),
           ],
@@ -129,14 +127,34 @@ class _DayMatches extends StatefulWidget {
   final String region;
   final String season;
 
-  const _DayMatches({required this.championshipId, required this.region, required this.season});
+  const _DayMatches({super.key, required this.championshipId, required this.region, required this.season});
 
   @override
   State<_DayMatches> createState() => _DayMatchesState();
 }
 
 class _DayMatchesState extends State<_DayMatches> {
-  MatchesFilter _day = MatchesFilter.today;
+  late MatchesFilter _day;
+
+  /// O cubit da home ignora o pedido se já ouve este campeonato/região/ano
+  /// (volta à aba); o dia na tela é o que ele já estava mostrando.
+  @override
+  void initState() {
+    super.initState();
+    final cubit = BlocProvider.of<MatchesCubit>(context);
+    final resumed = cubit.isWatching(
+      championshipId: widget.championshipId,
+      region: widget.region,
+      season: widget.season,
+    );
+    _day = resumed ? (cubit.filter ?? MatchesFilter.today) : MatchesFilter.today;
+    cubit.watch(
+      championshipId: widget.championshipId,
+      filter: _day,
+      region: widget.region,
+      season: widget.season,
+    );
+  }
 
   void _selectDay(MatchesFilter day) {
     setState(() => _day = day);

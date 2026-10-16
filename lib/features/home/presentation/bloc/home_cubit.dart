@@ -4,51 +4,59 @@ import 'package:either_dart/either.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
-import 'package:arena_soccer/features/highlights/domain/usecases/get_highlights_usecase.dart';
+import 'package:arena_soccer/features/highlights/domain/usecases/get_highlights_cache_first_usecase.dart';
 import 'package:arena_soccer/features/home/presentation/bloc/home_state.dart';
 import 'package:arena_soccer/features/player_requests/domain/usecases/watch_pending_player_requests_count_usecase.dart';
 import 'package:arena_soccer/features/team_requests/domain/usecases/watch_pending_team_requests_count_usecase.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_team_by_name_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_team_by_name_cache_first_usecase.dart';
 
 class HomeCubit extends Cubit<HomeState> {
-  final GetTeamByNameUseCase getTeamByNameUseCase;
+  final GetTeamByNameCacheFirstUseCase getTeamByNameCacheFirstUseCase;
   final WatchPendingPlayerRequestsCountUseCase watchPendingPlayerRequestsCountUseCase;
   final WatchPendingTeamRequestsCountUseCase watchPendingTeamRequestsCountUseCase;
-  final GetHighlightsUseCase getHighlightsUseCase;
+  final GetHighlightsCacheFirstUseCase getHighlightsCacheFirstUseCase;
   StreamSubscription<Either<Failure, int>>? _pendingRequests;
   StreamSubscription<Either<Failure, int>>? _pendingTeamRequests;
 
   HomeCubit(
-    this.getTeamByNameUseCase,
+    this.getTeamByNameCacheFirstUseCase,
     this.watchPendingPlayerRequestsCountUseCase,
     this.watchPendingTeamRequestsCountUseCase,
-    this.getHighlightsUseCase,
+    this.getHighlightsCacheFirstUseCase,
   ) : super(const HomeState());
 
   void selectTab(HomeTab tab) => emit(state.copyWith(tab: tab));
 
-  Future<void> loadFavoriteTeam(String teamName, {String teamId = ''}) async {
+  /// Escudo do time do coração (cache local primeiro, ver `cacheFirst`).
+  Future<void> loadFavoriteTeam(String teamName, {String teamId = '', bool force = false}) async {
     if (teamName.isEmpty && teamId.isEmpty) return;
-    final response = await getTeamByNameUseCase(teamName, id: teamId);
-    response.fold(
-      // O escudo é só decorativo; sem ele o drawer mostra o avatar vazio.
-      (_) => null,
-      (team) {
-        if (team != null && team.imageUrl.isNotEmpty) emit(state.copyWith(favoriteTeamImage: team.imageUrl));
-      },
-    );
+    await for (final response in getTeamByNameCacheFirstUseCase(teamName, id: teamId, force: force)) {
+      if (isClosed) return;
+      response.fold(
+        // O escudo é só decorativo; sem ele o drawer mostra o avatar vazio.
+        (_) => null,
+        (team) {
+          if (team != null && team.imageUrl.isNotEmpty) emit(state.copyWith(favoriteTeamImage: team.imageUrl));
+        },
+      );
+    }
   }
 
   /// Destaque de um deep link (`/destaque/<id>`); nulo se não existe mais.
+  /// Procura no cache primeiro; não achou (destaque novo), busca de novo.
   Future<Either<Failure, HighlightDTO?>> findHighlight(String id) async {
-    final response = await getHighlightsUseCase();
-    return response.map((highlights) {
-      for (final highlight in highlights) {
-        if (highlight.id == id) return highlight;
-      }
-      return null;
-    });
+    final cached = _find(await getHighlightsCacheFirstUseCase().last, id);
+    if (cached.isLeft || cached.right != null) return cached;
+    return _find(await getHighlightsCacheFirstUseCase(force: true).last, id);
   }
+
+  Either<Failure, HighlightDTO?> _find(Either<Failure, List<HighlightDTO>> response, String id) =>
+      response.map((highlights) {
+        for (final highlight in highlights) {
+          if (highlight.id == id) return highlight;
+        }
+        return null;
+      });
 
   /// Contador do menu do admin. Falha só deixa o contador como está.
   void watchPendingPlayerRequests() {
