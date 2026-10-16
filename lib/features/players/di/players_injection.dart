@@ -6,6 +6,7 @@ import 'package:arena_soccer/features/players/domain/usecases/add_player_stats_u
 import 'package:arena_soccer/features/players/domain/usecases/create_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/delete_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/get_players_usecase.dart';
+import 'package:arena_soccer/features/players/domain/usecases/get_top_players_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/remove_player_from_squad_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/update_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_player_usecase.dart';
@@ -18,11 +19,12 @@ void registerPlayersDependencies() {
   _sl.registerLazySingleton<PlayersDataSource>(() => PlayersDataSource(_sl()));
 
   // Repository (interface -> impl)
-  _sl.registerLazySingleton<IPlayersRepository>(() => PlayersRepositoryImpl(_sl()));
+  _sl.registerLazySingleton<IPlayersRepository>(() => PlayersRepositoryImpl(_sl(), _sl()));
 
   // UseCases
   _sl.registerLazySingleton(() => WatchTeamPlayersUseCase(_sl()));
   _sl.registerLazySingleton(() => GetPlayersUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetTopPlayersUseCase(_sl()));
   _sl.registerLazySingleton(() => CreatePlayerUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => AddPlayerStatsUseCase(_sl()));
   _sl.registerLazySingleton(() => UpdatePlayerUseCase(_sl(), _sl()));

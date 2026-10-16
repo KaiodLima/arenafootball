@@ -22,6 +22,12 @@ class RegionsDataSource {
   /// Nomes das regiões. Também carrega o [RegionRegistry] (id ↔ nome), que
   /// os DTOs e as consultas usam.
   Future<Either<Failure, List<String>>> getRegions() async {
+    final response = await getRegionRefs();
+    return response.map((regions) => regions.map((region) => region.name).toList());
+  }
+
+  /// Regiões com o id (para o cache local). Também carrega o [RegionRegistry].
+  Future<Either<Failure, List<RegionRef>>> getRegionRefs() async {
     const fallback = 'Não foi possível carregar as regiões.';
     try {
       final result = await _regions.get();
@@ -31,7 +37,7 @@ class RegionsDataSource {
             RegionRef(id: doc.id, name: doc.data()['nome'].toString()),
       ];
       RegionRegistry.configure(regions);
-      return Right(regions.map((region) => region.name).toList());
+      return Right(regions);
     } catch (e) {
       AppLogger.e('getRegions', name: 'RegionsDataSource', error: e);
       return Left(mapFirebaseError(e, fallbackMessage: fallback));

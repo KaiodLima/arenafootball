@@ -1,4 +1,5 @@
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/group_dto.dart';
@@ -27,4 +28,32 @@ abstract class IChampionshipsRepository {
     required String region,
     required String season,
   });
+
+  /// Cache local dos campeonatos da [region] na [season]. Nunca falha: sem
+  /// cache = `Right(null)`.
+  Future<Either<Failure, CachedValue<List<ChampionshipDTO>>?>> getCachedRegionChampionships({
+    required String region,
+    required String season,
+  });
+
+  Future<Either<Failure, void>> saveRegionChampionshipsCache(
+    List<ChampionshipDTO> championships, {
+    required String region,
+    required String season,
+  });
+
+  /// Cache local do campeonato da região (`data` nulo = não há).
+  Future<Either<Failure, CachedValue<ChampionshipDTO?>?>> getCachedRegionChampionship({
+    required String region,
+    required String season,
+  });
+
+  Future<Either<Failure, void>> saveRegionChampionshipCache(
+    ChampionshipDTO? championship, {
+    required String region,
+    required String season,
+  });
+
+  /// Apaga todo o cache de campeonatos (listas e avulsos).
+  Future<void> deleteChampionshipsCache();
 }

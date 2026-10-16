@@ -2,8 +2,8 @@ import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
-import 'package:arena_soccer/features/championships/domain/usecases/get_region_championship_usecase.dart';
-import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_usecase.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/get_region_championship_cache_first_usecase.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_cache_first_usecase.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/match_form_hints.dart';
 import 'package:arena_soccer/features/matches/domain/repositories/matches_repository_interface.dart';
@@ -13,12 +13,30 @@ import 'package:arena_soccer/features/matches/presentation/bloc/match_form_cubit
 import 'package:arena_soccer/features/matches/presentation/bloc/match_form_state.dart';
 import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
 const _existing = [
-  MatchDTO(homeTeam: 'Lava Jato', awayTeam: 'Volta', date: '18/10', time: '16:45', venue: 'Arena Orlandão', region: 'Floresta'),
-  MatchDTO(homeTeam: 'X-9', awayTeam: 'Risadinha', date: '18/10', time: '15:45', venue: 'Arena Orlandão', region: 'Floresta'),
-  MatchDTO(homeTeam: 'Riacho', awayTeam: 'Nova Era', date: '19/10', time: '15:45', venue: 'Campo do Riacho', region: 'Floresta'),
+  MatchDTO(
+      homeTeam: 'Lava Jato',
+      awayTeam: 'Volta',
+      date: '18/10',
+      time: '16:45',
+      venue: 'Arena Orlandão',
+      region: 'Floresta'),
+  MatchDTO(
+      homeTeam: 'X-9',
+      awayTeam: 'Risadinha',
+      date: '18/10',
+      time: '15:45',
+      venue: 'Arena Orlandão',
+      region: 'Floresta'),
+  MatchDTO(
+      homeTeam: 'Riacho',
+      awayTeam: 'Nova Era',
+      date: '19/10',
+      time: '15:45',
+      venue: 'Campo do Riacho',
+      region: 'Floresta'),
   MatchDTO(homeTeam: 'A', awayTeam: 'B', date: '19/10', time: '17:45', venue: 'Arena Orlandão', region: 'Santo inacio'),
 ];
 
@@ -26,7 +44,8 @@ class _FakeRepository implements IMatchesRepository {
   final created = <MatchDTO>[];
 
   @override
-  Stream<Either<Failure, List<MatchDTO>>> watchMatches({String? season}) => Stream.value(const Right(_existing));
+  Stream<Either<Failure, List<MatchDTO>>> watchMatches({String? season, String? region}) =>
+      Stream.value(const Right(_existing));
 
   @override
   Future<Either<Failure, void>> createMatch(MatchDTO match, {String? season}) async {
@@ -51,13 +70,14 @@ class _FakeRepository implements IMatchesRepository {
       const Right(null);
 }
 
-class _FakeChampionship implements GetRegionChampionshipUseCase {
+class _FakeChampionship implements GetRegionChampionshipCacheFirstUseCase {
   /// Campeonato cadastrado da região (nulo = ainda não cadastrado).
   ChampionshipDTO? registered;
 
   @override
-  Future<Either<Failure, ChampionshipDTO?>> call({required String region, required String season}) async =>
-      Right(registered);
+  Stream<Either<Failure, ChampionshipDTO?>> call(
+          {required String region, required String season, bool force = false}) =>
+      Stream.value(Right(registered));
 }
 
 class _FakeRegions implements GetRegionsUseCase {
@@ -65,17 +85,24 @@ class _FakeRegions implements GetRegionsUseCase {
   Future<Either<Failure, List<String>>> call() async => const Right(['Floresta', 'Santo inacio']);
 }
 
-class _FakeChampionships implements GetRegionChampionshipsUseCase {
+class _FakeChampionships implements GetRegionChampionshipsCacheFirstUseCase {
   List<ChampionshipDTO> list = const [];
 
   @override
-  Future<Either<Failure, List<ChampionshipDTO>>> call({required String region, required String season}) async =>
-      Right(list);
+  Stream<Either<Failure, List<ChampionshipDTO>>> call({
+    required String region,
+    required String season,
+    bool force = false,
+  }) =>
+      Stream.value(Right(list));
 }
 
-class _FakeTeams implements GetTeamsUseCase {
+class _FakeTeams implements GetTeamsCacheFirstUseCase {
   @override
-  Future<Either<Failure, List<TeamDTO>>> call({String? region, String? season}) async => const Right([
+  Stream<Either<Failure, List<TeamDTO>>> call({String? region, String? season, bool force = false}) =>
+      Stream.fromFuture(_load(region: region, season: season));
+
+  Future<Either<Failure, List<TeamDTO>>> _load({String? region, String? season}) async => const Right([
         TeamDTO(id: '1', name: 'Lava Jato'),
         TeamDTO(id: '2', name: 'Volta'),
         TeamDTO(id: '3', name: 'Riacho'),
@@ -100,7 +127,9 @@ void main() {
         time: '19:00',
         venue: 'Campo X',
       );
-      expect(conflicts, const [MatchConflict(type: MatchConflictType.teamSameDay, subject: 'Lava Jato', times: ['16:45'])]);
+      expect(conflicts, const [
+        MatchConflict(type: MatchConflictType.teamSameDay, subject: 'Lava Jato', times: ['16:45'])
+      ]);
     });
 
     test('conflito: local ocupado no mesmo horário (sem diferenciar caixa)', () {

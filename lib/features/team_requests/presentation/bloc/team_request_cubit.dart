@@ -10,7 +10,7 @@ import 'package:arena_soccer/features/team_requests/domain/usecases/cancel_team_
 import 'package:arena_soccer/features/team_requests/domain/usecases/submit_team_request_usecase.dart';
 import 'package:arena_soccer/features/team_requests/domain/usecases/watch_my_team_request_usecase.dart';
 import 'package:arena_soccer/features/team_requests/presentation/bloc/team_request_state.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
 /// "Sou dono de time": acompanha o pedido do usuário em tempo real e cuida
 /// do formulário (enviar, editar enquanto pendente, reenviar após rejeição).
@@ -19,7 +19,7 @@ class TeamRequestCubit extends Cubit<TeamRequestState> {
   final SubmitTeamRequestUseCase submitTeamRequestUseCase;
   final CancelTeamRequestUseCase cancelTeamRequestUseCase;
   final GetRegionsUseCase getRegionsUseCase;
-  final GetTeamsUseCase getTeamsUseCase;
+  final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
 
   StreamSubscription<Either<Failure, TeamRequestDTO?>>? _subscription;
   late String _userId;
@@ -32,7 +32,7 @@ class TeamRequestCubit extends Cubit<TeamRequestState> {
     this.submitTeamRequestUseCase,
     this.cancelTeamRequestUseCase,
     this.getRegionsUseCase,
-    this.getTeamsUseCase,
+    this.getTeamsCacheFirstUseCase,
   ) : super(const LoadingTeamRequestState());
 
   Future<void> start({
@@ -108,10 +108,11 @@ class TeamRequestCubit extends Cubit<TeamRequestState> {
   /// lista, o aviso só não aparece; o admin confere na aprovação.
   Future<void> _loadExistingTeams(String region) async {
     _updateForm(state.form.copyWith(selectedRegion: region, existingTeams: const []));
-    final response = await getTeamsUseCase(region: region);
-    if (isClosed || state.form.selectedRegion != region) return;
-    if (response.isRight) {
-      _updateForm(state.form.copyWith(existingTeams: response.right.map((t) => t.name).toList()));
+    await for (final response in getTeamsCacheFirstUseCase(region: region)) {
+      if (isClosed || state.form.selectedRegion != region) return;
+      if (response.isRight) {
+        _updateForm(state.form.copyWith(existingTeams: response.right.map((t) => t.name).toList()));
+      }
     }
   }
 

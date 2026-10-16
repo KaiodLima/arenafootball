@@ -1,13 +1,16 @@
+import 'package:either_dart/either.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/errors/failure.dart';
+import 'package:arena_soccer/features/global_results/domain/entities/global_match.dart';
 import 'package:arena_soccer/features/global_results/domain/entities/results_day.dart';
-import 'package:arena_soccer/features/global_results/domain/usecases/get_global_results_usecase.dart';
+import 'package:arena_soccer/features/global_results/domain/usecases/get_global_results_cache_first_usecase.dart';
 import 'package:arena_soccer/features/global_results/presentation/bloc/global_results_state.dart';
 
 /// Resultados pelo mundo do dia escolhido, com busca e filtro "ao vivo".
 class GlobalResultsCubit extends Cubit<GlobalResultsState> {
-  final GetGlobalResultsUseCase getGlobalResultsUseCase;
+  final GetGlobalResultsCacheFirstUseCase getGlobalResultsCacheFirstUseCase;
 
-  GlobalResultsCubit(this.getGlobalResultsUseCase) : super(const LoadingGlobalResultsState());
+  GlobalResultsCubit(this.getGlobalResultsCacheFirstUseCase) : super(const LoadingGlobalResultsState());
 
   /// Troca de dia: mostra o carregando e zera o filtro ao vivo (a busca fica).
   Future<void> load(ResultsDay day) async {
@@ -15,13 +18,21 @@ class GlobalResultsCubit extends Cubit<GlobalResultsState> {
     await _fetch(day);
   }
 
-  /// Puxar para atualizar: recarrega o mesmo dia mantendo a lista na tela.
-  Future<void> refresh() => _fetch(state.day);
+  /// Puxar para atualizar: recarrega o mesmo dia (ignora o cache local)
+  /// mantendo a lista na tela.
+  Future<void> refresh() => _fetch(state.day, force: true);
 
-  Future<void> _fetch(ResultsDay day) async {
-    final response = await getGlobalResultsUseCase(day);
-    // Ignora a resposta se o usuário trocou de dia enquanto carregava.
-    if (isClosed || state.day != day) return;
+  /// Cache local primeiro (ver `cacheFirst`): o dia reaberto em poucos
+  /// minutos aparece sem esperar o scraping.
+  Future<void> _fetch(ResultsDay day, {bool force = false}) async {
+    await for (final response in getGlobalResultsCacheFirstUseCase(day, force: force)) {
+      // Ignora a resposta se o usuário trocou de dia enquanto carregava.
+      if (isClosed || state.day != day) return;
+      _apply(day, response);
+    }
+  }
+
+  void _apply(ResultsDay day, Either<Failure, List<GlobalMatch>> response) {
     response.fold(
       (failure) => emit(ErrorGlobalResultsState(
         day: day,

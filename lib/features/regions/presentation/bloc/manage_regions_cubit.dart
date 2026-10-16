@@ -4,14 +4,14 @@ import 'package:arena_soccer/features/regions/domain/usecases/create_region_usec
 import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
 import 'package:arena_soccer/features/regions/domain/usecases/manage_region_usecases.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/manage_regions_state.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
 /// Painel do admin: lista as regiões (com os times da temporada atual),
 /// cria, renomeia, exclui (só vazia) e roda a manutenção "Vincular regiões
 /// por id".
 class ManageRegionsCubit extends Cubit<ManageRegionsState> {
   final GetRegionsUseCase getRegionsUseCase;
-  final GetTeamsUseCase getTeamsUseCase;
+  final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
   final CreateRegionUseCase createRegionUseCase;
   final RenameRegionUseCase renameRegionUseCase;
   final DeleteRegionUseCase deleteRegionUseCase;
@@ -19,7 +19,7 @@ class ManageRegionsCubit extends Cubit<ManageRegionsState> {
 
   ManageRegionsCubit(
     this.getRegionsUseCase,
-    this.getTeamsUseCase,
+    this.getTeamsCacheFirstUseCase,
     this.createRegionUseCase,
     this.renameRegionUseCase,
     this.deleteRegionUseCase,
@@ -51,7 +51,9 @@ class ManageRegionsCubit extends Cubit<ManageRegionsState> {
       return;
     }
     // Uma consulta só (todos os times da temporada), agrupada por região.
-    final teams = await getTeamsUseCase();
+    // A contagem decide se a região pode ser excluída: sempre do Firestore
+    // (o resultado renova o cache dos times).
+    final teams = await getTeamsCacheFirstUseCase(force: true).last;
     final counts = <String, int>{};
     for (final team in teams.isRight ? teams.right : const []) {
       counts[team.region] = (counts[team.region] ?? 0) + 1;

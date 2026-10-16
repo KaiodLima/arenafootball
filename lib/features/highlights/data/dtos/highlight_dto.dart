@@ -34,6 +34,27 @@ class HighlightDTO extends Equatable {
     );
   }
 
+  /// Cache local (ver `CacheStore`).
+  factory HighlightDTO.fromCache(Map<String, dynamic> json) {
+    return HighlightDTO(
+      id: json['id']?.toString() ?? '',
+      title: json['title']?.toString() ?? '',
+      link: json['link']?.toString() ?? '',
+      imageUrl: json['imageUrl']?.toString() ?? '',
+      isVisible: json['isVisible'] == true,
+      priority: json['priority']?.toString() ?? '',
+    );
+  }
+
+  Map<String, dynamic> toCache() => {
+        'id': id,
+        'title': title,
+        'link': link,
+        'imageUrl': imageUrl,
+        'isVisible': isVisible,
+        'priority': priority,
+      };
+
   Map<String, dynamic> toMap() => {
         'id': id,
         'title': title,

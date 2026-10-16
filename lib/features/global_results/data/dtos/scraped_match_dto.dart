@@ -24,6 +24,27 @@ class ScrapedGoalDTO extends Equatable {
     this.isPenalty = false,
   });
 
+  /// Cache local (ver `CacheStore`).
+  factory ScrapedGoalDTO.fromCache(Map<String, dynamic> json) => ScrapedGoalDTO(
+        homeScore: (json['homeScore'] as num?)?.toInt() ?? 0,
+        awayScore: (json['awayScore'] as num?)?.toInt() ?? 0,
+        scorer: json['scorer']?.toString() ?? '',
+        minute: json['minute']?.toString() ?? '',
+        isHome: json['isHome'] as bool?,
+        isOwnGoal: json['isOwnGoal'] == true,
+        isPenalty: json['isPenalty'] == true,
+      );
+
+  Map<String, dynamic> toCache() => {
+        'homeScore': homeScore,
+        'awayScore': awayScore,
+        'scorer': scorer,
+        'minute': minute,
+        'isHome': isHome,
+        'isOwnGoal': isOwnGoal,
+        'isPenalty': isPenalty,
+      };
+
   @override
   List<Object?> get props => [homeScore, awayScore, scorer, minute, isHome, isOwnGoal, isPenalty];
 }
@@ -72,6 +93,42 @@ class ScrapedMatchDTO extends Equatable {
     this.goals = const [],
     this.detailsUrl = '',
   });
+
+  /// Cache local (ver `CacheStore`).
+  factory ScrapedMatchDTO.fromCache(Map<String, dynamic> json) => ScrapedMatchDTO(
+        league: json['league']?.toString() ?? '',
+        flagBase64: json['flagBase64']?.toString() ?? '',
+        kickoff: json['kickoff']?.toString() ?? '',
+        statusText: json['statusText']?.toString() ?? '',
+        isLive: json['isLive'] == true,
+        featured: json['featured'] == true,
+        homeTeam: json['homeTeam']?.toString() ?? '',
+        awayTeam: json['awayTeam']?.toString() ?? '',
+        homeGoals: (json['homeGoals'] as num?)?.toInt(),
+        awayGoals: (json['awayGoals'] as num?)?.toInt(),
+        postponed: json['postponed'] == true,
+        goals: [
+          for (final item in (json['goals'] as List?) ?? const [])
+            ScrapedGoalDTO.fromCache(Map<String, dynamic>.from(item as Map)),
+        ],
+        detailsUrl: json['detailsUrl']?.toString() ?? '',
+      );
+
+  Map<String, dynamic> toCache() => {
+        'league': league,
+        'flagBase64': flagBase64,
+        'kickoff': kickoff,
+        'statusText': statusText,
+        'isLive': isLive,
+        'featured': featured,
+        'homeTeam': homeTeam,
+        'awayTeam': awayTeam,
+        'homeGoals': homeGoals,
+        'awayGoals': awayGoals,
+        'postponed': postponed,
+        'goals': [for (final goal in goals) goal.toCache()],
+        'detailsUrl': detailsUrl,
+      };
 
   @override
   List<Object?> get props => [

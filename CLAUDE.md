@@ -128,6 +128,12 @@ Push: tópico `regiaoid_<id>` (o app assina também o `regiao_<slug>` do nome na
 - **App:** `PushService` (`lib/core/services/push_service.dart`) faz permissão, exibição em primeiro plano e toque (abre a aba do `data.aba`). O `PushTopicsListener` (em `blocs_load.dart`) mantém os tópicos de acordo com a região e o time do coração.
 - **Deploy das functions:** `cd functions && npm install`, depois `firebase deploy --only functions`.
 
+## Cache local e economia de leituras
+
+- **Leituras únicas (`get`)**: cache Hive no padrão do Relove + validade. `CacheStore` (`lib/core/cache/cache_store.dart`, box `arenaCache`, JSON `{savedAt, data}`), chaves em `cache_keys.dart`, validades em `cache_ttl.dart`. Por dado: repositório com `getCachedX`/`saveXCache`/`deleteXCache`, trio de use cases e um `XCacheFirstUseCase` que usa `cacheFirst` (`lib/core/cache/cache_first.dart`): cache válido = não busca; vencido = mostra e atualiza; `force: true` ignora a validade. Gravações invalidam o cache **no repositório**. Logout limpa tudo; mudar `CacheStore.schemaVersion` limpa ao abrir. DTOs em cache têm `toCache()`/`fromCache()` (região guardada por id e resolvida pelo `RegionRegistry`).
+- **Streams** ficam no cache do próprio Firestore (persistência ilimitada). Para gastar menos: feed ao vivo só das 20 mais recentes + páginas antigas por `get` (`loadMore`); partidas filtradas por região no servidor; ranking só o top 50 (`getTopPlayers`, `whereIn` de ids de time); cubits das abas (feed, campeonatos, partidas) vivem na rota da home e não reabrem a consulta ao trocar de aba.
+- Leitura nova: siga o mesmo padrão (não chame o Firestore direto do cubit, nem leia uma coleção inteira para filtrar no app).
+
 ## Links compartilhados e deep links
 
 - **Links públicos:** `https://arenasoccerflutter.web.app/noticia/<id>`, `/atleta/<temporada>/<idJogador>`, `/destaque/<id>` e `/app` (montados em `lib/core/utils/share_links.dart`; todo texto de compartilhar termina com um deles).

@@ -10,15 +10,15 @@ import 'package:arena_soccer/features/fan_card/presentation/bloc/fan_card_cubit.
 import 'package:arena_soccer/features/fan_card/presentation/bloc/fan_card_state.dart';
 import 'package:arena_soccer/features/fan_card/presentation/widgets/fan_card.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_team_by_name_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_team_by_name_cache_first_usecase.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/team_colors.dart';
 
-class _FakeTeam implements GetTeamByNameUseCase {
+class _FakeTeam implements GetTeamByNameCacheFirstUseCase {
   @override
-  Future<Either<Failure, TeamDTO?>> call(String name, {String id = ''}) async => Right(
+  Stream<Either<Failure, TeamDTO?>> call(String name, {String id = '', bool force = false}) => Stream.value(Right(
         TeamDTO(id: '1', name: name, region: 'Floresta', primaryColor: TeamColor.navy.hex),
-      );
+      ));
 }
 
 class _FakePhoto implements UpdateUserPhotoUseCase {
@@ -40,8 +40,8 @@ void main() {
   });
 
   test('cores: as do time; sem time ou sem cores, as do app', () {
-    expect(FanCard.paletteFor(TeamDTO(id: '1', name: 'X', primaryColor: TeamColor.navy.hex)).accent,
-        TeamColor.navy.color);
+    expect(
+        FanCard.paletteFor(TeamDTO(id: '1', name: 'X', primaryColor: TeamColor.navy.hex)).accent, TeamColor.navy.color);
     expect(FanCard.paletteFor(null).accent, AppColors.primaryStrong);
     expect(FanCard.paletteFor(const TeamDTO(id: '1', name: 'X')).background, AppColors.white);
   });

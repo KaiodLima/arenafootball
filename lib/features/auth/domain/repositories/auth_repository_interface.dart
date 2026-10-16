@@ -1,4 +1,5 @@
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
 
@@ -28,4 +29,15 @@ abstract class IAuthRepository {
 
   /// Quando a conta logada foi criada; nulo sem sessão.
   DateTime? get accountCreatedAt;
+
+  /// Usuário logado salvo no cache local (abre o app sem rede). Sem sessão
+  /// ou sem cache = `Right(null)`; nunca falha.
+  Future<Either<Failure, CachedValue<UserDTO>?>> getCachedUser();
+
+  Future<Either<Failure, void>> saveUserCache(UserDTO user);
+
+  Future<Either<Failure, void>> deleteUserCache();
+
+  /// Apaga todo o cache local (saída da conta).
+  Future<void> clearCache();
 }

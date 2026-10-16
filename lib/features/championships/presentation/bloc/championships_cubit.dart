@@ -11,12 +11,18 @@ import 'package:arena_soccer/features/championships/presentation/bloc/championsh
 class ChampionshipsCubit extends Cubit<ChampionshipsState> {
   final WatchChampionshipsUseCase watchChampionshipsUseCase;
   StreamSubscription<Either<Failure, List<ChampionshipDTO>>>? _subscription;
+  String? _region;
 
   ChampionshipsCubit(this.watchChampionshipsUseCase) : super(const LoadingChampionshipsState());
 
+  /// Na home o cubit é compartilhado pelas abas de campeonatos e tabelas:
+  /// pedir de novo a mesma região não reabre a consulta. Trocar de região
+  /// limpa a lista (a anterior é de outra região).
   void watch({required String region}) {
+    if (_subscription != null && region == _region) return;
     _subscription?.cancel();
-    emit(LoadingChampionshipsState(championships: state.championships));
+    emit(LoadingChampionshipsState(championships: region == _region ? state.championships : const []));
+    _region = region;
     _subscription = watchChampionshipsUseCase(region: region).listen((response) {
       response.fold(
         (failure) => emit(ErrorChampionshipsState(

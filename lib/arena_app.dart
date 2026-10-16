@@ -17,6 +17,7 @@ import 'package:arena_soccer/features/championships/data/dtos/championship_dto.d
 import 'package:arena_soccer/features/championships/presentation/bloc/championship_details_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/championship_form_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/groups_cubit.dart';
+import 'package:arena_soccer/features/championships/presentation/bloc/championships_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/manage_championships_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/standings_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/page/championship_details_page.dart';
@@ -42,6 +43,7 @@ import 'package:arena_soccer/features/matches/presentation/bloc/match_form_cubit
 import 'package:arena_soccer/features/matches/presentation/bloc/matches_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/page/match_form_page.dart';
 import 'package:arena_soccer/features/matches/presentation/page/matches_page.dart';
+import 'package:arena_soccer/features/news/presentation/bloc/news_feed_cubit.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/features/news/presentation/bloc/goal_notification_cubit.dart';
 import 'package:arena_soccer/features/news/presentation/bloc/news_by_id_cubit.dart';
@@ -121,8 +123,16 @@ class ArenaApp extends StatelessWidget {
               create: (_) => FanCardCubit(sl(), sl(), sl()),
               child: const FanCardPage(),
             ),
-        AppRoutes.home: (_) => BlocProvider<HomeCubit>(
-              create: (_) => HomeCubit(sl(), sl(), sl(), sl()),
+        // Feed de notícias, campeonatos e partidas da aba de tabelas vivem na
+        // home: trocar de aba não reabre as consultas (cada doc relido é
+        // cobrado).
+        AppRoutes.home: (_) => MultiBlocProvider(
+              providers: [
+                BlocProvider<HomeCubit>(create: (_) => HomeCubit(sl(), sl(), sl(), sl())),
+                BlocProvider<ChampionshipsCubit>(create: (_) => ChampionshipsCubit(sl())),
+                BlocProvider<MatchesCubit>(create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl())),
+                BlocProvider<NewsFeedCubit>(create: (_) => NewsFeedCubit(sl(), sl(), sl())),
+              ],
               child: const HomePage(),
             ),
 

@@ -12,10 +12,13 @@ import 'package:arena_soccer/features/players/presentation/bloc/player_form_cubi
 import 'package:arena_soccer/features/players/presentation/bloc/player_form_state.dart';
 import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
 const _squads = {
-  'Lava Jato': [PlayerDTO(id: 'p1', name: 'Dudu', team: 'Lava Jato'), PlayerDTO(id: 'p2', name: 'João Pedro', team: 'Lava Jato')],
+  'Lava Jato': [
+    PlayerDTO(id: 'p1', name: 'Dudu', team: 'Lava Jato'),
+    PlayerDTO(id: 'p2', name: 'João Pedro', team: 'Lava Jato')
+  ],
   'Volta': [PlayerDTO(id: 'p3', name: 'Cassin', team: 'Volta')],
 };
 
@@ -29,15 +32,24 @@ class _FakeRepository implements IPlayersRepository {
   }
 
   @override
-  Stream<Either<Failure, List<PlayerDTO>>> watchTeamPlayers({String teamId = '', required String teamName, String? season}) =>
+  Stream<Either<Failure, List<PlayerDTO>>> watchTeamPlayers(
+          {String teamId = '', required String teamName, String? season}) =>
       Stream.value(Right(_squads[teamName] ?? const []));
 
   @override
-  Stream<Either<Failure, PlayerDTO?>> watchPlayer({required String id, String? season}) =>
-      const Stream.empty();
+  Stream<Either<Failure, PlayerDTO?>> watchPlayer({required String id, String? season}) => const Stream.empty();
 
   @override
   Future<Either<Failure, List<PlayerDTO>>> getPlayers({String? season}) async => const Right([]);
+
+  @override
+  Future<Either<Failure, List<PlayerDTO>>> getTopPlayers({
+    required List<String> teamIds,
+    required String field,
+    int limit = 50,
+    String? season,
+  }) async =>
+      const Right([]);
 
   @override
   Future<Either<Failure, void>> updatePlayer(PlayerDTO player, {String? season}) async => const Right(null);
@@ -76,9 +88,12 @@ class _FakeRegions implements GetRegionsUseCase {
   Future<Either<Failure, List<String>>> call() async => const Right(['Floresta', 'Santo inacio']);
 }
 
-class _FakeTeams implements GetTeamsUseCase {
+class _FakeTeams implements GetTeamsCacheFirstUseCase {
   @override
-  Future<Either<Failure, List<TeamDTO>>> call({String? region, String? season}) async => Right(region == 'Floresta'
+  Stream<Either<Failure, List<TeamDTO>>> call({String? region, String? season, bool force = false}) =>
+      Stream.fromFuture(_load(region: region, season: season));
+
+  Future<Either<Failure, List<TeamDTO>>> _load({String? region, String? season}) async => Right(region == 'Floresta'
       ? const [TeamDTO(id: '1', name: 'Lava Jato', imageUrl: 'https://img/lj.png'), TeamDTO(id: '2', name: 'Volta')]
       : const []);
 }

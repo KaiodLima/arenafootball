@@ -3,7 +3,8 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 
 abstract class IMatchesRepository {
-  Stream<Either<Failure, List<MatchDTO>>> watchMatches({String? season});
+  /// Com [region], só as partidas daquela região (filtradas no servidor).
+  Stream<Either<Failure, List<MatchDTO>>> watchMatches({String? season, String? region});
 
   Future<Either<Failure, void>> createMatch(MatchDTO match, {String? season});
 

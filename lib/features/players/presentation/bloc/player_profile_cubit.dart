@@ -6,7 +6,7 @@ import 'package:either_dart/either.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
-import 'package:arena_soccer/features/news/domain/usecases/get_player_goal_cards_usecase.dart';
+import 'package:arena_soccer/features/news/domain/usecases/get_player_goal_cards_cache_first_usecase.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/domain/usecases/delete_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/remove_player_from_squad_usecase.dart';
@@ -15,8 +15,8 @@ import 'package:arena_soccer/features/players/domain/usecases/watch_player_useca
 import 'package:arena_soccer/features/players/presentation/bloc/player_profile_state.dart';
 import 'package:arena_soccer/features/stats/domain/ranking_entry.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
-import 'package:arena_soccer/features/stats/domain/usecases/get_stats_ranking_usecase.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
+import 'package:arena_soccer/features/stats/domain/usecases/get_stats_ranking_cache_first_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
 /// Tela do atleta: o jogador em tempo real, o time dele, a posição na
 /// artilharia/assistências da região e os cards de gol em que participou.
@@ -24,9 +24,9 @@ import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.da
 /// tem conta vinculada, só o tira do elenco.
 class PlayerProfileCubit extends Cubit<PlayerProfileState> {
   final WatchPlayerUseCase watchPlayerUseCase;
-  final GetTeamsUseCase getTeamsUseCase;
-  final GetStatsRankingUseCase getStatsRankingUseCase;
-  final GetPlayerGoalCardsUseCase getPlayerGoalCardsUseCase;
+  final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
+  final GetStatsRankingCacheFirstUseCase getStatsRankingCacheFirstUseCase;
+  final GetPlayerGoalCardsCacheFirstUseCase getPlayerGoalCardsCacheFirstUseCase;
   final UpdatePlayerUseCase updatePlayerUseCase;
   final DeletePlayerUseCase deletePlayerUseCase;
   final RemovePlayerFromSquadUseCase removePlayerFromSquadUseCase;
@@ -38,9 +38,9 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
 
   PlayerProfileCubit(
     this.watchPlayerUseCase,
-    this.getTeamsUseCase,
-    this.getStatsRankingUseCase,
-    this.getPlayerGoalCardsUseCase,
+    this.getTeamsCacheFirstUseCase,
+    this.getStatsRankingCacheFirstUseCase,
+    this.getPlayerGoalCardsCacheFirstUseCase,
     this.updatePlayerUseCase,
     this.deletePlayerUseCase,
     this.removePlayerFromSquadUseCase,
@@ -68,9 +68,10 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
   }
 
   Future<void> _loadParticipations(String playerId) async {
-    final response = await getPlayerGoalCardsUseCase(playerId);
-    if (isClosed || response.isLeft) return;
-    emit(state.copyWith(participations: response.right));
+    await for (final response in getPlayerGoalCardsCacheFirstUseCase(playerId)) {
+      if (isClosed) return;
+      if (response.isRight) emit(state.copyWith(participations: response.right));
+    }
   }
 
   /// Time (para escudo e região) e posições nos rankings. Só refaz quando
@@ -88,15 +89,20 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
 
     var team = state.team;
     if (team == null || !sameTeam(idA: team.id, nameA: team.name, idB: player.teamId, nameB: player.team)) {
-      final teams = await getTeamsUseCase(season: _season);
+      // Cache-first: fica com a última emissão (o remoto quando revalidou).
+      final teams = await getTeamsCacheFirstUseCase(season: _season).last;
       if (isClosed) return;
       team = teams.fold((_) => null, (list) => TeamDirectory(list).resolve(id: player.teamId, name: player.team));
       if (team != null) emit(state.copyWith(team: team));
     }
     if (team == null || team.region.isEmpty) return;
 
-    final goals = await getStatsRankingUseCase(type: StatsRankingType.goals, region: team.region, season: _season);
-    final assists = await getStatsRankingUseCase(type: StatsRankingType.assists, region: team.region, season: _season);
+    // Rankings pelo cache local: a última emissão (o remoto quando revalidou).
+    final goals =
+        await getStatsRankingCacheFirstUseCase(type: StatsRankingType.goals, region: team.region, season: _season).last;
+    final assists =
+        await getStatsRankingCacheFirstUseCase(type: StatsRankingType.assists, region: team.region, season: _season)
+            .last;
     if (isClosed || _rankedFor != key) return;
     emit(state
         .copyWith(

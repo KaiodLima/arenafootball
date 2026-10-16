@@ -6,29 +6,33 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/services/storage_upload_service.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
-import 'package:arena_soccer/features/news/domain/usecases/get_player_goal_cards_usecase.dart';
+import 'package:arena_soccer/features/news/domain/usecases/get_player_goal_cards_cache_first_usecase.dart';
+import 'package:arena_soccer/features/players/data/datasources/players_datasource.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/domain/repositories/players_repository_interface.dart';
 import 'package:arena_soccer/features/players/domain/usecases/delete_player_usecase.dart';
-import 'package:arena_soccer/features/players/domain/usecases/get_players_usecase.dart';
+import 'package:arena_soccer/features/players/domain/usecases/get_top_players_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/remove_player_from_squad_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/update_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_player_usecase.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/player_profile_cubit.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/player_profile_state.dart';
+import 'package:arena_soccer/features/stats/domain/ranking_entry.dart';
+import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
+import 'package:arena_soccer/features/stats/domain/usecases/get_stats_ranking_cache_first_usecase.dart';
 import 'package:arena_soccer/features/stats/domain/usecases/get_stats_ranking_usecase.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
-const _dudu = PlayerDTO(id: 'dudu', name: 'Dudu', team: 'Lava Jato', goals: 3, assists: 1);
+const _dudu = PlayerDTO(id: 'dudu', name: 'Dudu', team: 'Lava Jato', teamId: '1', goals: 3, assists: 1);
 
 /// Artilharia de Floresta: Rafa 5, Dudu 3, Gabriel 3 (empate em 2º), Cassin 0.
 const _all = [
-  PlayerDTO(id: 'rafa', name: 'Rafa', team: 'Volta', goals: 5),
+  PlayerDTO(id: 'rafa', name: 'Rafa', team: 'Volta', teamId: '2', goals: 5),
   _dudu,
-  PlayerDTO(id: 'gabriel', name: 'Gabriel', team: 'Volta', goals: 3, assists: 4),
-  PlayerDTO(id: 'cassin', name: 'Cassin', team: 'Lava Jato'),
-  PlayerDTO(id: 'fora', name: 'Fora', team: 'Riacho', goals: 9),
+  PlayerDTO(id: 'gabriel', name: 'Gabriel', team: 'Volta', teamId: '2', goals: 3, assists: 4),
+  PlayerDTO(id: 'cassin', name: 'Cassin', team: 'Lava Jato', teamId: '1'),
+  PlayerDTO(id: 'fora', name: 'Fora', team: 'Riacho', teamId: '3', goals: 9),
 ];
 
 class _FakePlayers implements IPlayersRepository {
@@ -55,6 +59,18 @@ class _FakePlayers implements IPlayersRepository {
   @override
   Future<Either<Failure, List<PlayerDTO>>> getPlayers({String? season}) async => const Right(_all);
 
+  /// Como a consulta: só os times pedidos, decrescente pelo quesito, limitado.
+  @override
+  Future<Either<Failure, List<PlayerDTO>>> getTopPlayers({
+    required List<String> teamIds,
+    required String field,
+    int limit = 50,
+    String? season,
+  }) async {
+    final top = _all.where((p) => teamIds.contains(p.teamId)).toList();
+    return Right(PlayersDataSource.mergeTopPlayers([top], field: field, limit: limit));
+  }
+
   @override
   Future<Either<Failure, void>> updatePlayer(PlayerDTO player, {String? season}) async {
     updated.add(player);
@@ -62,7 +78,8 @@ class _FakePlayers implements IPlayersRepository {
   }
 
   @override
-  Stream<Either<Failure, List<PlayerDTO>>> watchTeamPlayers({String teamId = '', required String teamName, String? season}) =>
+  Stream<Either<Failure, List<PlayerDTO>>> watchTeamPlayers(
+          {String teamId = '', required String teamName, String? season}) =>
       const Stream.empty();
 
   @override
@@ -78,9 +95,12 @@ class _FakePlayers implements IPlayersRepository {
       const Right(null);
 }
 
-class _FakeTeams implements GetTeamsUseCase {
+class _FakeTeams implements GetTeamsCacheFirstUseCase {
   @override
-  Future<Either<Failure, List<TeamDTO>>> call({String? region, String? season}) async {
+  Stream<Either<Failure, List<TeamDTO>>> call({String? region, String? season, bool force = false}) =>
+      Stream.fromFuture(_load(region: region, season: season));
+
+  Future<Either<Failure, List<TeamDTO>>> _load({String? region, String? season}) async {
     const all = [
       TeamDTO(id: '1', name: 'Lava Jato', region: 'Floresta', imageUrl: 'https://img/lj.png'),
       TeamDTO(id: '2', name: 'Volta', region: 'Floresta'),
@@ -90,12 +110,32 @@ class _FakeTeams implements GetTeamsUseCase {
   }
 }
 
-class _FakeGoalCards implements GetPlayerGoalCardsUseCase {
+class _FakeGoalCards implements GetPlayerGoalCardsCacheFirstUseCase {
   @override
-  Future<Either<Failure, List<NewsDTO>>> call(String playerId) async => Right([
+  Stream<Either<Failure, List<NewsDTO>>> call(String playerId, {bool force = false}) =>
+      Stream.fromFuture(_load(playerId));
+
+  Future<Either<Failure, List<NewsDTO>>> _load(String playerId) async => Right([
         NewsDTO(id: 'c2', tag: NewsDTO.goalTag, date: DateTime(2026, 10, 2), scorerId: playerId, scorerName: 'Dudu'),
-        NewsDTO(id: 'c1', tag: NewsDTO.goalTag, date: DateTime(2026, 9, 1), assistantId: playerId, assistantName: 'Dudu'),
+        NewsDTO(
+            id: 'c1', tag: NewsDTO.goalTag, date: DateTime(2026, 9, 1), assistantId: playerId, assistantName: 'Dudu'),
       ]);
+}
+
+/// Ranking sem cache local: sempre o cálculo real.
+class _NoCacheRanking implements GetStatsRankingCacheFirstUseCase {
+  final GetStatsRankingUseCase inner;
+
+  _NoCacheRanking(this.inner);
+
+  @override
+  Stream<Either<Failure, StatsRanking>> call({
+    required StatsRankingType type,
+    required String region,
+    String? season,
+    bool force = false,
+  }) =>
+      Stream.fromFuture(inner(type: type, region: region, season: season));
 }
 
 class _FakeStorage implements StorageUploadService {
@@ -117,7 +157,7 @@ void main() {
     cubit = PlayerProfileCubit(
       WatchPlayerUseCase(players),
       teams,
-      GetStatsRankingUseCase(teams, GetPlayersUseCase(players)),
+      _NoCacheRanking(GetStatsRankingUseCase(teams, GetTopPlayersUseCase(players))),
       _FakeGoalCards(),
       UpdatePlayerUseCase(players, _FakeStorage()),
       DeletePlayerUseCase(players),
@@ -194,7 +234,9 @@ void main() {
     expect(players.deleted.single.id, _dudu.id);
     expect(
       cubit.state,
-      isA<DeletedPlayerProfileState>().having((s) => s.name, 'name', _dudu.name).having((s) => s.teamName, 'team', _dudu.team),
+      isA<DeletedPlayerProfileState>()
+          .having((s) => s.name, 'name', _dudu.name)
+          .having((s) => s.teamName, 'team', _dudu.team),
     );
   });
 

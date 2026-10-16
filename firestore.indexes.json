@@ -219,6 +219,216 @@
           "order": "DESCENDING"
         }
       ]
+    },
+    {
+      "collectionGroup": "partidas2022",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idRegiao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dataRegistro",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "partidas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idRegiao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dataRegistro",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "partidas2024",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idRegiao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dataRegistro",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "partidas2025",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idRegiao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dataRegistro",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "partidas2026",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idRegiao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dataRegistro",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "jogadores2022",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idTime",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nGols",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "jogadores2022",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idTime",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nAssistencias",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "jogadores",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idTime",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nGols",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "jogadores",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idTime",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nAssistencias",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "jogadores2024",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idTime",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nGols",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "jogadores2024",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idTime",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nAssistencias",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "jogadores2025",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idTime",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nGols",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "jogadores2025",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idTime",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nAssistencias",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "jogadores2026",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idTime",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nGols",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "jogadores2026",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idTime",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nAssistencias",
+          "order": "DESCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": []

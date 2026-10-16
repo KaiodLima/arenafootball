@@ -18,7 +18,7 @@ void registerTeamRequestsDependencies() {
   _sl.registerLazySingleton<TeamRequestsDataSource>(() => TeamRequestsDataSource(_sl()));
 
   // Repository (interface -> impl)
-  _sl.registerLazySingleton<ITeamRequestsRepository>(() => TeamRequestsRepositoryImpl(_sl()));
+  _sl.registerLazySingleton<ITeamRequestsRepository>(() => TeamRequestsRepositoryImpl(_sl(), _sl()));
 
   // UseCases
   _sl.registerLazySingleton(() => WatchMyTeamRequestUseCase(_sl()));

@@ -1,21 +1,17 @@
 import 'package:either_dart/either.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
-import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
+import 'package:arena_soccer/features/news/domain/news_feed_page.dart';
 import 'package:arena_soccer/features/news/domain/repositories/news_repository_interface.dart';
 
-/// Feed de notícias da região, já filtrado para exibição.
+/// Primeira página do feed da região, ao vivo e já filtrada para exibição.
 class WatchNewsFeedUseCase {
   final INewsRepository _repository;
 
   WatchNewsFeedUseCase(this._repository);
 
-  Stream<Either<Failure, List<NewsDTO>>> call({String? region}) {
-    return _repository.watchNews(region: region).map((response) => response.map(_visibleInFeed));
-  }
-
-  /// Cards de gol e de publicidade só aparecem com `exibir == "true"`.
-  /// Notícias comuns aparecem sempre (comportamento do app antigo).
-  static List<NewsDTO> _visibleInFeed(List<NewsDTO> news) {
-    return news.where((item) => (item.isGoal || item.isAd) ? item.isVisible : true).toList();
+  Stream<Either<Failure, NewsFeedPage>> call({String? region, int limit = newsFeedPageSize}) {
+    return _repository
+        .watchNews(region: region, limit: limit)
+        .map((response) => response.map((raw) => NewsFeedPage.fromRaw(raw, limit: limit)));
   }
 }

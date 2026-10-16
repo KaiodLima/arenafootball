@@ -3,6 +3,10 @@ import 'package:equatable/equatable.dart';
 
 /// Documento das coleções `jogadores` / `jogadores{ano}`.
 class PlayerDTO extends Equatable {
+  /// Campos de gols/assistências no Firestore (ranking ordena por eles).
+  static const String goalsField = 'nGols';
+  static const String assistsField = 'nAssistencias';
+
   final String id;
   final String name;
 
@@ -43,12 +47,39 @@ class PlayerDTO extends Equatable {
       team: data['time']?.toString() ?? '',
       teamId: data['idTime']?.toString() ?? '',
       imageUrl: data['urlImagem']?.toString() ?? '',
-      goals: (data['nGols'] as num?)?.toInt() ?? 0,
-      assists: (data['nAssistencias'] as num?)?.toInt() ?? 0,
+      goals: (data[goalsField] as num?)?.toInt() ?? 0,
+      assists: (data[assistsField] as num?)?.toInt() ?? 0,
       userId: data['idUsuario']?.toString() ?? '',
       position: data['posicao']?.toString() ?? '',
     );
   }
+
+  /// Cache local (ver `CacheStore`).
+  factory PlayerDTO.fromCache(Map<String, dynamic> json) {
+    return PlayerDTO(
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      team: json['team']?.toString() ?? '',
+      teamId: json['teamId']?.toString() ?? '',
+      imageUrl: json['imageUrl']?.toString() ?? '',
+      goals: (json['goals'] as num?)?.toInt() ?? 0,
+      assists: (json['assists'] as num?)?.toInt() ?? 0,
+      userId: json['userId']?.toString() ?? '',
+      position: json['position']?.toString() ?? '',
+    );
+  }
+
+  Map<String, dynamic> toCache() => {
+        'id': id,
+        'name': name,
+        'team': team,
+        'teamId': teamId,
+        'imageUrl': imageUrl,
+        'goals': goals,
+        'assists': assists,
+        'userId': userId,
+        'position': position,
+      };
 
   Map<String, dynamic> toMap() => {
         'idJogador': id,
@@ -56,12 +87,15 @@ class PlayerDTO extends Equatable {
         'time': team,
         'idTime': teamId,
         'urlImagem': imageUrl,
-        'nGols': goals,
-        'nAssistencias': assists,
+        goalsField: goals,
+        assistsField: assists,
         // Opcionais: só gravados quando existem (jogadores antigos não têm).
         if (userId.isNotEmpty) 'idUsuario': userId,
         if (position.isNotEmpty) 'posicao': position,
       };
+
+  /// Valor do quesito [field] ([goalsField] ou [assistsField]).
+  int statOf(String field) => field == goalsField ? goals : assists;
 
   PlayerDTO copyWith({
     String? id,

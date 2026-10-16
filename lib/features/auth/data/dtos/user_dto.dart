@@ -53,6 +53,29 @@ class UserDTO extends Equatable {
         if (photoUrl.isNotEmpty) 'urlImagem': photoUrl,
       };
 
+  /// Cache local da sessão (ver `CacheStore`).
+  factory UserDTO.fromCache(Map<String, dynamic> json) {
+    return UserDTO(
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      email: json['email']?.toString() ?? '',
+      favoriteTeam: json['favoriteTeam']?.toString() ?? '',
+      favoriteTeamId: json['favoriteTeamId']?.toString() ?? '',
+      isAdmin: json['isAdmin'] == true,
+      photoUrl: json['photoUrl']?.toString() ?? '',
+    );
+  }
+
+  Map<String, dynamic> toCache() => {
+        'id': id,
+        'name': name,
+        'email': email,
+        'favoriteTeam': favoriteTeam,
+        'favoriteTeamId': favoriteTeamId,
+        'isAdmin': isAdmin,
+        'photoUrl': photoUrl,
+      };
+
   /// Contas antigas e quem pulou a etapa 2 do cadastro ficam com `time` vazio.
   bool get hasFavoriteTeam => favoriteTeam.trim().isNotEmpty || favoriteTeamId.isNotEmpty;
 

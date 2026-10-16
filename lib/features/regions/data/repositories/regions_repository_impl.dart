@@ -1,4 +1,6 @@
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/cache/cache_keys.dart';
+import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/services/preferences_service.dart';
@@ -9,21 +11,50 @@ import 'package:arena_soccer/features/regions/domain/repositories/regions_reposi
 class RegionsRepositoryImpl implements IRegionsRepository {
   final RegionsDataSource _dataSource;
   final PreferencesService _preferences;
+  final CacheStore _cache;
 
-  RegionsRepositoryImpl(this._dataSource, this._preferences);
+  RegionsRepositoryImpl(this._dataSource, this._preferences, this._cache);
 
   @override
   Future<Either<Failure, List<String>>> getRegions() => _dataSource.getRegions();
 
   @override
-  Future<Either<Failure, void>> createRegion(String name) => _dataSource.createRegion(name);
+  Future<Either<Failure, List<RegionRef>>> getRegionRefs() => _dataSource.getRegionRefs();
 
   @override
-  Future<Either<Failure, void>> renameRegion({required String id, required String name}) =>
-      _dataSource.renameRegion(id: id, name: name);
+  Future<Either<Failure, CachedValue<List<RegionRef>>?>> getCachedRegions() async {
+    final response = await _cache.read<List<RegionRef>>(
+      CacheKeys.regions,
+      (json) => [for (final item in json as List) RegionRef.fromCache(Map<String, dynamic>.from(item as Map))],
+    );
+    // Igual ao remoto: o vínculo id ↔ nome passa a valer também sem rede.
+    final cached = response.isRight ? response.right : null;
+    if (cached != null && cached.data.isNotEmpty) RegionRegistry.configure(cached.data);
+    return response;
+  }
 
   @override
-  Future<Either<Failure, void>> deleteRegion(String id) => _dataSource.deleteRegion(id);
+  Future<Either<Failure, void>> saveRegionsCache(List<RegionRef> regions) =>
+      _cache.save(CacheKeys.regions, [for (final region in regions) region.toCache()]);
+
+  @override
+  Future<Either<Failure, void>> deleteRegionsCache() => _cache.delete(CacheKeys.regions);
+
+  /// Depois de gravar uma região: o próximo carregamento busca a lista nova.
+  Future<Either<Failure, void>> _invalidate(Either<Failure, void> response) async {
+    if (response.isRight) await deleteRegionsCache();
+    return response;
+  }
+
+  @override
+  Future<Either<Failure, void>> createRegion(String name) async => _invalidate(await _dataSource.createRegion(name));
+
+  @override
+  Future<Either<Failure, void>> renameRegion({required String id, required String name}) async =>
+      _invalidate(await _dataSource.renameRegion(id: id, name: name));
+
+  @override
+  Future<Either<Failure, void>> deleteRegion(String id) async => _invalidate(await _dataSource.deleteRegion(id));
 
   @override
   Future<Either<Failure, RegionUsage>> regionUsage({required String id, required String name}) =>

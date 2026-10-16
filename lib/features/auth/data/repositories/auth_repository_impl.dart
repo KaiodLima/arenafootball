@@ -1,4 +1,6 @@
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/cache/cache_keys.dart';
+import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/auth/data/datasources/auth_datasource.dart';
 import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
@@ -6,8 +8,9 @@ import 'package:arena_soccer/features/auth/domain/repositories/auth_repository_i
 
 class AuthRepositoryImpl implements IAuthRepository {
   final AuthDataSource _dataSource;
+  final CacheStore _cache;
 
-  AuthRepositoryImpl(this._dataSource);
+  AuthRepositoryImpl(this._dataSource, this._cache);
 
   @override
   Future<Either<Failure, UserDTO>> signIn({required String email, required String password}) =>
@@ -49,4 +52,28 @@ class AuthRepositoryImpl implements IAuthRepository {
 
   @override
   DateTime? get accountCreatedAt => _dataSource.accountCreatedAt;
+
+  @override
+  Future<Either<Failure, CachedValue<UserDTO>?>> getCachedUser() async {
+    final userId = _dataSource.currentUserId;
+    if (userId == null) return const Right(null);
+    return _cache.read(
+      CacheKeys.user(userId),
+      (json) => UserDTO.fromCache(Map<String, dynamic>.from(json as Map)),
+    );
+  }
+
+  @override
+  Future<Either<Failure, void>> saveUserCache(UserDTO user) =>
+      _cache.save(CacheKeys.user(_dataSource.currentUserId ?? user.id), user.toCache());
+
+  @override
+  Future<Either<Failure, void>> deleteUserCache() async {
+    final userId = _dataSource.currentUserId;
+    if (userId == null) return const Right(null);
+    return _cache.delete(CacheKeys.user(userId));
+  }
+
+  @override
+  Future<void> clearCache() => _cache.clear();
 }

@@ -5,7 +5,7 @@ import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecas
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/create_team_usecase.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_next_team_number_usecase.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 import 'package:arena_soccer/features/teams/presentation/bloc/team_form_state.dart';
 
 /// Cadastro de time (admin). Os times já cadastrados na região alimentam a
@@ -14,13 +14,13 @@ class TeamFormCubit extends Cubit<TeamFormState> {
   final CreateTeamUseCase createTeamUseCase;
   final GetNextTeamNumberUseCase getNextTeamNumberUseCase;
   final GetRegionsUseCase getRegionsUseCase;
-  final GetTeamsUseCase getTeamsUseCase;
+  final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
 
   TeamFormCubit(
     this.createTeamUseCase,
     this.getNextTeamNumberUseCase,
     this.getRegionsUseCase,
-    this.getTeamsUseCase,
+    this.getTeamsCacheFirstUseCase,
   ) : super(const EditingTeamFormState());
 
   void _edit(TeamFormData form) {
@@ -51,9 +51,10 @@ class TeamFormCubit extends Cubit<TeamFormState> {
 
   /// Times da temporada corrente na região. Falhar só esconde a lista.
   Future<void> _loadTeams(String region) async {
-    final response = await getTeamsUseCase(region: region);
-    if (isClosed || state.form.selectedRegion != region) return;
-    _edit(state.form.copyWith(existing: response.fold((_) => const <TeamDTO>[], (list) => list)));
+    await for (final response in getTeamsCacheFirstUseCase(region: region)) {
+      if (isClosed || state.form.selectedRegion != region) return;
+      _edit(state.form.copyWith(existing: response.fold((_) => const <TeamDTO>[], (list) => list)));
+    }
   }
 
   void changeName(String value) => _edit(state.form.copyWith(name: value));

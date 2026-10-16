@@ -49,10 +49,18 @@ class _FakeRepository implements INewsRepository {
   Future<Either<Failure, List<NewsDTO>>> getGoalCardsByPlayer(String playerId) async => const Right([]);
 
   @override
-  Stream<Either<Failure, List<NewsDTO>>> watchNews({String? region}) => const Stream.empty();
+  Stream<Either<Failure, List<NewsDTO>>> watchNews({String? region, int limit = 20}) => const Stream.empty();
+
+  @override
+  Future<Either<Failure, List<NewsDTO>>> getNewsPage(
+          {String? region, required String afterNewsId, int limit = 20}) async =>
+      const Right([]);
 
   @override
   Stream<Either<Failure, List<NewsDTO>>> watchNewsByTag(String tag) => const Stream.empty();
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 const _saved = NewsDTO(

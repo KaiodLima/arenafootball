@@ -22,9 +22,12 @@ class GetGlobalResultsUseCase {
   static final RegExp _minute = RegExp(r"^(\d+(?:\+\d+)?)'$");
 
   Future<Either<Failure, List<GlobalMatch>>> call(ResultsDay day) async {
-    final response = await _repository.getMatches(day);
+    final response = await scrape(day);
     return response.map((matches) => toMatches(matches, day));
   }
+
+  /// Partidas cruas do site (o que vai para o cache local).
+  Future<Either<Failure, List<ScrapedMatchDTO>>> scrape(ResultsDay day) => _repository.getMatches(day);
 
   /// Público para teste.
   static List<GlobalMatch> toMatches(List<ScrapedMatchDTO> scraped, ResultsDay day) {
