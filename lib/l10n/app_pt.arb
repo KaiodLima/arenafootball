@@ -1627,5 +1627,9 @@
   },
   "statsShortcut": "Artilharia e assistências",
   "alertHeaderConfirm": "Confirmação",
-  "alertHeaderNotice": "Aviso"
+  "alertHeaderNotice": "Aviso",
+  "newsShareTitle": "Compartilhar notícia",
+  "newsShareCardFooter": "Leia no app · arenasoccerflutter.web.app",
+  "newsNotFound": "Esta notícia não está mais disponível.",
+  "deepLinkHighlightNotFound": "Este destaque não está mais disponível."
 }

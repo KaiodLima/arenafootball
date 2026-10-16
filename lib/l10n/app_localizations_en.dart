@@ -2640,4 +2640,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get alertHeaderNotice => 'Notice';
+
+  @override
+  String get newsShareTitle => 'Share news';
+
+  @override
+  String get newsShareCardFooter =>
+      'Read it in the app · arenasoccerflutter.web.app';
+
+  @override
+  String get newsNotFound => 'This news item is no longer available.';
+
+  @override
+  String get deepLinkHighlightNotFound =>
+      'This highlight is no longer available.';
 }

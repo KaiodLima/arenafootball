@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/utils/share_links.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/page_title_bar.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/voting/domain/elected_player.dart';
@@ -50,11 +51,11 @@ class _ElectedPlayerPageState extends State<ElectedPlayerPage> {
       title: l10n.votingShareTitle,
       fileName: 'craque_$slug',
       preview: ShareImageFrame(date: DateTime.now(), card: MatchMvpShareCard(match: match, result: result)),
-      shareText: l10n.votingShareText(
+      shareText: '${l10n.votingShareText(
         elected.playerName,
         '${match.homeTeam} ${match.homeGoals} x ${match.awayGoals} ${match.awayTeam}',
         l10n.votingVotes(elected.votes),
-      ),
+      )}\n$appLink',
     );
   }
 

@@ -16,6 +16,9 @@ class NewsRepositoryImpl implements INewsRepository {
   Stream<Either<Failure, List<NewsDTO>>> watchNewsByTag(String tag) => _dataSource.watchNewsByTag(tag);
 
   @override
+  Future<Either<Failure, NewsDTO?>> getNewsById(String id) => _dataSource.getNewsById(id);
+
+  @override
   Future<Either<Failure, void>> createNews(NewsDTO news) => _dataSource.createNews(news);
 
   @override

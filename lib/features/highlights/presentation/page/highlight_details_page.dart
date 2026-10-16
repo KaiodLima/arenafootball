@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/utils/share_links.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/core/services/share_service.dart';
@@ -61,9 +62,16 @@ class _HighlightDetailsPageState extends State<HighlightDetailsPage> {
     if (uri != null) await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
+  /// Texto + link público do destaque (traz quem não tem o app) e, se houver,
+  /// o link externo do próprio destaque.
   void _share(AppLocalizations l10n) {
-    final text = l10n.highlightShareText(widget.highlight.title);
-    ShareService.shareText(_link.isEmpty ? text : '$text\n$_link', subject: widget.highlight.title);
+    final highlight = widget.highlight;
+    final text = [
+      l10n.highlightShareText(highlight.title),
+      if (highlight.id.isNotEmpty) highlightLink(highlight.id),
+      if (_link.isNotEmpty) _link,
+    ].join('\n');
+    ShareService.shareText(text, subject: highlight.title);
   }
 
   @override

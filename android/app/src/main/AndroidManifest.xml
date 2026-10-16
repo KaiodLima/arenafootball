@@ -26,6 +26,26 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- Deep links: quem trata é o DeepLinkService (app_links), não o
+                 Navigator do Flutter (senão ele tenta abrir o caminho como rota). -->
+            <meta-data android:name="flutter_deeplinking_enabled" android:value="false" />
+            <!-- App Links: links públicos (Hosting) abrem direto no app. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="https" android:host="arenasoccerflutter.web.app"/>
+                <data android:pathPrefix="/noticia"/>
+                <data android:pathPrefix="/atleta"/>
+                <data android:pathPrefix="/destaque"/>
+            </intent-filter>
+            <!-- Botão "Abrir no app" da página web (arenafootball://...). -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="arenafootball"/>
+            </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

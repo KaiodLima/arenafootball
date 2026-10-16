@@ -7,6 +7,8 @@ abstract class INewsRepository {
 
   Stream<Either<Failure, List<NewsDTO>>> watchNewsByTag(String tag);
 
+  Future<Either<Failure, NewsDTO?>> getNewsById(String id);
+
   Future<Either<Failure, void>> createNews(NewsDTO news);
 
   Future<Either<Failure, void>> updateNews(NewsDTO news);

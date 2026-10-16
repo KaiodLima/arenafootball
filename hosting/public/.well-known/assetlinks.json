@@ -1,0 +1,15 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.caiolima.arenafootball",
+      "sha256_cert_fingerprints": [
+        "CB:FB:41:86:A9:F1:72:A1:22:D1:44:E7:B6:5C:8B:C8:31:36:9A:43:AD:2A:08:D2:1D:01:8D:6B:02:64:A5:2C",
+        "02:6B:F8:D5:48:0A:47:98:00:D0:27:49:4B:04:E9:94:74:07:3D:D3:51:60:E4:67:0B:43:33:B3:24:AA:7F:42"
+      ]
+    }
+  }
+]

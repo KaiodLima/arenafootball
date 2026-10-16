@@ -44,9 +44,11 @@ import 'package:arena_soccer/features/matches/presentation/page/match_form_page.
 import 'package:arena_soccer/features/matches/presentation/page/matches_page.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/features/news/presentation/bloc/goal_notification_cubit.dart';
+import 'package:arena_soccer/features/news/presentation/bloc/news_by_id_cubit.dart';
 import 'package:arena_soccer/features/news/presentation/bloc/news_form_cubit.dart';
 import 'package:arena_soccer/features/news/presentation/page/ad_form_page.dart';
 import 'package:arena_soccer/features/news/presentation/page/goal_notification_page.dart';
+import 'package:arena_soccer/features/news/presentation/page/news_by_id_page.dart';
 import 'package:arena_soccer/features/news/presentation/page/news_details_page.dart';
 import 'package:arena_soccer/features/news/presentation/page/news_form_page.dart';
 import 'package:arena_soccer/features/player_requests/presentation/bloc/player_request_cubit.dart';
@@ -120,14 +122,20 @@ class ArenaApp extends StatelessWidget {
               child: const FanCardPage(),
             ),
         AppRoutes.home: (_) => BlocProvider<HomeCubit>(
-              create: (_) => HomeCubit(sl(), sl(), sl()),
+              create: (_) => HomeCubit(sl(), sl(), sl(), sl()),
               child: const HomePage(),
             ),
 
         // Notícias
+        // `news` (já carregada) ou `newsId` (deep link: busca antes de mostrar).
         AppRoutes.newsDetailsPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-          return NewsDetailsPage(news: args?['news'] as NewsDTO);
+          final news = args?['news'] as NewsDTO?;
+          if (news != null) return NewsDetailsPage(news: news);
+          return BlocProvider<NewsByIdCubit>(
+            create: (_) => NewsByIdCubit(sl()),
+            child: NewsByIdPage(newsId: args?['newsId'] as String? ?? ''),
+          );
         },
         // Sem argumento cria; com `news` edita.
         AppRoutes.registerNewsPage: (context) {

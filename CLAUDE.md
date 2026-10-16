@@ -128,6 +128,13 @@ Push: tópico `regiaoid_<id>` (o app assina também o `regiao_<slug>` do nome na
 - **App:** `PushService` (`lib/core/services/push_service.dart`) faz permissão, exibição em primeiro plano e toque (abre a aba do `data.aba`). O `PushTopicsListener` (em `blocs_load.dart`) mantém os tópicos de acordo com a região e o time do coração.
 - **Deploy das functions:** `cd functions && npm install`, depois `firebase deploy --only functions`.
 
+## Links compartilhados e deep links
+
+- **Links públicos:** `https://arenasoccerflutter.web.app/noticia/<id>`, `/atleta/<temporada>/<idJogador>`, `/destaque/<id>` e `/app` (montados em `lib/core/utils/share_links.dart`; todo texto de compartilhar termina com um deles).
+- **Página do link:** Hosting (`hosting/public`) reescreve essas rotas para a function `sharePage` (`functions/src/share_page.ts`), que devolve HTML com Open Graph (prévia no WhatsApp) e o botão `intent://…` que abre o app (`arenafootball://<caminho>`) ou a Play Store. Cache de 10 min no CDN (`s-maxage=600`).
+- **App:** `DeepLinkService` (`lib/core/services/deep_link_service.dart`, pacote `app_links`) recebe o link (App Links `https://arenasoccerflutter.web.app` + esquema `arenafootball://`, no `AndroidManifest`) e a home abre a tela. `hosting/public/.well-known/assetlinks.json` precisa do SHA-256 da chave de debug **e** do da assinatura da Play Store.
+- **Deploy:** `firebase deploy --only "hosting,functions"`.
+
 ## Security Rules
 
 Versionadas no repo: `firestore.rules` e `storage.rules` (projeto em `.firebaserc`). Qualquer mudança passa por esses arquivos e é publicada com:

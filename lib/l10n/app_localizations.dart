@@ -4527,6 +4527,30 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Aviso'**
   String get alertHeaderNotice;
+
+  /// No description provided for @newsShareTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compartilhar notícia'**
+  String get newsShareTitle;
+
+  /// No description provided for @newsShareCardFooter.
+  ///
+  /// In pt, this message translates to:
+  /// **'Leia no app · arenasoccerflutter.web.app'**
+  String get newsShareCardFooter;
+
+  /// No description provided for @newsNotFound.
+  ///
+  /// In pt, this message translates to:
+  /// **'Esta notícia não está mais disponível.'**
+  String get newsNotFound;
+
+  /// No description provided for @deepLinkHighlightNotFound.
+  ///
+  /// In pt, this message translates to:
+  /// **'Este destaque não está mais disponível.'**
+  String get deepLinkHighlightNotFound;
 }
 
 class _AppLocalizationsDelegate

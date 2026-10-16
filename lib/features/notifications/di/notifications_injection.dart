@@ -1,5 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get_it/get_it.dart';
+import 'package:arena_soccer/core/services/deep_link_service.dart';
 import 'package:arena_soccer/core/services/push_service.dart';
 import 'package:arena_soccer/features/notifications/data/datasources/notifications_datasource.dart';
 import 'package:arena_soccer/features/notifications/data/repositories/notifications_repository_impl.dart';
@@ -15,6 +16,9 @@ void registerNotificationsDependencies() {
   // Push no aparelho (FCM + notificação local) e a sincronia de tópicos
   _sl.registerLazySingleton(() => PushService(FirebaseMessaging.instance));
   _sl.registerLazySingleton(() => PushTopicSync(_sl<PushService>()));
+
+  // Links compartilhados que abrem o app (deep links)
+  _sl.registerLazySingleton(() => DeepLinkService());
 
   // Painel do admin
   _sl.registerLazySingleton(() => NotificationsDataSource(_sl()));

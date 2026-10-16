@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
+import 'package:arena_soccer/core/firebase/season_collection.dart';
+import 'package:arena_soccer/core/services/deep_link_service.dart';
 import 'package:arena_soccer/core/services/push_service.dart';
+import 'package:arena_soccer/core/utils/share_links.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/auth/presentation/page/choose_team_page.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/championships_tab.dart';
@@ -19,6 +22,7 @@ import 'package:arena_soccer/features/matches/presentation/widgets/matches_tab.d
 import 'package:arena_soccer/features/news/presentation/widgets/news_tab.dart';
 import 'package:arena_soccer/features/notifications/presentation/widgets/push_topics_listener.dart';
 import 'package:arena_soccer/features/player_requests/presentation/bloc/my_player_cubit.dart';
+import 'package:arena_soccer/features/players/presentation/player_navigation.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_state.dart';
 import 'package:arena_soccer/features/team_requests/presentation/bloc/owned_team_cubit.dart';
@@ -26,6 +30,7 @@ import 'package:arena_soccer/features/teams/presentation/widgets/teams_tab.dart'
 import 'package:arena_soccer/injection_container.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/section_header.dart';
+import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 
@@ -42,6 +47,7 @@ class _HomePageState extends State<HomePage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   late final HomeCubit _homeCubit;
   StreamSubscription<String>? _pushTabs;
+  StreamSubscription<DeepLinkTarget>? _deepLinks;
 
   @override
   void initState() {
@@ -57,11 +63,17 @@ class _HomePageState extends State<HomePage> {
     PushTopicsListener.syncNow(context);
     _openPushTab(push.takePendingTab());
     _pushTabs = push.tabRequests.listen(_openPushTab);
+
+    // Links compartilhados: o que abriu o app e os que chegam com ele aberto.
+    final deepLinks = sl<DeepLinkService>();
+    _openDeepLink(deepLinks.takePending());
+    _deepLinks = deepLinks.targets.listen(_openDeepLink);
   }
 
   @override
   void dispose() {
     _pushTabs?.cancel();
+    _deepLinks?.cancel();
     super.dispose();
   }
 
@@ -86,6 +98,42 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     _homeCubit.selectTab(tab == 'tabelas' ? HomeTab.tables : HomeTab.news);
+  }
+
+  /// Abre o destino do link (notícia, atleta ou destaque); `/app` fica na
+  /// home. Pode vir do initState: navega depois do frame.
+  void _openDeepLink(DeepLinkTarget? target) {
+    if (target == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      switch (target) {
+        case NewsLinkTarget(:final id):
+          Navigator.pushNamed(context, AppRoutes.newsDetailsPage, arguments: {'newsId': id});
+        case AthleteLinkTarget(:final season, :final id):
+          // Temporada nula = a corrente (como os outros acessos à tela).
+          openAthlete(context, {'playerId': id, 'season': season == SeasonCollection.currentSeason ? null : season});
+        case HighlightLinkTarget(:final id):
+          _openHighlight(id);
+        case AppLinkTarget():
+          break;
+      }
+    });
+  }
+
+  Future<void> _openHighlight(String id) async {
+    final response = await _homeCubit.findHighlight(id);
+    if (!mounted) return;
+    final highlight = response.isRight ? response.right : null;
+    if (highlight == null) {
+      final l10n = AppLocalizations.of(context);
+      showSnackBar(
+        context: context,
+        message: response.isLeft ? response.left.toString() : l10n.deepLinkHighlightNotFound,
+        isSuccess: false,
+      );
+      return;
+    }
+    Navigator.pushNamed(context, AppRoutes.highlightDetailsPage, arguments: {'highlight': highlight});
   }
 
   /// Escolha do time pelo menu (quem pulou a etapa no cadastro). Na volta,

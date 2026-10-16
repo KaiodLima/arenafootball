@@ -39,6 +39,17 @@ class NewsDataSource {
         );
   }
 
+  /// Uma notícia pelo id (link compartilhado). Nulo se não existe mais.
+  Future<Either<Failure, NewsDTO?>> getNewsById(String id) async {
+    try {
+      final doc = await _news.doc(id).get();
+      return Right(doc.exists ? NewsDTO.fromFirestore(doc) : null);
+    } catch (e) {
+      AppLogger.e('getNewsById id=$id', name: 'NewsDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _loadFallback));
+    }
+  }
+
   Future<Either<Failure, void>> createNews(NewsDTO news) async {
     try {
       final ref = _news.doc();

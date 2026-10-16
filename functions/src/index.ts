@@ -17,6 +17,7 @@ import type { FieldValue as FieldValueType, Firestore } from 'firebase-admin/fir
 import type { Messaging } from 'firebase-admin/messaging';
 import { logger, setGlobalOptions } from 'firebase-functions/v2';
 import { onDocumentCreated, onDocumentUpdated, onDocumentWritten } from 'firebase-functions/v2/firestore';
+import { onRequest } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import {
   PushMessage,
@@ -37,6 +38,16 @@ import {
   todayKey,
   votingMessage,
 } from './messages';
+import {
+  APP_PAGE,
+  NOT_FOUND_PAGE,
+  PageData,
+  athletePageData,
+  highlightPageData,
+  newsPageData,
+  parseSharePath,
+  renderSharePage,
+} from './share_page';
 
 setGlobalOptions({ region: 'us-central1', maxInstances: 5 });
 
@@ -205,5 +216,49 @@ export const dailyGames = onSchedule({ schedule: '0 9 * * *', timeZone: 'America
   for (const doc of matches.docs) {
     const message = dailyGameMessage(doc.data());
     if (message) await deliver(`jogo_do_dia_${today.replace('/', '-')}_${doc.id}`, message, `${collection}/${doc.id}`);
+  }
+});
+
+/**
+ * Página pública dos links compartilhados (Hosting reescreve `/noticia/**`,
+ * `/atleta/**`, `/destaque/**` e `/app` para cá). Cache no CDN do Hosting:
+ * a mesma página aberta várias vezes não chama a function de novo.
+ */
+export const sharePage = onRequest({ maxInstances: 3 }, async (req, res) => {
+  const path = req.path || '/';
+  const share = parseSharePath(path);
+  res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
+  if (!share) {
+    res.status(404).send(renderSharePage(NOT_FOUND_PAGE, { kind: 'app' }, '/app'));
+    return;
+  }
+  try {
+    let data: PageData | null = APP_PAGE;
+    if (share.kind !== 'app') {
+      const { db } = await admin();
+      const ref =
+        share.kind === 'noticia'
+          ? db.collection('noticias').doc(share.id)
+          : share.kind === 'destaque'
+            ? db.collection('destaques').doc(share.id)
+            : db.collection(seasonCollection('jogadores', share.season)).doc(share.id);
+      const doc = (await ref.get()).data();
+      data = !doc
+        ? null
+        : share.kind === 'noticia'
+          ? newsPageData(doc)
+          : share.kind === 'destaque'
+            ? highlightPageData(doc)
+            : athletePageData(doc, share.season);
+    }
+    if (!data) {
+      res.status(404).send(renderSharePage(NOT_FOUND_PAGE, share, path));
+      return;
+    }
+    res.status(200).send(renderSharePage(data, share, path));
+  } catch (error) {
+    logger.error('sharePage', { path, error });
+    res.set('Cache-Control', 'no-store');
+    res.status(500).send(renderSharePage(NOT_FOUND_PAGE, share, path));
   }
 });

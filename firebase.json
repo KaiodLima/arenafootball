@@ -11,7 +11,37 @@
     "cleanUrls": true,
     "ignore": [
       "firebase.json",
-      "**/.*"
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/noticia/**",
+        "function": {
+          "functionId": "sharePage",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/atleta/**",
+        "function": {
+          "functionId": "sharePage",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/destaque/**",
+        "function": {
+          "functionId": "sharePage",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/app",
+        "function": {
+          "functionId": "sharePage",
+          "region": "us-central1"
+        }
+      }
     ]
   },
   "functions": [

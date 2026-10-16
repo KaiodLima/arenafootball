@@ -43,6 +43,9 @@ class _FakeRepository implements INewsRepository {
   Future<Either<Failure, void>> deleteNews(String id) async => const Right(null);
 
   @override
+  Future<Either<Failure, NewsDTO?>> getNewsById(String id) async => const Right(null);
+
+  @override
   Future<Either<Failure, List<NewsDTO>>> getGoalCardsByPlayer(String playerId) async => const Right([]);
 
   @override

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/core/utils/relative_time.dart';
+import 'package:arena_soccer/core/utils/share_links.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
@@ -78,7 +80,8 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
           participations: state.participations.length,
         ),
       ),
-      shareText: l10n.athleteShareText(player.name, player.team, player.goals, player.assists),
+      shareText: '${l10n.athleteShareText(player.name, player.team, player.goals, player.assists)}\n'
+          '${athleteLink(widget.season ?? SeasonCollection.currentSeason, player.id)}',
     );
   }
 

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/utils/share_links.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
@@ -87,7 +88,8 @@ class _FanCardPageState extends State<FanCardPage> {
       title: l10n.fanCardShareTitle,
       fileName: 'carteirinha_arena',
       preview: ShareImageFrame(card: _buildCard(_cubit.state), date: DateTime.now()),
-      shareText: user.hasFavoriteTeam ? l10n.fanCardShareText(user.favoriteTeam) : l10n.fanCardShareTextNoTeam,
+      shareText: '${user.hasFavoriteTeam ? l10n.fanCardShareText(user.favoriteTeam) : l10n.fanCardShareTextNoTeam}'
+          '\n$appLink',
     );
   }
 

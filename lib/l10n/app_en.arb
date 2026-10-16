@@ -737,5 +737,9 @@
   "regionsLinkUnmatched": "Names that match no region (left without id): {names}",
   "statsShortcut": "Top scorers & assists",
   "alertHeaderConfirm": "Confirm",
-  "alertHeaderNotice": "Notice"
+  "alertHeaderNotice": "Notice",
+  "newsShareTitle": "Share news",
+  "newsShareCardFooter": "Read it in the app · arenasoccerflutter.web.app",
+  "newsNotFound": "This news item is no longer available.",
+  "deepLinkHighlightNotFound": "This highlight is no longer available."
 }

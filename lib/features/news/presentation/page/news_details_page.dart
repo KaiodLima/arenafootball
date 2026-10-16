@@ -3,9 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:arena_soccer/core/services/share_service.dart';
 import 'package:arena_soccer/core/utils/relative_time.dart';
+import 'package:arena_soccer/core/utils/share_links.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/news_image_header.dart';
+import 'package:arena_soccer/features/news/presentation/widgets/news_share_card.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/utils/components/share_image_frame.dart';
+import 'package:arena_soccer/utils/components/share_image_sheet.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
@@ -55,10 +59,22 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
     if (link != null) await launchUrl(link, mode: LaunchMode.externalApplication);
   }
 
+  /// Card com a capa e o título (o texto leva o link público da notícia,
+  /// que traz quem não tem o app). Sem id, só o texto como antes.
   void _share(AppLocalizations l10n) {
-    final link = news.link.trim();
-    final text = link.isEmpty ? '${news.title}\n\n${l10n.newsShareFooter}' : '${news.title}\n$link';
-    ShareService.shareText(text, subject: news.title);
+    if (news.id.isEmpty) {
+      final link = news.link.trim();
+      final text = link.isEmpty ? '${news.title}\n\n${l10n.newsShareFooter}' : '${news.title}\n$link';
+      ShareService.shareText(text, subject: news.title);
+      return;
+    }
+    showShareImageSheet(
+      context,
+      title: l10n.newsShareTitle,
+      fileName: 'noticia',
+      preview: ShareImageFrame(date: DateTime.now(), card: NewsShareCard(news: news)),
+      shareText: '${news.title}\n${newsLink(news.id)}',
+    );
   }
 
   @override
