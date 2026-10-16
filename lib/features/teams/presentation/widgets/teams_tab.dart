@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:arena_soccer/app_routes.dart';
+import 'package:arena_soccer/features/players/presentation/player_navigation.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/teams/presentation/bloc/teams_cubit.dart';
 import 'package:arena_soccer/features/teams/presentation/bloc/teams_state.dart';
@@ -49,7 +49,7 @@ class _TeamsList extends StatelessWidget {
             final team = state.teams[index];
             return TeamCard(
               team: team,
-              onTap: () => Navigator.pushNamed(context, AppRoutes.teamPlayersPage, arguments: {'team': team}),
+              onTap: () => openTeamRoster(context, {'team': team}),
             );
           },
         );

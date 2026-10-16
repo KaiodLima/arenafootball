@@ -7,6 +7,7 @@ import 'package:arena_soccer/features/championships/presentation/bloc/championsh
 import 'package:arena_soccer/features/championships/presentation/widgets/championship_hero_card.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/championship_rules_launcher.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/prize_podium.dart';
+import 'package:arena_soccer/features/players/presentation/player_navigation.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
@@ -361,7 +362,7 @@ class _TeamCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: radius, side: const BorderSide(color: AppColors.greyLight)),
       child: InkWell(
         borderRadius: radius,
-        onTap: found ? () => Navigator.pushNamed(context, AppRoutes.teamPlayersPage, arguments: {'team': team}) : null,
+        onTap: found ? () => openTeamRoster(context, {'team': team}) : null,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSizes.s6, vertical: AppSizes.s10),
           child: Column(

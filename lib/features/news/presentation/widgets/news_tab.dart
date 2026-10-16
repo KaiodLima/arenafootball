@@ -9,6 +9,7 @@ import 'package:arena_soccer/features/news/presentation/bloc/news_feed_state.dar
 import 'package:arena_soccer/features/news/presentation/widgets/ad_card.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/goal_card.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/news_card.dart';
+import 'package:arena_soccer/features/players/presentation/player_navigation.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/injection_container.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
@@ -161,10 +162,9 @@ class _NewsItem extends StatelessWidget {
   /// Tela do atleta, na temporada gravada no card (os jogadores são por
   /// temporada).
   void _openAthlete(BuildContext context, String playerId, String name) {
-    Navigator.pushNamed(
+    openAthlete(
       context,
-      AppRoutes.playerProfilePage,
-      arguments: {'playerId': playerId, 'season': news.season.isEmpty ? null : news.season, 'name': name},
+      {'playerId': playerId, 'season': news.season.isEmpty ? null : news.season, 'name': name},
     );
   }
 

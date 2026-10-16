@@ -6,6 +6,7 @@ import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart'
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/team_players_cubit.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/team_players_state.dart';
+import 'package:arena_soccer/features/players/presentation/player_navigation.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/player_card.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/squad_summary.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/team_header.dart';
@@ -270,10 +271,9 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
               return PlayerCard(
                 player: player,
                 isTopScorer: player.id == topScorerId,
-                onTap: () => Navigator.pushNamed(
+                onTap: () => openAthlete(
                   context,
-                  AppRoutes.playerProfilePage,
-                  arguments: {'playerId': player.id, 'season': _season, 'name': player.name, 'player': player},
+                  {'playerId': player.id, 'season': _season, 'name': player.name, 'player': player},
                 ),
               );
             },

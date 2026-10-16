@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
+import 'package:arena_soccer/features/players/presentation/player_navigation.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_hero_background.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
@@ -71,10 +72,9 @@ class HomeDrawer extends StatelessWidget {
                 ? null
                 : () {
                     Navigator.pop(context);
-                    Navigator.pushNamed(
+                    openAthlete(
                       context,
-                      AppRoutes.playerProfilePage,
-                      arguments: {'playerId': playerId, 'season': playerSeason},
+                      {'playerId': playerId, 'season': playerSeason},
                     );
                   },
             onOpenOwnedTeam: () => _open(context, AppRoutes.teamRequestPage),

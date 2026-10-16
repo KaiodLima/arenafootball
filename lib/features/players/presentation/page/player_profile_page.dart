@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/core/utils/relative_time.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/player_profile_cubit.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/player_profile_state.dart';
+import 'package:arena_soccer/features/players/presentation/player_navigation.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/athlete_share_card.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/count_stepper.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/player_card.dart';
@@ -291,9 +291,7 @@ class _Header extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppSizes.s20),
             child: InkWell(
               borderRadius: BorderRadius.circular(AppSizes.s20),
-              onTap: team == null
-                  ? null
-                  : () => Navigator.pushNamed(context, AppRoutes.teamPlayersPage, arguments: {'team': team}),
+              onTap: team == null ? null : () => openTeamRoster(context, {'team': team}),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(AppSizes.s6, AppSizes.s4, AppSizes.s8, AppSizes.s4),
                 child: Row(

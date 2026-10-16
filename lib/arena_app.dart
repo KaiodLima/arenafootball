@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
+import 'package:arena_soccer/core/navigation/route_stack.dart';
 import 'package:arena_soccer/features/fan_card/presentation/bloc/fan_card_cubit.dart';
 import 'package:arena_soccer/features/fan_card/presentation/page/fan_card_page.dart';
 import 'package:arena_soccer/features/global_results/presentation/bloc/global_results_cubit.dart';
@@ -93,6 +94,8 @@ class ArenaApp extends StatelessWidget {
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       debugShowCheckedModeBanner: false,
       navigatorKey: AppSession.navigatorKey,
+      // Pilha de rotas: Atleta/Time voltam à tela já aberta em vez de empilhar.
+      navigatorObservers: [routeStackObserver],
       theme: AppTheme.light,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,

@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
 import 'package:arena_soccer/features/player_requests/presentation/widgets/player_request_labels.dart';
+import 'package:arena_soccer/features/players/presentation/player_navigation.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/player_card.dart';
 import 'package:arena_soccer/features/team_requests/data/dtos/team_request_dto.dart';
 import 'package:arena_soccer/features/team_requests/presentation/bloc/my_team_cubit.dart';
@@ -200,10 +200,9 @@ class _SquadTab extends StatelessWidget {
                 player: player,
                 isTopScorer: false,
                 // O perfil libera o editor para o dono do time.
-                onTap: () => Navigator.pushNamed(
+                onTap: () => openAthlete(
                   context,
-                  AppRoutes.playerProfilePage,
-                  arguments: {'playerId': player.id, 'player': player},
+                  {'playerId': player.id, 'player': player},
                 ),
               ),
             ),

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
 import 'package:arena_soccer/features/player_requests/presentation/bloc/player_request_cubit.dart';
 import 'package:arena_soccer/features/player_requests/presentation/bloc/player_request_state.dart';
 import 'package:arena_soccer/features/player_requests/presentation/widgets/player_request_labels.dart';
+import 'package:arena_soccer/features/players/presentation/player_navigation.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
@@ -102,7 +102,7 @@ class _PlayerRequestPageState extends State<PlayerRequestPage> {
   }
 
   void _openProfile(PlayerRequestDTO request) {
-    Navigator.pushNamed(context, AppRoutes.playerProfilePage, arguments: {
+    openAthlete(context, {
       'playerId': request.playerId,
       'season': request.season == SeasonCollection.currentSeason ? null : request.season,
       'name': request.name,
