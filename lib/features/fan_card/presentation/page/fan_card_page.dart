@@ -140,10 +140,13 @@ class _FanCardPageState extends State<FanCardPage> {
                 return ListView(
                   padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s24, AppSizes.s16, AppSizes.s32),
                   children: [
-                    AnimatedOpacity(
-                      opacity: state.loading ? 0.4 : 1,
-                      duration: const Duration(milliseconds: 250),
-                      child: _buildCard(state),
+                    // Enquanto o time carrega, esqueleto neutro: o card só aparece
+                    // já com as cores do time (sem passar pelo verde padrão).
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      child: state.loading
+                          ? const _FanCardSkeleton(key: ValueKey('skeleton'))
+                          : KeyedSubtree(key: const ValueKey('card'), child: _buildCard(state)),
                     ),
                     const SizedBox(height: AppSizes.s16),
                     Text(
@@ -170,6 +173,42 @@ class _FanCardPageState extends State<FanCardPage> {
                 );
               },
             ),
+    );
+  }
+}
+
+/// Lugar da carteirinha enquanto o time do coração carrega: mesmo formato,
+/// cinza e pulsando de leve, sem cores de time.
+class _FanCardSkeleton extends StatefulWidget {
+  const _FanCardSkeleton({super.key});
+
+  @override
+  State<_FanCardSkeleton> createState() => _FanCardSkeletonState();
+}
+
+class _FanCardSkeletonState extends State<_FanCardSkeleton> with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse =
+      AnimationController(vsync: this, duration: const Duration(milliseconds: 900))..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: 1.6,
+      child: FadeTransition(
+        opacity: Tween<double>(begin: 0.55, end: 1).animate(_pulse),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.greyLight,
+            borderRadius: BorderRadius.circular(AppSizes.cardRadius),
+          ),
+        ),
+      ),
     );
   }
 }
