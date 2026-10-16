@@ -137,15 +137,15 @@ class _ManageRegionsPageState extends State<ManageRegionsPage> {
           if (state is CreatedManageRegionsState) {
             showSnackBar(context: context, message: l10n.regionsCreated(state.name));
             // A lista nova aparece nos chips da home e nos cadastros.
-            regions.load();
+            regions.load(force: true);
           }
           if (state is RenamedManageRegionsState) {
             showSnackBar(context: context, message: l10n.regionsRenamed(state.previous, state.name));
-            regions.load();
+            regions.load(force: true);
           }
           if (state is DeletedManageRegionsState) {
             showSnackBar(context: context, message: l10n.regionsDeleted(state.name));
-            regions.load();
+            regions.load(force: true);
           }
           if (state is DeleteCheckedManageRegionsState) _onDeleteChecked(state, l10n);
           if (state is LastRegionManageRegionsState) {

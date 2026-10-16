@@ -10,7 +10,7 @@ import 'package:arena_soccer/features/players/domain/usecases/add_player_stats_u
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
 import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
 /// Publica um card de gol (notícia com tag "gol") com o placar da partida e,
 /// opcionalmente, grava o mesmo placar na partida de hoje correspondente e
@@ -18,7 +18,7 @@ import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.da
 class GoalNotificationCubit extends Cubit<GoalNotificationState> {
   final CreateNewsUseCase createNewsUseCase;
   final GetRegionsUseCase getRegionsUseCase;
-  final GetTeamsUseCase getTeamsUseCase;
+  final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
   final GetTodayMatchesUseCase getTodayMatchesUseCase;
   final UpdateMatchScoreUseCase updateMatchScoreUseCase;
   final WatchTeamPlayersUseCase watchTeamPlayersUseCase;
@@ -38,7 +38,7 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
   GoalNotificationCubit(
     this.createNewsUseCase,
     this.getRegionsUseCase,
-    this.getTeamsUseCase,
+    this.getTeamsCacheFirstUseCase,
     this.getTodayMatchesUseCase,
     this.updateMatchScoreUseCase,
     this.watchTeamPlayersUseCase,
@@ -138,7 +138,8 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
   /// Times da temporada corrente e partidas de hoje da região. Como no app
   /// antigo, o mandante começa no primeiro time e o visitante no último.
   Future<void> _loadRegionData(String region) async {
-    final teamsFuture = getTeamsUseCase(region: region);
+    // Cache-first: fica com a última emissão (o remoto quando revalidou).
+    final teamsFuture = getTeamsCacheFirstUseCase(region: region).last;
     final matchesFuture = getTodayMatchesUseCase(region: region, season: _season);
     final teamsResponse = await teamsFuture;
     final matchesResponse = await matchesFuture;

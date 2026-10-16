@@ -1,7 +1,7 @@
 import 'package:either_dart/either.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
-import 'package:arena_soccer/features/championships/domain/usecases/get_region_championship_usecase.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/get_region_championship_cache_first_usecase.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/repositories/matches_repository_interface.dart';
 
@@ -11,7 +11,7 @@ import 'package:arena_soccer/features/matches/domain/repositories/matches_reposi
 /// cadastro, da tabela fixa do app antigo.
 class CreateMatchUseCase {
   final IMatchesRepository _repository;
-  final GetRegionChampionshipUseCase _getRegionChampionship;
+  final GetRegionChampionshipCacheFirstUseCase _getRegionChampionship;
 
   CreateMatchUseCase(this._repository, this._getRegionChampionship);
 
@@ -52,7 +52,8 @@ class CreateMatchUseCase {
   }
 
   Future<int> _championshipIdOf(String region) async {
-    final response = await _getRegionChampionship(region: region, season: SeasonCollection.currentSeason);
+    // Cache-first: fica com a última emissão (o remoto quando revalidou).
+    final response = await _getRegionChampionship(region: region, season: SeasonCollection.currentSeason).last;
     final registered = response.fold((_) => null, (championship) => championship?.championshipId);
     return registered != null && registered > 0 ? registered : championshipIdFor(region);
   }

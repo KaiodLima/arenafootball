@@ -7,7 +7,7 @@ import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 import 'package:arena_soccer/features/voting/data/dtos/vote_dto.dart';
 import 'package:arena_soccer/features/voting/domain/match_vote_ref.dart';
 import 'package:arena_soccer/features/voting/domain/usecases/cast_vote_usecase.dart';
@@ -21,7 +21,7 @@ class VoteBestPlayerCubit extends Cubit<VoteBestPlayerState> {
   final WatchTeamPlayersUseCase watchTeamPlayersUseCase;
   final CastVoteUseCase castVoteUseCase;
   final GetMyVoteUseCase getMyVoteUseCase;
-  final GetTeamsUseCase getTeamsUseCase;
+  final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
   StreamSubscription<Either<Failure, List<PlayerDTO>>>? _homeSubscription;
   StreamSubscription<Either<Failure, List<PlayerDTO>>>? _awaySubscription;
   MatchVoteRef _ref = const MatchVoteRef(matchId: '', season: '', homeTeam: '', awayTeam: '');
@@ -33,7 +33,7 @@ class VoteBestPlayerCubit extends Cubit<VoteBestPlayerState> {
     this.watchTeamPlayersUseCase,
     this.castVoteUseCase,
     this.getMyVoteUseCase,
-    this.getTeamsUseCase,
+    this.getTeamsCacheFirstUseCase,
   ) : super(const LoadingVoteBestPlayerState());
 
   /// [voterId] vazio = convidado (não tem voto atual).
@@ -57,13 +57,15 @@ class VoteBestPlayerCubit extends Cubit<VoteBestPlayerState> {
 
   /// Escudos são só decoração: se falhar, fica o ícone padrão.
   Future<void> _loadCrests({required String season}) async {
-    final response = await getTeamsUseCase(season: season);
-    if (isClosed || response.isLeft) return;
-    final directory = TeamDirectory(response.right);
-    _emitSame(
-      homeCrest: directory.resolve(id: _ref.homeTeamId, name: _ref.homeTeam)?.imageUrl ?? '',
-      awayCrest: directory.resolve(id: _ref.awayTeamId, name: _ref.awayTeam)?.imageUrl ?? '',
-    );
+    await for (final response in getTeamsCacheFirstUseCase(season: season)) {
+      if (isClosed) return;
+      if (response.isLeft) continue;
+      final directory = TeamDirectory(response.right);
+      _emitSame(
+        homeCrest: directory.resolve(id: _ref.homeTeamId, name: _ref.homeTeam)?.imageUrl ?? '',
+        awayCrest: directory.resolve(id: _ref.awayTeamId, name: _ref.awayTeam)?.imageUrl ?? '',
+      );
+    }
   }
 
   /// Falhar ao ler o voto atual não impede votar: só não mostra o selo.

@@ -10,7 +10,8 @@ class MatchesRepositoryImpl implements IMatchesRepository {
   MatchesRepositoryImpl(this._dataSource);
 
   @override
-  Stream<Either<Failure, List<MatchDTO>>> watchMatches({String? season}) => _dataSource.watchMatches(season: season);
+  Stream<Either<Failure, List<MatchDTO>>> watchMatches({String? season, String? region}) =>
+      _dataSource.watchMatches(season: season, region: region);
 
   @override
   Future<Either<Failure, void>> createMatch(MatchDTO match, {String? season}) =>

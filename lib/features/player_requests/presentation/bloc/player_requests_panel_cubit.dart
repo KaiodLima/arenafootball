@@ -12,7 +12,7 @@ import 'package:arena_soccer/features/player_requests/presentation/bloc/player_r
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/domain/usecases/get_players_usecase.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
 /// Painel do admin: pedidos "Sou jogador" em tempo real; aprovar (cria o
 /// jogador), rejeitar (com motivo) ou editar antes de responder.
@@ -21,7 +21,7 @@ class PlayerRequestsPanelCubit extends Cubit<PlayerRequestsPanelState> {
   final ApprovePlayerRequestUseCase approvePlayerRequestUseCase;
   final RejectPlayerRequestUseCase rejectPlayerRequestUseCase;
   final UpdatePlayerRequestUseCase updatePlayerRequestUseCase;
-  final GetTeamsUseCase getTeamsUseCase;
+  final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
   final GetPlayersUseCase getPlayersUseCase;
   StreamSubscription<Either<Failure, List<PlayerRequestDTO>>>? _subscription;
 
@@ -30,7 +30,7 @@ class PlayerRequestsPanelCubit extends Cubit<PlayerRequestsPanelState> {
     this.approvePlayerRequestUseCase,
     this.rejectPlayerRequestUseCase,
     this.updatePlayerRequestUseCase,
-    this.getTeamsUseCase,
+    this.getTeamsCacheFirstUseCase,
     this.getPlayersUseCase,
   ) : super(const LoadingPlayerRequestsPanelState());
 
@@ -47,7 +47,8 @@ class PlayerRequestsPanelCubit extends Cubit<PlayerRequestsPanelState> {
 
   /// Escudos e elenco: só enfeitam os cards, então uma falha aqui não trava o painel.
   Future<void> _loadReferences() async {
-    final teams = await getTeamsUseCase();
+    // Cache-first: fica com a última emissão (o remoto quando revalidou).
+    final teams = await getTeamsCacheFirstUseCase().last;
     final players = await getPlayersUseCase();
     if (isClosed) return;
     emit(_ready(

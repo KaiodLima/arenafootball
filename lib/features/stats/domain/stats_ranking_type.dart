@@ -7,4 +7,7 @@ enum StatsRankingType {
 
   /// Valor do jogador que conta para este ranking.
   int valueOf(PlayerDTO player) => this == goals ? player.goals : player.assists;
+
+  /// Campo do Firestore que ordena este ranking.
+  String get field => this == goals ? PlayerDTO.goalsField : PlayerDTO.assistsField;
 }

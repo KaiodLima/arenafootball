@@ -13,7 +13,8 @@ class GetTodayMatchesUseCase {
 
   Future<Either<Failure, List<MatchDTO>>> call({required String region, String? season, DateTime? now}) async {
     final today = WatchMatchesUseCase.formatMatchDate(now ?? DateTime.now());
-    final response = await _repository.watchMatches(season: season).first;
+    final response = await _repository.watchMatches(season: season, region: region).first;
+    // Região já filtrada no servidor; o filtro abaixo é só uma rede de segurança.
     return response.map(
       (matches) => matches.where((m) => m.region == region && m.date == today).toList()
         ..sort((a, b) => a.time.compareTo(b.time)),

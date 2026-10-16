@@ -19,7 +19,8 @@ import 'package:arena_soccer/injection_container.dart';
 // - HighlightFormCubit → registerHighlightPage
 // - ManageHighlightsCubit → manageHighlightsPage
 // - NotificationsPanelCubit → notificationsPanelPage
-// Cubits criados dentro de widgets: NewsFeedCubit (NewsTab), HighlightsCubit (HighlightsCarousel)
+// - NewsFeedCubit      → home (usado pela NewsTab)
+// Cubits criados dentro de widgets: HighlightsCubit (HighlightsCarousel)
 
 class BlocsLoad extends StatelessWidget {
   const BlocsLoad({super.key, required this.child});
@@ -30,7 +31,7 @@ class BlocsLoad extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         // Sessão — global: usuário logado e flag de admin usados no app todo
-        BlocProvider<SessionCubit>(create: (_) => SessionCubit(sl(), sl(), sl())),
+        BlocProvider<SessionCubit>(create: (_) => SessionCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl())),
 
         // Região e temporada — global: filtram notícias, times, tabelas...
         BlocProvider<RegionCubit>(create: (_) => RegionCubit(sl(), sl(), sl(), sl(), sl())..load()),

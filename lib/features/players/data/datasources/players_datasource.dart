@@ -59,6 +59,54 @@ class PlayersDataSource {
     }
   }
 
+  /// Limite do `whereIn` do Firestore (valores por consulta).
+  static const int whereInLimit = 30;
+
+  /// Os [limit] jogadores com mais [field] (`nGols`/`nAssistencias`) entre os
+  /// times [teamIds]: uma consulta por bloco de até 30 ids (em paralelo), cada
+  /// uma já ordenada e limitada no servidor; junta e corta em [limit]. Lê no
+  /// máximo `blocos x limit` docs, em vez da coleção inteira.
+  Future<Either<Failure, List<PlayerDTO>>> getTopPlayers({
+    required List<String> teamIds,
+    required String field,
+    int limit = 50,
+    String? season,
+  }) async {
+    final chunks = chunkIds(teamIds);
+    if (chunks.isEmpty || limit <= 0) return const Right([]);
+    try {
+      final results = await Future.wait(chunks.map(
+        (chunk) => _players(season).where('idTime', whereIn: chunk).orderBy(field, descending: true).limit(limit).get(),
+      ));
+      final lists = results.map((r) => r.docs.map(PlayerDTO.fromFirestore).toList()).toList();
+      return Right(mergeTopPlayers(lists, field: field, limit: limit));
+    } catch (e) {
+      AppLogger.e('getTopPlayers season=$season field=$field', name: 'PlayersDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _loadFallback));
+    }
+  }
+
+  /// Ids sem vazios e sem repetição, em blocos de até [size].
+  static List<List<String>> chunkIds(List<String> ids, {int size = whereInLimit}) {
+    final unique = ids.where((id) => id.isNotEmpty).toSet().toList();
+    return [
+      for (var i = 0; i < unique.length; i += size)
+        unique.sublist(i, i + size > unique.length ? unique.length : i + size),
+    ];
+  }
+
+  /// Junta os resultados dos blocos em ordem decrescente de [field] e fica com
+  /// os [limit] primeiros. Empate mantém a ordem de chegada (bloco, depois a
+  /// posição no bloco).
+  static List<PlayerDTO> mergeTopPlayers(List<List<PlayerDTO>> chunks, {required String field, required int limit}) {
+    final indexed = chunks.expand((chunk) => chunk).toList().asMap().entries.toList()
+      ..sort((a, b) {
+        final byValue = b.value.statOf(field).compareTo(a.value.statOf(field));
+        return byValue != 0 ? byValue : a.key.compareTo(b.key);
+      });
+    return indexed.take(limit).map((entry) => entry.value).toList();
+  }
+
   /// Cria o jogador com `idJogador` = id do documento, numa escrita só
   /// (o app antigo fazia `add()` + `set()`).
   Future<Either<Failure, void>> createPlayer(PlayerDTO player, {String? season}) async {

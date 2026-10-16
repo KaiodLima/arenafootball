@@ -9,7 +9,7 @@ import 'package:arena_soccer/features/team_requests/domain/usecases/reject_team_
 import 'package:arena_soccer/features/team_requests/domain/usecases/update_team_request_usecase.dart';
 import 'package:arena_soccer/features/team_requests/domain/usecases/watch_team_requests_usecase.dart';
 import 'package:arena_soccer/features/team_requests/presentation/bloc/team_requests_panel_state.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
 /// Painel do admin: pedidos de time em tempo real; aprovar (cria o time com
 /// o dono), rejeitar (com motivo) ou editar antes de responder.
@@ -18,7 +18,7 @@ class TeamRequestsPanelCubit extends Cubit<TeamRequestsPanelState> {
   final ApproveTeamRequestUseCase approveTeamRequestUseCase;
   final RejectTeamRequestUseCase rejectTeamRequestUseCase;
   final UpdateTeamRequestUseCase updateTeamRequestUseCase;
-  final GetTeamsUseCase getTeamsUseCase;
+  final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
   StreamSubscription<Either<Failure, List<TeamRequestDTO>>>? _subscription;
 
   TeamRequestsPanelCubit(
@@ -26,7 +26,7 @@ class TeamRequestsPanelCubit extends Cubit<TeamRequestsPanelState> {
     this.approveTeamRequestUseCase,
     this.rejectTeamRequestUseCase,
     this.updateTeamRequestUseCase,
-    this.getTeamsUseCase,
+    this.getTeamsCacheFirstUseCase,
   ) : super(const TeamRequestsPanelState());
 
   void watch() {
@@ -41,10 +41,12 @@ class TeamRequestsPanelCubit extends Cubit<TeamRequestsPanelState> {
   }
 
   /// Times da temporada atual (aviso de nome repetido). Falha só tira o aviso.
-  Future<void> _loadTeams() async {
-    final response = await getTeamsUseCase();
-    if (isClosed || response.isLeft) return;
-    emit(state.copyWith(teams: response.right));
+  /// [force]: depois de aprovar (time novo criado fora do repositório de times).
+  Future<void> _loadTeams({bool force = false}) async {
+    await for (final response in getTeamsCacheFirstUseCase(force: force)) {
+      if (isClosed) return;
+      if (response.isRight) emit(state.copyWith(teams: response.right));
+    }
   }
 
   void _setBusy(String userId, bool busy) {
@@ -62,7 +64,7 @@ class TeamRequestsPanelCubit extends Cubit<TeamRequestsPanelState> {
       (failure) => emit(ErrorTeamRequestsPanelState(state, errorMessage: failure.toString())),
       (team) {
         emit(NoticeTeamRequestsPanelState(state, notice: TeamRequestsNotice.approved, name: team.name));
-        _loadTeams();
+        _loadTeams(force: true);
       },
     );
   }

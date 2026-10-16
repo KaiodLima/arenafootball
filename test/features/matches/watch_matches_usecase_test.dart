@@ -15,7 +15,8 @@ const _matches = [
 
 class _FakeRepository implements IMatchesRepository {
   @override
-  Stream<Either<Failure, List<MatchDTO>>> watchMatches({String? season}) => Stream.value(const Right(_matches));
+  Stream<Either<Failure, List<MatchDTO>>> watchMatches({String? season, String? region}) =>
+      Stream.value(const Right(_matches));
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

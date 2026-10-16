@@ -18,6 +18,14 @@ class SeasonsConfigDTO extends Equatable {
 
   Map<String, dynamic> toMap() => {'atual': current, 'lista': seasons};
 
+  /// Cache local (ver `CacheStore`).
+  factory SeasonsConfigDTO.fromCache(Map<String, dynamic> json) => SeasonsConfigDTO(
+        current: json['current']?.toString() ?? '',
+        seasons: (json['seasons'] as List?)?.map((s) => s.toString()).toList() ?? const [],
+      );
+
+  Map<String, dynamic> toCache() => {'current': current, 'seasons': seasons};
+
   /// Próximo ano depois da atual ("2023" → "2024").
   static String nextSeason(String current) => '${(int.tryParse(current) ?? DateTime.now().year) + 1}';
 

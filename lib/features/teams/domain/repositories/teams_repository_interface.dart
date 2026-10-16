@@ -1,4 +1,5 @@
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 
@@ -26,4 +27,18 @@ abstract class ITeamsRepository {
   });
 
   Future<Either<Failure, void>> deleteTeam(TeamDTO team, {String? season});
+
+  /// Cache local dos times da [region] (nula = todas) na [season] (nula =
+  /// atual). Nunca falha: sem cache = `Right(null)`.
+  Future<Either<Failure, CachedValue<List<TeamDTO>>?>> getCachedTeams({String? region, String? season});
+
+  Future<Either<Failure, void>> saveTeamsCache(List<TeamDTO> teams, {String? region, String? season});
+
+  /// Cache local de um time pelo id (ou nome). `data` nulo = não achado.
+  Future<Either<Failure, CachedValue<TeamDTO?>?>> getCachedTeam({required String idOrName, String? season});
+
+  Future<Either<Failure, void>> saveTeamCache(TeamDTO? team, {required String idOrName, String? season});
+
+  /// Apaga todo o cache de times (listas e avulsos).
+  Future<void> deleteTeamsCache();
 }

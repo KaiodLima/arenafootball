@@ -123,6 +123,71 @@ class NewsDTO extends Equatable {
     );
   }
 
+  /// Cache local (ver `CacheStore`): data em ms; região pelo id, com o nome
+  /// atual na leitura (como no `TeamDTO`).
+  factory NewsDTO.fromCache(Map<String, dynamic> json) {
+    String text(String key) => json[key]?.toString() ?? '';
+    final date = json['date'] as num?;
+    return NewsDTO(
+      id: text('id'),
+      date: date == null ? null : DateTime.fromMillisecondsSinceEpoch(date.toInt()),
+      title: text('title'),
+      description: text('description'),
+      imageUrl: text('imageUrl'),
+      link: text('link'),
+      isVisible: json['isVisible'] == true,
+      region: RegionRegistry.nameOf(text(RegionRegistry.idField), fallback: text('region')),
+      homeTeam: text('homeTeam'),
+      awayTeam: text('awayTeam'),
+      homeGoals: text('homeGoals'),
+      awayGoals: text('awayGoals'),
+      tag: text('tag'),
+      images: (json['images'] as List?)?.map((item) => item.toString()).toList() ?? const [],
+      scorerId: text('scorerId'),
+      scorerName: text('scorerName'),
+      assistantId: text('assistantId'),
+      assistantName: text('assistantName'),
+      season: text('season'),
+      scoringTeam: text('scoringTeam'),
+      scoringTeamCrest: text('scoringTeamCrest'),
+      homeTeamId: text('homeTeamId'),
+      awayTeamId: text('awayTeamId'),
+      scoringTeamId: text('scoringTeamId'),
+      scoringTeamPrimaryColor: text('scoringTeamPrimaryColor'),
+      scoringTeamSecondaryColor: text('scoringTeamSecondaryColor'),
+    );
+  }
+
+  Map<String, dynamic> toCache() => {
+        'id': id,
+        'date': date?.millisecondsSinceEpoch,
+        'title': title,
+        'description': description,
+        'imageUrl': imageUrl,
+        'link': link,
+        'isVisible': isVisible,
+        RegionRegistry.idField: RegionRegistry.idOf(region),
+        'region': region,
+        'homeTeam': homeTeam,
+        'awayTeam': awayTeam,
+        'homeGoals': homeGoals,
+        'awayGoals': awayGoals,
+        'tag': tag,
+        'images': images,
+        'scorerId': scorerId,
+        'scorerName': scorerName,
+        'assistantId': assistantId,
+        'assistantName': assistantName,
+        'season': season,
+        'scoringTeam': scoringTeam,
+        'scoringTeamCrest': scoringTeamCrest,
+        'homeTeamId': homeTeamId,
+        'awayTeamId': awayTeamId,
+        'scoringTeamId': scoringTeamId,
+        'scoringTeamPrimaryColor': scoringTeamPrimaryColor,
+        'scoringTeamSecondaryColor': scoringTeamSecondaryColor,
+      };
+
   /// `data` fica de fora: na criação o DataSource grava o horário do
   /// servidor; na edição, o original.
   /// `images` só é gravado quando há fotos (cards de gol/anúncio nunca

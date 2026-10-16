@@ -55,6 +55,36 @@ class TeamDTO extends Equatable {
         if (secondaryColor.isNotEmpty) 'corSecundaria': secondaryColor,
       };
 
+  /// Cache local (ver `CacheStore`). Guarda o id da região ao lado do nome:
+  /// ao ler, vale o nome atual da região (renomeada depois de salvar).
+  factory TeamDTO.fromCache(Map<String, dynamic> json) {
+    return TeamDTO(
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      description: json['description']?.toString() ?? '',
+      region: RegionRegistry.nameOf(
+        json[RegionRegistry.idField]?.toString() ?? '',
+        fallback: json['region']?.toString() ?? '',
+      ),
+      imageUrl: json['imageUrl']?.toString() ?? '',
+      ownerId: json['ownerId']?.toString() ?? '',
+      primaryColor: json['primaryColor']?.toString() ?? '',
+      secondaryColor: json['secondaryColor']?.toString() ?? '',
+    );
+  }
+
+  Map<String, dynamic> toCache() => {
+        'id': id,
+        'name': name,
+        'description': description,
+        RegionRegistry.idField: RegionRegistry.idOf(region),
+        'region': region,
+        'imageUrl': imageUrl,
+        'ownerId': ownerId,
+        'primaryColor': primaryColor,
+        'secondaryColor': secondaryColor,
+      };
+
   /// Linha inicial do time na `classificacao`: os campos do time + as
   /// estatísticas zeradas e sem grupo. Inclui `saldo_gols`, que o app antigo
   /// não gravava: sem ele o time some da classificação (ordenada por esse campo).
