@@ -266,6 +266,7 @@
   "loginForgotPassword": "Forgot my password",
   "loginOr": "or",
   "loginWithGoogleButton": "SIGN IN WITH GOOGLE",
+  "loginWithAppleButton": "SIGN IN WITH APPLE",
   "loginContinueAsGuest": "Continue without an account",
   "loginShowPassword": "Show password",
   "loginHidePassword": "Hide password",

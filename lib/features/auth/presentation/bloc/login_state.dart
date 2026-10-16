@@ -24,6 +24,11 @@ class GoogleLoadingLoginState extends LoginState {
   const GoogleLoadingLoginState();
 }
 
+/// Login com Apple em andamento (spinner só no botão da Apple).
+class AppleLoadingLoginState extends LoginState {
+  const AppleLoadingLoginState();
+}
+
 class SuccessLoginState extends LoginState {
   final UserDTO user;
 

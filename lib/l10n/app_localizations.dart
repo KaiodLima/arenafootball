@@ -1696,6 +1696,12 @@ abstract class AppLocalizations {
   /// **'ENTRAR COM GOOGLE'**
   String get loginWithGoogleButton;
 
+  /// No description provided for @loginWithAppleButton.
+  ///
+  /// In pt, this message translates to:
+  /// **'ENTRAR COM APPLE'**
+  String get loginWithAppleButton;
+
   /// No description provided for @loginContinueAsGuest.
   ///
   /// In pt, this message translates to:

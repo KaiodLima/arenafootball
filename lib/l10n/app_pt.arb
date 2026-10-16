@@ -545,6 +545,7 @@
   "loginForgotPassword": "Esqueci minha senha",
   "loginOr": "ou",
   "loginWithGoogleButton": "ENTRAR COM GOOGLE",
+  "loginWithAppleButton": "ENTRAR COM APPLE",
   "loginContinueAsGuest": "Continuar sem conta",
   "loginShowPassword": "Mostrar senha",
   "loginHidePassword": "Ocultar senha",
