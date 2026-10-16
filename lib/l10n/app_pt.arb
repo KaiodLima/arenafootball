@@ -156,7 +156,7 @@
   "goalEditScorer": "Editar",
   "goalSearchPlayer": "Buscar jogador",
   "goalClear": "Limpar",
-  "goalScorerLine": "⚽ {scorer}",
+  "goalScorerLine": "{scorer}",
   "@goalScorerLine": {
     "placeholders": {
       "scorer": {
@@ -164,7 +164,7 @@
       }
     }
   },
-  "goalScorerAssistLine": "⚽ {scorer} · assist. {assistant}",
+  "goalScorerAssistLine": "{scorer} · assist. {assistant}",
   "@goalScorerAssistLine": {
     "placeholders": {
       "scorer": {
@@ -540,7 +540,7 @@
   "globalResultsPenalty": "pênalti",
   "globalResultsOwnGoal": "contra",
   "globalResultsGoalsError": "Não foi possível carregar os gols. Toque para tentar de novo.",
-  "loginWelcomeTitle": "Bem-vindo de volta 👋",
+  "loginWelcomeTitle": "Bem-vindo de volta",
   "loginWelcomeSubtitle": "Entre para acompanhar seu time, os jogos e a tabela.",
   "loginForgotPassword": "Esqueci minha senha",
   "loginOr": "ou",
@@ -582,7 +582,7 @@
   "drawerChooseTeam": "Escolher meu time",
   "drawerSignIn": "Entrar ou criar conta",
   "drawerGuestSubtitle": "Entre para salvar seu time e votar no melhor da partida.",
-  "homeGreeting": "Olá, {name} 👋",
+  "homeGreeting": "Olá, {name}",
   "@homeGreeting": {
     "placeholders": {
       "name": {
@@ -590,7 +590,7 @@
       }
     }
   },
-  "homeGreetingGuest": "Bem-vindo ao Arena 👋",
+  "homeGreetingGuest": "Bem-vindo ao Arena",
   "homeSubtitle": "Futebol amador de {region}",
   "@homeSubtitle": {
     "placeholders": {

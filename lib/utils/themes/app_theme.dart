@@ -6,6 +6,7 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 class AppTheme {
   static ThemeData get light => ThemeData(
         fontFamily: 'Roboto',
+        fontFamilyFallback: AppTypography.fontFallback,
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary, primary: AppColors.primary),
         scaffoldBackgroundColor: AppColors.background,
         appBarTheme: const AppBarTheme(

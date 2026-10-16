@@ -4,6 +4,7 @@ import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
 import 'package:arena_soccer/features/regions/presentation/widgets/region_chips.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_hero_background.dart';
+import 'package:arena_soccer/utils/components/icon_text.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_images.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
@@ -77,7 +78,12 @@ class HomeHeader extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(greeting, style: AppTypography.title(color: AppColors.white)),
+                    IconText(
+                      greeting,
+                      icon: Icons.waving_hand_rounded,
+                      iconColor: AppColors.gold,
+                      style: AppTypography.title(color: AppColors.white),
+                    ),
                     const SizedBox(height: AppSizes.s2),
                     Text(l10n.homeSubtitle(region), style: AppTypography.subtitle(color: AppColors.whiteSoft)),
                   ],

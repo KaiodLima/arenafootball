@@ -12,6 +12,7 @@ import 'package:arena_soccer/features/auth/presentation/widgets/google_logo.dart
 import 'package:arena_soccer/features/auth/presentation/widgets/or_divider.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
+import 'package:arena_soccer/utils/components/icon_text.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
@@ -96,14 +97,18 @@ class _LoginPageState extends State<LoginPage> {
     return BlocConsumer<LoginCubit, LoginState>(
       listener: (context, state) => _onStateChanged(context, state, l10n),
       builder: (context, state) {
-        final busy =
-            state is LoadingLoginState || state is GoogleLoadingLoginState || state is AppleLoadingLoginState;
+        final busy = state is LoadingLoginState || state is GoogleLoadingLoginState || state is AppleLoadingLoginState;
         return AuthScaffold(
           child: AutofillGroup(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(l10n.loginWelcomeTitle, style: AppTypography.display()),
+                IconText(
+                  l10n.loginWelcomeTitle,
+                  icon: Icons.waving_hand_rounded,
+                  iconColor: AppColors.gold,
+                  style: AppTypography.display(),
+                ),
                 const SizedBox(height: AppSizes.s6),
                 Text(l10n.loginWelcomeSubtitle, style: AppTypography.subtitle()),
                 const SizedBox(height: AppSizes.s28),

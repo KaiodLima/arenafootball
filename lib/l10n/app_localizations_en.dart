@@ -373,12 +373,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String goalScorerLine(String scorer) {
-    return '⚽ $scorer';
+    return '$scorer';
   }
 
   @override
   String goalScorerAssistLine(String scorer, String assistant) {
-    return '⚽ $scorer · assist $assistant';
+    return '$scorer · assist $assistant';
   }
 
   @override
@@ -918,7 +918,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not load the goals. Tap to try again.';
 
   @override
-  String get loginWelcomeTitle => 'Welcome back 👋';
+  String get loginWelcomeTitle => 'Welcome back';
 
   @override
   String get loginWelcomeSubtitle =>
@@ -1052,11 +1052,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String homeGreeting(String name) {
-    return 'Hi, $name 👋';
+    return 'Hi, $name';
   }
 
   @override
-  String get homeGreetingGuest => 'Welcome to Arena 👋';
+  String get homeGreetingGuest => 'Welcome to Arena';
 
   @override
   String homeSubtitle(String region) {

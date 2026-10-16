@@ -774,13 +774,13 @@ abstract class AppLocalizations {
   /// No description provided for @goalScorerLine.
   ///
   /// In pt, this message translates to:
-  /// **'⚽ {scorer}'**
+  /// **'{scorer}'**
   String goalScorerLine(String scorer);
 
   /// No description provided for @goalScorerAssistLine.
   ///
   /// In pt, this message translates to:
-  /// **'⚽ {scorer} · assist. {assistant}'**
+  /// **'{scorer} · assist. {assistant}'**
   String goalScorerAssistLine(String scorer, String assistant);
 
   /// No description provided for @goalStatsSaved.
@@ -1669,7 +1669,7 @@ abstract class AppLocalizations {
   /// No description provided for @loginWelcomeTitle.
   ///
   /// In pt, this message translates to:
-  /// **'Bem-vindo de volta 👋'**
+  /// **'Bem-vindo de volta'**
   String get loginWelcomeTitle;
 
   /// No description provided for @loginWelcomeSubtitle.
@@ -1921,13 +1921,13 @@ abstract class AppLocalizations {
   /// No description provided for @homeGreeting.
   ///
   /// In pt, this message translates to:
-  /// **'Olá, {name} 👋'**
+  /// **'Olá, {name}'**
   String homeGreeting(String name);
 
   /// No description provided for @homeGreetingGuest.
   ///
   /// In pt, this message translates to:
-  /// **'Bem-vindo ao Arena 👋'**
+  /// **'Bem-vindo ao Arena'**
   String get homeGreetingGuest;
 
   /// No description provided for @homeSubtitle.

@@ -7,8 +7,13 @@ import 'package:arena_soccer/utils/constants/app_sizes.dart';
 class AppTypography {
   static const String _headingFamily = 'Montserrat';
 
+  /// Fontes de reserva para o que a Montserrat/Roboto não têm (emoji como
+  /// 👋): sem isso, o iOS mostra um quadrado com "?".
+  static const List<String> fontFallback = ['Apple Color Emoji', 'Noto Color Emoji'];
+
   static TextStyle _heading(double size, double weight, Color color) => TextStyle(
         fontFamily: _headingFamily,
+        fontFamilyFallback: fontFallback,
         fontSize: size,
         color: color,
         fontWeight: FontWeight.w700,

@@ -20,6 +20,7 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
+import 'package:arena_soccer/utils/components/icon_text.dart';
 
 /// Publica um card de gol no feed: região, atalho com os jogos de hoje,
 /// placar com escudos e − / +, prévia ao vivo do card e confirmação antes de
@@ -123,7 +124,12 @@ class _GoalNotificationPageState extends State<GoalNotificationPage> {
           ),
           if (_scorerLine(form, l10n) != null) ...[
             const SizedBox(height: AppSizes.s8),
-            Text(_scorerLine(form, l10n)!, style: AppTypography.body()),
+            IconText(
+              _scorerLine(form, l10n)!,
+              icon: Icons.sports_soccer,
+              leading: true,
+              style: AppTypography.body(),
+            ),
           ],
         ],
       ),
@@ -366,8 +372,10 @@ class _ScorerSummary extends StatelessWidget {
           PlayerAvatar(player: scorer, size: AppSizes.s36),
           const SizedBox(width: AppSizes.s10),
           Expanded(
-            child: Text(
+            child: IconText(
               line,
+              icon: Icons.sports_soccer,
+              leading: true,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s14),
