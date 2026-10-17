@@ -993,6 +993,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chooseTeamConfirm => 'FINISH';
 
   @override
+  String get chooseTeamKeepCurrent => 'Keep my current team';
+
+  @override
   String get chooseTeamSkip => 'Skip for now';
 
   @override
@@ -2360,6 +2363,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fanCardShareTextNoTeam => 'My fan card on Arena Football! ⚽';
+
+  @override
+  String get fanCardChangeTeam => 'Change team';
+
+  @override
+  String fanCardChangeTeamNextAt(String date) {
+    return 'Next team change available from $date';
+  }
+
+  @override
+  String get teamChangeLockedTitle => 'Team change locked';
+
+  @override
+  String teamChangeLockedMessage(String date) {
+    return 'You can only change teams once every 15 days. Your next change unlocks on $date.';
+  }
+
+  @override
+  String get teamChangeLockedMessageNoDate =>
+      'You can only change teams once every 15 days. Please try again later.';
+
+  @override
+  String chooseTeamConfirmChangeTitle(String team) {
+    return 'Switch to $team?';
+  }
+
+  @override
+  String get chooseTeamConfirmChangeMessage =>
+      'After switching, your next team change unlocks in 15 days.';
+
+  @override
+  String get chooseTeamConfirmChange => 'Switch';
 
   @override
   String get shareFooter => 'Arena Football · amateur football in your region';

@@ -60,6 +60,8 @@ void main() {
       photoUrl: 'https://img/u.png',
     );
     expect(UserDTO.fromCache(_roundTrip(user.toCache())), user);
+    final changed = user.copyWith(teamChangedAt: DateTime(2026, 10, 1, 14, 30));
+    expect(UserDTO.fromCache(_roundTrip(changed.toCache())), changed);
   });
 
   test('RegionRef', () {

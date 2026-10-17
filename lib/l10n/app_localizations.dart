@@ -1810,6 +1810,12 @@ abstract class AppLocalizations {
   /// **'CONCLUIR'**
   String get chooseTeamConfirm;
 
+  /// No description provided for @chooseTeamKeepCurrent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Manter meu time atual'**
+  String get chooseTeamKeepCurrent;
+
   /// No description provided for @chooseTeamSkip.
   ///
   /// In pt, this message translates to:
@@ -4185,6 +4191,54 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Minha carteirinha de torcedor no Arena Football! ⚽'**
   String get fanCardShareTextNoTeam;
+
+  /// No description provided for @fanCardChangeTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar de time'**
+  String get fanCardChangeTeam;
+
+  /// No description provided for @fanCardChangeTeamNextAt.
+  ///
+  /// In pt, this message translates to:
+  /// **'Próxima troca de time a partir de {date}'**
+  String fanCardChangeTeamNextAt(String date);
+
+  /// No description provided for @teamChangeLockedTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Troca de time bloqueada'**
+  String get teamChangeLockedTitle;
+
+  /// No description provided for @teamChangeLockedMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você só pode trocar de time a cada 15 dias. A próxima troca fica liberada em {date}.'**
+  String teamChangeLockedMessage(String date);
+
+  /// No description provided for @teamChangeLockedMessageNoDate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você só pode trocar de time a cada 15 dias. Tente de novo mais tarde.'**
+  String get teamChangeLockedMessageNoDate;
+
+  /// No description provided for @chooseTeamConfirmChangeTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar para {team}?'**
+  String chooseTeamConfirmChangeTitle(String team);
+
+  /// No description provided for @chooseTeamConfirmChangeMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Depois de trocar, a próxima troca de time só fica liberada daqui a 15 dias.'**
+  String get chooseTeamConfirmChangeMessage;
+
+  /// No description provided for @chooseTeamConfirmChange.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar'**
+  String get chooseTeamConfirmChange;
 
   /// No description provided for @shareFooter.
   ///

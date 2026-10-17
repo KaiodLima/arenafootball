@@ -285,6 +285,7 @@
   "chooseTeamSubtitle": "Step 2 of 2 · personalize the app",
   "chooseTeamDescription": "Choose your region and the team you follow. You can change it later.",
   "chooseTeamConfirm": "FINISH",
+  "chooseTeamKeepCurrent": "Keep my current team",
   "chooseTeamSkip": "Skip for now",
   "chooseTeamLoadError": "Could not load the regions and teams.",
   "chooseTeamEmptyTeams": "No teams registered in this region.",
@@ -681,6 +682,35 @@
   "shareMoreOptions": "More options",
   "fanCardShareText": "I support {team} on Arena Football! ⚽",
   "fanCardShareTextNoTeam": "My fan card on Arena Football! ⚽",
+  "fanCardChangeTeam": "Change team",
+  "fanCardChangeTeamNextAt": "Next team change available from {date}",
+  "@fanCardChangeTeamNextAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "teamChangeLockedTitle": "Team change locked",
+  "teamChangeLockedMessage": "You can only change teams once every 15 days. Your next change unlocks on {date}.",
+  "@teamChangeLockedMessage": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "teamChangeLockedMessageNoDate": "You can only change teams once every 15 days. Please try again later.",
+  "chooseTeamConfirmChangeTitle": "Switch to {team}?",
+  "@chooseTeamConfirmChangeTitle": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseTeamConfirmChangeMessage": "After switching, your next team change unlocks in 15 days.",
+  "chooseTeamConfirmChange": "Switch",
   "shareFooter": "Arena Football · amateur football in your region",
   "athleteShareTitle": "Share athlete",
   "athleteCardLabel": "ATHLETE",

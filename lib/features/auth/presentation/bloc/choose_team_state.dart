@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 
 /// Etapa 2 do cadastro (região e time do coração). O estado base carrega as
@@ -68,14 +69,23 @@ class SavingChooseTeamState extends ChooseTeamState {
 }
 
 class SavedChooseTeamState extends ChooseTeamState {
-  const SavedChooseTeamState({required String region, required String team, required String teamId})
+  /// Hora da troca de time (nula na primeira escolha): vai para a sessão.
+  final DateTime? changedAt;
+
+  const SavedChooseTeamState({required String region, required String team, required String teamId, this.changedAt})
       : super(selectedRegion: region, selectedTeam: team, selectedTeamId: teamId);
+
+  @override
+  List<Object?> get props => [...super.props, changedAt];
 }
 
 class SaveErrorChooseTeamState extends ChooseTeamState {
   final String errorMessage;
 
-  SaveErrorChooseTeamState(ChooseTeamState from, {required this.errorMessage})
+  /// Falha original (ex.: `TeamChangeLockedFailure`, mostrada com a data).
+  final Failure? failure;
+
+  SaveErrorChooseTeamState(ChooseTeamState from, {required this.errorMessage, this.failure})
       : super(
           regions: from.regions,
           selectedRegion: from.selectedRegion,

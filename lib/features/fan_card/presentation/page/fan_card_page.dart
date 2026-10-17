@@ -6,7 +6,10 @@ import 'package:arena_soccer/core/utils/share_links.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
+import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
+import 'package:arena_soccer/features/auth/domain/team_change_policy.dart';
 import 'package:arena_soccer/features/auth/presentation/page/choose_team_page.dart';
+import 'package:arena_soccer/features/auth/presentation/widgets/team_change_notice.dart';
 import 'package:arena_soccer/features/fan_card/domain/fan_card_number.dart';
 import 'package:arena_soccer/features/fan_card/presentation/bloc/fan_card_cubit.dart';
 import 'package:arena_soccer/features/fan_card/presentation/bloc/fan_card_state.dart';
@@ -54,6 +57,16 @@ class _FanCardPageState extends State<FanCardPage> {
     final picked = await ImagePicker().pickImage(source: source, imageQuality: 85, maxWidth: 800);
     if (picked == null || !mounted) return;
     await _cubit.changePhoto(userId: userId, photo: File(picked.path));
+  }
+
+  /// Troca de time: antes do prazo de 15 dias, só o aviso com a data.
+  Future<void> _changeTeam() async {
+    final user = BlocProvider.of<SessionCubit>(context).state.user;
+    if (user == null) return;
+    if (!TeamChangePolicy.canChange(user, DateTime.now())) {
+      return showTeamChangeLocked(context, TeamChangePolicy.nextChangeAt(user));
+    }
+    await _chooseTeam();
   }
 
   Future<void> _chooseTeam() async {
@@ -165,14 +178,44 @@ class _FanCardPageState extends State<FanCardPage> {
                       isLoading: state.savingPhoto,
                       function: state.savingPhoto ? null : () => _pickPhoto(user.id),
                     ),
-                    if (!user.hasFavoriteTeam) ...[
-                      const SizedBox(height: AppSizes.s12),
-                      ArenaButton.primary(title: l10n.drawerChooseTeam, function: _chooseTeam),
-                    ],
+                    const SizedBox(height: AppSizes.s12),
+                    if (!user.hasFavoriteTeam)
+                      ArenaButton.primary(title: l10n.drawerChooseTeam, function: _chooseTeam)
+                    else
+                      _ChangeTeamButton(user: user, onTap: _changeTeam),
                   ],
                 );
               },
             ),
+    );
+  }
+}
+
+/// "Trocar de time"; travado (prazo de 15 dias), mostra a data da próxima troca.
+class _ChangeTeamButton extends StatelessWidget {
+  final UserDTO user;
+  final VoidCallback onTap;
+
+  const _ChangeTeamButton({required this.user, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final locked = !TeamChangePolicy.canChange(user, DateTime.now());
+    final nextAt = TeamChangePolicy.nextChangeAt(user);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ArenaButton.outlined(title: l10n.fanCardChangeTeam, function: onTap),
+        if (locked && nextAt != null) ...[
+          const SizedBox(height: AppSizes.s6),
+          Text(
+            l10n.fanCardChangeTeamNextAt(teamChangeDate(context, nextAt)),
+            textAlign: TextAlign.center,
+            style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+          ),
+        ],
+      ],
     );
   }
 }
@@ -187,8 +230,8 @@ class _FanCardSkeleton extends StatefulWidget {
 }
 
 class _FanCardSkeletonState extends State<_FanCardSkeleton> with SingleTickerProviderStateMixin {
-  late final AnimationController _pulse =
-      AnimationController(vsync: this, duration: const Duration(milliseconds: 900))..repeat(reverse: true);
+  late final AnimationController _pulse = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))
+    ..repeat(reverse: true);
 
   @override
   void dispose() {

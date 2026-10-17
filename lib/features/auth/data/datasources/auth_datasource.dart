@@ -262,12 +262,18 @@ class AuthDataSource {
     required String userId,
     required String team,
     required String teamId,
+    bool stampChange = false,
   }) async {
     const fallback = 'Não foi possível salvar o seu time.';
     try {
       final doc = await _findUserDoc(userId);
       if (doc == null) return Left(ErrorWithMessage(fallback, code: _userDataNotFound));
-      await doc.reference.update({'time': team, 'idTime': teamId});
+      await doc.reference.update({
+        'time': team,
+        'idTime': teamId,
+        // Troca de um time para outro: as regras exigem a hora do servidor.
+        if (stampChange) 'trocaTimeEm': FieldValue.serverTimestamp(),
+      });
       return const Right(null);
     } catch (e) {
       AppLogger.e('updateFavoriteTeam id=$userId', name: 'AuthDataSource', error: e);

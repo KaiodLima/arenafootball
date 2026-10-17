@@ -4,7 +4,10 @@ import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/choose_team_cubit.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/choose_team_state.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
+import 'package:arena_soccer/features/auth/domain/team_change_policy.dart';
 import 'package:arena_soccer/features/auth/presentation/widgets/auth_scaffold.dart';
+import 'package:arena_soccer/features/auth/presentation/widgets/team_change_notice.dart';
+import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 import 'package:arena_soccer/utils/components/team_choice_selector.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
@@ -49,6 +52,10 @@ class _ChooseTeamPageState extends State<ChooseTeamPage> {
     return args is ChooseTeamArgs && args.canGoBack;
   }
 
+  /// Já tem time (veio trocar): a saída é "manter o time atual", não "pular".
+  bool get _keepsCurrentTeam =>
+      _canGoBack && (BlocProvider.of<SessionCubit>(context).state.user?.hasFavoriteTeam ?? false);
+
   /// Sai da tela: volta à home que abriu (menu) ou abre a home (cadastro).
   void _leave() {
     if (_canGoBack) {
@@ -58,17 +65,38 @@ class _ChooseTeamPageState extends State<ChooseTeamPage> {
     }
   }
 
-  void _save() {
+  Future<void> _save() async {
     final user = BlocProvider.of<SessionCubit>(context).state.user;
     if (user == null) return _leave();
-    _cubit.save(userId: user.id);
+    final state = _cubit.state;
+    final team = state.selectedTeam!;
+    // Troca de um time para outro: avisa do prazo antes de gravar.
+    if (TeamChangePolicy.isChange(user, team: team, teamId: state.selectedTeamId)) {
+      if (!TeamChangePolicy.canChange(user, DateTime.now())) {
+        return showTeamChangeLocked(context, TeamChangePolicy.nextChangeAt(user));
+      }
+      final l10n = AppLocalizations.of(context);
+      final confirmed = await showArenaConfirm(
+        context,
+        title: l10n.chooseTeamConfirmChangeTitle(team),
+        message: l10n.chooseTeamConfirmChangeMessage,
+        confirmLabel: l10n.chooseTeamConfirmChange,
+        icon: Icons.swap_horiz_rounded,
+      );
+      if (!confirmed || !mounted) return;
+    }
+    await _cubit.save(user: user);
   }
 
   void _onSaved(SavedChooseTeamState state) {
     final session = BlocProvider.of<SessionCubit>(context);
     final user = session.state.user;
     if (user != null) {
-      session.updateUser(user.copyWith(favoriteTeam: state.selectedTeam, favoriteTeamId: state.selectedTeamId));
+      session.updateUser(user.copyWith(
+        favoriteTeam: state.selectedTeam,
+        favoriteTeamId: state.selectedTeamId,
+        teamChangedAt: state.changedAt,
+      ));
     }
     BlocProvider.of<RegionCubit>(context).selectRegion(state.selectedRegion!);
     _leave();
@@ -85,12 +113,19 @@ class _ChooseTeamPageState extends State<ChooseTeamPage> {
         listener: (context, state) {
           if (state is SavedChooseTeamState) _onSaved(state);
           if (state is SaveErrorChooseTeamState) {
-            showSnackBar(context: context, message: state.errorMessage, isSuccess: false);
+            final failure = state.failure;
+            if (failure is TeamChangeLockedFailure) {
+              showTeamChangeLocked(context, failure.nextAt);
+            } else {
+              showSnackBar(context: context, message: state.errorMessage, isSuccess: false);
+            }
           }
         },
         builder: (context, state) {
           return AuthScaffold(
             compact: true,
+            // Aberta pela carteirinha/menu: seta para voltar sem trocar nada.
+            onBack: _canGoBack && state is! SavingChooseTeamState ? _leave : null,
             title: l10n.chooseTeamTitle,
             subtitle: l10n.chooseTeamSubtitle,
             child: Column(
@@ -150,7 +185,8 @@ class _ChooseTeamPageState extends State<ChooseTeamPage> {
                 Center(
                   child: TextButton(
                     onPressed: state is SavingChooseTeamState ? null : _leave,
-                    child: Text(l10n.chooseTeamSkip, style: AppTypography.label(color: AppColors.textSecondary)),
+                    child: Text(_keepsCurrentTeam ? l10n.chooseTeamKeepCurrent : l10n.chooseTeamSkip,
+                        style: AppTypography.label(color: AppColors.textSecondary)),
                   ),
                 ),
               ],

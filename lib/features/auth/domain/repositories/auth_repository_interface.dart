@@ -25,8 +25,13 @@ abstract class IAuthRepository {
     required String password,
   });
 
-  Future<Either<Failure, void>> updateFavoriteTeam(
-      {required String userId, required String team, required String teamId});
+  /// [stampChange]: troca de um time para outro (grava `trocaTimeEm`).
+  Future<Either<Failure, void>> updateFavoriteTeam({
+    required String userId,
+    required String team,
+    required String teamId,
+    bool stampChange = false,
+  });
 
   Future<Either<Failure, void>> signOut();
 

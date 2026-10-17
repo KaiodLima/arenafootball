@@ -91,7 +91,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 
 | Coleção | Campos principais |
 |---------|-------------------|
-| `usuarios` | idUsuario, nome, email, time (nome, cópia), idTime (time do coração), admin (bool), urlImagem (opcional: foto da carteirinha; conta Google usa a foto do Google até trocar; conta Apple não tem foto). Contas antigas têm `senha` em texto puro — não gravar mais |
+| `usuarios` | idUsuario, nome, email, time (nome, cópia), idTime (time do coração), admin (bool), urlImagem (opcional: foto da carteirinha; conta Google usa a foto do Google até trocar; conta Apple não tem foto), trocaTimeEm (opcional: hora do servidor da última troca de time; a 1ª escolha não grava; 1 troca a cada 15 dias, `TeamChangePolicy` + regras). Contas antigas têm `senha` em texto puro — não gravar mais |
 | `noticias` | id, data (Timestamp), titulo, descricao, urlImagem, link, exibir ("true"/"false" **string**), fk_competicao, time_casa, time_fora, gol_time_casa, gol_time_fora, tag ("gol", "publicidade", título de destaque...), images[]. Cards de gol, opcionais: autor_gol_id, autor_gol, assistencia_id, assistencia (id/nome em `jogadores{ano}`), temporada, time_marcador, escudo_marcador (URL), id_time_casa, id_time_fora, id_time_marcador, cor_marcador, cor_marcador_secundaria (hex do time que marcou: fundo do card) |
 | `destaques` | id, title, link, urlImagem, exibir (string), priority |
 | `competicao` | nome (as "regiões": Floresta, Santo inacio...). O **id do doc** é o vínculo: os docs de conteúdo e os pedidos gravam `idRegiao` ao lado do nome (`fk_competicao`/`regiao`, só cópia). Renomear = trocar só o `nome` |
@@ -150,6 +150,7 @@ firebase deploy --only "firestore:rules,firestore:indexes,storage"
 ```
 
 - Leitura pública do conteúdo (inclui o modo convidado); `usuarios` só pelo dono ou admin.
+- `usuarios`: trocar de um time do coração para outro exige `trocaTimeEm` = `request.time` e 15 dias desde a troca anterior; a primeira escolha é livre.
 - Escrita de conteúdo só do admin (`usuarios/{uid}.admin == true`); o usuário não consegue gravar `admin` no próprio perfil.
 - Votos (`melhorjogador*`): cada usuário logado grava só o doc com o próprio uid.
 - `solicitacoes_jogador` / `solicitacoes_time`: o dono cria/corrige/reenvia o próprio pedido sempre como `pendente` (campos limitados), nunca se aprova; o admin lê e responde.

@@ -18,6 +18,10 @@ class UserDTO extends Equatable {
   /// `urlImagem`: foto da conta (carteirinha de torcedor); vazio = sem foto.
   final String photoUrl;
 
+  /// `trocaTimeEm`: última troca de time do coração (a primeira escolha não
+  /// conta); nulo = pode trocar. Ver `TeamChangePolicy`.
+  final DateTime? teamChangedAt;
+
   const UserDTO({
     required this.id,
     required this.name,
@@ -26,6 +30,7 @@ class UserDTO extends Equatable {
     this.favoriteTeamId = '',
     this.isAdmin = false,
     this.photoUrl = '',
+    this.teamChangedAt,
   });
 
   factory UserDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -38,6 +43,7 @@ class UserDTO extends Equatable {
       favoriteTeamId: data['idTime']?.toString() ?? '',
       isAdmin: data['admin'] == true,
       photoUrl: data['urlImagem']?.toString() ?? '',
+      teamChangedAt: (data['trocaTimeEm'] as Timestamp?)?.toDate(),
     );
   }
 
@@ -63,6 +69,8 @@ class UserDTO extends Equatable {
       favoriteTeamId: json['favoriteTeamId']?.toString() ?? '',
       isAdmin: json['isAdmin'] == true,
       photoUrl: json['photoUrl']?.toString() ?? '',
+      teamChangedAt:
+          json['teamChangedAt'] is int ? DateTime.fromMillisecondsSinceEpoch(json['teamChangedAt'] as int) : null,
     );
   }
 
@@ -74,6 +82,7 @@ class UserDTO extends Equatable {
         'favoriteTeamId': favoriteTeamId,
         'isAdmin': isAdmin,
         'photoUrl': photoUrl,
+        if (teamChangedAt != null) 'teamChangedAt': teamChangedAt!.millisecondsSinceEpoch,
       };
 
   /// Contas antigas e quem pulou a etapa 2 do cadastro ficam com `time` vazio.
@@ -83,7 +92,13 @@ class UserDTO extends Equatable {
   bool isFavorite({String id = '', String name = ''}) =>
       hasFavoriteTeam && sameTeam(idA: favoriteTeamId, nameA: favoriteTeam, idB: id, nameB: name);
 
-  UserDTO copyWith({String? name, String? email, String? favoriteTeam, String? favoriteTeamId, String? photoUrl}) {
+  UserDTO copyWith(
+      {String? name,
+      String? email,
+      String? favoriteTeam,
+      String? favoriteTeamId,
+      String? photoUrl,
+      DateTime? teamChangedAt}) {
     return UserDTO(
       id: id,
       name: name ?? this.name,
@@ -92,9 +107,10 @@ class UserDTO extends Equatable {
       favoriteTeamId: favoriteTeamId ?? this.favoriteTeamId,
       isAdmin: isAdmin,
       photoUrl: photoUrl ?? this.photoUrl,
+      teamChangedAt: teamChangedAt ?? this.teamChangedAt,
     );
   }
 
   @override
-  List<Object?> get props => [id, name, email, favoriteTeam, favoriteTeamId, isAdmin, photoUrl];
+  List<Object?> get props => [id, name, email, favoriteTeam, favoriteTeamId, isAdmin, photoUrl, teamChangedAt];
 }

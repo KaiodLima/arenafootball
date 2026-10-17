@@ -1001,6 +1001,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get chooseTeamConfirm => 'CONCLUIR';
 
   @override
+  String get chooseTeamKeepCurrent => 'Manter meu time atual';
+
+  @override
   String get chooseTeamSkip => 'Pular por agora';
 
   @override
@@ -2382,6 +2385,38 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get fanCardShareTextNoTeam =>
       'Minha carteirinha de torcedor no Arena Football! ⚽';
+
+  @override
+  String get fanCardChangeTeam => 'Trocar de time';
+
+  @override
+  String fanCardChangeTeamNextAt(String date) {
+    return 'Próxima troca de time a partir de $date';
+  }
+
+  @override
+  String get teamChangeLockedTitle => 'Troca de time bloqueada';
+
+  @override
+  String teamChangeLockedMessage(String date) {
+    return 'Você só pode trocar de time a cada 15 dias. A próxima troca fica liberada em $date.';
+  }
+
+  @override
+  String get teamChangeLockedMessageNoDate =>
+      'Você só pode trocar de time a cada 15 dias. Tente de novo mais tarde.';
+
+  @override
+  String chooseTeamConfirmChangeTitle(String team) {
+    return 'Trocar para $team?';
+  }
+
+  @override
+  String get chooseTeamConfirmChangeMessage =>
+      'Depois de trocar, a próxima troca de time só fica liberada daqui a 15 dias.';
+
+  @override
+  String get chooseTeamConfirmChange => 'Trocar';
 
   @override
   String get shareFooter => 'Arena Football · o futebol amador da sua região';

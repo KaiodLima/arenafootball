@@ -48,13 +48,37 @@ service cloud.firestore {
         return signedIn() && (userId == request.auth.uid || resource.data.idUsuario == request.auth.uid);
       }
 
+      // Troca do time do coração (sai de um time para outro): pelo id e, em
+      // doc antigo sem id, pelo nome. A primeira escolha não é troca.
+      function teamSwitch() {
+        let oldId = resource.data.get('idTime', '');
+        let oldName = resource.data.get('time', '');
+        return (oldId != '' && request.resource.data.get('idTime', '') != oldId)
+          || (oldId == '' && oldName != '' && request.resource.data.get('time', '') != oldName);
+      }
+      // `trocaTimeEm` só pode ser a hora do servidor (nunca uma data inventada).
+      function honestStamp() {
+        return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['trocaTimeEm'])
+          || request.resource.data.trocaTimeEm == request.time;
+      }
+      // Uma troca a cada 15 dias, carimbada em `trocaTimeEm`.
+      function teamSwitchAllowed() {
+        return !teamSwitch()
+          || (request.resource.data.get('trocaTimeEm', null) == request.time
+            && (resource.data.get('trocaTimeEm', null) == null
+              || request.time >= resource.data.trocaTimeEm + duration.value(15, 'd')));
+      }
+
       allow read: if isOwner() || isAdmin();
       allow create: if signedIn()
         && userId == request.auth.uid
         && request.resource.data.idUsuario == request.auth.uid
-        && request.resource.data.admin == false;
+        && request.resource.data.admin == false
+        && !('trocaTimeEm' in request.resource.data);
       allow update: if isOwner()
-        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin', 'idUsuario']);
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin', 'idUsuario'])
+        && honestStamp()
+        && teamSwitchAllowed();
       allow delete: if isOwner();
     }
 

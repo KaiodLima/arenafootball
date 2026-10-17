@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/update_favorite_team_usecase.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/choose_team_state.dart';
 import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
@@ -104,21 +105,22 @@ class ChooseTeamCubit extends Cubit<ChooseTeamState> {
     );
   }
 
-  Future<void> save({required String userId}) async {
+  Future<void> save({required UserDTO user}) async {
     if (!state.canSave || state is SavingChooseTeamState) return;
     final current = state;
     emit(SavingChooseTeamState(current));
     final response = await updateFavoriteTeamUseCase(
-      userId: userId,
+      user: user,
       team: current.selectedTeam!,
       teamId: current.selectedTeamId,
     );
     response.fold(
-      (failure) => emit(SaveErrorChooseTeamState(current, errorMessage: failure.toString())),
-      (_) => emit(SavedChooseTeamState(
+      (failure) => emit(SaveErrorChooseTeamState(current, errorMessage: failure.toString(), failure: failure)),
+      (changedAt) => emit(SavedChooseTeamState(
         region: current.selectedRegion!,
         team: current.selectedTeam!,
         teamId: current.selectedTeamId,
+        changedAt: changedAt,
       )),
     );
   }

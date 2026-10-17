@@ -564,6 +564,7 @@
   "chooseTeamSubtitle": "Etapa 2 de 2 · personalize o app",
   "chooseTeamDescription": "Escolha sua região e o time que você acompanha. Dá para mudar depois.",
   "chooseTeamConfirm": "CONCLUIR",
+  "chooseTeamKeepCurrent": "Manter meu time atual",
   "chooseTeamSkip": "Pular por agora",
   "chooseTeamLoadError": "Não foi possível carregar as regiões e os times.",
   "chooseTeamEmptyTeams": "Nenhum time cadastrado nesta região.",
@@ -1426,6 +1427,35 @@
     }
   },
   "fanCardShareTextNoTeam": "Minha carteirinha de torcedor no Arena Football! ⚽",
+  "fanCardChangeTeam": "Trocar de time",
+  "fanCardChangeTeamNextAt": "Próxima troca de time a partir de {date}",
+  "@fanCardChangeTeamNextAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "teamChangeLockedTitle": "Troca de time bloqueada",
+  "teamChangeLockedMessage": "Você só pode trocar de time a cada 15 dias. A próxima troca fica liberada em {date}.",
+  "@teamChangeLockedMessage": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "teamChangeLockedMessageNoDate": "Você só pode trocar de time a cada 15 dias. Tente de novo mais tarde.",
+  "chooseTeamConfirmChangeTitle": "Trocar para {team}?",
+  "@chooseTeamConfirmChangeTitle": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseTeamConfirmChangeMessage": "Depois de trocar, a próxima troca de time só fica liberada daqui a 15 dias.",
+  "chooseTeamConfirmChange": "Trocar",
   "shareFooter": "Arena Football · o futebol amador da sua região",
   "athleteShareTitle": "Compartilhar atleta",
   "athleteCardLabel": "ATLETA",
