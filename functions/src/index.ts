@@ -41,6 +41,7 @@ import {
   votingMessage,
 } from './messages';
 import { isLegacyVoteCollection, seasonCollections, seasonsToSweep, userPhotoPath } from './account_cleanup';
+import { claimReconcilePlan, needsClaimReconcile } from './claim_reconcile';
 import {
   APP_PAGE,
   NOT_FOUND_PAGE,
@@ -177,6 +178,7 @@ export const onPlayerRequestWritten = onDocumentWritten('solicitacoes_jogador/{u
   const before = event.data?.before.data();
   const after = event.data?.after.data();
   const origem = `solicitacoes_jogador/${uid}`;
+  if (after && needsClaimReconcile(after)) await reconcileClaim(uid, after);
   const toAdmins = playerRequestMessage(uid, before, after);
   if (toAdmins) await deliver(`solicitacao_${event.id}`, toAdmins, origem);
   const toUser = playerRequestAnswerMessage(uid, before, after);
@@ -199,6 +201,47 @@ export const onPlayerRequestWritten = onDocumentWritten('solicitacoes_jogador/{u
     if (toOwner) await deliver(`dono_${event.id}`, toOwner, origem);
   }
 });
+
+/**
+ * Vínculo aprovado por app antigo (criou um atleta novo em vez de ligar a
+ * conta ao reivindicado): liga a conta ao reivindicado, soma os números do
+ * criado, apaga o criado e aponta o pedido e os cards de gol para o
+ * reivindicado. Idempotente: depois disso o pedido já não precisa.
+ */
+async function reconcileClaim(uid: string, request: Record<string, unknown>): Promise<void> {
+  const { db } = await admin();
+  const season = typeof request.temporada === 'string' ? request.temporada : '';
+  const players = db.collection(seasonCollection('jogadores', season));
+  const claimedRef = players.doc(String(request.idJogadorVinculo));
+  const createdId = String(request.idJogador);
+  const createdRef = players.doc(createdId);
+  const requestRef = db.collection('solicitacoes_jogador').doc(uid);
+
+  const plan = await db.runTransaction(async (tx) => {
+    const [claimed, created, current] = await Promise.all([tx.get(claimedRef), tx.get(createdRef), tx.get(requestRef)]);
+    // Outra execução já resolveu (ou o pedido mudou): nada a fazer.
+    const fresh = current.data();
+    if (!fresh || !needsClaimReconcile(fresh)) return null;
+    const result = claimReconcilePlan(uid, fresh, claimed.data(), created.data());
+    if (!result) return null;
+    tx.update(claimedRef, result.claimedUpdate);
+    if (result.deleteCreated) tx.delete(createdRef);
+    tx.update(requestRef, { idJogador: result.requestPlayerId });
+    return result;
+  });
+  if (!plan) {
+    logger.warn('vínculo não reconciliado', { uid, claimed: request.idJogadorVinculo, created: createdId });
+    return;
+  }
+
+  // Cards de gol lançados para o atleta criado passam para o reivindicado.
+  const news = db.collection('noticias');
+  for (const field of ['autor_gol_id', 'assistencia_id']) {
+    const cards = await news.where(field, '==', createdId).get();
+    await Promise.all(cards.docs.map((doc) => doc.ref.update({ [field]: plan.requestPlayerId })));
+  }
+  logger.info('vínculo reconciliado', { uid, player: plan.requestPlayerId, removed: createdId });
+}
 
 /** Pedido "Sou dono de time": novo/reenviado avisa os admins; resposta avisa quem pediu. */
 export const onTeamRequestWritten = onDocumentWritten('solicitacoes_time/{uid}', async (event) => {

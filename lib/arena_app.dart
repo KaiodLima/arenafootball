@@ -242,7 +242,7 @@ class ArenaApp extends StatelessWidget {
           );
         },
         AppRoutes.playerRequestPage: (_) => BlocProvider<PlayerRequestCubit>(
-              create: (_) => PlayerRequestCubit(sl(), sl(), sl(), sl(), sl()),
+              create: (_) => PlayerRequestCubit(sl(), sl(), sl(), sl(), sl(), sl()),
               child: const PlayerRequestPage(),
             ),
         AppRoutes.playerRequestsPanelPage: (_) => BlocProvider<PlayerRequestsPanelCubit>(

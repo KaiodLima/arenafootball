@@ -2854,6 +2854,72 @@ abstract class AppLocalizations {
   /// **'Sou jogador'**
   String get playerRequestTitle;
 
+  /// No description provided for @playerRequestClaimTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Já está no elenco?'**
+  String get playerRequestClaimTitle;
+
+  /// No description provided for @playerRequestClaimHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Estes atletas do time ainda não têm conta. Se um deles é você, toque nele para pedir o vínculo e ficar com os seus números.'**
+  String get playerRequestClaimHint;
+
+  /// No description provided for @playerRequestClaimNotListed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não está na lista? Preencha abaixo como jogador novo.'**
+  String get playerRequestClaimNotListed;
+
+  /// No description provided for @playerRequestClaimSelected.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você vai pedir o vínculo com o atleta {name}.'**
+  String playerRequestClaimSelected(String name);
+
+  /// No description provided for @playerRequestClaimStatus.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedido de vínculo com o atleta {name}'**
+  String playerRequestClaimStatus(String name);
+
+  /// No description provided for @playerRequestsClaimBadge.
+  ///
+  /// In pt, this message translates to:
+  /// **'Diz ser o atleta {name} · {goals} gols'**
+  String playerRequestsClaimBadge(String name, int goals);
+
+  /// No description provided for @playerRequestsApproveClaimMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'A conta será ligada ao atleta {name}, que mantém os gols e as assistências.'**
+  String playerRequestsApproveClaimMessage(String name);
+
+  /// No description provided for @playerRequestClaimPlaceholder.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sou um destes atletas (opcional)'**
+  String get playerRequestClaimPlaceholder;
+
+  /// No description provided for @playerRequestClaimSearch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Buscar pelo nome'**
+  String get playerRequestClaimSearch;
+
+  /// No description provided for @playerRequestClaimNoResults.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum atleta com esse nome'**
+  String get playerRequestClaimNoResults;
+
+  /// No description provided for @playerRequestClaimGoals.
+  ///
+  /// In pt, this message translates to:
+  /// **'{goals} gols'**
+  String playerRequestClaimGoals(int goals);
+
   /// No description provided for @playerRequestIntro.
   ///
   /// In pt, this message translates to:
@@ -3033,6 +3099,12 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Lateral'**
   String get playerPositionFullBack;
+
+  /// No description provided for @playerPositionDefensiveMidfielder.
+  ///
+  /// In pt, this message translates to:
+  /// **'Volante'**
+  String get playerPositionDefensiveMidfielder;
 
   /// No description provided for @playerPositionMidfielder.
   ///

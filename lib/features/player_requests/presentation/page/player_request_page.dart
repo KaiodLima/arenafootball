@@ -5,7 +5,9 @@ import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart'
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
 import 'package:arena_soccer/features/player_requests/presentation/bloc/player_request_cubit.dart';
 import 'package:arena_soccer/features/player_requests/presentation/bloc/player_request_state.dart';
+import 'package:arena_soccer/features/player_requests/presentation/widgets/player_claim_selector.dart';
 import 'package:arena_soccer/features/player_requests/presentation/widgets/player_request_labels.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/presentation/player_navigation.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
@@ -114,7 +116,9 @@ class _PlayerRequestPageState extends State<PlayerRequestPage> {
           current is SubmittedPlayerRequestState ||
           current is CancelledPlayerRequestState ||
           current is ErrorPlayerRequestState ||
-          previous.editing != current.editing,
+          previous.editing != current.editing ||
+          // Marcar/desmarcar o "sou eu" troca o nome: o campo acompanha.
+          previous.form.claimedPlayer != current.form.claimedPlayer,
       listener: (context, state) {
         if (state is SubmittedPlayerRequestState) {
           setState(() => _showErrors = false);
@@ -124,7 +128,7 @@ class _PlayerRequestPageState extends State<PlayerRequestPage> {
         if (state is ErrorPlayerRequestState) {
           showSnackBar(context: context, message: state.errorMessage, isSuccess: false);
         }
-        if (state.editing) _syncControllers(state.form);
+        _syncControllers(state.form);
       },
       builder: (context, state) {
         final submitting = state is SubmittingPlayerRequestState;
@@ -208,6 +212,15 @@ class _PlayerRequestPageState extends State<PlayerRequestPage> {
           onSelected: (team) => _cubit.selectTeam(team.name),
         ),
         if (error == PlayerRequestFormError.team) _ErrorText(l10n.playerRequestTeamRequired),
+        if (form.selectedTeam != null && (form.loadingPlayers || form.unlinkedPlayers.isNotEmpty)) ...[
+          const SizedBox(height: AppSizes.s20),
+          _ClaimSection(
+            players: form.unlinkedPlayers,
+            loading: form.loadingPlayers,
+            claimed: form.claimedPlayer,
+            onSelected: _cubit.claimPlayer,
+          ),
+        ],
         const SizedBox(height: AppSizes.s20),
         Center(
           child: CirclePhotoPicker(
@@ -229,12 +242,14 @@ class _PlayerRequestPageState extends State<PlayerRequestPage> {
               TextField(
                 controller: _nameController,
                 onChanged: _cubit.changeName,
+                // Vínculo: o nome é o do atleta já cadastrado.
+                readOnly: form.isClaim,
                 maxLength: PlayerRequestForm.nameMaxLength,
                 textCapitalization: TextCapitalization.words,
                 style: AppTypography.body().copyWith(fontWeight: FontWeight.w600),
                 decoration: arenaInputDecoration(
                   label: l10n.playerRequestNameLabel,
-                  icon: Icons.person_outline_rounded,
+                  icon: form.isClaim ? Icons.lock_outline_rounded : Icons.person_outline_rounded,
                   errorText: error == PlayerRequestFormError.name ? l10n.playersNameRequired : null,
                 ),
               ),
@@ -279,6 +294,45 @@ class _PlayerRequestPageState extends State<PlayerRequestPage> {
             ),
           ),
       ],
+    );
+  }
+}
+
+/// "Já está no elenco?": seletor dos atletas do time sem conta ("sou eu").
+class _ClaimSection extends StatelessWidget {
+  final List<PlayerDTO> players;
+  final bool loading;
+  final PlayerDTO? claimed;
+  final ValueChanged<PlayerDTO?> onSelected;
+
+  const _ClaimSection({
+    required this.players,
+    required this.loading,
+    required this.claimed,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return FormSection(
+      title: l10n.playerRequestClaimTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(l10n.playerRequestClaimHint, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+          const SizedBox(height: AppSizes.s12),
+          PlayerClaimSelector(players: players, selected: claimed, loading: loading, onSelected: onSelected),
+          if (!loading) ...[
+            const SizedBox(height: AppSizes.s8),
+            Text(
+              claimed == null ? l10n.playerRequestClaimNotListed : l10n.playerRequestClaimSelected(claimed!.name),
+              style: AppTypography.subtitle(color: claimed == null ? AppColors.textSecondary : AppColors.primaryDark)
+                  .copyWith(fontSize: AppSizes.s12),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }
@@ -353,6 +407,10 @@ class _StatusView extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: AppTypography.subtitle(),
               ),
+              if (request.isClaim && request.status == PlayerRequestStatus.pending) ...[
+                const SizedBox(height: AppSizes.s8),
+                _ClaimBadge(text: l10n.playerRequestClaimStatus(request.name)),
+              ],
               if (sentOn.isNotEmpty) ...[
                 const SizedBox(height: AppSizes.s4),
                 Text(
@@ -430,6 +488,35 @@ class _LoadError extends StatelessWidget {
         ArenaEmptyState.error(message: l10n.playerRequestLoadError),
         TextButton(onPressed: onRetry, child: Text(l10n.commonTryAgain)),
       ],
+    );
+  }
+}
+
+/// Selo "pedido de vínculo com o atleta X" na tela de status.
+class _ClaimBadge extends StatelessWidget {
+  final String text;
+
+  const _ClaimBadge({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.s12, vertical: AppSizes.s6),
+      decoration: BoxDecoration(color: AppColors.primarySoft, borderRadius: BorderRadius.circular(AppSizes.s12)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.link_rounded, size: AppSizes.s16, color: AppColors.primaryDark),
+          const SizedBox(width: AppSizes.s6),
+          Flexible(
+            child: Text(
+              text,
+              textAlign: TextAlign.center,
+              style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s12),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

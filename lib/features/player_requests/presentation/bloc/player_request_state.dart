@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 
 /// Primeiro campo inválido do formulário (traduzido na página).
@@ -32,6 +33,13 @@ class PlayerRequestForm extends Equatable {
   /// Foto que já estava no pedido (mantida se não trocar).
   final String imageUrl;
 
+  /// Atletas do time escolhido ainda sem conta (para o "sou eu").
+  final List<PlayerDTO> unlinkedPlayers;
+  final bool loadingPlayers;
+
+  /// Atleta que o usuário diz ser (pedido de vínculo); nulo = jogador novo.
+  final PlayerDTO? claimedPlayer;
+
   const PlayerRequestForm({
     this.regions = const [],
     this.selectedRegion,
@@ -43,11 +51,17 @@ class PlayerRequestForm extends Equatable {
     this.message = '',
     this.photo,
     this.imageUrl = '',
+    this.unlinkedPlayers = const [],
+    this.loadingPlayers = false,
+    this.claimedPlayer,
   });
+
+  bool get isClaim => claimedPlayer != null;
 
   PlayerRequestFormError? get error {
     if (selectedTeam == null) return PlayerRequestFormError.team;
-    if (name.trim().length < nameMinLength) return PlayerRequestFormError.name;
+    // Vínculo: o nome é o do atleta.
+    if (!isClaim && name.trim().length < nameMinLength) return PlayerRequestFormError.name;
     if (position == null) return PlayerRequestFormError.position;
     return null;
   }
@@ -70,6 +84,9 @@ class PlayerRequestForm extends Equatable {
     String? message,
     File? Function()? photo,
     String? imageUrl,
+    List<PlayerDTO>? unlinkedPlayers,
+    bool? loadingPlayers,
+    PlayerDTO? Function()? claimedPlayer,
   }) {
     return PlayerRequestForm(
       regions: regions ?? this.regions,
@@ -82,12 +99,28 @@ class PlayerRequestForm extends Equatable {
       message: message ?? this.message,
       photo: photo != null ? photo() : this.photo,
       imageUrl: imageUrl ?? this.imageUrl,
+      unlinkedPlayers: unlinkedPlayers ?? this.unlinkedPlayers,
+      loadingPlayers: loadingPlayers ?? this.loadingPlayers,
+      claimedPlayer: claimedPlayer != null ? claimedPlayer() : this.claimedPlayer,
     );
   }
 
   @override
-  List<Object?> get props =>
-      [regions, selectedRegion, teams, loadingTeams, selectedTeam, name, position, message, photo, imageUrl];
+  List<Object?> get props => [
+        regions,
+        selectedRegion,
+        teams,
+        loadingTeams,
+        selectedTeam,
+        name,
+        position,
+        message,
+        photo,
+        imageUrl,
+        unlinkedPlayers,
+        loadingPlayers,
+        claimedPlayer,
+      ];
 }
 
 /// Tela "Sou jogador". O estado base carrega o pedido atual (ou nulo), o

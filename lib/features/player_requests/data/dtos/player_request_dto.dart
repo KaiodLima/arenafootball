@@ -28,6 +28,7 @@ enum PlayerPosition {
   goalkeeper('goleiro'),
   defender('zagueiro'),
   fullBack('lateral'),
+  defensiveMidfielder('volante'),
   midfielder('meia'),
   forward('atacante');
 
@@ -71,6 +72,10 @@ class PlayerRequestDTO extends Equatable {
 
   /// Jogador criado na aprovação.
   final String playerId;
+
+  /// `idJogadorVinculo`: atleta já cadastrado (sem conta) que o usuário diz
+  /// ser; vazio = pedido de jogador novo. Aprovado, a conta é ligada a ele.
+  final String claimedPlayerId;
   final DateTime? createdAt;
 
   const PlayerRequestDTO({
@@ -88,10 +93,14 @@ class PlayerRequestDTO extends Equatable {
     this.status = PlayerRequestStatus.pending,
     this.reason = '',
     this.playerId = '',
+    this.claimedPlayerId = '',
     this.createdAt,
   });
 
   bool get isPending => status == PlayerRequestStatus.pending;
+
+  /// Pedido de vínculo com um atleta já cadastrado.
+  bool get isClaim => claimedPlayerId.isNotEmpty;
 
   factory PlayerRequestDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? const {};
@@ -111,6 +120,7 @@ class PlayerRequestDTO extends Equatable {
       status: PlayerRequestStatus.fromKey(text('status')),
       reason: text('motivo'),
       playerId: text('idJogador'),
+      claimedPlayerId: text('idJogadorVinculo'),
       // Escrita local ainda sem o horário do servidor: fica nulo até confirmar.
       createdAt: (data['data'] as Timestamp?)?.toDate(),
     );
@@ -130,6 +140,7 @@ class PlayerRequestDTO extends Equatable {
         'mensagem': message,
         'urlImagem': imageUrl,
         'status': PlayerRequestStatus.pending.key,
+        if (claimedPlayerId.isNotEmpty) 'idJogadorVinculo': claimedPlayerId,
       };
 
   PlayerRequestDTO copyWith({
@@ -144,6 +155,7 @@ class PlayerRequestDTO extends Equatable {
     PlayerRequestStatus? status,
     String? reason,
     String? playerId,
+    String? claimedPlayerId,
   }) {
     return PlayerRequestDTO(
       userId: userId,
@@ -160,6 +172,7 @@ class PlayerRequestDTO extends Equatable {
       status: status ?? this.status,
       reason: reason ?? this.reason,
       playerId: playerId ?? this.playerId,
+      claimedPlayerId: claimedPlayerId ?? this.claimedPlayerId,
       createdAt: createdAt,
     );
   }
@@ -180,6 +193,7 @@ class PlayerRequestDTO extends Equatable {
         status,
         reason,
         playerId,
+        claimedPlayerId,
         createdAt,
       ];
 }

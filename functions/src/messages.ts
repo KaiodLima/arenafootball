@@ -282,10 +282,15 @@ export function playerRequestMessage(uid: string, before: Doc | undefined, after
   const name = text(after.nome);
   const team = text(after.time);
   if (!name || !team || !uid) return null;
+  // Pedido de vínculo com atleta já cadastrado: `nome` é o do atleta.
+  const account = text(after.nome_usuario);
+  const body = text(after.idJogadorVinculo)
+    ? `${account || 'Um usuário'} diz ser o atleta ${name} do ${team}`
+    : `${name} quer jogar no ${team}`;
   return {
     tipo: 'solicitacao_jogador',
     titulo: 'Nova solicitação de jogador',
-    corpo: shorten(`${name} quer jogar no ${team}`, 240),
+    corpo: shorten(body, 240),
     aba: 'solicitacoes',
     regiao: text(after.regiao),
     alvo: { topic: ADMINS_TOPIC },

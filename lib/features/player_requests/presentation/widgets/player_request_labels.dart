@@ -10,6 +10,7 @@ String playerPositionLabel(AppLocalizations l10n, PlayerPosition position) => sw
       PlayerPosition.goalkeeper => l10n.playerPositionGoalkeeper,
       PlayerPosition.defender => l10n.playerPositionDefender,
       PlayerPosition.fullBack => l10n.playerPositionFullBack,
+      PlayerPosition.defensiveMidfielder => l10n.playerPositionDefensiveMidfielder,
       PlayerPosition.midfielder => l10n.playerPositionMidfielder,
       PlayerPosition.forward => l10n.playerPositionForward,
     };

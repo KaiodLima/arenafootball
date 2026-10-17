@@ -39,6 +39,8 @@ class PlayerRequestsPanelState extends Equatable {
   /// Jogador do mesmo time com o mesmo nome (sem acento/caixa), que não seja
   /// o próprio usuário do pedido.
   PlayerDTO? duplicateOf(PlayerRequestDTO request) {
+    // Pedido de vínculo: o "duplicado" é o próprio atleta reivindicado.
+    if (request.isClaim) return null;
     final key = foldForSearch(request.name.trim());
     if (key.isEmpty) return null;
     for (final player in players) {

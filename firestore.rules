@@ -157,7 +157,9 @@ service cloud.firestore {
         return data.uid == request.auth.uid
           && data.status == 'pendente'
           && data.keys().hasOnly(['uid', 'nome_usuario', 'email', 'nome', 'time', 'idTime', 'regiao', 'idRegiao', 'temporada',
-            'posicao', 'mensagem', 'urlImagem', 'status', 'data', 'atualizado_em'])
+            'posicao', 'mensagem', 'urlImagem', 'status', 'data', 'atualizado_em', 'idJogadorVinculo'])
+          // Pedido de vínculo: id do atleta (sem conta) que o usuário diz ser.
+          && (!('idJogadorVinculo' in data) || (data.idJogadorVinculo is string && data.idJogadorVinculo.size() <= 64))
           && data.nome is string && data.nome.size() >= 3 && data.nome.size() <= 40
           && data.time is string && data.time.size() > 0
           && data.mensagem is string && data.mensagem.size() <= 200;

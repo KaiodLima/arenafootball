@@ -10,6 +10,8 @@ import 'package:arena_soccer/features/player_requests/domain/usecases/cancel_pla
 import 'package:arena_soccer/features/player_requests/domain/usecases/submit_player_request_usecase.dart';
 import 'package:arena_soccer/features/player_requests/domain/usecases/watch_my_player_request_usecase.dart';
 import 'package:arena_soccer/features/player_requests/presentation/bloc/player_request_state.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
+import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
 import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
@@ -21,6 +23,7 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
   final CancelPlayerRequestUseCase cancelPlayerRequestUseCase;
   final GetRegionsUseCase getRegionsUseCase;
   final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
+  final WatchTeamPlayersUseCase watchTeamPlayersUseCase;
 
   StreamSubscription<Either<Failure, PlayerRequestDTO?>>? _subscription;
   late String _userId;
@@ -34,6 +37,7 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
     this.cancelPlayerRequestUseCase,
     this.getRegionsUseCase,
     this.getTeamsCacheFirstUseCase,
+    this.watchTeamPlayersUseCase,
   ) : super(const LoadingPlayerRequestState());
 
   Future<void> start({
@@ -95,6 +99,8 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
     return form.copyWith(
       selectedRegion: request.region.isEmpty ? null : request.region,
       selectedTeam: () => request.team,
+      claimedPlayer: () => null,
+      unlinkedPlayers: const [],
       name: request.name,
       position: request.position,
       message: request.message,
@@ -136,6 +142,9 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
     final request = state.request;
     final form = request == null ? state.form : _formFrom(request, state.form);
     _emitReady(request: request, form: form, editing: true);
+    // Atletas sem conta do time do pedido (e o "sou eu" que já estava marcado).
+    final team = form.selectedTeam;
+    if (team != null) _loadUnlinkedPlayers(team, restoreClaimId: request?.claimedPlayerId ?? '');
   }
 
   void stopEditing() {
@@ -149,7 +158,49 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
     await _loadTeams(region);
   }
 
-  void selectTeam(String team) => _updateForm(state.form.copyWith(selectedTeam: () => team));
+  /// Escolher o time limpa o "sou eu" e carrega os atletas dele sem conta.
+  Future<void> selectTeam(String team) async {
+    if (team == state.form.selectedTeam) return;
+    _updateForm(state.form.copyWith(
+      selectedTeam: () => team,
+      claimedPlayer: () => null,
+      unlinkedPlayers: const [],
+    ));
+    await _loadUnlinkedPlayers(team);
+  }
+
+  /// Uma leitura do elenco (não fica ouvindo): só os atletas sem conta.
+  Future<void> _loadUnlinkedPlayers(String team, {String restoreClaimId = ''}) async {
+    final teamId = state.form.selectedTeamId;
+    _updateForm(state.form.copyWith(loadingPlayers: true));
+    final response = await watchTeamPlayersUseCase(
+      teamId: teamId,
+      teamName: team,
+      season: SeasonCollection.currentSeason,
+    ).first;
+    if (isClosed || state.form.selectedTeam != team) return;
+    final players = response.isRight
+        ? (response.right.where((p) => p.userId.isEmpty).toList()
+          ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase())))
+        : const <PlayerDTO>[];
+    final restored = players.where((p) => p.id == restoreClaimId).firstOrNull;
+    _updateForm(state.form.copyWith(
+      unlinkedPlayers: players,
+      loadingPlayers: false,
+      claimedPlayer: restored == null ? null : () => restored,
+    ));
+  }
+
+  /// "Sou eu": marca o atleta (nulo ou o mesmo de novo = desmarca).
+  void claimPlayer(PlayerDTO? player) {
+    final same = player != null && player.id == state.form.claimedPlayer?.id;
+    final claimed = same ? null : player;
+    _updateForm(state.form.copyWith(
+      claimedPlayer: () => claimed,
+      name: claimed?.name ?? (state.form.isClaim ? _userName : state.form.name),
+      position: claimed == null ? null : PlayerPosition.fromKey(claimed.position),
+    ));
+  }
 
   void changeName(String name) => _updateForm(state.form.copyWith(name: name));
 
@@ -178,7 +229,8 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
       season: SeasonCollection.currentSeason,
       position: form.position,
       message: form.message,
-      imageUrl: form.imageUrl,
+      imageUrl: form.imageUrl.isEmpty && form.photo == null ? form.claimedPlayer?.imageUrl ?? '' : form.imageUrl,
+      claimedPlayerId: form.claimedPlayer?.id ?? '',
     );
     final response = await submitPlayerRequestUseCase(request, photo: form.photo);
     if (isClosed) return;

@@ -1573,6 +1573,52 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playerRequestTitle => 'I\'m a player';
 
   @override
+  String get playerRequestClaimTitle => 'Already on the squad?';
+
+  @override
+  String get playerRequestClaimHint =>
+      'These team players don\'t have an account yet. If one of them is you, tap it to request the link and keep your stats.';
+
+  @override
+  String get playerRequestClaimNotListed =>
+      'Not on the list? Fill in below as a new player.';
+
+  @override
+  String playerRequestClaimSelected(String name) {
+    return 'You will request the link with player $name.';
+  }
+
+  @override
+  String playerRequestClaimStatus(String name) {
+    return 'Link request with player $name';
+  }
+
+  @override
+  String playerRequestsClaimBadge(String name, int goals) {
+    return 'Says they are $name · $goals goals';
+  }
+
+  @override
+  String playerRequestsApproveClaimMessage(String name) {
+    return 'The account will be linked to player $name, keeping their goals and assists.';
+  }
+
+  @override
+  String get playerRequestClaimPlaceholder =>
+      'I\'m one of these players (optional)';
+
+  @override
+  String get playerRequestClaimSearch => 'Search by name';
+
+  @override
+  String get playerRequestClaimNoResults => 'No player with that name';
+
+  @override
+  String playerRequestClaimGoals(int goals) {
+    return '$goals goals';
+  }
+
+  @override
   String get playerRequestIntro =>
       'Play for a team in your region: send a request and an admin will review it.';
 
@@ -1674,6 +1720,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get playerPositionFullBack => 'Full-back';
+
+  @override
+  String get playerPositionDefensiveMidfielder => 'Defensive midfielder';
 
   @override
   String get playerPositionMidfielder => 'Midfielder';

@@ -459,6 +459,55 @@
   "pushSent": "Notice sent!",
   "playerRequestMenu": "I'm a player",
   "playerRequestTitle": "I'm a player",
+  "playerRequestClaimTitle": "Already on the squad?",
+  "playerRequestClaimHint": "These team players don't have an account yet. If one of them is you, tap it to request the link and keep your stats.",
+  "playerRequestClaimNotListed": "Not on the list? Fill in below as a new player.",
+  "playerRequestClaimSelected": "You will request the link with player {name}.",
+  "@playerRequestClaimSelected": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playerRequestClaimStatus": "Link request with player {name}",
+  "@playerRequestClaimStatus": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playerRequestsClaimBadge": "Says they are {name} · {goals} goals",
+  "@playerRequestsClaimBadge": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "goals": {
+        "type": "int"
+      }
+    }
+  },
+  "playerRequestsApproveClaimMessage": "The account will be linked to player {name}, keeping their goals and assists.",
+  "@playerRequestsApproveClaimMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playerRequestClaimPlaceholder": "I'm one of these players (optional)",
+  "playerRequestClaimSearch": "Search by name",
+  "playerRequestClaimNoResults": "No player with that name",
+  "playerRequestClaimGoals": "{goals} goals",
+  "@playerRequestClaimGoals": {
+    "placeholders": {
+      "goals": {
+        "type": "int"
+      }
+    }
+  },
   "playerRequestIntro": "Play for a team in your region: send a request and an admin will review it.",
   "playerRequestTeamRequired": "Choose the team you play for.",
   "playerRequestNameLabel": "Player name",
@@ -489,6 +538,7 @@
   "playerPositionGoalkeeper": "Goalkeeper",
   "playerPositionDefender": "Defender",
   "playerPositionFullBack": "Full-back",
+  "playerPositionDefensiveMidfielder": "Defensive midfielder",
   "playerPositionMidfielder": "Midfielder",
   "playerPositionForward": "Forward",
   "playerRequestsPanelTitle": "Player requests",

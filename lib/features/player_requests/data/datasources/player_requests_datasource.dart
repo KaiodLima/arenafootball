@@ -10,6 +10,12 @@ import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 
 /// Pedidos "Sou jogador" (`solicitacoes_jogador/{uid}`). O usuário grava o
 /// próprio pedido; o admin edita, aprova (cria o jogador) ou rejeita.
+/// Aprovação de vínculo recusada: o atleta já tem outra conta.
+const String claimTakenCode = 'claim-taken';
+
+/// Aprovação de vínculo recusada: a conta já tem outro atleta na temporada.
+const String claimAccountHasPlayerCode = 'claim-account-has-player';
+
 class PlayerRequestsDataSource {
   final FirebaseFirestore _firestore;
 
@@ -100,6 +106,8 @@ class PlayerRequestsDataSource {
         'time': request.team,
         'idTime': request.teamId,
         'posicao': request.position?.key ?? '',
+        // Outro time: o atleta reivindicado era do time antigo.
+        'idJogadorVinculo': request.claimedPlayerId,
         'atualizado_em': FieldValue.serverTimestamp(),
       });
       return const Right(null);
@@ -121,9 +129,11 @@ class PlayerRequestsDataSource {
     return teams.docs.isEmpty ? '' : teams.docs.first.id;
   }
 
-  /// Aprova o pedido, numa escrita só com a marcação do pedido. Se a conta já
-  /// tem atleta na temporada (saiu de outro elenco), reaproveita ele: troca
-  /// time, nome, posição e foto e mantém gols e assistências. Senão, cria.
+  /// Aprova o pedido, numa escrita só com a marcação do pedido. Pedido de
+  /// vínculo: liga a conta ao atleta reivindicado (mantém nome e números).
+  /// Se a conta já tem atleta na temporada (saiu de outro elenco), reaproveita
+  /// ele: troca time, nome, posição e foto e mantém gols e assistências.
+  /// Senão, cria.
   Future<Either<Failure, String>> approve(PlayerRequestDTO request) async {
     try {
       final players = _firestore.collection(SeasonCollection.name('jogadores', request.season));
@@ -131,7 +141,25 @@ class PlayerRequestsDataSource {
       final existing = await players.where('idUsuario', isEqualTo: request.userId).limit(1).get();
       final batch = _firestore.batch();
       final DocumentReference<Map<String, dynamic>> playerRef;
-      if (existing.docs.isNotEmpty) {
+      if (request.isClaim) {
+        playerRef = players.doc(request.claimedPlayerId);
+        final claimed = await playerRef.get();
+        final owner = claimed.data()?['idUsuario']?.toString() ?? '';
+        if (!claimed.exists || (owner.isNotEmpty && owner != request.userId)) {
+          return Left(ErrorWithMessage('Este atleta já foi vinculado a outra conta.', code: claimTakenCode));
+        }
+        if (existing.docs.isNotEmpty && existing.docs.first.id != playerRef.id) {
+          return Left(
+              ErrorWithMessage('Esta conta já tem outro atleta nesta temporada.', code: claimAccountHasPlayerCode));
+        }
+        batch.update(playerRef, {
+          'idUsuario': request.userId,
+          'time': request.team,
+          'idTime': teamId,
+          if (request.position != null) 'posicao': request.position!.key,
+          if (request.imageUrl.isNotEmpty) 'urlImagem': request.imageUrl,
+        });
+      } else if (existing.docs.isNotEmpty) {
         playerRef = existing.docs.first.reference;
         batch.update(playerRef, {
           'nome': request.name,

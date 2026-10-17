@@ -5,6 +5,8 @@ import 'package:arena_soccer/features/player_requests/data/dtos/player_request_d
 import 'package:arena_soccer/features/player_requests/presentation/bloc/player_requests_panel_cubit.dart';
 import 'package:arena_soccer/features/player_requests/presentation/bloc/player_requests_panel_state.dart';
 import 'package:arena_soccer/features/player_requests/presentation/widgets/edit_player_request_sheet.dart';
+import 'package:arena_soccer/features/player_requests/presentation/widgets/player_request_claim_info.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/player_requests/presentation/widgets/player_request_labels.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
@@ -38,7 +40,9 @@ class _PlayerRequestsPanelPageState extends State<PlayerRequestsPanelPage> {
     final confirmed = await showArenaConfirm(
       context,
       title: l10n.playerRequestsApproveTitle(request.name),
-      message: l10n.playerRequestsApproveMessage(request.name, request.team),
+      message: request.isClaim
+          ? l10n.playerRequestsApproveClaimMessage(request.name)
+          : l10n.playerRequestsApproveMessage(request.name, request.team),
       confirmLabel: l10n.playerRequestsApprove,
       icon: Icons.how_to_reg_outlined,
       tone: ArenaAlertTone.primary,
@@ -171,6 +175,7 @@ class _RequestList extends StatelessWidget {
           request: request,
           crest: state.crestOf(request.team),
           duplicateName: request.isPending ? state.duplicateOf(request)?.name : null,
+          claimed: PlayerRequestClaimInfo.find(request, state.players),
           busy: state.busy.contains(request.userId),
           onApprove: onApprove == null ? null : () => onApprove!(request),
           onReject: onReject == null ? null : () => onReject!(request),
@@ -185,6 +190,9 @@ class _RequestCard extends StatelessWidget {
   final PlayerRequestDTO request;
   final String? crest;
   final String? duplicateName;
+
+  /// Atleta reivindicado (pedido de vínculo), se estiver na lista carregada.
+  final PlayerDTO? claimed;
   final bool busy;
   final VoidCallback? onApprove;
   final VoidCallback? onReject;
@@ -194,6 +202,7 @@ class _RequestCard extends StatelessWidget {
     required this.request,
     required this.crest,
     required this.duplicateName,
+    this.claimed,
     required this.busy,
     this.onApprove,
     this.onReject,
@@ -275,6 +284,10 @@ class _RequestCard extends StatelessWidget {
               ),
               child: Text('"${request.message}"', style: AppTypography.body().copyWith(fontSize: AppSizes.s14)),
             ),
+          ],
+          if (request.isClaim) ...[
+            const SizedBox(height: AppSizes.s10),
+            PlayerRequestClaimInfo(request: request, player: claimed),
           ],
           if (duplicateName != null) ...[
             const SizedBox(height: AppSizes.s10),

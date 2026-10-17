@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
+import 'package:arena_soccer/features/player_requests/presentation/widgets/player_request_claim_info.dart';
 import 'package:arena_soccer/features/player_requests/presentation/widgets/player_request_labels.dart';
 import 'package:arena_soccer/features/players/presentation/player_navigation.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/player_card.dart';
@@ -247,6 +248,10 @@ class _RequestsTab extends StatelessWidget {
                 [if (position != null) playerPositionLabel(l10n, position), request.userName].join(' · '),
                 style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
               ),
+              if (request.isClaim) ...[
+                const SizedBox(height: AppSizes.s8),
+                PlayerRequestClaimInfo(request: request, player: PlayerRequestClaimInfo.find(request, state.players)),
+              ],
               if (request.message.isNotEmpty) ...[
                 const SizedBox(height: AppSizes.s8),
                 Text('"${request.message}"', style: AppTypography.body().copyWith(fontSize: AppSizes.s14)),

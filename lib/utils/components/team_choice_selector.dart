@@ -184,7 +184,7 @@ class _TeamChoiceSelectorState extends State<TeamChoiceSelector> {
               ),
               if (pages.length > 1) ...[
                 const SizedBox(height: AppSizes.s12),
-                _PageDots(
+                ChoicePageDots(
                   count: pages.length,
                   current: _page,
                   onTap: (page) => _pageController?.animateToPage(
@@ -202,13 +202,13 @@ class _TeamChoiceSelectorState extends State<TeamChoiceSelector> {
   }
 }
 
-/// Indicador de página do carrossel; tocar num ponto vai à página.
-class _PageDots extends StatelessWidget {
+/// Indicador de página dos carrosséis de escolha; tocar num ponto vai à página.
+class ChoicePageDots extends StatelessWidget {
   final int count;
   final int current;
   final ValueChanged<int> onTap;
 
-  const _PageDots({required this.count, required this.current, required this.onTap});
+  const ChoicePageDots({super.key, required this.count, required this.current, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

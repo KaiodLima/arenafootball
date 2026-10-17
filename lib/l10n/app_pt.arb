@@ -872,6 +872,55 @@
   "pushSent": "Aviso enviado!",
   "playerRequestMenu": "Sou jogador",
   "playerRequestTitle": "Sou jogador",
+  "playerRequestClaimTitle": "Já está no elenco?",
+  "playerRequestClaimHint": "Estes atletas do time ainda não têm conta. Se um deles é você, toque nele para pedir o vínculo e ficar com os seus números.",
+  "playerRequestClaimNotListed": "Não está na lista? Preencha abaixo como jogador novo.",
+  "playerRequestClaimSelected": "Você vai pedir o vínculo com o atleta {name}.",
+  "@playerRequestClaimSelected": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playerRequestClaimStatus": "Pedido de vínculo com o atleta {name}",
+  "@playerRequestClaimStatus": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playerRequestsClaimBadge": "Diz ser o atleta {name} · {goals} gols",
+  "@playerRequestsClaimBadge": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "goals": {
+        "type": "int"
+      }
+    }
+  },
+  "playerRequestsApproveClaimMessage": "A conta será ligada ao atleta {name}, que mantém os gols e as assistências.",
+  "@playerRequestsApproveClaimMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playerRequestClaimPlaceholder": "Sou um destes atletas (opcional)",
+  "playerRequestClaimSearch": "Buscar pelo nome",
+  "playerRequestClaimNoResults": "Nenhum atleta com esse nome",
+  "playerRequestClaimGoals": "{goals} gols",
+  "@playerRequestClaimGoals": {
+    "placeholders": {
+      "goals": {
+        "type": "int"
+      }
+    }
+  },
   "playerRequestIntro": "Jogue pelo seu time da região: envie a solicitação e um administrador vai analisar.",
   "playerRequestTeamRequired": "Escolha o time em que você joga.",
   "playerRequestNameLabel": "Nome de jogador",
@@ -930,6 +979,7 @@
   "playerPositionGoalkeeper": "Goleiro",
   "playerPositionDefender": "Zagueiro",
   "playerPositionFullBack": "Lateral",
+  "playerPositionDefensiveMidfielder": "Volante",
   "playerPositionMidfielder": "Meia",
   "playerPositionForward": "Atacante",
   "playerRequestsPanelTitle": "Solicitações de jogadores",
