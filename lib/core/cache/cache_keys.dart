@@ -80,6 +80,9 @@ abstract final class CacheKeys {
   /// Votos da partida [matchId] na [season] (resultado de votação encerrada).
   static String votes({required String matchId, String? season}) => 'votes_${_season(season)}_${matchId}_cache';
 
+  /// Ranking de torcidas da [season] (doc da function, todas as regiões).
+  static String fanRanking(String season) => 'fan_ranking_${_season(season)}_cache';
+
   static String _season(String? season) => (season == null || season.isEmpty) ? SeasonCollection.currentSeason : season;
 
   static String _region(String? region) {

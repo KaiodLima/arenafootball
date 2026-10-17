@@ -109,6 +109,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeTabTables => 'Tables';
 
   @override
+  String get fanRankingTitle => 'Fan ranking';
+
+  @override
+  String fanRankingFans(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fans',
+      one: '1 fan',
+      zero: 'no fans',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fanRankingYourFans => 'Your team';
+
+  @override
+  String fanRankingUpdatedAt(String time) {
+    return 'Updated at $time · counts app users by their favorite team';
+  }
+
+  @override
+  String get fanRankingPreparing =>
+      'The fan ranking is being prepared. Check back soon!';
+
+  @override
+  String get fanRankingNoTeams => 'No teams in this region yet.';
+
+  @override
+  String get fanRankingError => 'Couldn\'t load the fan ranking.';
+
+  @override
   String get drawerResults => 'Results around the world';
 
   @override

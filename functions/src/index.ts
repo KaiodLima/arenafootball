@@ -42,6 +42,7 @@ import {
 } from './messages';
 import { isLegacyVoteCollection, seasonCollections, seasonsToSweep, userPhotoPath } from './account_cleanup';
 import { claimReconcilePlan, needsClaimReconcile } from './claim_reconcile';
+import { FanRankingTeam, fanRankingTotal, rankingTeamOf, sortFanRanking } from './fan_ranking';
 import {
   APP_PAGE,
   NOT_FOUND_PAGE,
@@ -265,6 +266,37 @@ export const dailyGames = onSchedule({ schedule: '0 9 * * *', timeZone: 'America
     const message = dailyGameMessage(doc.data());
     if (message) await deliver(`jogo_do_dia_${today.replace('/', '-')}_${doc.id}`, message, `${collection}/${doc.id}`);
   }
+});
+
+/**
+ * A cada hora: ranking de torcidas da temporada atual. Conta os torcedores de
+ * cada time com `count()` em `usuarios` (pelo `idTime`, e as contas antigas
+ * sem id pelo nome), sem ler os perfis, e grava um doc público que o app lê
+ * de uma vez: `ranking_torcidas/{temporada}`.
+ */
+export const fanRanking = onSchedule({ schedule: '0 * * * *', timeZone: 'America/Sao_Paulo' }, async () => {
+  const { db, FieldValue } = await admin();
+  const season = await currentSeason();
+  const teams = await db.collection(seasonCollection('times', season)).get();
+  const users = db.collection('usuarios');
+  const entries: FanRankingTeam[] = [];
+  for (const team of teams.docs) {
+    const data = team.data();
+    const name = typeof data.nome === 'string' ? data.nome : '';
+    const [byId, legacy] = await Promise.all([
+      users.where('idTime', '==', team.id).count().get(),
+      name ? users.where('idTime', '==', '').where('time', '==', name).count().get() : null,
+    ]);
+    entries.push(rankingTeamOf(team.id, data, byId.data().count + (legacy?.data().count ?? 0)));
+  }
+  const ranking = sortFanRanking(entries);
+  await db.collection('ranking_torcidas').doc(season).set({
+    temporada: season,
+    atualizado_em: FieldValue.serverTimestamp(),
+    total: fanRankingTotal(ranking),
+    times: ranking,
+  });
+  logger.info('ranking de torcidas', { season, times: ranking.length, total: fanRankingTotal(ranking) });
 });
 
 /**

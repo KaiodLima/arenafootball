@@ -34,7 +34,7 @@ Clean Architecture por feature (`data/` -> `domain/` -> `presentation/`), detalh
 UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Auth/Storage
 ```
 
-## Features (18 módulos em `lib/features/`)
+## Features (19 módulos em `lib/features/`)
 
 | Feature | Conteúdo |
 |---------|----------|
@@ -54,6 +54,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | `matches` | Aba TABELAS, lista de partidas (hoje/todas), cadastro, placar, votação on/off |
 | `voting` | Votar no melhor jogador, contagem de votos, jogador eleito |
 | `global_results` | Resultados pelo mundo (scraping do soccerstats.com; parser em `data/parsers/`) |
+| `fan_ranking` | Ranking de torcidas (drawer): times da região com mais torcedores entre os usuários, lido de `ranking_torcidas/{temporada}` (uma leitura, com cache) |
 | `notifications` | Painel de push do admin (liga/desliga por ação, histórico, aviso manual) + sincronia de tópicos |
 
 ## Fluxo para feature ou tela nova
@@ -107,6 +108,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | `notificacoes_envios` | histórico gravado pelas Cloud Functions (id = evento): tipo, titulo, corpo, alvo, regiao, data, status (enviado/desligado/erro), erro, origem |
 | `solicitacoes_jogador` | pedido "Sou jogador", id = uid (um por usuário): uid, nome_usuario, email, nome, time, idTime, regiao, temporada, posicao, mensagem, urlImagem, status (pendente/aprovada/rejeitada/removido), motivo, idJogador, data, atualizado_em, idJogadorVinculo (opcional: atleta já cadastrado sem conta que o usuário diz ser; a tela lista os sem `idUsuario` do time escolhido). Aprovar = batch que cria o jogador (ou reaproveita o atleta da conta, mantendo os números; com `idJogadorVinculo`, liga a conta a esse atleta, recusando se ele já tem outra conta ou se a conta já tem outro atleta) e marca o pedido. Atleta vinculado não é excluído: "remover do elenco" zera o `time` e o pedido vira `removido` |
 | `solicitacoes_time` | pedido "Sou dono de time", id = uid (um por usuário): uid, nome_usuario, email, nome (do time), regiao, descricao, urlImagem, corPrimaria, corSecundaria, contato (WhatsApp), mensagem, temporada, status (pendente/aprovada/rejeitada), motivo, idTime, data, atualizado_em. Aprovado = registro de dono que as regras consultam (`ownedTeam()`); o nome do time só o admin muda |
+| `ranking_torcidas/{temporada}` | gravado de hora em hora pela function `fanRanking` (o app só lê): temporada, atualizado_em, total, times[] (id, nome, idRegiao, regiao, urlImagem, corPrimaria, corSecundaria, torcedores), em ordem do ranking |
 | `push_avisos` | aviso manual do admin (titulo, corpo, regiao vazia = todos, data); a function envia |
 
 `{ano}`: **2023 é a única temporada sem sufixo** (legado: `times`, `partidas`...); todas as outras usam o ano (`times2022`, `times2024`). A temporada **atual** fica em `config/temporadas` (`atual`, `lista`; leitura pública, escrita do admin), carregada no `RegionCubit.load()` e aplicada em `SeasonCollection.configure`. Sem a config, vale 2023. Para abrir a temporada nova: admin → **Temporadas** → "Iniciar temporada" (opcionalmente copia os times com a classificação zerada); nada é copiado à mão nem renomeado, e os cadastros passam a ir para as coleções do ano novo. Não comparar com o ano do relógio.
@@ -123,7 +125,7 @@ Push: tópico `regiaoid_<id>` (o app assina também o `regiao_<slug>` do nome na
 
 ## Notificações push (FCM)
 
-- **Envio:** Cloud Functions em `functions/` (TypeScript, região `us-central1`, a mesma do Firestore `nam5`). Gatilhos em `noticias`, `partidas` da temporada atual (gatilho em `{colecao}/{id}` filtrando a coleção de partidas da `config/temporadas`), `push_avisos`, `solicitacoes_jogador` (avisa admins, quem pediu e o dono do time) e `solicitacoes_time`, mais o agendamento diário `dailyGames` (9h, Brasília). No mesmo gatilho dos pedidos "Sou jogador", a reconciliação de vínculo (`functions/src/claim_reconcile.ts`) corrige aprovações feitas por app antigo: se o pedido aprovado tem `idJogadorVinculo` diferente do `idJogador`, liga a conta ao atleta reivindicado (somando os números), apaga o atleta criado e aponta o pedido e os cards de gol para o reivindicado. Fora do push, `onUserDeleted` (gatilho v1 do Auth) apaga perfil, foto, pedidos e votos da conta excluída e tira o `idUsuario`/`idDono` dos atletas e times (regras de varredura em `functions/src/account_cleanup.ts`). Mensagens e alvos em `functions/src/messages.ts` (funções puras, `npm test`).
+- **Envio:** Cloud Functions em `functions/` (TypeScript, região `us-central1`, a mesma do Firestore `nam5`). Gatilhos em `noticias`, `partidas` da temporada atual (gatilho em `{colecao}/{id}` filtrando a coleção de partidas da `config/temporadas`), `push_avisos`, `solicitacoes_jogador` (avisa admins, quem pediu e o dono do time) e `solicitacoes_time`, mais o agendamento diário `dailyGames` (9h, Brasília) e o `fanRanking` (de hora em hora: conta os torcedores de cada time com `count()` em `usuarios` e grava `ranking_torcidas/{temporada}`; lógica em `functions/src/fan_ranking.ts`). No mesmo gatilho dos pedidos "Sou jogador", a reconciliação de vínculo (`functions/src/claim_reconcile.ts`) corrige aprovações feitas por app antigo: se o pedido aprovado tem `idJogadorVinculo` diferente do `idJogador`, liga a conta ao atleta reivindicado (somando os números), apaga o atleta criado e aponta o pedido e os cards de gol para o reivindicado. Fora do push, `onUserDeleted` (gatilho v1 do Auth) apaga perfil, foto, pedidos e votos da conta excluída e tira o `idUsuario`/`idDono` dos atletas e times (regras de varredura em `functions/src/account_cleanup.ts`). Mensagens e alvos em `functions/src/messages.ts` (funções puras, `npm test`).
 - **Tópicos:** `todos`, `regiao_<slug>`, `timeid_<idTime>` (time do coração pelo id), `usuario_<uid>` (logado) e `admins` (conta admin). `time_<slug do nome>` é o tópico antigo: o app novo só assina quando a conta ainda não tem `idTime`, e as functions mandam para os dois na transição. O slug/`teamIdTopic` de `lib/core/utils/push_topics.dart` e o de `messages.ts` precisam ser iguais.
 - **App:** `PushService` (`lib/core/services/push_service.dart`) faz permissão, exibição em primeiro plano e toque (abre a aba do `data.aba`). O `PushTopicsListener` (em `blocs_load.dart`) mantém os tópicos de acordo com a região e o time do coração.
 - **Deploy das functions:** `cd functions && npm install`, depois `firebase deploy --only functions`.

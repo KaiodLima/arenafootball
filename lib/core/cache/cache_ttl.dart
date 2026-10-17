@@ -9,6 +9,9 @@ abstract final class CacheTtl {
   static const Duration standings = Duration(minutes: 30);
   static const Duration highlights = Duration(minutes: 15);
   static const Duration ranking = Duration(minutes: 10);
+
+  /// Ranking de torcidas (o servidor recalcula de hora em hora).
+  static const Duration fanRanking = Duration(minutes: 30);
   static const Duration globalResults = Duration(minutes: 5);
 
   /// Apuração de votação encerrada (lida só depois de fechar).

@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/services/preferences_service.dart';
 import 'package:arena_soccer/core/services/storage_upload_service.dart';
+import 'package:arena_soccer/features/fan_ranking/di/fan_ranking_injection.dart';
 import 'package:arena_soccer/features/global_results/di/global_results_injection.dart';
 import 'package:arena_soccer/features/auth/di/auth_injection.dart';
 import 'package:arena_soccer/features/championships/di/championships_injection.dart';
@@ -43,6 +44,7 @@ Future<void> init() async {
   registerHighlightsDependencies();
   registerGlobalResultsDependencies();
   registerNotificationsDependencies();
+  registerFanRankingDependencies();
 }
 
 /// A persistência do Firestore só pode ser configurada antes do primeiro uso.

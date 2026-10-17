@@ -290,6 +290,48 @@ abstract class AppLocalizations {
   /// **'Tabelas'**
   String get homeTabTables;
 
+  /// No description provided for @fanRankingTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ranking de torcidas'**
+  String get fanRankingTitle;
+
+  /// No description provided for @fanRankingFans.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{nenhum torcedor} =1{1 torcedor} other{{count} torcedores}}'**
+  String fanRankingFans(int count);
+
+  /// No description provided for @fanRankingYourFans.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua torcida'**
+  String get fanRankingYourFans;
+
+  /// No description provided for @fanRankingUpdatedAt.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atualizado às {time} · conta os usuários do app pelo time do coração'**
+  String fanRankingUpdatedAt(String time);
+
+  /// No description provided for @fanRankingPreparing.
+  ///
+  /// In pt, this message translates to:
+  /// **'O ranking de torcidas está sendo preparado. Volte daqui a pouco!'**
+  String get fanRankingPreparing;
+
+  /// No description provided for @fanRankingNoTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum time nesta região ainda.'**
+  String get fanRankingNoTeams;
+
+  /// No description provided for @fanRankingError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar o ranking de torcidas.'**
+  String get fanRankingError;
+
   /// No description provided for @drawerResults.
   ///
   /// In pt, this message translates to:

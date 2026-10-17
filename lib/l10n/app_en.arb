@@ -32,6 +32,27 @@
   "homeTabChampionships": "Championships",
   "homeTabTeams": "Teams",
   "homeTabTables": "Tables",
+  "fanRankingTitle": "Fan ranking",
+  "fanRankingFans": "{count, plural, =0{no fans} =1{1 fan} other{{count} fans}}",
+  "@fanRankingFans": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fanRankingYourFans": "Your team",
+  "fanRankingUpdatedAt": "Updated at {time} · counts app users by their favorite team",
+  "@fanRankingUpdatedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "fanRankingPreparing": "The fan ranking is being prepared. Check back soon!",
+  "fanRankingNoTeams": "No teams in this region yet.",
+  "fanRankingError": "Couldn't load the fan ranking.",
   "drawerResults": "Results around the world",
   "drawerRegisterHighlight": "Highlights",
   "drawerRegisterPlayer": "Add player",

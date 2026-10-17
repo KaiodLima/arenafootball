@@ -49,6 +49,7 @@ class AppRoutes {
   static const String seasonsPanelPage = '/seasons_panel_page';
   static const String adminPanelPage = '/admin_panel_page';
   static const String settingsPage = '/settings_page';
+  static const String fanRankingPage = '/fan_ranking_page';
 }
 
 class AppSession {

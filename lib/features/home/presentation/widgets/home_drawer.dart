@@ -93,6 +93,11 @@ class HomeDrawer extends StatelessWidget {
                   title: l10n.drawerResults,
                   onTap: () => _open(context, AppRoutes.globalResultsPage),
                 ),
+                _DrawerItem(
+                  icon: Icons.groups_rounded,
+                  title: l10n.fanRankingTitle,
+                  onTap: () => _open(context, AppRoutes.fanRankingPage),
+                ),
                 if (user != null)
                   _DrawerItem(
                     icon: Icons.badge_outlined,

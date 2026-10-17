@@ -109,6 +109,40 @@ class AppLocalizationsPt extends AppLocalizations {
   String get homeTabTables => 'Tabelas';
 
   @override
+  String get fanRankingTitle => 'Ranking de torcidas';
+
+  @override
+  String fanRankingFans(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count torcedores',
+      one: '1 torcedor',
+      zero: 'nenhum torcedor',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fanRankingYourFans => 'Sua torcida';
+
+  @override
+  String fanRankingUpdatedAt(String time) {
+    return 'Atualizado às $time · conta os usuários do app pelo time do coração';
+  }
+
+  @override
+  String get fanRankingPreparing =>
+      'O ranking de torcidas está sendo preparado. Volte daqui a pouco!';
+
+  @override
+  String get fanRankingNoTeams => 'Nenhum time nesta região ainda.';
+
+  @override
+  String get fanRankingError =>
+      'Não foi possível carregar o ranking de torcidas.';
+
+  @override
   String get drawerResults => 'Resultados pelo mundo';
 
   @override
