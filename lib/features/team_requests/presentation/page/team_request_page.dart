@@ -210,7 +210,7 @@ class _TeamRequestPageState extends State<TeamRequestPage> {
         ),
         const SizedBox(height: AppSizes.s20),
         FormSection(
-          title: l10n.playersSectionData,
+          title: l10n.teamsSectionData,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
