@@ -290,12 +290,6 @@ abstract class AppLocalizations {
   /// **'Tabelas'**
   String get homeTabTables;
 
-  /// No description provided for @drawerHome.
-  ///
-  /// In pt, this message translates to:
-  /// **'Início'**
-  String get drawerHome;
-
   /// No description provided for @drawerResults.
   ///
   /// In pt, this message translates to:
@@ -1839,6 +1833,48 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Navegação'**
   String get drawerNavigation;
+
+  /// No description provided for @adminPanelTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Painel do admin'**
+  String get adminPanelTitle;
+
+  /// No description provided for @adminPanelContent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conteúdo'**
+  String get adminPanelContent;
+
+  /// No description provided for @adminPanelCompetition.
+  ///
+  /// In pt, this message translates to:
+  /// **'Competição'**
+  String get adminPanelCompetition;
+
+  /// No description provided for @adminPanelSettings.
+  ///
+  /// In pt, this message translates to:
+  /// **'Configurações'**
+  String get adminPanelSettings;
+
+  /// No description provided for @drawerClose.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fechar menu'**
+  String get drawerClose;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Configurações'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsAccountSection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conta'**
+  String get settingsAccountSection;
 
   /// No description provided for @drawerAdmin.
   ///

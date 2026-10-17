@@ -29,7 +29,6 @@ class HomeDrawer extends StatelessWidget {
   final String? ownedTeam;
   final VoidCallback onChooseTeam;
   final VoidCallback onLogout;
-  final VoidCallback onDeleteAccount;
 
   const HomeDrawer({
     super.key,
@@ -42,7 +41,6 @@ class HomeDrawer extends StatelessWidget {
     this.playerSeason,
     this.ownedTeam,
     required this.onChooseTeam,
-    required this.onDeleteAccount,
     required this.onLogout,
   });
 
@@ -91,12 +89,6 @@ class HomeDrawer extends StatelessWidget {
               children: [
                 _SectionLabel(l10n.drawerNavigation),
                 _DrawerItem(
-                  icon: Icons.home_rounded,
-                  title: l10n.drawerHome,
-                  selected: true,
-                  onTap: () => Navigator.pop(context),
-                ),
-                _DrawerItem(
                   icon: Icons.public_rounded,
                   title: l10n.drawerResults,
                   onTap: () => _open(context, AppRoutes.globalResultsPage),
@@ -135,49 +127,9 @@ class HomeDrawer extends StatelessWidget {
                     onTap: () => _open(context, AppRoutes.teamRequestsPanelPage),
                   ),
                   _DrawerItem(
-                    icon: Icons.article_outlined,
-                    title: l10n.drawerRegisterNews,
-                    onTap: () => _open(context, AppRoutes.registerNewsPage),
-                  ),
-                  _DrawerItem(
-                    icon: Icons.place_outlined,
-                    title: l10n.regionsManageTitle,
-                    onTap: () => _open(context, AppRoutes.manageRegionsPage),
-                  ),
-                  _DrawerItem(
-                    icon: Icons.star_outline_rounded,
-                    title: l10n.drawerRegisterHighlight,
-                    onTap: () => _open(context, AppRoutes.manageHighlightsPage),
-                  ),
-                  _DrawerItem(
-                    icon: Icons.notifications_active_outlined,
-                    title: l10n.pushPanelTitle,
-                    onTap: () => _open(context, AppRoutes.notificationsPanelPage),
-                  ),
-                  _DrawerItem(
-                    icon: Icons.date_range_rounded,
-                    title: l10n.seasonsPanelTitle,
-                    onTap: () => _open(context, AppRoutes.seasonsPanelPage),
-                  ),
-                  _DrawerItem(
-                    icon: Icons.emoji_events_outlined,
-                    title: l10n.championshipsManageTitle,
-                    onTap: () => _open(context, AppRoutes.manageChampionshipsPage),
-                  ),
-                  _DrawerItem(
-                    icon: Icons.scoreboard_outlined,
-                    title: l10n.drawerRegisterMatch,
-                    onTap: () => _open(context, AppRoutes.registerMatchPage),
-                  ),
-                  _DrawerItem(
-                    icon: Icons.shield_outlined,
-                    title: l10n.drawerRegisterTeam,
-                    onTap: () => _open(context, AppRoutes.registerTeamPage),
-                  ),
-                  _DrawerItem(
-                    icon: Icons.person_add_alt_outlined,
-                    title: l10n.drawerRegisterPlayer,
-                    onTap: () => _open(context, AppRoutes.registerPlayerPage),
+                    icon: Icons.admin_panel_settings_outlined,
+                    title: l10n.adminPanelTitle,
+                    onTap: () => _open(context, AppRoutes.adminPanelPage),
                   ),
                 ],
               ],
@@ -192,14 +144,9 @@ class HomeDrawer extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _DrawerItem(
-                      icon: Icons.person_remove_outlined,
-                      title: l10n.drawerDeleteAccount,
-                      color: AppColors.danger,
-                      showChevron: false,
-                      onTap: () {
-                        Navigator.pop(context);
-                        onDeleteAccount();
-                      },
+                      icon: Icons.settings_outlined,
+                      title: l10n.settingsTitle,
+                      onTap: () => _open(context, AppRoutes.settingsPage),
                     ),
                     _DrawerItem(
                       icon: Icons.logout_rounded,
@@ -255,77 +202,92 @@ class _ProfileHeader extends StatelessWidget {
       watermarkFactor: 0.9,
       child: SafeArea(
         bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(AppSizes.s20, AppSizes.s24, AppSizes.s20, AppSizes.s24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(AppSizes.s4),
-                decoration: const BoxDecoration(color: AppColors.white, shape: BoxShape.circle),
-                child: CircleAvatar(
-                  radius: AppSizes.s32,
-                  backgroundColor: AppColors.background,
-                  backgroundImage: favoriteTeamImage == null ? null : CachedNetworkImageProvider(favoriteTeamImage!),
-                  child: favoriteTeamImage == null
-                      ? const Icon(Icons.person_rounded, color: AppColors.textSecondary, size: AppSizes.s32)
-                      : null,
-                ),
-              ),
-              const SizedBox(height: AppSizes.s14),
-              Text(
-                isGuest ? l10n.drawerGuest : user!.name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: AppTypography.title(color: AppColors.white),
-              ),
-              const SizedBox(height: AppSizes.s8),
-              if (isGuest) ...[
-                Text(l10n.drawerGuestSubtitle, style: AppTypography.subtitle(color: AppColors.whiteSoft)),
-                const SizedBox(height: AppSizes.s14),
-                FilledButton(
-                  style: _headerButtonStyle,
-                  onPressed: () => Navigator.pushNamedAndRemoveUntil(context, AppRoutes.loginPage, (_) => false),
-                  child: Text(l10n.drawerSignIn),
-                ),
-              ] else ...[
-                // Papéis da conta: dono/treinador, jogador e torcedor.
-                if (ownedTeam != null || playerTeam != null || user!.hasFavoriteTeam)
-                  Wrap(
-                    spacing: AppSizes.s6,
-                    runSpacing: AppSizes.s6,
-                    children: [
-                      if (ownedTeam != null)
-                        _RoleBadge(
-                          icon: Icons.shield_rounded,
-                          label: l10n.drawerOwnerOf(ownedTeam!),
-                          highlighted: true,
-                          onTap: onOpenOwnedTeam,
-                        ),
-                      if (playerTeam != null)
-                        _RoleBadge(
-                          icon: Icons.sports_soccer_rounded,
-                          label: l10n.drawerPlayerOf(playerTeam!),
-                          highlighted: true,
-                          onTap: onOpenPlayer,
-                        ),
-                      if (user!.hasFavoriteTeam)
-                        _RoleBadge(icon: Icons.favorite_rounded, label: l10n.drawerFanOf(user!.favoriteTeam)),
+        child: Stack(
+          children: [
+            Padding(
+              // À direita, espaço para o ✕ não cobrir o nome.
+              padding: const EdgeInsets.fromLTRB(AppSizes.s20, AppSizes.s24, AppSizes.s48, AppSizes.s24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(AppSizes.s4),
+                    decoration: const BoxDecoration(color: AppColors.white, shape: BoxShape.circle),
+                    child: CircleAvatar(
+                      radius: AppSizes.s32,
+                      backgroundColor: AppColors.background,
+                      backgroundImage:
+                          favoriteTeamImage == null ? null : CachedNetworkImageProvider(favoriteTeamImage!),
+                      child: favoriteTeamImage == null
+                          ? const Icon(Icons.person_rounded, color: AppColors.textSecondary, size: AppSizes.s32)
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(height: AppSizes.s14),
+                  Text(
+                    isGuest ? l10n.drawerGuest : user!.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.title(color: AppColors.white),
+                  ),
+                  const SizedBox(height: AppSizes.s8),
+                  if (isGuest) ...[
+                    Text(l10n.drawerGuestSubtitle, style: AppTypography.subtitle(color: AppColors.whiteSoft)),
+                    const SizedBox(height: AppSizes.s14),
+                    FilledButton(
+                      style: _headerButtonStyle,
+                      onPressed: () => Navigator.pushNamedAndRemoveUntil(context, AppRoutes.loginPage, (_) => false),
+                      child: Text(l10n.drawerSignIn),
+                    ),
+                  ] else ...[
+                    // Papéis da conta: dono/treinador, jogador e torcedor.
+                    if (ownedTeam != null || playerTeam != null || user!.hasFavoriteTeam)
+                      Wrap(
+                        spacing: AppSizes.s6,
+                        runSpacing: AppSizes.s6,
+                        children: [
+                          if (ownedTeam != null)
+                            _RoleBadge(
+                              icon: Icons.shield_rounded,
+                              label: l10n.drawerOwnerOf(ownedTeam!),
+                              highlighted: true,
+                              onTap: onOpenOwnedTeam,
+                            ),
+                          if (playerTeam != null)
+                            _RoleBadge(
+                              icon: Icons.sports_soccer_rounded,
+                              label: l10n.drawerPlayerOf(playerTeam!),
+                              highlighted: true,
+                              onTap: onOpenPlayer,
+                            ),
+                          if (user!.hasFavoriteTeam)
+                            _RoleBadge(icon: Icons.favorite_rounded, label: l10n.drawerFanOf(user!.favoriteTeam)),
+                        ],
+                      ),
+                    if (!user!.hasFavoriteTeam) ...[
+                      if (ownedTeam != null || playerTeam != null) const SizedBox(height: AppSizes.s10),
+                      FilledButton.icon(
+                        style: _headerButtonStyle,
+                        onPressed: onChooseTeam,
+                        icon: const Icon(Icons.shield_outlined, size: AppSizes.s18),
+                        label: Text(l10n.drawerChooseTeam),
+                      ),
                     ],
-                  ),
-                if (!user!.hasFavoriteTeam) ...[
-                  if (ownedTeam != null || playerTeam != null) const SizedBox(height: AppSizes.s10),
-                  FilledButton.icon(
-                    style: _headerButtonStyle,
-                    onPressed: onChooseTeam,
-                    icon: const Icon(Icons.shield_outlined, size: AppSizes.s18),
-                    label: Text(l10n.drawerChooseTeam),
-                  ),
+                  ],
                 ],
-              ],
-            ],
-          ),
+              ),
+            ),
+            Positioned(
+              top: AppSizes.s4,
+              right: AppSizes.s4,
+              child: IconButton(
+                tooltip: l10n.drawerClose,
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.close_rounded, color: AppColors.white),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -353,7 +315,6 @@ class _DrawerItem extends StatelessWidget {
   final IconData icon;
   final String title;
   final VoidCallback onTap;
-  final bool selected;
   final bool showChevron;
   final Color color;
 
@@ -364,7 +325,6 @@ class _DrawerItem extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.onTap,
-    this.selected = false,
     this.showChevron = true,
     this.color = AppColors.primaryDark,
     this.badge = 0,
@@ -375,7 +335,7 @@ class _DrawerItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSizes.s4),
       child: Material(
-        color: selected ? AppColors.primarySoft : AppColors.transparent,
+        color: AppColors.transparent,
         borderRadius: BorderRadius.circular(AppSizes.fieldRadius),
         child: InkWell(
           borderRadius: BorderRadius.circular(AppSizes.fieldRadius),
@@ -388,7 +348,7 @@ class _DrawerItem extends StatelessWidget {
                   width: AppSizes.s36,
                   height: AppSizes.s36,
                   decoration: BoxDecoration(
-                    color: selected ? AppColors.surface : color.withValues(alpha: 0.10),
+                    color: color.withValues(alpha: 0.10),
                     borderRadius: BorderRadius.circular(AppSizes.s10),
                   ),
                   child: Icon(icon, color: color, size: AppSizes.s20),

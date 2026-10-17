@@ -109,9 +109,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeTabTables => 'Tables';
 
   @override
-  String get drawerHome => 'Home';
-
-  @override
   String get drawerResults => 'Results around the world';
 
   @override
@@ -1006,6 +1003,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get drawerNavigation => 'Navigation';
+
+  @override
+  String get adminPanelTitle => 'Admin panel';
+
+  @override
+  String get adminPanelContent => 'Content';
+
+  @override
+  String get adminPanelCompetition => 'Competition';
+
+  @override
+  String get adminPanelSettings => 'Settings';
+
+  @override
+  String get drawerClose => 'Close menu';
+
+  @override
+  String get settingsTitle => 'Settings';
+
+  @override
+  String get settingsAccountSection => 'Account';
 
   @override
   String get drawerAdmin => 'Administration';

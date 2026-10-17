@@ -47,6 +47,8 @@ class AppRoutes {
   static const String manageChampionshipsPage = '/manage_championships_page';
   static const String championshipFormPage = '/championship_form_page';
   static const String seasonsPanelPage = '/seasons_panel_page';
+  static const String adminPanelPage = '/admin_panel_page';
+  static const String settingsPage = '/settings_page';
 }
 
 class AppSession {
