@@ -204,7 +204,9 @@ class _ProfileHeader extends StatelessWidget {
         bottom: false,
         child: Stack(
           children: [
-            Padding(
+            // Largura toda do header: o ✕ fica no canto, não no fim do conteúdo.
+            Container(
+              width: double.infinity,
               // À direita, espaço para o ✕ não cobrir o nome.
               padding: const EdgeInsets.fromLTRB(AppSizes.s20, AppSizes.s24, AppSizes.s48, AppSizes.s24),
               child: Column(
@@ -278,13 +280,26 @@ class _ProfileHeader extends StatelessWidget {
                 ],
               ),
             ),
+            // Alinhado ao topo do escudo, no canto direito.
+            // Mesmo círculo translúcido dos botões do cabeçalho da home.
             Positioned(
-              top: AppSizes.s4,
-              right: AppSizes.s4,
-              child: IconButton(
-                tooltip: l10n.drawerClose,
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.close_rounded, color: AppColors.white),
+              top: AppSizes.s16,
+              right: AppSizes.s12,
+              child: Tooltip(
+                message: l10n.drawerClose,
+                child: Material(
+                  color: AppColors.white.withValues(alpha: 0.12),
+                  shape: const CircleBorder(),
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: () => Navigator.pop(context),
+                    child: const SizedBox(
+                      width: AppSizes.s44,
+                      height: AppSizes.s44,
+                      child: Icon(Icons.close_rounded, color: AppColors.white, size: AppSizes.s22),
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
