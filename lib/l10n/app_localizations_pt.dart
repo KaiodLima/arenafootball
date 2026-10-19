@@ -618,6 +618,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchesLoadError => 'Não foi possível carregar as partidas.';
 
   @override
+  String get matchesAllChampionships => 'Todas as competições';
+
+  @override
+  String get matchesChampionshipFilter => 'Competição';
+
+  @override
+  String get matchesFriendly => 'Amistoso';
+
+  @override
   String get matchesAllGames => 'Todos os jogos';
 
   @override

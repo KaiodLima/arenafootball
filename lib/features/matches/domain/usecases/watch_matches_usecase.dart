@@ -4,8 +4,8 @@ import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/matches_filter.dart';
 import 'package:arena_soccer/features/matches/domain/repositories/matches_repository_interface.dart';
 
-/// Partidas de um campeonato na temporada, das mais recentes para as mais
-/// antigas. Com ontem/hoje/amanhã ([MatchesFilter.dayOffset]), só as daquele
+/// Partidas de um campeonato na temporada (sem [championshipId]: de todas as
+/// competições e amistosos), das mais recentes para as mais antigas. Com ontem/hoje/amanhã ([MatchesFilter.dayOffset]), só as daquele
 /// dia: a data da partida é texto "dd/MM" e é comparada com o dia no mesmo formato.
 /// Com [region] a consulta já vem só com as partidas da região (menos leituras).
 class WatchMatchesUseCase {
@@ -18,7 +18,7 @@ class WatchMatchesUseCase {
       '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}';
 
   Stream<Either<Failure, List<MatchDTO>>> call({
-    required int championshipId,
+    int? championshipId,
     required MatchesFilter filter,
     String? region,
     String? season,
@@ -31,7 +31,7 @@ class WatchMatchesUseCase {
     return _repository.watchMatches(season: season, region: region).map(
           (response) => response.map(
             (matches) => matches
-                .where((match) => match.championshipId == championshipId)
+                .where((match) => championshipId == null || match.championshipId == championshipId)
                 .where((match) => day == null || match.date == day)
                 .toList(),
           ),

@@ -1155,6 +1155,24 @@ abstract class AppLocalizations {
   /// **'Não foi possível carregar as partidas.'**
   String get matchesLoadError;
 
+  /// No description provided for @matchesAllChampionships.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todas as competições'**
+  String get matchesAllChampionships;
+
+  /// No description provided for @matchesChampionshipFilter.
+  ///
+  /// In pt, this message translates to:
+  /// **'Competição'**
+  String get matchesChampionshipFilter;
+
+  /// No description provided for @matchesFriendly.
+  ///
+  /// In pt, this message translates to:
+  /// **'Amistoso'**
+  String get matchesFriendly;
+
   /// No description provided for @matchesAllGames.
   ///
   /// In pt, this message translates to:

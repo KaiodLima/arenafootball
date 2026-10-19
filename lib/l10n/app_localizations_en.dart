@@ -615,6 +615,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchesLoadError => 'Could not load the matches.';
 
   @override
+  String get matchesAllChampionships => 'All competitions';
+
+  @override
+  String get matchesChampionshipFilter => 'Competition';
+
+  @override
+  String get matchesFriendly => 'Friendly';
+
+  @override
   String get matchesAllGames => 'All games';
 
   @override

@@ -35,6 +35,9 @@ class MatchCard extends StatelessWidget {
   /// Toque no card (admin: abre o "Card de gol" com esta partida).
   final VoidCallback? onTap;
 
+  /// Nome da competição (lista de todas as competições); nulo = sem etiqueta.
+  final String? championshipLabel;
+
   const MatchCard({
     super.key,
     required this.match,
@@ -49,6 +52,7 @@ class MatchCard extends StatelessWidget {
     this.isFavoriteTeam = _none,
     this.showVoting = true,
     this.onTap,
+    this.championshipLabel,
   });
 
   static bool _none(String _) => false;
@@ -68,6 +72,24 @@ class MatchCard extends StatelessWidget {
         padding: EdgeInsets.fromLTRB(AppSizes.s12, isAdmin ? AppSizes.s4 : AppSizes.s16, AppSizes.s4, AppSizes.s12),
         child: Column(
           children: [
+            if (championshipLabel != null)
+              Padding(
+                padding: EdgeInsets.only(top: isAdmin ? AppSizes.s8 : 0, right: AppSizes.s8),
+                child: Row(
+                  children: [
+                    const Icon(Icons.emoji_events_outlined, size: AppSizes.s14, color: AppColors.textSecondary),
+                    const SizedBox(width: AppSizes.s4),
+                    Flexible(
+                      child: Text(
+                        championshipLabel!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             if (isAdmin)
               Align(
                 alignment: Alignment.centerRight,

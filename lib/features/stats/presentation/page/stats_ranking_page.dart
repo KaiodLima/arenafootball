@@ -25,7 +25,10 @@ class StatsRankingPage extends StatefulWidget {
   final String? region;
   final String? season;
 
-  const StatsRankingPage({super.key, required this.type, this.region, this.season});
+  /// Abre já no ranking da competição (nula = geral).
+  final int? championshipId;
+
+  const StatsRankingPage({super.key, required this.type, this.region, this.season, this.championshipId});
 
   @override
   State<StatsRankingPage> createState() => _StatsRankingPageState();
@@ -41,7 +44,8 @@ class _StatsRankingPageState extends State<StatsRankingPage> {
     final selected = BlocProvider.of<RegionCubit>(context).state;
     _region = widget.region ?? selected.selectedRegion;
     _season = widget.season ?? selected.selectedSeason;
-    BlocProvider.of<StatsRankingCubit>(context).load(type: widget.type, region: _region, season: _season);
+    BlocProvider.of<StatsRankingCubit>(context)
+        .load(type: widget.type, region: _region, season: _season, championshipId: widget.championshipId);
   }
 
   @override

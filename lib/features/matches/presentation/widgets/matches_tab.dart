@@ -4,6 +4,8 @@ import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/championships_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/championships_state.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/championship_picker.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/matches_filter.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/matches_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/matches_list.dart';
@@ -12,7 +14,6 @@ import 'package:arena_soccer/features/matches/presentation/widgets/match_day_swi
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
-import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/section_header.dart';
 import 'package:arena_soccer/utils/components/shortcut_tile.dart';
@@ -20,12 +21,13 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// Aba de tabelas da home: campeonatos da região na temporada (chips quando
-/// há mais de um ao mesmo tempo) e as partidas de ontem, hoje ou amanhã do
-/// escolhido, com atalhos para todos os jogos, grupos, artilharia e
-/// assistências. A home recria a aba (key) quando região/ano mudam.
-/// [ChampionshipsCubit] e [MatchesCubit] são os da home: trocar de aba e
-/// voltar não reabre as consultas; região/ano/campeonato novos, sim.
+/// Aba de tabelas da home: as partidas de ontem, hoje ou amanhã da região, de
+/// todas as competições (e amistosos) ou só da escolhida no seletor (lista com
+/// busca, como no cadastro de partida), com atalhos para todos os jogos,
+/// grupos, artilharia e assistências. A home recria a aba (key) quando
+/// região/ano mudam. [ChampionshipsCubit] e [MatchesCubit] são os da home:
+/// trocar de aba e voltar não reabre as consultas; região/ano/competição
+/// novos, sim.
 class MatchesTab extends StatefulWidget {
   const MatchesTab({super.key});
 
@@ -45,6 +47,15 @@ class _MatchesTabState extends State<MatchesTab> {
   Widget build(BuildContext context) => const _ChampionshipMatches();
 }
 
+/// Competições da temporada que aparecem na região: as que a consulta da
+/// região trouxe (inclui intermunicipais com sede em outra região); sem
+/// nenhuma com `ano`, os dados antigos da região.
+List<ChampionshipDTO> tableChampionships(List<ChampionshipDTO> all, {required String season}) {
+  final ofSeason = all.where((c) => c.season == season).toList()
+    ..sort((a, b) => a.championshipId.compareTo(b.championshipId));
+  return ofSeason.isNotEmpty ? ofSeason : [if (all.isNotEmpty) all.first];
+}
+
 class _ChampionshipMatches extends StatefulWidget {
   const _ChampionshipMatches();
 
@@ -53,9 +64,21 @@ class _ChampionshipMatches extends StatefulWidget {
 }
 
 class _ChampionshipMatchesState extends State<_ChampionshipMatches> {
-  /// Campeonato escolhido por região/temporada, lembrado enquanto o app está
-  /// aberto (a home recria a aba ao trocar de região).
-  static final Map<String, int> _remembered = {};
+  /// Competição escolhida por região/temporada (ausente = todas), lembrada
+  /// enquanto o app está aberto (a home recria a aba ao trocar de região).
+  static final Map<String, int?> _remembered = {};
+
+  Future<void> _pick(List<ChampionshipDTO> options, int? current, String key) async {
+    final l10n = AppLocalizations.of(context);
+    final picked = await showChampionshipPickerSheet(
+      context,
+      championships: options,
+      selectedId: current,
+      noneLabel: l10n.matchesAllChampionships,
+      noneIcon: Icons.format_list_bulleted_rounded,
+    );
+    if (picked != null && mounted) setState(() => _remembered[key] = picked.id);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,44 +95,34 @@ class _ChampionshipMatchesState extends State<_ChampionshipMatches> {
           return ArenaEmptyState.error(message: l10n.championshipsLoadError);
         }
 
-        // Os da temporada selecionada (podem ser vários ao mesmo tempo); sem
-        // nenhum, o primeiro da região (dados antigos sem `ano`).
-        final inRegion = state.championships.where((c) => c.region == region.selectedRegion).toList();
-        final ofSeason = inRegion.where((c) => c.season == region.selectedSeason).toList()
-          ..sort((a, b) => a.championshipId.compareTo(b.championshipId));
-        final options = ofSeason.isNotEmpty ? ofSeason : [if (inRegion.isNotEmpty) inRegion.first];
-        if (options.isEmpty) {
-          return ArenaEmptyState(message: l10n.matchesNoChampionship, icon: Icons.emoji_events_outlined);
-        }
-        final ChampionshipDTO championship =
-            options.where((c) => c.championshipId == _remembered[key]).firstOrNull ?? options.first;
+        final options = tableChampionships(state.championships, season: region.selectedSeason);
+        final rememberedId = _remembered[key];
+        final championship = options.where((c) => c.championshipId == rememberedId).firstOrNull;
+        final championshipId = championship?.championshipId;
+        final titles = {for (final c in options) c.championshipId: c.title};
 
-        final championshipId = championship.championshipId;
         return Column(
           children: [
-            if (options.length > 1)
-              SizedBox(
-                height: AppSizes.s56,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s12, AppSizes.s16, 0),
-                  itemCount: options.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: AppSizes.s8),
-                  itemBuilder: (context, index) {
-                    final option = options[index];
-                    return ArenaChoiceChip(
-                      label: option.title,
-                      icon: Icons.emoji_events_outlined,
-                      selected: option.championshipId == championshipId,
-                      onTap: () => setState(() => _remembered[key] = option.championshipId),
-                    );
-                  },
+            if (options.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s12, AppSizes.s16, 0),
+                child: ChampionshipSelectTile(
+                  label: l10n.matchesChampionshipFilter,
+                  championship: championship,
+                  noneLabel: l10n.matchesAllChampionships,
+                  noneIcon: Icons.format_list_bulleted_rounded,
+                  onTap: () => _pick(options, championshipId, key),
                 ),
               ),
             Expanded(
               child: _DayMatches(
                 key: ValueKey(championshipId),
                 championshipId: championshipId,
+                championships: options,
+                // Em "todas as competições", cada card diz de qual é.
+                championshipLabelOf: championshipId != null
+                    ? null
+                    : (MatchDTO match) => titles[match.championshipId] ?? l10n.matchesFriendly,
                 region: region.selectedRegion,
                 season: region.selectedSeason,
               ),
@@ -123,11 +136,21 @@ class _ChampionshipMatchesState extends State<_ChampionshipMatches> {
 
 /// Atalhos, seletor de dia (ontem/hoje/amanhã) e as partidas do dia escolhido.
 class _DayMatches extends StatefulWidget {
-  final int championshipId;
+  /// Nulo = todas as competições.
+  final int? championshipId;
+  final List<ChampionshipDTO> championships;
+  final String? Function(MatchDTO match)? championshipLabelOf;
   final String region;
   final String season;
 
-  const _DayMatches({super.key, required this.championshipId, required this.region, required this.season});
+  const _DayMatches({
+    super.key,
+    required this.championshipId,
+    required this.championships,
+    required this.championshipLabelOf,
+    required this.region,
+    required this.season,
+  });
 
   @override
   State<_DayMatches> createState() => _DayMatchesState();
@@ -136,7 +159,7 @@ class _DayMatches extends StatefulWidget {
 class _DayMatchesState extends State<_DayMatches> {
   late MatchesFilter _day;
 
-  /// O cubit da home ignora o pedido se já ouve este campeonato/região/ano
+  /// O cubit da home ignora o pedido se já ouve esta competição/região/ano
   /// (volta à aba); o dia na tela é o que ele já estava mostrando.
   @override
   void initState() {
@@ -173,10 +196,16 @@ class _DayMatchesState extends State<_DayMatches> {
     return MatchesList(
       season: widget.season,
       emptyMessage: empty,
+      championshipLabelOf: widget.championshipLabelOf,
       header: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _Shortcuts(championshipId: widget.championshipId, region: widget.region, season: widget.season),
+          _Shortcuts(
+            championshipId: widget.championshipId,
+            championships: widget.championships,
+            region: widget.region,
+            season: widget.season,
+          ),
           const SizedBox(height: AppSizes.s20),
           MatchDaySwitch(selected: _day, onChanged: _selectDay),
           const SizedBox(height: AppSizes.s16),
@@ -195,20 +224,44 @@ class _DayMatchesState extends State<_DayMatches> {
   }
 }
 
-/// Atalhos para outras telas do campeonato, em 3 blocos iguais (artilharia e
-/// assistências são a mesma tela, com o seletor lá dentro).
+/// Atalhos para outras telas da competição, em 3 blocos iguais (artilharia e
+/// assistências são a mesma tela, com o seletor lá dentro). Em "todas as
+/// competições", os jogos são de todas; grupos pedem a competição antes.
 class _Shortcuts extends StatelessWidget {
-  final int championshipId;
+  final int? championshipId;
+  final List<ChampionshipDTO> championships;
   final String region;
   final String season;
 
-  const _Shortcuts({required this.championshipId, required this.region, required this.season});
+  const _Shortcuts({
+    required this.championshipId,
+    required this.championships,
+    required this.region,
+    required this.season,
+  });
 
   void _openStats(BuildContext context, StatsRankingType type) => Navigator.pushNamed(
         context,
         AppRoutes.statsRankingPage,
-        arguments: {'type': type, 'region': region, 'season': season},
+        arguments: {'type': type, 'region': region, 'season': season, 'championshipId': championshipId},
       );
+
+  Future<void> _openGroups(BuildContext context) async {
+    var id = championshipId;
+    if (id == null && championships.length == 1) id = championships.first.championshipId;
+    if (id == null && championships.isNotEmpty) {
+      final picked = await showChampionshipPickerSheet(context, championships: championships, showNone: false);
+      // Grupos são de uma competição: "nenhuma" não abre.
+      id = picked?.id;
+      if (id == null) return;
+    }
+    if (!context.mounted) return;
+    await Navigator.pushNamed(
+      context,
+      AppRoutes.groupsPage,
+      arguments: {'region': region, 'season': season, 'championshipId': id},
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -229,11 +282,7 @@ class _Shortcuts extends StatelessWidget {
         ShortcutTile(
           title: l10n.matchesGroups,
           icon: Icons.groups_rounded,
-          onTap: () => Navigator.pushNamed(
-            context,
-            AppRoutes.groupsPage,
-            arguments: {'region': region, 'season': season, 'championshipId': championshipId},
-          ),
+          onTap: () => _openGroups(context),
         ),
         ShortcutTile(
           title: l10n.statsShortcut,

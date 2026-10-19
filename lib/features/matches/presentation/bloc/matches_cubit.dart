@@ -29,6 +29,9 @@ class MatchesCubit extends Cubit<MatchesState> {
   int? _championshipId;
   MatchesFilter? _filter;
 
+  /// Já houve um [watch] (o campeonato pode ser nulo = todas as competições).
+  bool _started = false;
+
   /// Conta as cargas de escudos: só a mais recente é aplicada.
   int _crestsLoad = 0;
 
@@ -44,7 +47,7 @@ class MatchesCubit extends Cubit<MatchesState> {
   MatchesFilter? get filter => _filter;
 
   /// Já ouve as partidas deste campeonato na região/temporada.
-  bool isWatching({required int championshipId, required String region, required String season}) =>
+  bool isWatching({int? championshipId, required String region, required String season}) =>
       _subscription != null && _championshipId == championshipId && _region == region && _season == season;
 
   /// Ouve as partidas do campeonato na região/temporada. Na aba de tabelas o
@@ -52,7 +55,7 @@ class MatchesCubit extends Cubit<MatchesState> {
   /// não reabre a consulta (só troca o dia, se mudou); qualquer outra troca
   /// começa do zero (lista, filtro por time e escudos).
   void watch({
-    required int championshipId,
+    int? championshipId,
     required MatchesFilter filter,
     required String region,
     required String season,
@@ -64,6 +67,7 @@ class MatchesCubit extends Cubit<MatchesState> {
     _region = region;
     _season = season;
     _championshipId = championshipId;
+    _started = true;
     emit(const LoadingMatchesState());
     _loadCrests(region: region, season: season);
     _subscribe(filter);
@@ -72,7 +76,7 @@ class MatchesCubit extends Cubit<MatchesState> {
   /// Troca o dia da aba de tabelas (ontem/hoje/amanhã) sem recarregar os
   /// escudos; a lista anterior fica na tela até chegar a nova.
   void selectDay(MatchesFilter filter) {
-    if (_championshipId == null) return;
+    if (!_started) return;
     _subscribe(filter);
   }
 
@@ -81,7 +85,7 @@ class MatchesCubit extends Cubit<MatchesState> {
     _filter = filter;
     emit(LoadingMatchesState(matches: state.matches, teamFilter: state.teamFilter, crests: state.crests));
     _subscription = watchMatchesUseCase(
-      championshipId: _championshipId!,
+      championshipId: _championshipId,
       filter: filter,
       region: _region,
       season: _season,

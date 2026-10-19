@@ -277,6 +277,7 @@ class ArenaApp extends StatelessWidget {
               type: args?['type'] as StatsRankingType? ?? StatsRankingType.goals,
               region: args?['region'] as String?,
               season: args?['season'] as String?,
+              championshipId: args?['championshipId'] as int?,
             ),
           );
         },
@@ -287,7 +288,7 @@ class ArenaApp extends StatelessWidget {
           return BlocProvider<MatchesCubit>(
             create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl()),
             child: MatchesPage(
-              championshipId: args?['championshipId'] as int,
+              championshipId: args?['championshipId'] as int?,
               region: args?['region'] as String?,
               season: args?['season'] as String?,
             ),

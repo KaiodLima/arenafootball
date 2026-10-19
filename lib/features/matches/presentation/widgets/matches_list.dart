@@ -33,7 +33,17 @@ class MatchesList extends StatelessWidget {
   /// Mensagem quando não há partidas no recorte (padrão: "Nenhuma partida cadastrada").
   final String? emptyMessage;
 
-  const MatchesList({super.key, required this.season, this.header, this.groupByDate = false, this.emptyMessage});
+  /// Etiqueta da competição em cada card (nulo = sem etiqueta).
+  final String? Function(MatchDTO match)? championshipLabelOf;
+
+  const MatchesList({
+    super.key,
+    required this.season,
+    this.header,
+    this.groupByDate = false,
+    this.emptyMessage,
+    this.championshipLabelOf,
+  });
 
   void _openVoting(BuildContext context, MatchDTO match) {
     Navigator.pushNamed(
@@ -101,6 +111,7 @@ class MatchesList extends StatelessWidget {
 
         Widget card(MatchDTO match) => MatchCard(
               match: match,
+              championshipLabel: championshipLabelOf?.call(match),
               isAdmin: isAdmin,
               homeCrest: state.crestOf(match.homeTeam),
               awayCrest: state.crestOf(match.awayTeam),

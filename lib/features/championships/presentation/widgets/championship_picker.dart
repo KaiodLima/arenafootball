@@ -19,14 +19,16 @@ String championshipScopeLine(AppLocalizations l10n, ChampionshipDTO championship
 class _ChampionshipThumb extends StatelessWidget {
   final ChampionshipDTO? championship;
   final double size;
+  final IconData noneIcon;
 
-  const _ChampionshipThumb({required this.championship, this.size = AppSizes.s44});
+  const _ChampionshipThumb(
+      {required this.championship, this.size = AppSizes.s44, this.noneIcon = Icons.handshake_outlined});
 
   @override
   Widget build(BuildContext context) {
     final url = championship?.imageUrl ?? '';
     final icon = Icon(
-      championship == null ? Icons.handshake_outlined : Icons.emoji_events_outlined,
+      championship == null ? noneIcon : Icons.emoji_events_outlined,
       color: AppColors.primaryDark,
       size: size * 0.5,
     );
@@ -58,7 +60,18 @@ class ChampionshipSelectTile extends StatelessWidget {
   final ChampionshipDTO? championship;
   final VoidCallback onTap;
 
-  const ChampionshipSelectTile({super.key, required this.label, required this.championship, required this.onTap});
+  /// Texto e ícone quando nenhum está escolhido (padrão: amistoso).
+  final String? noneLabel;
+  final IconData noneIcon;
+
+  const ChampionshipSelectTile({
+    super.key,
+    required this.label,
+    required this.championship,
+    required this.onTap,
+    this.noneLabel,
+    this.noneIcon = Icons.handshake_outlined,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +88,7 @@ class ChampionshipSelectTile extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(AppSizes.s12, AppSizes.s10, AppSizes.s12, AppSizes.s10),
           child: Row(
             children: [
-              _ChampionshipThumb(championship: selected),
+              _ChampionshipThumb(championship: selected, noneIcon: noneIcon),
               const SizedBox(width: AppSizes.s12),
               Expanded(
                 child: Column(
@@ -83,7 +96,7 @@ class ChampionshipSelectTile extends StatelessWidget {
                   children: [
                     Text(label, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
                     Text(
-                      selected?.title ?? l10n.matchFormNoChampionship,
+                      selected?.title ?? noneLabel ?? l10n.matchFormNoChampionship,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s16),
@@ -114,20 +127,40 @@ Future<({int? id})?> showChampionshipPickerSheet(
   BuildContext context, {
   required List<ChampionshipDTO> championships,
   int? selectedId,
+  String? noneLabel,
+  IconData noneIcon = Icons.handshake_outlined,
+  bool showNone = true,
 }) {
   return showModalBottomSheet<({int? id})>(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
-    builder: (_) => _ChampionshipPicker(championships: championships, selectedId: selectedId),
+    builder: (_) => _ChampionshipPicker(
+      championships: championships,
+      selectedId: selectedId,
+      noneLabel: noneLabel,
+      noneIcon: noneIcon,
+      showNone: showNone,
+    ),
   );
 }
 
 class _ChampionshipPicker extends StatefulWidget {
   final List<ChampionshipDTO> championships;
   final int? selectedId;
+  final String? noneLabel;
+  final IconData noneIcon;
 
-  const _ChampionshipPicker({required this.championships, required this.selectedId});
+  /// Mostra a opção nula (amistoso / todas) no topo.
+  final bool showNone;
+
+  const _ChampionshipPicker({
+    required this.championships,
+    required this.selectedId,
+    required this.noneLabel,
+    required this.noneIcon,
+    required this.showNone,
+  });
 
   @override
   State<_ChampionshipPicker> createState() => _ChampionshipPickerState();
@@ -140,9 +173,9 @@ class _ChampionshipPickerState extends State<_ChampionshipPicker> {
     final l10n = AppLocalizations.of(context);
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: AppSizes.s20),
-      leading: _ChampionshipThumb(championship: championship, size: AppSizes.s40),
+      leading: _ChampionshipThumb(championship: championship, size: AppSizes.s40, noneIcon: widget.noneIcon),
       title: Text(
-        championship?.title ?? l10n.matchFormNoChampionship,
+        championship?.title ?? widget.noneLabel ?? l10n.matchFormNoChampionship,
         style: AppTypography.body().copyWith(fontWeight: selected ? FontWeight.w700 : FontWeight.w500),
       ),
       subtitle: championship == null
@@ -180,8 +213,10 @@ class _ChampionshipPickerState extends State<_ChampionshipPicker> {
             ),
             const SizedBox(height: AppSizes.s8),
             // Amistoso sempre no topo (fora da busca).
-            _tile(championship: null, selected: widget.selectedId == null),
-            const Divider(height: 1),
+            if (widget.showNone) ...[
+              _tile(championship: null, selected: widget.selectedId == null),
+              const Divider(height: 1),
+            ],
             Expanded(
               child: list.isEmpty
                   ? ArenaEmptyState(message: l10n.matchFormChampionshipNoResults, icon: Icons.emoji_events_outlined)

@@ -15,11 +15,12 @@ import 'package:arena_soccer/utils/constants/app_sizes.dart';
 /// por data, com resumo, filtro por time e as mesmas ações da aba. Sem
 /// [region]/[season], usa o [RegionCubit].
 class MatchesPage extends StatefulWidget {
-  final int championshipId;
+  /// Nulo = partidas de todas as competições.
+  final int? championshipId;
   final String? region;
   final String? season;
 
-  const MatchesPage({super.key, required this.championshipId, this.region, this.season});
+  const MatchesPage({super.key, this.championshipId, this.region, this.season});
 
   @override
   State<MatchesPage> createState() => _MatchesPageState();
