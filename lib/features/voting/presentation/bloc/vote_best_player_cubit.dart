@@ -26,6 +26,10 @@ class VoteBestPlayerCubit extends Cubit<VoteBestPlayerState> {
   StreamSubscription<Either<Failure, List<PlayerDTO>>>? _awaySubscription;
   MatchVoteRef _ref = const MatchVoteRef(matchId: '', season: '', homeTeam: '', awayTeam: '');
 
+  /// Competição da partida: os elencos mostram só quem joga por cada time
+  /// nela (0 = partida sem competição, elenco geral).
+  int _championshipId = 0;
+
   /// O voto atual só pré-seleciona uma vez (depois o usuário manda).
   bool _preselected = false;
 
@@ -39,6 +43,7 @@ class VoteBestPlayerCubit extends Cubit<VoteBestPlayerState> {
   /// [voterId] vazio = convidado (não tem voto atual).
   void watch({required MatchDTO match, required String season, required String voterId}) {
     _ref = MatchVoteRef.of(match, season);
+    _championshipId = match.championshipId;
     _preselected = false;
     _homeSubscription?.cancel();
     _awaySubscription?.cancel();
@@ -79,7 +84,16 @@ class VoteBestPlayerCubit extends Cubit<VoteBestPlayerState> {
   void _onPlayers(Either<Failure, List<PlayerDTO>> response, {required bool isHome}) {
     response.fold(
       (failure) => emit(_error(failure)),
-      (players) {
+      (all) {
+        final players = _championshipId <= 0
+            ? all
+            : all
+                .where((p) => p.playsIn(
+                      _championshipId,
+                      teamId: isHome ? _ref.homeTeamId : _ref.awayTeamId,
+                      teamName: isHome ? _ref.homeTeam : _ref.awayTeam,
+                    ))
+                .toList();
         emit(ReadyVoteBestPlayerState(
           homePlayers: isHome ? players : state.homePlayers,
           awayPlayers: isHome ? state.awayPlayers : players,
@@ -102,9 +116,9 @@ class VoteBestPlayerCubit extends Cubit<VoteBestPlayerState> {
     if (_preselected || vote == null || state.selected != null) return;
     final isAway = sameTeam(idA: vote.teamId, nameA: vote.team, idB: _ref.awayTeamId, nameB: _ref.awayTeam);
     final squad = isAway ? state.awayPlayers : state.homePlayers;
+    // O elenco já é o do time do voto (o atleta pode ter outro time principal).
     for (final player in squad) {
-      if (player.name == vote.playerName &&
-          sameTeam(idA: player.teamId, nameA: player.team, idB: vote.teamId, nameB: vote.team)) {
+      if (player.name == vote.playerName) {
         _preselected = true;
         emit(_ready(selected: player, showAway: isAway));
         return;
@@ -136,11 +150,13 @@ class VoteBestPlayerCubit extends Cubit<VoteBestPlayerState> {
       awayCrest: state.awayCrest,
     ));
 
+    // O voto leva o time da partida em que ele jogou (não o principal dele).
+    final isAway = selected != null && state.awayPlayers.any((p) => p.id == selected.id);
     final vote = VoteDTO(
       voterId: voterId,
       playerName: selected?.name ?? '',
-      team: selected?.team ?? '',
-      teamId: selected?.teamId ?? '',
+      team: selected == null ? '' : (isAway ? _ref.awayTeam : _ref.homeTeam),
+      teamId: selected == null ? '' : (isAway ? _ref.awayTeamId : _ref.homeTeamId),
     );
     final response = await castVoteUseCase(ref: _ref, vote: vote);
     if (isClosed) return;

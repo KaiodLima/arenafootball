@@ -42,7 +42,7 @@ class BlocsLoad extends StatelessWidget {
 
         // Time em que o usuário logado joga ("Sou jogador" aprovado) — global:
         // o menu mostra "Jogador do {time}".
-        BlocProvider<MyPlayerCubit>(create: (_) => MyPlayerCubit(sl())),
+        BlocProvider<MyPlayerCubit>(create: (_) => MyPlayerCubit(sl(), sl())),
       ],
       // Tópicos de push acompanham a região e o time do coração.
       child: OwnedTeamSync(child: PushTopicsListener(child: child)),

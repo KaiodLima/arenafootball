@@ -1,4 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_cache_first_usecase.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/get_today_matches_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/update_match_score_usecase.dart';
@@ -23,6 +25,7 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
   final UpdateMatchScoreUseCase updateMatchScoreUseCase;
   final WatchTeamPlayersUseCase watchTeamPlayersUseCase;
   final AddPlayerStatsUseCase addPlayerStatsUseCase;
+  final GetRegionChampionshipsCacheFirstUseCase getRegionChampionshipsCacheFirstUseCase;
   String? _season;
 
   /// Confronto cujos elencos estão carregados (ou carregando).
@@ -43,6 +46,7 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
     this.updateMatchScoreUseCase,
     this.watchTeamPlayersUseCase,
     this.addPlayerStatsUseCase,
+    this.getRegionChampionshipsCacheFirstUseCase,
   ) : super(const EditingGoalNotificationState());
 
   /// Toda edição passa por aqui: se o confronto mudou, autor e assistência
@@ -88,14 +92,23 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
       _edit(form.copyWith(clearScorer: true));
       return;
     }
-    // A assistência só vale se for outro jogador do mesmo time.
-    final valid = assistant != null && assistant.id != scorer.id && assistant.team == scorer.team;
+    // A assistência só vale se for outro jogador do mesmo time (no elenco
+    // do time do autor nesta competição).
+    final side = form.sideOf(scorer);
+    final valid = assistant != null && assistant.id != scorer.id && side != null && form.sideOf(assistant) == side;
     _edit(form.copyWith(
       scorer: scorer,
       assistant: valid ? assistant : null,
       clearAssistant: !valid,
-      scoringTeam: scorer.team,
+      scoringTeam: side ?? scorer.team,
     ));
+  }
+
+  /// Competição do gol nas chips (quando a partida não diz qual é). O autor
+  /// escolhido pode não jogar nela: escolhe de novo.
+  void selectChampionship(int championshipId) {
+    if (championshipId == state.form.championshipId) return;
+    _edit(state.form.copyWith(selectedChampionshipId: () => championshipId, clearScorer: true));
   }
 
   Future<void> load({
@@ -141,14 +154,18 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
     // Cache-first: fica com a última emissão (o remoto quando revalidou).
     final teamsFuture = getTeamsCacheFirstUseCase(region: region).last;
     final matchesFuture = getTodayMatchesUseCase(region: region, season: _season);
+    final championshipsFuture = getRegionChampionshipsCacheFirstUseCase(region: region, season: _season ?? '').last;
     final teamsResponse = await teamsFuture;
     final matchesResponse = await matchesFuture;
+    final championshipsResponse = await championshipsFuture;
     if (isClosed || state.form.selectedRegion != region) return;
     final teams = teamsResponse.fold((_) => const <TeamDTO>[], (list) => list);
     // Sem as partidas de hoje, só não aparece o atalho.
     final matches = matchesResponse.fold((_) => const <MatchDTO>[], (list) => list);
+    // Sem as competições, o gol soma só no total.
+    final championships = championshipsResponse.fold((_) => const <ChampionshipDTO>[], (list) => list);
 
-    final form = state.form.copyWith(teams: teams, todayMatches: matches);
+    final form = state.form.copyWith(teams: teams, todayMatches: matches, championships: championships);
     final initialMatch = _initialMatch;
     _initialMatch = null;
     if (initialMatch != null) {
@@ -196,7 +213,7 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
   /// Desfazer o gol do time do autor desfaz também autor e assistência.
   void decrementHome() {
     _setGoals(home: state.form.homeGoals - 1);
-    if (state.form.scorer?.team == state.form.homeTeam) setScorer(null, null);
+    if (state.form.sideOf(state.form.scorer) == state.form.homeTeam) setScorer(null, null);
     if (state.form.scoringTeam == state.form.homeTeam) _edit(state.form.copyWith(clearScoringTeam: true));
   }
 
@@ -207,7 +224,7 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
 
   void decrementAway() {
     _setGoals(away: state.form.awayGoals - 1);
-    if (state.form.scorer?.team == state.form.awayTeam) setScorer(null, null);
+    if (state.form.sideOf(state.form.scorer) == state.form.awayTeam) setScorer(null, null);
     if (state.form.scoringTeam == state.form.awayTeam) _edit(state.form.copyWith(clearScoringTeam: true));
   }
 
@@ -255,6 +272,7 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
         scoringTeamId: form.teamIdOf(form.scoringTeam),
         scoringTeamPrimaryColor: form.teamOf(form.scoringTeam)?.primaryColor ?? '',
         scoringTeamSecondaryColor: form.teamOf(form.scoringTeam)?.secondaryColor ?? '',
+        championshipId: form.championshipId,
       ),
     );
     if (isClosed) return;
@@ -292,7 +310,14 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
     final scorer = form.scorer;
     final assistant = form.assistant;
     if (scorer != null || assistant != null) {
-      final stats = await addPlayerStatsUseCase(scorer: scorer, assistant: assistant, season: _season);
+      final stats = await addPlayerStatsUseCase(
+        scorer: scorer,
+        assistant: assistant,
+        season: _season,
+        championshipId: form.championshipId,
+        teamId: form.teamIdOf(form.scoringTeam),
+        team: form.scoringTeam ?? '',
+      );
       if (isClosed) return;
       if (stats.isLeft) {
         emit(PartialGoalNotificationState(

@@ -1,4 +1,5 @@
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/core/cache/cache_keys.dart';
 import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
@@ -41,6 +42,19 @@ class ChampionshipsRepositoryImpl implements IChampionshipsRepository {
   @override
   Future<Either<Failure, void>> deleteChampionship(String id) async =>
       _invalidate(await _dataSource.deleteChampionship(id));
+
+  @override
+  Future<Either<Failure, List<ChampionshipDTO>>> getSeasonChampionships(String season) =>
+      _dataSource.getSeasonChampionships(season);
+
+  @override
+  Future<Either<Failure, ChampionshipDTO>> setTeamEnrollment({
+    required String championshipDocId,
+    required TeamDTO team,
+    required bool enrolled,
+  }) async =>
+      _invalidate(
+          await _dataSource.setTeamEnrollment(championshipDocId: championshipDocId, team: team, enrolled: enrolled));
 
   @override
   Future<Either<Failure, ChampionshipDTO?>> getChampionshipForRegion({

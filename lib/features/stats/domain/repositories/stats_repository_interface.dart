@@ -12,6 +12,7 @@ abstract class IStatsRepository {
     required StatsRankingType type,
     required String region,
     String? season,
+    int? championshipId,
   });
 
   Future<Either<Failure, void>> saveRankingCache(
@@ -19,6 +20,7 @@ abstract class IStatsRepository {
     required StatsRankingType type,
     required String region,
     String? season,
+    int? championshipId,
   });
 
   /// Apaga todos os rankings (qualquer quesito, região e temporada).

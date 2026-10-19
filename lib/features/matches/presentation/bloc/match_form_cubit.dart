@@ -71,12 +71,15 @@ class MatchFormCubit extends Cubit<MatchFormState> {
   Future<void> _loadRegionData(String region) async {
     // Cache-first: fica com a última emissão (o remoto quando revalidou).
     final teamsFuture = getTeamsCacheFirstUseCase(region: region).last;
+    // Todos da temporada (cache): os de fora da região, para intermunicipal.
+    final seasonTeamsFuture = getTeamsCacheFirstUseCase().last;
     final matchesFuture = getRegionMatchesUseCase(region: region);
     final championshipsFuture =
         getRegionChampionshipsCacheFirstUseCase(region: region, season: SeasonCollection.currentSeason).last;
     final teamsResponse = await teamsFuture;
     final matchesResponse = await matchesFuture;
     final championshipsResponse = await championshipsFuture;
+    final seasonTeamsResponse = await seasonTeamsFuture;
     if (isClosed || state.form.selectedRegion != region) return;
 
     final regionTeams = teamsResponse.fold((_) => const <TeamDTO>[], (list) => list);
@@ -88,6 +91,7 @@ class MatchFormCubit extends Cubit<MatchFormState> {
 
     var form = state.form.copyWith(
       regionTeams: regionTeams,
+      seasonTeams: seasonTeamsResponse.fold((_) => const <TeamDTO>[], (list) => list),
       championships: championships,
       championshipId: () => championshipId,
       existing: existing,
@@ -101,11 +105,15 @@ class MatchFormCubit extends Cubit<MatchFormState> {
       ? form.copyWith(clearTeams: true)
       : form.copyWith(homeTeam: form.teams.first.name, awayTeam: form.teams.last.name);
 
-  /// Outro campeonato: os times oferecidos passam a ser os dele.
-  void selectChampionship(int championshipId) {
+  /// Outro campeonato (nulo = amistoso, sem campeonato): os times oferecidos
+  /// passam a ser os dele; os escolhidos ficam se continuarem valendo.
+  void selectChampionship(int? championshipId) {
     if (championshipId == state.form.championshipId) return;
     final form = state.form.copyWith(championshipId: () => championshipId);
-    _edit(_withTeams(form.copyWith(teams: form.teamsFor(championshipId))));
+    final teams = form.teamsFor(championshipId);
+    bool offered(String? name) => name != null && teams.any((t) => t.name == name);
+    final next = form.copyWith(teams: teams);
+    _edit(offered(form.homeTeam) && offered(form.awayTeam) ? next : _withTeams(next));
   }
 
   void selectHomeTeam(String team) => _edit(state.form.copyWith(homeTeam: team));
@@ -136,7 +144,8 @@ class MatchFormCubit extends Cubit<MatchFormState> {
     emit(SubmittingMatchFormState(form: form));
 
     final match = form.toMatch();
-    final response = await createMatchUseCase(match);
+    // Região com campeonatos e nenhum escolhido = amistoso.
+    final response = await createMatchUseCase(match, friendly: form.isFriendly);
     if (isClosed) return;
     response.fold(
       (failure) => emit(ErrorMatchFormState(form: form, errorMessage: failure.toString())),

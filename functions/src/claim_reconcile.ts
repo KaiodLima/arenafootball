@@ -9,6 +9,7 @@ type Doc = Record<string, unknown>;
 
 const text = (value: unknown): string => (value === undefined || value === null ? '' : String(value).trim());
 const count = (value: unknown): number => (typeof value === 'number' && Number.isFinite(value) ? value : 0);
+const isRecord = (value: unknown): value is Doc => typeof value === 'object' && value !== null && !Array.isArray(value);
 
 /** O pedido precisa de reconciliação: aprovado, com vínculo e outro atleta. */
 export function needsClaimReconcile(request: Doc | undefined): boolean {
@@ -43,17 +44,61 @@ export function claimReconcilePlan(
   const createdIsOwn = created !== undefined && text(created.idUsuario) === uid;
   const position = text(request.posicao);
   const photo = text(request.urlImagem);
+  const teamId = text(created?.idTime) || text(request.idTime) || text(claimed.idTime);
+  const extraGoals = createdIsOwn ? count(created?.nGols) : 0;
+  const extraAssists = createdIsOwn ? count(created?.nAssistencias) : 0;
+  // Pedido com competição: a inscrição do pedido vai para o reivindicado (com
+  // o que o criado já tinha recebido nela); o time principal fica o dele.
+  const championshipId = typeof request.idCampeonato === 'number' ? request.idCampeonato : null;
+  const enrollments = isRecord(claimed.inscricoes) ? claimed.inscricoes : {};
+  const key = championshipId === null ? '' : `c${championshipId}`;
+  const current = key && isRecord(enrollments[key]) ? (enrollments[key] as Doc) : {};
+  const teamIds = Array.isArray(claimed.idsTimes) ? claimed.idsTimes.map(text).filter((id) => id !== '') : [];
+  const enrollmentUpdate: Doc = key
+    ? {
+        [`inscricoes.${key}.idTime`]: teamId,
+        [`inscricoes.${key}.time`]: text(request.time),
+        [`inscricoes.${key}.nGols`]: count(current.nGols) + extraGoals,
+        [`inscricoes.${key}.nAssistencias`]: count(current.nAssistencias) + extraAssists,
+        idsTimes: [...new Set([...teamIds, ...(teamId ? [teamId] : [])])],
+      }
+    : {};
+  const keepsPrimary = key !== '' && text(claimed.time) !== '';
   return {
     claimedUpdate: {
       idUsuario: uid,
-      time: text(request.time),
-      idTime: text(created?.idTime) || text(request.idTime) || text(claimed.idTime),
+      ...(keepsPrimary ? {} : { time: text(request.time), idTime: teamId }),
       ...(position ? { posicao: position } : {}),
       ...(photo ? { urlImagem: photo } : {}),
-      nGols: count(claimed.nGols) + (createdIsOwn ? count(created?.nGols) : 0),
-      nAssistencias: count(claimed.nAssistencias) + (createdIsOwn ? count(created?.nAssistencias) : 0),
+      nGols: count(claimed.nGols) + extraGoals,
+      nAssistencias: count(claimed.nAssistencias) + extraAssists,
+      ...enrollmentUpdate,
     },
     deleteCreated: createdIsOwn,
     requestPlayerId: text(request.idJogadorVinculo),
   };
 }
+
+/**
+ * Pedido aprovado com competição (`idCampeonato`): a inscrição precisa estar
+ * no atleta da aprovação (`idJogador`). O app antigo aprova sem gravá-la (só
+ * troca o time); aqui ela é completada. Nulo = já está certo (ou não se aplica).
+ */
+export function missingEnrollmentFix(request: Doc | undefined, player: Doc | undefined): Doc | null {
+  if (!request || !player || text(request.status) !== 'aprovada' || needsClaimReconcile(request)) return null;
+  const championshipId = typeof request.idCampeonato === 'number' ? request.idCampeonato : null;
+  if (championshipId === null || text(request.idJogador) === '') return null;
+  const key = `c${championshipId}`;
+  const enrollments = isRecord(player.inscricoes) ? player.inscricoes : {};
+  if (isRecord(enrollments[key])) return null;
+  const teamId = text(request.idTime) || text(player.idTime);
+  const teamIds = Array.isArray(player.idsTimes) ? player.idsTimes.map(text).filter((id) => id !== '') : [];
+  return {
+    [`inscricoes.${key}.idTime`]: teamId,
+    [`inscricoes.${key}.time`]: text(request.time),
+    [`inscricoes.${key}.nGols`]: 0,
+    [`inscricoes.${key}.nAssistencias`]: 0,
+    idsTimes: [...new Set([...teamIds, ...(teamId ? [teamId] : [])])],
+  };
+}
+

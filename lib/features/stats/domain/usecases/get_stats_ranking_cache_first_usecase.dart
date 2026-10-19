@@ -20,12 +20,14 @@ class GetStatsRankingCacheFirstUseCase {
     required StatsRankingType type,
     required String region,
     String? season,
+    int? championshipId,
     bool force = false,
   }) =>
       cacheFirst<StatsRanking>(
-        readCache: () => _getCached(type: type, region: region, season: season),
-        fetchRemote: () => _getRanking(type: type, region: region, season: season),
-        saveCache: (ranking) => _saveCache(ranking, type: type, region: region, season: season),
+        readCache: () => _getCached(type: type, region: region, season: season, championshipId: championshipId),
+        fetchRemote: () => _getRanking(type: type, region: region, season: season, championshipId: championshipId),
+        saveCache: (ranking) =>
+            _saveCache(ranking, type: type, region: region, season: season, championshipId: championshipId),
         ttl: CacheTtl.ranking,
         force: force,
         logName: 'GetStatsRankingCacheFirstUseCase',

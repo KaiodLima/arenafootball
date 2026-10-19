@@ -284,9 +284,12 @@ export function playerRequestMessage(uid: string, before: Doc | undefined, after
   if (!name || !team || !uid) return null;
   // Pedido de vínculo com atleta já cadastrado: `nome` é o do atleta.
   const account = text(after.nome_usuario);
+  // Competição do pedido (opcional): "… no Lava Jato na Copa Floresta".
+  const championship = text(after.campeonato);
+  const where = championship ? `${team} na ${championship}` : team;
   const body = text(after.idJogadorVinculo)
-    ? `${account || 'Um usuário'} diz ser o atleta ${name} do ${team}`
-    : `${name} quer jogar no ${team}`;
+    ? `${account || 'Um usuário'} diz ser o atleta ${name} do ${where}`
+    : `${name} quer jogar no ${where}`;
   return {
     tipo: 'solicitacao_jogador',
     titulo: 'Nova solicitação de jogador',

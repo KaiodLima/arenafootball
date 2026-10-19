@@ -6,7 +6,9 @@ import 'package:arena_soccer/core/firebase/either_stream.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
+import 'package:arena_soccer/features/players/data/datasources/players_datasource.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
 
 /// Pedidos "Sou jogador" (`solicitacoes_jogador/{uid}`). O usuário grava o
 /// próprio pedido; o admin edita, aprova (cria o jogador) ou rejeita.
@@ -141,6 +143,12 @@ class PlayerRequestsDataSource {
       final existing = await players.where('idUsuario', isEqualTo: request.userId).limit(1).get();
       final batch = _firestore.batch();
       final DocumentReference<Map<String, dynamic>> playerRef;
+      // Pedido com competição: acrescenta a inscrição (o atleta continua nas
+      // outras). Pedido antigo (sem competição): troca o time, como antes.
+      final championshipId = request.championshipId;
+      final enrollment = championshipId == null
+          ? null
+          : PlayerEnrollment(championshipId: championshipId, teamId: teamId, team: request.team);
       if (request.isClaim) {
         playerRef = players.doc(request.claimedPlayerId);
         final claimed = await playerRef.get();
@@ -154,8 +162,8 @@ class PlayerRequestsDataSource {
         }
         batch.update(playerRef, {
           'idUsuario': request.userId,
-          'time': request.team,
-          'idTime': teamId,
+          if (enrollment == null) ...{'time': request.team, 'idTime': teamId},
+          if (enrollment != null) ...PlayersDataSource.enrollFields(PlayerDTO.fromFirestore(claimed), enrollment),
           if (request.position != null) 'posicao': request.position!.key,
           if (request.imageUrl.isNotEmpty) 'urlImagem': request.imageUrl,
         });
@@ -163,8 +171,9 @@ class PlayerRequestsDataSource {
         playerRef = existing.docs.first.reference;
         batch.update(playerRef, {
           'nome': request.name,
-          'time': request.team,
-          'idTime': teamId,
+          if (enrollment == null) ...{'time': request.team, 'idTime': teamId},
+          if (enrollment != null)
+            ...PlayersDataSource.enrollFields(PlayerDTO.fromFirestore(existing.docs.first), enrollment),
           'posicao': request.position?.key ?? '',
           if (request.imageUrl.isNotEmpty) 'urlImagem': request.imageUrl,
         });
@@ -178,6 +187,7 @@ class PlayerRequestsDataSource {
           imageUrl: request.imageUrl,
           userId: request.userId,
           position: request.position?.key ?? '',
+          enrollments: [if (enrollment != null) enrollment],
         );
         batch.set(playerRef, player.toMap());
       }

@@ -341,7 +341,7 @@ class _TeamsTab extends StatelessWidget {
           childAspectRatio: 0.85,
         ),
         itemCount: teams.length,
-        itemBuilder: (context, index) => _TeamCard(team: teams[index]),
+        itemBuilder: (context, index) => _TeamCard(team: teams[index], championshipId: championship.championshipId),
       ),
     );
   }
@@ -351,7 +351,10 @@ class _TeamsTab extends StatelessWidget {
 class _TeamCard extends StatelessWidget {
   final TeamDTO team;
 
-  const _TeamCard({required this.team});
+  /// Abre o elenco já na sublista desta competição.
+  final int championshipId;
+
+  const _TeamCard({required this.team, required this.championshipId});
 
   @override
   Widget build(BuildContext context) {
@@ -362,7 +365,7 @@ class _TeamCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: radius, side: const BorderSide(color: AppColors.greyLight)),
       child: InkWell(
         borderRadius: radius,
-        onTap: found ? () => openTeamRoster(context, {'team': team}) : null,
+        onTap: found ? () => openTeamRoster(context, {'team': team, 'championshipId': championshipId}) : null,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSizes.s6, vertical: AppSizes.s10),
           child: Column(

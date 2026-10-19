@@ -172,7 +172,7 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.goalNotificationPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<GoalNotificationCubit>(
-            create: (_) => GoalNotificationCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl()),
+            create: (_) => GoalNotificationCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl()),
             child: GoalNotificationPage(
               initial: args?['news'] as NewsDTO?,
               initialMatch: args?['match'] as MatchDTO?,
@@ -226,15 +226,15 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.teamPlayersPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<TeamPlayersCubit>(
-            create: (_) => TeamPlayersCubit(sl(), sl()),
-            child: TeamPlayersPage(team: args?['team'] as TeamDTO),
+            create: (_) => TeamPlayersCubit(sl(), sl(), sl(), sl(), sl(), sl()),
+            child: TeamPlayersPage(team: args?['team'] as TeamDTO, championshipId: args?['championshipId'] as int?),
           );
         },
         // `playerId` obrigatório; `season` nulo = corrente; `player` (opcional) aparece na hora.
         AppRoutes.playerProfilePage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
           return BlocProvider<PlayerProfileCubit>(
-            create: (_) => PlayerProfileCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl()),
+            create: (_) => PlayerProfileCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl()),
             child: PlayerProfilePage(
               playerId: args['playerId'] as String,
               season: args['season'] as String?,
@@ -244,7 +244,7 @@ class ArenaApp extends StatelessWidget {
           );
         },
         AppRoutes.playerRequestPage: (_) => BlocProvider<PlayerRequestCubit>(
-              create: (_) => PlayerRequestCubit(sl(), sl(), sl(), sl(), sl(), sl()),
+              create: (_) => PlayerRequestCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl()),
               child: const PlayerRequestPage(),
             ),
         AppRoutes.playerRequestsPanelPage: (_) => BlocProvider<PlayerRequestsPanelCubit>(
@@ -255,7 +255,7 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.teamRequestPage: (_) => MultiBlocProvider(
               providers: [
                 BlocProvider<TeamRequestCubit>(create: (_) => TeamRequestCubit(sl(), sl(), sl(), sl(), sl())),
-                BlocProvider<MyTeamCubit>(create: (_) => MyTeamCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl())),
+                BlocProvider<MyTeamCubit>(create: (_) => MyTeamCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl())),
               ],
               child: const TeamRequestPage(),
             ),
@@ -264,7 +264,7 @@ class ArenaApp extends StatelessWidget {
               child: const TeamRequestsPanelPage(),
             ),
         AppRoutes.registerPlayerPage: (_) => BlocProvider<PlayerFormCubit>(
-              create: (_) => PlayerFormCubit(sl(), sl(), sl(), sl()),
+              create: (_) => PlayerFormCubit(sl(), sl(), sl(), sl(), sl()),
               child: const PlayerFormPage(),
             ),
 
@@ -272,7 +272,7 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.statsRankingPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<StatsRankingCubit>(
-            create: (_) => StatsRankingCubit(sl()),
+            create: (_) => StatsRankingCubit(sl(), sl()),
             child: StatsRankingPage(
               type: args?['type'] as StatsRankingType? ?? StatsRankingType.goals,
               region: args?['region'] as String?,

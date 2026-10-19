@@ -25,7 +25,10 @@ class MatchesDataSource {
   /// é feito no UseCase.
   Stream<Either<Failure, List<MatchDTO>>> watchMatches({String? season, String? region}) {
     Query<Map<String, dynamic>> query = _matches(season);
-    if (region != null && region.isNotEmpty) query = RegionRegistry.where(query, region);
+    // Também as entre regiões (campeonato intermunicipal) com time desta.
+    if (region != null && region.isNotEmpty) {
+      query = RegionRegistry.whereRegionOrIn(query, region, listField: MatchDTO.regionIdsField);
+    }
     return query.orderBy('dataRegistro', descending: true).snapshots().toEither(
           (snapshot) => snapshot.docs.map(MatchDTO.fromFirestore).toList(),
           fallbackMessage: 'Não foi possível carregar as partidas.',

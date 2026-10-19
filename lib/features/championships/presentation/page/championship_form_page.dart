@@ -260,12 +260,42 @@ class _ChampionshipFormPageState extends State<ChampionshipFormPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Abrangência: municipal (só times da sede) ou intermunicipal.
+              Wrap(
+                spacing: AppSizes.s8,
+                runSpacing: AppSizes.s8,
+                children: [
+                  for (final scope in ChampionshipScope.values)
+                    ArenaChoiceChip(
+                      label: scope == ChampionshipScope.municipal
+                          ? l10n.championshipScopeMunicipal
+                          : l10n.championshipScopeIntermunicipal,
+                      icon: scope == ChampionshipScope.municipal ? Icons.location_city_rounded : Icons.public_rounded,
+                      selected: form.base.scope == scope,
+                      onTap: () {
+                        final removed = _cubit.selectScope(scope);
+                        if (removed > 0) {
+                          showSnackBar(
+                              context: context, message: l10n.championshipScopeRemoved(removed, form.base.region));
+                        }
+                      },
+                    ),
+                ],
+              ),
+              const SizedBox(height: AppSizes.s6),
+              Text(
+                form.base.isIntermunicipal
+                    ? l10n.championshipScopeIntermunicipalHint
+                    : l10n.championshipScopeMunicipalHint(form.base.region),
+                style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+              ),
+              const SizedBox(height: AppSizes.s12),
               if (form.loadingTeams)
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: AppSizes.s20),
                   child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
                 )
-              else if (form.teams.isEmpty)
+              else if (form.visibleTeams.isEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: AppSizes.s12),
                   child: Text(l10n.championshipFormTeamsEmpty, style: AppTypography.subtitle()),
@@ -286,8 +316,33 @@ class _ChampionshipFormPageState extends State<ChampionshipFormPage> {
                   ],
                 ),
                 const SizedBox(height: AppSizes.s4),
-                TeamMultiSelectGrid(teams: form.teams, selected: form.selectedTeams, onToggle: _cubit.toggleTeam),
+                if (!form.base.isIntermunicipal)
+                  TeamMultiSelectGrid(
+                    teams: form.visibleTeams,
+                    selected: form.selectedTeams,
+                    onToggle: _cubit.toggleTeam,
+                  )
+                else
+                  // Intermunicipal: uma grade por região, a sede primeiro.
+                  for (final group in form.teamsByRegion.entries) ...[
+                    Padding(
+                      padding: const EdgeInsets.only(top: AppSizes.s8, bottom: AppSizes.s6),
+                      child: Text(
+                        group.key.isEmpty ? l10n.championshipScopeNoRegion : group.key,
+                        style: AppTypography.label(color: AppColors.textPrimary),
+                      ),
+                    ),
+                    TeamMultiSelectGrid(teams: group.value, selected: form.selectedTeams, onToggle: _cubit.toggleTeam),
+                  ],
               ],
+              if (error == ChampionshipFormError.outsideRegion)
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSizes.s8),
+                  child: Text(
+                    l10n.championshipScopeOutsideError(form.base.region),
+                    style: AppTypography.body(color: AppColors.danger).copyWith(fontSize: AppSizes.s12),
+                  ),
+                ),
               if (error == ChampionshipFormError.teams)
                 Padding(
                   padding: const EdgeInsets.only(top: AppSizes.s8),

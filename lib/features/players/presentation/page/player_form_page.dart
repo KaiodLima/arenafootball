@@ -64,7 +64,7 @@ class _PlayerFormPageState extends State<PlayerFormPage> {
     final picked = await showTeamPickerSheet(
       context,
       title: l10n.playersTeam,
-      teams: form.teams,
+      teams: form.selectableTeams,
       selected: form.selectedTeam,
     );
     if (picked != null) _cubit.selectTeam(picked.name);
@@ -161,6 +161,31 @@ class _PlayerFormPageState extends State<PlayerFormPage> {
                       ),
                   ],
                 ),
+                // Competição em que o atleta entra (os times são os dela).
+                if (form.championships.isNotEmpty) ...[
+                  const SizedBox(height: AppSizes.s16),
+                  Wrap(
+                    spacing: AppSizes.s8,
+                    runSpacing: AppSizes.s8,
+                    children: [
+                      for (final championship in form.championships)
+                        ArenaChoiceChip(
+                          label: championship.title,
+                          icon: Icons.emoji_events_outlined,
+                          selected: championship.championshipId == form.championshipId,
+                          onTap: () => _cubit.selectChampionship(championship.championshipId),
+                        ),
+                    ],
+                  ),
+                  if (error == PlayerFormError.championship)
+                    Padding(
+                      padding: const EdgeInsets.only(top: AppSizes.s6, left: AppSizes.s12),
+                      child: Text(
+                        l10n.playerRequestChampionshipRequired,
+                        style: AppTypography.body(color: AppColors.danger).copyWith(fontSize: AppSizes.s12),
+                      ),
+                    ),
+                ],
                 const SizedBox(height: AppSizes.s16),
                 TeamSelectTile(
                   label: l10n.playersTeam,

@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/core/utils/team_key.dart';
+import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
@@ -38,6 +39,11 @@ class GoalFormData extends Equatable {
   /// Time do gol deste card: o do último "+" (ou o do autor escolhido).
   final String? scoringTeam;
 
+  /// Competições da região e a escolhida nas chips (quando a partida
+  /// vinculada não diz qual é).
+  final List<ChampionshipDTO> championships;
+  final int? selectedChampionshipId;
+
   const GoalFormData({
     this.regions = const [],
     this.selectedRegion,
@@ -54,12 +60,47 @@ class GoalFormData extends Equatable {
     this.scorer,
     this.assistant,
     this.scoringTeam,
+    this.championships = const [],
+    this.selectedChampionshipId,
   });
 
-  /// Elenco do mandante ou do visitante pelo nome do time.
+  /// Competições da região que têm os dois times do confronto.
+  List<ChampionshipDTO> get matchChampionships {
+    if (!hasTeams) return const [];
+    return championships
+        .where((c) =>
+            c.hasTeam(id: teamIdOf(homeTeam), name: homeTeam!) && c.hasTeam(id: teamIdOf(awayTeam), name: awayTeam!))
+        .toList();
+  }
+
+  /// A partida vinculada já diz a competição (as chips não aparecem).
+  bool get championshipFromMatch => (linkedMatch?.championshipId ?? 0) > 0;
+
+  /// Competição do gol: a da partida vinculada; senão, a escolhida (ou a
+  /// única do confronto). Nula = sem competição (soma só no total).
+  int? get championshipId {
+    if (championshipFromMatch) return linkedMatch!.championshipId;
+    final options = matchChampionships;
+    if (options.any((c) => c.championshipId == selectedChampionshipId)) return selectedChampionshipId;
+    return options.length == 1 ? options.first.championshipId : null;
+  }
+
+  /// Elenco do mandante ou do visitante pelo nome do time, só com quem joga
+  /// por ele na competição do gol (atleta antigo conta em todas).
   List<PlayerDTO> squadOf(String? team) {
     if (team == null) return const [];
-    return team == homeTeam ? homeSquad : (team == awayTeam ? awaySquad : const []);
+    final squad = team == homeTeam ? homeSquad : (team == awayTeam ? awaySquad : const <PlayerDTO>[]);
+    final id = championshipId;
+    if (id == null) return squad;
+    return squad.where((p) => p.playsIn(id, teamId: teamIdOf(team), teamName: team)).toList();
+  }
+
+  /// Time (mandante ou visitante) em cujo elenco está [player]; nulo se nenhum.
+  String? sideOf(PlayerDTO? player) {
+    if (player == null) return null;
+    if (squadOf(homeTeam).any((p) => p.id == player.id)) return homeTeam;
+    if (squadOf(awayTeam).any((p) => p.id == player.id)) return awayTeam;
+    return null;
   }
 
   bool get hasTeams => homeTeam != null && awayTeam != null;
@@ -120,6 +161,8 @@ class GoalFormData extends Equatable {
     bool clearAssistant = false,
     String? scoringTeam,
     bool clearScoringTeam = false,
+    List<ChampionshipDTO>? championships,
+    int? Function()? selectedChampionshipId,
   }) {
     return GoalFormData(
       regions: regions ?? this.regions,
@@ -137,6 +180,8 @@ class GoalFormData extends Equatable {
       scorer: clearScorer ? null : (scorer ?? this.scorer),
       assistant: clearAssistant || clearScorer ? null : (assistant ?? this.assistant),
       scoringTeam: clearScoringTeam ? null : (scoringTeam ?? this.scoringTeam),
+      championships: championships ?? this.championships,
+      selectedChampionshipId: selectedChampionshipId != null ? selectedChampionshipId() : this.selectedChampionshipId,
     );
   }
 
@@ -157,6 +202,8 @@ class GoalFormData extends Equatable {
         scorer,
         assistant,
         scoringTeam,
+        championships,
+        selectedChampionshipId,
       ];
 }
 

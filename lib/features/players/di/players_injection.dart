@@ -3,14 +3,19 @@ import 'package:arena_soccer/features/players/data/datasources/players_datasourc
 import 'package:arena_soccer/features/players/data/repositories/players_repository_impl.dart';
 import 'package:arena_soccer/features/players/domain/repositories/players_repository_interface.dart';
 import 'package:arena_soccer/features/players/domain/usecases/add_player_stats_usecase.dart';
+import 'package:arena_soccer/features/players/domain/usecases/adjust_player_stats_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/create_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/delete_player_usecase.dart';
+import 'package:arena_soccer/features/players/domain/usecases/enroll_player_usecase.dart';
+import 'package:arena_soccer/features/players/domain/usecases/get_top_players_in_championship_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/get_players_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/get_top_players_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/remove_player_from_squad_usecase.dart';
+import 'package:arena_soccer/features/players/domain/usecases/set_player_championships_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/update_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
+import 'package:arena_soccer/features/players/domain/usecases/watch_user_player_usecase.dart';
 
 final _sl = GetIt.instance;
 
@@ -31,4 +36,9 @@ void registerPlayersDependencies() {
   _sl.registerLazySingleton(() => WatchPlayerUseCase(_sl()));
   _sl.registerLazySingleton(() => DeletePlayerUseCase(_sl()));
   _sl.registerLazySingleton(() => RemovePlayerFromSquadUseCase(_sl()));
+  _sl.registerLazySingleton(() => EnrollPlayerUseCase(_sl()));
+  _sl.registerLazySingleton(() => AdjustPlayerStatsUseCase(_sl()));
+  _sl.registerLazySingleton(() => WatchUserPlayerUseCase(_sl()));
+  _sl.registerLazySingleton(() => SetPlayerChampionshipsUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetTopPlayersInChampionshipUseCase(_sl()));
 }

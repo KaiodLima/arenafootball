@@ -1,5 +1,6 @@
 import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/get_region_championship_cache_first_usecase.dart';
@@ -264,6 +265,74 @@ void main() {
       final repository = _FakeRepository();
       await CreateMatchUseCase(repository, _FakeChampionship())(match);
       expect(repository.created.single.championshipId, 1);
+    });
+  });
+
+  test('intermunicipal: times de outra região e a partida vai para as duas regiões', () {
+    RegionRegistry.configure(const [RegionRef(id: 'fl', name: 'Floresta'), RegionRef(id: 'si', name: 'Santo inacio')]);
+    addTearDown(RegionRegistry.reset);
+    const lavaJato = TeamDTO(id: '1', name: 'Lava Jato', region: 'Floresta');
+    const parceiros = TeamDTO(id: '3', name: 'Parceiros', region: 'Santo inacio');
+    const form = MatchFormData(
+      selectedRegion: 'Floresta',
+      regionTeams: [lavaJato],
+      seasonTeams: [lavaJato, parceiros],
+      championships: [
+        ChampionshipDTO(
+          id: 'c',
+          championshipId: 5,
+          teams: ['Lava Jato', 'Parceiros'],
+          teamIds: ['1', '3'],
+          scope: ChampionshipScope.intermunicipal,
+        ),
+        ChampionshipDTO(id: 'm', championshipId: 6, teams: ['Lava Jato', 'Parceiros'], teamIds: ['1', '3']),
+      ],
+    );
+    expect(form.teamsFor(5).map((t) => t.name), ['Lava Jato', 'Parceiros']);
+    // Municipal: só os da região, mesmo que a lista tenha outros.
+    expect(form.teamsFor(6).map((t) => t.name), ['Lava Jato']);
+
+    final match = form
+        .copyWith(teams: form.teamsFor(5), championshipId: () => 5, homeTeam: 'Lava Jato', awayTeam: 'Parceiros')
+        .toMatch();
+    expect(match.regionIds.toSet(), {'fl', 'si'});
+    expect(form.copyWith(teams: [lavaJato], homeTeam: 'Lava Jato', awayTeam: 'Lava Jato').toMatch().regionIds, isEmpty);
+  });
+
+  group('campeonato da partida', () {
+    test('um campeonato já vem escolhido; amistoso grava 0 sem a tabela fixa e com os ids dos times', () async {
+      final repository = _FakeRepository();
+      final championship = _FakeChampionship()
+        ..registered = const ChampionshipDTO(id: 'r', championshipId: 9, region: 'Floresta');
+      final championships = _FakeChampionships()
+        ..list = const [
+          ChampionshipDTO(id: 'c', championshipId: 5, title: 'Copa', teams: ['Lava Jato', 'Volta'], teamIds: ['1', '2']),
+        ];
+      final cubit = MatchFormCubit(
+        CreateMatchUseCase(repository, championship),
+        _FakeRegions(),
+        _FakeTeams(),
+        GetRegionMatchesUseCase(repository),
+        championships,
+      );
+      await cubit.load(initialRegion: 'Floresta', now: DateTime(2026, 10, 18));
+      expect(cubit.state.form.championshipId, 5);
+      expect(cubit.state.form.teams.map((t) => t.name), ['Lava Jato', 'Volta']);
+
+      // Amistoso: todos os times da região; os escolhidos continuam.
+      cubit.selectChampionship(null);
+      expect(cubit.state.form.isFriendly, isTrue);
+      expect(cubit.state.form.teams.length, 3);
+      expect([cubit.state.form.homeTeam, cubit.state.form.awayTeam], ['Lava Jato', 'Volta']);
+
+      cubit
+        ..selectTime('16:00')
+        ..selectVenue('Campo');
+      await cubit.submit();
+      final created = repository.created.single;
+      expect(created.championshipId, 0);
+      expect([created.homeTeamId, created.awayTeamId], ['1', '2']);
+      await cubit.close();
     });
   });
 }

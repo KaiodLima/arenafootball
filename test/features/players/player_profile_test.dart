@@ -5,10 +5,14 @@ import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/services/storage_upload_service.dart';
+import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_cache_first_usecase.dart';
+import 'package:arena_soccer/features/players/domain/usecases/adjust_player_stats_usecase.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/features/news/domain/usecases/get_player_goal_cards_cache_first_usecase.dart';
 import 'package:arena_soccer/features/players/data/datasources/players_datasource.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
 import 'package:arena_soccer/features/players/domain/repositories/players_repository_interface.dart';
 import 'package:arena_soccer/features/players/domain/usecases/delete_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/get_top_players_usecase.dart';
@@ -36,13 +40,41 @@ const _all = [
 ];
 
 class _FakePlayers implements IPlayersRepository {
+  @override
+  Future<Either<Failure, void>> setChampionships(
+    PlayerDTO player, {
+    required String teamId,
+    required String team,
+    required Set<int> selected,
+    required List<int> teamChampionships,
+    String? season,
+  }) async =>
+      const Right(null);
+
+  @override
+  Stream<Either<Failure, PlayerDTO?>> watchPlayerOfUser({required String userId, String? season}) =>
+      const Stream.empty();
+
+  @override
+  Future<Either<Failure, void>> enroll(PlayerDTO player, PlayerEnrollment enrollment, {String? season}) async =>
+      const Right(null);
+
+  @override
+  Future<Either<Failure, List<PlayerDTO>>> getTopPlayersInChampionship({
+    required int championshipId,
+    required String field,
+    int limit = 50,
+    String? season,
+  }) async =>
+      const Right([]);
+
   final controller = StreamController<Either<Failure, PlayerDTO?>>();
   final updated = <PlayerDTO>[];
   final deleted = <PlayerDTO>[];
   final removed = <PlayerDTO>[];
 
   @override
-  Future<Either<Failure, void>> removeFromSquad(PlayerDTO player, {String? season}) async {
+  Future<Either<Failure, void>> removeFromSquad(PlayerDTO player, {int? championshipId, String? season}) async {
     removed.add(player);
     return const Right(null);
   }
@@ -90,6 +122,7 @@ class _FakePlayers implements IPlayersRepository {
     required String playerId,
     int goals = 0,
     int assists = 0,
+    PlayerEnrollment? enrollment,
     String? season,
   }) async =>
       const Right(null);
@@ -133,9 +166,20 @@ class _NoCacheRanking implements GetStatsRankingCacheFirstUseCase {
     required StatsRankingType type,
     required String region,
     String? season,
+    int? championshipId,
     bool force = false,
   }) =>
       Stream.fromFuture(inner(type: type, region: region, season: season));
+}
+
+class _NoChampionships implements GetRegionChampionshipsCacheFirstUseCase {
+  @override
+  Stream<Either<Failure, List<ChampionshipDTO>>> call(
+          {required String region, required String season, bool force = false}) =>
+      const Stream.empty();
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 class _FakeStorage implements StorageUploadService {
@@ -162,6 +206,8 @@ void main() {
       UpdatePlayerUseCase(players, _FakeStorage()),
       DeletePlayerUseCase(players),
       RemovePlayerFromSquadUseCase(players),
+      AdjustPlayerStatsUseCase(players),
+      _NoChampionships(),
     );
   });
 

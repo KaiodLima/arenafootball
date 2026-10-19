@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
@@ -22,10 +23,15 @@ class MatchFormData extends Equatable {
   /// Todos os times da região (base para filtrar por campeonato).
   final List<TeamDTO> regionTeams;
 
+  /// Todos os times da temporada (campeonato intermunicipal: times de fora
+  /// da região).
+  final List<TeamDTO> seasonTeams;
+
   /// Campeonatos da região na temporada atual.
   final List<ChampionshipDTO> championships;
 
-  /// `id_campeonato` escolhido; nulo = sem campeonato cadastrado na região.
+  /// `id_campeonato` escolhido; nulo = sem campeonato (amistoso, ou região
+  /// sem campeonato cadastrado).
   final int? championshipId;
   final String? homeTeam;
   final String? awayTeam;
@@ -48,6 +54,7 @@ class MatchFormData extends Equatable {
     this.selectedRegion,
     this.teams = const [],
     this.regionTeams = const [],
+    this.seasonTeams = const [],
     this.championships = const [],
     this.championshipId,
     this.homeTeam,
@@ -61,11 +68,30 @@ class MatchFormData extends Equatable {
 
   bool get sameTeam => homeTeam != null && homeTeam == awayTeam;
 
+  /// O admin escolheu "Sem campeonato" (a região tem campeonatos).
+  bool get isFriendly => championshipId == null && championships.isNotEmpty;
+
   /// Times do campeonato [id] (todos da região se ele não marcou nenhum).
+  /// Intermunicipal: os dele de qualquer região.
   List<TeamDTO> teamsFor(int? id) {
     final championship = championships.where((c) => c.championshipId == id).firstOrNull;
     if (championship == null || championship.teams.isEmpty) return regionTeams;
-    return regionTeams.where((t) => championship.hasTeam(id: t.id, name: t.name)).toList();
+    final base = championship.isIntermunicipal && seasonTeams.isNotEmpty ? seasonTeams : regionTeams;
+    return base.where((t) => championship.hasTeam(id: t.id, name: t.name)).toList();
+  }
+
+  /// Ids das regiões dos dois times quando são diferentes (vazio = mesma
+  /// região): a partida aparece nas duas.
+  List<String> get regionIdsOfTeams {
+    String regionIdOf(String? name) {
+      for (final team in teams) {
+        if (team.name == name) return RegionRegistry.idOf(team.region);
+      }
+      return '';
+    }
+
+    final ids = {regionIdOf(homeTeam), regionIdOf(awayTeam), RegionRegistry.idOf(selectedRegion ?? '')}..remove('');
+    return ids.length > 1 ? ids.toList() : const [];
   }
 
   MatchFormMissing? get missing {
@@ -115,6 +141,7 @@ class MatchFormData extends Equatable {
         venue: venue.trim(),
         region: selectedRegion ?? '',
         championshipId: championshipId ?? 0,
+        regionIds: regionIdsOfTeams,
       );
 
   MatchFormData copyWith({
@@ -122,6 +149,7 @@ class MatchFormData extends Equatable {
     String? selectedRegion,
     List<TeamDTO>? teams,
     List<TeamDTO>? regionTeams,
+    List<TeamDTO>? seasonTeams,
     List<ChampionshipDTO>? championships,
     int? Function()? championshipId,
     String? homeTeam,
@@ -138,6 +166,7 @@ class MatchFormData extends Equatable {
       selectedRegion: selectedRegion ?? this.selectedRegion,
       teams: teams ?? this.teams,
       regionTeams: regionTeams ?? this.regionTeams,
+      seasonTeams: seasonTeams ?? this.seasonTeams,
       championships: championships ?? this.championships,
       championshipId: championshipId != null ? championshipId() : this.championshipId,
       homeTeam: clearTeams ? null : (homeTeam ?? this.homeTeam),
@@ -156,6 +185,7 @@ class MatchFormData extends Equatable {
         selectedRegion,
         teams,
         regionTeams,
+        seasonTeams,
         championships,
         championshipId,
         homeTeam,

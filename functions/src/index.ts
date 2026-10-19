@@ -41,7 +41,7 @@ import {
   votingMessage,
 } from './messages';
 import { isLegacyVoteCollection, seasonCollections, seasonsToSweep, userPhotoPath } from './account_cleanup';
-import { claimReconcilePlan, needsClaimReconcile } from './claim_reconcile';
+import { claimReconcilePlan, missingEnrollmentFix, needsClaimReconcile } from './claim_reconcile';
 import { FanRankingTeam, fanRankingTotal, rankingTeamOf, sortFanRanking } from './fan_ranking';
 import {
   APP_PAGE,
@@ -180,6 +180,7 @@ export const onPlayerRequestWritten = onDocumentWritten('solicitacoes_jogador/{u
   const after = event.data?.after.data();
   const origem = `solicitacoes_jogador/${uid}`;
   if (after && needsClaimReconcile(after)) await reconcileClaim(uid, after);
+  if (after?.status === 'aprovada' && typeof after.idCampeonato === 'number') await ensureEnrollment(after);
   const toAdmins = playerRequestMessage(uid, before, after);
   if (toAdmins) await deliver(`solicitacao_${event.id}`, toAdmins, origem);
   const toUser = playerRequestAnswerMessage(uid, before, after);
@@ -242,6 +243,22 @@ async function reconcileClaim(uid: string, request: Record<string, unknown>): Pr
     await Promise.all(cards.docs.map((doc) => doc.ref.update({ [field]: plan.requestPlayerId })));
   }
   logger.info('vínculo reconciliado', { uid, player: plan.requestPlayerId, removed: createdId });
+}
+
+/** Aprovado por app antigo sem a inscrição da competição: completa no atleta. */
+async function ensureEnrollment(request: Record<string, unknown>): Promise<void> {
+  const playerId = typeof request.idJogador === 'string' ? request.idJogador : '';
+  if (!playerId) return;
+  const { db } = await admin();
+  const season = typeof request.temporada === 'string' ? request.temporada : '';
+  const ref = db.collection(seasonCollection('jogadores', season)).doc(playerId);
+  const fix = await db.runTransaction(async (tx) => {
+    const player = await tx.get(ref);
+    const changes = missingEnrollmentFix(request, player.data());
+    if (changes) tx.update(ref, changes);
+    return changes;
+  });
+  if (fix) logger.info('inscrição completada', { player: playerId, championship: request.idCampeonato });
 }
 
 /** Pedido "Sou dono de time": novo/reenviado avisa os admins; resposta avisa quem pediu. */

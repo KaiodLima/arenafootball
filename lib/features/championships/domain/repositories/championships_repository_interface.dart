@@ -4,6 +4,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/group_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/standing_dto.dart';
+import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 
 abstract class IChampionshipsRepository {
   Stream<Either<Failure, List<ChampionshipDTO>>> watchChampionships({String? region});
@@ -21,6 +22,16 @@ abstract class IChampionshipsRepository {
   Future<Either<Failure, ChampionshipDTO>> updateChampionship(ChampionshipDTO championship);
 
   Future<Either<Failure, void>> deleteChampionship(String id);
+
+  /// Competições da temporada, de todas as regiões.
+  Future<Either<Failure, List<ChampionshipDTO>>> getSeasonChampionships(String season);
+
+  /// Inscreve ou tira o time do campeonato.
+  Future<Either<Failure, ChampionshipDTO>> setTeamEnrollment({
+    required String championshipDocId,
+    required TeamDTO team,
+    required bool enrolled,
+  });
 
   Future<Either<Failure, ChampionshipDTO?>> getChampionshipForRegion({required String region, required String season});
 

@@ -3,6 +3,9 @@ import 'dart:io';
 
 import 'package:either_dart/either.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/firebase/season_collection.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_cache_first_usecase.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
 import 'package:arena_soccer/features/player_requests/domain/usecases/approve_player_request_usecase.dart';
@@ -27,6 +30,7 @@ class MyTeamCubit extends Cubit<MyTeamState> {
   final ApprovePlayerRequestUseCase approvePlayerRequestUseCase;
   final RejectPlayerRequestUseCase rejectPlayerRequestUseCase;
   final CreatePlayerUseCase createPlayerUseCase;
+  final GetRegionChampionshipsCacheFirstUseCase? getRegionChampionshipsCacheFirstUseCase;
 
   StreamSubscription<Either<Failure, List<PlayerDTO>>>? _players;
   StreamSubscription<Either<Failure, List<PlayerRequestDTO>>>? _requests;
@@ -38,8 +42,9 @@ class MyTeamCubit extends Cubit<MyTeamState> {
     this.watchTeamPlayerRequestsUseCase,
     this.approvePlayerRequestUseCase,
     this.rejectPlayerRequestUseCase,
-    this.createPlayerUseCase,
-  ) : super(const MyTeamState());
+    this.createPlayerUseCase, [
+    this.getRegionChampionshipsCacheFirstUseCase,
+  ]) : super(const MyTeamState());
 
   /// [teamId]/[teamName] vêm do pedido aprovado. Sem o time na temporada
   /// atual (ex.: temporada nova sem cópia), mostra só o nome.
@@ -64,7 +69,22 @@ class MyTeamCubit extends Cubit<MyTeamState> {
 
     final team = await getTeamUseCase(teamId);
     if (isClosed) return;
-    emit(state.copyWith(team: team.fold((_) => null, (t) => t) ?? fallback, loading: false));
+    final loaded = team.fold((_) => null, (t) => t) ?? fallback;
+    emit(state.copyWith(team: loaded, loading: false));
+    await _loadChampionships(loaded);
+  }
+
+  /// Competições da temporada atual que o time joga.
+  Future<void> _loadChampionships(TeamDTO team) async {
+    final useCase = getRegionChampionshipsCacheFirstUseCase;
+    if (useCase == null || team.region.isEmpty) return;
+    await for (final response in useCase(region: team.region, season: SeasonCollection.currentSeason)) {
+      if (isClosed) return;
+      if (response.isLeft) continue;
+      final mine = response.right.where((c) => c.hasTeam(id: team.id, name: team.name)).toList()
+        ..sort((a, b) => a.championshipId.compareTo(b.championshipId));
+      emit(state.copyWith(championships: mine));
+    }
   }
 
   Future<void> saveDetails({
@@ -87,13 +107,23 @@ class MyTeamCubit extends Cubit<MyTeamState> {
     );
   }
 
-  /// Jogador cadastrado pelo dono, sempre no time dele.
-  Future<void> addPlayer({required String name, String position = '', File? photo}) async {
+  /// Jogador cadastrado pelo dono, sempre no time dele (inscrito na
+  /// competição [championshipId], quando o time joga alguma).
+  Future<void> addPlayer({required String name, String position = '', File? photo, int? championshipId}) async {
     final team = state.team;
     if (team == null || state.saving || name.trim().length < 3) return;
     emit(state.copyWith(saving: true));
     final response = await createPlayerUseCase(
-      PlayerDTO(name: name, team: team.name, teamId: team.id, position: position),
+      PlayerDTO(
+        name: name,
+        team: team.name,
+        teamId: team.id,
+        position: position,
+        enrollments: [
+          if (championshipId != null)
+            PlayerEnrollment(championshipId: championshipId, teamId: team.id, team: team.name),
+        ],
+      ),
       photo: photo,
     );
     if (isClosed) return;

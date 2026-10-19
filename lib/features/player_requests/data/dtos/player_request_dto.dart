@@ -76,6 +76,11 @@ class PlayerRequestDTO extends Equatable {
   /// `idJogadorVinculo`: atleta já cadastrado (sem conta) que o usuário diz
   /// ser; vazio = pedido de jogador novo. Aprovado, a conta é ligada a ele.
   final String claimedPlayerId;
+
+  /// `idCampeonato`/`campeonato`: competição em que quer jogar pelo time
+  /// (nula em pedidos antigos e em região sem competições).
+  final int? championshipId;
+  final String championship;
   final DateTime? createdAt;
 
   const PlayerRequestDTO({
@@ -94,6 +99,8 @@ class PlayerRequestDTO extends Equatable {
     this.reason = '',
     this.playerId = '',
     this.claimedPlayerId = '',
+    this.championshipId,
+    this.championship = '',
     this.createdAt,
   });
 
@@ -121,6 +128,8 @@ class PlayerRequestDTO extends Equatable {
       reason: text('motivo'),
       playerId: text('idJogador'),
       claimedPlayerId: text('idJogadorVinculo'),
+      championshipId: (data['idCampeonato'] as num?)?.toInt(),
+      championship: text('campeonato'),
       // Escrita local ainda sem o horário do servidor: fica nulo até confirmar.
       createdAt: (data['data'] as Timestamp?)?.toDate(),
     );
@@ -141,6 +150,8 @@ class PlayerRequestDTO extends Equatable {
         'urlImagem': imageUrl,
         'status': PlayerRequestStatus.pending.key,
         if (claimedPlayerId.isNotEmpty) 'idJogadorVinculo': claimedPlayerId,
+        if (championshipId != null) 'idCampeonato': championshipId,
+        if (championshipId != null) 'campeonato': championship,
       };
 
   PlayerRequestDTO copyWith({
@@ -156,6 +167,8 @@ class PlayerRequestDTO extends Equatable {
     String? reason,
     String? playerId,
     String? claimedPlayerId,
+    int? Function()? championshipId,
+    String? championship,
   }) {
     return PlayerRequestDTO(
       userId: userId,
@@ -173,6 +186,8 @@ class PlayerRequestDTO extends Equatable {
       reason: reason ?? this.reason,
       playerId: playerId ?? this.playerId,
       claimedPlayerId: claimedPlayerId ?? this.claimedPlayerId,
+      championshipId: championshipId != null ? championshipId() : this.championshipId,
+      championship: championship ?? this.championship,
       createdAt: createdAt,
     );
   }
@@ -194,6 +209,8 @@ class PlayerRequestDTO extends Equatable {
         reason,
         playerId,
         claimedPlayerId,
+        championshipId,
+        championship,
         createdAt,
       ];
 }

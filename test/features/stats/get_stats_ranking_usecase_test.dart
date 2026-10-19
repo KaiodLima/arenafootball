@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/players/data/datasources/players_datasource.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
+import 'package:arena_soccer/features/players/domain/usecases/get_top_players_in_championship_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/get_top_players_usecase.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
 import 'package:arena_soccer/features/stats/domain/usecases/get_stats_ranking_usecase.dart';
@@ -50,6 +52,23 @@ class _FakeTopPlayers implements GetTopPlayersUseCase {
     }
     return Right(PlayersDataSource.mergeTopPlayers(perChunk, field: field, limit: limit));
   }
+}
+
+/// Ordena pelos números da inscrição na competição (como a consulta).
+class _FakeTopInChampionship implements GetTopPlayersInChampionshipUseCase {
+  final List<PlayerDTO> players;
+
+  _FakeTopInChampionship(this.players);
+
+  @override
+  Future<Either<Failure, List<PlayerDTO>>> call({
+    required int championshipId,
+    required String field,
+    int limit = 50,
+    String? season,
+  }) async =>
+      Right(players.where((p) => p.enrollmentIn(championshipId) != null).toList()
+        ..sort((a, b) => b.statIn(field, championshipId).compareTo(a.statIn(field, championshipId))));
 }
 
 void main() {
@@ -122,5 +141,29 @@ void main() {
       expect(result.right.entries.map((e) => e.position), [1, 2, 2]);
       expect(result.right.crests, {'Time 1': 'https://img/1.png'});
     });
+  });
+
+  test('ranking da competição: números e time da inscrição', () async {
+    const teams = [
+      TeamDTO(id: '1', name: 'Lava Jato', region: 'Floresta'),
+      TeamDTO(id: '2', name: 'Volta', region: 'Floresta'),
+    ];
+    const dudu = PlayerDTO(id: 'dudu', name: 'Dudu', team: 'Lava Jato', teamId: '1', goals: 9, enrollments: [
+      PlayerEnrollment(championshipId: 7, teamId: '2', team: 'Volta', goals: 2),
+      PlayerEnrollment(championshipId: 9, teamId: '1', team: 'Lava Jato', goals: 7),
+    ]);
+    const ana = PlayerDTO(id: 'ana', name: 'Ana', team: 'Volta', teamId: '2', goals: 3, enrollments: [
+      PlayerEnrollment(championshipId: 7, teamId: '2', team: 'Volta', goals: 3),
+    ]);
+    final result = await GetStatsRankingUseCase(
+      _FakeTeams(teams),
+      _FakeTopPlayers(const []),
+      _FakeTopInChampionship(const [dudu, ana]),
+    )(type: StatsRankingType.goals, region: 'Floresta', championshipId: 7);
+
+    expect(result.right.entries.map((e) => e.player.id), ['ana', 'dudu']);
+    expect(result.right.entries.map((e) => e.value), [3, 2]);
+    // Na Copa, Dudu aparece pelo Volta (time da inscrição), não pelo principal.
+    expect(result.right.entries.last.player.team, 'Volta');
   });
 }

@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
+import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/errors/firebase_error.dart';
@@ -21,7 +23,10 @@ class ChampionshipsDataSource {
   /// é separada por temporada.
   Stream<Either<Failure, List<ChampionshipDTO>>> watchChampionships({String? region}) {
     Query<Map<String, dynamic>> query = _firestore.collection('campeonatos');
-    if (region != null) query = RegionRegistry.where(query, region);
+    // Também os intermunicipais com time da região (`idsRegioes`).
+    if (region != null) {
+      query = RegionRegistry.whereRegionOrIn(query, region, listField: ChampionshipDTO.regionIdsField);
+    }
     return query.snapshots().toEither(
           (snapshot) => snapshot.docs.map(ChampionshipDTO.fromFirestore).toList(),
           fallbackMessage: 'Não foi possível carregar as competições.',
@@ -92,6 +97,87 @@ class ChampionshipsDataSource {
     }
   }
 
+  /// Competições da temporada [season] (`ano`), de todas as regiões.
+  Future<Either<Failure, List<ChampionshipDTO>>> getSeasonChampionships(String season) async {
+    try {
+      final result = await _championships.where('ano', isEqualTo: season).get();
+      final list = result.docs.map(ChampionshipDTO.fromFirestore).toList()
+        ..sort((a, b) => a.championshipId.compareTo(b.championshipId));
+      return Right(list);
+    } catch (e) {
+      AppLogger.e('getSeasonChampionships season=$season', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível carregar os campeonatos.'));
+    }
+  }
+
+  /// Código da recusa: campeonato municipal de outra região.
+  static const String outsideRegionCode = 'championship-outside-region';
+
+  /// Inscreve ([enrolled]) ou tira o [team] do campeonato [championshipDocId],
+  /// numa transação (lê o doc e regrava `times`/`ids_times` alinhados e
+  /// `idsRegioes`).
+  Future<Either<Failure, ChampionshipDTO>> setTeamEnrollment({
+    required String championshipDocId,
+    required TeamDTO team,
+    required bool enrolled,
+  }) async {
+    try {
+      final ref = _championships.doc(championshipDocId);
+      final updated = await _firestore.runTransaction<ChampionshipDTO?>((tx) async {
+        final current = ChampionshipDTO.fromFirestore(await tx.get(ref));
+        final next = withTeam(current, team, enrolled: enrolled);
+        if (next == null) return null;
+        tx.update(ref, {
+          'times': next.teams,
+          'ids_times': next.teamIds,
+          ChampionshipDTO.regionIdsField: next.regionIds,
+        });
+        return next;
+      });
+      if (updated == null) {
+        return Left(
+            ErrorWithMessage('Campeonato municipal só aceita times da própria região.', code: outsideRegionCode));
+      }
+      return Right(updated);
+    } catch (e) {
+      AppLogger.e('setTeamEnrollment id=$championshipDocId', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
+    }
+  }
+
+  /// O campeonato com o [team] incluído ou tirado: `times`/`ids_times` ficam
+  /// alinhados e `idsRegioes` ganha a região do time (ao tirar, as regiões
+  /// ficam: sem os outros times à mão, não dá para saber se alguma esvaziou).
+  /// Nulo = municipal de outra região (recusado).
+  static ChampionshipDTO? withTeam(ChampionshipDTO championship, TeamDTO team, {required bool enrolled}) {
+    bool same(int i) {
+      final id = i < championship.teamIds.length ? championship.teamIds[i] : '';
+      return sameTeam(idA: id, nameA: championship.teams[i], idB: team.id, nameB: team.name);
+    }
+
+    final names = <String>[];
+    final ids = <String>[];
+    for (var i = 0; i < championship.teams.length; i++) {
+      if (same(i)) continue;
+      names.add(championship.teams[i]);
+      ids.add(i < championship.teamIds.length ? championship.teamIds[i] : '');
+    }
+    if (!enrolled) return championship.copyWith(teams: names, teamIds: ids);
+
+    final homeRegion = championship.region.trim().toLowerCase();
+    if (!championship.isIntermunicipal && team.region.trim().toLowerCase() != homeRegion) return null;
+    final regionIds = {
+      ...championship.regionIds,
+      RegionRegistry.idOf(championship.region),
+      RegionRegistry.idOf(team.region)
+    }..remove('');
+    return championship.copyWith(
+      teams: [...names, team.name],
+      teamIds: [...ids, team.id],
+      regionIds: regionIds.toList(),
+    );
+  }
+
   /// Apaga só o campeonato (partidas, grupos e classificação continuam).
   Future<Either<Failure, void>> deleteChampionship(String id) async {
     try {
@@ -110,7 +196,8 @@ class ChampionshipsDataSource {
     required String season,
   }) async {
     try {
-      final result = await RegionRegistry.where(_championships, region).get();
+      final result =
+          await RegionRegistry.whereRegionOrIn(_championships, region, listField: ChampionshipDTO.regionIdsField).get();
       final list = result.docs.map(ChampionshipDTO.fromFirestore).where((c) => c.season == season).toList()
         ..sort((a, b) => a.championshipId.compareTo(b.championshipId));
       return Right(list);
@@ -126,7 +213,8 @@ class ChampionshipsDataSource {
     required String season,
   }) async {
     try {
-      final result = await RegionRegistry.where(_championships, region).get();
+      final result =
+          await RegionRegistry.whereRegionOrIn(_championships, region, listField: ChampionshipDTO.regionIdsField).get();
       final list = result.docs.map(ChampionshipDTO.fromFirestore).toList();
       return Right(pickChampionshipForSeason(list, season));
     } catch (e) {

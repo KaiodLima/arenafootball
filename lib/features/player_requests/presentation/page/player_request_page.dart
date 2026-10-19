@@ -171,6 +171,10 @@ class _PlayerRequestPageState extends State<PlayerRequestPage> {
                   onCancel: () => _confirmCancel(state.request!, l10n),
                   onResubmit: () => _edit(state),
                   onOpenProfile: () => _openProfile(state.request!),
+                  onNewRequest: () {
+                    _cubit.startNewRequest();
+                    setState(() => _showErrors = false);
+                  },
                 ),
             },
           ),
@@ -202,10 +206,30 @@ class _PlayerRequestPageState extends State<PlayerRequestPage> {
               ),
           ],
         ),
+        // Competição em que quer jogar (os times são os dela).
+        if (form.championships.isNotEmpty) ...[
+          const SizedBox(height: AppSizes.s16),
+          Text(l10n.playerRequestChampionshipLabel, style: AppTypography.label(color: AppColors.textPrimary)),
+          const SizedBox(height: AppSizes.s8),
+          Wrap(
+            spacing: AppSizes.s8,
+            runSpacing: AppSizes.s8,
+            children: [
+              for (final championship in form.championships)
+                ArenaChoiceChip(
+                  label: championship.title,
+                  icon: Icons.emoji_events_outlined,
+                  selected: championship.championshipId == form.championshipId,
+                  onTap: () => _cubit.selectChampionship(championship.championshipId),
+                ),
+            ],
+          ),
+          if (error == PlayerRequestFormError.championship) _ErrorText(l10n.playerRequestChampionshipRequired),
+        ],
         const SizedBox(height: AppSizes.s16),
         TeamChoiceSelector(
-          key: ValueKey(form.selectedRegion),
-          teams: form.teams,
+          key: ValueKey('${form.selectedRegion}-${form.championshipId}'),
+          teams: form.selectableTeams,
           selected: form.selectedTeam,
           loading: form.loadingTeams,
           placeholder: l10n.playersTeam,
@@ -360,6 +384,7 @@ class _StatusView extends StatelessWidget {
   final VoidCallback onCancel;
   final VoidCallback onResubmit;
   final VoidCallback onOpenProfile;
+  final VoidCallback onNewRequest;
 
   const _StatusView({
     required this.request,
@@ -369,6 +394,7 @@ class _StatusView extends StatelessWidget {
     required this.onCancel,
     required this.onResubmit,
     required this.onOpenProfile,
+    required this.onNewRequest,
   });
 
   @override
@@ -403,7 +429,11 @@ class _StatusView extends StatelessWidget {
               Text(request.name, textAlign: TextAlign.center, style: AppTypography.title()),
               const SizedBox(height: AppSizes.s4),
               Text(
-                [request.team, if (position != null) playerPositionLabel(l10n, position)].join(' · '),
+                [
+                  request.team,
+                  if (request.championship.isNotEmpty) request.championship,
+                  if (position != null) playerPositionLabel(l10n, position),
+                ].join(' · '),
                 textAlign: TextAlign.center,
                 style: AppTypography.subtitle(),
               ),
@@ -459,6 +489,9 @@ class _StatusView extends StatelessWidget {
           PlayerRequestStatus.approved => [
               if (request.playerId.isNotEmpty)
                 ArenaButton.primary(title: l10n.playerRequestViewProfile, function: onOpenProfile),
+              const SizedBox(height: AppSizes.s8),
+              // Joga também em outra competição (por outro time ou o mesmo).
+              ArenaButton.outlined(title: l10n.playerRequestAnotherChampionship, function: onNewRequest),
             ],
           // Saiu do elenco: pede outro time; o perfil (com os números) continua.
           PlayerRequestStatus.removed => [

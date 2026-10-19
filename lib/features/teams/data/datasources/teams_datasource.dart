@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/utils/team_key.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/errors/firebase_error.dart';
@@ -150,12 +153,20 @@ class TeamsDataSource {
       }
 
       final byTeam = Filter.or(Filter('idTime', isEqualTo: team.id), Filter('time', isEqualTo: team.name));
-      final players = await _firestore.collection(SeasonCollection.name('jogadores', season)).where(byTeam).get();
+      // Atletas: também os inscritos no time em alguma competição (`idsTimes`).
+      final playersQuery = team.id.isEmpty
+          ? byTeam
+          : Filter.or(
+              Filter(PlayerDTO.teamIdsField, arrayContains: team.id),
+              Filter('idTime', isEqualTo: team.id),
+              Filter('time', isEqualTo: team.name),
+            );
+      final players = await _firestore.collection(SeasonCollection.name('jogadores', season)).where(playersQuery).get();
       for (final doc in players.docs) {
-        if (!ofTeam(doc.data())) continue;
-        final linked = (doc.data()['idUsuario']?.toString() ?? '').isNotEmpty;
-        writes.add(
-            (batch) => linked ? batch.update(doc.reference, {'time': '', 'idTime': ''}) : batch.delete(doc.reference));
+        final player = PlayerDTO.fromFirestore(doc);
+        if (!player.playsFor(teamId: team.id, teamName: team.name)) continue;
+        final changes = teamRemovalFields(player, team);
+        writes.add((batch) => changes == null ? batch.delete(doc.reference) : batch.update(doc.reference, changes));
       }
 
       final requests = await _firestore.collection('solicitacoes_jogador').where(byTeam).get();
@@ -220,5 +231,33 @@ class TeamsDataSource {
       AppLogger.e('deleteTeam id=${team.id}', name: 'TeamsDataSource', error: e);
       return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível excluir o time.'));
     }
+  }
+
+  /// O que muda no atleta quando o [team] é excluído: saem as inscrições
+  /// nesse time; joga por outro time em outra competição = fica com elas (e o
+  /// principal passa para a próxima, se era este). Sem nenhuma: com conta
+  /// vinculada fica sem time (mantém os números); sem vínculo, nulo = apagar.
+  static Map<Object, Object?>? teamRemovalFields(PlayerDTO player, TeamDTO team) {
+    bool isTeam(String id, String name) => sameTeam(idA: id, nameA: name, idB: team.id, nameB: team.name);
+    final remaining = player.enrollments.where((e) => !isTeam(e.teamId, e.team)).toList();
+    if (remaining.isEmpty) {
+      if (player.userId.isEmpty) return null;
+      return {
+        'time': '',
+        'idTime': '',
+        // Vazios em vez de apagados: as regras não deixam sumir o campo (o app
+        // antigo regravava o atleta inteiro sem ele).
+        if (!player.isLegacy) PlayerEnrollment.field: <String, Object?>{},
+        if (!player.isLegacy) PlayerDTO.teamIdsField: <String>[],
+      };
+    }
+    final next = remaining.first;
+    return {
+      for (final e in player.enrollments)
+        if (isTeam(e.teamId, e.team))
+          FieldPath([PlayerEnrollment.field, PlayerEnrollment.keyOf(e.championshipId)]): FieldValue.delete(),
+      PlayerDTO.teamIdsField: remaining.map((e) => e.teamId).where((id) => id.isNotEmpty).toSet().toList(),
+      if (isTeam(player.teamId, player.team)) ...{'time': next.team, 'idTime': next.teamId},
+    };
   }
 }

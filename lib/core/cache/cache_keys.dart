@@ -42,9 +42,10 @@ abstract final class CacheKeys {
 
   static const String _rankingPrefix = 'ranking_';
 
-  /// Ranking ([type] = nome do quesito) da [region] na [season].
-  static String ranking({required String type, required String region, String? season}) =>
-      '$_rankingPrefix${type}_${_season(season)}_${_region(region)}_cache';
+  /// Ranking ([type] = nome do quesito) da [region] na [season]; com
+  /// [championshipId], o da competição.
+  static String ranking({required String type, required String region, String? season, int? championshipId}) =>
+      '$_rankingPrefix${type}_${_season(season)}_${_region(region)}${championshipId == null ? '' : '_c$championshipId'}_cache';
 
   /// Chaves de ranking: apagar depois de mexer nos números de um jogador.
   static bool isRankingKey(String key) => key.startsWith(_rankingPrefix);

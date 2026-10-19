@@ -15,6 +15,7 @@ class GetCachedStatsRankingUseCase {
     required StatsRankingType type,
     required String region,
     String? season,
+    int? championshipId,
   }) =>
-      _repository.getCachedRanking(type: type, region: region, season: season);
+      _repository.getCachedRanking(type: type, region: region, season: season, championshipId: championshipId);
 }

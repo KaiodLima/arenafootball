@@ -23,11 +23,15 @@ class _FakeTeams implements GetTeamsCacheFirstUseCase {
   Stream<Either<Failure, List<TeamDTO>>> call({String? region, String? season, bool force = false}) =>
       Stream.fromFuture(_load(region: region, season: season));
 
-  Future<Either<Failure, List<TeamDTO>>> _load({String? region, String? season}) async => Right(
-        region == 'Floresta'
-            ? const [TeamDTO(id: '1', name: 'Volta'), TeamDTO(id: '2', name: 'Lava Jato')]
-            : const [TeamDTO(id: '3', name: 'Parceiros')],
-      );
+  /// Sem região (a grade agora lê a temporada inteira): todos.
+  static const _all = [
+    TeamDTO(id: '1', name: 'Volta', region: 'Floresta'),
+    TeamDTO(id: '2', name: 'Lava Jato', region: 'Floresta'),
+    TeamDTO(id: '3', name: 'Parceiros', region: 'Santo inacio'),
+  ];
+
+  Future<Either<Failure, List<TeamDTO>>> _load({String? region, String? season}) async =>
+      Right(region == null ? _all : _all.where((t) => t.region == region).toList());
 }
 
 class _FakeSave implements SaveChampionshipUseCase {
@@ -59,7 +63,7 @@ void main() {
   tearDown(() => cubit.close());
 
   test('carrega os times da região em ordem alfabética', () {
-    expect(cubit.state.form.teams.map((t) => t.name), ['Lava Jato', 'Volta']);
+    expect(cubit.state.form.visibleTeams.map((t) => t.name), ['Lava Jato', 'Volta']);
     expect(cubit.state.form.base.region, 'Floresta');
   });
 
@@ -81,7 +85,7 @@ void main() {
     cubit.toggleTeam('Volta');
     await cubit.selectRegion('Santo inacio');
     expect(cubit.state.form.selectedTeams, isEmpty);
-    expect(cubit.state.form.teams.single.name, 'Parceiros');
+    expect(cubit.state.form.visibleTeams.single.name, 'Parceiros');
   });
 
   test('salvar envia os times marcados e o PDF escolhido', () async {
@@ -117,5 +121,46 @@ void main() {
     expect(save.saved?.rulesUrl, isEmpty);
     expect(edit.state, isA<SavedChampionshipFormState>().having((s) => s.created, 'created', isFalse));
     await edit.close();
+  });
+
+  group('abrangência', () {
+    test('municipal (padrão) só com times da sede; intermunicipal com todos, sede primeiro', () {
+      expect(cubit.state.form.base.scope, ChampionshipScope.municipal);
+      expect(cubit.state.form.visibleTeams.map((t) => t.name), ['Lava Jato', 'Volta']);
+      cubit.selectScope(ChampionshipScope.intermunicipal);
+      expect(cubit.state.form.visibleTeams.map((t) => t.name), ['Lava Jato', 'Volta', 'Parceiros']);
+      expect(cubit.state.form.teamsByRegion.keys, ['Floresta', 'Santo inacio']);
+    });
+
+    test('voltar para municipal tira os de fora; salvar grava abrangência e regiões', () async {
+      cubit.changeTitle('Copa Regional');
+      cubit.selectScope(ChampionshipScope.intermunicipal);
+      cubit
+        ..toggleTeam('Volta')
+        ..toggleTeam('Parceiros');
+      expect(cubit.selectScope(ChampionshipScope.municipal), 1);
+      expect(cubit.state.form.selectedTeams, ['Volta']);
+
+      cubit.selectScope(ChampionshipScope.intermunicipal);
+      cubit.toggleTeam('Parceiros');
+      await cubit.submit();
+      expect(save.saved?.scope, ChampionshipScope.intermunicipal);
+      expect(save.saved?.teamIds, ['1', '3']);
+      expect(save.saved?.toMap()['abrangencia'], 'intermunicipal');
+    });
+
+    test('doc antigo sem o campo é municipal; DTO vai e volta pelo cache', () {
+      const old = ChampionshipDTO(id: 'a', region: 'Floresta');
+      expect(old.isIntermunicipal, isFalse);
+      const inter = ChampionshipDTO(
+        id: 'b',
+        region: 'Floresta',
+        scope: ChampionshipScope.intermunicipal,
+        regionIds: ['fl', 'si'],
+      );
+      final back = ChampionshipDTO.fromCache(inter.toCache());
+      expect(back.scope, ChampionshipScope.intermunicipal);
+      expect(back.regionIds, ['fl', 'si']);
+    });
   });
 }

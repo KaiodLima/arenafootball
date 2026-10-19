@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/championship_picker.dart';
 import 'package:arena_soccer/features/matches/domain/match_form_hints.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/match_form_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/match_form_state.dart';
@@ -49,6 +50,17 @@ class _MatchFormPageState extends State<MatchFormPage> {
     _venueController.dispose();
     _venueFocus.dispose();
     super.dispose();
+  }
+
+  /// Lista de campeonatos com busca (como a de times) e o amistoso.
+  Future<void> _pickChampionship(MatchFormData form) async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    final picked = await showChampionshipPickerSheet(
+      context,
+      championships: form.championships,
+      selectedId: form.championshipId,
+    );
+    if (picked != null) _cubit.selectChampionship(picked.id);
   }
 
   Future<void> _pickTeam(MatchFormData form, {required bool home}) async {
@@ -148,22 +160,19 @@ class _MatchFormPageState extends State<MatchFormPage> {
                     ),
                 ],
               ),
-              // Vários campeonatos ao mesmo tempo na região: escolhe em qual entra.
-              if (form.championships.length > 1) ...[
-                const SizedBox(height: AppSizes.s20),
-                _Label(l10n.matchFormChampionship),
-                Wrap(
-                  spacing: AppSizes.s8,
-                  runSpacing: AppSizes.s8,
-                  children: [
-                    for (final championship in form.championships)
-                      ArenaChoiceChip(
-                        label: championship.title,
-                        icon: Icons.emoji_events_outlined,
-                        selected: championship.championshipId == form.championshipId,
-                        onTap: () => _cubit.selectChampionship(championship.championshipId),
-                      ),
-                  ],
+              // Campeonato da partida (sempre à vista), ou amistoso.
+              const SizedBox(height: AppSizes.s20),
+              _Label(l10n.matchFormChampionship),
+              ChampionshipSelectTile(
+                label: l10n.matchFormPickChampionship,
+                championship: form.championships.where((c) => c.championshipId == form.championshipId).firstOrNull,
+                onTap: () => _pickChampionship(form),
+              ),
+              if (form.championships.isEmpty) ...[
+                const SizedBox(height: AppSizes.s6),
+                Text(
+                  l10n.matchFormNoChampionshipHint,
+                  style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
                 ),
               ],
               const SizedBox(height: AppSizes.s20),

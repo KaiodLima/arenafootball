@@ -33,7 +33,9 @@ class CreateMatchUseCase {
     }
   }
 
-  Future<Either<Failure, void>> call(MatchDTO match) async {
+  /// [friendly]: o admin escolheu "Sem campeonato" (amistoso): grava 0, sem
+  /// procurar o da região nem usar a tabela fixa.
+  Future<Either<Failure, void>> call(MatchDTO match, {bool friendly = false}) async {
     if (!isTeamValid(match.homeTeam) || !isTeamValid(match.awayTeam)) {
       return Left(ErrorWithMessage('Preencha todos os campos!!!', code: invalidTeamsCode));
     }
@@ -41,12 +43,20 @@ class CreateMatchUseCase {
       MatchDTO(
         homeTeam: match.homeTeam,
         awayTeam: match.awayTeam,
+        // Vínculo com os times pelo id (o nome é só cópia).
+        homeTeamId: match.homeTeamId,
+        awayTeamId: match.awayTeamId,
         date: match.date,
         time: match.time,
         venue: match.venue,
         region: match.region,
-        // Escolhido no formulário; sem escolha, o da região na temporada.
-        championshipId: match.championshipId > 0 ? match.championshipId : await _championshipIdOf(match.region),
+        regionIds: match.regionIds,
+        // Escolhido no formulário; amistoso, nenhum; sem escolha, o da região.
+        championshipId: friendly
+            ? 0
+            : match.championshipId > 0
+                ? match.championshipId
+                : await _championshipIdOf(match.region),
       ),
     );
   }

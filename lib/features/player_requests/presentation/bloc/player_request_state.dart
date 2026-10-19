@@ -2,12 +2,13 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/core/utils/team_key.dart';
+import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 
 /// Primeiro campo inválido do formulário (traduzido na página).
-enum PlayerRequestFormError { team, name, position }
+enum PlayerRequestFormError { championship, team, name, position }
 
 /// Dados do formulário "Sou jogador".
 class PlayerRequestForm extends Equatable {
@@ -40,6 +41,11 @@ class PlayerRequestForm extends Equatable {
   /// Atleta que o usuário diz ser (pedido de vínculo); nulo = jogador novo.
   final PlayerDTO? claimedPlayer;
 
+  /// Competições da região (temporada atual) e a escolhida. Sem competições
+  /// na região, o pedido vai só com o time, como antes.
+  final List<ChampionshipDTO> championships;
+  final int? championshipId;
+
   const PlayerRequestForm({
     this.regions = const [],
     this.selectedRegion,
@@ -54,11 +60,29 @@ class PlayerRequestForm extends Equatable {
     this.unlinkedPlayers = const [],
     this.loadingPlayers = false,
     this.claimedPlayer,
+    this.championships = const [],
+    this.championshipId,
   });
 
   bool get isClaim => claimedPlayer != null;
 
+  ChampionshipDTO? get selectedChampionship {
+    for (final c in championships) {
+      if (c.championshipId == championshipId) return c;
+    }
+    return null;
+  }
+
+  /// Times que dá para escolher: os da competição escolhida (sem
+  /// competições na região, todos).
+  List<TeamDTO> get selectableTeams {
+    final championship = selectedChampionship;
+    if (championship == null) return championships.isEmpty ? teams : const [];
+    return teams.where((t) => championship.hasTeam(id: t.id, name: t.name)).toList();
+  }
+
   PlayerRequestFormError? get error {
+    if (championships.isNotEmpty && selectedChampionship == null) return PlayerRequestFormError.championship;
     if (selectedTeam == null) return PlayerRequestFormError.team;
     // Vínculo: o nome é o do atleta.
     if (!isClaim && name.trim().length < nameMinLength) return PlayerRequestFormError.name;
@@ -87,6 +111,8 @@ class PlayerRequestForm extends Equatable {
     List<PlayerDTO>? unlinkedPlayers,
     bool? loadingPlayers,
     PlayerDTO? Function()? claimedPlayer,
+    List<ChampionshipDTO>? championships,
+    int? Function()? championshipId,
   }) {
     return PlayerRequestForm(
       regions: regions ?? this.regions,
@@ -102,6 +128,8 @@ class PlayerRequestForm extends Equatable {
       unlinkedPlayers: unlinkedPlayers ?? this.unlinkedPlayers,
       loadingPlayers: loadingPlayers ?? this.loadingPlayers,
       claimedPlayer: claimedPlayer != null ? claimedPlayer() : this.claimedPlayer,
+      championships: championships ?? this.championships,
+      championshipId: championshipId != null ? championshipId() : this.championshipId,
     );
   }
 
@@ -120,6 +148,8 @@ class PlayerRequestForm extends Equatable {
         unlinkedPlayers,
         loadingPlayers,
         claimedPlayer,
+        championships,
+        championshipId,
       ];
 }
 

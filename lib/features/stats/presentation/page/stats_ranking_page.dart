@@ -11,6 +11,7 @@ import 'package:arena_soccer/features/stats/presentation/widgets/ranking_list.da
 import 'package:arena_soccer/features/stats/presentation/widgets/ranking_podium.dart';
 import 'package:arena_soccer/features/stats/presentation/widgets/ranking_type_switch.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
@@ -67,6 +68,7 @@ class _StatsRankingPageState extends State<StatsRankingPage> {
                   state: state,
                   isFavorite: isFavorite,
                   onTypeChanged: BlocProvider.of<StatsRankingCubit>(context).setType,
+                  onChampionshipChanged: BlocProvider.of<StatsRankingCubit>(context).setChampionship,
                 ),
               ),
               ..._body(state, l10n, isGoals, isFavorite),
@@ -118,8 +120,14 @@ class _Header extends StatelessWidget {
   final StatsRankingState state;
   final bool Function(RankingEntry) isFavorite;
   final ValueChanged<StatsRankingType> onTypeChanged;
+  final ValueChanged<int?> onChampionshipChanged;
 
-  const _Header({required this.state, required this.isFavorite, required this.onTypeChanged});
+  const _Header({
+    required this.state,
+    required this.isFavorite,
+    required this.onTypeChanged,
+    required this.onChampionshipChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -133,6 +141,37 @@ class _Header extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s4, AppSizes.s16, AppSizes.s20),
             child: RankingTypeSwitch(selected: state.type, onChanged: onTypeChanged),
           ),
+          // Geral + uma chip por competição da região.
+          if (state.championships.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSizes.s16),
+              child: SizedBox(
+                height: AppSizes.s40,
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSizes.s16),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: state.championships.length + 1,
+                  separatorBuilder: (_, __) => const SizedBox(width: AppSizes.s8),
+                  itemBuilder: (context, index) {
+                    final l10n = AppLocalizations.of(context);
+                    if (index == 0) {
+                      return ArenaChoiceChip(
+                        label: l10n.statsGeneral,
+                        selected: state.championshipId == null,
+                        onTap: () => onChampionshipChanged(null),
+                      );
+                    }
+                    final championship = state.championships[index - 1];
+                    return ArenaChoiceChip(
+                      label: championship.title,
+                      icon: Icons.emoji_events_outlined,
+                      selected: state.championshipId == championship.championshipId,
+                      onTap: () => onChampionshipChanged(championship.championshipId),
+                    );
+                  },
+                ),
+              ),
+            ),
           if (podium.isNotEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSizes.s16),

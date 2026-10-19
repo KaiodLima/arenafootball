@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
@@ -25,6 +26,11 @@ class PlayerProfileState extends Equatable {
   /// Gravando uma edição do admin.
   final bool saving;
 
+  /// Times da temporada (escudo de cada inscrição) e competições da região
+  /// (nome de cada inscrição).
+  final List<TeamDTO> teams;
+  final List<ChampionshipDTO> championships;
+
   const PlayerProfileState({
     this.player,
     this.team,
@@ -33,7 +39,25 @@ class PlayerProfileState extends Equatable {
     this.participations = const [],
     this.notFound = false,
     this.saving = false,
+    this.teams = const [],
+    this.championships = const [],
   });
+
+  /// Nome da competição pelo `id_campeonato` (vazio se não carregou).
+  String championshipTitle(int championshipId) {
+    for (final c in championships) {
+      if (c.championshipId == championshipId) return c.title;
+    }
+    return '';
+  }
+
+  /// Time da inscrição (escudo, link para o elenco).
+  TeamDTO? teamOf({required String teamId, required String name}) {
+    for (final t in teams) {
+      if (teamId.isNotEmpty ? t.id == teamId : t.name.trim().toLowerCase() == name.trim().toLowerCase()) return t;
+    }
+    return null;
+  }
 
   PlayerProfileState copyWith({
     PlayerDTO? player,
@@ -45,6 +69,8 @@ class PlayerProfileState extends Equatable {
     List<NewsDTO>? participations,
     bool? notFound,
     bool? saving,
+    List<TeamDTO>? teams,
+    List<ChampionshipDTO>? championships,
   }) {
     return PlayerProfileState(
       player: player ?? this.player,
@@ -54,11 +80,14 @@ class PlayerProfileState extends Equatable {
       participations: participations ?? this.participations,
       notFound: notFound ?? this.notFound,
       saving: saving ?? this.saving,
+      teams: teams ?? this.teams,
+      championships: championships ?? this.championships,
     );
   }
 
   @override
-  List<Object?> get props => [player, team, goalsRank, assistsRank, participations, notFound, saving];
+  List<Object?> get props =>
+      [player, team, goalsRank, assistsRank, participations, notFound, saving, teams, championships];
 }
 
 /// Uma falha de leitura ou de gravação (a tela mostra no snackbar, ou o

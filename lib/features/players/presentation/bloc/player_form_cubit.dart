@@ -1,6 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/firebase/season_collection.dart';
+import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_cache_first_usecase.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/domain/usecases/create_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
@@ -15,13 +18,15 @@ class PlayerFormCubit extends Cubit<PlayerFormState> {
   final GetRegionsUseCase getRegionsUseCase;
   final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
   final WatchTeamPlayersUseCase watchTeamPlayersUseCase;
+  final GetRegionChampionshipsCacheFirstUseCase? getRegionChampionshipsCacheFirstUseCase;
 
   PlayerFormCubit(
     this.createPlayerUseCase,
     this.getRegionsUseCase,
     this.getTeamsCacheFirstUseCase,
-    this.watchTeamPlayersUseCase,
-  ) : super(const EditingPlayerFormState());
+    this.watchTeamPlayersUseCase, [
+    this.getRegionChampionshipsCacheFirstUseCase,
+  ]) : super(const EditingPlayerFormState());
 
   void _edit(PlayerFormData form) {
     if (!isClosed) emit(EditingPlayerFormState(form: form));
@@ -45,13 +50,22 @@ class PlayerFormCubit extends Cubit<PlayerFormState> {
   /// onde o jogador novo é gravado; já carrega o elenco do primeiro.
   Future<void> _loadTeams(String region) async {
     // Cache-first: fica com a última emissão (o remoto quando revalidou).
+    final championshipsUseCase = getRegionChampionshipsCacheFirstUseCase;
+    final championshipsFuture = championshipsUseCase == null
+        ? null
+        : championshipsUseCase(region: region, season: SeasonCollection.currentSeason).last;
     final response = await getTeamsCacheFirstUseCase(region: region).last;
+    final championshipsResponse = await championshipsFuture;
     if (isClosed || state.form.selectedRegion != region) return;
     if (response.isLeft) {
       emit(ErrorPlayerFormState(form: state.form.withTeams(const []), errorMessage: response.left.toString()));
       return;
     }
-    _edit(state.form.withTeams(response.right));
+    final championships = [...?championshipsResponse?.fold((_) => const <ChampionshipDTO>[], (list) => list)]
+      ..sort((a, b) => a.championshipId.compareTo(b.championshipId));
+    // Uma competição só: já vem escolhida.
+    final championshipId = championships.length == 1 ? championships.first.championshipId : null;
+    _edit(state.form.withChampionships(championships, championshipId).withTeams(response.right));
     await _loadSquad();
   }
 
@@ -67,8 +81,17 @@ class PlayerFormCubit extends Cubit<PlayerFormState> {
 
   Future<void> selectRegion(String region) async {
     if (region == state.form.selectedRegion) return;
-    _edit(state.form.copyWith(selectedRegion: region, squad: const []).withTeams(const []));
+    _edit(state.form
+        .copyWith(selectedRegion: region, squad: const []).withChampionships(const [], null).withTeams(const []));
     await _loadTeams(region);
+  }
+
+  /// Competição em que o atleta entra: o time fica se jogar nela.
+  Future<void> selectChampionship(int championshipId) async {
+    if (championshipId == state.form.championshipId) return;
+    final before = state.form.selectedTeam;
+    _edit(state.form.withChampionships(state.form.championships, championshipId));
+    if (state.form.selectedTeam != before) await _loadSquad();
   }
 
   Future<void> selectTeam(String team) async {

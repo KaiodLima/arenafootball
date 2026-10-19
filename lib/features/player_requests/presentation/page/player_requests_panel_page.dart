@@ -260,7 +260,7 @@ class _RequestCard extends StatelessWidget {
               const SizedBox(width: AppSizes.s8),
               Expanded(
                 child: Text(
-                  '${request.team} · ${request.region}',
+                  [request.team, if (request.championship.isNotEmpty) request.championship, request.region].join(' · '),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppTypography.body().copyWith(fontSize: AppSizes.s14, fontWeight: FontWeight.w600),

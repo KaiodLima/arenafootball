@@ -324,6 +324,13 @@ class AppLocalizationsPt extends AppLocalizations {
       'Toque para preencher os times e o placar.';
 
   @override
+  String get goalChampionship => 'Competição';
+
+  @override
+  String get goalChampionshipHint =>
+      'O gol soma nos números do atleta nesta competição.';
+
+  @override
   String get goalScoreboard => 'Placar';
 
   @override
@@ -594,6 +601,9 @@ class AppLocalizationsPt extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get statsGeneral => 'Geral';
 
   @override
   String get statsLoadError => 'Não foi possível carregar o ranking.';
@@ -1242,6 +1252,51 @@ class AppLocalizationsPt extends AppLocalizations {
   String get playersSortAssists => 'Assistências';
 
   @override
+  String get enrollTeamMenu => 'Inscrever em competição';
+
+  @override
+  String get enrollTeamTitle => 'Competições do time';
+
+  @override
+  String enrollTeamSubtitle(String team) {
+    return 'Marque as competições da temporada em que o $team joga. Os atletas são inscritos um a um.';
+  }
+
+  @override
+  String get enrollNoChampionships => 'Nenhuma competição na temporada.';
+
+  @override
+  String get enrollSaved => 'Inscrições salvas.';
+
+  @override
+  String get enrollLoadError => 'Não foi possível carregar as competições.';
+
+  @override
+  String get enrollPlayerTitle => 'Competições do atleta';
+
+  @override
+  String enrollPlayerSubtitle(String name, String team) {
+    return 'Em quais competições $name joga pelo $team?';
+  }
+
+  @override
+  String enrollPlayerOtherTeam(String team) {
+    return 'Joga pelo $team nesta competição';
+  }
+
+  @override
+  String enrollPlayerSaved(String name) {
+    return 'Inscrições de $name salvas.';
+  }
+
+  @override
+  String get playersGeneralSquad => 'Elenco geral';
+
+  @override
+  String get playersEmptyChampionship =>
+      'Nenhum atleta deste time nesta competição.';
+
+  @override
   String get playersSortName => 'A–Z';
 
   @override
@@ -1299,6 +1354,30 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get standingsYourTeam => 'Seu time';
+
+  @override
+  String get athletePlaysFor => 'Atua por';
+
+  @override
+  String athleteChampionshipFallback(int id) {
+    return 'Competição $id';
+  }
+
+  @override
+  String athleteEnrollmentStats(int goals, int assists) {
+    return '$goals G · $assists A';
+  }
+
+  @override
+  String get athleteStatsTotal => 'Total';
+
+  @override
+  String get athleteStatsTotalHint =>
+      'Ajusta só o total (números de antes das competições).';
+
+  @override
+  String get athleteStatsChampionshipHint =>
+      'Ajusta a competição; o total acompanha.';
 
   @override
   String get athleteTitle => 'Atleta';
@@ -1665,6 +1744,16 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get playerRequestChampionshipLabel => 'Competição';
+
+  @override
+  String get playerRequestChampionshipRequired =>
+      'Escolha a competição em que você joga por esse time.';
+
+  @override
+  String get playerRequestAnotherChampionship => 'Jogar em outra competição';
+
+  @override
   String get playerRequestIntro =>
       'Jogue pelo seu time da região: envie a solicitação e um administrador vai analisar.';
 
@@ -1981,6 +2070,40 @@ class AppLocalizationsPt extends AppLocalizations {
   String get championshipFormSeasonLabel => 'Temporada';
 
   @override
+  String get championshipScopeMunicipal => 'Municipal';
+
+  @override
+  String get championshipScopeIntermunicipal => 'Intermunicipal';
+
+  @override
+  String championshipScopeMunicipalHint(String region) {
+    return 'Só times de $region.';
+  }
+
+  @override
+  String get championshipScopeIntermunicipalHint =>
+      'Times de qualquer região. O campeonato aparece em todas as regiões dos times.';
+
+  @override
+  String championshipScopeRemoved(int count, String region) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count times de fora de $region saíram da seleção.',
+      one: '1 time de fora de $region saiu da seleção.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String championshipScopeOutsideError(String region) {
+    return 'Campeonato municipal só aceita times de $region.';
+  }
+
+  @override
+  String get championshipScopeNoRegion => 'Sem região';
+
+  @override
   String get championshipFormSectionTeams => 'Times participantes';
 
   @override
@@ -2162,6 +2285,23 @@ class AppLocalizationsPt extends AppLocalizations {
   String seasonsStarted(String season) {
     return 'Temporada $season iniciada!';
   }
+
+  @override
+  String get matchFormNoChampionship => 'Sem campeonato (amistoso)';
+
+  @override
+  String get matchFormNoChampionshipHint =>
+      'Nenhum campeonato na região nesta temporada; cadastre em Painel do admin → Campeonatos.';
+
+  @override
+  String get matchFormPickChampionship => 'Campeonato da partida';
+
+  @override
+  String get matchFormChampionshipSearch => 'Buscar campeonato';
+
+  @override
+  String get matchFormChampionshipNoResults =>
+      'Nenhum campeonato com esse nome';
 
   @override
   String get matchFormChampionship => 'Campeonato';

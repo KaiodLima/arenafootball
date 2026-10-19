@@ -16,9 +16,10 @@ class StatsRepositoryImpl implements IStatsRepository {
     required StatsRankingType type,
     required String region,
     String? season,
+    int? championshipId,
   }) =>
       _cache.read(
-        CacheKeys.ranking(type: type.name, region: region, season: season),
+        CacheKeys.ranking(type: type.name, region: region, season: season, championshipId: championshipId),
         (json) => StatsRanking.fromCache(Map<String, dynamic>.from(json as Map)),
       );
 
@@ -28,8 +29,10 @@ class StatsRepositoryImpl implements IStatsRepository {
     required StatsRankingType type,
     required String region,
     String? season,
+    int? championshipId,
   }) =>
-      _cache.save(CacheKeys.ranking(type: type.name, region: region, season: season), ranking.toCache());
+      _cache.save(CacheKeys.ranking(type: type.name, region: region, season: season, championshipId: championshipId),
+          ranking.toCache());
 
   @override
   Future<void> deleteRankingCache() => _cache.deleteWhere(CacheKeys.isRankingKey);

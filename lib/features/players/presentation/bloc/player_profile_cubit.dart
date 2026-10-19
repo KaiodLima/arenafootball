@@ -7,7 +7,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/news/domain/usecases/get_player_goal_cards_cache_first_usecase.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_cache_first_usecase.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
+import 'package:arena_soccer/features/players/domain/usecases/adjust_player_stats_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/delete_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/remove_player_from_squad_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/update_player_usecase.dart';
@@ -30,6 +32,8 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
   final UpdatePlayerUseCase updatePlayerUseCase;
   final DeletePlayerUseCase deletePlayerUseCase;
   final RemovePlayerFromSquadUseCase removePlayerFromSquadUseCase;
+  final AdjustPlayerStatsUseCase adjustPlayerStatsUseCase;
+  final GetRegionChampionshipsCacheFirstUseCase getRegionChampionshipsCacheFirstUseCase;
   StreamSubscription<Either<Failure, PlayerDTO?>>? _subscription;
   String? _season;
 
@@ -44,7 +48,12 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
     this.updatePlayerUseCase,
     this.deletePlayerUseCase,
     this.removePlayerFromSquadUseCase,
+    this.adjustPlayerStatsUseCase,
+    this.getRegionChampionshipsCacheFirstUseCase,
   ) : super(const PlayerProfileState());
+
+  /// Região cujas competições já foram carregadas.
+  String? _championshipsRegion;
 
   /// [initial] (opcional) aparece enquanto o stream não chega.
   void watch({required String playerId, String? season, PlayerDTO? initial}) {
@@ -93,9 +102,10 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
       final teams = await getTeamsCacheFirstUseCase(season: _season).last;
       if (isClosed) return;
       team = teams.fold((_) => null, (list) => TeamDirectory(list).resolve(id: player.teamId, name: player.team));
-      if (team != null) emit(state.copyWith(team: team));
+      emit(state.copyWith(team: team, teams: teams.fold((_) => null, (list) => list)));
     }
     if (team == null || team.region.isEmpty) return;
+    unawaited(_loadChampionships(team.region));
 
     // Rankings pelo cache local: a última emissão (o remoto quando revalidou).
     final goals =
@@ -112,6 +122,16 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
           goalsRank: goals.fold((_) => null, (ranking) => positionOf(ranking.entries, player.id)),
           assistsRank: assists.fold((_) => null, (ranking) => positionOf(ranking.entries, player.id)),
         ));
+  }
+
+  /// Competições da região (nome de cada inscrição), uma vez por região.
+  Future<void> _loadChampionships(String region) async {
+    if (_championshipsRegion == region) return;
+    _championshipsRegion = region;
+    await for (final response in getRegionChampionshipsCacheFirstUseCase(region: region, season: _season ?? '')) {
+      if (isClosed) return;
+      if (response.isRight) emit(state.copyWith(championships: response.right));
+    }
   }
 
   /// Posição do jogador no ranking (empates dividem a posição); nulo se não
@@ -131,16 +151,54 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
     return _save(player.copyWith(name: name.trim()));
   }
 
-  Future<void> adjustGoals(int delta) {
+  /// Com [championshipId], ajusta a competição (e o total junto); sem ela,
+  /// só o total (números de antes das competições).
+  Future<void> adjustGoals(int delta, {int? championshipId}) {
     final player = state.player;
     if (player == null) return Future.value();
+    if (championshipId != null) return _adjustIn(player, championshipId, goals: delta);
     return _save(player.copyWith(goals: max(0, player.goals + delta)));
   }
 
-  Future<void> adjustAssists(int delta) {
+  Future<void> adjustAssists(int delta, {int? championshipId}) {
     final player = state.player;
     if (player == null) return Future.value();
+    if (championshipId != null) return _adjustIn(player, championshipId, assists: delta);
     return _save(player.copyWith(assists: max(0, player.assists + delta)));
+  }
+
+  /// Ajuste atômico na competição; mostra na hora (o stream confirma).
+  Future<void> _adjustIn(PlayerDTO player, int championshipId, {int goals = 0, int assists = 0}) async {
+    final enrollment = player.enrollmentIn(championshipId);
+    if (enrollment == null) return;
+    final goalsDelta =
+        AdjustPlayerStatsUseCase.clampDelta(goals, inChampionship: enrollment.goals, total: player.goals);
+    final assistsDelta =
+        AdjustPlayerStatsUseCase.clampDelta(assists, inChampionship: enrollment.assists, total: player.assists);
+    if (goalsDelta == 0 && assistsDelta == 0) return;
+    final updated = player.copyWith(
+      goals: player.goals + goalsDelta,
+      assists: player.assists + assistsDelta,
+      enrollments: [
+        for (final e in player.enrollments)
+          e.championshipId == championshipId
+              ? e.copyWith(goals: e.goals + goalsDelta, assists: e.assists + assistsDelta)
+              : e,
+      ],
+    );
+    emit(state.copyWith(player: updated, saving: true));
+    final response = await adjustPlayerStatsUseCase(
+      player,
+      enrollment,
+      goals: goalsDelta,
+      assists: assistsDelta,
+      season: _season,
+    );
+    if (isClosed) return;
+    response.fold(
+      (failure) => emit(ErrorPlayerProfileState(state.copyWith(player: player, saving: false), failure.toString())),
+      (_) => emit(state.copyWith(saving: false)),
+    );
   }
 
   Future<void> changePhoto(File image) {
@@ -179,19 +237,21 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
     );
   }
 
-  /// Só para jogador com conta vinculada; o stream mostra ele sem time.
-  Future<void> removeFromSquad() async {
+  /// Só para jogador com conta vinculada. Com [championshipId], sai só da
+  /// competição; o stream mostra o resultado.
+  Future<void> removeFromSquad({int? championshipId}) async {
     final player = state.player;
     if (player == null || state.saving || player.team.isEmpty) return;
     emit(state.copyWith(saving: true));
-    final response = await removePlayerFromSquadUseCase(player, season: _season);
+    final enrollment = championshipId == null ? null : player.enrollmentIn(championshipId);
+    final response = await removePlayerFromSquadUseCase(player, championshipId: championshipId, season: _season);
     if (isClosed) return;
     response.fold(
       (failure) => emit(ErrorPlayerProfileState(state.copyWith(saving: false), failure.toString())),
       (_) => emit(RemovedFromSquadPlayerProfileState(
         state.copyWith(saving: false),
         name: player.name,
-        teamName: player.team,
+        teamName: enrollment?.team ?? player.team,
       )),
     );
   }

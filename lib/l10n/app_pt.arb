@@ -122,6 +122,8 @@
   "newsGoalCreated": "Gol publicado!",
   "goalTodayMatches": "Jogos de hoje",
   "goalTodayMatchesHint": "Toque para preencher os times e o placar.",
+  "goalChampionship": "Competição",
+  "goalChampionshipHint": "O gol soma nos números do atleta nesta competição.",
   "goalScoreboard": "Placar",
   "goalPickTeam": "Escolher time",
   "goalHome": "Mandante",
@@ -323,6 +325,7 @@
       }
     }
   },
+  "statsGeneral": "Geral",
   "statsLoadError": "Não foi possível carregar o ranking.",
   "matchesNoChampionship": "Nenhum registro no momento",
   "matchesEmpty": "Nenhuma partida cadastrada",
@@ -693,6 +696,49 @@
   "playersSummaryAssists": "Assistências",
   "playersSortGoals": "Gols",
   "playersSortAssists": "Assistências",
+  "enrollTeamMenu": "Inscrever em competição",
+  "enrollTeamTitle": "Competições do time",
+  "enrollTeamSubtitle": "Marque as competições da temporada em que o {team} joga. Os atletas são inscritos um a um.",
+  "@enrollTeamSubtitle": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "enrollNoChampionships": "Nenhuma competição na temporada.",
+  "enrollSaved": "Inscrições salvas.",
+  "enrollLoadError": "Não foi possível carregar as competições.",
+  "enrollPlayerTitle": "Competições do atleta",
+  "enrollPlayerSubtitle": "Em quais competições {name} joga pelo {team}?",
+  "@enrollPlayerSubtitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "enrollPlayerOtherTeam": "Joga pelo {team} nesta competição",
+  "@enrollPlayerOtherTeam": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "enrollPlayerSaved": "Inscrições de {name} salvas.",
+  "@enrollPlayerSaved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playersGeneralSquad": "Elenco geral",
+  "playersEmptyChampionship": "Nenhum atleta deste time nesta competição.",
   "playersSortName": "A–Z",
   "playersSearchHint": "Buscar jogador",
   "playersNoResults": "Nenhum jogador encontrado.",
@@ -722,6 +768,29 @@
   "standingsGoalsAgainst": "Gols sofridos",
   "standingsPerformance": "Aproveitamento",
   "standingsYourTeam": "Seu time",
+  "athletePlaysFor": "Atua por",
+  "athleteChampionshipFallback": "Competição {id}",
+  "@athleteChampionshipFallback": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
+  "athleteEnrollmentStats": "{goals} G · {assists} A",
+  "@athleteEnrollmentStats": {
+    "placeholders": {
+      "goals": {
+        "type": "int"
+      },
+      "assists": {
+        "type": "int"
+      }
+    }
+  },
+  "athleteStatsTotal": "Total",
+  "athleteStatsTotalHint": "Ajusta só o total (números de antes das competições).",
+  "athleteStatsChampionshipHint": "Ajusta a competição; o total acompanha.",
   "athleteTitle": "Atleta",
   "athleteScored": "Fez o gol",
   "athleteAssisted": "Deu o passe",
@@ -942,6 +1011,9 @@
       }
     }
   },
+  "playerRequestChampionshipLabel": "Competição",
+  "playerRequestChampionshipRequired": "Escolha a competição em que você joga por esse time.",
+  "playerRequestAnotherChampionship": "Jogar em outra competição",
   "playerRequestIntro": "Jogue pelo seu time da região: envie a solicitação e um administrador vai analisar.",
   "playerRequestTeamRequired": "Escolha o time em que você joga.",
   "playerRequestNameLabel": "Nome de jogador",
@@ -1182,6 +1254,37 @@
   "championshipFormTitleRequired": "Informe o nome (mínimo 3 letras).",
   "championshipFormDescriptionLabel": "Descrição (opcional)",
   "championshipFormSeasonLabel": "Temporada",
+  "championshipScopeMunicipal": "Municipal",
+  "championshipScopeIntermunicipal": "Intermunicipal",
+  "championshipScopeMunicipalHint": "Só times de {region}.",
+  "@championshipScopeMunicipalHint": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "championshipScopeIntermunicipalHint": "Times de qualquer região. O campeonato aparece em todas as regiões dos times.",
+  "championshipScopeRemoved": "{count, plural, =1{1 time de fora de {region} saiu da seleção.} other{{count} times de fora de {region} saíram da seleção.}}",
+  "@championshipScopeRemoved": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "championshipScopeOutsideError": "Campeonato municipal só aceita times de {region}.",
+  "@championshipScopeOutsideError": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "championshipScopeNoRegion": "Sem região",
   "championshipFormSectionTeams": "Times participantes",
   "championshipFormTeamsAll": "Todos",
   "championshipFormTeamsClear": "Limpar",
@@ -1289,6 +1392,11 @@
       }
     }
   },
+  "matchFormNoChampionship": "Sem campeonato (amistoso)",
+  "matchFormNoChampionshipHint": "Nenhum campeonato na região nesta temporada; cadastre em Painel do admin → Campeonatos.",
+  "matchFormPickChampionship": "Campeonato da partida",
+  "matchFormChampionshipSearch": "Buscar campeonato",
+  "matchFormChampionshipNoResults": "Nenhum campeonato com esse nome",
   "matchFormChampionship": "Campeonato",
   "teamRequestMenu": "Sou dono de time",
   "teamRequestTitle": "Sou dono de time",

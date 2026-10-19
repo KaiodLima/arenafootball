@@ -1,12 +1,15 @@
 import 'package:either_dart/either.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/utils/team_key.dart';
+import 'package:arena_soccer/features/players/domain/usecases/get_top_players_in_championship_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/get_top_players_usecase.dart';
 import 'package:arena_soccer/features/stats/domain/ranking_entry.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
-/// Ranking de artilharia/assistências de uma região na temporada.
+/// Ranking de artilharia/assistências de uma região na temporada (ou, com
+/// `championshipId`, de uma competição: os números da inscrição, com o time
+/// pelo qual o atleta joga nela).
 ///
 /// Busca só os [limit] melhores no quesito entre os times da região (consulta
 /// por `idTime`, ordenada e limitada no servidor), em vez de todos os
@@ -22,16 +25,18 @@ import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_firs
 class GetStatsRankingUseCase {
   final GetTeamsCacheFirstUseCase _getTeams;
   final GetTopPlayersUseCase _getTopPlayers;
+  final GetTopPlayersInChampionshipUseCase? _getTopInChampionship;
 
   /// Tamanho do ranking (por quesito).
   static const int limit = 50;
 
-  GetStatsRankingUseCase(this._getTeams, this._getTopPlayers);
+  GetStatsRankingUseCase(this._getTeams, this._getTopPlayers, [this._getTopInChampionship]);
 
   Future<Either<Failure, StatsRanking>> call({
     required StatsRankingType type,
     required String region,
     String? season,
+    int? championshipId,
   }) async {
     // Times pelo cache local: a última emissão (o remoto quando revalidou).
     final teams = await _getTeams(region: region, season: season).last;
@@ -40,12 +45,24 @@ class GetStatsRankingUseCase {
       for (final team in teams.right)
         if (team.id.isNotEmpty) team.id,
     ];
-    final players = await _getTopPlayers(teamIds: teamIds, field: type.field, limit: limit, season: season);
-    if (players.isLeft) return Left(players.left);
+    final inChampionship = _getTopInChampionship;
+    final byChampionship = championshipId != null && inChampionship != null;
+    final response = byChampionship
+        ? await inChampionship(championshipId: championshipId, field: type.field, limit: limit, season: season)
+        : await _getTopPlayers(teamIds: teamIds, field: type.field, limit: limit, season: season);
+    if (response.isLeft) return Left(response.left);
+    // Na competição, o atleta aparece pelo time e pelos números dela.
+    final players = byChampionship
+        ? [
+            for (final player in response.right)
+              if (player.enrollmentIn(championshipId) case final e?)
+                player.copyWith(team: e.team, teamId: e.teamId, goals: e.goals, assists: e.assists),
+          ]
+        : response.right;
 
     // Rede de segurança: só jogadores de um time da região (a consulta já filtra pelo id).
     final directory = TeamDirectory(teams.right);
-    final ranked = players.right
+    final ranked = players
         .where((player) => directory.resolve(id: player.teamId, name: player.team) != null && type.valueOf(player) > 0)
         .toList();
 

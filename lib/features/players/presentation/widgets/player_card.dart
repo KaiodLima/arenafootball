@@ -73,7 +73,17 @@ class PlayerCard extends StatelessWidget {
   /// Foto local (prévia do cadastro).
   final File? photoFile;
 
-  const PlayerCard({super.key, required this.player, required this.isTopScorer, this.onTap, this.photoFile});
+  /// Admin/dono: abre as competições do atleta pelo time (nulo = sem botão).
+  final VoidCallback? onEnroll;
+
+  const PlayerCard({
+    super.key,
+    required this.player,
+    required this.isTopScorer,
+    this.onTap,
+    this.photoFile,
+    this.onEnroll,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -121,6 +131,12 @@ class PlayerCard extends StatelessWidget {
               ],
             ),
           ),
+          if (onEnroll != null)
+            IconButton(
+              tooltip: l10n.enrollPlayerTitle,
+              onPressed: onEnroll,
+              icon: const Icon(Icons.emoji_events_outlined, color: AppColors.primaryDark),
+            ),
           const Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary),
         ],
       ),

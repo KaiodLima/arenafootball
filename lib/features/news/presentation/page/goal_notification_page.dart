@@ -214,6 +214,24 @@ class _GoalNotificationPageState extends State<GoalNotificationPage> {
                 TodayMatchesStrip(matches: form.todayMatches, selected: linked, onPick: _cubit.pickMatch),
                 const SizedBox(height: AppSizes.s20),
               ],
+              // Competição do gol (a partida vinculada já diz qual é).
+              if (!form.championshipFromMatch && form.matchChampionships.length > 1) ...[
+                _Label(l10n.goalChampionship, hint: l10n.goalChampionshipHint),
+                Wrap(
+                  spacing: AppSizes.s8,
+                  runSpacing: AppSizes.s8,
+                  children: [
+                    for (final championship in form.matchChampionships)
+                      ArenaChoiceChip(
+                        label: championship.title,
+                        icon: Icons.emoji_events_outlined,
+                        selected: championship.championshipId == form.championshipId,
+                        onTap: () => _cubit.selectChampionship(championship.championshipId),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: AppSizes.s20),
+              ],
               _Label(l10n.goalScoreboard),
               GoalScoreboard(
                 maxGoals: GoalFormData.maxGoals,

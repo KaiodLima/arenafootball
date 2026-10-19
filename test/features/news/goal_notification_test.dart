@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
+import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_cache_first_usecase.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/repositories/matches_repository_interface.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/get_today_matches_usecase.dart';
@@ -12,6 +14,7 @@ import 'package:arena_soccer/features/news/domain/usecases/create_news_usecase.d
 import 'package:arena_soccer/features/news/presentation/bloc/goal_notification_cubit.dart';
 import 'package:arena_soccer/features/news/presentation/bloc/goal_notification_state.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
 import 'package:arena_soccer/features/players/domain/repositories/players_repository_interface.dart';
 import 'package:arena_soccer/features/players/domain/usecases/add_player_stats_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
@@ -114,7 +117,49 @@ const _squads = {
   'Riacho': [PlayerDTO(id: 'rafa', name: 'Rafa', team: 'Riacho')],
 };
 
+class _FakeChampionships implements GetRegionChampionshipsCacheFirstUseCase {
+  final List<ChampionshipDTO> championships;
+
+  _FakeChampionships([this.championships = const []]);
+
+  @override
+  Stream<Either<Failure, List<ChampionshipDTO>>> call(
+          {required String region, required String season, bool force = false}) =>
+      Stream.value(Right(championships));
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 class _FakePlayersRepository implements IPlayersRepository {
+  @override
+  Future<Either<Failure, void>> setChampionships(
+    PlayerDTO player, {
+    required String teamId,
+    required String team,
+    required Set<int> selected,
+    required List<int> teamChampionships,
+    String? season,
+  }) async =>
+      const Right(null);
+
+  @override
+  Stream<Either<Failure, PlayerDTO?>> watchPlayerOfUser({required String userId, String? season}) =>
+      const Stream.empty();
+
+  @override
+  Future<Either<Failure, void>> enroll(PlayerDTO player, PlayerEnrollment enrollment, {String? season}) async =>
+      const Right(null);
+
+  @override
+  Future<Either<Failure, List<PlayerDTO>>> getTopPlayersInChampionship({
+    required int championshipId,
+    required String field,
+    int limit = 50,
+    String? season,
+  }) async =>
+      const Right([]);
+
   final increments = <String>[];
   bool fail = false;
 
@@ -128,10 +173,12 @@ class _FakePlayersRepository implements IPlayersRepository {
     required String playerId,
     int goals = 0,
     int assists = 0,
+    PlayerEnrollment? enrollment,
     String? season,
   }) async {
     if (fail) return Left(ErrorWithMessage('erro'));
-    increments.add('$playerId:g$goals:a$assists');
+    increments.add(
+        '$playerId:g$goals:a$assists${enrollment == null ? '' : ':c${enrollment.championshipId}/${enrollment.team}'}');
     return const Right(null);
   }
 
@@ -160,7 +207,21 @@ class _FakePlayersRepository implements IPlayersRepository {
   Future<Either<Failure, void>> deletePlayer(PlayerDTO player, {String? season}) async => const Right(null);
 
   @override
-  Future<Either<Failure, void>> removeFromSquad(PlayerDTO player, {String? season}) async => const Right(null);
+  Future<Either<Failure, void>> removeFromSquad(PlayerDTO player, {int? championshipId, String? season}) async =>
+      const Right(null);
+}
+
+/// Leo joga a Liga (9) pelo Lava Jato e a Copa (7) pelo Volta.
+class _EnrolledPlayers extends _FakePlayersRepository {
+  static const leo = PlayerDTO(id: 'leo', name: 'Leo', team: 'Lava Jato', teamId: '1', enrollments: [
+    PlayerEnrollment(championshipId: 9, teamId: '1', team: 'Lava Jato'),
+    PlayerEnrollment(championshipId: 7, teamId: '2', team: 'Volta'),
+  ]);
+
+  @override
+  Stream<Either<Failure, List<PlayerDTO>>> watchTeamPlayers(
+          {String teamId = '', required String teamName, String? season}) =>
+      Stream.value(Right([...?_squads[teamName], leo]));
 }
 
 void main() {
@@ -206,6 +267,7 @@ void main() {
         UpdateMatchScoreUseCase(matches),
         WatchTeamPlayersUseCase(players),
         AddPlayerStatsUseCase(players),
+        _FakeChampionships(),
       );
       await cubit.load(initialRegion: 'Floresta', season: '2023');
     });
@@ -256,6 +318,7 @@ void main() {
         UpdateMatchScoreUseCase(matches),
         WatchTeamPlayersUseCase(players),
         AddPlayerStatsUseCase(players),
+        _FakeChampionships(),
       );
       await fromCard.load(
         initialRegion: 'Floresta',
@@ -277,6 +340,7 @@ void main() {
         UpdateMatchScoreUseCase(matches),
         WatchTeamPlayersUseCase(players),
         AddPlayerStatsUseCase(players),
+        _FakeChampionships(),
       );
       await fromCard.load(
         initialRegion: 'Floresta',
@@ -303,6 +367,7 @@ void main() {
         UpdateMatchScoreUseCase(matches),
         WatchTeamPlayersUseCase(players),
         AddPlayerStatsUseCase(players),
+        _FakeChampionships(),
       );
       await fromMatch.load(initialRegion: 'Floresta', season: '2023', initialMatch: old);
       var form = fromMatch.state.form;
@@ -426,6 +491,43 @@ void main() {
       expect(cubit.state.form.scoringTeam, isNull);
       await cubit.submit();
       expect(createNews.created!.toMap().keys, isNot(contains('time_marcador')));
+    });
+  });
+
+  group('competição do gol', () {
+    test('elencos filtrados pela competição escolhida e gol somado nela, pelo time do lado', () async {
+      final repo = _EnrolledPlayers();
+      final cubit = GoalNotificationCubit(
+        _FakeCreateNews(),
+        _FakeRegions(),
+        _FakeTeams(),
+        _TodayMatches(_FakeMatchesRepository()),
+        UpdateMatchScoreUseCase(_FakeMatchesRepository()),
+        WatchTeamPlayersUseCase(repo),
+        AddPlayerStatsUseCase(repo),
+        _FakeChampionships(const [
+          ChampionshipDTO(
+              id: 'a', championshipId: 7, title: 'Copa', teams: ['Lava Jato', 'Volta'], teamIds: ['1', '2']),
+          ChampionshipDTO(
+              id: 'b', championshipId: 9, title: 'Liga', teams: ['Lava Jato', 'Volta'], teamIds: ['1', '2']),
+        ]),
+      );
+      await cubit.load(initialRegion: 'Floresta', season: '2026');
+      await Future<void>.delayed(Duration.zero);
+      // Dois campeonatos com o confronto e nenhum escolhido: sem competição.
+      expect(cubit.state.form.championshipId, isNull);
+
+      cubit.selectChampionship(7);
+      await Future<void>.delayed(Duration.zero);
+      // Na Copa, Leo joga pelo Volta (o antigo Dudu continua no Lava Jato).
+      expect(cubit.state.form.squadOf('Lava Jato').map((p) => p.id), ['cassin', 'dudu']);
+      expect(cubit.state.form.squadOf('Volta').map((p) => p.id), ['gabriel', 'leo']);
+
+      cubit.setScorer(_EnrolledPlayers.leo, null);
+      expect(cubit.state.form.scoringTeam, 'Volta');
+      await cubit.submit();
+      expect(repo.increments, ['leo:g1:a0:c7/Volta']);
+      await cubit.close();
     });
   });
 

@@ -125,6 +125,11 @@ test('pedido de jogador: novo ou reenviado avisa os admins; correção não', ()
   assert.equal(playerRequestMessage('AbC1', pending, undefined), null);
 });
 
+test('pedido de jogador com competição: cita a competição', () => {
+  const pending = { nome: 'Kaio', time: 'Lava Jato', campeonato: 'Copa Floresta', status: 'pendente' };
+  assert.equal(playerRequestMessage('AbC1', undefined, pending)?.corpo, 'Kaio quer jogar no Lava Jato na Copa Floresta');
+});
+
 test('pedido de vínculo: diz quem é a conta e o atleta reivindicado', () => {
   const claim = { nome: 'Dudu', nome_usuario: 'Eduardo Lima', time: 'Lava Jato', status: 'pendente', idJogadorVinculo: 'p1' };
   assert.equal(playerRequestMessage('AbC1', undefined, claim)?.corpo, 'Eduardo Lima diz ser o atleta Dudu do Lava Jato');

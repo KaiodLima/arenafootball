@@ -108,6 +108,8 @@
   "newsGoalCreated": "Goal published!",
   "goalTodayMatches": "Today's matches",
   "goalTodayMatchesHint": "Tap to fill in the teams and the score.",
+  "goalChampionship": "Competition",
+  "goalChampionshipHint": "The goal counts toward the player's stats in this competition.",
   "goalScoreboard": "Score",
   "goalPickTeam": "Choose team",
   "goalHome": "Home",
@@ -183,6 +185,7 @@
   "statsEmptyAssists": "No assists yet",
   "statsUnitGoals": "{count, plural, =1{goal} other{goals}}",
   "statsUnitAssists": "{count, plural, =1{assist} other{assists}}",
+  "statsGeneral": "Overall",
   "statsLoadError": "Could not load the ranking.",
   "matchesNoChampionship": "No records at the moment",
   "matchesEmpty": "No matches registered",
@@ -369,6 +372,49 @@
   "playersSummaryAssists": "Assists",
   "playersSortGoals": "Goals",
   "playersSortAssists": "Assists",
+  "enrollTeamMenu": "Enter a competition",
+  "enrollTeamTitle": "Team's competitions",
+  "enrollTeamSubtitle": "Check the competitions of the season {team} plays in. Players are entered one by one.",
+  "@enrollTeamSubtitle": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "enrollNoChampionships": "No competitions this season.",
+  "enrollSaved": "Entries saved.",
+  "enrollLoadError": "Could not load the competitions.",
+  "enrollPlayerTitle": "Player's competitions",
+  "enrollPlayerSubtitle": "Which competitions does {name} play for {team}?",
+  "@enrollPlayerSubtitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "enrollPlayerOtherTeam": "Plays for {team} in this competition",
+  "@enrollPlayerOtherTeam": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "enrollPlayerSaved": "{name}'s entries saved.",
+  "@enrollPlayerSaved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playersGeneralSquad": "Full squad",
+  "playersEmptyChampionship": "No players from this team in this competition.",
   "playersSortName": "A–Z",
   "playersSearchHint": "Search player",
   "playersNoResults": "No players found.",
@@ -388,6 +434,29 @@
   "standingsGoalsAgainst": "Goals against",
   "standingsPerformance": "Performance",
   "standingsYourTeam": "Your team",
+  "athletePlaysFor": "Plays for",
+  "athleteChampionshipFallback": "Competition {id}",
+  "@athleteChampionshipFallback": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
+  "athleteEnrollmentStats": "{goals} G · {assists} A",
+  "@athleteEnrollmentStats": {
+    "placeholders": {
+      "goals": {
+        "type": "int"
+      },
+      "assists": {
+        "type": "int"
+      }
+    }
+  },
+  "athleteStatsTotal": "Total",
+  "athleteStatsTotalHint": "Adjusts only the total (numbers from before competitions).",
+  "athleteStatsChampionshipHint": "Adjusts the competition; the total follows.",
   "athleteTitle": "Athlete",
   "athleteScored": "Scored",
   "athleteAssisted": "Assisted",
@@ -529,6 +598,9 @@
       }
     }
   },
+  "playerRequestChampionshipLabel": "Competition",
+  "playerRequestChampionshipRequired": "Choose the competition you play in for this team.",
+  "playerRequestAnotherChampionship": "Play in another competition",
   "playerRequestIntro": "Play for a team in your region: send a request and an admin will review it.",
   "playerRequestTeamRequired": "Choose the team you play for.",
   "playerRequestNameLabel": "Player name",
@@ -615,6 +687,37 @@
   "championshipFormTitleRequired": "Enter the name (at least 3 letters).",
   "championshipFormDescriptionLabel": "Description (optional)",
   "championshipFormSeasonLabel": "Season",
+  "championshipScopeMunicipal": "Municipal",
+  "championshipScopeIntermunicipal": "Intermunicipal",
+  "championshipScopeMunicipalHint": "Only teams from {region}.",
+  "@championshipScopeMunicipalHint": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "championshipScopeIntermunicipalHint": "Teams from any region. The championship shows up in every team's region.",
+  "championshipScopeRemoved": "{count, plural, =1{1 team from outside {region} was unselected.} other{{count} teams from outside {region} were unselected.}}",
+  "@championshipScopeRemoved": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "championshipScopeOutsideError": "A municipal championship only accepts teams from {region}.",
+  "@championshipScopeOutsideError": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "championshipScopeNoRegion": "No region",
   "championshipFormSectionTeams": "Participating teams",
   "championshipFormTeamsAll": "All",
   "championshipFormTeamsClear": "Clear",
@@ -666,6 +769,11 @@
   "seasonsConfirmMessage": "Every user will see {season} as the current season and new records go to it. This can't be undone in the app.",
   "seasonsConfirmAction": "Start",
   "seasonsStarted": "{season} season started!",
+  "matchFormNoChampionship": "No championship (friendly)",
+  "matchFormNoChampionshipHint": "No championship in this region this season; add one in Admin panel → Championships.",
+  "matchFormPickChampionship": "Match championship",
+  "matchFormChampionshipSearch": "Search championship",
+  "matchFormChampionshipNoResults": "No championship with that name",
   "matchFormChampionship": "Championship",
   "teamRequestMenu": "I own a team",
   "teamRequestTitle": "I own a team",

@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
+import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_cache_first_usecase.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/team_players_cubit.dart';
@@ -18,6 +20,16 @@ class _FakeWatch implements WatchTeamPlayersUseCase {
     calls++;
     return Stream.value(const Right([PlayerDTO(id: 'p1', name: 'Kaio', team: 'Volta')]));
   }
+}
+
+class _NoChampionships implements GetRegionChampionshipsCacheFirstUseCase {
+  @override
+  Stream<Either<Failure, List<ChampionshipDTO>>> call(
+          {required String region, required String season, bool force = false}) =>
+      const Stream.empty();
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 class _FakeDelete implements DeleteTeamUseCase {
@@ -42,7 +54,7 @@ void main() {
   setUp(() async {
     watch = _FakeWatch();
     delete = _FakeDelete();
-    cubit = TeamPlayersCubit(watch, delete)..watch(teamName: 'Volta', season: '2024');
+    cubit = TeamPlayersCubit(watch, delete, _NoChampionships())..watch(teamName: 'Volta', season: '2024');
     await Future<void>.delayed(Duration.zero);
   });
 

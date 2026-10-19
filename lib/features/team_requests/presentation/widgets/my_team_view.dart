@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
 import 'package:arena_soccer/features/player_requests/presentation/widgets/player_request_claim_info.dart';
 import 'package:arena_soccer/features/player_requests/presentation/widgets/player_request_labels.dart';
@@ -166,13 +167,15 @@ class _MyTeamViewState extends State<MyTeamView> {
   }
 
   Future<void> _openAddPlayer(MyTeamState state) async {
-    final result = await showModalBottomSheet<(String, String, File?)>(
+    final result = await showModalBottomSheet<(String, String, File?, int?)>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (_) => const _AddPlayerSheet(),
+      builder: (_) => _AddPlayerSheet(championships: state.championships),
     );
-    if (result != null) await _cubit.addPlayer(name: result.$1, position: result.$2, photo: result.$3);
+    if (result != null) {
+      await _cubit.addPlayer(name: result.$1, position: result.$2, photo: result.$3, championshipId: result.$4);
+    }
   }
 }
 
@@ -245,7 +248,11 @@ class _RequestsTab extends StatelessWidget {
             children: [
               Text(request.name, style: AppTypography.body().copyWith(fontWeight: FontWeight.w700)),
               Text(
-                [if (position != null) playerPositionLabel(l10n, position), request.userName].join(' · '),
+                [
+                  if (request.championship.isNotEmpty) request.championship,
+                  if (position != null) playerPositionLabel(l10n, position),
+                  request.userName,
+                ].join(' · '),
                 style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
               ),
               if (request.isClaim) ...[
@@ -286,7 +293,10 @@ class _RequestsTab extends StatelessWidget {
 
 /// Jogador novo do time: nome, posição e foto. Devolve (nome, posição, foto).
 class _AddPlayerSheet extends StatefulWidget {
-  const _AddPlayerSheet();
+  /// Competições que o time joga: o jogador novo entra numa delas.
+  final List<ChampionshipDTO> championships;
+
+  const _AddPlayerSheet({required this.championships});
 
   @override
   State<_AddPlayerSheet> createState() => _AddPlayerSheetState();
@@ -297,6 +307,9 @@ class _AddPlayerSheetState extends State<_AddPlayerSheet> {
   PlayerPosition? _position;
   File? _photo;
 
+  /// Uma competição só: já vem escolhida.
+  late int? _championshipId = widget.championships.length == 1 ? widget.championships.first.championshipId : null;
+
   @override
   void dispose() {
     _name.dispose();
@@ -306,7 +319,7 @@ class _AddPlayerSheetState extends State<_AddPlayerSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final valid = _name.text.trim().length >= 3;
+    final valid = _name.text.trim().length >= 3 && (widget.championships.isEmpty || _championshipId != null);
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -340,6 +353,24 @@ class _AddPlayerSheetState extends State<_AddPlayerSheet> {
               textCapitalization: TextCapitalization.words,
               decoration: arenaInputDecoration(label: l10n.playersNameLabel, icon: Icons.person_outline_rounded),
             ),
+            if (widget.championships.isNotEmpty) ...[
+              Text(l10n.playerRequestChampionshipLabel, style: AppTypography.label(color: AppColors.textPrimary)),
+              const SizedBox(height: AppSizes.s10),
+              Wrap(
+                spacing: AppSizes.s8,
+                runSpacing: AppSizes.s8,
+                children: [
+                  for (final championship in widget.championships)
+                    ArenaChoiceChip(
+                      label: championship.title,
+                      icon: Icons.emoji_events_outlined,
+                      selected: championship.championshipId == _championshipId,
+                      onTap: () => setState(() => _championshipId = championship.championshipId),
+                    ),
+                ],
+              ),
+              const SizedBox(height: AppSizes.s16),
+            ],
             Text(l10n.playerRequestPositionLabel, style: AppTypography.label(color: AppColors.textPrimary)),
             const SizedBox(height: AppSizes.s10),
             Wrap(
@@ -358,9 +389,9 @@ class _AddPlayerSheetState extends State<_AddPlayerSheet> {
             ArenaButton.primary(
               title: l10n.playersSubmit,
               function: valid
-                  ? () => Navigator.pop<(String, String, File?)>(
+                  ? () => Navigator.pop<(String, String, File?, int?)>(
                         context,
-                        (_name.text.trim(), _position?.key ?? '', _photo),
+                        (_name.text.trim(), _position?.key ?? '', _photo, _championshipId),
                       )
                   : null,
             ),

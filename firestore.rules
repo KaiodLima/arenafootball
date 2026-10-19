@@ -18,13 +18,15 @@ service cloud.firestore {
 
     // O doc (jogador ou pedido "Sou jogador") é do time do dono? Pelo id
     // (`idTime`) quando os dois lados têm; doc antigo, sem id, pelo nome (`time`).
+    // Atleta inscrito no time em alguma competição (`idsTimes`) também conta.
     function ownsTeam(data) {
       let owned = ownedTeam();
       let id = data.get('idTime', '');
       let ownedId = owned == null ? '' : owned.get('idTime', '');
-      return owned != null && (id != '' && ownedId != ''
+      return owned != null && ((id != '' && ownedId != ''
         ? id == ownedId
-        : data.get('time', '') != '' && data.get('time', '') == owned.nome);
+        : data.get('time', '') != '' && data.get('time', '') == owned.nome)
+        || (ownedId != '' && data.get('idsTimes', []).hasAny([ownedId])));
     }
 
     // Doc sem time (atleta tirado do elenco).
@@ -115,11 +117,31 @@ service cloud.firestore {
         'solicitacoes_time']);
       allow create: if writable() && (isAdmin() || isOwnVote()
         || (isPlayers() && ownsTeam(request.resource.data)));
+      // As inscrições por competição nunca somem do atleta (o app antigo
+      // regravava o documento inteiro sem elas): esvaziar pode, apagar não.
+      function keepsEnrollments() {
+        return !isPlayers() || !('inscricoes' in resource.data) || 'inscricoes' in request.resource.data;
+      }
+
+      // Dono aprova o "Sou jogador" de quem já é atleta de outro time (outra
+      // competição): só acrescenta a inscrição no time dele, e só se o pedido
+      // da conta é para o time dele. O time principal só muda se estava vazio.
+      function joinsOwnedTeam() {
+        let owned = ownedTeam();
+        let uid = resource.data.get('idUsuario', '');
+        let changed = request.resource.data.diff(resource.data).affectedKeys();
+        return owned != null && uid != '' && ownsTeam(request.resource.data)
+          && changed.hasOnly(['inscricoes', 'idsTimes', 'nome', 'posicao', 'urlImagem', 'time', 'idTime'])
+          && (!changed.hasAny(['time', 'idTime']) || noTeam(resource.data))
+          && get(/databases/$(database)/documents/solicitacoes_jogador/$(uid)).data.get('idTime', '') == owned.get('idTime', '-');
+      }
+
       // Atleta sem time ('') pode entrar no elenco do dono (aprovação do "Sou jogador").
-      allow update: if writable() && (isAdmin() || isOwnVote()
+      allow update: if writable() && keepsEnrollments() && (isAdmin() || isOwnVote()
         || (isPlayers()
           && (ownsTeam(resource.data) || noTeam(resource.data))
           && (ownsTeam(request.resource.data) || noTeam(request.resource.data)))
+        || (isPlayers() && joinsOwnedTeam())
         || (isTeamDoc() && signedIn() && resource.data.idDono == request.auth.uid
           && request.resource.data.diff(resource.data).affectedKeys()
             .hasOnly(['descricao', 'urlImagem', 'corPrimaria', 'corSecundaria'])));
@@ -157,7 +179,11 @@ service cloud.firestore {
         return data.uid == request.auth.uid
           && data.status == 'pendente'
           && data.keys().hasOnly(['uid', 'nome_usuario', 'email', 'nome', 'time', 'idTime', 'regiao', 'idRegiao', 'temporada',
-            'posicao', 'mensagem', 'urlImagem', 'status', 'data', 'atualizado_em', 'idJogadorVinculo'])
+            'posicao', 'mensagem', 'urlImagem', 'status', 'data', 'atualizado_em', 'idJogadorVinculo',
+            'idCampeonato', 'campeonato'])
+          // Competição em que quer jogar pelo time (opcional).
+          && (!('idCampeonato' in data) || data.idCampeonato is int)
+          && (!('campeonato' in data) || (data.campeonato is string && data.campeonato.size() <= 80))
           // Pedido de vínculo: id do atleta (sem conta) que o usuário diz ser.
           && (!('idJogadorVinculo' in data) || (data.idJogadorVinculo is string && data.idJogadorVinculo.size() <= 64))
           && data.nome is string && data.nome.size() >= 3 && data.nome.size() <= 40
@@ -179,7 +205,9 @@ service cloud.firestore {
 
       allow read: if isRequester() || isAdmin() || isTeamOwner();
       allow create: if isRequester() && validSubmit();
-      allow update: if (isRequester() && resource.data.status != 'aprovada' && validSubmit()) || isAdmin()
+      // Aprovado também pode mandar um pedido novo (outra competição): a
+      // inscrição aprovada fica no atleta.
+      allow update: if (isRequester() && validSubmit()) || isAdmin()
         || (isTeamOwner() && ownerAnswer());
       allow delete: if (isRequester() && resource.data.status == 'pendente') || isAdmin();
     }

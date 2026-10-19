@@ -14,6 +14,7 @@ class SaveStatsRankingCacheUseCase {
     required StatsRankingType type,
     required String region,
     String? season,
+    int? championshipId,
   }) =>
-      _repository.saveRankingCache(ranking, type: type, region: region, season: season);
+      _repository.saveRankingCache(ranking, type: type, region: region, season: season, championshipId: championshipId);
 }

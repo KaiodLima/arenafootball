@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
@@ -17,6 +18,9 @@ class MyTeamState extends Equatable {
   final bool saving;
   final bool loading;
 
+  /// Competições da temporada que o time joga (jogador novo entra numa delas).
+  final List<ChampionshipDTO> championships;
+
   const MyTeamState({
     this.team,
     this.players = const [],
@@ -24,6 +28,7 @@ class MyTeamState extends Equatable {
     this.busy = const {},
     this.saving = false,
     this.loading = true,
+    this.championships = const [],
   });
 
   List<PlayerRequestDTO> get pendingRequests => requests.where((r) => r.isPending).toList();
@@ -35,6 +40,7 @@ class MyTeamState extends Equatable {
     Set<String>? busy,
     bool? saving,
     bool? loading,
+    List<ChampionshipDTO>? championships,
   }) {
     return MyTeamState(
       team: team ?? this.team,
@@ -43,11 +49,12 @@ class MyTeamState extends Equatable {
       busy: busy ?? this.busy,
       saving: saving ?? this.saving,
       loading: loading ?? this.loading,
+      championships: championships ?? this.championships,
     );
   }
 
   @override
-  List<Object?> get props => [team, players, requests, busy, saving, loading];
+  List<Object?> get props => [team, players, requests, busy, saving, loading, championships];
 }
 
 /// Avisos de uma ação (a página mostra o snackbar).
@@ -65,6 +72,7 @@ class MyTeamNoticeState extends MyTeamState {
           busy: from.busy,
           saving: from.saving,
           loading: from.loading,
+          championships: from.championships,
         );
 
   @override
@@ -84,6 +92,7 @@ class ErrorMyTeamState extends MyTeamState {
           busy: from.busy,
           saving: false,
           loading: false,
+          championships: from.championships,
         );
 
   @override

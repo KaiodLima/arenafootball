@@ -1,4 +1,6 @@
 import 'package:get_it/get_it.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/get_season_championships_usecase.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/set_team_championships_usecase.dart';
 import 'package:arena_soccer/features/championships/data/datasources/championships_datasource.dart';
 import 'package:arena_soccer/features/championships/data/repositories/championships_repository_impl.dart';
 import 'package:arena_soccer/features/championships/domain/repositories/championships_repository_interface.dart';
@@ -43,4 +45,6 @@ void registerChampionshipsDependencies() {
   _sl.registerLazySingleton(() => DeleteChampionshipsCacheUseCase(_sl()));
   _sl.registerLazySingleton(() => GetRegionChampionshipsCacheFirstUseCase(_sl(), _sl(), _sl()));
   _sl.registerLazySingleton(() => GetRegionChampionshipCacheFirstUseCase(_sl(), _sl(), _sl()));
+  _sl.registerLazySingleton(() => GetSeasonChampionshipsUseCase(_sl()));
+  _sl.registerLazySingleton(() => SetTeamChampionshipsUseCase(_sl()));
 }

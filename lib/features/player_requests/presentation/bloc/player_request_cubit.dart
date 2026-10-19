@@ -5,6 +5,7 @@ import 'package:either_dart/either.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_cache_first_usecase.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
 import 'package:arena_soccer/features/player_requests/domain/usecases/cancel_player_request_usecase.dart';
 import 'package:arena_soccer/features/player_requests/domain/usecases/submit_player_request_usecase.dart';
@@ -24,6 +25,7 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
   final GetRegionsUseCase getRegionsUseCase;
   final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
   final WatchTeamPlayersUseCase watchTeamPlayersUseCase;
+  final GetRegionChampionshipsCacheFirstUseCase getRegionChampionshipsCacheFirstUseCase;
 
   StreamSubscription<Either<Failure, PlayerRequestDTO?>>? _subscription;
   late String _userId;
@@ -38,6 +40,7 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
     this.getRegionsUseCase,
     this.getTeamsCacheFirstUseCase,
     this.watchTeamPlayersUseCase,
+    this.getRegionChampionshipsCacheFirstUseCase,
   ) : super(const LoadingPlayerRequestState());
 
   Future<void> start({
@@ -99,6 +102,7 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
     return form.copyWith(
       selectedRegion: request.region.isEmpty ? null : request.region,
       selectedTeam: () => request.team,
+      championshipId: () => request.championshipId,
       claimedPlayer: () => null,
       unlinkedPlayers: const [],
       name: request.name,
@@ -117,6 +121,7 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
 
   Future<void> _loadTeams(String region) async {
     _updateForm(state.form.copyWith(selectedRegion: region, loadingTeams: true));
+    unawaited(_loadChampionships(region));
     await for (final response in getTeamsCacheFirstUseCase(region: region)) {
       // Só aplica se a região não mudou enquanto carregava.
       if (isClosed || state.form.selectedRegion != region) return;
@@ -135,6 +140,54 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
         },
       );
     }
+  }
+
+  /// Competições da região na temporada atual (chips antes do time).
+  Future<void> _loadChampionships(String region) async {
+    await for (final response
+        in getRegionChampionshipsCacheFirstUseCase(region: region, season: SeasonCollection.currentSeason)) {
+      if (isClosed || state.form.selectedRegion != region) return;
+      if (response.isLeft) continue;
+      final championships = [...response.right]..sort((a, b) => a.championshipId.compareTo(b.championshipId));
+      final current = state.form.championshipId;
+      final keep = championships.any((c) => c.championshipId == current);
+      _updateForm(state.form.copyWith(
+        championships: championships,
+        // Uma competição só: já vem escolhida.
+        championshipId: keep ? null : () => championships.length == 1 ? championships.first.championshipId : null,
+      ));
+    }
+  }
+
+  /// Competição em que quer jogar: o time escolhido precisa jogar nela.
+  Future<void> selectChampionship(int championshipId) async {
+    if (championshipId == state.form.championshipId) return;
+    final form = state.form.copyWith(championshipId: () => championshipId);
+    final team = form.selectedTeam;
+    final teamStays = team != null && form.selectableTeams.any((t) => t.name == team);
+    _updateForm(form.copyWith(
+      selectedTeam: teamStays ? null : () => null,
+      claimedPlayer: () => null,
+      unlinkedPlayers: teamStays ? null : const [],
+    ));
+    if (teamStays) await _loadUnlinkedPlayers(team);
+  }
+
+  /// Atleta aprovado pedindo para jogar também em outra competição (por outro
+  /// time ou pelo mesmo): formulário novo; o pedido anterior é substituído ao
+  /// enviar (a inscrição aprovada continua no atleta).
+  void startNewRequest() {
+    final form = state.form.copyWith(
+      selectedTeam: () => null,
+      championshipId: () => null,
+      claimedPlayer: () => null,
+      unlinkedPlayers: const [],
+      name: _userName,
+      message: '',
+      photo: () => null,
+      imageUrl: '',
+    );
+    _emitReady(request: state.request, form: form, editing: true);
   }
 
   /// Abre o formulário sobre o pedido atual (corrigir pendente ou reenviar).
@@ -179,8 +232,13 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
       season: SeasonCollection.currentSeason,
     ).first;
     if (isClosed || state.form.selectedTeam != team) return;
+    final championshipId = state.form.championshipId;
     final players = response.isRight
-        ? (response.right.where((p) => p.userId.isEmpty).toList()
+        ? (response.right
+            .where((p) =>
+                p.userId.isEmpty &&
+                (championshipId == null || p.playsIn(championshipId, teamId: teamId, teamName: team)))
+            .toList()
           ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase())))
         : const <PlayerDTO>[];
     final restored = players.where((p) => p.id == restoreClaimId).firstOrNull;
@@ -231,6 +289,8 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
       message: form.message,
       imageUrl: form.imageUrl.isEmpty && form.photo == null ? form.claimedPlayer?.imageUrl ?? '' : form.imageUrl,
       claimedPlayerId: form.claimedPlayer?.id ?? '',
+      championshipId: form.selectedChampionship?.championshipId,
+      championship: form.selectedChampionship?.title ?? '',
     );
     final response = await submitPlayerRequestUseCase(request, photo: form.photo);
     if (isClosed) return;

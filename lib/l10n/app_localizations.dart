@@ -662,6 +662,18 @@ abstract class AppLocalizations {
   /// **'Toque para preencher os times e o placar.'**
   String get goalTodayMatchesHint;
 
+  /// No description provided for @goalChampionship.
+  ///
+  /// In pt, this message translates to:
+  /// **'Competição'**
+  String get goalChampionship;
+
+  /// No description provided for @goalChampionshipHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'O gol soma nos números do atleta nesta competição.'**
+  String get goalChampionshipHint;
+
   /// No description provided for @goalScoreboard.
   ///
   /// In pt, this message translates to:
@@ -1112,6 +1124,12 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'{count, plural, =1{assist.} other{assist.}}'**
   String statsUnitAssists(int count);
+
+  /// No description provided for @statsGeneral.
+  ///
+  /// In pt, this message translates to:
+  /// **'Geral'**
+  String get statsGeneral;
 
   /// No description provided for @statsLoadError.
   ///
@@ -2230,6 +2248,78 @@ abstract class AppLocalizations {
   /// **'Assistências'**
   String get playersSortAssists;
 
+  /// No description provided for @enrollTeamMenu.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inscrever em competição'**
+  String get enrollTeamMenu;
+
+  /// No description provided for @enrollTeamTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Competições do time'**
+  String get enrollTeamTitle;
+
+  /// No description provided for @enrollTeamSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Marque as competições da temporada em que o {team} joga. Os atletas são inscritos um a um.'**
+  String enrollTeamSubtitle(String team);
+
+  /// No description provided for @enrollNoChampionships.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma competição na temporada.'**
+  String get enrollNoChampionships;
+
+  /// No description provided for @enrollSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inscrições salvas.'**
+  String get enrollSaved;
+
+  /// No description provided for @enrollLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar as competições.'**
+  String get enrollLoadError;
+
+  /// No description provided for @enrollPlayerTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Competições do atleta'**
+  String get enrollPlayerTitle;
+
+  /// No description provided for @enrollPlayerSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Em quais competições {name} joga pelo {team}?'**
+  String enrollPlayerSubtitle(String name, String team);
+
+  /// No description provided for @enrollPlayerOtherTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Joga pelo {team} nesta competição'**
+  String enrollPlayerOtherTeam(String team);
+
+  /// No description provided for @enrollPlayerSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inscrições de {name} salvas.'**
+  String enrollPlayerSaved(String name);
+
+  /// No description provided for @playersGeneralSquad.
+  ///
+  /// In pt, this message translates to:
+  /// **'Elenco geral'**
+  String get playersGeneralSquad;
+
+  /// No description provided for @playersEmptyChampionship.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum atleta deste time nesta competição.'**
+  String get playersEmptyChampionship;
+
   /// No description provided for @playersSortName.
   ///
   /// In pt, this message translates to:
@@ -2343,6 +2433,42 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Seu time'**
   String get standingsYourTeam;
+
+  /// No description provided for @athletePlaysFor.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atua por'**
+  String get athletePlaysFor;
+
+  /// No description provided for @athleteChampionshipFallback.
+  ///
+  /// In pt, this message translates to:
+  /// **'Competição {id}'**
+  String athleteChampionshipFallback(int id);
+
+  /// No description provided for @athleteEnrollmentStats.
+  ///
+  /// In pt, this message translates to:
+  /// **'{goals} G · {assists} A'**
+  String athleteEnrollmentStats(int goals, int assists);
+
+  /// No description provided for @athleteStatsTotal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Total'**
+  String get athleteStatsTotal;
+
+  /// No description provided for @athleteStatsTotalHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ajusta só o total (números de antes das competições).'**
+  String get athleteStatsTotalHint;
+
+  /// No description provided for @athleteStatsChampionshipHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ajusta a competição; o total acompanha.'**
+  String get athleteStatsChampionshipHint;
 
   /// No description provided for @athleteTitle.
   ///
@@ -2962,6 +3088,24 @@ abstract class AppLocalizations {
   /// **'{goals} gols'**
   String playerRequestClaimGoals(int goals);
 
+  /// No description provided for @playerRequestChampionshipLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Competição'**
+  String get playerRequestChampionshipLabel;
+
+  /// No description provided for @playerRequestChampionshipRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha a competição em que você joga por esse time.'**
+  String get playerRequestChampionshipRequired;
+
+  /// No description provided for @playerRequestAnotherChampionship.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogar em outra competição'**
+  String get playerRequestAnotherChampionship;
+
   /// No description provided for @playerRequestIntro.
   ///
   /// In pt, this message translates to:
@@ -3478,6 +3622,48 @@ abstract class AppLocalizations {
   /// **'Temporada'**
   String get championshipFormSeasonLabel;
 
+  /// No description provided for @championshipScopeMunicipal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Municipal'**
+  String get championshipScopeMunicipal;
+
+  /// No description provided for @championshipScopeIntermunicipal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Intermunicipal'**
+  String get championshipScopeIntermunicipal;
+
+  /// No description provided for @championshipScopeMunicipalHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Só times de {region}.'**
+  String championshipScopeMunicipalHint(String region);
+
+  /// No description provided for @championshipScopeIntermunicipalHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Times de qualquer região. O campeonato aparece em todas as regiões dos times.'**
+  String get championshipScopeIntermunicipalHint;
+
+  /// No description provided for @championshipScopeRemoved.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 time de fora de {region} saiu da seleção.} other{{count} times de fora de {region} saíram da seleção.}}'**
+  String championshipScopeRemoved(int count, String region);
+
+  /// No description provided for @championshipScopeOutsideError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeonato municipal só aceita times de {region}.'**
+  String championshipScopeOutsideError(String region);
+
+  /// No description provided for @championshipScopeNoRegion.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem região'**
+  String get championshipScopeNoRegion;
+
   /// No description provided for @championshipFormSectionTeams.
   ///
   /// In pt, this message translates to:
@@ -3783,6 +3969,36 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Temporada {season} iniciada!'**
   String seasonsStarted(String season);
+
+  /// No description provided for @matchFormNoChampionship.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem campeonato (amistoso)'**
+  String get matchFormNoChampionship;
+
+  /// No description provided for @matchFormNoChampionshipHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum campeonato na região nesta temporada; cadastre em Painel do admin → Campeonatos.'**
+  String get matchFormNoChampionshipHint;
+
+  /// No description provided for @matchFormPickChampionship.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeonato da partida'**
+  String get matchFormPickChampionship;
+
+  /// No description provided for @matchFormChampionshipSearch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Buscar campeonato'**
+  String get matchFormChampionshipSearch;
+
+  /// No description provided for @matchFormChampionshipNoResults.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum campeonato com esse nome'**
+  String get matchFormChampionshipNoResults;
 
   /// No description provided for @matchFormChampionship.
   ///

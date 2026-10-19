@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/services/storage_upload_service.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
 import 'package:arena_soccer/features/players/domain/repositories/players_repository_interface.dart';
 import 'package:arena_soccer/features/players/domain/usecases/create_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
@@ -23,6 +24,34 @@ const _squads = {
 };
 
 class _FakeRepository implements IPlayersRepository {
+  @override
+  Future<Either<Failure, void>> setChampionships(
+    PlayerDTO player, {
+    required String teamId,
+    required String team,
+    required Set<int> selected,
+    required List<int> teamChampionships,
+    String? season,
+  }) async =>
+      const Right(null);
+
+  @override
+  Stream<Either<Failure, PlayerDTO?>> watchPlayerOfUser({required String userId, String? season}) =>
+      const Stream.empty();
+
+  @override
+  Future<Either<Failure, void>> enroll(PlayerDTO player, PlayerEnrollment enrollment, {String? season}) async =>
+      const Right(null);
+
+  @override
+  Future<Either<Failure, List<PlayerDTO>>> getTopPlayersInChampionship({
+    required int championshipId,
+    required String field,
+    int limit = 50,
+    String? season,
+  }) async =>
+      const Right([]);
+
   final created = <PlayerDTO>[];
 
   @override
@@ -58,13 +87,15 @@ class _FakeRepository implements IPlayersRepository {
   Future<Either<Failure, void>> deletePlayer(PlayerDTO player, {String? season}) async => const Right(null);
 
   @override
-  Future<Either<Failure, void>> removeFromSquad(PlayerDTO player, {String? season}) async => const Right(null);
+  Future<Either<Failure, void>> removeFromSquad(PlayerDTO player, {int? championshipId, String? season}) async =>
+      const Right(null);
 
   @override
   Future<Either<Failure, void>> incrementStats({
     required String playerId,
     int goals = 0,
     int assists = 0,
+    PlayerEnrollment? enrollment,
     String? season,
   }) async =>
       const Right(null);

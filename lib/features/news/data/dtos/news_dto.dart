@@ -50,6 +50,9 @@ class NewsDTO extends Equatable {
   final String scoringTeamPrimaryColor;
   final String scoringTeamSecondaryColor;
 
+  /// `id_campeonato` da competição do gol (card de gol; nulo = sem competição).
+  final int? championshipId;
+
   const NewsDTO({
     this.id = '',
     this.date,
@@ -77,6 +80,7 @@ class NewsDTO extends Equatable {
     this.scoringTeamId = '',
     this.scoringTeamPrimaryColor = '',
     this.scoringTeamSecondaryColor = '',
+    this.championshipId,
   });
 
   bool get hasScorer => scorerId.isNotEmpty && scorerName.isNotEmpty;
@@ -120,6 +124,7 @@ class NewsDTO extends Equatable {
       scoringTeamId: data['id_time_marcador']?.toString() ?? '',
       scoringTeamPrimaryColor: data['cor_marcador']?.toString() ?? '',
       scoringTeamSecondaryColor: data['cor_marcador_secundaria']?.toString() ?? '',
+      championshipId: (data['id_campeonato'] as num?)?.toInt(),
     );
   }
 
@@ -155,6 +160,7 @@ class NewsDTO extends Equatable {
       scoringTeamId: text('scoringTeamId'),
       scoringTeamPrimaryColor: text('scoringTeamPrimaryColor'),
       scoringTeamSecondaryColor: text('scoringTeamSecondaryColor'),
+      championshipId: (json['championshipId'] as num?)?.toInt(),
     );
   }
 
@@ -186,6 +192,7 @@ class NewsDTO extends Equatable {
         'scoringTeamId': scoringTeamId,
         'scoringTeamPrimaryColor': scoringTeamPrimaryColor,
         'scoringTeamSecondaryColor': scoringTeamSecondaryColor,
+        if (championshipId != null) 'championshipId': championshipId,
       };
 
   /// `data` fica de fora: na criação o DataSource grava o horário do
@@ -219,6 +226,7 @@ class NewsDTO extends Equatable {
         if (scoringTeamId.isNotEmpty) 'id_time_marcador': scoringTeamId,
         if (scoringTeamPrimaryColor.isNotEmpty) 'cor_marcador': scoringTeamPrimaryColor,
         if (scoringTeamSecondaryColor.isNotEmpty) 'cor_marcador_secundaria': scoringTeamSecondaryColor,
+        if (championshipId != null) 'id_campeonato': championshipId,
       };
 
   NewsDTO copyWith({
@@ -248,6 +256,7 @@ class NewsDTO extends Equatable {
     String? scoringTeamId,
     String? scoringTeamPrimaryColor,
     String? scoringTeamSecondaryColor,
+    int? championshipId,
   }) {
     return NewsDTO(
       id: id ?? this.id,
@@ -276,6 +285,7 @@ class NewsDTO extends Equatable {
       scoringTeamId: scoringTeamId ?? this.scoringTeamId,
       scoringTeamPrimaryColor: scoringTeamPrimaryColor ?? this.scoringTeamPrimaryColor,
       scoringTeamSecondaryColor: scoringTeamSecondaryColor ?? this.scoringTeamSecondaryColor,
+      championshipId: championshipId ?? this.championshipId,
     );
   }
 
@@ -307,5 +317,6 @@ class NewsDTO extends Equatable {
         scoringTeamId,
         scoringTeamPrimaryColor,
         scoringTeamSecondaryColor,
+        championshipId,
       ];
 }

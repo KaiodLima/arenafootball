@@ -429,6 +429,76 @@
           "order": "DESCENDING"
         }
       ]
+    },
+    {
+      "collectionGroup": "partidas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idsRegioes",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "dataRegistro",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "partidas2022",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idsRegioes",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "dataRegistro",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "partidas2024",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idsRegioes",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "dataRegistro",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "partidas2025",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idsRegioes",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "dataRegistro",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "partidas2026",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idsRegioes",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "dataRegistro",
+          "order": "DESCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": []

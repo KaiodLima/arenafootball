@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/core/utils/relative_time.dart';
 import 'package:arena_soccer/core/utils/share_links.dart';
@@ -135,7 +137,9 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
             _ => _Content(
                 state: state,
                 player: player,
-                isAdmin: isAdmin || ownedTeam.owns(id: player.teamId, name: player.team),
+                isAdmin: isAdmin ||
+                    ownedTeam.owns(id: player.teamId, name: player.team) ||
+                    player.enrollments.any((e) => ownedTeam.owns(id: e.teamId, name: e.team)),
                 season: widget.season,
               ),
           },
@@ -236,7 +240,11 @@ class _Content extends StatelessWidget {
             ],
           ),
         ),
-        if (isAdmin) _AdminEditor(player: player, saving: state.saving),
+        if (player.enrollments.isNotEmpty) ...[
+          _SectionLabel(l10n.athletePlaysFor),
+          for (final enrollment in player.enrollments) _EnrollmentTile(state: state, enrollment: enrollment),
+        ],
+        if (isAdmin) _AdminEditor(player: player, saving: state.saving, state: state),
         _SectionLabel(l10n.athleteParticipations),
         if (state.participations.isEmpty)
           Padding(
@@ -357,11 +365,58 @@ class _StatCard extends StatelessWidget {
 }
 
 /// Edição do admin: foto, nome e os números (cada toque grava).
+/// Uma inscrição: escudo, time, competição e os números dela; abre o elenco
+/// do time já na competição.
+class _EnrollmentTile extends StatelessWidget {
+  final PlayerProfileState state;
+  final PlayerEnrollment enrollment;
+
+  const _EnrollmentTile({required this.state, required this.enrollment});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final team = state.teamOf(teamId: enrollment.teamId, name: enrollment.team);
+    final title = state.championshipTitle(enrollment.championshipId);
+    return ArenaCard(
+      margin: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s8),
+      padding: const EdgeInsets.all(AppSizes.s12),
+      onTap: team == null
+          ? null
+          : () => openTeamRoster(context, {'team': team, 'championshipId': enrollment.championshipId}),
+      child: Row(
+        children: [
+          TeamCrest(imageUrl: team?.imageUrl, size: AppSizes.s40),
+          const SizedBox(width: AppSizes.s12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(enrollment.team, style: AppTypography.label(color: AppColors.textPrimary)),
+                Text(
+                  title.isEmpty ? l10n.athleteChampionshipFallback(enrollment.championshipId) : title,
+                  style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            l10n.athleteEnrollmentStats(enrollment.goals, enrollment.assists),
+            style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s12),
+          ),
+          if (team != null) const Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary),
+        ],
+      ),
+    );
+  }
+}
+
 class _AdminEditor extends StatefulWidget {
   final PlayerDTO player;
   final bool saving;
+  final PlayerProfileState state;
 
-  const _AdminEditor({required this.player, required this.saving});
+  const _AdminEditor({required this.player, required this.saving, required this.state});
 
   @override
   State<_AdminEditor> createState() => _AdminEditorState();
@@ -369,6 +424,14 @@ class _AdminEditor extends StatefulWidget {
 
 class _AdminEditorState extends State<_AdminEditor> {
   late final _nameController = TextEditingController(text: widget.player.name);
+
+  /// Competição dos ajustes (nula = total, números de antes das competições).
+  int? _championshipId;
+
+  PlayerEnrollment? get _enrollment {
+    final id = _championshipId;
+    return id == null ? null : widget.player.enrollmentIn(id);
+  }
 
   @override
   void didUpdateWidget(covariant _AdminEditor oldWidget) {
@@ -402,19 +465,19 @@ class _AdminEditorState extends State<_AdminEditor> {
     FocusManager.instance.primaryFocus?.unfocus();
     final player = widget.player;
     final linked = player.userId.isNotEmpty;
+    final enrollment = _enrollment;
+    final team = enrollment?.team ?? player.team;
     final confirmed = await showArenaConfirm(
       context,
       title: linked ? l10n.athleteRemoveTitle(player.name) : l10n.athleteDeleteTitle(player.name),
-      message: linked
-          ? l10n.athleteRemoveMessage(player.name, player.team)
-          : l10n.athleteDeleteMessage(player.name, player.team),
+      message: linked ? l10n.athleteRemoveMessage(player.name, team) : l10n.athleteDeleteMessage(player.name, team),
       confirmLabel: linked ? l10n.athleteRemoveFromSquad : l10n.commonDelete,
       icon: linked ? Icons.person_remove_outlined : Icons.delete_outline_rounded,
       tone: ArenaAlertTone.danger,
     );
     if (!confirmed || !mounted) return;
     final cubit = BlocProvider.of<PlayerProfileCubit>(context);
-    linked ? await cubit.removeFromSquad() : await cubit.delete();
+    linked ? await cubit.removeFromSquad(championshipId: enrollment?.championshipId) : await cubit.delete();
   }
 
   Future<void> _pickPhoto() async {
@@ -430,6 +493,8 @@ class _AdminEditorState extends State<_AdminEditor> {
     final l10n = AppLocalizations.of(context);
     final cubit = BlocProvider.of<PlayerProfileCubit>(context);
     final player = widget.player;
+    final enrollment = _enrollment;
+    final championshipId = enrollment?.championshipId;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -462,22 +527,49 @@ class _AdminEditorState extends State<_AdminEditor> {
                 ),
               ),
               const SizedBox(height: AppSizes.s16),
+              if (player.enrollments.isNotEmpty) ...[
+                Wrap(
+                  spacing: AppSizes.s8,
+                  runSpacing: AppSizes.s8,
+                  children: [
+                    ArenaChoiceChip(
+                      label: l10n.athleteStatsTotal,
+                      selected: championshipId == null,
+                      onTap: () => setState(() => _championshipId = null),
+                    ),
+                    for (final e in player.enrollments)
+                      ArenaChoiceChip(
+                        label: widget.state.championshipTitle(e.championshipId).isEmpty
+                            ? l10n.athleteChampionshipFallback(e.championshipId)
+                            : widget.state.championshipTitle(e.championshipId),
+                        selected: championshipId == e.championshipId,
+                        onTap: () => setState(() => _championshipId = e.championshipId),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: AppSizes.s6),
+                Text(
+                  championshipId == null ? l10n.athleteStatsTotalHint : l10n.athleteStatsChampionshipHint,
+                  style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+                ),
+                const SizedBox(height: AppSizes.s12),
+              ],
               CountStepper(
                 icon: Icons.sports_soccer_rounded,
                 label: l10n.playersSummaryGoals,
-                value: player.goals,
+                value: enrollment?.goals ?? player.goals,
                 max: 999,
-                onIncrement: () => cubit.adjustGoals(1),
-                onDecrement: () => cubit.adjustGoals(-1),
+                onIncrement: () => cubit.adjustGoals(1, championshipId: championshipId),
+                onDecrement: () => cubit.adjustGoals(-1, championshipId: championshipId),
               ),
               const SizedBox(height: AppSizes.s12),
               CountStepper(
                 icon: Icons.assistant_rounded,
                 label: l10n.playersSummaryAssists,
-                value: player.assists,
+                value: enrollment?.assists ?? player.assists,
                 max: 999,
-                onIncrement: () => cubit.adjustAssists(1),
-                onDecrement: () => cubit.adjustAssists(-1),
+                onIncrement: () => cubit.adjustAssists(1, championshipId: championshipId),
+                onDecrement: () => cubit.adjustAssists(-1, championshipId: championshipId),
               ),
               const SizedBox(height: AppSizes.s12),
               Align(

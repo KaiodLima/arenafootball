@@ -50,7 +50,8 @@ class ChampionshipFormCubit extends Cubit<ChampionshipFormState> {
     final region = _form.base.region;
     final season = _form.base.season;
     emit(EditingChampionshipFormState(_form.copyWith(loadingTeams: true)));
-    await for (final response in getTeamsCacheFirstUseCase(region: region, season: season)) {
+    // Todos da temporada: o intermunicipal aceita times de outras regiões.
+    await for (final response in getTeamsCacheFirstUseCase(season: season)) {
       // Só aplica se região/temporada não mudaram enquanto carregava.
       if (isClosed || _form.base.region != region || _form.base.season != season) return;
       response.fold(
@@ -68,9 +69,25 @@ class ChampionshipFormCubit extends Cubit<ChampionshipFormState> {
 
   Future<void> selectRegion(String region) async {
     if (region == _form.base.region) return;
-    // Outra região, outros times: a seleção anterior não vale mais.
-    _edit(_form.copyWith(base: _form.base.copyWith(region: region), selectedTeams: const []));
-    await _loadTeams();
+    // Outra sede: no municipal a seleção anterior não vale mais; no
+    // intermunicipal os times continuam valendo.
+    final keep = _form.base.isIntermunicipal ? _form.selectedTeams : const <String>[];
+    _edit(_form.copyWith(base: _form.base.copyWith(region: region), selectedTeams: keep));
+  }
+
+  /// Municipal (só times da sede) ou intermunicipal. Voltar para municipal
+  /// desmarca os times de fora da sede; devolve quantos saíram.
+  int selectScope(ChampionshipScope scope) {
+    if (scope == _form.base.scope) return 0;
+    final outside = scope == ChampionshipScope.municipal ? _form.selectedOutsideRegion : const <String>[];
+    _edit(_form.copyWith(
+      base: _form.base.copyWith(scope: scope),
+      selectedTeams: [
+        for (final t in _form.selectedTeams)
+          if (!outside.contains(t)) t
+      ],
+    ));
+    return outside.length;
   }
 
   Future<void> selectSeason(String season) async {
@@ -106,7 +123,7 @@ class ChampionshipFormCubit extends Cubit<ChampionshipFormState> {
   void selectAllTeams() => _edit(_form.copyWith(
         selectedTeams: [
           ..._form.selectedTeams,
-          for (final team in _form.teams)
+          for (final team in _form.visibleTeams)
             if (!_form.selectedTeams.contains(team.name)) team.name,
         ],
       ));
@@ -128,9 +145,11 @@ class ChampionshipFormCubit extends Cubit<ChampionshipFormState> {
     if (form.error != null || state is SubmittingChampionshipFormState) return;
     emit(SubmittingChampionshipFormState(form));
     // Ids dos participantes (vínculo) na mesma ordem dos nomes.
-    final directory = TeamDirectory(form.teams);
+    // Times da grade (no municipal, os da sede): nome igual em outra região não confunde.
+    final directory = TeamDirectory(form.visibleTeams);
     final response = await saveChampionshipUseCase(
       form.base.copyWith(
+        regionIds: form.regionIds,
         teams: form.selectedTeams,
         // Alinhado com os nomes ('' = time não achado na lista).
         teamIds: [for (final name in form.selectedTeams) directory.idOf(name: name)],

@@ -73,6 +73,19 @@ abstract final class RegionRegistry {
     return {nameKey: name, if (id.isNotEmpty) idField: id};
   }
 
+  /// Filtro de região que também aceita docs que valem para várias regiões
+  /// (lista de ids em [listField], ex. campeonato intermunicipal): pelo id,
+  /// `idRegiao == id || listField contém id`; região sem id, só pelo nome.
+  static Query<Map<String, dynamic>> whereRegionOrIn(
+    Query<Map<String, dynamic>> query,
+    String name, {
+    required String listField,
+  }) {
+    final id = idOf(name);
+    if (id.isEmpty) return query.where(nameField, isEqualTo: name);
+    return query.where(Filter.or(Filter(idField, isEqualTo: id), Filter(listField, arrayContains: id)));
+  }
+
   /// Filtro de região: pelo id quando a região é conhecida; senão pelo nome
   /// (doc antigo, região fora da lista).
   static Query<Map<String, dynamic>> where(Query<Map<String, dynamic>> query, String name) {

@@ -18,7 +18,7 @@ void registerStatsDependencies() {
   _sl.registerLazySingleton<IStatsRepository>(() => StatsRepositoryImpl(_sl()));
 
   // UseCases
-  _sl.registerLazySingleton(() => GetStatsRankingUseCase(_sl(), _sl()));
+  _sl.registerLazySingleton(() => GetStatsRankingUseCase(_sl(), _sl(), _sl()));
 
   // Cache local (ver `cacheFirst`)
   _sl.registerLazySingleton(() => GetCachedStatsRankingUseCase(_sl()));

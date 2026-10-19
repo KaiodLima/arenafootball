@@ -4,6 +4,9 @@ import 'package:arena_soccer/core/firebase/region_registry.dart';
 
 /// Documento das coleções `partidas` / `partidas{ano}`.
 class MatchDTO extends Equatable {
+  /// Campo com as regiões da partida entre regiões (consulta por região).
+  static const String regionIdsField = 'idsRegioes';
+
   /// Id do documento (gravado também em `id_partida`).
   final String id;
 
@@ -38,6 +41,10 @@ class MatchDTO extends Equatable {
   /// `dataRegistro`: momento do cadastro (ordenação da lista).
   final DateTime? registeredAt;
 
+  /// `idsRegioes`: regiões dos dois times quando são de regiões diferentes
+  /// (campeonato intermunicipal): a partida aparece na aba TABELAS das duas.
+  final List<String> regionIds;
+
   const MatchDTO({
     this.id = '',
     required this.homeTeam,
@@ -56,6 +63,7 @@ class MatchDTO extends Equatable {
     this.bestPlayer = '',
     this.votesCount = '',
     this.registeredAt,
+    this.regionIds = const [],
   });
 
   static int _int(Object? value) => value is num ? value.toInt() : int.tryParse(value?.toString() ?? '') ?? 0;
@@ -82,6 +90,7 @@ class MatchDTO extends Equatable {
       bestPlayer: data['melhorJogador']?.toString() ?? '',
       votesCount: data['quantidadeVotos']?.toString() ?? '',
       registeredAt: registeredAt is Timestamp ? registeredAt.toDate() : null,
+      regionIds: (data[regionIdsField] as List?)?.map((id) => id.toString()).toList() ?? const [],
     );
   }
 
@@ -105,6 +114,7 @@ class MatchDTO extends Equatable {
         'melhorJogador': bestPlayer,
         'quantidadeVotos': votesCount,
         if (registeredAt != null) 'dataRegistro': Timestamp.fromDate(registeredAt!),
+        if (regionIds.isNotEmpty) regionIdsField: regionIds,
       };
 
   MatchDTO copyWith({
@@ -125,6 +135,7 @@ class MatchDTO extends Equatable {
     String? bestPlayer,
     String? votesCount,
     DateTime? registeredAt,
+    List<String>? regionIds,
   }) {
     return MatchDTO(
       id: id ?? this.id,
@@ -144,6 +155,7 @@ class MatchDTO extends Equatable {
       bestPlayer: bestPlayer ?? this.bestPlayer,
       votesCount: votesCount ?? this.votesCount,
       registeredAt: registeredAt ?? this.registeredAt,
+      regionIds: regionIds ?? this.regionIds,
     );
   }
 
@@ -166,5 +178,6 @@ class MatchDTO extends Equatable {
         bestPlayer,
         votesCount,
         registeredAt,
+        regionIds,
       ];
 }
