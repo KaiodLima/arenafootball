@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/update_match_goals_usecase.dart';
 import 'package:arena_soccer/features/matches/data/datasources/matches_datasource.dart';
 import 'package:arena_soccer/features/matches/data/repositories/matches_repository_impl.dart';
 import 'package:arena_soccer/features/matches/domain/repositories/matches_repository_interface.dart';
@@ -23,6 +24,7 @@ void registerMatchesDependencies() {
   _sl.registerLazySingleton(() => WatchMatchesUseCase(_sl()));
   _sl.registerLazySingleton(() => CreateMatchUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => UpdateMatchScoreUseCase(_sl()));
+  _sl.registerLazySingleton(() => UpdateMatchGoalsUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => GetTodayMatchesUseCase(_sl()));
   _sl.registerLazySingleton(() => GetRegionMatchesUseCase(_sl()));
   _sl.registerLazySingleton(() => ToggleMatchVotingUseCase(_sl()));

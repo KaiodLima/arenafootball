@@ -67,6 +67,9 @@ class _FakeRepository implements IMatchesRepository {
   Future<Either<Failure, void>> deleteMatch({required String matchId, String? season}) async => const Right(null);
 
   @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+
+  @override
   Future<Either<Failure, void>> setVotingOpen({required String matchId, required bool isOpen, String? season}) async =>
       const Right(null);
 }

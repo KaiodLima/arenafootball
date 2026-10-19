@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_card.dart';
 import 'package:arena_soccer/utils/components/card_menu_button.dart';
@@ -13,7 +14,7 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 /// (votar quando aberta; ver o eleito quando fechada). A data fica no
 /// cabeçalho do dia, fora do card. Para o admin, um menu com abrir/fechar
 /// votação, editar placar e excluir.
-class MatchCard extends StatelessWidget {
+class MatchCard extends StatefulWidget {
   final MatchDTO match;
   final bool isAdmin;
   final String? homeCrest;
@@ -58,8 +59,30 @@ class MatchCard extends StatelessWidget {
   static bool _none(String _) => false;
 
   @override
+  State<MatchCard> createState() => _MatchCardState();
+}
+
+class _MatchCardState extends State<MatchCard> {
+  /// Expandido: mostra os gols com autor e assistência.
+  bool _expanded = false;
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final match = widget.match;
+    final isAdmin = widget.isAdmin;
+    final homeCrest = widget.homeCrest;
+    final awayCrest = widget.awayCrest;
+    final isFavorite = widget.isFavorite;
+    final isFavoriteTeam = widget.isFavoriteTeam;
+    final onVotingTap = widget.onVotingTap;
+    final onToggleVoting = widget.onToggleVoting;
+    final onEditScore = widget.onEditScore;
+    final onDelete = widget.onDelete;
+    final showVoting = widget.showVoting;
+    final onTap = widget.onTap;
+    final championshipLabel = widget.championshipLabel;
+    final hasScorers = match.goals.any((g) => g.hasScorer);
     final info = [match.time, match.venue].where((part) => part.trim().isNotEmpty).join('  ·  ');
     final homeWon = match.homeGoals > match.awayGoals;
     final awayWon = match.awayGoals > match.homeGoals;
@@ -81,7 +104,7 @@ class MatchCard extends StatelessWidget {
                     const SizedBox(width: AppSizes.s4),
                     Flexible(
                       child: Text(
-                        championshipLabel!,
+                        championshipLabel,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
@@ -149,6 +172,31 @@ class MatchCard extends StatelessWidget {
                 ],
               ),
             ),
+            // Expandido: autores e assistências de cada lado.
+            AnimatedSize(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutCubic,
+              alignment: Alignment.topCenter,
+              child: _expanded && hasScorers
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: AppSizes.s10, right: AppSizes.s8),
+                      child: Column(
+                        children: [
+                          const Divider(height: 1, color: AppColors.greyLight),
+                          const SizedBox(height: AppSizes.s8),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(child: _SideGoals(goals: match.goals, side: MatchSide.home, alignEnd: true)),
+                              const SizedBox(width: AppSizes.s24),
+                              Expanded(child: _SideGoals(goals: match.goals, side: MatchSide.away, alignEnd: false)),
+                            ],
+                          ),
+                        ],
+                      ),
+                    )
+                  : const SizedBox(width: double.infinity),
+            ),
             const SizedBox(height: AppSizes.s12),
             Padding(
               padding: const EdgeInsets.only(left: AppSizes.s4, right: AppSizes.s8),
@@ -167,6 +215,10 @@ class MatchCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: AppSizes.s8),
+                  if (hasScorers) ...[
+                    _GoalsToggle(expanded: _expanded, onTap: () => setState(() => _expanded = !_expanded)),
+                    const SizedBox(width: AppSizes.s6),
+                  ],
                   if (showVoting) _VotingChip(isOpen: match.isVotingOpen, onTap: onVotingTap),
                 ],
               ),
@@ -174,6 +226,96 @@ class MatchCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Botão "Gols ▾/▴" do rodapé: abre/fecha os autores e passes.
+class _GoalsToggle extends StatelessWidget {
+  final bool expanded;
+  final VoidCallback onTap;
+
+  const _GoalsToggle({required this.expanded, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Tooltip(
+      message: expanded ? l10n.matchCardHideGoals : l10n.matchCardGoals,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppSizes.s12),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.sports_soccer_rounded, size: AppSizes.s14, color: AppColors.primaryDark),
+              const SizedBox(width: AppSizes.s4),
+              Text(
+                l10n.matchCardGoals,
+                style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s12),
+              ),
+              Icon(
+                expanded ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+                size: AppSizes.s18,
+                color: AppColors.primaryDark,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Gols de um lado: autor (com "(2)" se repetiu) e as assistências embaixo.
+class _SideGoals extends StatelessWidget {
+  final List<MatchGoal> goals;
+  final MatchSide side;
+  final bool alignEnd;
+
+  const _SideGoals({required this.goals, required this.side, required this.alignEnd});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final summary = MatchGoal.summaryOf(goals, side);
+    final align = alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+    final textAlign = alignEnd ? TextAlign.right : TextAlign.left;
+    return Column(
+      crossAxisAlignment: align,
+      children: [
+        for (final line in summary)
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSizes.s6),
+            child: Column(
+              crossAxisAlignment: align,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.sports_soccer_rounded, size: AppSizes.s14, color: AppColors.textSecondary),
+                    const SizedBox(width: AppSizes.s4),
+                    Flexible(
+                      child: Text(
+                        line.count > 1 ? '${line.scorer} (${line.count})' : line.scorer,
+                        textAlign: textAlign,
+                        style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s14),
+                      ),
+                    ),
+                  ],
+                ),
+                if (line.assists.isNotEmpty)
+                  Text(
+                    l10n.matchGoalsAssist(line.assists.join(', ')),
+                    textAlign: textAlign,
+                    style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+                  ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }

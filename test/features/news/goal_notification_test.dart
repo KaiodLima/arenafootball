@@ -6,6 +6,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_cache_first_usecase.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/matches/domain/repositories/matches_repository_interface.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/get_today_matches_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/update_match_score_usecase.dart';
@@ -36,6 +37,25 @@ const _today = MatchDTO(
 class _FakeMatchesRepository implements IMatchesRepository {
   bool failUpdate = false;
   int updates = 0;
+  final appended = <MatchGoal>[];
+
+  @override
+  Future<Either<Failure, void>> updateGoals({required String matchId, required List<MatchGoal> goals, String? season}) async =>
+      const Right(null);
+
+  @override
+  Future<Either<Failure, void>> appendGoal({
+    required String matchId,
+    required MatchGoal goal,
+    required int homeGoals,
+    required int awayGoals,
+    String? season,
+  }) async {
+    if (failUpdate) return Left(ErrorWithMessage('erro'));
+    appended.add(goal);
+    updates++;
+    return const Right(null);
+  }
 
   @override
   Stream<Either<Failure, List<MatchDTO>>> watchMatches({String? season, String? region}) => Stream.value(const Right([

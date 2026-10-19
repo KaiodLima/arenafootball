@@ -1251,6 +1251,78 @@ abstract class AppLocalizations {
   /// **'X'**
   String get matchesVersus;
 
+  /// No description provided for @matchGoalsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gols da partida'**
+  String get matchGoalsTitle;
+
+  /// No description provided for @matchGoalsAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol'**
+  String get matchGoalsAdd;
+
+  /// No description provided for @matchGoalsNone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum gol.'**
+  String get matchGoalsNone;
+
+  /// No description provided for @matchGoalsNoScorer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol sem autor'**
+  String get matchGoalsNoScorer;
+
+  /// No description provided for @matchGoalsRemove.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tirar gol'**
+  String get matchGoalsRemove;
+
+  /// No description provided for @matchGoalsSave.
+  ///
+  /// In pt, this message translates to:
+  /// **'SALVAR PLACAR'**
+  String get matchGoalsSave;
+
+  /// No description provided for @matchGoalsSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Placar salvo.'**
+  String get matchGoalsSaved;
+
+  /// No description provided for @matchGoalsDiscardTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Descartar as alterações do placar?'**
+  String get matchGoalsDiscardTitle;
+
+  /// No description provided for @matchGoalsDiscard.
+  ///
+  /// In pt, this message translates to:
+  /// **'Descartar'**
+  String get matchGoalsDiscard;
+
+  /// No description provided for @matchGoalsAssist.
+  ///
+  /// In pt, this message translates to:
+  /// **'assist. {name}'**
+  String matchGoalsAssist(String name);
+
+  /// No description provided for @matchCardGoals.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gols'**
+  String get matchCardGoals;
+
+  /// No description provided for @matchCardHideGoals.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ocultar gols'**
+  String get matchCardHideGoals;
+
   /// No description provided for @matchesEditScore.
   ///
   /// In pt, this message translates to:

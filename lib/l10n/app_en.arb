@@ -206,6 +206,25 @@
   "matchesEmptyForTeam": "No matches for this team",
   "matchesAllGamesTitle": "All games",
   "matchesVersus": "X",
+  "matchGoalsTitle": "Match goals",
+  "matchGoalsAdd": "Goal",
+  "matchGoalsNone": "No goals.",
+  "matchGoalsNoScorer": "Goal with no scorer",
+  "matchGoalsRemove": "Remove goal",
+  "matchGoalsSave": "SAVE SCORE",
+  "matchGoalsSaved": "Score saved.",
+  "matchGoalsDiscardTitle": "Discard the score changes?",
+  "matchGoalsDiscard": "Discard",
+  "matchGoalsAssist": "assist {name}",
+  "@matchGoalsAssist": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "matchCardGoals": "Goals",
+  "matchCardHideGoals": "Hide goals",
   "matchesEditScore": "Edit Score",
   "matchesDeleteMatch": "Delete Match",
   "matchesDeleteConfirm": "DO YOU REALLY WANT TO DELETE THIS MATCH?",

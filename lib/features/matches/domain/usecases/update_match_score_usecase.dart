@@ -1,4 +1,5 @@
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/repositories/matches_repository_interface.dart';
@@ -20,11 +21,24 @@ class UpdateMatchScoreUseCase {
     required String homeGoals,
     required String awayGoals,
     String? season,
+    MatchGoal? goal,
   }) async {
     final updated = match.copyWith(
       homeGoals: resolveGoals(homeGoals, match.homeGoals),
       awayGoals: resolveGoals(awayGoals, match.awayGoals),
     );
+    // Um gol a mais (card de gol): entra também na lista de gols da partida.
+    final oneMore = updated.homeGoals + updated.awayGoals == match.homeGoals + match.awayGoals + 1;
+    if (goal != null && oneMore) {
+      final appended = await _repository.appendGoal(
+        matchId: match.id,
+        goal: goal,
+        homeGoals: updated.homeGoals,
+        awayGoals: updated.awayGoals,
+        season: season,
+      );
+      return appended.map((_) => updated.copyWith(goals: [...match.goals, goal]));
+    }
     final response = await _repository.updateScore(
       matchId: match.id,
       homeGoals: updated.homeGoals,

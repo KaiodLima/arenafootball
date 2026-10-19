@@ -690,6 +690,44 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchesVersus => 'X';
 
   @override
+  String get matchGoalsTitle => 'Gols da partida';
+
+  @override
+  String get matchGoalsAdd => 'Gol';
+
+  @override
+  String get matchGoalsNone => 'Nenhum gol.';
+
+  @override
+  String get matchGoalsNoScorer => 'Gol sem autor';
+
+  @override
+  String get matchGoalsRemove => 'Tirar gol';
+
+  @override
+  String get matchGoalsSave => 'SALVAR PLACAR';
+
+  @override
+  String get matchGoalsSaved => 'Placar salvo.';
+
+  @override
+  String get matchGoalsDiscardTitle => 'Descartar as alterações do placar?';
+
+  @override
+  String get matchGoalsDiscard => 'Descartar';
+
+  @override
+  String matchGoalsAssist(String name) {
+    return 'assist. $name';
+  }
+
+  @override
+  String get matchCardGoals => 'Gols';
+
+  @override
+  String get matchCardHideGoals => 'Ocultar gols';
+
+  @override
   String get matchesEditScore => 'Editar Placar';
 
   @override

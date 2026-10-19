@@ -367,6 +367,25 @@
   "matchesFilterAll": "Todos",
   "matchesEmptyForTeam": "Nenhuma partida deste time",
   "matchesVersus": "X",
+  "matchGoalsTitle": "Gols da partida",
+  "matchGoalsAdd": "Gol",
+  "matchGoalsNone": "Nenhum gol.",
+  "matchGoalsNoScorer": "Gol sem autor",
+  "matchGoalsRemove": "Tirar gol",
+  "matchGoalsSave": "SALVAR PLACAR",
+  "matchGoalsSaved": "Placar salvo.",
+  "matchGoalsDiscardTitle": "Descartar as alterações do placar?",
+  "matchGoalsDiscard": "Descartar",
+  "matchGoalsAssist": "assist. {name}",
+  "@matchGoalsAssist": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "matchCardGoals": "Gols",
+  "matchCardHideGoals": "Ocultar gols",
   "matchesEditScore": "Editar Placar",
   "matchesDeleteMatch": "Excluir Partida",
   "matchesDeleteConfirm": "DESEJA REALMENTE EXCLUIR ESSA PARTIDA ?",

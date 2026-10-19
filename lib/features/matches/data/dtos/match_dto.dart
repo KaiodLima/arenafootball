@@ -1,11 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
 
 /// Documento das coleções `partidas` / `partidas{ano}`.
 class MatchDTO extends Equatable {
   /// Campo com as regiões da partida entre regiões (consulta por região).
   static const String regionIdsField = 'idsRegioes';
+
+  /// Campo com os gols da partida (autor e assistência).
+  static const String goalsField = 'gols';
 
   /// Id do documento (gravado também em `id_partida`).
   final String id;
@@ -45,6 +49,10 @@ class MatchDTO extends Equatable {
   /// (campeonato intermunicipal): a partida aparece na aba TABELAS das duas.
   final List<String> regionIds;
 
+  /// `gols`: os gols com autor/assistência (vazio em partidas antigas: o
+  /// placar fica só em [homeGoals]/[awayGoals]).
+  final List<MatchGoal> goals;
+
   const MatchDTO({
     this.id = '',
     required this.homeTeam,
@@ -64,6 +72,7 @@ class MatchDTO extends Equatable {
     this.votesCount = '',
     this.registeredAt,
     this.regionIds = const [],
+    this.goals = const [],
   });
 
   static int _int(Object? value) => value is num ? value.toInt() : int.tryParse(value?.toString() ?? '') ?? 0;
@@ -91,6 +100,7 @@ class MatchDTO extends Equatable {
       votesCount: data['quantidadeVotos']?.toString() ?? '',
       registeredAt: registeredAt is Timestamp ? registeredAt.toDate() : null,
       regionIds: (data[regionIdsField] as List?)?.map((id) => id.toString()).toList() ?? const [],
+      goals: MatchGoal.listFrom(data[goalsField]),
     );
   }
 
@@ -115,6 +125,7 @@ class MatchDTO extends Equatable {
         'quantidadeVotos': votesCount,
         if (registeredAt != null) 'dataRegistro': Timestamp.fromDate(registeredAt!),
         if (regionIds.isNotEmpty) regionIdsField: regionIds,
+        if (goals.isNotEmpty) goalsField: [for (final g in goals) g.toMap()],
       };
 
   MatchDTO copyWith({
@@ -136,6 +147,7 @@ class MatchDTO extends Equatable {
     String? votesCount,
     DateTime? registeredAt,
     List<String>? regionIds,
+    List<MatchGoal>? goals,
   }) {
     return MatchDTO(
       id: id ?? this.id,
@@ -156,6 +168,7 @@ class MatchDTO extends Equatable {
       votesCount: votesCount ?? this.votesCount,
       registeredAt: registeredAt ?? this.registeredAt,
       regionIds: regionIds ?? this.regionIds,
+      goals: goals ?? this.goals,
     );
   }
 
@@ -179,5 +192,6 @@ class MatchDTO extends Equatable {
         votesCount,
         registeredAt,
         regionIds,
+        goals,
       ];
 }

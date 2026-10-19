@@ -1,4 +1,5 @@
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/matches/data/datasources/matches_datasource.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
@@ -25,6 +26,27 @@ class MatchesRepositoryImpl implements IMatchesRepository {
     String? season,
   }) =>
       _dataSource.updateScore(matchId: matchId, homeGoals: homeGoals, awayGoals: awayGoals, season: season);
+
+  @override
+  Future<Either<Failure, void>> updateGoals(
+          {required String matchId, required List<MatchGoal> goals, String? season}) =>
+      _dataSource.updateGoals(matchId: matchId, goals: goals, season: season);
+
+  @override
+  Future<Either<Failure, void>> appendGoal({
+    required String matchId,
+    required MatchGoal goal,
+    required int homeGoals,
+    required int awayGoals,
+    String? season,
+  }) =>
+      _dataSource.appendGoal(
+        matchId: matchId,
+        goal: goal,
+        homeGoals: homeGoals,
+        awayGoals: awayGoals,
+        season: season,
+      );
 
   @override
   Future<Either<Failure, void>> setVotingOpen({required String matchId, required bool isOpen, String? season}) =>

@@ -687,6 +687,44 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchesVersus => 'X';
 
   @override
+  String get matchGoalsTitle => 'Match goals';
+
+  @override
+  String get matchGoalsAdd => 'Goal';
+
+  @override
+  String get matchGoalsNone => 'No goals.';
+
+  @override
+  String get matchGoalsNoScorer => 'Goal with no scorer';
+
+  @override
+  String get matchGoalsRemove => 'Remove goal';
+
+  @override
+  String get matchGoalsSave => 'SAVE SCORE';
+
+  @override
+  String get matchGoalsSaved => 'Score saved.';
+
+  @override
+  String get matchGoalsDiscardTitle => 'Discard the score changes?';
+
+  @override
+  String get matchGoalsDiscard => 'Discard';
+
+  @override
+  String matchGoalsAssist(String name) {
+    return 'assist $name';
+  }
+
+  @override
+  String get matchCardGoals => 'Goals';
+
+  @override
+  String get matchCardHideGoals => 'Hide goals';
+
+  @override
   String get matchesEditScore => 'Edit Score';
 
   @override

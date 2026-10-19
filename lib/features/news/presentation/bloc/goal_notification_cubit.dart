@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_cache_first_usecase.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
@@ -285,11 +286,25 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
     var matchUpdated = false;
     final match = form.updateMatch ? form.linkedMatch : null;
     if (match != null) {
+      final scoringSide =
+          form.scoringTeam == null ? null : (form.scoringTeam == match.homeTeam ? MatchSide.home : MatchSide.away);
+      final assistant = form.assistant != null && form.assistant!.id != form.scorer?.id ? form.assistant : null;
       final update = await updateMatchScoreUseCase(
         match: match,
         homeGoals: '${form.homeGoals}',
         awayGoals: '${form.awayGoals}',
         season: _season,
+        // O gol entra na lista da partida (os números já somam pelo card).
+        goal: scoringSide == null
+            ? null
+            : MatchGoal(
+                id: MatchGoal.newId(),
+                side: scoringSide,
+                scorerId: form.scorer?.id ?? '',
+                scorerName: form.scorer?.name ?? '',
+                assistantId: assistant?.id ?? '',
+                assistantName: assistant?.name ?? '',
+              ),
       );
       if (isClosed) return;
       if (update.isLeft) {

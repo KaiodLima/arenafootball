@@ -5,7 +5,7 @@ import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart'
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/matches_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/matches_state.dart';
-import 'package:arena_soccer/features/matches/presentation/widgets/edit_score_dialog.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/match_goals_sheet.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_card.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/matches_summary_card.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/team_filter_chips.dart';
@@ -53,10 +53,17 @@ class MatchesList extends StatelessWidget {
     );
   }
 
+  /// "Editar placar": os gols da partida com autor e assistência (o stream
+  /// traz o placar novo).
   Future<void> _editScore(BuildContext context, MatchDTO match) async {
-    final cubit = BlocProvider.of<MatchesCubit>(context);
-    final score = await showEditScoreDialog(context);
-    if (score != null) await cubit.updateScore(match, homeGoals: score.homeGoals, awayGoals: score.awayGoals);
+    final state = BlocProvider.of<MatchesCubit>(context).state;
+    await showMatchGoalsSheet(
+      context,
+      match: match,
+      season: season,
+      homeCrest: state.crestOf(match.homeTeam),
+      awayCrest: state.crestOf(match.awayTeam),
+    );
   }
 
   Future<void> _confirmDelete(BuildContext context, MatchDTO match) async {

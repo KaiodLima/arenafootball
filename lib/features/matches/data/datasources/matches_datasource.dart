@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/errors/firebase_error.dart';
 import 'package:arena_soccer/core/firebase/either_stream.dart';
@@ -59,6 +60,39 @@ class MatchesDataSource {
     String? season,
   }) =>
       _update(matchId, {'golTimeCasa': homeGoals, 'golTimeFora': awayGoals}, season: season);
+
+  /// Lista de gols da partida (autor/assistência) e o placar contado dela.
+  Future<Either<Failure, void>> updateGoals({
+    required String matchId,
+    required List<MatchGoal> goals,
+    String? season,
+  }) =>
+      _update(matchId, goalsFields(goals), season: season);
+
+  /// Campos gravados com a lista: os gols e o placar (contagem de cada lado).
+  static Map<String, dynamic> goalsFields(List<MatchGoal> goals) => {
+        MatchDTO.goalsField: [for (final g in goals) g.toMap()],
+        'golTimeCasa': goals.where((g) => g.side == MatchSide.home).length,
+        'golTimeFora': goals.where((g) => g.side == MatchSide.away).length,
+      };
+
+  /// Um gol a mais (card de gol): entra na lista, com o placar escolhido.
+  Future<Either<Failure, void>> appendGoal({
+    required String matchId,
+    required MatchGoal goal,
+    required int homeGoals,
+    required int awayGoals,
+    String? season,
+  }) =>
+      _update(
+        matchId,
+        {
+          MatchDTO.goalsField: FieldValue.arrayUnion([goal.toMap()]),
+          'golTimeCasa': homeGoals,
+          'golTimeFora': awayGoals,
+        },
+        season: season,
+      );
 
   /// `votacao` continua gravado como string.
   Future<Either<Failure, void>> setVotingOpen({required String matchId, required bool isOpen, String? season}) =>
