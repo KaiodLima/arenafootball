@@ -731,6 +731,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get achievementsAlmostThere => 'ALMOST THERE';
+
+  @override
+  String get achievementsSeeAll => 'See all';
+
+  @override
+  String get achievementsStatMedals => 'medals';
+
+  @override
+  String get achievementsStatXp => 'XP';
+
+  @override
+  String get achievementsStatStreak => 'day streak';
+
+  @override
   String get drawerAchievements => 'My achievements';
 
   @override

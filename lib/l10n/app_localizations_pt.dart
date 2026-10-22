@@ -734,6 +734,21 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get achievementsAlmostThere => 'QUASE LÁ';
+
+  @override
+  String get achievementsSeeAll => 'Ver todas';
+
+  @override
+  String get achievementsStatMedals => 'medalhas';
+
+  @override
+  String get achievementsStatXp => 'XP';
+
+  @override
+  String get achievementsStatStreak => 'dias seguidos';
+
+  @override
   String get drawerAchievements => 'Minhas conquistas';
 
   @override

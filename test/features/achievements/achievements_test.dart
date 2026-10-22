@@ -74,6 +74,20 @@ void main() {
     expect(board.best(limit: 1).single.achievement.id, 's1');
   });
 
+  test('"quase lá" e prateleira: ignora secreta e ganha; ganhas primeiro, bloqueadas por progresso', () {
+    const secret = AchievementDTO(id: 'z', title: 'Z', metric: AchievementMetric.votes, goal: 4, secret: true);
+    const fifty = AchievementDTO(id: 'v50', title: 'V50', metric: AchievementMetric.votes, goal: 50, order: 3);
+    final board = AchievementBoard.of(
+      catalog: const [_voter, _jury, fifty, secret],
+      progress: _progress({AchievementMetric.votes: 3, AchievementMetric.bestStreak: 6}),
+    );
+    // Secreta tem 75%, mas não aparece; Jurado (30%) ganha de V50 (6%).
+    expect(board.almostThere()?.achievement.id, 'v10');
+    expect(board.shelfOf(AchievementCategory.fan).map((e) => e.achievement.id), ['v1', 'z', 'v10', 'v50']);
+    expect(board.bestStreak, 6);
+    expect(AchievementBoard.of(catalog: const [_jury], progress: _progress({})).almostThere(), isNull);
+  });
+
   test('números do app entram no lugar dos do servidor enquanto ele não grava', () {
     final progress = _progress({AchievementMetric.athleteGoals: 2}).withDerived({
       AchievementMetric.athleteGoals: 5,

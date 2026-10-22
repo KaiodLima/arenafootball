@@ -28,7 +28,10 @@ class AchievementEntry extends Equatable {
 class AchievementBoard extends Equatable {
   final List<AchievementEntry> entries;
 
-  const AchievementBoard(this.entries);
+  /// Maior sequência de dias seguidos (número do topo da tela).
+  final int bestStreak;
+
+  const AchievementBoard(this.entries, {this.bestStreak = 0});
 
   static const AchievementBoard empty = AchievementBoard([]);
 
@@ -42,7 +45,7 @@ class AchievementBoard extends Equatable {
         final byOrder = a.order.compareTo(b.order);
         return byOrder != 0 ? byOrder : a.goal.compareTo(b.goal);
       });
-    return AchievementBoard([
+    return AchievementBoard(bestStreak: progress.valueOf(AchievementMetric.bestStreak), [
       for (final achievement in active)
         () {
           final current = progress.valueOf(achievement.metric!);
@@ -66,6 +69,27 @@ class AchievementBoard extends Equatable {
   List<AchievementEntry> ofCategory(AchievementCategory? category) =>
       category == null ? entries : entries.where((e) => e.achievement.category == category).toList();
 
+  /// "Quase lá": a bloqueada (não secreta) com mais progresso; nula sem nenhuma em andamento.
+  AchievementEntry? almostThere() {
+    AchievementEntry? best;
+    for (final entry in entries) {
+      if (entry.unlocked || entry.achievement.secret || entry.current <= 0) continue;
+      if (best == null || entry.progress > best.progress) best = entry;
+    }
+    return best;
+  }
+
+  /// Prateleira da categoria: ganhas primeiro (maior nível antes), depois as
+  /// bloqueadas da mais perto para a mais longe da meta.
+  List<AchievementEntry> shelfOf(AchievementCategory category) {
+    final list = ofCategory(category);
+    return [
+      ...list.where((e) => e.unlocked).toList()
+        ..sort((a, b) => b.achievement.tier.index.compareTo(a.achievement.tier.index)),
+      ...list.where((e) => !e.unlocked).toList()..sort((a, b) => b.progress.compareTo(a.progress)),
+    ];
+  }
+
   /// Últimas desbloqueadas (com data), da mais nova para a mais antiga.
   List<AchievementEntry> recent({int limit = 8}) {
     final dated = unlocked.where((e) => e.unlockedAt != null).toList()
@@ -83,7 +107,7 @@ class AchievementBoard extends Equatable {
   }
 
   @override
-  List<Object?> get props => [entries];
+  List<Object?> get props => [entries, bestStreak];
 }
 
 /// Registro do dia de uso: dias diferentes, sequência de dias seguidos e a

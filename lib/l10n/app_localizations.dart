@@ -1335,6 +1335,36 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @achievementsAlmostThere.
+  ///
+  /// In pt, this message translates to:
+  /// **'QUASE LÁ'**
+  String get achievementsAlmostThere;
+
+  /// No description provided for @achievementsSeeAll.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver todas'**
+  String get achievementsSeeAll;
+
+  /// No description provided for @achievementsStatMedals.
+  ///
+  /// In pt, this message translates to:
+  /// **'medalhas'**
+  String get achievementsStatMedals;
+
+  /// No description provided for @achievementsStatXp.
+  ///
+  /// In pt, this message translates to:
+  /// **'XP'**
+  String get achievementsStatXp;
+
+  /// No description provided for @achievementsStatStreak.
+  ///
+  /// In pt, this message translates to:
+  /// **'dias seguidos'**
+  String get achievementsStatStreak;
+
   /// No description provided for @drawerAchievements.
   ///
   /// In pt, this message translates to:

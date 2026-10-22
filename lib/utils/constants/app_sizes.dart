@@ -92,7 +92,7 @@ class AppSizes {
   static const double matchHeaderHeight = s300;
 
   /// Cabeçalho aberto da tela de conquistas (nível e XP).
-  static const double achievementsHeaderHeight = s250;
+  static const double achievementsHeaderHeight = s300 + s60;
 
   /// Logo na AppBar.
   static const double logoWidth = s110;
