@@ -79,8 +79,10 @@ class MatchFormData extends Equatable {
   bool get isFriendly => championshipId == null && championships.isNotEmpty;
 
   /// Times do campeonato [id] (todos da região se ele não marcou nenhum).
-  /// Intermunicipal: os dele de qualquer região.
+  /// Intermunicipal: os dele de qualquer região. Amistoso (a região tem
+  /// campeonatos e nenhum foi escolhido): qualquer time da temporada.
   List<TeamDTO> teamsFor(int? id) {
+    if (id == null && championships.isNotEmpty && seasonTeams.isNotEmpty) return seasonTeams;
     final championship = championships.where((c) => c.championshipId == id).firstOrNull;
     if (championship == null || championship.teams.isEmpty) return regionTeams;
     final base = championship.isIntermunicipal && seasonTeams.isNotEmpty ? seasonTeams : regionTeams;
