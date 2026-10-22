@@ -1323,6 +1323,216 @@ abstract class AppLocalizations {
   /// **'Ocultar gols'**
   String get matchCardHideGoals;
 
+  /// No description provided for @matchCardToday.
+  ///
+  /// In pt, this message translates to:
+  /// **'HOJE'**
+  String get matchCardToday;
+
+  /// No description provided for @matchCardTomorrow.
+  ///
+  /// In pt, this message translates to:
+  /// **'AMANHÃ'**
+  String get matchCardTomorrow;
+
+  /// No description provided for @matchDetailsVotingEnded.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votação encerrada'**
+  String get matchDetailsVotingEnded;
+
+  /// No description provided for @votingNoWinnerTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem melhor da partida'**
+  String get votingNoWinnerTitle;
+
+  /// No description provided for @votingNoWinnerNotEnough.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mínimo de {min} votos não atingido ({total} votos).'**
+  String votingNoWinnerNotEnough(int min, int total);
+
+  /// No description provided for @votingNoWinnerNoMajority.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ninguém chegou a {percent}% dos votos (o mais votado teve {leader}%).'**
+  String votingNoWinnerNoMajority(int percent, int leader);
+
+  /// No description provided for @votingNoWinnerTie.
+  ///
+  /// In pt, this message translates to:
+  /// **'Empate no primeiro lugar.'**
+  String get votingNoWinnerTie;
+
+  /// No description provided for @votingRulesHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para eleger o melhor da partida: no mínimo {min} votos e o mais votado com {percent}% ou mais, à frente do segundo.'**
+  String votingRulesHint(int min, int percent);
+
+  /// No description provided for @votingSelfBlocked.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você não pode votar em si'**
+  String get votingSelfBlocked;
+
+  /// No description provided for @votingSeeResult.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver resultado'**
+  String get votingSeeResult;
+
+  /// No description provided for @votingRulesTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Regras da votação'**
+  String get votingRulesTitle;
+
+  /// No description provided for @votingRulesSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mínimo de votos e porcentagem do mais votado'**
+  String get votingRulesSubtitle;
+
+  /// No description provided for @votingRulesMinVotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mínimo de votos'**
+  String get votingRulesMinVotes;
+
+  /// No description provided for @votingRulesMinPercent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Porcentagem mínima do mais votado'**
+  String get votingRulesMinPercent;
+
+  /// No description provided for @votingRulesSave.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salvar regras'**
+  String get votingRulesSave;
+
+  /// No description provided for @votingRulesSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Regras da votação salvas'**
+  String get votingRulesSaved;
+
+  /// No description provided for @matchCardLive.
+  ///
+  /// In pt, this message translates to:
+  /// **'EM ANDAMENTO'**
+  String get matchCardLive;
+
+  /// No description provided for @matchStart.
+  ///
+  /// In pt, this message translates to:
+  /// **'Iniciar partida'**
+  String get matchStart;
+
+  /// No description provided for @matchFinish.
+  ///
+  /// In pt, this message translates to:
+  /// **'Encerrar partida'**
+  String get matchFinish;
+
+  /// No description provided for @matchFormDuration.
+  ///
+  /// In pt, this message translates to:
+  /// **'Duração'**
+  String get matchFormDuration;
+
+  /// No description provided for @matchFormDurationMinutes.
+  ///
+  /// In pt, this message translates to:
+  /// **'{n} min'**
+  String matchFormDurationMinutes(int n);
+
+  /// No description provided for @matchDetailsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Partida'**
+  String get matchDetailsTitle;
+
+  /// No description provided for @matchDetailsFinished.
+  ///
+  /// In pt, this message translates to:
+  /// **'ENCERRADO'**
+  String get matchDetailsFinished;
+
+  /// No description provided for @matchDetailsNoScorers.
+  ///
+  /// In pt, this message translates to:
+  /// **'Autores dos gols não informados'**
+  String get matchDetailsNoScorers;
+
+  /// No description provided for @matchDetailsNotStarted.
+  ///
+  /// In pt, this message translates to:
+  /// **'A bola ainda não rolou'**
+  String get matchDetailsNotStarted;
+
+  /// No description provided for @matchDetailsNoGoals.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem gols'**
+  String get matchDetailsNoGoals;
+
+  /// No description provided for @matchDetailsUnknownScorer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol'**
+  String get matchDetailsUnknownScorer;
+
+  /// No description provided for @matchDetailsBestPlayer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Melhor da partida'**
+  String get matchDetailsBestPlayer;
+
+  /// No description provided for @matchDetailsVotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} votos'**
+  String matchDetailsVotes(String count);
+
+  /// No description provided for @matchDetailsVotingOpen.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votação aberta: escolha o craque do jogo'**
+  String get matchDetailsVotingOpen;
+
+  /// No description provided for @matchDetailsVotingClosed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votação ainda não aberta'**
+  String get matchDetailsVotingClosed;
+
+  /// No description provided for @matchDetailsSquads.
+  ///
+  /// In pt, this message translates to:
+  /// **'Elencos'**
+  String get matchDetailsSquads;
+
+  /// No description provided for @matchDetailsNoSquad.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum atleta inscrito'**
+  String get matchDetailsNoSquad;
+
+  /// No description provided for @matchDetailsGoalCard.
+  ///
+  /// In pt, this message translates to:
+  /// **'Lançar card de gol'**
+  String get matchDetailsGoalCard;
+
+  /// No description provided for @matchDetailsDeleted.
+  ///
+  /// In pt, this message translates to:
+  /// **'Esta partida foi excluída'**
+  String get matchDetailsDeleted;
+
   /// No description provided for @matchesEditScore.
   ///
   /// In pt, this message translates to:

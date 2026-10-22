@@ -15,6 +15,10 @@ class MatchesRepositoryImpl implements IMatchesRepository {
       _dataSource.watchMatches(season: season, region: region);
 
   @override
+  Stream<Either<Failure, MatchDTO?>> watchMatch({required String matchId, String? season}) =>
+      _dataSource.watchMatch(matchId: matchId, season: season);
+
+  @override
   Future<Either<Failure, void>> createMatch(MatchDTO match, {String? season}) =>
       _dataSource.createMatch(match, season: season);
 
@@ -51,6 +55,14 @@ class MatchesRepositoryImpl implements IMatchesRepository {
   @override
   Future<Either<Failure, void>> setVotingOpen({required String matchId, required bool isOpen, String? season}) =>
       _dataSource.setVotingOpen(matchId: matchId, isOpen: isOpen, season: season);
+
+  @override
+  Future<Either<Failure, void>> setManualStatus({
+    required String matchId,
+    required MatchManualStatus status,
+    String? season,
+  }) =>
+      _dataSource.setManualStatus(matchId: matchId, status: status, season: season);
 
   @override
   Future<Either<Failure, void>> deleteMatch({required String matchId, String? season}) =>

@@ -46,7 +46,15 @@ class _TeamPickerState extends State<_TeamPicker> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final term = foldForSearch(_query.trim());
-    final teams = widget.teams.where((t) => term.isEmpty || foldForSearch(t.name).contains(term)).toList();
+    // Times de mais de uma região (amistoso, intermunicipal): a região aparece
+    // embaixo do nome e também entra na busca.
+    final showRegion = widget.teams.map((t) => t.region.trim()).where((r) => r.isNotEmpty).toSet().length > 1;
+    final teams = widget.teams
+        .where((t) =>
+            term.isEmpty ||
+            foldForSearch(t.name).contains(term) ||
+            (showRegion && foldForSearch(t.region).contains(term)))
+        .toList();
     final viewInsets = MediaQuery.of(context).viewInsets.bottom;
 
     return Padding(
@@ -73,8 +81,8 @@ class _TeamPickerState extends State<_TeamPicker> {
                       itemCount: teams.length,
                       itemBuilder: (context, index) {
                         final team = teams[index];
-                        final selected =
-                            sameTeam(idA: team.id, nameA: team.name, idB: widget.selectedId, nameB: widget.selected ?? '');
+                        final selected = sameTeam(
+                            idA: team.id, nameA: team.name, idB: widget.selectedId, nameB: widget.selected ?? '');
                         return ListTile(
                           contentPadding: const EdgeInsets.symmetric(horizontal: AppSizes.s20),
                           leading: TeamCrest(imageUrl: team.imageUrl, size: AppSizes.s40),
@@ -84,6 +92,10 @@ class _TeamPickerState extends State<_TeamPicker> {
                               fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                             ),
                           ),
+                          subtitle: showRegion && team.region.trim().isNotEmpty
+                              ? Text(team.region.trim(),
+                                  style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12))
+                              : null,
                           trailing: selected ? const Icon(Icons.check_circle_rounded, color: AppColors.primary) : null,
                           onTap: () => Navigator.pop(context, team),
                         );

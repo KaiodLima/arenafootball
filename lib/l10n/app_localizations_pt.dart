@@ -728,6 +728,123 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardHideGoals => 'Ocultar gols';
 
   @override
+  String get matchCardToday => 'HOJE';
+
+  @override
+  String get matchCardTomorrow => 'AMANHÃ';
+
+  @override
+  String get matchDetailsVotingEnded => 'Votação encerrada';
+
+  @override
+  String get votingNoWinnerTitle => 'Sem melhor da partida';
+
+  @override
+  String votingNoWinnerNotEnough(int min, int total) {
+    return 'Mínimo de $min votos não atingido ($total votos).';
+  }
+
+  @override
+  String votingNoWinnerNoMajority(int percent, int leader) {
+    return 'Ninguém chegou a $percent% dos votos (o mais votado teve $leader%).';
+  }
+
+  @override
+  String get votingNoWinnerTie => 'Empate no primeiro lugar.';
+
+  @override
+  String votingRulesHint(int min, int percent) {
+    return 'Para eleger o melhor da partida: no mínimo $min votos e o mais votado com $percent% ou mais, à frente do segundo.';
+  }
+
+  @override
+  String get votingSelfBlocked => 'Você não pode votar em si';
+
+  @override
+  String get votingSeeResult => 'Ver resultado';
+
+  @override
+  String get votingRulesTitle => 'Regras da votação';
+
+  @override
+  String get votingRulesSubtitle =>
+      'Mínimo de votos e porcentagem do mais votado';
+
+  @override
+  String get votingRulesMinVotes => 'Mínimo de votos';
+
+  @override
+  String get votingRulesMinPercent => 'Porcentagem mínima do mais votado';
+
+  @override
+  String get votingRulesSave => 'Salvar regras';
+
+  @override
+  String get votingRulesSaved => 'Regras da votação salvas';
+
+  @override
+  String get matchCardLive => 'EM ANDAMENTO';
+
+  @override
+  String get matchStart => 'Iniciar partida';
+
+  @override
+  String get matchFinish => 'Encerrar partida';
+
+  @override
+  String get matchFormDuration => 'Duração';
+
+  @override
+  String matchFormDurationMinutes(int n) {
+    return '$n min';
+  }
+
+  @override
+  String get matchDetailsTitle => 'Partida';
+
+  @override
+  String get matchDetailsFinished => 'ENCERRADO';
+
+  @override
+  String get matchDetailsNoScorers => 'Autores dos gols não informados';
+
+  @override
+  String get matchDetailsNotStarted => 'A bola ainda não rolou';
+
+  @override
+  String get matchDetailsNoGoals => 'Sem gols';
+
+  @override
+  String get matchDetailsUnknownScorer => 'Gol';
+
+  @override
+  String get matchDetailsBestPlayer => 'Melhor da partida';
+
+  @override
+  String matchDetailsVotes(String count) {
+    return '$count votos';
+  }
+
+  @override
+  String get matchDetailsVotingOpen =>
+      'Votação aberta: escolha o craque do jogo';
+
+  @override
+  String get matchDetailsVotingClosed => 'Votação ainda não aberta';
+
+  @override
+  String get matchDetailsSquads => 'Elencos';
+
+  @override
+  String get matchDetailsNoSquad => 'Nenhum atleta inscrito';
+
+  @override
+  String get matchDetailsGoalCard => 'Lançar card de gol';
+
+  @override
+  String get matchDetailsDeleted => 'Esta partida foi excluída';
+
+  @override
   String get matchesEditScore => 'Editar Placar';
 
   @override

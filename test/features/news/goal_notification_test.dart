@@ -40,7 +40,19 @@ class _FakeMatchesRepository implements IMatchesRepository {
   final appended = <MatchGoal>[];
 
   @override
-  Future<Either<Failure, void>> updateGoals({required String matchId, required List<MatchGoal> goals, String? season}) async =>
+  Future<Either<Failure, void>> setManualStatus({
+    required String matchId,
+    required MatchManualStatus status,
+    String? season,
+  }) async =>
+      const Right(null);
+
+  @override
+  Stream<Either<Failure, MatchDTO?>> watchMatch({required String matchId, String? season}) => const Stream.empty();
+
+  @override
+  Future<Either<Failure, void>> updateGoals(
+          {required String matchId, required List<MatchGoal> goals, String? season}) async =>
       const Right(null);
 
   @override

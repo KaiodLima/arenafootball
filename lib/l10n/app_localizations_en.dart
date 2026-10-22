@@ -725,6 +725,122 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardHideGoals => 'Hide goals';
 
   @override
+  String get matchCardToday => 'TODAY';
+
+  @override
+  String get matchCardTomorrow => 'TOMORROW';
+
+  @override
+  String get matchDetailsVotingEnded => 'Voting closed';
+
+  @override
+  String get votingNoWinnerTitle => 'No player of the match';
+
+  @override
+  String votingNoWinnerNotEnough(int min, int total) {
+    return 'Minimum of $min votes not reached ($total votes).';
+  }
+
+  @override
+  String votingNoWinnerNoMajority(int percent, int leader) {
+    return 'Nobody reached $percent% of the votes (the leader had $leader%).';
+  }
+
+  @override
+  String get votingNoWinnerTie => 'Tie for first place.';
+
+  @override
+  String votingRulesHint(int min, int percent) {
+    return 'To elect the player of the match: at least $min votes and the leader with $percent% or more, ahead of second place.';
+  }
+
+  @override
+  String get votingSelfBlocked => 'You can\'t vote for yourself';
+
+  @override
+  String get votingSeeResult => 'See result';
+
+  @override
+  String get votingRulesTitle => 'Voting rules';
+
+  @override
+  String get votingRulesSubtitle => 'Minimum votes and leader percentage';
+
+  @override
+  String get votingRulesMinVotes => 'Minimum votes';
+
+  @override
+  String get votingRulesMinPercent => 'Leader\'s minimum percentage';
+
+  @override
+  String get votingRulesSave => 'Save rules';
+
+  @override
+  String get votingRulesSaved => 'Voting rules saved';
+
+  @override
+  String get matchCardLive => 'LIVE';
+
+  @override
+  String get matchStart => 'Start match';
+
+  @override
+  String get matchFinish => 'End match';
+
+  @override
+  String get matchFormDuration => 'Duration';
+
+  @override
+  String matchFormDurationMinutes(int n) {
+    return '$n min';
+  }
+
+  @override
+  String get matchDetailsTitle => 'Match';
+
+  @override
+  String get matchDetailsFinished => 'FULL TIME';
+
+  @override
+  String get matchDetailsNoScorers => 'Goal scorers not informed';
+
+  @override
+  String get matchDetailsNotStarted => 'Kick-off hasn\'t happened yet';
+
+  @override
+  String get matchDetailsNoGoals => 'No goals';
+
+  @override
+  String get matchDetailsUnknownScorer => 'Goal';
+
+  @override
+  String get matchDetailsBestPlayer => 'Player of the match';
+
+  @override
+  String matchDetailsVotes(String count) {
+    return '$count votes';
+  }
+
+  @override
+  String get matchDetailsVotingOpen =>
+      'Voting open: pick the star of the match';
+
+  @override
+  String get matchDetailsVotingClosed => 'Voting not open yet';
+
+  @override
+  String get matchDetailsSquads => 'Squads';
+
+  @override
+  String get matchDetailsNoSquad => 'No players registered';
+
+  @override
+  String get matchDetailsGoalCard => 'Post goal card';
+
+  @override
+  String get matchDetailsDeleted => 'This match was deleted';
+
+  @override
   String get matchesEditScore => 'Edit Score';
 
   @override

@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
+import 'package:arena_soccer/features/matches/domain/match_squads.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/update_match_goals_usecase.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
@@ -92,19 +93,10 @@ class MatchGoalsCubit extends Cubit<MatchGoalsState> {
     final homeResponse = await home;
     final awayResponse = await away;
     if (isClosed) return;
-    List<PlayerDTO> squad(List<PlayerDTO> list, {required bool isHome}) {
-      final teamId = isHome ? match.homeTeamId : match.awayTeamId;
-      final teamName = isHome ? match.homeTeam : match.awayTeam;
-      // Só quem joga por esse time na competição da partida.
-      final filtered = match.championshipId > 0
-          ? list.where((p) => p.playsIn(match.championshipId, teamId: teamId, teamName: teamName)).toList()
-          : list;
-      return filtered..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-    }
-
+    // Só quem joga por esse time na competição da partida.
     emit(state.copyWith(
-      homeSquad: homeResponse.fold((_) => const [], (list) => squad(list, isHome: true)),
-      awaySquad: awayResponse.fold((_) => const [], (list) => squad(list, isHome: false)),
+      homeSquad: homeResponse.fold((_) => const [], (list) => matchSquad(list, match, MatchSide.home)),
+      awaySquad: awayResponse.fold((_) => const [], (list) => matchSquad(list, match, MatchSide.away)),
     ));
   }
 

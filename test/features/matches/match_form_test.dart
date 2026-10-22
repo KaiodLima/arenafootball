@@ -106,10 +106,12 @@ class _FakeTeams implements GetTeamsCacheFirstUseCase {
   Stream<Either<Failure, List<TeamDTO>>> call({String? region, String? season, bool force = false}) =>
       Stream.fromFuture(_load(region: region, season: season));
 
-  Future<Either<Failure, List<TeamDTO>>> _load({String? region, String? season}) async => const Right([
-        TeamDTO(id: '1', name: 'Lava Jato'),
-        TeamDTO(id: '2', name: 'Volta'),
-        TeamDTO(id: '3', name: 'Riacho'),
+  Future<Either<Failure, List<TeamDTO>>> _load({String? region, String? season}) async => Right([
+        const TeamDTO(id: '1', name: 'Lava Jato'),
+        const TeamDTO(id: '2', name: 'Volta'),
+        const TeamDTO(id: '3', name: 'Riacho'),
+        // Sem região = todos da temporada: inclui um de outra região.
+        if (region == null) const TeamDTO(id: '9', name: 'Furacão', region: 'Colonia'),
       ]);
 }
 
@@ -157,6 +159,17 @@ void main() {
   });
 
   group('MatchFormData', () {
+    test('duração: começa em 90, vai para a partida e para o doc (com o status manual)', () {
+      expect(const MatchFormData().durationMinutes, 90);
+      final match = const MatchFormData(homeTeam: 'Volta', awayTeam: 'Riacho').copyWith(durationMinutes: 60).toMatch();
+      expect(match.durationMinutes, 60);
+      expect(match.toMap()['duracao'], 60);
+      expect(match.toMap().containsKey('status'), isFalse);
+      expect(match.copyWith(manualStatus: MatchManualStatus.live).toMap()['status'], 'andamento');
+      expect(MatchManualStatus.fromKey('encerrada'), MatchManualStatus.finished);
+      expect(MatchManualStatus.fromKey(''), MatchManualStatus.none);
+    });
+
     test('primeiro campo faltante', () {
       expect(const MatchFormData().missing, MatchFormMissing.teams);
       expect(const MatchFormData(homeTeam: 'Volta', awayTeam: 'Volta').missing, MatchFormMissing.sameTeam);
@@ -215,7 +228,19 @@ void main() {
         ..selectAwayTeam('Volta');
       await multi.submit();
       expect(repository.created.last.championshipId, 6);
+
+      // Amistoso: qualquer time da temporada, de qualquer região.
+      multi.selectChampionship(null);
+      expect(multi.state.form.teams.map((t) => t.name), contains('Furacão'));
+      multi
+        ..selectHomeTeam('Lava Jato')
+        ..selectAwayTeam('Furacão');
+      expect(multi.state.form.toMatch().awayTeamId, '9');
       await multi.close();
+    });
+
+    test('região sem campeonatos: sem campeonato continua só com os times da região', () {
+      expect(cubit.state.form.teamsFor(null).map((t) => t.name), isNot(contains('Furacão')));
     });
 
     test('carrega a região: data de hoje, times e local mais usado', () {
@@ -309,7 +334,8 @@ void main() {
         ..registered = const ChampionshipDTO(id: 'r', championshipId: 9, region: 'Floresta');
       final championships = _FakeChampionships()
         ..list = const [
-          ChampionshipDTO(id: 'c', championshipId: 5, title: 'Copa', teams: ['Lava Jato', 'Volta'], teamIds: ['1', '2']),
+          ChampionshipDTO(
+              id: 'c', championshipId: 5, title: 'Copa', teams: ['Lava Jato', 'Volta'], teamIds: ['1', '2']),
         ];
       final cubit = MatchFormCubit(
         CreateMatchUseCase(repository, championship),
@@ -322,10 +348,10 @@ void main() {
       expect(cubit.state.form.championshipId, 5);
       expect(cubit.state.form.teams.map((t) => t.name), ['Lava Jato', 'Volta']);
 
-      // Amistoso: todos os times da região; os escolhidos continuam.
+      // Amistoso: todos os times da temporada (de qualquer região); os escolhidos continuam.
       cubit.selectChampionship(null);
       expect(cubit.state.form.isFriendly, isTrue);
-      expect(cubit.state.form.teams.length, 3);
+      expect(cubit.state.form.teams.length, 4);
       expect([cubit.state.form.homeTeam, cubit.state.form.awayTeam], ['Lava Jato', 'Volta']);
 
       cubit

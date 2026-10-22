@@ -41,6 +41,10 @@ import 'package:arena_soccer/features/home/presentation/page/home_page.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/match_form_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/matches_cubit.dart';
+import 'package:arena_soccer/features/matches/presentation/bloc/match_details_cubit.dart';
+import 'package:arena_soccer/features/matches/presentation/page/match_details_page.dart';
+import 'package:arena_soccer/features/voting/presentation/bloc/voting_rules_cubit.dart';
+import 'package:arena_soccer/features/voting/presentation/page/voting_rules_page.dart';
 import 'package:arena_soccer/features/matches/presentation/page/match_form_page.dart';
 import 'package:arena_soccer/features/matches/presentation/page/matches_page.dart';
 import 'package:arena_soccer/features/news/presentation/bloc/news_feed_cubit.dart';
@@ -134,7 +138,7 @@ class ArenaApp extends StatelessWidget {
               providers: [
                 BlocProvider<HomeCubit>(create: (_) => HomeCubit(sl(), sl(), sl(), sl())),
                 BlocProvider<ChampionshipsCubit>(create: (_) => ChampionshipsCubit(sl())),
-                BlocProvider<MatchesCubit>(create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl())),
+                BlocProvider<MatchesCubit>(create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl(), sl())),
                 BlocProvider<NewsFeedCubit>(create: (_) => NewsFeedCubit(sl(), sl(), sl())),
               ],
               child: const HomePage(),
@@ -282,11 +286,33 @@ class ArenaApp extends StatelessWidget {
           );
         },
 
+        // Admin: regras da votação de melhor jogador.
+        AppRoutes.votingRulesPage: (context) => BlocProvider<VotingRulesCubit>(
+              create: (_) => VotingRulesCubit(sl(), sl())..load(),
+              child: const VotingRulesPage(),
+            ),
+        // Detalhes da partida: `match` obrigatório; escudos, cores e o nome da competição opcionais.
+        AppRoutes.matchDetailsPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+          final season = args['season'] as String?;
+          return BlocProvider<MatchDetailsCubit>(
+            create: (_) =>
+                MatchDetailsCubit(sl(), sl(), sl(), sl(), match: args['match'] as MatchDTO)..start(season: season),
+            child: MatchDetailsPage(
+              season: season,
+              homeCrest: args['homeCrest'] as String?,
+              awayCrest: args['awayCrest'] as String?,
+              homeColor: args['homeColor'] as Color?,
+              awayColor: args['awayColor'] as Color?,
+              championshipLabel: args['championshipLabel'] as String?,
+            ),
+          );
+        },
         // Partidas. `region`/`season` opcionais: sem eles, usa o RegionCubit.
         AppRoutes.matchesPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<MatchesCubit>(
-            create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl()),
+            create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl(), sl()),
             child: MatchesPage(
               championshipId: args?['championshipId'] as int?,
               region: args?['region'] as String?,

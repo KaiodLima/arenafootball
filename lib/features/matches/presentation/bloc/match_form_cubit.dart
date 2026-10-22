@@ -131,6 +131,8 @@ class MatchFormCubit extends Cubit<MatchFormState> {
 
   void selectTime(String time) => _edit(state.form.copyWith(time: time));
 
+  void selectDuration(int minutes) => _edit(state.form.copyWith(durationMinutes: minutes));
+
   void selectVenue(String venue) => _edit(state.form.copyWith(venue: venue, customVenue: false));
 
   /// "Novo local": troca os chips pelo campo de texto.

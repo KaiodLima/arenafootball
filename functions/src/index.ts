@@ -43,6 +43,7 @@ import {
 import { isLegacyVoteCollection, seasonCollections, seasonsToSweep, userPhotoPath } from './account_cleanup';
 import { claimReconcilePlan, missingEnrollmentFix, needsClaimReconcile } from './claim_reconcile';
 import { FanRankingTeam, fanRankingTotal, rankingTeamOf, sortFanRanking } from './fan_ranking';
+import { shouldCloseVoting } from './voting_close';
 import {
   APP_PAGE,
   NOT_FOUND_PAGE,
@@ -104,8 +105,12 @@ async function deliver(logId: string, message: PushMessage, origem: string): Pro
   try {
     const messageId = await messaging.send({
       ...message.alvo,
-      notification: { title: message.titulo, body: message.corpo },
-      data: { tipo: message.tipo, aba: message.aba },
+      notification: {
+        title: message.titulo,
+        body: message.corpo,
+        ...(message.imagem ? { imageUrl: message.imagem } : {}),
+      },
+      data: { tipo: message.tipo, aba: message.aba, ...(message.imagem ? { imagem: message.imagem } : {}) },
       android: {
         priority: 'high',
         notification: { channelId: ANDROID_CHANNEL, icon: 'ic_stat_arena', color: '#4CAF50' },
@@ -282,6 +287,24 @@ export const dailyGames = onSchedule({ schedule: '0 9 * * *', timeZone: 'America
   for (const doc of matches.docs) {
     const message = dailyGameMessage(doc.data());
     if (message) await deliver(`jogo_do_dia_${today.replace('/', '-')}_${doc.id}`, message, `${collection}/${doc.id}`);
+  }
+});
+
+/**
+ * A cada hora: fecha as votações de melhor jogador abertas há 24h do fim da
+ * partida (data + horário + duração). Fechar grava `votacao: "false"`, e o
+ * gatilho de partidas manda o push de votação encerrada.
+ */
+export const closeVotings = onSchedule({ schedule: '15 * * * *', timeZone: 'America/Sao_Paulo' }, async () => {
+  const { db } = await admin();
+  const season = await currentSeason();
+  const collection = seasonCollection('partidas', season);
+  const open = await db.collection(collection).where('votacao', '==', 'true').get();
+  const now = new Date();
+  for (const doc of open.docs) {
+    if (!shouldCloseVoting(doc.data(), season, now)) continue;
+    await doc.ref.update({ votacao: 'false' });
+    logger.info('Votação encerrada automaticamente', { match: `${collection}/${doc.id}` });
   }
 });
 

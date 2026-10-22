@@ -43,6 +43,12 @@ class MatchFormData extends Equatable {
   final String time;
   final String venue;
 
+  /// Durações oferecidas no cadastro, em minutos.
+  static const List<int> durationOptions = [40, 50, 60, 70, 80, 90, 120];
+
+  /// Duração em minutos (o fim = horário + duração).
+  final int durationMinutes;
+
   /// O admin está digitando um local novo (fora das sugestões).
   final bool customVenue;
 
@@ -62,6 +68,7 @@ class MatchFormData extends Equatable {
     this.date = '',
     this.time = '',
     this.venue = '',
+    this.durationMinutes = MatchDTO.defaultDurationMinutes,
     this.customVenue = false,
     this.existing = const [],
   });
@@ -72,8 +79,10 @@ class MatchFormData extends Equatable {
   bool get isFriendly => championshipId == null && championships.isNotEmpty;
 
   /// Times do campeonato [id] (todos da região se ele não marcou nenhum).
-  /// Intermunicipal: os dele de qualquer região.
+  /// Intermunicipal: os dele de qualquer região. Amistoso (a região tem
+  /// campeonatos e nenhum foi escolhido): qualquer time da temporada.
   List<TeamDTO> teamsFor(int? id) {
+    if (id == null && championships.isNotEmpty && seasonTeams.isNotEmpty) return seasonTeams;
     final championship = championships.where((c) => c.championshipId == id).firstOrNull;
     if (championship == null || championship.teams.isEmpty) return regionTeams;
     final base = championship.isIntermunicipal && seasonTeams.isNotEmpty ? seasonTeams : regionTeams;
@@ -117,6 +126,14 @@ class MatchFormData extends Equatable {
     return null;
   }
 
+  /// Cor principal ("#RRGGBB") do time de nome [teamName] ('' sem cor).
+  String colorOf(String? teamName) {
+    for (final team in teams) {
+      if (team.name == teamName) return team.primaryColor;
+    }
+    return '';
+  }
+
   List<String> get frequentTimes => MatchFormHints.frequentTimes(existing);
 
   List<String> get frequentVenues => MatchFormHints.frequentVenues(existing);
@@ -139,6 +156,7 @@ class MatchFormData extends Equatable {
         date: date,
         time: time,
         venue: venue.trim(),
+        durationMinutes: durationMinutes,
         region: selectedRegion ?? '',
         championshipId: championshipId ?? 0,
         regionIds: regionIdsOfTeams,
@@ -157,6 +175,7 @@ class MatchFormData extends Equatable {
     String? date,
     String? time,
     String? venue,
+    int? durationMinutes,
     bool? customVenue,
     List<MatchDTO>? existing,
     bool clearTeams = false,
@@ -174,6 +193,7 @@ class MatchFormData extends Equatable {
       date: date ?? this.date,
       time: time ?? this.time,
       venue: venue ?? this.venue,
+      durationMinutes: durationMinutes ?? this.durationMinutes,
       customVenue: customVenue ?? this.customVenue,
       existing: existing ?? this.existing,
     );
@@ -193,6 +213,7 @@ class MatchFormData extends Equatable {
         date,
         time,
         venue,
+        durationMinutes,
         customVenue,
         existing
       ];

@@ -51,6 +51,15 @@ test('gol: placar no título, autor e assistência no corpo, região + times', (
   assert.deepEqual(message?.alvo, {
     condition: "'regiao_floresta' in topics || 'time_lava_jato' in topics || 'time_volta' in topics",
   });
+  assert.equal(message?.imagem, undefined);
+});
+
+test('gol: escudo do time que marcou vira a imagem do push (só URL https)', () => {
+  const base = { time_casa: 'Lava Jato', time_fora: 'Volta', fk_competicao: 'Floresta' };
+  const crest = 'https://firebasestorage.googleapis.com/v0/b/x/o/times%2Flava.png?alt=media';
+  assert.equal(goalMessage({ ...base, escudo_marcador: crest })?.imagem, crest);
+  assert.equal(goalMessage({ ...base, escudo_marcador: 'http://inseguro/x.png' })?.imagem, undefined);
+  assert.equal(goalMessage({ ...base, escudo_marcador: '' })?.imagem, undefined);
 });
 
 test('notícia: só visível e sem gol/publicidade', () => {

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
 
@@ -125,11 +126,15 @@ class PushService implements TopicClient {
     // No iOS o próprio sistema mostra (setForegroundNotificationPresentationOptions).
     if (notification == null || _isIOS) return;
     try {
+      // Card de gol: o escudo do time no lugar da logo; sem ele, a logo.
+      final crest = await _downloadImage(message.data['imagem']?.toString() ?? notification.android?.imageUrl);
+      AndroidBitmap<Object> largeIcon = const DrawableResourceAndroidBitmap('@mipmap/ic_launcher');
+      if (crest != null) largeIcon = ByteArrayAndroidBitmap(crest);
       await _local.show(
         id: _nextId++,
         title: notification.title,
         body: notification.body,
-        notificationDetails: const NotificationDetails(
+        notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
             channelId,
             'Arena Football',
@@ -138,13 +143,25 @@ class PushService implements TopicClient {
             // Barra de status: silhueta do estádio da logo; ao lado do texto,
             // a logo colorida (ícone do app).
             icon: 'ic_stat_arena',
-            largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
+            largeIcon: largeIcon,
           ),
         ),
         payload: message.data['aba']?.toString(),
       );
     } catch (e) {
       AppLogger.e('show', name: 'PushService', error: e);
+    }
+  }
+
+  /// Bytes da imagem do push (escudo); nulo se não houver ou falhar em até 4 s.
+  Future<Uint8List?> _downloadImage(String? url) async {
+    if (url == null || !url.startsWith('https://')) return null;
+    try {
+      final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 4));
+      return response.statusCode == 200 && response.bodyBytes.isNotEmpty ? response.bodyBytes : null;
+    } catch (e) {
+      AppLogger.e('downloadImage', name: 'PushService', error: e);
+      return null;
     }
   }
 

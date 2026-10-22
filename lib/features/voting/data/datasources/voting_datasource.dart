@@ -5,6 +5,7 @@ import 'package:arena_soccer/core/errors/firebase_error.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
 import 'package:arena_soccer/features/voting/data/dtos/vote_dto.dart';
+import 'package:arena_soccer/features/voting/data/dtos/voting_rules_dto.dart';
 import 'package:arena_soccer/features/voting/domain/match_vote_ref.dart';
 
 class VotingDataSource {
@@ -13,6 +14,30 @@ class VotingDataSource {
   VotingDataSource(this._firestore);
 
   static const String _logName = 'VotingDataSource';
+
+  DocumentReference<Map<String, dynamic>> get _rulesDoc => _firestore.collection('config').doc('votacao');
+
+  /// Regras da votação (`config/votacao`); sem o doc, os padrões.
+  Future<Either<Failure, VotingRulesDTO>> getRules() async {
+    try {
+      final doc = await _rulesDoc.get();
+      return Right(VotingRulesDTO.fromMap(doc.data()));
+    } catch (e) {
+      AppLogger.e('getRules', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível carregar as regras da votação.'));
+    }
+  }
+
+  /// Admin grava as regras da votação.
+  Future<Either<Failure, void>> saveRules(VotingRulesDTO rules) async {
+    try {
+      await _rulesDoc.set(rules.toMap(), SetOptions(merge: true));
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('saveRules', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível salvar as regras da votação.'));
+    }
+  }
 
   /// Votos da partida: subcoleção `votos` do doc em `partidas{ano}`.
   CollectionReference<Map<String, dynamic>> _votes(MatchVoteRef ref) =>

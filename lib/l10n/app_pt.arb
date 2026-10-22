@@ -386,6 +386,85 @@
   },
   "matchCardGoals": "Gols",
   "matchCardHideGoals": "Ocultar gols",
+  "matchCardToday": "HOJE",
+  "matchCardTomorrow": "AMANHÃ",
+  "matchDetailsVotingEnded": "Votação encerrada",
+  "votingNoWinnerTitle": "Sem melhor da partida",
+  "votingNoWinnerNotEnough": "Mínimo de {min} votos não atingido ({total} votos).",
+  "@votingNoWinnerNotEnough": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "votingNoWinnerNoMajority": "Ninguém chegou a {percent}% dos votos (o mais votado teve {leader}%).",
+  "@votingNoWinnerNoMajority": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      },
+      "leader": {
+        "type": "int"
+      }
+    }
+  },
+  "votingNoWinnerTie": "Empate no primeiro lugar.",
+  "votingRulesHint": "Para eleger o melhor da partida: no mínimo {min} votos e o mais votado com {percent}% ou mais, à frente do segundo.",
+  "@votingRulesHint": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "votingSelfBlocked": "Você não pode votar em si",
+  "votingSeeResult": "Ver resultado",
+  "votingRulesTitle": "Regras da votação",
+  "votingRulesSubtitle": "Mínimo de votos e porcentagem do mais votado",
+  "votingRulesMinVotes": "Mínimo de votos",
+  "votingRulesMinPercent": "Porcentagem mínima do mais votado",
+  "votingRulesSave": "Salvar regras",
+  "votingRulesSaved": "Regras da votação salvas",
+  "matchCardLive": "EM ANDAMENTO",
+  "matchStart": "Iniciar partida",
+  "matchFinish": "Encerrar partida",
+  "matchFormDuration": "Duração",
+  "matchFormDurationMinutes": "{n} min",
+  "@matchFormDurationMinutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "matchDetailsTitle": "Partida",
+  "matchDetailsFinished": "ENCERRADO",
+  "matchDetailsNoScorers": "Autores dos gols não informados",
+  "matchDetailsNotStarted": "A bola ainda não rolou",
+  "matchDetailsNoGoals": "Sem gols",
+  "matchDetailsUnknownScorer": "Gol",
+  "matchDetailsBestPlayer": "Melhor da partida",
+  "matchDetailsVotes": "{count} votos",
+  "@matchDetailsVotes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "matchDetailsVotingOpen": "Votação aberta: escolha o craque do jogo",
+  "matchDetailsVotingClosed": "Votação ainda não aberta",
+  "matchDetailsSquads": "Elencos",
+  "matchDetailsNoSquad": "Nenhum atleta inscrito",
+  "matchDetailsGoalCard": "Lançar card de gol",
+  "matchDetailsDeleted": "Esta partida foi excluída",
   "matchesEditScore": "Editar Placar",
   "matchesDeleteMatch": "Excluir Partida",
   "matchesDeleteConfirm": "DESEJA REALMENTE EXCLUIR ESSA PARTIDA ?",

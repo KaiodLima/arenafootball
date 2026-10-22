@@ -7,6 +7,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/matches_filter.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/delete_match_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/set_match_status_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/toggle_match_voting_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/update_match_score_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/watch_matches_usecase.dart';
@@ -23,6 +24,7 @@ class MatchesCubit extends Cubit<MatchesState> {
   final ToggleMatchVotingUseCase toggleMatchVotingUseCase;
   final DeleteMatchUseCase deleteMatchUseCase;
   final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
+  final SetMatchStatusUseCase setMatchStatusUseCase;
   StreamSubscription<Either<Failure, List<MatchDTO>>>? _subscription;
   String? _region;
   String? _season;
@@ -41,6 +43,7 @@ class MatchesCubit extends Cubit<MatchesState> {
     this.toggleMatchVotingUseCase,
     this.deleteMatchUseCase,
     this.getTeamsCacheFirstUseCase,
+    this.setMatchStatusUseCase,
   ) : super(const LoadingMatchesState());
 
   /// Recorte (dia) que está sendo ouvido; nulo antes do primeiro [watch].
@@ -83,7 +86,8 @@ class MatchesCubit extends Cubit<MatchesState> {
   void _subscribe(MatchesFilter filter) {
     _subscription?.cancel();
     _filter = filter;
-    emit(LoadingMatchesState(matches: state.matches, teamFilter: state.teamFilter, crests: state.crests));
+    emit(LoadingMatchesState(
+        matches: state.matches, teamFilter: state.teamFilter, crests: state.crests, colors: state.colors));
     _subscription = watchMatchesUseCase(
       championshipId: _championshipId,
       filter: filter,
@@ -97,14 +101,16 @@ class MatchesCubit extends Cubit<MatchesState> {
             matches: state.matches,
             teamFilter: state.teamFilter,
             crests: state.crests,
+            colors: state.colors,
           )),
-          (matches) => emit(SuccessMatchesState(matches: matches, teamFilter: state.teamFilter, crests: state.crests)),
+          (matches) => emit(SuccessMatchesState(
+              matches: matches, teamFilter: state.teamFilter, crests: state.crests, colors: state.colors)),
         );
       },
     );
   }
 
-  /// Escudos são só decoração: se falhar, o card mostra o ícone padrão.
+  /// Escudos e cores são só decoração: se falhar, o card mostra o ícone padrão.
   Future<void> _loadCrests({required String region, required String season}) async {
     final load = ++_crestsLoad;
     await for (final response in getTeamsCacheFirstUseCase(region: region, season: season)) {
@@ -114,7 +120,11 @@ class MatchesCubit extends Cubit<MatchesState> {
           for (final team in teams)
             if (team.imageUrl.isNotEmpty) normalizeTeamName(team.name): team.imageUrl,
         };
-        _emitWith(crests: crests);
+        final colors = {
+          for (final team in teams)
+            if (team.primaryColor.isNotEmpty) normalizeTeamName(team.name): team.primaryColor,
+        };
+        _emitWith(crests: crests, colors: colors);
       });
     }
   }
@@ -127,19 +137,23 @@ class MatchesCubit extends Cubit<MatchesState> {
 
   /// Reemite o estado atual trocando filtro/escudos. Um erro de ação (com a
   /// lista na tela) já virou snackbar e não é reemitido, para não repetir.
-  void _emitWith({String? teamFilter, bool clearFilter = false, Map<String, String>? crests}) {
+  void _emitWith(
+      {String? teamFilter, bool clearFilter = false, Map<String, String>? crests, Map<String, String>? colors}) {
     final s = state;
     final filter = clearFilter ? null : (teamFilter ?? s.teamFilter);
     final newCrests = crests ?? s.crests;
+    final newColors = colors ?? s.colors;
     emit(switch (s) {
       ErrorMatchesState() when s.matches.isEmpty => ErrorMatchesState(
           errorMessage: s.errorMessage,
           matches: s.matches,
           teamFilter: filter,
           crests: newCrests,
+          colors: newColors,
         ),
-      LoadingMatchesState() => LoadingMatchesState(matches: s.matches, teamFilter: filter, crests: newCrests),
-      _ => SuccessMatchesState(matches: s.matches, teamFilter: filter, crests: newCrests),
+      LoadingMatchesState() =>
+        LoadingMatchesState(matches: s.matches, teamFilter: filter, crests: newCrests, colors: newColors),
+      _ => SuccessMatchesState(matches: s.matches, teamFilter: filter, crests: newCrests, colors: newColors),
     });
   }
 
@@ -157,6 +171,11 @@ class MatchesCubit extends Cubit<MatchesState> {
     _emitIfFailed(await toggleMatchVotingUseCase(match: match, season: _season));
   }
 
+  /// Admin: inicia ([live]) ou encerra a partida na mão.
+  Future<void> setLive(MatchDTO match, bool live) async {
+    _emitIfFailed(await setMatchStatusUseCase(match: match, live: live, season: _season));
+  }
+
   Future<void> delete(MatchDTO match) async {
     _emitIfFailed(await deleteMatchUseCase(matchId: match.id, season: _season));
   }
@@ -168,6 +187,7 @@ class MatchesCubit extends Cubit<MatchesState> {
       matches: state.matches,
       teamFilter: state.teamFilter,
       crests: state.crests,
+      colors: state.colors,
     ));
   }
 

@@ -139,6 +139,8 @@ class VoteBestPlayerCubit extends Cubit<VoteBestPlayerState> {
   Future<void> vote({required String voterId}) async {
     if (state is SubmittingVoteBestPlayerState) return;
     final selected = state.selected;
+    // Ninguém vota no próprio atleta (a apuração também descarta).
+    if (selected != null && voterId.isNotEmpty && selected.userId == voterId) return;
     emit(SubmittingVoteBestPlayerState(
       homePlayers: state.homePlayers,
       awayPlayers: state.awayPlayers,

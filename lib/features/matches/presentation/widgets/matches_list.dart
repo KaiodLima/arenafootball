@@ -13,6 +13,7 @@ import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
+import 'package:arena_soccer/utils/constants/team_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
@@ -122,14 +123,30 @@ class MatchesList extends StatelessWidget {
               isAdmin: isAdmin,
               homeCrest: state.crestOf(match.homeTeam),
               awayCrest: state.crestOf(match.awayTeam),
+              homeColor: colorFromHex(state.colorOf(match.homeTeam) ?? ''),
+              awayColor: colorFromHex(state.colorOf(match.awayTeam) ?? ''),
               isFavorite: isFavoriteMatch(match),
               isFavoriteTeam: isFavoriteTeam,
               onVotingTap: () => _openVoting(context, match),
               onToggleVoting: () => BlocProvider.of<MatchesCubit>(context).toggleVoting(match),
               onEditScore: () => _editScore(context, match),
               onDelete: () => _confirmDelete(context, match),
+              onTap: () => Navigator.pushNamed(
+                context,
+                AppRoutes.matchDetailsPage,
+                arguments: {
+                  'match': match,
+                  'season': season,
+                  'homeCrest': state.crestOf(match.homeTeam),
+                  'awayCrest': state.crestOf(match.awayTeam),
+                  'homeColor': colorFromHex(state.colorOf(match.homeTeam) ?? ''),
+                  'awayColor': colorFromHex(state.colorOf(match.awayTeam) ?? ''),
+                  'championshipLabel': championshipLabelOf?.call(match),
+                },
+              ),
               // Admin: lança um card de gol desta partida (e atualiza o placar dela).
-              onTap: isAdmin
+              onSetLive: isAdmin ? (live) => BlocProvider.of<MatchesCubit>(context).setLive(match, live) : null,
+              onGoalCard: isAdmin
                   ? () => Navigator.pushNamed(
                         context,
                         AppRoutes.goalNotificationPage,

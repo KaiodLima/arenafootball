@@ -148,11 +148,14 @@ class _VoteBestPlayerPageState extends State<VoteBestPlayerPage> {
           itemCount: players.length,
           itemBuilder: (context, index) {
             final player = players[index];
+            // O atleta da própria conta não pode ser votado por ela.
+            final isSelf = !isGuest && player.userId.isNotEmpty && player.userId == _voterId;
             return VotePlayerTile(
               player: player,
-              selected: !isGuest && state.isSelected(player),
+              selected: !isGuest && !isSelf && state.isSelected(player),
               isMyVote: state.isMyVote(player),
-              onTap: isGuest ? null : () => _cubit.select(player),
+              isSelf: isSelf,
+              onTap: isGuest || isSelf ? null : () => _cubit.select(player),
             );
           },
         ),

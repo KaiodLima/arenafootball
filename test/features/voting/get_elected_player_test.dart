@@ -5,14 +5,17 @@ import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
+import 'package:arena_soccer/features/voting/data/dtos/voting_rules_dto.dart';
 import 'package:arena_soccer/features/voting/domain/elected_player.dart';
+import 'package:arena_soccer/features/voting/domain/voting_outcome.dart';
 import 'package:arena_soccer/features/voting/domain/match_vote_ref.dart';
 import 'package:arena_soccer/features/voting/domain/usecases/calculate_best_player_usecase.dart';
 import 'package:arena_soccer/features/voting/domain/usecases/get_elected_player_usecase.dart';
+import 'package:arena_soccer/features/voting/domain/usecases/get_voting_rules_cache_first_usecase.dart';
 
 class _FakeTally implements CalculateBestPlayerUseCase {
   @override
-  Future<Either<Failure, List<VoteTally>>> call(MatchVoteRef ref) async =>
+  Future<Either<Failure, List<VoteTally>>> call(MatchVoteRef ref, {List<PlayerDTO> players = const []}) async =>
       const Right([VoteTally(playerName: 'Carlos', team: 'Lava Jato', votes: 3)]);
 
   @override
@@ -42,9 +45,22 @@ class _FakePlayers implements WatchTeamPlayersUseCase {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+/// Regras frouxas: 1 voto já elege (os testes daqui são de escudos/cores).
+class _LenientRules implements GetVotingRulesCacheFirstUseCase {
+  final VotingRulesDTO rules;
+
+  _LenientRules([this.rules = const VotingRulesDTO(minVotes: 1, minPercent: 0)]);
+
+  @override
+  Stream<Either<Failure, VotingRulesDTO>> call({bool force = false}) => Stream.value(Right(rules));
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 void main() {
   test('apuração traz escudos e cores do mandante e do visitante', () async {
-    final useCase = GetElectedPlayerUseCase(_FakeTally(), _FakeTeams(), _FakePlayers());
+    final useCase = GetElectedPlayerUseCase(_FakeTally(), _FakeTeams(), _FakePlayers(), _LenientRules());
     final result =
         (await useCase(const MatchVoteRef(matchId: 'm1', season: '2024', homeTeam: 'Lava Jato', awayTeam: 'Real')))
             .right;
@@ -58,7 +74,7 @@ void main() {
   });
 
   test('pelo id: acha o time mesmo com outro nome gravado na partida', () async {
-    final useCase = GetElectedPlayerUseCase(_FakeTally(), _FakeTeams(), _FakePlayers());
+    final useCase = GetElectedPlayerUseCase(_FakeTally(), _FakeTeams(), _FakePlayers(), _LenientRules());
     final result = (await useCase(const MatchVoteRef(
       matchId: 'm1',
       season: '2024',
@@ -73,12 +89,24 @@ void main() {
   });
 
   test('time não cadastrado: cores vazias (o card usa as do app)', () async {
-    final useCase = GetElectedPlayerUseCase(_FakeTally(), _FakeTeams(), _FakePlayers());
+    final useCase = GetElectedPlayerUseCase(_FakeTally(), _FakeTeams(), _FakePlayers(), _LenientRules());
     final result = (await useCase(
             const MatchVoteRef(matchId: 'm1', season: '2024', homeTeam: 'Lava Jato', awayTeam: 'Desconhecido')))
         .right;
 
     expect(result.awayPrimaryColor, '');
     expect(result.awayCrest, '');
+  });
+
+  test('abaixo do mínimo: sem eleito, com o motivo e o ranking', () async {
+    final useCase =
+        GetElectedPlayerUseCase(_FakeTally(), _FakeTeams(), _FakePlayers(), _LenientRules(const VotingRulesDTO()));
+    final result =
+        (await useCase(const MatchVoteRef(matchId: 'm1', season: '2024', homeTeam: 'Lava Jato', awayTeam: 'Real')))
+            .right;
+    expect(result.elected, isNull);
+    expect(result.outcome?.reason, VotingOutcomeReason.notEnoughVotes);
+    expect(result.outcome?.totalVotes, 3);
+    expect(result.ranking, isNotEmpty);
   });
 }

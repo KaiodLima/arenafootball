@@ -37,6 +37,15 @@ class MatchesDataSource {
         );
   }
 
+  /// Uma partida ao vivo (tela de detalhes); null se o doc foi apagado.
+  Stream<Either<Failure, MatchDTO?>> watchMatch({required String matchId, String? season}) {
+    return _matches(season).doc(matchId).snapshots().toEither(
+          (doc) => doc.exists ? MatchDTO.fromFirestore(doc) : null,
+          fallbackMessage: 'Não foi possível carregar a partida.',
+          logName: _logName,
+        );
+  }
+
   /// Cria a partida com `id_partida` = id do documento e `dataRegistro` do
   /// servidor, numa escrita só (o app antigo fazia `add()` + `set()`).
   Future<Either<Failure, void>> createMatch(MatchDTO match, {String? season}) async {
@@ -97,6 +106,14 @@ class MatchesDataSource {
   /// `votacao` continua gravado como string.
   Future<Either<Failure, void>> setVotingOpen({required String matchId, required bool isOpen, String? season}) =>
       _update(matchId, {'votacao': isOpen.toString()}, season: season);
+
+  /// Admin inicia/encerra a partida na mão (vale mais que o horário).
+  Future<Either<Failure, void>> setManualStatus({
+    required String matchId,
+    required MatchManualStatus status,
+    String? season,
+  }) =>
+      _update(matchId, {'status': status.key, 'statusEm': FieldValue.serverTimestamp()}, season: season);
 
   Future<Either<Failure, void>> _update(String matchId, Map<String, dynamic> fields, {String? season}) async {
     try {
