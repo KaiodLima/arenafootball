@@ -88,6 +88,11 @@ class AdminPanelPage extends StatelessWidget {
                     icon: Icons.date_range_rounded,
                     onTap: () => open(AppRoutes.seasonsPanelPage),
                   ),
+                  ShortcutTile(
+                    title: l10n.votingRulesTitle,
+                    icon: Icons.how_to_vote_outlined,
+                    onTap: () => open(AppRoutes.votingRulesPage),
+                  ),
                 ]),
               ],
             ),

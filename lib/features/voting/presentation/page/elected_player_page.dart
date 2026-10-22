@@ -7,6 +7,7 @@ import 'package:arena_soccer/features/voting/domain/elected_player.dart';
 import 'package:arena_soccer/features/voting/presentation/bloc/elected_player_cubit.dart';
 import 'package:arena_soccer/features/voting/presentation/bloc/elected_player_state.dart';
 import 'package:arena_soccer/features/voting/presentation/widgets/elected_player_card.dart';
+import 'package:arena_soccer/features/voting/presentation/widgets/voting_no_winner_card.dart';
 import 'package:arena_soccer/features/voting/presentation/widgets/match_mvp_share_card.dart';
 import 'package:arena_soccer/features/voting/presentation/widgets/match_score_header.dart';
 import 'package:arena_soccer/features/voting/presentation/widgets/vote_ranking_card.dart';
@@ -122,7 +123,7 @@ class _ElectedPlayerPageState extends State<ElectedPlayerPage> {
       return [fill(ArenaEmptyState.error(message: l10n.votingLoadError))];
     }
     final elected = result.elected;
-    if (elected == null) {
+    if (result.ranking.isEmpty) {
       return [fill(ArenaEmptyState(message: l10n.votingNoVotesYet, icon: Icons.how_to_vote_outlined))];
     }
 
@@ -143,7 +144,10 @@ class _ElectedPlayerPageState extends State<ElectedPlayerPage> {
               // Filho não posicionado do Stack recebe restrição frouxa: força a largura toda.
               child: SizedBox(
                 width: double.infinity,
-                child: ElectedPlayerCard(elected: elected, share: result.shareOf(elected.votes)),
+                // Sem eleito (regras não atingidas): o motivo no lugar do cartão.
+                child: elected != null
+                    ? ElectedPlayerCard(elected: elected, share: result.shareOf(elected.votes))
+                    : VotingNoWinnerCard(outcome: result.outcome),
               ),
             ),
           ],

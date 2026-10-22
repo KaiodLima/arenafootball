@@ -4,6 +4,7 @@ import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/voting/data/datasources/voting_datasource.dart';
 import 'package:arena_soccer/features/voting/data/dtos/vote_dto.dart';
+import 'package:arena_soccer/features/voting/data/dtos/voting_rules_dto.dart';
 import 'package:arena_soccer/features/voting/domain/match_vote_ref.dart';
 import 'package:arena_soccer/features/voting/domain/repositories/voting_repository_interface.dart';
 
@@ -42,6 +43,26 @@ class VotingRepositoryImpl implements IVotingRepository {
   Future<void> deleteVotesCache({required MatchVoteRef ref}) async {
     await _cache.delete(_key(ref));
   }
+
+  @override
+  Future<Either<Failure, VotingRulesDTO>> getRules() => _dataSource.getRules();
+
+  @override
+  Future<Either<Failure, void>> saveRules(VotingRulesDTO rules) async {
+    final response = await _dataSource.saveRules(rules);
+    if (response.isRight) await _cache.delete(CacheKeys.votingRules);
+    return response;
+  }
+
+  @override
+  Future<Either<Failure, CachedValue<VotingRulesDTO>?>> getCachedRules() => _cache.read(
+        CacheKeys.votingRules,
+        (json) => VotingRulesDTO.fromCache(Map<String, dynamic>.from(json as Map)),
+      );
+
+  @override
+  Future<Either<Failure, void>> saveRulesCache(VotingRulesDTO rules) =>
+      _cache.save(CacheKeys.votingRules, rules.toCache());
 
   String _key(MatchVoteRef ref) => CacheKeys.votes(matchId: ref.matchId, season: ref.season);
 }

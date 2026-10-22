@@ -7,6 +7,7 @@ import 'package:arena_soccer/core/firebase/season_collection.dart';
 abstract final class CacheKeys {
   static const String regions = 'regions_cache';
   static const String seasonsConfig = 'seasons_config_cache';
+  static const String votingRules = 'voting_rules_cache';
 
   static const String _teamsPrefix = 'teams_';
   static const String _teamPrefix = 'team_';

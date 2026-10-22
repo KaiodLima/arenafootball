@@ -238,7 +238,7 @@ export function votingMessage(before: Doc, after: Doc): PushMessage | null {
     : {
         tipo: 'votacao_encerrada',
         titulo: '🏆 Votação encerrada',
-        corpo: `Veja quem foi eleito o melhor de ${home} × ${away}`,
+        corpo: `Veja o resultado de ${home} × ${away}`,
         aba: 'tabelas',
         regiao: region,
         alvo,

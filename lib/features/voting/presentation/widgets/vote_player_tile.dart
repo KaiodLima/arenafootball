@@ -14,12 +14,16 @@ class VotePlayerTile extends StatelessWidget {
   final bool isMyVote;
   final VoidCallback? onTap;
 
+  /// Atleta da própria conta: não pode receber o voto dela (esmaecido, com aviso).
+  final bool isSelf;
+
   const VotePlayerTile({
     super.key,
     required this.player,
     required this.selected,
     required this.isMyVote,
     this.onTap,
+    this.isSelf = false,
   });
 
   @override
@@ -51,14 +55,25 @@ class VotePlayerTile extends StatelessWidget {
                   PlayerAvatar(player: player, size: AppSizes.s44),
                   const SizedBox(width: AppSizes.s12),
                   Expanded(
-                    child: Text(
-                      player.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTypography.label(color: AppColors.textPrimary).copyWith(
-                        fontSize: AppSizes.s16,
-                        fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          player.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTypography.label(color: isSelf ? AppColors.textSecondary : AppColors.textPrimary)
+                              .copyWith(
+                            fontSize: AppSizes.s16,
+                            fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                          ),
+                        ),
+                        if (isSelf)
+                          Text(
+                            l10n.votingSelfBlocked,
+                            style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+                          ),
+                      ],
                     ),
                   ),
                   if (isMyVote) ...[

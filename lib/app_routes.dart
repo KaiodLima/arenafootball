@@ -25,6 +25,7 @@ class AppRoutes {
   // Partidas, campeonatos e votação
   static const String matchesPage = '/matches_page';
   static const String matchDetailsPage = '/match_details_page';
+  static const String votingRulesPage = '/voting_rules_page';
   static const String championshipDetailsPage = '/championship_details_page';
   static const String groupsPage = '/groups_page';
   static const String standingsPage = '/standings_page';

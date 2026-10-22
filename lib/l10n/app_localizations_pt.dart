@@ -734,6 +734,55 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get matchDetailsVotingEnded => 'Votação encerrada';
+
+  @override
+  String get votingNoWinnerTitle => 'Sem melhor da partida';
+
+  @override
+  String votingNoWinnerNotEnough(int min, int total) {
+    return 'Mínimo de $min votos não atingido ($total votos).';
+  }
+
+  @override
+  String votingNoWinnerNoMajority(int percent, int leader) {
+    return 'Ninguém chegou a $percent% dos votos (o mais votado teve $leader%).';
+  }
+
+  @override
+  String get votingNoWinnerTie => 'Empate no primeiro lugar.';
+
+  @override
+  String votingRulesHint(int min, int percent) {
+    return 'Para eleger o melhor da partida: no mínimo $min votos e o mais votado com $percent% ou mais, à frente do segundo.';
+  }
+
+  @override
+  String get votingSelfBlocked => 'Você não pode votar em si';
+
+  @override
+  String get votingSeeResult => 'Ver resultado';
+
+  @override
+  String get votingRulesTitle => 'Regras da votação';
+
+  @override
+  String get votingRulesSubtitle =>
+      'Mínimo de votos e porcentagem do mais votado';
+
+  @override
+  String get votingRulesMinVotes => 'Mínimo de votos';
+
+  @override
+  String get votingRulesMinPercent => 'Porcentagem mínima do mais votado';
+
+  @override
+  String get votingRulesSave => 'Salvar regras';
+
+  @override
+  String get votingRulesSaved => 'Regras da votação salvas';
+
+  @override
   String get matchCardLive => 'EM ANDAMENTO';
 
   @override

@@ -43,6 +43,8 @@ import 'package:arena_soccer/features/matches/presentation/bloc/match_form_cubit
 import 'package:arena_soccer/features/matches/presentation/bloc/matches_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/match_details_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/page/match_details_page.dart';
+import 'package:arena_soccer/features/voting/presentation/bloc/voting_rules_cubit.dart';
+import 'package:arena_soccer/features/voting/presentation/page/voting_rules_page.dart';
 import 'package:arena_soccer/features/matches/presentation/page/match_form_page.dart';
 import 'package:arena_soccer/features/matches/presentation/page/matches_page.dart';
 import 'package:arena_soccer/features/news/presentation/bloc/news_feed_cubit.dart';
@@ -284,12 +286,18 @@ class ArenaApp extends StatelessWidget {
           );
         },
 
+        // Admin: regras da votação de melhor jogador.
+        AppRoutes.votingRulesPage: (context) => BlocProvider<VotingRulesCubit>(
+              create: (_) => VotingRulesCubit(sl(), sl())..load(),
+              child: const VotingRulesPage(),
+            ),
         // Detalhes da partida: `match` obrigatório; escudos, cores e o nome da competição opcionais.
         AppRoutes.matchDetailsPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
           final season = args['season'] as String?;
           return BlocProvider<MatchDetailsCubit>(
-            create: (_) => MatchDetailsCubit(sl(), sl(), sl(), sl(), match: args['match'] as MatchDTO)..start(season: season),
+            create: (_) =>
+                MatchDetailsCubit(sl(), sl(), sl(), sl(), match: args['match'] as MatchDTO)..start(season: season),
             child: MatchDetailsPage(
               season: season,
               homeCrest: args['homeCrest'] as String?,

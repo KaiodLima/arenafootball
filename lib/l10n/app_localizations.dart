@@ -1335,6 +1335,90 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @matchDetailsVotingEnded.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votação encerrada'**
+  String get matchDetailsVotingEnded;
+
+  /// No description provided for @votingNoWinnerTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem melhor da partida'**
+  String get votingNoWinnerTitle;
+
+  /// No description provided for @votingNoWinnerNotEnough.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mínimo de {min} votos não atingido ({total} votos).'**
+  String votingNoWinnerNotEnough(int min, int total);
+
+  /// No description provided for @votingNoWinnerNoMajority.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ninguém chegou a {percent}% dos votos (o mais votado teve {leader}%).'**
+  String votingNoWinnerNoMajority(int percent, int leader);
+
+  /// No description provided for @votingNoWinnerTie.
+  ///
+  /// In pt, this message translates to:
+  /// **'Empate no primeiro lugar.'**
+  String get votingNoWinnerTie;
+
+  /// No description provided for @votingRulesHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para eleger o melhor da partida: no mínimo {min} votos e o mais votado com {percent}% ou mais, à frente do segundo.'**
+  String votingRulesHint(int min, int percent);
+
+  /// No description provided for @votingSelfBlocked.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você não pode votar em si'**
+  String get votingSelfBlocked;
+
+  /// No description provided for @votingSeeResult.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver resultado'**
+  String get votingSeeResult;
+
+  /// No description provided for @votingRulesTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Regras da votação'**
+  String get votingRulesTitle;
+
+  /// No description provided for @votingRulesSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mínimo de votos e porcentagem do mais votado'**
+  String get votingRulesSubtitle;
+
+  /// No description provided for @votingRulesMinVotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mínimo de votos'**
+  String get votingRulesMinVotes;
+
+  /// No description provided for @votingRulesMinPercent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Porcentagem mínima do mais votado'**
+  String get votingRulesMinPercent;
+
+  /// No description provided for @votingRulesSave.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salvar regras'**
+  String get votingRulesSave;
+
+  /// No description provided for @votingRulesSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Regras da votação salvas'**
+  String get votingRulesSaved;
+
   /// No description provided for @matchCardLive.
   ///
   /// In pt, this message translates to:

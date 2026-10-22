@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/features/voting/domain/voting_outcome.dart';
 
 /// Resultado da votação de melhor jogador de uma partida.
 class ElectedPlayer extends Equatable {
@@ -61,11 +62,14 @@ class VoteTally extends Equatable {
   List<Object?> get props => [playerName, team, teamId, votes];
 }
 
-/// Apuração completa de uma partida, para a tela do eleito: o eleito (null sem
-/// votos), o ranking de todos os votados e os escudos e cores (hex, vazio =
+/// Apuração completa de uma partida, para a tela do eleito: o eleito (null se
+/// a votação não valeu: ver [outcome]), o resultado das regras, o ranking de todos os votados e os escudos e cores (hex, vazio =
 /// sem cor) dos dois times.
 class VotingResult extends Equatable {
   final ElectedPlayer? elected;
+
+  /// Resultado das regras (nulo = sem apuração).
+  final VotingOutcome? outcome;
   final List<VoteTally> ranking;
   final String homeCrest;
   final String awayCrest;
@@ -76,6 +80,7 @@ class VotingResult extends Equatable {
 
   const VotingResult({
     this.elected,
+    this.outcome,
     this.ranking = const [],
     this.homeCrest = '',
     this.awayCrest = '',
@@ -93,6 +98,7 @@ class VotingResult extends Equatable {
   @override
   List<Object?> get props => [
         elected,
+        outcome,
         ranking,
         homeCrest,
         awayCrest,

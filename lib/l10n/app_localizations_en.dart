@@ -731,6 +731,54 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get matchDetailsVotingEnded => 'Voting closed';
+
+  @override
+  String get votingNoWinnerTitle => 'No player of the match';
+
+  @override
+  String votingNoWinnerNotEnough(int min, int total) {
+    return 'Minimum of $min votes not reached ($total votes).';
+  }
+
+  @override
+  String votingNoWinnerNoMajority(int percent, int leader) {
+    return 'Nobody reached $percent% of the votes (the leader had $leader%).';
+  }
+
+  @override
+  String get votingNoWinnerTie => 'Tie for first place.';
+
+  @override
+  String votingRulesHint(int min, int percent) {
+    return 'To elect the player of the match: at least $min votes and the leader with $percent% or more, ahead of second place.';
+  }
+
+  @override
+  String get votingSelfBlocked => 'You can\'t vote for yourself';
+
+  @override
+  String get votingSeeResult => 'See result';
+
+  @override
+  String get votingRulesTitle => 'Voting rules';
+
+  @override
+  String get votingRulesSubtitle => 'Minimum votes and leader percentage';
+
+  @override
+  String get votingRulesMinVotes => 'Minimum votes';
+
+  @override
+  String get votingRulesMinPercent => 'Leader\'s minimum percentage';
+
+  @override
+  String get votingRulesSave => 'Save rules';
+
+  @override
+  String get votingRulesSaved => 'Voting rules saved';
+
+  @override
   String get matchCardLive => 'LIVE';
 
   @override

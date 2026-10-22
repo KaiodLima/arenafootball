@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:arena_soccer/features/voting/data/dtos/voting_rules_dto.dart';
+import 'package:arena_soccer/features/voting/domain/usecases/get_voting_rules_cache_first_usecase.dart';
 import 'package:arena_soccer/core/cache/cache_keys.dart';
 import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
@@ -457,6 +459,7 @@ void main() {
         )),
         teamsUseCase(_TeamsSource(), store),
         _TeamPlayers(),
+        _LenientRules(),
       ));
     }
 
@@ -478,4 +481,14 @@ void main() {
       expect(source.calls, 2);
     });
   });
+}
+
+/// Regras frouxas da votação: 1 voto já elege (o teste é do cache dos votos).
+class _LenientRules implements GetVotingRulesCacheFirstUseCase {
+  @override
+  Stream<Either<Failure, VotingRulesDTO>> call({bool force = false}) =>
+      Stream.value(const Right(VotingRulesDTO(minVotes: 1, minPercent: 0)));
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

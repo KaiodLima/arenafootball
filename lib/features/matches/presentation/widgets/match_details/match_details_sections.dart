@@ -212,7 +212,9 @@ class MatchBestPlayerCard extends StatelessWidget {
     final votes = match.votesCount.trim();
     final hasResult = elected.isNotEmpty;
     final open = match.isVotingOpen;
-    final canTap = open || hasResult;
+    // Encerrada (partida acabou): a apuração mostra o eleito ou por que não houve.
+    final closed = !open && MatchCardStatus.of(match, DateTime.now()).finished;
+    final canTap = open || hasResult || closed;
 
     final Widget avatar = player != null
         ? PlayerAvatar(player: player!, size: AppSizes.s52)
@@ -258,7 +260,9 @@ class MatchBestPlayerCard extends StatelessWidget {
                           ? elected
                           : open
                               ? l10n.matchDetailsVotingOpen
-                              : l10n.matchDetailsVotingClosed,
+                              : closed
+                                  ? l10n.matchDetailsVotingEnded
+                                  : l10n.matchDetailsVotingClosed,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: hasResult
@@ -281,7 +285,7 @@ class MatchBestPlayerCard extends StatelessWidget {
                     border: Border.all(color: open ? AppColors.primary : AppColors.greyLight),
                   ),
                   child: Text(
-                    open ? l10n.matchesVoteAction : l10n.matchesSeeElected,
+                    open ? l10n.matchesVoteAction : l10n.votingSeeResult,
                     style: AppTypography.label(color: open ? AppColors.white : AppColors.primaryDark)
                         .copyWith(fontSize: AppSizes.s12),
                   ),

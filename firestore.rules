@@ -249,6 +249,13 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Regras da votação de melhor jogador (mínimo de votos e porcentagem):
+    // leitura pública (a apuração roda no app), escrita do admin.
+    match /config/votacao {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Notificações push (Cloud Functions em functions/).
     // Liga/desliga por ação: só o admin lê e altera.
     match /config/notificacoes {

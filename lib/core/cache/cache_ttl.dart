@@ -3,6 +3,9 @@
 abstract final class CacheTtl {
   static const Duration regions = Duration(hours: 24);
   static const Duration seasonsConfig = Duration(hours: 24);
+
+  /// Regras da votação (o admin muda raramente).
+  static const Duration votingRules = Duration(hours: 1);
   static const Duration teams = Duration(minutes: 30);
   static const Duration championships = Duration(minutes: 30);
   static const Duration groups = Duration(minutes: 30);
