@@ -104,8 +104,12 @@ async function deliver(logId: string, message: PushMessage, origem: string): Pro
   try {
     const messageId = await messaging.send({
       ...message.alvo,
-      notification: { title: message.titulo, body: message.corpo },
-      data: { tipo: message.tipo, aba: message.aba },
+      notification: {
+        title: message.titulo,
+        body: message.corpo,
+        ...(message.imagem ? { imageUrl: message.imagem } : {}),
+      },
+      data: { tipo: message.tipo, aba: message.aba, ...(message.imagem ? { imagem: message.imagem } : {}) },
       android: {
         priority: 'high',
         notification: { channelId: ANDROID_CHANNEL, icon: 'ic_stat_arena', color: '#4CAF50' },

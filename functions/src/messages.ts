@@ -48,6 +48,8 @@ export interface PushMessage {
   aba: 'home' | 'tabelas' | 'solicitacoes' | 'sou_jogador' | 'solicitacoes_time' | 'meu_time';
   regiao: string;
   alvo: Target;
+  /** Imagem do push (URL https): o escudo do time no card de gol. */
+  imagem?: string;
 }
 
 type Doc = Record<string, unknown>;
@@ -159,6 +161,7 @@ export function goalMessage(news: Doc): PushMessage | null {
     : team
       ? `Gol do ${team}`
       : 'Confira no Arena Football';
+  const crest = text(news.escudo_marcador);
   return {
     tipo: 'gol',
     titulo: `⚽ GOL! ${home} ${text(news.gol_time_casa) || '0'} × ${text(news.gol_time_fora) || '0'} ${away}`,
@@ -166,6 +169,7 @@ export function goalMessage(news: Doc): PushMessage | null {
     aba: 'home',
     regiao: region,
     alvo,
+    ...(crest.startsWith('https://') ? { imagem: crest } : {}),
   };
 }
 
