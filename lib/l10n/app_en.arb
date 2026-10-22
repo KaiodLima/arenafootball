@@ -227,6 +227,127 @@
   "matchCardHideGoals": "Hide goals",
   "matchCardToday": "TODAY",
   "matchCardTomorrow": "TOMORROW",
+  "drawerAchievements": "My achievements",
+  "achievementsTitle": "My achievements",
+  "achievementsXp": "{xp} XP",
+  "@achievementsXp": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementsNextLevel": "{left} XP to {level}",
+  "@achievementsNextLevel": {
+    "placeholders": {
+      "left": {
+        "type": "int"
+      },
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "achievementsMaxLevel": "Max level reached!",
+  "achievementsCount": "{unlocked} of {total} achievements",
+  "@achievementsCount": {
+    "placeholders": {
+      "unlocked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementsRecent": "Recent",
+  "achievementsAll": "All",
+  "achievementsEmpty": "No achievements here yet",
+  "achievementsSecret": "Secret achievement",
+  "achievementsSecretHint": "Keep using the app to find out.",
+  "achievementsUnlockedOn": "Unlocked on {date}",
+  "@achievementsUnlockedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "achievementsUnlocked": "Unlocked!",
+  "achievementsProgress": "{current} of {goal}",
+  "@achievementsProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementsPoints": "+{points} XP",
+  "@achievementsPoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementCategoryFan": "Fan",
+  "achievementCategoryVoting": "Voting",
+  "achievementCategorySharing": "Sharing",
+  "achievementCategoryNews": "News",
+  "achievementCategoryAthlete": "Athlete",
+  "achievementTierBronze": "Bronze",
+  "achievementTierSilver": "Silver",
+  "achievementTierGold": "Gold",
+  "achievementTierLegend": "Legend",
+  "fanLevelFan": "Fan",
+  "fanLevelLoyal": "Loyal",
+  "fanLevelRoots": "Hardcore",
+  "fanLevelUltra": "Ultra",
+  "fanLevelLegend": "Legend",
+  "achievementMetricVotes": "Match votes",
+  "achievementMetricShares": "Shares",
+  "achievementMetricNewsRead": "News read",
+  "achievementMetricActiveDays": "Days using the app",
+  "achievementMetricBestStreak": "Days in a row (best streak)",
+  "achievementMetricFavoriteTeam": "Picked a favorite team",
+  "achievementMetricCardPhoto": "Photo on the fan card",
+  "achievementMetricAthlete": "Account linked to an athlete",
+  "achievementMetricAthleteGoals": "Athlete's goals (season)",
+  "achievementMetricAthleteAssists": "Athlete's assists (season)",
+  "achievementMetricTeamOwner": "Approved team owner",
+  "achievementsManageTitle": "Achievements",
+  "achievementsNew": "New achievement",
+  "achievementsEdit": "Edit achievement",
+  "achievementsCreateSuggested": "Create suggested achievements",
+  "achievementsSuggestedCreated": "Suggested achievements created",
+  "achievementsManageEmpty": "No achievements yet",
+  "achievementFieldTitle": "Title",
+  "achievementFieldDescription": "Description (how to earn)",
+  "achievementFieldCategory": "Category",
+  "achievementFieldTier": "Medal tier",
+  "achievementFieldIcon": "Icon",
+  "achievementFieldMetric": "What counts",
+  "achievementFieldGoal": "Goal",
+  "achievementFieldPoints": "Points (XP)",
+  "achievementFieldSecret": "Secret (shows ? while locked)",
+  "achievementFieldActive": "Active",
+  "achievementSave": "Save achievement",
+  "achievementSaved": "Achievement saved",
+  "achievementDeleteConfirm": "Delete the achievement \"{title}\"?",
+  "@achievementDeleteConfirm": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "achievementDeleted": "Achievement deleted",
+  "achievementTitleRequired": "Enter the title",
+  "achievementInactive": "Inactive",
+  "achievementPreview": "Preview",
   "matchDetailsVotingEnded": "Voting closed",
   "votingNoWinnerTitle": "No player of the match",
   "votingNoWinnerNotEnough": "Minimum of {min} votes not reached ({total} votes).",

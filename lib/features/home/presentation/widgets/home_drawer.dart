@@ -106,6 +106,12 @@ class HomeDrawer extends StatelessWidget {
                   ),
                 if (user != null)
                   _DrawerItem(
+                    icon: Icons.military_tech_outlined,
+                    title: l10n.drawerAchievements,
+                    onTap: () => _open(context, AppRoutes.achievementsPage),
+                  ),
+                if (user != null)
+                  _DrawerItem(
                     icon: Icons.sports_soccer_rounded,
                     title: playerTeam != null ? l10n.drawerMyPlayerProfile : l10n.playerRequestMenu,
                     onTap: () => _open(context, AppRoutes.playerRequestPage),

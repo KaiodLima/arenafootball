@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/achievements/presentation/bloc/achievements_cubit.dart';
+import 'package:arena_soccer/features/achievements/presentation/widgets/achievements_sync.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_state.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
@@ -43,9 +45,13 @@ class BlocsLoad extends StatelessWidget {
         // Time em que o usuário logado joga ("Sou jogador" aprovado) — global:
         // o menu mostra "Jogador do {time}".
         BlocProvider<MyPlayerCubit>(create: (_) => MyPlayerCubit(sl(), sl())),
+
+        // Conquistas da conta logada — global: drawer, carteirinha, contagem
+        // das ações (compartilhar, ler notícia) e comemoração ao desbloquear.
+        BlocProvider<AchievementsCubit>(create: (_) => AchievementsCubit(sl(), sl(), sl(), sl(), sl(), sl())),
       ],
       // Tópicos de push acompanham a região e o time do coração.
-      child: OwnedTeamSync(child: PushTopicsListener(child: child)),
+      child: OwnedTeamSync(child: AchievementsSync(child: PushTopicsListener(child: child))),
     );
   }
 }

@@ -6,9 +6,17 @@ import 'package:arena_soccer/core/utils/app_logger.dart';
 /// Compartilhamento pelo seletor nativo do sistema (WhatsApp, Instagram...).
 /// Isola o `share_plus` para as telas não dependerem do pacote.
 class ShareService {
+  /// Chamado depois de um compartilhamento que não foi cancelado (conta
+  /// para as conquistas; quem liga é o `AchievementsSync`).
+  static void Function()? onShared;
+
+  static void _done(ShareResult result) {
+    if (result.status != ShareResultStatus.dismissed) onShared?.call();
+  }
+
   static Future<void> shareText(String text, {String? subject}) async {
     try {
-      await SharePlus.instance.share(ShareParams(text: text, subject: subject));
+      _done(await SharePlus.instance.share(ShareParams(text: text, subject: subject)));
     } catch (e) {
       // Cancelar ou não ter app de destino não é erro para o usuário.
       AppLogger.e('shareText', name: 'ShareService', error: e);
@@ -19,9 +27,9 @@ class ShareService {
   /// O `share_plus` grava o arquivo temporário sozinho.
   static Future<void> shareImage(Uint8List png, {String? text, String fileName = 'arena_football.png'}) async {
     try {
-      await SharePlus.instance.share(
+      _done(await SharePlus.instance.share(
         ShareParams(files: [XFile.fromData(png, mimeType: 'image/png', name: fileName)], text: text),
-      );
+      ));
     } catch (e) {
       AppLogger.e('shareImage', name: 'ShareService', error: e);
     }

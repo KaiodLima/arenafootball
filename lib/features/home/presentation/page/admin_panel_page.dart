@@ -50,6 +50,11 @@ class AdminPanelPage extends StatelessWidget {
                     onTap: () => open(AppRoutes.manageHighlightsPage),
                   ),
                   ShortcutTile(
+                    title: l10n.achievementsManageTitle,
+                    icon: Icons.military_tech_outlined,
+                    onTap: () => open(AppRoutes.manageAchievementsPage),
+                  ),
+                  ShortcutTile(
                     title: l10n.pushPanelTitle,
                     icon: Icons.notifications_active_outlined,
                     onTap: () => open(AppRoutes.notificationsPanelPage),

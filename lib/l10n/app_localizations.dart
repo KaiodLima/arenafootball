@@ -1335,6 +1335,384 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @drawerAchievements.
+  ///
+  /// In pt, this message translates to:
+  /// **'Minhas conquistas'**
+  String get drawerAchievements;
+
+  /// No description provided for @achievementsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Minhas conquistas'**
+  String get achievementsTitle;
+
+  /// No description provided for @achievementsXp.
+  ///
+  /// In pt, this message translates to:
+  /// **'{xp} XP'**
+  String achievementsXp(int xp);
+
+  /// No description provided for @achievementsNextLevel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Faltam {left} XP para {level}'**
+  String achievementsNextLevel(int left, String level);
+
+  /// No description provided for @achievementsMaxLevel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nível máximo alcançado!'**
+  String get achievementsMaxLevel;
+
+  /// No description provided for @achievementsCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{unlocked} de {total} conquistas'**
+  String achievementsCount(int unlocked, int total);
+
+  /// No description provided for @achievementsRecent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Recentes'**
+  String get achievementsRecent;
+
+  /// No description provided for @achievementsAll.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todas'**
+  String get achievementsAll;
+
+  /// No description provided for @achievementsEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma conquista por aqui ainda'**
+  String get achievementsEmpty;
+
+  /// No description provided for @achievementsSecret.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conquista secreta'**
+  String get achievementsSecret;
+
+  /// No description provided for @achievementsSecretHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Continue usando o app para descobrir.'**
+  String get achievementsSecretHint;
+
+  /// No description provided for @achievementsUnlockedOn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conquistada em {date}'**
+  String achievementsUnlockedOn(String date);
+
+  /// No description provided for @achievementsUnlocked.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conquistada!'**
+  String get achievementsUnlocked;
+
+  /// No description provided for @achievementsProgress.
+  ///
+  /// In pt, this message translates to:
+  /// **'{current} de {goal}'**
+  String achievementsProgress(int current, int goal);
+
+  /// No description provided for @achievementsPoints.
+  ///
+  /// In pt, this message translates to:
+  /// **'+{points} XP'**
+  String achievementsPoints(int points);
+
+  /// No description provided for @achievementCategoryFan.
+  ///
+  /// In pt, this message translates to:
+  /// **'Torcida'**
+  String get achievementCategoryFan;
+
+  /// No description provided for @achievementCategoryVoting.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votação'**
+  String get achievementCategoryVoting;
+
+  /// No description provided for @achievementCategorySharing.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compartilhar'**
+  String get achievementCategorySharing;
+
+  /// No description provided for @achievementCategoryNews.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícias'**
+  String get achievementCategoryNews;
+
+  /// No description provided for @achievementCategoryAthlete.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atleta'**
+  String get achievementCategoryAthlete;
+
+  /// No description provided for @achievementTierBronze.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bronze'**
+  String get achievementTierBronze;
+
+  /// No description provided for @achievementTierSilver.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prata'**
+  String get achievementTierSilver;
+
+  /// No description provided for @achievementTierGold.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ouro'**
+  String get achievementTierGold;
+
+  /// No description provided for @achievementTierLegend.
+  ///
+  /// In pt, this message translates to:
+  /// **'Lenda'**
+  String get achievementTierLegend;
+
+  /// No description provided for @fanLevelFan.
+  ///
+  /// In pt, this message translates to:
+  /// **'Torcedor'**
+  String get fanLevelFan;
+
+  /// No description provided for @fanLevelLoyal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fiel'**
+  String get fanLevelLoyal;
+
+  /// No description provided for @fanLevelRoots.
+  ///
+  /// In pt, this message translates to:
+  /// **'Raiz'**
+  String get fanLevelRoots;
+
+  /// No description provided for @fanLevelUltra.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ultra'**
+  String get fanLevelUltra;
+
+  /// No description provided for @fanLevelLegend.
+  ///
+  /// In pt, this message translates to:
+  /// **'Lenda'**
+  String get fanLevelLegend;
+
+  /// No description provided for @achievementMetricVotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votos em partidas'**
+  String get achievementMetricVotes;
+
+  /// No description provided for @achievementMetricShares.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compartilhamentos'**
+  String get achievementMetricShares;
+
+  /// No description provided for @achievementMetricNewsRead.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícias lidas'**
+  String get achievementMetricNewsRead;
+
+  /// No description provided for @achievementMetricActiveDays.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dias de uso'**
+  String get achievementMetricActiveDays;
+
+  /// No description provided for @achievementMetricBestStreak.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dias seguidos (maior sequência)'**
+  String get achievementMetricBestStreak;
+
+  /// No description provided for @achievementMetricFavoriteTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolheu o time do coração'**
+  String get achievementMetricFavoriteTeam;
+
+  /// No description provided for @achievementMetricCardPhoto.
+  ///
+  /// In pt, this message translates to:
+  /// **'Foto na carteirinha'**
+  String get achievementMetricCardPhoto;
+
+  /// No description provided for @achievementMetricAthlete.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conta ligada a atleta'**
+  String get achievementMetricAthlete;
+
+  /// No description provided for @achievementMetricAthleteGoals.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gols do atleta (temporada)'**
+  String get achievementMetricAthleteGoals;
+
+  /// No description provided for @achievementMetricAthleteAssists.
+  ///
+  /// In pt, this message translates to:
+  /// **'Assistências do atleta (temporada)'**
+  String get achievementMetricAthleteAssists;
+
+  /// No description provided for @achievementMetricTeamOwner.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dono de time aprovado'**
+  String get achievementMetricTeamOwner;
+
+  /// No description provided for @achievementsManageTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conquistas'**
+  String get achievementsManageTitle;
+
+  /// No description provided for @achievementsNew.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nova conquista'**
+  String get achievementsNew;
+
+  /// No description provided for @achievementsEdit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar conquista'**
+  String get achievementsEdit;
+
+  /// No description provided for @achievementsCreateSuggested.
+  ///
+  /// In pt, this message translates to:
+  /// **'Criar conquistas sugeridas'**
+  String get achievementsCreateSuggested;
+
+  /// No description provided for @achievementsSuggestedCreated.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conquistas sugeridas criadas'**
+  String get achievementsSuggestedCreated;
+
+  /// No description provided for @achievementsManageEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma conquista cadastrada'**
+  String get achievementsManageEmpty;
+
+  /// No description provided for @achievementFieldTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Título'**
+  String get achievementFieldTitle;
+
+  /// No description provided for @achievementFieldDescription.
+  ///
+  /// In pt, this message translates to:
+  /// **'Descrição (como ganhar)'**
+  String get achievementFieldDescription;
+
+  /// No description provided for @achievementFieldCategory.
+  ///
+  /// In pt, this message translates to:
+  /// **'Categoria'**
+  String get achievementFieldCategory;
+
+  /// No description provided for @achievementFieldTier.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nível da medalha'**
+  String get achievementFieldTier;
+
+  /// No description provided for @achievementFieldIcon.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ícone'**
+  String get achievementFieldIcon;
+
+  /// No description provided for @achievementFieldMetric.
+  ///
+  /// In pt, this message translates to:
+  /// **'O que conta'**
+  String get achievementFieldMetric;
+
+  /// No description provided for @achievementFieldGoal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Meta'**
+  String get achievementFieldGoal;
+
+  /// No description provided for @achievementFieldPoints.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pontos (XP)'**
+  String get achievementFieldPoints;
+
+  /// No description provided for @achievementFieldSecret.
+  ///
+  /// In pt, this message translates to:
+  /// **'Secreta (bloqueada aparece como ?)'**
+  String get achievementFieldSecret;
+
+  /// No description provided for @achievementFieldActive.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ativa'**
+  String get achievementFieldActive;
+
+  /// No description provided for @achievementSave.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salvar conquista'**
+  String get achievementSave;
+
+  /// No description provided for @achievementSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conquista salva'**
+  String get achievementSaved;
+
+  /// No description provided for @achievementDeleteConfirm.
+  ///
+  /// In pt, this message translates to:
+  /// **'Excluir a conquista \"{title}\"?'**
+  String achievementDeleteConfirm(String title);
+
+  /// No description provided for @achievementDeleted.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conquista excluída'**
+  String get achievementDeleted;
+
+  /// No description provided for @achievementTitleRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Informe o título'**
+  String get achievementTitleRequired;
+
+  /// No description provided for @achievementInactive.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inativa'**
+  String get achievementInactive;
+
+  /// No description provided for @achievementPreview.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prévia'**
+  String get achievementPreview;
+
   /// No description provided for @matchDetailsVotingEnded.
   ///
   /// In pt, this message translates to:
