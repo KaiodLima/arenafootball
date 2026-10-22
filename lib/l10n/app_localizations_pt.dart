@@ -734,6 +734,23 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get matchCardLive => 'EM ANDAMENTO';
+
+  @override
+  String get matchStart => 'Iniciar partida';
+
+  @override
+  String get matchFinish => 'Encerrar partida';
+
+  @override
+  String get matchFormDuration => 'Duração';
+
+  @override
+  String matchFormDurationMinutes(int n) {
+    return '$n min';
+  }
+
+  @override
   String get matchDetailsTitle => 'Partida';
 
   @override

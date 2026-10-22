@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
-import 'package:arena_soccer/features/matches/domain/usecases/watch_matches_usecase.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_card.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
@@ -39,16 +38,15 @@ class MatchDetailsHeader extends StatelessWidget {
     final homeWon = !status.upcoming && match.homeGoals > match.awayGoals;
     final awayWon = !status.upcoming && match.awayGoals > match.homeGoals;
     final time = match.time.trim();
-    final isToday = match.date.trim() == WatchMatchesUseCase.formatMatchDate(clock);
     final chip = status.upcoming
         ? switch (status.dayOffset) {
             0 => l10n.matchCardToday,
             1 => l10n.matchCardTomorrow,
             _ => match.date.trim(),
           }
-        : isToday
-            ? l10n.matchCardToday
-            : l10n.matchDetailsFinished;
+        : status.finished
+            ? l10n.matchDetailsFinished
+            : time;
     final venue = match.venue.trim();
     final topInset = MediaQuery.paddingOf(context).top + kToolbarHeight;
 
@@ -117,26 +115,29 @@ class MatchDetailsHeader extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: AppSizes.s6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: AppSizes.s10, vertical: AppSizes.s4),
-                              decoration: BoxDecoration(
-                                color: AppColors.white.withValues(alpha: status.upcoming ? 0.95 : 0.18),
-                                borderRadius: BorderRadius.circular(AppSizes.s12),
+                            if (status.live)
+                              const MatchLiveBadge(onDark: true)
+                            else if (chip.isNotEmpty)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: AppSizes.s10, vertical: AppSizes.s4),
+                                decoration: BoxDecoration(
+                                  color: AppColors.white.withValues(alpha: status.upcoming ? 0.95 : 0.18),
+                                  borderRadius: BorderRadius.circular(AppSizes.s12),
+                                ),
+                                child: Text(
+                                  chip,
+                                  style: AppTypography.label(
+                                    color: status.upcoming ? AppColors.primaryDark : AppColors.white,
+                                  ).copyWith(fontSize: AppSizes.s12, letterSpacing: 1, fontWeight: FontWeight.w800),
+                                ),
                               ),
-                              child: Text(
-                                chip,
-                                style: AppTypography.label(
-                                  color: status.upcoming ? AppColors.primaryDark : AppColors.white,
-                                ).copyWith(fontSize: AppSizes.s12, letterSpacing: 1, fontWeight: FontWeight.w800),
-                              ),
-                            ),
                           ],
                         ),
                       ),
                       Expanded(child: _HeaderTeam(name: match.awayTeam, crest: awayCrest, dimmed: homeWon)),
                     ],
                   ),
-                  if (venue.isNotEmpty || (!status.upcoming && time.isNotEmpty)) ...[
+                  if (venue.isNotEmpty || time.isNotEmpty) ...[
                     const SizedBox(height: AppSizes.s16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -145,7 +146,7 @@ class MatchDetailsHeader extends StatelessWidget {
                         const SizedBox(width: AppSizes.s4),
                         Flexible(
                           child: Text(
-                            [venue, if (!status.upcoming) time].where((p) => p.isNotEmpty).join('  ·  '),
+                            [venue, MatchCardStatus.timeRange(match)].where((p) => p.isNotEmpty).join('  ·  '),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: AppTypography.label(color: AppColors.white.withValues(alpha: 0.9))

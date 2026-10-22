@@ -157,6 +157,17 @@ void main() {
   });
 
   group('MatchFormData', () {
+    test('duração: começa em 90, vai para a partida e para o doc (com o status manual)', () {
+      expect(const MatchFormData().durationMinutes, 90);
+      final match = const MatchFormData(homeTeam: 'Volta', awayTeam: 'Riacho').copyWith(durationMinutes: 60).toMatch();
+      expect(match.durationMinutes, 60);
+      expect(match.toMap()['duracao'], 60);
+      expect(match.toMap().containsKey('status'), isFalse);
+      expect(match.copyWith(manualStatus: MatchManualStatus.live).toMap()['status'], 'andamento');
+      expect(MatchManualStatus.fromKey('encerrada'), MatchManualStatus.finished);
+      expect(MatchManualStatus.fromKey(''), MatchManualStatus.none);
+    });
+
     test('primeiro campo faltante', () {
       expect(const MatchFormData().missing, MatchFormMissing.teams);
       expect(const MatchFormData(homeTeam: 'Volta', awayTeam: 'Volta').missing, MatchFormMissing.sameTeam);
@@ -309,7 +320,8 @@ void main() {
         ..registered = const ChampionshipDTO(id: 'r', championshipId: 9, region: 'Floresta');
       final championships = _FakeChampionships()
         ..list = const [
-          ChampionshipDTO(id: 'c', championshipId: 5, title: 'Copa', teams: ['Lava Jato', 'Volta'], teamIds: ['1', '2']),
+          ChampionshipDTO(
+              id: 'c', championshipId: 5, title: 'Copa', teams: ['Lava Jato', 'Volta'], teamIds: ['1', '2']),
         ];
       final cubit = MatchFormCubit(
         CreateMatchUseCase(repository, championship),

@@ -7,6 +7,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/matches/domain/match_squads.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/set_match_status_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/toggle_match_voting_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/watch_match_usecase.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/match_details_cubit.dart';
@@ -64,6 +65,16 @@ class _Squads implements WatchTeamPlayersUseCase {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+class _SetStatus implements SetMatchStatusUseCase {
+  final calls = <bool>[];
+
+  @override
+  Future<Either<Failure, MatchDTO>> call({required MatchDTO match, required bool live, String? season}) async {
+    calls.add(live);
+    return Right(match.copyWith(manualStatus: live ? MatchManualStatus.live : MatchManualStatus.finished));
+  }
+}
+
 class _Toggle implements ToggleMatchVotingUseCase {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -88,7 +99,8 @@ void main() {
 
   test('cubit: começa com a partida recebida, carrega elencos e o stream atualiza', () async {
     final watch = _WatchMatch();
-    final cubit = MatchDetailsCubit(watch, _Squads(), _Toggle(), match: _match);
+    final setStatus = _SetStatus();
+    final cubit = MatchDetailsCubit(watch, _Squads(), _Toggle(), setStatus, match: _match);
     expect(cubit.state.match, _match);
     await cubit.start(season: '2026');
     expect(cubit.state.squadsLoading, isFalse);
@@ -98,6 +110,10 @@ void main() {
     watch.controller.add(Right(_match.copyWith(bestPlayer: 'Dudu')));
     await Future<void>.delayed(Duration.zero);
     expect(cubit.state.bestPlayer?.id, 'dudu');
+
+    await cubit.setLive(true);
+    expect(setStatus.calls, [true]);
+    expect(cubit.state.match.manualStatus, MatchManualStatus.live);
 
     watch.controller.add(const Right(null));
     await Future<void>.delayed(Duration.zero);

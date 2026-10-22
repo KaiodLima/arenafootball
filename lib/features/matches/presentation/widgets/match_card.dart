@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
@@ -11,39 +13,87 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/constants/team_colors.dart';
 
 /// Momento da partida para o centro do card: antes do jogo (horário grande e
-/// o dia) ou jogada (placar). Antes = sem gol e, se for hoje, antes da hora.
+/// o dia), em andamento (do horário até horário + duração, ou iniciada na mão
+/// pelo admin), encerrada ou só jogada (sem data para saber). O status manual
+/// vale mais que o horário.
 class MatchCardStatus {
   final bool upcoming;
+  final bool live;
+
+  /// Passou do fim, é de dia passado ou o admin encerrou.
+  final bool finished;
 
   /// Dias até a partida (0 = hoje, 1 = amanhã); só vale antes do jogo.
   final int dayOffset;
 
-  const MatchCardStatus._({required this.upcoming, this.dayOffset = 0});
+  /// Próximo instante em que o status muda sozinho (início ou fim); nulo = não muda hoje.
+  final DateTime? nextChange;
 
-  static const played = MatchCardStatus._(upcoming: false);
+  const MatchCardStatus._({
+    this.upcoming = false,
+    this.live = false,
+    this.finished = false,
+    this.dayOffset = 0,
+    this.nextChange,
+  });
 
-  static MatchCardStatus of(MatchDTO match, DateTime now) {
-    if (match.homeGoals > 0 || match.awayGoals > 0 || match.goals.isNotEmpty) return played;
+  static const played = MatchCardStatus._();
+
+  /// Dias de hoje até a data "dd/MM" (ou "dd/MM/aaaa") da partida; nulo sem data.
+  static int? _dayOffset(MatchDTO match, DateTime now) {
     final parts = match.date.split('/');
     final day = int.tryParse(parts.first.trim());
     final month = parts.length > 1 ? int.tryParse(parts[1].trim()) : null;
-    if (day == null || month == null) return played;
+    if (day == null || month == null) return null;
     final year = parts.length > 2 ? int.tryParse(parts[2].trim()) : null;
     final today = DateTime.utc(now.year, now.month, now.day);
     var date = DateTime.utc(year ?? now.year, month, day);
     // Data sem ano: janeiro visto em dezembro é do ano que vem.
     if (year == null && date.difference(today).inDays < -180) date = DateTime.utc(now.year + 1, month, day);
-    final offset = date.difference(today).inDays;
-    if (offset < 0) return played;
-    if (offset == 0) {
-      final time = match.time.split(':');
-      final hour = int.tryParse(time.first.trim());
-      final minute = time.length > 1 ? int.tryParse(time[1].trim()) : 0;
-      if (hour != null && minute != null && !now.isBefore(DateTime(now.year, now.month, now.day, hour, minute))) {
-        return played;
-      }
+    return date.difference(today).inDays;
+  }
+
+  /// Hora "HH:mm" da partida no dia de [now]; nula se não der para ler.
+  static DateTime? _kickoff(MatchDTO match, DateTime now) {
+    final time = match.time.split(':');
+    final hour = int.tryParse(time.first.trim());
+    final minute = time.length > 1 ? int.tryParse(time[1].trim()) : 0;
+    if (hour == null || minute == null) return null;
+    return DateTime(now.year, now.month, now.day, hour, minute);
+  }
+
+  /// "15:45 – 17:15" (horário até o fim pela duração); só o horário se não der para ler.
+  static String timeRange(MatchDTO match) {
+    final time = match.time.trim();
+    final start = _kickoff(match, DateTime(2000));
+    if (start == null) return time;
+    final end = start.add(Duration(minutes: match.durationMinutes));
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '$time – ${two(end.hour)}:${two(end.minute)}';
+  }
+
+  static MatchCardStatus of(MatchDTO match, DateTime now) {
+    final offset = _dayOffset(match, now);
+    switch (match.manualStatus) {
+      case MatchManualStatus.finished:
+        return const MatchCardStatus._(finished: true);
+      case MatchManualStatus.live when offset == null || offset >= 0:
+        return const MatchCardStatus._(live: true);
+      default:
+        break;
     }
-    return MatchCardStatus._(upcoming: true, dayOffset: offset);
+    if (offset == null) return played;
+    if (offset < 0) return const MatchCardStatus._(finished: true);
+    final hasGoals = match.homeGoals > 0 || match.awayGoals > 0 || match.goals.isNotEmpty;
+    final kickoff = offset == 0 ? _kickoff(match, now) : null;
+    if (kickoff == null || now.isBefore(kickoff)) {
+      return hasGoals
+          ? MatchCardStatus._(nextChange: kickoff)
+          : MatchCardStatus._(upcoming: true, dayOffset: offset, nextChange: kickoff);
+    }
+    final end = kickoff.add(Duration(minutes: match.durationMinutes));
+    if (now.isBefore(end)) return MatchCardStatus._(live: true, nextChange: end);
+    return const MatchCardStatus._(finished: true);
   }
 }
 
@@ -85,6 +135,9 @@ class MatchCard extends StatefulWidget {
   /// Admin: "Lançar card de gol" no menu (nulo = sem a ação).
   final VoidCallback? onGoalCard;
 
+  /// Admin: iniciar (true) / encerrar (false) a partida na mão (nulo = sem a ação).
+  final ValueChanged<bool>? onSetLive;
+
   /// Agora (só para teste).
   final DateTime? now;
 
@@ -106,6 +159,7 @@ class MatchCard extends StatefulWidget {
     this.onTap,
     this.championshipLabel,
     this.onGoalCard,
+    this.onSetLive,
     this.now,
   });
 
@@ -118,6 +172,41 @@ class MatchCard extends StatefulWidget {
 class _MatchCardState extends State<MatchCard> {
   /// Expandido: mostra os gols com autor e assistência.
   bool _expanded = false;
+
+  /// Redesenha quando a partida começa ou termina pelo horário.
+  Timer? _statusTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _scheduleStatus();
+  }
+
+  @override
+  void didUpdateWidget(covariant MatchCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.match != widget.match) _scheduleStatus();
+  }
+
+  void _scheduleStatus() {
+    _statusTimer?.cancel();
+    // Com o relógio fixo (teste), o status não muda.
+    if (widget.now != null) return;
+    final now = DateTime.now();
+    final next = MatchCardStatus.of(widget.match, now).nextChange;
+    if (next == null) return;
+    _statusTimer = Timer(next.difference(now) + const Duration(seconds: 1), () {
+      if (!mounted) return;
+      setState(() {});
+      _scheduleStatus();
+    });
+  }
+
+  @override
+  void dispose() {
+    _statusTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -180,6 +269,12 @@ class _MatchCardState extends State<MatchCard> {
                           label: l10n.matchesEditScore,
                           onSelected: widget.onEditScore,
                         ),
+                        if (widget.onSetLive != null)
+                          CardMenuAction(
+                            icon: status.live ? Icons.stop_circle_outlined : Icons.play_circle_outline_rounded,
+                            label: status.live ? l10n.matchFinish : l10n.matchStart,
+                            onSelected: () => widget.onSetLive!(!status.live),
+                          ),
                         if (widget.onGoalCard != null)
                           CardMenuAction(
                             icon: Icons.sports_soccer_rounded,
@@ -300,8 +395,8 @@ class _MatchCardState extends State<MatchCard> {
   }
 }
 
-/// Centro do card: placar grande com a hora embaixo ou, antes do jogo, a hora
-/// grande com "HOJE"/"AMANHÃ"/a data.
+/// Centro do card: placar grande com a hora embaixo ("EM ANDAMENTO" durante
+/// a partida) ou, antes do jogo, a hora grande com "HOJE"/"AMANHÃ"/a data.
 class _Center extends StatelessWidget {
   final MatchDTO match;
   final MatchCardStatus status;
@@ -332,7 +427,10 @@ class _Center extends StatelessWidget {
               style: AppTypography.display(color: status.upcoming ? AppColors.primaryDark : AppColors.textPrimary)
                   .copyWith(fontSize: AppSizes.s28, fontFeatures: const [FontFeature.tabularFigures()]),
             ),
-            if (small.isNotEmpty) ...[
+            if (status.live) ...[
+              const SizedBox(height: AppSizes.s4),
+              const MatchLiveBadge(),
+            ] else if (small.isNotEmpty) ...[
               const SizedBox(height: AppSizes.s2),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s2),
@@ -544,6 +642,58 @@ class _VotingChip extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Pílula vermelha "EM ANDAMENTO" com um ponto pulsando.
+class MatchLiveBadge extends StatefulWidget {
+  /// Sobre fundo escuro (cabeçalho dos detalhes): pílula branca.
+  final bool onDark;
+
+  const MatchLiveBadge({super.key, this.onDark = false});
+
+  @override
+  State<MatchLiveBadge> createState() => _MatchLiveBadgeState();
+}
+
+class _MatchLiveBadgeState extends State<MatchLiveBadge> with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))
+    ..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final background = widget.onDark ? AppColors.white : AppColors.danger;
+    final foreground = widget.onDark ? AppColors.danger : AppColors.white;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s2),
+      decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(AppSizes.s10)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FadeTransition(
+            opacity: Tween<double>(begin: 0.3, end: 1).animate(_pulse),
+            child: Container(
+              width: AppSizes.s6,
+              height: AppSizes.s6,
+              decoration: BoxDecoration(color: foreground, shape: BoxShape.circle),
+            ),
+          ),
+          const SizedBox(width: AppSizes.s4),
+          Text(
+            l10n.matchCardLive,
+            style: AppTypography.label(color: foreground)
+                .copyWith(fontSize: AppSizes.s12, letterSpacing: 0.8, fontWeight: FontWeight.w800),
+          ),
+        ],
       ),
     );
   }

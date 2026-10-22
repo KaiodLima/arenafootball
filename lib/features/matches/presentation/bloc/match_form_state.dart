@@ -43,6 +43,12 @@ class MatchFormData extends Equatable {
   final String time;
   final String venue;
 
+  /// Durações oferecidas no cadastro, em minutos.
+  static const List<int> durationOptions = [40, 50, 60, 70, 80, 90, 120];
+
+  /// Duração em minutos (o fim = horário + duração).
+  final int durationMinutes;
+
   /// O admin está digitando um local novo (fora das sugestões).
   final bool customVenue;
 
@@ -62,6 +68,7 @@ class MatchFormData extends Equatable {
     this.date = '',
     this.time = '',
     this.venue = '',
+    this.durationMinutes = MatchDTO.defaultDurationMinutes,
     this.customVenue = false,
     this.existing = const [],
   });
@@ -147,6 +154,7 @@ class MatchFormData extends Equatable {
         date: date,
         time: time,
         venue: venue.trim(),
+        durationMinutes: durationMinutes,
         region: selectedRegion ?? '',
         championshipId: championshipId ?? 0,
         regionIds: regionIdsOfTeams,
@@ -165,6 +173,7 @@ class MatchFormData extends Equatable {
     String? date,
     String? time,
     String? venue,
+    int? durationMinutes,
     bool? customVenue,
     List<MatchDTO>? existing,
     bool clearTeams = false,
@@ -182,6 +191,7 @@ class MatchFormData extends Equatable {
       date: date ?? this.date,
       time: time ?? this.time,
       venue: venue ?? this.venue,
+      durationMinutes: durationMinutes ?? this.durationMinutes,
       customVenue: customVenue ?? this.customVenue,
       existing: existing ?? this.existing,
     );
@@ -201,6 +211,7 @@ class MatchFormData extends Equatable {
         date,
         time,
         venue,
+        durationMinutes,
         customVenue,
         existing
       ];

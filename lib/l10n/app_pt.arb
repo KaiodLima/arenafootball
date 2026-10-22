@@ -388,6 +388,18 @@
   "matchCardHideGoals": "Ocultar gols",
   "matchCardToday": "HOJE",
   "matchCardTomorrow": "AMANHÃ",
+  "matchCardLive": "EM ANDAMENTO",
+  "matchStart": "Iniciar partida",
+  "matchFinish": "Encerrar partida",
+  "matchFormDuration": "Duração",
+  "matchFormDurationMinutes": "{n} min",
+  "@matchFormDurationMinutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "matchDetailsTitle": "Partida",
   "matchDetailsFinished": "ENCERRADO",
   "matchDetailsNoScorers": "Autores dos gols não informados",

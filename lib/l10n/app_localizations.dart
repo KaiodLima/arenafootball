@@ -1335,6 +1335,36 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @matchCardLive.
+  ///
+  /// In pt, this message translates to:
+  /// **'EM ANDAMENTO'**
+  String get matchCardLive;
+
+  /// No description provided for @matchStart.
+  ///
+  /// In pt, this message translates to:
+  /// **'Iniciar partida'**
+  String get matchStart;
+
+  /// No description provided for @matchFinish.
+  ///
+  /// In pt, this message translates to:
+  /// **'Encerrar partida'**
+  String get matchFinish;
+
+  /// No description provided for @matchFormDuration.
+  ///
+  /// In pt, this message translates to:
+  /// **'Duração'**
+  String get matchFormDuration;
+
+  /// No description provided for @matchFormDurationMinutes.
+  ///
+  /// In pt, this message translates to:
+  /// **'{n} min'**
+  String matchFormDurationMinutes(int n);
+
   /// No description provided for @matchDetailsTitle.
   ///
   /// In pt, this message translates to:

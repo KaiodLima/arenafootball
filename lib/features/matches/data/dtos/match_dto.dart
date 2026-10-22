@@ -3,6 +3,20 @@ import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
 
+/// Início/fim marcado na mão pelo admin (`status`); vale mais que o horário.
+enum MatchManualStatus {
+  none(''),
+  live('andamento'),
+  finished('encerrada');
+
+  final String key;
+
+  const MatchManualStatus(this.key);
+
+  static MatchManualStatus fromKey(String? key) =>
+      values.firstWhere((s) => s.key.isNotEmpty && s.key == key, orElse: () => none);
+}
+
 /// Documento das coleções `partidas` / `partidas{ano}`.
 class MatchDTO extends Equatable {
   /// Campo com as regiões da partida entre regiões (consulta por região).
@@ -10,6 +24,9 @@ class MatchDTO extends Equatable {
 
   /// Campo com os gols da partida (autor e assistência).
   static const String goalsField = 'gols';
+
+  /// Duração de partida sem o campo `duracao` (cadastros antigos).
+  static const int defaultDurationMinutes = 90;
 
   /// Id do documento (gravado também em `id_partida`).
   final String id;
@@ -53,6 +70,12 @@ class MatchDTO extends Equatable {
   /// placar fica só em [homeGoals]/[awayGoals]).
   final List<MatchGoal> goals;
 
+  /// `duracao` em minutos: o fim é o horário + a duração.
+  final int durationMinutes;
+
+  /// `status`: iniciada/encerrada na mão pelo admin.
+  final MatchManualStatus manualStatus;
+
   const MatchDTO({
     this.id = '',
     required this.homeTeam,
@@ -73,6 +96,8 @@ class MatchDTO extends Equatable {
     this.registeredAt,
     this.regionIds = const [],
     this.goals = const [],
+    this.durationMinutes = defaultDurationMinutes,
+    this.manualStatus = MatchManualStatus.none,
   });
 
   static int _int(Object? value) => value is num ? value.toInt() : int.tryParse(value?.toString() ?? '') ?? 0;
@@ -101,6 +126,8 @@ class MatchDTO extends Equatable {
       registeredAt: registeredAt is Timestamp ? registeredAt.toDate() : null,
       regionIds: (data[regionIdsField] as List?)?.map((id) => id.toString()).toList() ?? const [],
       goals: MatchGoal.listFrom(data[goalsField]),
+      durationMinutes: _int(data['duracao']) > 0 ? _int(data['duracao']) : defaultDurationMinutes,
+      manualStatus: MatchManualStatus.fromKey(data['status']?.toString()),
     );
   }
 
@@ -126,6 +153,8 @@ class MatchDTO extends Equatable {
         if (registeredAt != null) 'dataRegistro': Timestamp.fromDate(registeredAt!),
         if (regionIds.isNotEmpty) regionIdsField: regionIds,
         if (goals.isNotEmpty) goalsField: [for (final g in goals) g.toMap()],
+        'duracao': durationMinutes,
+        if (manualStatus != MatchManualStatus.none) 'status': manualStatus.key,
       };
 
   MatchDTO copyWith({
@@ -148,6 +177,8 @@ class MatchDTO extends Equatable {
     DateTime? registeredAt,
     List<String>? regionIds,
     List<MatchGoal>? goals,
+    int? durationMinutes,
+    MatchManualStatus? manualStatus,
   }) {
     return MatchDTO(
       id: id ?? this.id,
@@ -169,6 +200,8 @@ class MatchDTO extends Equatable {
       registeredAt: registeredAt ?? this.registeredAt,
       regionIds: regionIds ?? this.regionIds,
       goals: goals ?? this.goals,
+      durationMinutes: durationMinutes ?? this.durationMinutes,
+      manualStatus: manualStatus ?? this.manualStatus,
     );
   }
 
@@ -193,5 +226,7 @@ class MatchDTO extends Equatable {
         registeredAt,
         regionIds,
         goals,
+        durationMinutes,
+        manualStatus,
       ];
 }

@@ -227,6 +227,18 @@
   "matchCardHideGoals": "Hide goals",
   "matchCardToday": "TODAY",
   "matchCardTomorrow": "TOMORROW",
+  "matchCardLive": "LIVE",
+  "matchStart": "Start match",
+  "matchFinish": "End match",
+  "matchFormDuration": "Duration",
+  "matchFormDurationMinutes": "{n} min",
+  "@matchFormDurationMinutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "matchDetailsTitle": "Match",
   "matchDetailsFinished": "FULL TIME",
   "matchDetailsNoScorers": "Goal scorers not informed",

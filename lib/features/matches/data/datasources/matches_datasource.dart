@@ -107,6 +107,14 @@ class MatchesDataSource {
   Future<Either<Failure, void>> setVotingOpen({required String matchId, required bool isOpen, String? season}) =>
       _update(matchId, {'votacao': isOpen.toString()}, season: season);
 
+  /// Admin inicia/encerra a partida na mão (vale mais que o horário).
+  Future<Either<Failure, void>> setManualStatus({
+    required String matchId,
+    required MatchManualStatus status,
+    String? season,
+  }) =>
+      _update(matchId, {'status': status.key, 'statusEm': FieldValue.serverTimestamp()}, season: season);
+
   Future<Either<Failure, void>> _update(String matchId, Map<String, dynamic> fields, {String? season}) async {
     try {
       await _matches(season).doc(matchId).update(fields);

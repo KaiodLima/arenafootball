@@ -5,6 +5,7 @@ import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart'
 import 'package:arena_soccer/features/matches/presentation/bloc/match_details_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_details/match_details_header.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_details/match_details_sections.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/match_card.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_goals_sheet.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
@@ -67,6 +68,7 @@ class MatchDetailsPage extends StatelessWidget {
           championshipLabel ?? l10n.matchDetailsTitle,
           if (match.date.trim().isNotEmpty) match.date.trim(),
         ].join('  ·  ');
+        final live = MatchCardStatus.of(match, DateTime.now()).live;
         final home = headerColor(homeColor);
         final away = headerColor(awayColor);
 
@@ -119,6 +121,11 @@ class MatchDetailsPage extends StatelessWidget {
                             AppRoutes.goalNotificationPage,
                             arguments: {'match': match, 'season': season},
                           ),
+                        ),
+                        CardMenuAction(
+                          icon: live ? Icons.stop_circle_outlined : Icons.play_circle_outline_rounded,
+                          label: live ? l10n.matchFinish : l10n.matchStart,
+                          onSelected: () => cubit.setLive(!live),
                         ),
                         CardMenuAction(
                           icon: match.isVotingOpen ? Icons.lock_outline_rounded : Icons.how_to_vote_outlined,

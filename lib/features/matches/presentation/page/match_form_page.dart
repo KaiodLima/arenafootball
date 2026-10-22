@@ -193,6 +193,20 @@ class _MatchFormPageState extends State<MatchFormPage> {
               MatchDateChips(selected: form.date, onSelected: _cubit.selectDate),
               const SizedBox(height: AppSizes.s10),
               MatchTimeChips(frequent: form.frequentTimes, selected: form.time, onSelected: _cubit.selectTime),
+              const SizedBox(height: AppSizes.s16),
+              _Label(l10n.matchFormDuration),
+              Wrap(
+                spacing: AppSizes.s8,
+                runSpacing: AppSizes.s8,
+                children: [
+                  for (final minutes in MatchFormData.durationOptions)
+                    ArenaChoiceChip(
+                      label: l10n.matchFormDurationMinutes(minutes),
+                      selected: form.durationMinutes == minutes,
+                      onTap: () => _cubit.selectDuration(minutes),
+                    ),
+                ],
+              ),
               if (whenError != null) ...[
                 const SizedBox(height: AppSizes.s8),
                 Text(whenError, style: AppTypography.label(color: AppColors.danger).copyWith(fontSize: AppSizes.s12)),

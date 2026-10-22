@@ -5,6 +5,7 @@ import 'package:arena_soccer/features/matches/data/repositories/matches_reposito
 import 'package:arena_soccer/features/matches/domain/repositories/matches_repository_interface.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/create_match_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/delete_match_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/set_match_status_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/toggle_match_voting_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/get_today_matches_usecase.dart';
@@ -31,4 +32,5 @@ void registerMatchesDependencies() {
   _sl.registerLazySingleton(() => GetRegionMatchesUseCase(_sl()));
   _sl.registerLazySingleton(() => ToggleMatchVotingUseCase(_sl()));
   _sl.registerLazySingleton(() => DeleteMatchUseCase(_sl()));
+  _sl.registerLazySingleton(() => SetMatchStatusUseCase(_sl()));
 }

@@ -731,6 +731,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get matchCardLive => 'LIVE';
+
+  @override
+  String get matchStart => 'Start match';
+
+  @override
+  String get matchFinish => 'End match';
+
+  @override
+  String get matchFormDuration => 'Duration';
+
+  @override
+  String matchFormDurationMinutes(int n) {
+    return '$n min';
+  }
+
+  @override
   String get matchDetailsTitle => 'Match';
 
   @override

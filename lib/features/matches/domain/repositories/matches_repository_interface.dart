@@ -33,5 +33,11 @@ abstract class IMatchesRepository {
 
   Future<Either<Failure, void>> setVotingOpen({required String matchId, required bool isOpen, String? season});
 
+  Future<Either<Failure, void>> setManualStatus({
+    required String matchId,
+    required MatchManualStatus status,
+    String? season,
+  });
+
   Future<Either<Failure, void>> deleteMatch({required String matchId, String? season});
 }

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/matches/domain/match_squads.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/set_match_status_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/toggle_match_voting_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/watch_match_usecase.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
@@ -76,13 +77,15 @@ class MatchDetailsCubit extends Cubit<MatchDetailsState> {
   final WatchMatchUseCase watchMatchUseCase;
   final WatchTeamPlayersUseCase watchTeamPlayersUseCase;
   final ToggleMatchVotingUseCase toggleMatchVotingUseCase;
+  final SetMatchStatusUseCase setMatchStatusUseCase;
   StreamSubscription? _subscription;
   String? _season;
 
   MatchDetailsCubit(
     this.watchMatchUseCase,
     this.watchTeamPlayersUseCase,
-    this.toggleMatchVotingUseCase, {
+    this.toggleMatchVotingUseCase,
+    this.setMatchStatusUseCase, {
     required MatchDTO match,
   }) : super(MatchDetailsState(match: match));
 
@@ -119,6 +122,16 @@ class MatchDetailsCubit extends Cubit<MatchDetailsState> {
   /// Admin: abre/fecha a votação (o stream traz a partida nova).
   Future<void> toggleVoting() async {
     final response = await toggleMatchVotingUseCase(match: state.match, season: _season);
+    if (isClosed) return;
+    response.fold(
+      (failure) => emit(state.copyWith(errorMessage: () => failure.toString())),
+      (updated) => emit(state.copyWith(match: updated, errorMessage: () => null)),
+    );
+  }
+
+  /// Admin: inicia ([live]) ou encerra a partida na mão.
+  Future<void> setLive(bool live) async {
+    final response = await setMatchStatusUseCase(match: state.match, live: live, season: _season);
     if (isClosed) return;
     response.fold(
       (failure) => emit(state.copyWith(errorMessage: () => failure.toString())),

@@ -145,6 +145,7 @@ class MatchesList extends StatelessWidget {
                 },
               ),
               // Admin: lança um card de gol desta partida (e atualiza o placar dela).
+              onSetLive: isAdmin ? (live) => BlocProvider.of<MatchesCubit>(context).setLive(match, live) : null,
               onGoalCard: isAdmin
                   ? () => Navigator.pushNamed(
                         context,

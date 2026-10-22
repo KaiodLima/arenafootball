@@ -57,6 +57,14 @@ class MatchesRepositoryImpl implements IMatchesRepository {
       _dataSource.setVotingOpen(matchId: matchId, isOpen: isOpen, season: season);
 
   @override
+  Future<Either<Failure, void>> setManualStatus({
+    required String matchId,
+    required MatchManualStatus status,
+    String? season,
+  }) =>
+      _dataSource.setManualStatus(matchId: matchId, status: status, season: season);
+
+  @override
   Future<Either<Failure, void>> deleteMatch({required String matchId, String? season}) =>
       _dataSource.deleteMatch(matchId: matchId, season: season);
 }
