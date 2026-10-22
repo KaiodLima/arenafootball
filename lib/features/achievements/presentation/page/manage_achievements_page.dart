@@ -60,12 +60,10 @@ class ManageAchievementsPage extends StatelessWidget {
           style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s20),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
+      floatingActionButton: FloatingActionButton(
+        tooltip: l10n.achievementsNew,
         onPressed: () => _openForm(context),
-        icon: const Icon(Icons.add_rounded),
-        label: Text(l10n.achievementsNew),
+        child: const Icon(Icons.add_rounded),
       ),
       body: BlocConsumer<ManageAchievementsCubit, ManageAchievementsState>(
         listener: (context, state) {
