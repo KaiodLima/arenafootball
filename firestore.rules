@@ -84,6 +84,62 @@ service cloud.firestore {
       allow delete: if isOwner();
     }
 
+    // Conquistas: contadores do usuário. O app só grava os campos dele, sempre
+    // +1 (compartilhar, ler notícia) ou o dia de uso (um por dia de Brasília,
+    // pela hora do servidor); os outros (votos, atleta...) só as Cloud Functions.
+    match /usuarios/{userId}/progresso/contadores {
+      function own() {
+        return signedIn() && userId == request.auth.uid;
+      }
+      function num(data, key) {
+        return key in data ? data[key] : 0;
+      }
+      function before(key) {
+        return resource == null ? 0 : num(resource.data, key);
+      }
+      function after(key) {
+        return num(request.resource.data, key);
+      }
+      function plusOne(key) {
+        return after(key) == before(key) + 1;
+      }
+      function day(moment) {
+        return (moment - duration.value(3, 'h')).date();
+      }
+      function firstVisit() {
+        return resource == null || !('ultimoAcesso' in resource.data);
+      }
+      function visitOk() {
+        let seq = after('sequenciaDias');
+        let best = before('melhorSequencia');
+        return request.resource.data.ultimoAcesso == request.time
+          && plusOne('diasAtivos')
+          && (firstVisit() || day(request.time) > day(resource.data.ultimoAcesso))
+          && (seq == 1 || (!firstVisit()
+            && day(request.time) == day(resource.data.ultimoAcesso) + duration.value(1, 'd')
+            && seq == before('sequenciaDias') + 1))
+          && after('melhorSequencia') == (seq > best ? seq : best);
+      }
+      function appChange(keys) {
+        return (keys.hasOnly(['compartilhamentos']) && plusOne('compartilhamentos'))
+          || (keys.hasOnly(['noticiasLidas']) && plusOne('noticiasLidas'))
+          || (keys.hasOnly(['diasAtivos', 'sequenciaDias', 'melhorSequencia', 'ultimoAcesso']) && visitOk());
+      }
+
+      allow read: if own() || isAdmin();
+      allow create: if own() && appChange(request.resource.data.keys());
+      allow update: if own() && appChange(request.resource.data.diff(resource.data).affectedKeys());
+    }
+
+    // Conquistas desbloqueadas: gravadas pelas Cloud Functions; o dono lê e
+    // só marca que viu a comemoração.
+    match /usuarios/{userId}/conquistas/{achievementId} {
+      allow read: if signedIn() && (userId == request.auth.uid || isAdmin());
+      allow update: if signedIn() && userId == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['vista'])
+        && request.resource.data.vista == true;
+    }
+
     // Conteúdo do app: noticias, destaques, competicao, campeonatos,
     // times{ano}, jogadores{ano}, partidas{ano}, classificacao{ano}, grupos{ano}
     // e os votos antigos melhorjogador{timeC}{timeF} (os novos ficam em

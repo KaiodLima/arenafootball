@@ -81,4 +81,16 @@ class AppColors {
   static const Color gold = Color(0xFFFFC107);
   static const Color silver = Color(0xFFC4CCD4);
   static const Color bronze = Color(0xFFCD8B4E);
+
+  // Medalhas das conquistas: cor clara e escura do metal (degradê).
+  static const Color medalBronzeLight = Color(0xFFE8A86A);
+  static const Color medalBronzeDark = Color(0xFF8C5523);
+  static const Color medalSilverLight = Color(0xFFEEF2F5);
+  static const Color medalSilverDark = Color(0xFF8E9AA6);
+  static const Color medalGoldLight = Color(0xFFFFE27A);
+  static const Color medalGoldDark = Color(0xFFC79100);
+  static const Color medalLegendLight = Color(0xFF9C7BFF);
+  static const Color medalLegendDark = Color(0xFF0FA38E);
+  static const Color medalLockedLight = Color(0xFFE3E7EA);
+  static const Color medalLockedDark = Color(0xFFB4BCC3);
 }

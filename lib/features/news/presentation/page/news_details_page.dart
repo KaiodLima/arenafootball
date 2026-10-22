@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:arena_soccer/features/achievements/domain/achievement_metric.dart';
+import 'package:arena_soccer/features/achievements/presentation/bloc/achievements_cubit.dart';
 import 'package:arena_soccer/core/services/share_service.dart';
 import 'package:arena_soccer/core/utils/relative_time.dart';
 import 'package:arena_soccer/core/utils/share_links.dart';
@@ -39,6 +42,8 @@ class _NewsDetailsPageState extends State<NewsDetailsPage> {
   void initState() {
     super.initState();
     _scroll.addListener(_onScroll);
+    // Conquistas: notícia lida (convidado não conta).
+    BlocProvider.of<AchievementsCubit>(context).record(AchievementMetric.newsRead);
   }
 
   @override

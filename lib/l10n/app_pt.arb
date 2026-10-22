@@ -388,6 +388,132 @@
   "matchCardHideGoals": "Ocultar gols",
   "matchCardToday": "HOJE",
   "matchCardTomorrow": "AMANHÃ",
+  "achievementsAlmostThere": "QUASE LÁ",
+  "achievementsSeeAll": "Ver todas",
+  "achievementsStatMedals": "medalhas",
+  "achievementsStatXp": "XP",
+  "achievementsStatStreak": "dias seguidos",
+  "drawerAchievements": "Minhas conquistas",
+  "achievementsTitle": "Minhas conquistas",
+  "achievementsXp": "{xp} XP",
+  "@achievementsXp": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementsNextLevel": "Faltam {left} XP para {level}",
+  "@achievementsNextLevel": {
+    "placeholders": {
+      "left": {
+        "type": "int"
+      },
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "achievementsMaxLevel": "Nível máximo alcançado!",
+  "achievementsCount": "{unlocked} de {total} conquistas",
+  "@achievementsCount": {
+    "placeholders": {
+      "unlocked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementsRecent": "Recentes",
+  "achievementsAll": "Todas",
+  "achievementsEmpty": "Nenhuma conquista por aqui ainda",
+  "achievementsSecret": "Conquista secreta",
+  "achievementsSecretHint": "Continue usando o app para descobrir.",
+  "achievementsUnlockedOn": "Conquistada em {date}",
+  "@achievementsUnlockedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "achievementsUnlocked": "Conquistada!",
+  "achievementsProgress": "{current} de {goal}",
+  "@achievementsProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementsPoints": "+{points} XP",
+  "@achievementsPoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementCategoryFan": "Torcida",
+  "achievementCategoryVoting": "Votação",
+  "achievementCategorySharing": "Compartilhar",
+  "achievementCategoryNews": "Notícias",
+  "achievementCategoryAthlete": "Atleta",
+  "achievementTierBronze": "Bronze",
+  "achievementTierSilver": "Prata",
+  "achievementTierGold": "Ouro",
+  "achievementTierLegend": "Lenda",
+  "fanLevelFan": "Torcedor",
+  "fanLevelLoyal": "Fiel",
+  "fanLevelRoots": "Raiz",
+  "fanLevelUltra": "Ultra",
+  "fanLevelLegend": "Lenda",
+  "achievementMetricVotes": "Votos em partidas",
+  "achievementMetricShares": "Compartilhamentos",
+  "achievementMetricNewsRead": "Notícias lidas",
+  "achievementMetricActiveDays": "Dias de uso",
+  "achievementMetricBestStreak": "Dias seguidos (maior sequência)",
+  "achievementMetricFavoriteTeam": "Escolheu o time do coração",
+  "achievementMetricCardPhoto": "Foto na carteirinha",
+  "achievementMetricAthlete": "Conta ligada a atleta",
+  "achievementMetricAthleteGoals": "Gols do atleta (temporada)",
+  "achievementMetricAthleteAssists": "Assistências do atleta (temporada)",
+  "achievementMetricTeamOwner": "Dono de time aprovado",
+  "achievementsManageTitle": "Conquistas",
+  "achievementsNew": "Nova conquista",
+  "achievementsEdit": "Editar conquista",
+  "achievementsCreateSuggested": "Criar conquistas sugeridas",
+  "achievementsSuggestedCreated": "Conquistas sugeridas criadas",
+  "achievementsManageEmpty": "Nenhuma conquista cadastrada",
+  "achievementFieldTitle": "Título",
+  "achievementFieldDescription": "Descrição (como ganhar)",
+  "achievementFieldCategory": "Categoria",
+  "achievementFieldTier": "Nível da medalha",
+  "achievementFieldIcon": "Ícone",
+  "achievementFieldMetric": "O que conta",
+  "achievementFieldGoal": "Meta",
+  "achievementFieldPoints": "Pontos (XP)",
+  "achievementFieldSecret": "Secreta (bloqueada aparece como ?)",
+  "achievementFieldActive": "Ativa",
+  "achievementSave": "Salvar conquista",
+  "achievementSaved": "Conquista salva",
+  "achievementDeleteConfirm": "Excluir a conquista \"{title}\"?",
+  "@achievementDeleteConfirm": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "achievementDeleted": "Conquista excluída",
+  "achievementTitleRequired": "Informe o título",
+  "achievementInactive": "Inativa",
+  "achievementPreview": "Prévia",
   "matchDetailsVotingEnded": "Votação encerrada",
   "votingNoWinnerTitle": "Sem melhor da partida",
   "votingNoWinnerNotEnough": "Mínimo de {min} votos não atingido ({total} votos).",

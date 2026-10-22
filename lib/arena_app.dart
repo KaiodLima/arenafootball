@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/achievements/data/dtos/achievement_dto.dart';
+import 'package:arena_soccer/features/achievements/presentation/bloc/achievement_form_cubit.dart';
+import 'package:arena_soccer/features/achievements/presentation/bloc/manage_achievements_cubit.dart';
+import 'package:arena_soccer/features/achievements/presentation/page/achievement_form_page.dart';
+import 'package:arena_soccer/features/achievements/presentation/page/achievements_page.dart';
+import 'package:arena_soccer/features/achievements/presentation/page/manage_achievements_page.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/core/navigation/route_stack.dart';
 import 'package:arena_soccer/features/fan_card/presentation/bloc/fan_card_cubit.dart';
@@ -286,6 +292,24 @@ class ArenaApp extends StatelessWidget {
           );
         },
 
+        // Conquistas da conta logada (o cubit é global).
+        AppRoutes.achievementsPage: (context) => const AchievementsPage(),
+        // Admin: catálogo de conquistas e o formulário (`achievement` nulo = nova; `order` = posição).
+        AppRoutes.manageAchievementsPage: (context) => BlocProvider<ManageAchievementsCubit>(
+              create: (_) => ManageAchievementsCubit(sl(), sl(), sl(), sl())..watch(),
+              child: const ManageAchievementsPage(),
+            ),
+        AppRoutes.achievementFormPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          return BlocProvider<AchievementFormCubit>(
+            create: (_) => AchievementFormCubit(
+              sl(),
+              initial: args?['achievement'] as AchievementDTO?,
+              order: args?['order'] as int? ?? 0,
+            ),
+            child: const AchievementFormPage(),
+          );
+        },
         // Admin: regras da votação de melhor jogador.
         AppRoutes.votingRulesPage: (context) => BlocProvider<VotingRulesCubit>(
               create: (_) => VotingRulesCubit(sl(), sl())..load(),

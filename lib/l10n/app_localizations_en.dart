@@ -731,6 +731,224 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get achievementsAlmostThere => 'ALMOST THERE';
+
+  @override
+  String get achievementsSeeAll => 'See all';
+
+  @override
+  String get achievementsStatMedals => 'medals';
+
+  @override
+  String get achievementsStatXp => 'XP';
+
+  @override
+  String get achievementsStatStreak => 'day streak';
+
+  @override
+  String get drawerAchievements => 'My achievements';
+
+  @override
+  String get achievementsTitle => 'My achievements';
+
+  @override
+  String achievementsXp(int xp) {
+    return '$xp XP';
+  }
+
+  @override
+  String achievementsNextLevel(int left, String level) {
+    return '$left XP to $level';
+  }
+
+  @override
+  String get achievementsMaxLevel => 'Max level reached!';
+
+  @override
+  String achievementsCount(int unlocked, int total) {
+    return '$unlocked of $total achievements';
+  }
+
+  @override
+  String get achievementsRecent => 'Recent';
+
+  @override
+  String get achievementsAll => 'All';
+
+  @override
+  String get achievementsEmpty => 'No achievements here yet';
+
+  @override
+  String get achievementsSecret => 'Secret achievement';
+
+  @override
+  String get achievementsSecretHint => 'Keep using the app to find out.';
+
+  @override
+  String achievementsUnlockedOn(String date) {
+    return 'Unlocked on $date';
+  }
+
+  @override
+  String get achievementsUnlocked => 'Unlocked!';
+
+  @override
+  String achievementsProgress(int current, int goal) {
+    return '$current of $goal';
+  }
+
+  @override
+  String achievementsPoints(int points) {
+    return '+$points XP';
+  }
+
+  @override
+  String get achievementCategoryFan => 'Fan';
+
+  @override
+  String get achievementCategoryVoting => 'Voting';
+
+  @override
+  String get achievementCategorySharing => 'Sharing';
+
+  @override
+  String get achievementCategoryNews => 'News';
+
+  @override
+  String get achievementCategoryAthlete => 'Athlete';
+
+  @override
+  String get achievementTierBronze => 'Bronze';
+
+  @override
+  String get achievementTierSilver => 'Silver';
+
+  @override
+  String get achievementTierGold => 'Gold';
+
+  @override
+  String get achievementTierLegend => 'Legend';
+
+  @override
+  String get fanLevelFan => 'Fan';
+
+  @override
+  String get fanLevelLoyal => 'Loyal';
+
+  @override
+  String get fanLevelRoots => 'Hardcore';
+
+  @override
+  String get fanLevelUltra => 'Ultra';
+
+  @override
+  String get fanLevelLegend => 'Legend';
+
+  @override
+  String get achievementMetricVotes => 'Match votes';
+
+  @override
+  String get achievementMetricShares => 'Shares';
+
+  @override
+  String get achievementMetricNewsRead => 'News read';
+
+  @override
+  String get achievementMetricActiveDays => 'Days using the app';
+
+  @override
+  String get achievementMetricBestStreak => 'Days in a row (best streak)';
+
+  @override
+  String get achievementMetricFavoriteTeam => 'Picked a favorite team';
+
+  @override
+  String get achievementMetricCardPhoto => 'Photo on the fan card';
+
+  @override
+  String get achievementMetricAthlete => 'Account linked to an athlete';
+
+  @override
+  String get achievementMetricAthleteGoals => 'Athlete\'s goals (season)';
+
+  @override
+  String get achievementMetricAthleteAssists => 'Athlete\'s assists (season)';
+
+  @override
+  String get achievementMetricTeamOwner => 'Approved team owner';
+
+  @override
+  String get achievementsManageTitle => 'Achievements';
+
+  @override
+  String get achievementsNew => 'New achievement';
+
+  @override
+  String get achievementsEdit => 'Edit achievement';
+
+  @override
+  String get achievementsCreateSuggested => 'Create suggested achievements';
+
+  @override
+  String get achievementsSuggestedCreated => 'Suggested achievements created';
+
+  @override
+  String get achievementsManageEmpty => 'No achievements yet';
+
+  @override
+  String get achievementFieldTitle => 'Title';
+
+  @override
+  String get achievementFieldDescription => 'Description (how to earn)';
+
+  @override
+  String get achievementFieldCategory => 'Category';
+
+  @override
+  String get achievementFieldTier => 'Medal tier';
+
+  @override
+  String get achievementFieldIcon => 'Icon';
+
+  @override
+  String get achievementFieldMetric => 'What counts';
+
+  @override
+  String get achievementFieldGoal => 'Goal';
+
+  @override
+  String get achievementFieldPoints => 'Points (XP)';
+
+  @override
+  String get achievementFieldSecret => 'Secret (shows ? while locked)';
+
+  @override
+  String get achievementFieldActive => 'Active';
+
+  @override
+  String get achievementSave => 'Save achievement';
+
+  @override
+  String get achievementSaved => 'Achievement saved';
+
+  @override
+  String achievementDeleteConfirm(String title) {
+    return 'Delete the achievement \"$title\"?';
+  }
+
+  @override
+  String get achievementDeleted => 'Achievement deleted';
+
+  @override
+  String get achievementTitleRequired => 'Enter the title';
+
+  @override
+  String get achievementInactive => 'Inactive';
+
+  @override
+  String get achievementPreview => 'Preview';
+
+  @override
   String get matchDetailsVotingEnded => 'Voting closed';
 
   @override

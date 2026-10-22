@@ -734,6 +734,225 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get achievementsAlmostThere => 'QUASE LÁ';
+
+  @override
+  String get achievementsSeeAll => 'Ver todas';
+
+  @override
+  String get achievementsStatMedals => 'medalhas';
+
+  @override
+  String get achievementsStatXp => 'XP';
+
+  @override
+  String get achievementsStatStreak => 'dias seguidos';
+
+  @override
+  String get drawerAchievements => 'Minhas conquistas';
+
+  @override
+  String get achievementsTitle => 'Minhas conquistas';
+
+  @override
+  String achievementsXp(int xp) {
+    return '$xp XP';
+  }
+
+  @override
+  String achievementsNextLevel(int left, String level) {
+    return 'Faltam $left XP para $level';
+  }
+
+  @override
+  String get achievementsMaxLevel => 'Nível máximo alcançado!';
+
+  @override
+  String achievementsCount(int unlocked, int total) {
+    return '$unlocked de $total conquistas';
+  }
+
+  @override
+  String get achievementsRecent => 'Recentes';
+
+  @override
+  String get achievementsAll => 'Todas';
+
+  @override
+  String get achievementsEmpty => 'Nenhuma conquista por aqui ainda';
+
+  @override
+  String get achievementsSecret => 'Conquista secreta';
+
+  @override
+  String get achievementsSecretHint => 'Continue usando o app para descobrir.';
+
+  @override
+  String achievementsUnlockedOn(String date) {
+    return 'Conquistada em $date';
+  }
+
+  @override
+  String get achievementsUnlocked => 'Conquistada!';
+
+  @override
+  String achievementsProgress(int current, int goal) {
+    return '$current de $goal';
+  }
+
+  @override
+  String achievementsPoints(int points) {
+    return '+$points XP';
+  }
+
+  @override
+  String get achievementCategoryFan => 'Torcida';
+
+  @override
+  String get achievementCategoryVoting => 'Votação';
+
+  @override
+  String get achievementCategorySharing => 'Compartilhar';
+
+  @override
+  String get achievementCategoryNews => 'Notícias';
+
+  @override
+  String get achievementCategoryAthlete => 'Atleta';
+
+  @override
+  String get achievementTierBronze => 'Bronze';
+
+  @override
+  String get achievementTierSilver => 'Prata';
+
+  @override
+  String get achievementTierGold => 'Ouro';
+
+  @override
+  String get achievementTierLegend => 'Lenda';
+
+  @override
+  String get fanLevelFan => 'Torcedor';
+
+  @override
+  String get fanLevelLoyal => 'Fiel';
+
+  @override
+  String get fanLevelRoots => 'Raiz';
+
+  @override
+  String get fanLevelUltra => 'Ultra';
+
+  @override
+  String get fanLevelLegend => 'Lenda';
+
+  @override
+  String get achievementMetricVotes => 'Votos em partidas';
+
+  @override
+  String get achievementMetricShares => 'Compartilhamentos';
+
+  @override
+  String get achievementMetricNewsRead => 'Notícias lidas';
+
+  @override
+  String get achievementMetricActiveDays => 'Dias de uso';
+
+  @override
+  String get achievementMetricBestStreak => 'Dias seguidos (maior sequência)';
+
+  @override
+  String get achievementMetricFavoriteTeam => 'Escolheu o time do coração';
+
+  @override
+  String get achievementMetricCardPhoto => 'Foto na carteirinha';
+
+  @override
+  String get achievementMetricAthlete => 'Conta ligada a atleta';
+
+  @override
+  String get achievementMetricAthleteGoals => 'Gols do atleta (temporada)';
+
+  @override
+  String get achievementMetricAthleteAssists =>
+      'Assistências do atleta (temporada)';
+
+  @override
+  String get achievementMetricTeamOwner => 'Dono de time aprovado';
+
+  @override
+  String get achievementsManageTitle => 'Conquistas';
+
+  @override
+  String get achievementsNew => 'Nova conquista';
+
+  @override
+  String get achievementsEdit => 'Editar conquista';
+
+  @override
+  String get achievementsCreateSuggested => 'Criar conquistas sugeridas';
+
+  @override
+  String get achievementsSuggestedCreated => 'Conquistas sugeridas criadas';
+
+  @override
+  String get achievementsManageEmpty => 'Nenhuma conquista cadastrada';
+
+  @override
+  String get achievementFieldTitle => 'Título';
+
+  @override
+  String get achievementFieldDescription => 'Descrição (como ganhar)';
+
+  @override
+  String get achievementFieldCategory => 'Categoria';
+
+  @override
+  String get achievementFieldTier => 'Nível da medalha';
+
+  @override
+  String get achievementFieldIcon => 'Ícone';
+
+  @override
+  String get achievementFieldMetric => 'O que conta';
+
+  @override
+  String get achievementFieldGoal => 'Meta';
+
+  @override
+  String get achievementFieldPoints => 'Pontos (XP)';
+
+  @override
+  String get achievementFieldSecret => 'Secreta (bloqueada aparece como ?)';
+
+  @override
+  String get achievementFieldActive => 'Ativa';
+
+  @override
+  String get achievementSave => 'Salvar conquista';
+
+  @override
+  String get achievementSaved => 'Conquista salva';
+
+  @override
+  String achievementDeleteConfirm(String title) {
+    return 'Excluir a conquista \"$title\"?';
+  }
+
+  @override
+  String get achievementDeleted => 'Conquista excluída';
+
+  @override
+  String get achievementTitleRequired => 'Informe o título';
+
+  @override
+  String get achievementInactive => 'Inativa';
+
+  @override
+  String get achievementPreview => 'Prévia';
+
+  @override
   String get matchDetailsVotingEnded => 'Votação encerrada';
 
   @override
