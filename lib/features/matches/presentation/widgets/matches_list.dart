@@ -13,6 +13,7 @@ import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
+import 'package:arena_soccer/utils/constants/team_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
@@ -122,6 +123,8 @@ class MatchesList extends StatelessWidget {
               isAdmin: isAdmin,
               homeCrest: state.crestOf(match.homeTeam),
               awayCrest: state.crestOf(match.awayTeam),
+              homeColor: colorFromHex(state.colorOf(match.homeTeam) ?? ''),
+              awayColor: colorFromHex(state.colorOf(match.awayTeam) ?? ''),
               isFavorite: isFavoriteMatch(match),
               isFavoriteTeam: isFavoriteTeam,
               onVotingTap: () => _openVoting(context, match),

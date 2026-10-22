@@ -15,6 +15,7 @@ import 'package:arena_soccer/utils/components/arena_submit_bar.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/components/team_picker_sheet.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
+import 'package:arena_soccer/utils/constants/team_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
@@ -226,6 +227,8 @@ class _MatchFormPageState extends State<MatchFormPage> {
                   showVoting: false,
                   homeCrest: form.crestOf(form.homeTeam),
                   awayCrest: form.crestOf(form.awayTeam),
+                  homeColor: colorFromHex(form.colorOf(form.homeTeam)),
+                  awayColor: colorFromHex(form.colorOf(form.awayTeam)),
                   onVotingTap: () {},
                   onToggleVoting: () {},
                   onEditScore: () {},

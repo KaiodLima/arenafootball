@@ -386,6 +386,8 @@
   },
   "matchCardGoals": "Gols",
   "matchCardHideGoals": "Ocultar gols",
+  "matchCardToday": "HOJE",
+  "matchCardTomorrow": "AMANHÃ",
   "matchesEditScore": "Editar Placar",
   "matchesDeleteMatch": "Excluir Partida",
   "matchesDeleteConfirm": "DESEJA REALMENTE EXCLUIR ESSA PARTIDA ?",

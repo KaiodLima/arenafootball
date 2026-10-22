@@ -117,6 +117,14 @@ class MatchFormData extends Equatable {
     return null;
   }
 
+  /// Cor principal ("#RRGGBB") do time de nome [teamName] ('' sem cor).
+  String colorOf(String? teamName) {
+    for (final team in teams) {
+      if (team.name == teamName) return team.primaryColor;
+    }
+    return '';
+  }
+
   List<String> get frequentTimes => MatchFormHints.frequentTimes(existing);
 
   List<String> get frequentVenues => MatchFormHints.frequentVenues(existing);

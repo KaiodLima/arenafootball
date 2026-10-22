@@ -12,7 +12,10 @@ class MatchesState extends Equatable {
   /// Escudos por nome normalizado do time ([normalizeTeamName]).
   final Map<String, String> crests;
 
-  const MatchesState({this.matches = const [], this.teamFilter, this.crests = const {}});
+  /// Cor principal ("#RRGGBB") por nome normalizado do time.
+  final Map<String, String> colors;
+
+  const MatchesState({this.matches = const [], this.teamFilter, this.crests = const {}, this.colors = const {}});
 
   /// Partidas do recorte do filtro.
   List<MatchDTO> get visibleMatches => teamFilter == null
@@ -33,23 +36,25 @@ class MatchesState extends Equatable {
 
   String? crestOf(String teamName) => crests[normalizeTeamName(teamName)];
 
+  String? colorOf(String teamName) => colors[normalizeTeamName(teamName)];
+
   @override
-  List<Object?> get props => [matches, teamFilter, crests];
+  List<Object?> get props => [matches, teamFilter, crests, colors];
 }
 
 class LoadingMatchesState extends MatchesState {
-  const LoadingMatchesState({super.matches, super.teamFilter, super.crests});
+  const LoadingMatchesState({super.matches, super.teamFilter, super.crests, super.colors});
 }
 
 class SuccessMatchesState extends MatchesState {
-  const SuccessMatchesState({required super.matches, super.teamFilter, super.crests});
+  const SuccessMatchesState({required super.matches, super.teamFilter, super.crests, super.colors});
 }
 
 class ErrorMatchesState extends MatchesState {
   final String errorMessage;
 
-  const ErrorMatchesState({required this.errorMessage, super.matches, super.teamFilter, super.crests});
+  const ErrorMatchesState({required this.errorMessage, super.matches, super.teamFilter, super.crests, super.colors});
 
   @override
-  List<Object?> get props => [matches, teamFilter, crests, errorMessage];
+  List<Object?> get props => [matches, teamFilter, crests, colors, errorMessage];
 }

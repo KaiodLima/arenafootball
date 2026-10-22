@@ -225,6 +225,8 @@
   },
   "matchCardGoals": "Goals",
   "matchCardHideGoals": "Hide goals",
+  "matchCardToday": "TODAY",
+  "matchCardTomorrow": "TOMORROW",
   "matchesEditScore": "Edit Score",
   "matchesDeleteMatch": "Delete Match",
   "matchesDeleteConfirm": "DO YOU REALLY WANT TO DELETE THIS MATCH?",

@@ -1323,6 +1323,18 @@ abstract class AppLocalizations {
   /// **'Ocultar gols'**
   String get matchCardHideGoals;
 
+  /// No description provided for @matchCardToday.
+  ///
+  /// In pt, this message translates to:
+  /// **'HOJE'**
+  String get matchCardToday;
+
+  /// No description provided for @matchCardTomorrow.
+  ///
+  /// In pt, this message translates to:
+  /// **'AMANHÃ'**
+  String get matchCardTomorrow;
+
   /// No description provided for @matchesEditScore.
   ///
   /// In pt, this message translates to:

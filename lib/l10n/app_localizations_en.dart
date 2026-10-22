@@ -725,6 +725,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardHideGoals => 'Hide goals';
 
   @override
+  String get matchCardToday => 'TODAY';
+
+  @override
+  String get matchCardTomorrow => 'TOMORROW';
+
+  @override
   String get matchesEditScore => 'Edit Score';
 
   @override

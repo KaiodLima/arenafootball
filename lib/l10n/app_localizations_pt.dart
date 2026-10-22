@@ -728,6 +728,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardHideGoals => 'Ocultar gols';
 
   @override
+  String get matchCardToday => 'HOJE';
+
+  @override
+  String get matchCardTomorrow => 'AMANHÃ';
+
+  @override
   String get matchesEditScore => 'Editar Placar';
 
   @override
