@@ -76,11 +76,14 @@ class MatchCard extends StatefulWidget {
   /// Mostra o botão de votação (falso na prévia do cadastro).
   final bool showVoting;
 
-  /// Toque no card (admin: abre o "Card de gol" com esta partida).
+  /// Toque no card (abre os detalhes da partida).
   final VoidCallback? onTap;
 
   /// Nome da competição (lista de todas as competições); nulo = sem etiqueta.
   final String? championshipLabel;
+
+  /// Admin: "Lançar card de gol" no menu (nulo = sem a ação).
+  final VoidCallback? onGoalCard;
 
   /// Agora (só para teste).
   final DateTime? now;
@@ -102,6 +105,7 @@ class MatchCard extends StatefulWidget {
     this.showVoting = true,
     this.onTap,
     this.championshipLabel,
+    this.onGoalCard,
     this.now,
   });
 
@@ -176,6 +180,12 @@ class _MatchCardState extends State<MatchCard> {
                           label: l10n.matchesEditScore,
                           onSelected: widget.onEditScore,
                         ),
+                        if (widget.onGoalCard != null)
+                          CardMenuAction(
+                            icon: Icons.sports_soccer_rounded,
+                            label: l10n.matchDetailsGoalCard,
+                            onSelected: widget.onGoalCard!,
+                          ),
                         CardMenuAction(
                           icon: Icons.delete_outline_rounded,
                           label: l10n.matchesDeleteMatch,

@@ -37,6 +37,7 @@ class AppSizes {
   static const double s150 = 150.0;
   static const double s200 = 200.0;
   static const double s250 = 250.0;
+  static const double s300 = 300.0;
 
   // ---------------------------------------------------------------------
   // Aliases semânticos
@@ -86,6 +87,9 @@ class AppSizes {
 
   /// Altura do carrossel de destaques da home.
   static const double highlightsHeight = s200;
+
+  /// Cabeçalho aberto dos detalhes da partida.
+  static const double matchHeaderHeight = s300;
 
   /// Logo na AppBar.
   static const double logoWidth = s110;

@@ -734,6 +734,51 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get matchDetailsTitle => 'Partida';
+
+  @override
+  String get matchDetailsFinished => 'ENCERRADO';
+
+  @override
+  String get matchDetailsNoScorers => 'Autores dos gols não informados';
+
+  @override
+  String get matchDetailsNotStarted => 'A bola ainda não rolou';
+
+  @override
+  String get matchDetailsNoGoals => 'Sem gols';
+
+  @override
+  String get matchDetailsUnknownScorer => 'Gol';
+
+  @override
+  String get matchDetailsBestPlayer => 'Melhor da partida';
+
+  @override
+  String matchDetailsVotes(String count) {
+    return '$count votos';
+  }
+
+  @override
+  String get matchDetailsVotingOpen =>
+      'Votação aberta: escolha o craque do jogo';
+
+  @override
+  String get matchDetailsVotingClosed => 'Votação ainda não aberta';
+
+  @override
+  String get matchDetailsSquads => 'Elencos';
+
+  @override
+  String get matchDetailsNoSquad => 'Nenhum atleta inscrito';
+
+  @override
+  String get matchDetailsGoalCard => 'Lançar card de gol';
+
+  @override
+  String get matchDetailsDeleted => 'Esta partida foi excluída';
+
+  @override
   String get matchesEditScore => 'Editar Placar';
 
   @override

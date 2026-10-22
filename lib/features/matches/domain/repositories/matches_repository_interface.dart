@@ -7,6 +7,9 @@ abstract class IMatchesRepository {
   /// Com [region], só as partidas daquela região (filtradas no servidor).
   Stream<Either<Failure, List<MatchDTO>>> watchMatches({String? season, String? region});
 
+  /// Uma partida ao vivo; null se foi apagada.
+  Stream<Either<Failure, MatchDTO?>> watchMatch({required String matchId, String? season});
+
   Future<Either<Failure, void>> createMatch(MatchDTO match, {String? season});
 
   Future<Either<Failure, void>> updateScore({

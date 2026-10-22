@@ -227,6 +227,27 @@
   "matchCardHideGoals": "Hide goals",
   "matchCardToday": "TODAY",
   "matchCardTomorrow": "TOMORROW",
+  "matchDetailsTitle": "Match",
+  "matchDetailsFinished": "FULL TIME",
+  "matchDetailsNoScorers": "Goal scorers not informed",
+  "matchDetailsNotStarted": "Kick-off hasn't happened yet",
+  "matchDetailsNoGoals": "No goals",
+  "matchDetailsUnknownScorer": "Goal",
+  "matchDetailsBestPlayer": "Player of the match",
+  "matchDetailsVotes": "{count} votes",
+  "@matchDetailsVotes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "matchDetailsVotingOpen": "Voting open: pick the star of the match",
+  "matchDetailsVotingClosed": "Voting not open yet",
+  "matchDetailsSquads": "Squads",
+  "matchDetailsNoSquad": "No players registered",
+  "matchDetailsGoalCard": "Post goal card",
+  "matchDetailsDeleted": "This match was deleted",
   "matchesEditScore": "Edit Score",
   "matchesDeleteMatch": "Delete Match",
   "matchesDeleteConfirm": "DO YOU REALLY WANT TO DELETE THIS MATCH?",

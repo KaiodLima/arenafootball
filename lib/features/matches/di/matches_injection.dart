@@ -9,6 +9,7 @@ import 'package:arena_soccer/features/matches/domain/usecases/toggle_match_votin
 import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/get_today_matches_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/update_match_score_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/watch_match_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/watch_matches_usecase.dart';
 
 final _sl = GetIt.instance;
@@ -22,6 +23,7 @@ void registerMatchesDependencies() {
 
   // UseCases
   _sl.registerLazySingleton(() => WatchMatchesUseCase(_sl()));
+  _sl.registerLazySingleton(() => WatchMatchUseCase(_sl()));
   _sl.registerLazySingleton(() => CreateMatchUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => UpdateMatchScoreUseCase(_sl()));
   _sl.registerLazySingleton(() => UpdateMatchGoalsUseCase(_sl(), _sl()));

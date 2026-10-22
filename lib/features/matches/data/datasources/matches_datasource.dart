@@ -37,6 +37,15 @@ class MatchesDataSource {
         );
   }
 
+  /// Uma partida ao vivo (tela de detalhes); null se o doc foi apagado.
+  Stream<Either<Failure, MatchDTO?>> watchMatch({required String matchId, String? season}) {
+    return _matches(season).doc(matchId).snapshots().toEither(
+          (doc) => doc.exists ? MatchDTO.fromFirestore(doc) : null,
+          fallbackMessage: 'Não foi possível carregar a partida.',
+          logName: _logName,
+        );
+  }
+
   /// Cria a partida com `id_partida` = id do documento e `dataRegistro` do
   /// servidor, numa escrita só (o app antigo fazia `add()` + `set()`).
   Future<Either<Failure, void>> createMatch(MatchDTO match, {String? season}) async {

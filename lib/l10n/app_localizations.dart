@@ -1335,6 +1335,90 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @matchDetailsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Partida'**
+  String get matchDetailsTitle;
+
+  /// No description provided for @matchDetailsFinished.
+  ///
+  /// In pt, this message translates to:
+  /// **'ENCERRADO'**
+  String get matchDetailsFinished;
+
+  /// No description provided for @matchDetailsNoScorers.
+  ///
+  /// In pt, this message translates to:
+  /// **'Autores dos gols não informados'**
+  String get matchDetailsNoScorers;
+
+  /// No description provided for @matchDetailsNotStarted.
+  ///
+  /// In pt, this message translates to:
+  /// **'A bola ainda não rolou'**
+  String get matchDetailsNotStarted;
+
+  /// No description provided for @matchDetailsNoGoals.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem gols'**
+  String get matchDetailsNoGoals;
+
+  /// No description provided for @matchDetailsUnknownScorer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol'**
+  String get matchDetailsUnknownScorer;
+
+  /// No description provided for @matchDetailsBestPlayer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Melhor da partida'**
+  String get matchDetailsBestPlayer;
+
+  /// No description provided for @matchDetailsVotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} votos'**
+  String matchDetailsVotes(String count);
+
+  /// No description provided for @matchDetailsVotingOpen.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votação aberta: escolha o craque do jogo'**
+  String get matchDetailsVotingOpen;
+
+  /// No description provided for @matchDetailsVotingClosed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votação ainda não aberta'**
+  String get matchDetailsVotingClosed;
+
+  /// No description provided for @matchDetailsSquads.
+  ///
+  /// In pt, this message translates to:
+  /// **'Elencos'**
+  String get matchDetailsSquads;
+
+  /// No description provided for @matchDetailsNoSquad.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum atleta inscrito'**
+  String get matchDetailsNoSquad;
+
+  /// No description provided for @matchDetailsGoalCard.
+  ///
+  /// In pt, this message translates to:
+  /// **'Lançar card de gol'**
+  String get matchDetailsGoalCard;
+
+  /// No description provided for @matchDetailsDeleted.
+  ///
+  /// In pt, this message translates to:
+  /// **'Esta partida foi excluída'**
+  String get matchDetailsDeleted;
+
   /// No description provided for @matchesEditScore.
   ///
   /// In pt, this message translates to:

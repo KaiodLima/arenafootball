@@ -731,6 +731,51 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get matchDetailsTitle => 'Match';
+
+  @override
+  String get matchDetailsFinished => 'FULL TIME';
+
+  @override
+  String get matchDetailsNoScorers => 'Goal scorers not informed';
+
+  @override
+  String get matchDetailsNotStarted => 'Kick-off hasn\'t happened yet';
+
+  @override
+  String get matchDetailsNoGoals => 'No goals';
+
+  @override
+  String get matchDetailsUnknownScorer => 'Goal';
+
+  @override
+  String get matchDetailsBestPlayer => 'Player of the match';
+
+  @override
+  String matchDetailsVotes(String count) {
+    return '$count votes';
+  }
+
+  @override
+  String get matchDetailsVotingOpen =>
+      'Voting open: pick the star of the match';
+
+  @override
+  String get matchDetailsVotingClosed => 'Voting not open yet';
+
+  @override
+  String get matchDetailsSquads => 'Squads';
+
+  @override
+  String get matchDetailsNoSquad => 'No players registered';
+
+  @override
+  String get matchDetailsGoalCard => 'Post goal card';
+
+  @override
+  String get matchDetailsDeleted => 'This match was deleted';
+
+  @override
   String get matchesEditScore => 'Edit Score';
 
   @override
