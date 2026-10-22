@@ -18,8 +18,8 @@ import 'package:arena_soccer/utils/constants/app_sizes.dart';
 /// Medalha hexagonal com chanfro (estilo prêmios do Apple Fitness): aro
 /// escuro, bisel claro, face metálica em degradê, faixa de luz e fitinha
 /// embaixo. Cada nível tem um detalhe: prata com aro duplo, ouro com raios em
-/// volta, lenda com aro em degradê e brilho. Bloqueada é uma silhueta de vidro
-/// escuro com cadeado e o progresso desenhado em volta do hexágono; [hidden]
+/// volta, lenda com aro em degradê e brilho. Bloqueada é uma silhueta
+/// cinza-clara com cadeado e o progresso desenhado em volta do hexágono; [hidden]
 /// (secreta bloqueada) mostra "?".
 class MedalBadge extends StatelessWidget {
   final AchievementTier tier;
@@ -44,7 +44,7 @@ class MedalBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (_, dark) = medalColors(tier);
-    final glyphColor = unlocked ? AppColors.white : AppColors.white.withValues(alpha: 0.28);
+    final glyphColor = unlocked ? AppColors.white : AppColors.medalLockedDark;
     final glyphShadow = [
       Shadow(color: dark.withValues(alpha: unlocked ? 0.7 : 0), blurRadius: 3, offset: const Offset(0, 1))
     ];
@@ -65,7 +65,7 @@ class MedalBadge extends StatelessWidget {
                       style: TextStyle(
                         fontSize: size * 0.34,
                         fontWeight: FontWeight.w900,
-                        color: AppColors.white.withValues(alpha: 0.45),
+                        color: AppColors.medalLockedDark,
                       ),
                     )
                   : Icon(achievementIcon(icon), size: size * 0.34, color: glyphColor, shadows: glyphShadow),
@@ -76,8 +76,12 @@ class MedalBadge extends StatelessWidget {
                 bottom: size * 0.14,
                 child: Container(
                   padding: EdgeInsets.all(size * 0.03),
-                  decoration: const BoxDecoration(color: AppColors.trophyBackground, shape: BoxShape.circle),
-                  child: Icon(Icons.lock_rounded, size: size * 0.13, color: AppColors.white.withValues(alpha: 0.7)),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.greyLight),
+                  ),
+                  child: Icon(Icons.lock_rounded, size: size * 0.13, color: AppColors.textSecondary),
                 ),
               ),
           ],
@@ -227,16 +231,16 @@ class _MedalPainter extends CustomPainter {
   }
 
   void _paintLocked(Canvas canvas, Offset center, double radius, double s) {
-    // Vidro escuro: aro, face e um reflexo leve.
-    canvas.drawPath(hexagon(center, radius), Paint()..color = AppColors.trophyLockedRim);
+    // Silhueta cinza-clara: aro, face e um filete claro.
+    canvas.drawPath(hexagon(center, radius), Paint()..color = AppColors.medalLockedDark.withValues(alpha: 0.55));
     final face = hexagon(center, radius * 0.86);
-    canvas.drawPath(face, Paint()..color = AppColors.trophyLockedFace);
+    canvas.drawPath(face, Paint()..color = AppColors.medalLockedLight);
     canvas.drawPath(
       face,
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = radius * 0.03
-        ..color = AppColors.white.withValues(alpha: 0.08),
+        ..color = AppColors.white.withValues(alpha: 0.7),
     );
     // Progresso: contorno do hexágono a partir da ponta de cima.
     final outline = hexagon(center, radius * 1.13);
@@ -245,7 +249,7 @@ class _MedalPainter extends CustomPainter {
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = s * 0.035
-        ..color = AppColors.white.withValues(alpha: 0.08),
+        ..color = AppColors.greyLight,
     );
     if (progress <= 0) return;
     final metric = outline.computeMetrics().first;

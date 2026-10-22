@@ -10,7 +10,9 @@ import 'package:arena_soccer/features/achievements/presentation/widgets/achievem
 import 'package:arena_soccer/features/achievements/presentation/widgets/medal_badge.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/utils/components/arena_card.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
+import 'package:arena_soccer/utils/components/arena_hero_background.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
@@ -23,7 +25,7 @@ AchievementTier _levelTier(FanLevel level) => switch (level) {
       FanLevel.legend => AchievementTier.legend,
     };
 
-/// "Minhas conquistas" como sala de troféus (fundo noturno): emblema do nível
+/// "Minhas conquistas": topo com o fundo da marca e o emblema do nível
 /// com o anel de XP, números, o "quase lá" e uma prateleira por categoria.
 /// As medalhas entram em sequência ao abrir.
 class AchievementsPage extends StatefulWidget {
@@ -69,13 +71,13 @@ class _AchievementsPageState extends State<AchievementsPage> with SingleTickerPr
         var shelfIndex = 0;
 
         return Scaffold(
-          backgroundColor: AppColors.trophyBackground,
+          backgroundColor: AppColors.background,
           body: CustomScrollView(
             slivers: [
               SliverAppBar(
                 pinned: true,
                 expandedHeight: AppSizes.achievementsHeaderHeight,
-                backgroundColor: AppColors.trophyBackground,
+                backgroundColor: AppColors.primaryDark,
                 surfaceTintColor: AppColors.transparent,
                 foregroundColor: AppColors.white,
                 title: Text(
@@ -90,17 +92,12 @@ class _AchievementsPageState extends State<AchievementsPage> with SingleTickerPr
               if (state.loading && board.entries.isEmpty)
                 const SliverFillRemaining(
                   hasScrollBody: false,
-                  child: Center(child: CircularProgressIndicator(color: AppColors.gold)),
+                  child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
                 )
               else if (board.entries.isEmpty)
                 SliverFillRemaining(
                   hasScrollBody: false,
-                  child: Theme(
-                    data: Theme.of(context).copyWith(
-                      textTheme: Theme.of(context).textTheme.apply(bodyColor: AppColors.white),
-                    ),
-                    child: ArenaEmptyState(message: l10n.achievementsEmpty, icon: Icons.military_tech_outlined),
-                  ),
+                  child: ArenaEmptyState(message: l10n.achievementsEmpty, icon: Icons.military_tech_outlined),
                 )
               else
                 SliverPadding(
@@ -126,7 +123,7 @@ class _AchievementsPageState extends State<AchievementsPage> with SingleTickerPr
   }
 }
 
-/// Topo: holofote, emblema do nível dentro do anel de XP (animado), nome, XP
+/// Topo (fundo da marca): emblema do nível dentro do anel de XP (animado), nome, XP
 /// até o próximo nível e os três números em cartões de vidro.
 class _TrophyHeader extends StatelessWidget {
   final AchievementBoard board;
@@ -144,14 +141,7 @@ class _TrophyHeader extends StatelessWidget {
     final topInset = MediaQuery.paddingOf(context).top + kToolbarHeight;
     final ring = CurvedAnimation(parent: reveal, curve: const Interval(0, 0.7, curve: Curves.easeOutCubic));
 
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        gradient: RadialGradient(
-          center: Alignment(0, -0.35),
-          radius: 0.9,
-          colors: [AppColors.trophyGlow, AppColors.trophyBackground],
-        ),
-      ),
+    return ArenaHeroBackground(
       child: Padding(
         padding: EdgeInsets.fromLTRB(AppSizes.s16, topInset, AppSizes.s16, AppSizes.s16),
         child: FittedBox(
@@ -325,7 +315,9 @@ class _AlmostThereCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, 0),
       child: Material(
-        color: AppColors.trophySurface,
+        color: AppColors.surface,
+        elevation: AppSizes.s2,
+        shadowColor: AppColors.shadow,
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
         child: InkWell(
           borderRadius: BorderRadius.circular(AppSizes.cardRadius),
@@ -348,14 +340,14 @@ class _AlmostThereCard extends StatelessWidget {
                     children: [
                       Text(
                         l10n.achievementsAlmostThere,
-                        style: AppTypography.label(color: AppColors.gold)
+                        style: AppTypography.label(color: AppColors.primary)
                             .copyWith(fontSize: AppSizes.s12, letterSpacing: 1.4, fontWeight: FontWeight.w800),
                       ),
                       Text(
                         achievement.title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s18),
+                        style: AppTypography.title().copyWith(fontSize: AppSizes.s18),
                       ),
                       const SizedBox(height: AppSizes.s6),
                       ClipRRect(
@@ -364,19 +356,19 @@ class _AlmostThereCard extends StatelessWidget {
                           value: entry.progress,
                           minHeight: AppSizes.s8,
                           color: AppColors.primary,
-                          backgroundColor: AppColors.white.withValues(alpha: 0.1),
+                          backgroundColor: AppColors.greyLight,
                         ),
                       ),
                       const SizedBox(height: AppSizes.s4),
                       Text(
                         l10n.achievementsProgress(entry.current.clamp(0, achievement.goal), achievement.goal),
-                        style: AppTypography.label(color: AppColors.white.withValues(alpha: 0.65))
+                        style: AppTypography.label(color: AppColors.textSecondary)
                             .copyWith(fontSize: AppSizes.s12, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
                 ),
-                Icon(Icons.chevron_right_rounded, color: AppColors.white.withValues(alpha: 0.5)),
+                const Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary),
               ],
             ),
           ),
@@ -404,21 +396,21 @@ class _CategoryShelf extends StatelessWidget {
     final title = achievementCategoryLabel(l10n, category);
     final unlocked = entries.where((e) => e.unlocked).length;
 
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSizes.s20),
+    return ArenaCard(
+      margin: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, 0),
+      padding: const EdgeInsets.only(top: AppSizes.s4, bottom: AppSizes.s8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: AppSizes.s20, right: AppSizes.s8),
+            padding: const EdgeInsets.only(left: AppSizes.s16, right: AppSizes.s4),
             child: Row(
               children: [
-                Text(title, style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s18)),
+                Text(title, style: AppTypography.title().copyWith(fontSize: AppSizes.s18)),
                 const SizedBox(width: AppSizes.s8),
                 Text(
                   '$unlocked/${entries.length}',
-                  style: AppTypography.label(color: AppColors.white.withValues(alpha: 0.5))
-                      .copyWith(fontSize: AppSizes.s14),
+                  style: AppTypography.label(color: AppColors.textSecondary).copyWith(fontSize: AppSizes.s14),
                 ),
                 const Spacer(),
                 TextButton(
@@ -427,7 +419,7 @@ class _CategoryShelf extends StatelessWidget {
                   )),
                   child: Text(
                     l10n.achievementsSeeAll,
-                    style: AppTypography.label(color: AppColors.gold).copyWith(fontSize: AppSizes.s14),
+                    style: AppTypography.label(color: AppColors.primary).copyWith(fontSize: AppSizes.s14),
                   ),
                 ),
               ],
@@ -437,7 +429,7 @@ class _CategoryShelf extends StatelessWidget {
             height: AppSizes.s150,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: AppSizes.s16),
+              padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8),
               itemCount: entries.length,
               separatorBuilder: (_, __) => const SizedBox(width: AppSizes.s8),
               itemBuilder: (context, index) {
@@ -463,7 +455,7 @@ class _CategoryShelf extends StatelessWidget {
   }
 }
 
-/// Medalha com o nome embaixo (ganha em branco; bloqueada apagada).
+/// Medalha com o nome embaixo (bloqueada em cinza).
 class _ShelfMedal extends StatelessWidget {
   final AchievementEntry entry;
 
@@ -496,7 +488,7 @@ class _ShelfMedal extends StatelessWidget {
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
               style: AppTypography.label(
-                color: entry.unlocked ? AppColors.white : AppColors.white.withValues(alpha: 0.45),
+                color: entry.unlocked ? AppColors.textPrimary : AppColors.textSecondary,
               ).copyWith(fontSize: AppSizes.s12, height: 1.15),
             ),
           ],
@@ -516,9 +508,9 @@ class _CategoryGridPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.trophyBackground,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.trophyBackground,
+        backgroundColor: AppColors.primaryDark,
         surfaceTintColor: AppColors.transparent,
         foregroundColor: AppColors.white,
         title: Text(title, style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s20)),

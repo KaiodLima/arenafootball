@@ -93,11 +93,4 @@ class AppColors {
   static const Color medalLegendDark = Color(0xFF0FA38E);
   static const Color medalLockedLight = Color(0xFFE3E7EA);
   static const Color medalLockedDark = Color(0xFFB4BCC3);
-
-  // Sala de troféus (tela de conquistas): fundo noturno e brilhos.
-  static const Color trophyBackground = Color(0xFF07140D);
-  static const Color trophySurface = Color(0xFF10261A);
-  static const Color trophyGlow = Color(0xFF1F6B3F);
-  static const Color trophyLockedFace = Color(0xFF1A3324);
-  static const Color trophyLockedRim = Color(0xFF2C4A37);
 }

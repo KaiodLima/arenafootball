@@ -9,14 +9,14 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// Detalhes de uma conquista em tela cheia escura: a medalha grande balançando
-/// em 3D sobre um holofote, título, descrição, nível, pontos e o progresso
-/// (ou a data em que foi conquistada). Toque fora ou ✕ fecha.
+/// Detalhes de uma conquista num cartão branco central: a medalha grande
+/// balançando em 3D sobre um brilho na cor do nível, título, descrição, nível,
+/// pontos e o progresso (ou a data em que foi conquistada). Toque fora ou ✕ fecha.
 Future<void> showAchievementDetails(BuildContext context, AchievementEntry entry) => showGeneralDialog<void>(
       context: context,
       barrierDismissible: true,
       barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      barrierColor: AppColors.black.withValues(alpha: 0.85),
+      barrierColor: AppColors.black.withValues(alpha: 0.5),
       transitionDuration: const Duration(milliseconds: 280),
       transitionBuilder: (context, animation, _, child) => FadeTransition(
         opacity: animation,
@@ -65,119 +65,123 @@ class _AchievementDetailsState extends State<_AchievementDetails> with SingleTic
     final l10n = AppLocalizations.of(context);
     final entry = widget.entry;
     final achievement = entry.achievement;
-    final (light, _) = medalColors(achievement.tier);
-    final accent = entry.unlocked ? light : AppColors.white.withValues(alpha: 0.6);
+    final (light, dark) = medalColors(achievement.tier);
+    final accent = entry.unlocked ? dark : AppColors.textSecondary;
 
     return SafeArea(
-      child: Material(
-        color: AppColors.transparent,
-        child: Stack(
-          children: [
-            Positioned(
-              top: AppSizes.s8,
-              right: AppSizes.s8,
-              child: IconButton(
-                tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.close_rounded, color: AppColors.white),
-              ),
-            ),
-            Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppSizes.s32),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Holofote + medalha balançando em 3D.
-                    Container(
-                      width: AppSizes.s250,
-                      height: AppSizes.s250,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: RadialGradient(
-                          colors: [
-                            (entry.unlocked ? light : AppColors.trophyGlow).withValues(alpha: 0.35),
-                            AppColors.transparent,
-                          ],
-                        ),
-                      ),
-                      child: AnimatedBuilder(
-                        animation: _swing,
-                        builder: (context, child) => Transform(
-                          alignment: Alignment.center,
-                          transform: Matrix4.identity()
-                            ..setEntry(3, 2, 0.0015)
-                            ..rotateY(math.sin(_swing.value * 2 * math.pi) * 0.45),
-                          child: child,
-                        ),
-                        child: MedalBadge(
-                          tier: achievement.tier,
-                          icon: achievement.icon,
-                          unlocked: entry.unlocked,
-                          progress: entry.progress,
-                          hidden: entry.hidden,
-                          size: AppSizes.s200,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: AppSizes.s12),
-                    Text(
-                      entry.hidden ? l10n.achievementsSecret : achievement.title,
-                      textAlign: TextAlign.center,
-                      style: AppTypography.display(color: AppColors.white).copyWith(fontSize: AppSizes.s28),
-                    ),
-                    const SizedBox(height: AppSizes.s8),
-                    Text(
-                      entry.hidden ? l10n.achievementsSecretHint : achievement.description,
-                      textAlign: TextAlign.center,
-                      style: AppTypography.body(color: AppColors.white.withValues(alpha: 0.75)),
-                    ),
-                    const SizedBox(height: AppSizes.s20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _Pill(text: achievementTierLabel(l10n, achievement.tier).toUpperCase(), color: accent),
-                        const SizedBox(width: AppSizes.s8),
-                        _Pill(text: l10n.achievementsPoints(achievement.points), color: AppColors.gold),
-                      ],
-                    ),
-                    const SizedBox(height: AppSizes.s24),
-                    if (entry.unlocked)
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.verified_rounded, color: AppColors.primary, size: AppSizes.s20),
-                          const SizedBox(width: AppSizes.s6),
-                          Text(
-                            entry.unlockedAt != null
-                                ? l10n.achievementsUnlockedOn(_date(entry.unlockedAt!))
-                                : l10n.achievementsUnlocked,
-                            style: AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s14),
+      child: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSizes.s20),
+          child: Material(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(AppSizes.radiusLarge),
+            clipBehavior: Clip.antiAlias,
+            child: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(AppSizes.s24, AppSizes.s16, AppSizes.s24, AppSizes.s28),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Brilho na cor do nível + medalha balançando em 3D.
+                      Container(
+                        width: AppSizes.s250,
+                        height: AppSizes.s250,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: RadialGradient(
+                            colors: [
+                              (entry.unlocked ? light : AppColors.greyLight).withValues(alpha: 0.45),
+                              AppColors.surface.withValues(alpha: 0),
+                            ],
                           ),
-                        ],
-                      )
-                    else if (!entry.hidden) ...[
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(AppSizes.s8),
-                        child: LinearProgressIndicator(
-                          value: entry.progress,
-                          minHeight: AppSizes.s10,
-                          color: AppColors.primary,
-                          backgroundColor: AppColors.white.withValues(alpha: 0.12),
                         ),
+                        child: AnimatedBuilder(
+                          animation: _swing,
+                          builder: (context, child) => Transform(
+                            alignment: Alignment.center,
+                            transform: Matrix4.identity()
+                              ..setEntry(3, 2, 0.0015)
+                              ..rotateY(math.sin(_swing.value * 2 * math.pi) * 0.45),
+                            child: child,
+                          ),
+                          child: MedalBadge(
+                            tier: achievement.tier,
+                            icon: achievement.icon,
+                            unlocked: entry.unlocked,
+                            progress: entry.progress,
+                            hidden: entry.hidden,
+                            size: AppSizes.s200,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        entry.hidden ? l10n.achievementsSecret : achievement.title,
+                        textAlign: TextAlign.center,
+                        style: AppTypography.display().copyWith(fontSize: AppSizes.s28),
                       ),
                       const SizedBox(height: AppSizes.s8),
                       Text(
-                        l10n.achievementsProgress(entry.current.clamp(0, achievement.goal), achievement.goal),
-                        style: AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s14),
+                        entry.hidden ? l10n.achievementsSecretHint : achievement.description,
+                        textAlign: TextAlign.center,
+                        style: AppTypography.subtitle(),
                       ),
+                      const SizedBox(height: AppSizes.s20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _Pill(text: achievementTierLabel(l10n, achievement.tier).toUpperCase(), color: accent),
+                          const SizedBox(width: AppSizes.s8),
+                          _Pill(text: l10n.achievementsPoints(achievement.points), color: AppColors.primaryDark),
+                        ],
+                      ),
+                      const SizedBox(height: AppSizes.s24),
+                      if (entry.unlocked)
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.verified_rounded, color: AppColors.primary, size: AppSizes.s20),
+                            const SizedBox(width: AppSizes.s6),
+                            Text(
+                              entry.unlockedAt != null
+                                  ? l10n.achievementsUnlockedOn(_date(entry.unlockedAt!))
+                                  : l10n.achievementsUnlocked,
+                              style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s14),
+                            ),
+                          ],
+                        )
+                      else if (!entry.hidden) ...[
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(AppSizes.s8),
+                          child: LinearProgressIndicator(
+                            value: entry.progress,
+                            minHeight: AppSizes.s10,
+                            color: AppColors.primary,
+                            backgroundColor: AppColors.greyLight,
+                          ),
+                        ),
+                        const SizedBox(height: AppSizes.s8),
+                        Text(
+                          l10n.achievementsProgress(entry.current.clamp(0, achievement.goal), achievement.goal),
+                          style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s14),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
+                Positioned(
+                  top: AppSizes.s4,
+                  right: AppSizes.s4,
+                  child: IconButton(
+                    tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close_rounded, color: AppColors.textSecondary),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -194,9 +198,9 @@ class _Pill extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.symmetric(horizontal: AppSizes.s12, vertical: AppSizes.s6),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.14),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppSizes.s20),
-          border: Border.all(color: color.withValues(alpha: 0.5)),
+          border: Border.all(color: color.withValues(alpha: 0.4)),
         ),
         child: Text(
           text,
