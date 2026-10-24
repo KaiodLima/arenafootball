@@ -180,10 +180,19 @@ class PlayersDataSource {
     int goals = 0,
     int assists = 0,
     PlayerEnrollment? enrollment,
+    bool friendly = false,
     String? season,
   }) async {
     if (goals == 0 && assists == 0) return const Right(null);
     try {
+      // Amistoso: só a contagem à parte (não entra no Geral nem em competição).
+      if (friendly) {
+        await _players(season).doc(playerId).update({
+          if (goals != 0) PlayerDTO.friendlyGoalsField: FieldValue.increment(goals),
+          if (assists != 0) PlayerDTO.friendlyAssistsField: FieldValue.increment(assists),
+        });
+        return const Right(null);
+      }
       await _players(season).doc(playerId).update({
         if (goals != 0) PlayerDTO.goalsField: FieldValue.increment(goals),
         if (assists != 0) PlayerDTO.assistsField: FieldValue.increment(assists),
@@ -196,6 +205,46 @@ class PlayersDataSource {
       return const Right(null);
     } catch (e) {
       AppLogger.e('incrementStats id=$playerId', name: 'PlayersDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
+    }
+  }
+
+  /// Manutenção do admin: acerta o Geral (soma das competições, sem os
+  /// amistosos) e grava os amistosos contados nas partidas
+  /// ([friendlyCounts]: id do atleta → gols/assistências). Grava só quem
+  /// mudou; devolve quantos atletas foram corrigidos.
+  Future<Either<Failure, int>> repairTotals(
+    Map<String, ({int goals, int assists})> friendlyCounts, {
+    String? season,
+  }) async {
+    try {
+      final snapshot = await _players(season).get();
+      var batch = _firestore.batch();
+      var pending = 0;
+      var fixed = 0;
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final friendly = friendlyCounts[doc.id];
+        final changes = PlayerDTO.fromFirestore(doc).repairedTotals(
+          stored: (data[PlayerDTO.goalsField] as num?)?.toInt() ?? 0,
+          storedAssists: (data[PlayerDTO.assistsField] as num?)?.toInt() ?? 0,
+          friendlyGoals: friendly?.goals ?? 0,
+          friendlyAssists: friendly?.assists ?? 0,
+        );
+        if (changes == null) continue;
+        batch.update(doc.reference, changes);
+        fixed++;
+        // Lote do Firestore: até 500 gravações.
+        if (++pending == 450) {
+          await batch.commit();
+          batch = _firestore.batch();
+          pending = 0;
+        }
+      }
+      if (pending > 0) await batch.commit();
+      return Right(fixed);
+    } catch (e) {
+      AppLogger.e('repairTotals', name: 'PlayersDataSource', error: e);
       return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
     }
   }

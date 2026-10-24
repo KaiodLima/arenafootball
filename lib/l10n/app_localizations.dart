@@ -1335,6 +1335,48 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @athleteStatsFriendly.
+  ///
+  /// In pt, this message translates to:
+  /// **'Amistosos'**
+  String get athleteStatsFriendly;
+
+  /// No description provided for @athleteStatsFriendlyHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ajusta os amistosos (contagem à parte, fora do geral).'**
+  String get athleteStatsFriendlyHint;
+
+  /// No description provided for @athleteStatsTotalSumHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'O geral é a soma das competições: ajuste na aba da competição.'**
+  String get athleteStatsTotalSumHint;
+
+  /// No description provided for @teamPlayersFriendly.
+  ///
+  /// In pt, this message translates to:
+  /// **'Amistosos'**
+  String get teamPlayersFriendly;
+
+  /// No description provided for @seasonsRepairTotals.
+  ///
+  /// In pt, this message translates to:
+  /// **'Corrigir números dos atletas'**
+  String get seasonsRepairTotals;
+
+  /// No description provided for @seasonsRepairTotalsHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'O geral de cada atleta volta a ser a soma das competições, e os gols de amistosos (partidas sem competição) passam a ser contados à parte. Pode rodar de novo.'**
+  String get seasonsRepairTotalsHint;
+
+  /// No description provided for @seasonsRepairTotalsDone.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{Nenhum atleta precisou de correção} =1{1 atleta corrigido} other{{count} atletas corrigidos}}'**
+  String seasonsRepairTotalsDone(int count);
+
   /// No description provided for @matchCardFinished.
   ///
   /// In pt, this message translates to:

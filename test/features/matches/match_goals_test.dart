@@ -44,14 +44,23 @@ class _Players implements IPlayersRepository {
   final calls = <String>[];
 
   @override
+  Future<Either<Failure, int>> repairTotals(
+    Map<String, ({int goals, int assists})> friendlyCounts, {
+    String? season,
+  }) async =>
+      const Right(0);
+
+  @override
   Future<Either<Failure, void>> incrementStats({
     required String playerId,
     int goals = 0,
     int assists = 0,
     PlayerEnrollment? enrollment,
+    bool friendly = false,
     String? season,
   }) async {
-    calls.add('$playerId:g$goals:a$assists:c${enrollment?.championshipId}/${enrollment?.teamId}');
+    calls.add(
+        '$playerId:g$goals:a$assists:c${enrollment?.championshipId}/${enrollment?.teamId}${friendly ? ':amistoso' : ''}');
     return const Right(null);
   }
 
@@ -145,6 +154,16 @@ void main() {
     expect(result.right.awayGoals, 1);
     expect(matches.saved?.length, 2);
     expect(players.calls.toSet(), {'dudu:g1:a0:c7/1', 'ana:g0:a1:c7/1'});
+  });
+
+  test('amistoso: o gol vai para a contagem à parte, fora do geral', () async {
+    final players = _Players();
+    await UpdateMatchGoalsUseCase(_Matches(), players)(
+      match: const MatchDTO(id: 'f', homeTeam: 'Lava Jato', awayTeam: 'Volta', homeTeamId: '1', awayTeamId: '2'),
+      before: const [],
+      after: const [MatchGoal(id: 'n', side: MatchSide.home, scorerId: 'dudu')],
+    );
+    expect(players.calls, ['dudu:g1:a0:cnull/null:amistoso']);
   });
 
   test('cubit: elenco da competição; acrescentar e tirar mudam o placar e salvar fecha', () async {

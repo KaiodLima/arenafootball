@@ -151,20 +151,51 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
     return _save(player.copyWith(name: name.trim()));
   }
 
-  /// Com [championshipId], ajusta a competição (e o total junto); sem ela,
-  /// só o total (números de antes das competições).
+  /// Com [championshipId], ajusta a competição (e o Geral junto);
+  /// [PlayerDTO.friendlyId], os amistosos (à parte). Sem ela, o Geral só do
+  /// atleta antigo: com inscrições, o Geral é a soma das competições e não se
+  /// ajusta direto.
   Future<void> adjustGoals(int delta, {int? championshipId}) {
     final player = state.player;
     if (player == null) return Future.value();
+    if (championshipId == PlayerDTO.friendlyId) return _adjustFriendly(player, goals: delta);
     if (championshipId != null) return _adjustIn(player, championshipId, goals: delta);
+    if (!player.isLegacy) return Future.value();
     return _save(player.copyWith(goals: max(0, player.goals + delta)));
   }
 
   Future<void> adjustAssists(int delta, {int? championshipId}) {
     final player = state.player;
     if (player == null) return Future.value();
+    if (championshipId == PlayerDTO.friendlyId) return _adjustFriendly(player, assists: delta);
     if (championshipId != null) return _adjustIn(player, championshipId, assists: delta);
+    if (!player.isLegacy) return Future.value();
     return _save(player.copyWith(assists: max(0, player.assists + delta)));
+  }
+
+  /// Ajuste atômico nos amistosos (sem ficar negativo); mostra na hora.
+  Future<void> _adjustFriendly(PlayerDTO player, {int goals = 0, int assists = 0}) async {
+    final goalsDelta = goals < 0 && -goals > player.friendlyGoals ? -player.friendlyGoals : goals;
+    final assistsDelta = assists < 0 && -assists > player.friendlyAssists ? -player.friendlyAssists : assists;
+    if (goalsDelta == 0 && assistsDelta == 0) return;
+    emit(state.copyWith(
+      player: player.copyWith(
+        friendlyGoals: player.friendlyGoals + goalsDelta,
+        friendlyAssists: player.friendlyAssists + assistsDelta,
+      ),
+      saving: true,
+    ));
+    final response = await adjustPlayerStatsUseCase.friendly(
+      player,
+      goals: goalsDelta,
+      assists: assistsDelta,
+      season: _season,
+    );
+    if (isClosed) return;
+    response.fold(
+      (failure) => emit(ErrorPlayerProfileState(state.copyWith(player: player, saving: false), failure.toString())),
+      (_) => emit(state.copyWith(saving: false)),
+    );
   }
 
   /// Ajuste atômico na competição; mostra na hora (o stream confirma).

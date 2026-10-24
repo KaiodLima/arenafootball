@@ -62,10 +62,17 @@ class TeamPlayersState extends Equatable {
   String get query => view.query;
   int? get championshipId => view.championshipId;
 
-  /// Quem está na lista escolhida: o elenco geral ou o da competição.
+  /// Algum atleta do elenco tem gol ou assistência em amistoso (chip "Amistosos").
+  bool get hasFriendlies => players.any((p) => p.friendlyGoals > 0 || p.friendlyAssists > 0);
+
+  /// Quem está na lista escolhida: o elenco geral, o da competição ou, nos
+  /// amistosos ([PlayerDTO.friendlyId]), quem tem números neles.
   List<PlayerDTO> get squad {
     final id = championshipId;
     if (id == null) return players;
+    if (id == PlayerDTO.friendlyId) {
+      return players.where((p) => p.friendlyGoals > 0 || p.friendlyAssists > 0).toList();
+    }
     return players.where((p) => p.playsIn(id, teamId: view.teamId, teamName: view.teamName)).toList();
   }
 

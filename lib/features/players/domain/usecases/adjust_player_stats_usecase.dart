@@ -36,4 +36,8 @@ class AdjustPlayerStatsUseCase {
       season: season,
     );
   }
+
+  /// Ajuste nos amistosos (contagem à parte, fora do Geral).
+  Future<Either<Failure, void>> friendly(PlayerDTO player, {int goals = 0, int assists = 0, String? season}) =>
+      _repository.incrementStats(playerId: player.id, goals: goals, assists: assists, friendly: true, season: season);
 }

@@ -734,6 +734,39 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get athleteStatsFriendly => 'Amistosos';
+
+  @override
+  String get athleteStatsFriendlyHint =>
+      'Ajusta os amistosos (contagem à parte, fora do geral).';
+
+  @override
+  String get athleteStatsTotalSumHint =>
+      'O geral é a soma das competições: ajuste na aba da competição.';
+
+  @override
+  String get teamPlayersFriendly => 'Amistosos';
+
+  @override
+  String get seasonsRepairTotals => 'Corrigir números dos atletas';
+
+  @override
+  String get seasonsRepairTotalsHint =>
+      'O geral de cada atleta volta a ser a soma das competições, e os gols de amistosos (partidas sem competição) passam a ser contados à parte. Pode rodar de novo.';
+
+  @override
+  String seasonsRepairTotalsDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count atletas corrigidos',
+      one: '1 atleta corrigido',
+      zero: 'Nenhum atleta precisou de correção',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get matchCardFinished => 'ENCERRADA';
 
   @override

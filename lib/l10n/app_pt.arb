@@ -388,6 +388,20 @@
   "matchCardHideGoals": "Ocultar gols",
   "matchCardToday": "HOJE",
   "matchCardTomorrow": "AMANHÃ",
+  "athleteStatsFriendly": "Amistosos",
+  "athleteStatsFriendlyHint": "Ajusta os amistosos (contagem à parte, fora do geral).",
+  "athleteStatsTotalSumHint": "O geral é a soma das competições: ajuste na aba da competição.",
+  "teamPlayersFriendly": "Amistosos",
+  "seasonsRepairTotals": "Corrigir números dos atletas",
+  "seasonsRepairTotalsHint": "O geral de cada atleta volta a ser a soma das competições, e os gols de amistosos (partidas sem competição) passam a ser contados à parte. Pode rodar de novo.",
+  "seasonsRepairTotalsDone": "{count, plural, =0{Nenhum atleta precisou de correção} =1{1 atleta corrigido} other{{count} atletas corrigidos}}",
+  "@seasonsRepairTotalsDone": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "matchCardFinished": "ENCERRADA",
   "achievementsAlmostThere": "QUASE LÁ",
   "achievementsSeeAll": "Ver todas",

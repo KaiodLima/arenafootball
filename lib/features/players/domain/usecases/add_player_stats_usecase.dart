@@ -24,12 +24,23 @@ class AddPlayerStatsUseCase {
     final enrollment =
         championshipId == null ? null : PlayerEnrollment(championshipId: championshipId, teamId: teamId, team: team);
     if (scorer != null) {
-      final response =
-          await _repository.incrementStats(playerId: scorer.id, goals: 1, enrollment: enrollment, season: season);
+      final response = await _repository.incrementStats(
+        playerId: scorer.id,
+        goals: 1,
+        enrollment: enrollment,
+        friendly: enrollment == null,
+        season: season,
+      );
       if (response.isLeft) return response;
     }
     if (assistant != null && assistant.id != scorer?.id) {
-      return _repository.incrementStats(playerId: assistant.id, assists: 1, enrollment: enrollment, season: season);
+      return _repository.incrementStats(
+        playerId: assistant.id,
+        assists: 1,
+        enrollment: enrollment,
+        friendly: enrollment == null,
+        season: season,
+      );
     }
     return const Right(null);
   }

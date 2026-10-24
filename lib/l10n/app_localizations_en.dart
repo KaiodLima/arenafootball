@@ -731,6 +731,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get athleteStatsFriendly => 'Friendlies';
+
+  @override
+  String get athleteStatsFriendlyHint =>
+      'Adjusts friendlies (counted apart, outside the overall).';
+
+  @override
+  String get athleteStatsTotalSumHint =>
+      'The overall is the sum of the competitions: adjust in the competition tab.';
+
+  @override
+  String get teamPlayersFriendly => 'Friendlies';
+
+  @override
+  String get seasonsRepairTotals => 'Fix athletes\' numbers';
+
+  @override
+  String get seasonsRepairTotalsHint =>
+      'Each athlete\'s overall goes back to the sum of the competitions, and friendly goals (matches without competition) are counted apart. Can run again.';
+
+  @override
+  String seasonsRepairTotalsDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count athletes fixed',
+      one: '1 athlete fixed',
+      zero: 'No athlete needed fixing',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get matchCardFinished => 'FULL TIME';
 
   @override

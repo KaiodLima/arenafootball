@@ -8,7 +8,8 @@ import 'package:arena_soccer/features/players/domain/repositories/players_reposi
 
 /// "Editar placar": grava a lista de gols da partida (o placar sai dela) e
 /// acerta os números dos atletas pela diferença com a lista anterior — +1/−1
-/// gol no autor e assistência no garçom, no total e na competição da partida.
+/// gol no autor e assistência no garçom, no Geral e na competição da partida
+/// (amistoso: só na contagem de amistosos).
 class UpdateMatchGoalsUseCase {
   final IMatchesRepository _matches;
   final IPlayersRepository _players;
@@ -39,6 +40,8 @@ class UpdateMatchGoalsUseCase {
         goals: entry.value.goals,
         assists: entry.value.assists,
         enrollment: enrollment,
+        // Amistoso (sem competição): contagem à parte, fora do Geral.
+        friendly: match.championshipId <= 0,
         season: season,
       );
       if (response.isLeft) return Left(response.left);

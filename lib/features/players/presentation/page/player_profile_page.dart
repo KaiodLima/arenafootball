@@ -240,9 +240,33 @@ class _Content extends StatelessWidget {
             ],
           ),
         ),
-        if (player.enrollments.isNotEmpty) ...[
+        if (player.enrollments.isNotEmpty || player.friendlyGoals > 0 || player.friendlyAssists > 0) ...[
           _SectionLabel(l10n.athletePlaysFor),
           for (final enrollment in player.enrollments) _EnrollmentTile(state: state, enrollment: enrollment),
+          // Amistosos: contagem à parte, fora do Geral.
+          if (player.friendlyGoals > 0 || player.friendlyAssists > 0)
+            ArenaCard(
+              margin: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s8),
+              padding: const EdgeInsets.all(AppSizes.s12),
+              child: Row(
+                children: [
+                  Container(
+                    width: AppSizes.s40,
+                    height: AppSizes.s40,
+                    decoration: const BoxDecoration(color: AppColors.primarySoft, shape: BoxShape.circle),
+                    child: const Icon(Icons.handshake_outlined, color: AppColors.primaryDark, size: AppSizes.s20),
+                  ),
+                  const SizedBox(width: AppSizes.s12),
+                  Expanded(
+                    child: Text(l10n.athleteStatsFriendly, style: AppTypography.label(color: AppColors.textPrimary)),
+                  ),
+                  Text(
+                    l10n.athleteEnrollmentStats(player.friendlyGoals, player.friendlyAssists),
+                    style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s12),
+                  ),
+                ],
+              ),
+            ),
         ],
         if (isAdmin) _AdminEditor(player: player, saving: state.saving, state: state),
         _SectionLabel(l10n.athleteParticipations),
@@ -425,12 +449,12 @@ class _AdminEditor extends StatefulWidget {
 class _AdminEditorState extends State<_AdminEditor> {
   late final _nameController = TextEditingController(text: widget.player.name);
 
-  /// Competição dos ajustes (nula = total, números de antes das competições).
+  /// Competição dos ajustes (nula = Geral; [PlayerDTO.friendlyId] = amistosos).
   int? _championshipId;
 
   PlayerEnrollment? get _enrollment {
     final id = _championshipId;
-    return id == null ? null : widget.player.enrollmentIn(id);
+    return id == null || id == PlayerDTO.friendlyId ? null : widget.player.enrollmentIn(id);
   }
 
   @override
@@ -494,7 +518,19 @@ class _AdminEditorState extends State<_AdminEditor> {
     final cubit = BlocProvider.of<PlayerProfileCubit>(context);
     final player = widget.player;
     final enrollment = _enrollment;
-    final championshipId = enrollment?.championshipId;
+    final friendly = _championshipId == PlayerDTO.friendlyId;
+    final championshipId = friendly ? PlayerDTO.friendlyId : enrollment?.championshipId;
+    // Com inscrições, o Geral é a soma das competições: só mostra.
+    final canAdjust = championshipId != null || player.isLegacy;
+    final goals = friendly ? player.friendlyGoals : enrollment?.goals ?? player.goals;
+    final assists = friendly ? player.friendlyAssists : enrollment?.assists ?? player.assists;
+    final hint = friendly
+        ? l10n.athleteStatsFriendlyHint
+        : championshipId != null
+            ? l10n.athleteStatsChampionshipHint
+            : player.isLegacy
+                ? l10n.athleteStatsTotalHint
+                : l10n.athleteStatsTotalSumHint;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -527,7 +563,7 @@ class _AdminEditorState extends State<_AdminEditor> {
                 ),
               ),
               const SizedBox(height: AppSizes.s16),
-              if (player.enrollments.isNotEmpty) ...[
+              ...[
                 Wrap(
                   spacing: AppSizes.s8,
                   runSpacing: AppSizes.s8,
@@ -545,11 +581,16 @@ class _AdminEditorState extends State<_AdminEditor> {
                         selected: championshipId == e.championshipId,
                         onTap: () => setState(() => _championshipId = e.championshipId),
                       ),
+                    ArenaChoiceChip(
+                      label: l10n.athleteStatsFriendly,
+                      selected: friendly,
+                      onTap: () => setState(() => _championshipId = PlayerDTO.friendlyId),
+                    ),
                   ],
                 ),
                 const SizedBox(height: AppSizes.s6),
                 Text(
-                  championshipId == null ? l10n.athleteStatsTotalHint : l10n.athleteStatsChampionshipHint,
+                  hint,
                   style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
                 ),
                 const SizedBox(height: AppSizes.s12),
@@ -557,8 +598,9 @@ class _AdminEditorState extends State<_AdminEditor> {
               CountStepper(
                 icon: Icons.sports_soccer_rounded,
                 label: l10n.playersSummaryGoals,
-                value: enrollment?.goals ?? player.goals,
+                value: goals,
                 max: 999,
+                enabled: canAdjust,
                 onIncrement: () => cubit.adjustGoals(1, championshipId: championshipId),
                 onDecrement: () => cubit.adjustGoals(-1, championshipId: championshipId),
               ),
@@ -566,8 +608,9 @@ class _AdminEditorState extends State<_AdminEditor> {
               CountStepper(
                 icon: Icons.assistant_rounded,
                 label: l10n.playersSummaryAssists,
-                value: enrollment?.assists ?? player.assists,
+                value: assists,
                 max: 999,
+                enabled: canAdjust,
                 onIncrement: () => cubit.adjustAssists(1, championshipId: championshipId),
                 onDecrement: () => cubit.adjustAssists(-1, championshipId: championshipId),
               ),

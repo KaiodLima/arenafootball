@@ -92,6 +92,7 @@ class PlayersRepositoryImpl implements IPlayersRepository {
     int goals = 0,
     int assists = 0,
     PlayerEnrollment? enrollment,
+    bool friendly = false,
     String? season,
   }) async =>
       _invalidate(await _dataSource.incrementStats(
@@ -99,8 +100,19 @@ class PlayersRepositoryImpl implements IPlayersRepository {
         goals: goals,
         assists: assists,
         enrollment: enrollment,
+        friendly: friendly,
         season: season,
       ));
+
+  @override
+  Future<Either<Failure, int>> repairTotals(
+    Map<String, ({int goals, int assists})> friendlyCounts, {
+    String? season,
+  }) async {
+    final response = await _dataSource.repairTotals(friendlyCounts, season: season);
+    await _invalidate(response.map((_) {}));
+    return response;
+  }
 
   /// Depois de mexer num jogador (números, time, elenco): os rankings do
   /// cache local ficam velhos.

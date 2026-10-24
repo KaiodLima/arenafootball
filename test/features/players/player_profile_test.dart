@@ -118,11 +118,19 @@ class _FakePlayers implements IPlayersRepository {
   Future<Either<Failure, void>> createPlayer(PlayerDTO player, {String? season}) async => const Right(null);
 
   @override
+  Future<Either<Failure, int>> repairTotals(
+    Map<String, ({int goals, int assists})> friendlyCounts, {
+    String? season,
+  }) async =>
+      const Right(0);
+
+  @override
   Future<Either<Failure, void>> incrementStats({
     required String playerId,
     int goals = 0,
     int assists = 0,
     PlayerEnrollment? enrollment,
+    bool friendly = false,
     String? season,
   }) async =>
       const Right(null);
@@ -261,6 +269,25 @@ void main() {
     expect(players.updated.length, count);
     await cubit.rename('  Dudu Silva ');
     expect(players.updated.last.name, 'Dudu Silva');
+  });
+
+  test('com inscrições, o geral (soma das competições) não se ajusta direto', () async {
+    cubit.watch(playerId: 'dudu');
+    players.controller.add(const Right(PlayerDTO(
+      id: 'dudu',
+      name: 'Dudu',
+      team: 'Lava Jato',
+      goals: 3,
+      enrollments: [PlayerEnrollment(championshipId: 7, teamId: '1', team: 'Lava Jato', goals: 3)],
+      hasEnrollmentField: true,
+    )));
+    await settle();
+
+    final count = players.updated.length;
+    await cubit.adjustGoals(-1);
+    await cubit.adjustAssists(1);
+    expect(players.updated.length, count);
+    expect(cubit.state.player?.goals, 3);
   });
 
   test('trocar a foto envia e grava a nova URL', () async {

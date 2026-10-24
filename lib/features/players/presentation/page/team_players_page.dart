@@ -298,7 +298,7 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (state.view.championships.isNotEmpty) ...[
+              if (state.view.championships.isNotEmpty || state.hasFriendlies) ...[
                 _ChampionshipChips(state: state, onSelected: cubit.selectChampionship),
                 const SizedBox(height: AppSizes.s12),
               ],
@@ -363,7 +363,8 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
   }
 }
 
-/// "Elenco geral" + uma chip por competição que o time joga na temporada.
+/// "Elenco geral" + uma chip por competição que o time joga na temporada e,
+/// se houver números em amistosos, "Amistosos".
 class _ChampionshipChips extends StatelessWidget {
   final TeamPlayersState state;
   final ValueChanged<int?> onSelected;
@@ -374,11 +375,12 @@ class _ChampionshipChips extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final championships = state.view.championships;
+    final friendlies = state.hasFriendlies || state.championshipId == PlayerDTO.friendlyId;
     return SizedBox(
       height: AppSizes.s40,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: championships.length + 1,
+        itemCount: championships.length + 1 + (friendlies ? 1 : 0),
         separatorBuilder: (_, __) => const SizedBox(width: AppSizes.s8),
         itemBuilder: (context, index) {
           if (index == 0) {
@@ -387,6 +389,15 @@ class _ChampionshipChips extends StatelessWidget {
               icon: Icons.groups_rounded,
               selected: state.championshipId == null,
               onTap: () => onSelected(null),
+            );
+          }
+          // Amistosos: contagem à parte, depois das competições.
+          if (index > championships.length) {
+            return ArenaChoiceChip(
+              label: l10n.teamPlayersFriendly,
+              icon: Icons.handshake_outlined,
+              selected: state.championshipId == PlayerDTO.friendlyId,
+              onTap: () => onSelected(PlayerDTO.friendlyId),
             );
           }
           final championship = championships[index - 1];

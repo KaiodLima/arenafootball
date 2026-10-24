@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/players/presentation/widgets/player_totals_repair_section.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/seasons/presentation/bloc/seasons_panel_cubit.dart';
 import 'package:arena_soccer/features/seasons/presentation/bloc/seasons_panel_state.dart';
@@ -171,6 +172,9 @@ class _SeasonsPanelPageState extends State<SeasonsPanelPage> {
                   seasons: state.seasons,
                   current: state.current,
                 ),
+              const SizedBox(height: AppSizes.s16),
+              // Geral = soma das competições; amistosos à parte.
+              PlayerTotalsRepairSection(season: state.current),
             ],
           );
         },

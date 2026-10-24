@@ -14,6 +14,9 @@ class CountStepper extends StatelessWidget {
   final VoidCallback onIncrement;
   final VoidCallback onDecrement;
 
+  /// Falso: só mostra o número (botões apagados).
+  final bool enabled;
+
   const CountStepper({
     super.key,
     required this.icon,
@@ -22,6 +25,7 @@ class CountStepper extends StatelessWidget {
     required this.max,
     required this.onIncrement,
     required this.onDecrement,
+    this.enabled = true,
   });
 
   @override
@@ -40,7 +44,7 @@ class CountStepper extends StatelessWidget {
         Expanded(
           child: Text(label, style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s14)),
         ),
-        _Step(icon: Icons.remove_rounded, tooltip: l10n.goalDecrease, onTap: value > 0 ? onDecrement : null),
+        _Step(icon: Icons.remove_rounded, tooltip: l10n.goalDecrease, onTap: enabled && value > 0 ? onDecrement : null),
         SizedBox(
           width: AppSizes.s48,
           child: Text(
@@ -50,7 +54,10 @@ class CountStepper extends StatelessWidget {
           ),
         ),
         _Step(
-            icon: Icons.add_rounded, tooltip: l10n.goalIncrease, onTap: value < max ? onIncrement : null, filled: true),
+            icon: Icons.add_rounded,
+            tooltip: l10n.goalIncrease,
+            onTap: enabled && value < max ? onIncrement : null,
+            filled: true),
       ],
     );
   }

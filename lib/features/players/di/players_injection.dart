@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:arena_soccer/features/players/data/datasources/players_datasource.dart';
 import 'package:arena_soccer/features/players/data/repositories/players_repository_impl.dart';
 import 'package:arena_soccer/features/players/domain/repositories/players_repository_interface.dart';
+import 'package:arena_soccer/features/players/domain/usecases/repair_player_totals_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/add_player_stats_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/adjust_player_stats_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/create_player_usecase.dart';
@@ -38,6 +39,7 @@ void registerPlayersDependencies() {
   _sl.registerLazySingleton(() => RemovePlayerFromSquadUseCase(_sl()));
   _sl.registerLazySingleton(() => EnrollPlayerUseCase(_sl()));
   _sl.registerLazySingleton(() => AdjustPlayerStatsUseCase(_sl()));
+  _sl.registerLazySingleton(() => RepairPlayerTotalsUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => WatchUserPlayerUseCase(_sl()));
   _sl.registerLazySingleton(() => SetPlayerChampionshipsUseCase(_sl()));
   _sl.registerLazySingleton(() => GetTopPlayersInChampionshipUseCase(_sl()));

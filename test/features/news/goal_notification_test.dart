@@ -201,11 +201,19 @@ class _FakePlayersRepository implements IPlayersRepository {
       Stream.value(Right(_squads[teamName] ?? const []));
 
   @override
+  Future<Either<Failure, int>> repairTotals(
+    Map<String, ({int goals, int assists})> friendlyCounts, {
+    String? season,
+  }) async =>
+      const Right(0);
+
+  @override
   Future<Either<Failure, void>> incrementStats({
     required String playerId,
     int goals = 0,
     int assists = 0,
     PlayerEnrollment? enrollment,
+    bool friendly = false,
     String? season,
   }) async {
     if (fail) return Left(ErrorWithMessage('erro'));

@@ -227,6 +227,20 @@
   "matchCardHideGoals": "Hide goals",
   "matchCardToday": "TODAY",
   "matchCardTomorrow": "TOMORROW",
+  "athleteStatsFriendly": "Friendlies",
+  "athleteStatsFriendlyHint": "Adjusts friendlies (counted apart, outside the overall).",
+  "athleteStatsTotalSumHint": "The overall is the sum of the competitions: adjust in the competition tab.",
+  "teamPlayersFriendly": "Friendlies",
+  "seasonsRepairTotals": "Fix athletes' numbers",
+  "seasonsRepairTotalsHint": "Each athlete's overall goes back to the sum of the competitions, and friendly goals (matches without competition) are counted apart. Can run again.",
+  "seasonsRepairTotalsDone": "{count, plural, =0{No athlete needed fixing} =1{1 athlete fixed} other{{count} athletes fixed}}",
+  "@seasonsRepairTotalsDone": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "matchCardFinished": "FULL TIME",
   "achievementsAlmostThere": "ALMOST THERE",
   "achievementsSeeAll": "See all",

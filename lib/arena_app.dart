@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/players/presentation/bloc/player_totals_repair_cubit.dart';
 import 'package:arena_soccer/features/achievements/data/dtos/achievement_dto.dart';
 import 'package:arena_soccer/features/achievements/presentation/bloc/achievement_form_cubit.dart';
 import 'package:arena_soccer/features/achievements/presentation/bloc/manage_achievements_cubit.dart';
@@ -367,6 +368,7 @@ class ArenaApp extends StatelessWidget {
               providers: [
                 BlocProvider<SeasonsPanelCubit>(create: (_) => SeasonsPanelCubit(sl(), sl())),
                 BlocProvider<TeamLinksCubit>(create: (_) => TeamLinksCubit(sl())),
+                BlocProvider<PlayerTotalsRepairCubit>(create: (_) => PlayerTotalsRepairCubit(sl())),
               ],
               child: const SeasonsPanelPage(),
             ),

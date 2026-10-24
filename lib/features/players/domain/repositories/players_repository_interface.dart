@@ -54,12 +54,17 @@ abstract class IPlayersRepository {
   Future<Either<Failure, void>> enroll(PlayerDTO player, PlayerEnrollment enrollment, {String? season});
 
   /// Soma gols/assistências ao jogador (atômico); com [enrollment], também na
-  /// competição dela.
+  /// competição dela; [friendly] soma só na contagem de amistosos.
   Future<Either<Failure, void>> incrementStats({
     required String playerId,
     int goals = 0,
     int assists = 0,
     PlayerEnrollment? enrollment,
+    bool friendly = false,
     String? season,
   });
+
+  /// Manutenção: acerta o Geral e grava os amistosos contados nas partidas;
+  /// devolve quantos atletas mudaram.
+  Future<Either<Failure, int>> repairTotals(Map<String, ({int goals, int assists})> friendlyCounts, {String? season});
 }
