@@ -123,6 +123,24 @@ void main() {
           homeTeam: 'Lava Jato', awayTeam: 'Volta', date: '22/10', time: '10:00', homeGoals: 2, awayGoals: 1),
     );
     expect(find.text('2 × 1'), findsOneWidget);
-    expect(find.text('10:00'), findsOneWidget);
+    // Passou do fim: "ENCERRADA" no lugar do horário.
+    expect(find.text('ENCERRADA'), findsOneWidget);
+    expect(find.text('10:00'), findsNothing);
+  });
+
+  testWidgets('encerrada pelo admin antes da hora: "ENCERRADA"', (tester) async {
+    await pump(
+      tester,
+      const MatchDTO(
+        homeTeam: 'Lava Jato',
+        awayTeam: 'Volta',
+        date: '22/10',
+        time: '16:00',
+        homeGoals: 1,
+        manualStatus: MatchManualStatus.finished,
+      ),
+    );
+    expect(find.text('ENCERRADA'), findsOneWidget);
+    expect(find.text('16:00'), findsNothing);
   });
 }

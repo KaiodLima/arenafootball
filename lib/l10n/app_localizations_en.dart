@@ -731,6 +731,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get matchCardFinished => 'FULL TIME';
+
+  @override
   String get achievementsAlmostThere => 'ALMOST THERE';
 
   @override

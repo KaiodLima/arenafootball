@@ -1335,6 +1335,12 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @matchCardFinished.
+  ///
+  /// In pt, this message translates to:
+  /// **'ENCERRADA'**
+  String get matchCardFinished;
+
   /// No description provided for @achievementsAlmostThere.
   ///
   /// In pt, this message translates to:

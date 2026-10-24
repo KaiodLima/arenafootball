@@ -395,8 +395,8 @@ class _MatchCardState extends State<MatchCard> {
   }
 }
 
-/// Centro do card: placar grande com a hora embaixo ("EM ANDAMENTO" durante
-/// a partida) ou, antes do jogo, a hora grande com "HOJE"/"AMANHÃ"/a data.
+/// Centro do card: placar grande com "EM ANDAMENTO" durante a partida,
+/// "ENCERRADA" depois do fim (ou a hora, sem data para saber) ou, antes do jogo, a hora grande com "HOJE"/"AMANHÃ"/a data.
 class _Center extends StatelessWidget {
   final MatchDTO match;
   final MatchCardStatus status;
@@ -414,7 +414,11 @@ class _Center extends StatelessWidget {
             1 => l10n.matchCardTomorrow,
             _ => match.date.trim(),
           }
-        : time;
+        : status.finished
+            ? l10n.matchCardFinished
+            : time;
+    // Antes do jogo (verde) e encerrada (cinza) vão numa pílula.
+    final pill = status.upcoming || status.finished;
     return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: AppSizes.s100),
       child: Padding(
@@ -434,13 +438,16 @@ class _Center extends StatelessWidget {
               const SizedBox(height: AppSizes.s2),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s2),
-                decoration: status.upcoming
-                    ? BoxDecoration(color: AppColors.primarySoft, borderRadius: BorderRadius.circular(AppSizes.s8))
+                decoration: pill
+                    ? BoxDecoration(
+                        color: status.upcoming ? AppColors.primarySoft : AppColors.greyLight,
+                        borderRadius: BorderRadius.circular(AppSizes.s8),
+                      )
                     : null,
                 child: Text(
                   small,
                   style: AppTypography.label(color: status.upcoming ? AppColors.primaryDark : AppColors.textSecondary)
-                      .copyWith(fontSize: AppSizes.s12, letterSpacing: status.upcoming ? 0.8 : 0),
+                      .copyWith(fontSize: AppSizes.s12, letterSpacing: pill ? 0.8 : 0),
                 ),
               ),
             ],

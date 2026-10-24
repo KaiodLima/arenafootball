@@ -734,6 +734,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get matchCardFinished => 'ENCERRADA';
+
+  @override
   String get achievementsAlmostThere => 'QUASE LÁ';
 
   @override
