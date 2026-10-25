@@ -21,7 +21,8 @@ class NewsFeedPage {
     );
   }
 
-  /// Cards de gol e de publicidade só aparecem com `exibir == "true"`.
-  /// Notícias comuns aparecem sempre (comportamento do app antigo).
-  static bool _visibleInFeed(NewsDTO item) => (item.isGoal || item.isAd) ? item.isVisible : true;
+  /// Cards de gol, de resultado, de votação e de publicidade só aparecem com
+  /// `exibir == "true"`. Notícias comuns aparecem sempre (como no app antigo).
+  static bool _visibleInFeed(NewsDTO item) =>
+      (item.isGoal || item.isResult || item.isVoteCall || item.isAd) ? item.isVisible : true;
 }

@@ -734,6 +734,42 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get matchClockFirstHalf => '1º TEMPO';
+
+  @override
+  String get matchClockSecondHalf => '2º TEMPO';
+
+  @override
+  String get matchClockHalfTime => 'INTERVALO';
+
+  @override
+  String get matchHalfTime => 'Intervalo';
+
+  @override
+  String get matchStartSecondHalf => 'Iniciar 2º tempo';
+
+  @override
+  String get voteCallBadge => 'VOTE NO CRAQUE';
+
+  @override
+  String get voteCallClosedBadge => 'VOTAÇÃO ENCERRADA';
+
+  @override
+  String get voteCallAction => 'Votar agora';
+
+  @override
+  String get voteCallResult => 'Ver resultado';
+
+  @override
+  String get resultCardFullTime => 'FIM DE JOGO';
+
+  @override
+  String get resultCardFriendly => 'Amistoso';
+
+  @override
+  String get resultCardSeeMatch => 'Ver partida';
+
+  @override
   String get athleteStatsFriendly => 'Amistosos';
 
   @override

@@ -45,6 +45,15 @@ import { claimReconcilePlan, missingEnrollmentFix, needsClaimReconcile } from '.
 import { FanRankingTeam, fanRankingTotal, rankingTeamOf, sortFanRanking } from './fan_ranking';
 import { shouldCloseVoting } from './voting_close';
 import {
+  ResultTeam,
+  recentDays,
+  resultChanged,
+  resultNews,
+  resultNewsId,
+  shouldPostResult,
+} from './match_result';
+import { shouldPostVoteCard, voteCardNews, voteNewsId } from './vote_card';
+import {
   APP_PAGE,
   NOT_FOUND_PAGE,
   PageData,
@@ -169,7 +178,113 @@ export const onMatchUpdated = onDocumentUpdated('{colecao}/{matchId}', async (ev
   if (message) {
     await deliver(`${message.tipo}_${event.id}`, message, `${event.params.colecao}/${event.params.matchId}`);
   }
+  if (!before || !after) return;
+  const { colecao, matchId } = event.params;
+  const justFinished = before.status !== 'encerrada' && after.status === 'encerrada';
+  // Card "Vote no craque": encerrada na mão antes dos 15 min finais → posta agora.
+  if (justFinished && shouldPostVoteCard(after, await currentSeason())) {
+    await postVoteCard(colecao, await currentSeason(), matchId, after);
+  }
+  // Votação abriu/fechou: o card de votação acompanha ("Votar agora" / "Ver resultado").
+  if (after.votacaoNoticia && before.votacao !== after.votacao) {
+    const { db } = await admin();
+    await db
+      .collection('noticias')
+      .doc(String(after.votacaoNoticia))
+      .update({ votacao: String(after.votacao) === 'true' ? 'true' : 'false' })
+      .catch((error) => logger.warn('Card de votação não atualizado', { matchId, error: String(error) }));
+  }
+  // Card de resultado: o admin encerrou agora → posta; placar corrigido → atualiza.
+  if (justFinished && !after.resultadoNoticia) {
+    await postResult(colecao, await currentSeason(), matchId, after);
+  } else if (after.resultadoNoticia && resultChanged(before, after)) {
+    await updateResult(await currentSeason(), matchId, after);
+  }
 });
+
+/**
+ * Posta o card "Vote no craque" (uma vez por partida), marca a partida e abre
+ * a votação se estiver fechada (o gatilho de partidas manda o push de votação aberta).
+ */
+async function postVoteCard(collection: string, season: string, matchId: string, match: Record<string, unknown>) {
+  const { db, FieldValue } = await admin();
+  const [home, away, title] = await Promise.all([
+    resultTeam(season, match.idTimeC),
+    resultTeam(season, match.idTimeF),
+    championshipTitle(match.id_campeonato),
+  ]);
+  const ref = db.collection('noticias').doc(voteNewsId(matchId));
+  try {
+    await ref.create({
+      ...voteCardNews(match, matchId, season, { home, away, championshipTitle: title }),
+      data: FieldValue.serverTimestamp(),
+    });
+    logger.info('Card de votação postado', { match: `${collection}/${matchId}` });
+  } catch (error) {
+    logger.info('Card de votação já existia', { match: `${collection}/${matchId}`, error: String(error) });
+  }
+  await db
+    .collection(collection)
+    .doc(matchId)
+    .update({ votacaoNoticia: ref.id, ...(String(match.votacao) === 'true' ? {} : { votacao: 'true' }) });
+}
+
+/** Escudo e cor do time (`times{ano}`), para o card de resultado. */
+async function resultTeam(season: string, teamId: unknown): Promise<ResultTeam | undefined> {
+  const id = typeof teamId === 'string' ? teamId.trim() : '';
+  if (!id) return undefined;
+  const { db } = await admin();
+  const data = (await db.collection(seasonCollection('times', season)).doc(id).get()).data();
+  return data ? { crest: String(data.urlImagem ?? ''), color: String(data.corPrimaria ?? '') } : undefined;
+}
+
+/** Título do campeonato da partida (vazio em amistoso ou sem cadastro). */
+async function championshipTitle(championshipId: unknown): Promise<string> {
+  const id = Number(championshipId);
+  if (!(id > 0)) return '';
+  const { db } = await admin();
+  const found = await db.collection('campeonatos').where('id_campeonato', '==', id).limit(1).get();
+  return String(found.docs[0]?.data().titulo ?? '').trim();
+}
+
+/** Posta o card de resultado (uma vez por partida) e marca a partida. */
+async function postResult(collection: string, season: string, matchId: string, match: Record<string, unknown>) {
+  const { db, FieldValue } = await admin();
+  const [home, away, title] = await Promise.all([
+    resultTeam(season, match.idTimeC),
+    resultTeam(season, match.idTimeF),
+    championshipTitle(match.id_campeonato),
+  ]);
+  const news = resultNews(match, matchId, season, { home, away, championshipTitle: title });
+  const ref = db.collection('noticias').doc(resultNewsId(matchId));
+  try {
+    await ref.create({ ...news, data: FieldValue.serverTimestamp() });
+    logger.info('Card de resultado postado', { match: `${collection}/${matchId}` });
+  } catch (error) {
+    // Já existe (rodada anterior ou o gatilho do admin): só marca a partida.
+    logger.info('Card de resultado já existia', { match: `${collection}/${matchId}`, error: String(error) });
+  }
+  await db.collection(collection).doc(matchId).update({ resultadoNoticia: ref.id });
+}
+
+/** Placar/gols corrigidos depois: refaz título, texto e placar do mesmo card. */
+async function updateResult(season: string, matchId: string, match: Record<string, unknown>) {
+  const { db } = await admin();
+  const ref = db.collection('noticias').doc(resultNewsId(matchId));
+  const current = (await ref.get()).data();
+  if (!current) return;
+  const news = resultNews(match, matchId, season, {
+    home: { crest: String(current.escudo_casa ?? ''), color: String(current.cor_casa ?? '') },
+    away: { crest: String(current.escudo_fora ?? ''), color: String(current.cor_fora ?? '') },
+    championshipTitle: String(current.campeonato ?? ''),
+  });
+  await ref.update({
+    titulo: news.titulo,
+    descricao: news.descricao,
+    gol_time_casa: news.gol_time_casa,
+    gol_time_fora: news.gol_time_fora,
+  });
+}
 
 /** Aviso manual enviado pelo painel. */
 export const onNoticeCreated = onDocumentCreated('push_avisos/{noticeId}', async (event) => {
@@ -291,11 +406,13 @@ export const dailyGames = onSchedule({ schedule: '0 9 * * *', timeZone: 'America
 });
 
 /**
- * A cada hora: fecha as votações de melhor jogador abertas há 24h do fim da
+ * A cada 15 min: fecha as votações de melhor jogador abertas há 24h do fim da
  * partida (data + horário + duração). Fechar grava `votacao: "false"`, e o
- * gatilho de partidas manda o push de votação encerrada.
+ * gatilho de partidas manda o push de votação encerrada. Na mesma rodada,
+ * posta o card "Vote no craque" ~15 min antes do fim (`vote_card.ts`) e o
+ * card de resultado das partidas que acabaram (`match_result.ts`).
  */
-export const closeVotings = onSchedule({ schedule: '15 * * * *', timeZone: 'America/Sao_Paulo' }, async () => {
+export const closeVotings = onSchedule({ schedule: 'every 15 minutes', timeZone: 'America/Sao_Paulo' }, async () => {
   const { db } = await admin();
   const season = await currentSeason();
   const collection = seasonCollection('partidas', season);
@@ -305,6 +422,14 @@ export const closeVotings = onSchedule({ schedule: '15 * * * *', timeZone: 'Amer
     if (!shouldCloseVoting(doc.data(), season, now)) continue;
     await doc.ref.update({ votacao: 'false' });
     logger.info('Votação encerrada automaticamente', { match: `${collection}/${doc.id}` });
+  }
+  // Na mesma rodada (sem agendamento novo): card de resultado das partidas de
+  // hoje e de ontem que já acabaram pelo horário.
+  const recent = await db.collection(collection).where('data', 'in', recentDays(now)).get();
+  for (const doc of recent.docs) {
+    // ~15 min antes do fim: card "Vote no craque" (abre a votação).
+    if (shouldPostVoteCard(doc.data(), season, now)) await postVoteCard(collection, season, doc.id, doc.data());
+    if (shouldPostResult(doc.data(), season, now)) await postResult(collection, season, doc.id, doc.data());
   }
 });
 

@@ -106,13 +106,14 @@ void main() {
     expect(find.text('0 × 0'), findsNothing);
   });
 
-  testWidgets('em andamento: placar e "EM ANDAMENTO" no lugar da hora', (tester) async {
+  testWidgets('em andamento: placar e o relógio no lugar da hora', (tester) async {
     await pump(
       tester,
       const MatchDTO(homeTeam: 'Lava Jato', awayTeam: 'Volta', date: '22/10', time: '15:00', homeGoals: 1),
     );
     expect(find.text('1 × 0'), findsOneWidget);
-    expect(find.text('EM ANDAMENTO'), findsOneWidget);
+    // Relógio: começou às 15:00, agora 15:30.
+    expect(find.text("1º TEMPO · 31'"), findsOneWidget);
     expect(find.text('15:00'), findsNothing);
   });
 

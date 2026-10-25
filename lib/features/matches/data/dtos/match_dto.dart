@@ -7,6 +7,9 @@ import 'package:arena_soccer/core/firebase/region_registry.dart';
 enum MatchManualStatus {
   none(''),
   live('andamento'),
+
+  /// Intervalo marcado pelo admin: relógio parado entre os tempos.
+  halfTime('intervalo'),
   finished('encerrada');
 
   final String key;
@@ -76,6 +79,14 @@ class MatchDTO extends Equatable {
   /// `status`: iniciada/encerrada na mão pelo admin.
   final MatchManualStatus manualStatus;
 
+  /// Relógio de jogo (hora do servidor das ações do admin): `inicioEm`
+  /// (iniciou), `intervaloEm` (intervalo), `segundoTempoEm` (2º tempo) e
+  /// `statusEm` (última mudança; início das partidas antigas sem `inicioEm`).
+  final DateTime? startedAt;
+  final DateTime? halfTimeAt;
+  final DateTime? secondHalfAt;
+  final DateTime? statusAt;
+
   const MatchDTO({
     this.id = '',
     required this.homeTeam,
@@ -98,7 +109,13 @@ class MatchDTO extends Equatable {
     this.goals = const [],
     this.durationMinutes = defaultDurationMinutes,
     this.manualStatus = MatchManualStatus.none,
+    this.startedAt,
+    this.halfTimeAt,
+    this.secondHalfAt,
+    this.statusAt,
   });
+
+  static DateTime? _time(Object? value) => value is Timestamp ? value.toDate() : null;
 
   static int _int(Object? value) => value is num ? value.toInt() : int.tryParse(value?.toString() ?? '') ?? 0;
 
@@ -128,6 +145,10 @@ class MatchDTO extends Equatable {
       goals: MatchGoal.listFrom(data[goalsField]),
       durationMinutes: _int(data['duracao']) > 0 ? _int(data['duracao']) : defaultDurationMinutes,
       manualStatus: MatchManualStatus.fromKey(data['status']?.toString()),
+      startedAt: _time(data['inicioEm']),
+      halfTimeAt: _time(data['intervaloEm']),
+      secondHalfAt: _time(data['segundoTempoEm']),
+      statusAt: _time(data['statusEm']),
     );
   }
 
@@ -179,6 +200,10 @@ class MatchDTO extends Equatable {
     List<MatchGoal>? goals,
     int? durationMinutes,
     MatchManualStatus? manualStatus,
+    DateTime? startedAt,
+    DateTime? halfTimeAt,
+    DateTime? secondHalfAt,
+    DateTime? statusAt,
   }) {
     return MatchDTO(
       id: id ?? this.id,
@@ -202,8 +227,40 @@ class MatchDTO extends Equatable {
       goals: goals ?? this.goals,
       durationMinutes: durationMinutes ?? this.durationMinutes,
       manualStatus: manualStatus ?? this.manualStatus,
+      startedAt: startedAt ?? this.startedAt,
+      halfTimeAt: halfTimeAt ?? this.halfTimeAt,
+      secondHalfAt: secondHalfAt ?? this.secondHalfAt,
+      statusAt: statusAt ?? this.statusAt,
     );
   }
+
+  /// "Iniciar partida" de novo: relógio zerado a partir de [startedAt]
+  /// (sem intervalo nem 2º tempo).
+  MatchDTO withRestartedClock(DateTime startedAt) => MatchDTO(
+        id: id,
+        homeTeam: homeTeam,
+        awayTeam: awayTeam,
+        homeTeamId: homeTeamId,
+        awayTeamId: awayTeamId,
+        date: date,
+        time: time,
+        venue: venue,
+        championshipId: championshipId,
+        region: region,
+        homeGoals: homeGoals,
+        awayGoals: awayGoals,
+        isVotingOpen: isVotingOpen,
+        votingTitle: votingTitle,
+        bestPlayer: bestPlayer,
+        votesCount: votesCount,
+        registeredAt: registeredAt,
+        regionIds: regionIds,
+        goals: goals,
+        durationMinutes: durationMinutes,
+        manualStatus: MatchManualStatus.live,
+        startedAt: startedAt,
+        statusAt: statusAt,
+      );
 
   @override
   List<Object?> get props => [
@@ -228,5 +285,9 @@ class MatchDTO extends Equatable {
         goals,
         durationMinutes,
         manualStatus,
+        startedAt,
+        halfTimeAt,
+        secondHalfAt,
+        statusAt,
       ];
 }

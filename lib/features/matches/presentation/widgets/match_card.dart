@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
+import 'package:arena_soccer/features/matches/domain/match_clock.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/set_match_phase_usecase.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_card.dart';
 import 'package:arena_soccer/utils/components/card_menu_button.dart';
@@ -23,6 +25,9 @@ class MatchCardStatus {
   /// Passou do fim, é de dia passado ou o admin encerrou.
   final bool finished;
 
+  /// Intervalo marcado pelo admin (conta como em andamento, relógio parado).
+  final bool halfTime;
+
   /// Dias até a partida (0 = hoje, 1 = amanhã); só vale antes do jogo.
   final int dayOffset;
 
@@ -33,6 +38,7 @@ class MatchCardStatus {
     this.upcoming = false,
     this.live = false,
     this.finished = false,
+    this.halfTime = false,
     this.dayOffset = 0,
     this.nextChange,
   });
@@ -79,6 +85,8 @@ class MatchCardStatus {
         return const MatchCardStatus._(finished: true);
       case MatchManualStatus.live when offset == null || offset >= 0:
         return const MatchCardStatus._(live: true);
+      case MatchManualStatus.halfTime when offset == null || offset >= 0:
+        return const MatchCardStatus._(live: true, halfTime: true);
       default:
         break;
     }
@@ -135,8 +143,8 @@ class MatchCard extends StatefulWidget {
   /// Admin: "Lançar card de gol" no menu (nulo = sem a ação).
   final VoidCallback? onGoalCard;
 
-  /// Admin: iniciar (true) / encerrar (false) a partida na mão (nulo = sem a ação).
-  final ValueChanged<bool>? onSetLive;
+  /// Admin: iniciar, intervalo, 2º tempo ou encerrar na mão (nulo = sem as ações).
+  final ValueChanged<MatchPhase>? onSetPhase;
 
   /// Agora (só para teste).
   final DateTime? now;
@@ -159,7 +167,7 @@ class MatchCard extends StatefulWidget {
     this.onTap,
     this.championshipLabel,
     this.onGoalCard,
-    this.onSetLive,
+    this.onSetPhase,
     this.now,
   });
 
@@ -223,7 +231,8 @@ class _MatchCardState extends State<MatchCard> {
     final homeColor = accent(widget.homeColor);
     final awayColor = accent(widget.awayColor);
     final hasScorers = match.goals.any((g) => g.hasScorer);
-    final status = MatchCardStatus.of(match, widget.now ?? DateTime.now());
+    final now = widget.now ?? DateTime.now();
+    final status = MatchCardStatus.of(match, now);
     final homeWon = !status.upcoming && match.homeGoals > match.awayGoals;
     final awayWon = !status.upcoming && match.awayGoals > match.homeGoals;
     final venue = match.venue.trim();
@@ -269,12 +278,13 @@ class _MatchCardState extends State<MatchCard> {
                           label: l10n.matchesEditScore,
                           onSelected: widget.onEditScore,
                         ),
-                        if (widget.onSetLive != null)
-                          CardMenuAction(
-                            icon: status.live ? Icons.stop_circle_outlined : Icons.play_circle_outline_rounded,
-                            label: status.live ? l10n.matchFinish : l10n.matchStart,
-                            onSelected: () => widget.onSetLive!(!status.live),
-                          ),
+                        if (widget.onSetPhase != null)
+                          for (final action in matchPhaseActions(l10n, match, status, now))
+                            CardMenuAction(
+                              icon: action.icon,
+                              label: action.label,
+                              onSelected: () => widget.onSetPhase!(action.phase),
+                            ),
                         if (widget.onGoalCard != null)
                           CardMenuAction(
                             icon: Icons.sports_soccer_rounded,
@@ -307,7 +317,7 @@ class _MatchCardState extends State<MatchCard> {
               ),
               Padding(
                 padding: const EdgeInsets.only(top: AppSizes.s8),
-                child: _Center(match: match, status: status),
+                child: _Center(match: match, status: status, now: widget.now),
               ),
               Expanded(
                 child: _Team(
@@ -401,7 +411,10 @@ class _Center extends StatelessWidget {
   final MatchDTO match;
   final MatchCardStatus status;
 
-  const _Center({required this.match, required this.status});
+  /// Hora fixa (teste); nula = relógio de verdade.
+  final DateTime? now;
+
+  const _Center({required this.match, required this.status, this.now});
 
   @override
   Widget build(BuildContext context) {
@@ -433,7 +446,7 @@ class _Center extends StatelessWidget {
             ),
             if (status.live) ...[
               const SizedBox(height: AppSizes.s4),
-              const MatchLiveBadge(),
+              MatchClockBadge(match: match, now: now),
             ] else if (small.isNotEmpty) ...[
               const SizedBox(height: AppSizes.s2),
               Container(
@@ -659,7 +672,13 @@ class MatchLiveBadge extends StatefulWidget {
   /// Sobre fundo escuro (cabeçalho dos detalhes): pílula branca.
   final bool onDark;
 
-  const MatchLiveBadge({super.key, this.onDark = false});
+  /// Texto da pílula ("1º TEMPO · 23'"); nulo = "EM ANDAMENTO".
+  final String? label;
+
+  /// Intervalo: pílula âmbar, sem o ponto pulsando.
+  final bool paused;
+
+  const MatchLiveBadge({super.key, this.onDark = false, this.label, this.paused = false});
 
   @override
   State<MatchLiveBadge> createState() => _MatchLiveBadgeState();
@@ -678,30 +697,121 @@ class _MatchLiveBadgeState extends State<MatchLiveBadge> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final background = widget.onDark ? AppColors.white : AppColors.danger;
-    final foreground = widget.onDark ? AppColors.danger : AppColors.white;
+    final accent = widget.paused ? AppColors.warning : AppColors.danger;
+    final background = widget.onDark ? AppColors.white : accent;
+    final foreground = widget.onDark ? accent : AppColors.white;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s2),
       decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(AppSizes.s10)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          FadeTransition(
-            opacity: Tween<double>(begin: 0.3, end: 1).animate(_pulse),
-            child: Container(
-              width: AppSizes.s6,
-              height: AppSizes.s6,
-              decoration: BoxDecoration(color: foreground, shape: BoxShape.circle),
+          if (widget.paused)
+            Icon(Icons.pause_rounded, size: AppSizes.s12, color: foreground)
+          else
+            FadeTransition(
+              opacity: Tween<double>(begin: 0.3, end: 1).animate(_pulse),
+              child: Container(
+                width: AppSizes.s6,
+                height: AppSizes.s6,
+                decoration: BoxDecoration(color: foreground, shape: BoxShape.circle),
+              ),
             ),
-          ),
           const SizedBox(width: AppSizes.s4),
           Text(
-            l10n.matchCardLive,
+            widget.label ?? l10n.matchCardLive,
             style: AppTypography.label(color: foreground)
                 .copyWith(fontSize: AppSizes.s12, letterSpacing: 0.8, fontWeight: FontWeight.w800),
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Rótulo do relógio: "1º TEMPO · 23'", "INTERVALO" ou "2º TEMPO · 67'".
+String matchClockLabel(AppLocalizations l10n, MatchClock clock) {
+  final minute = clock.minuteLabel;
+  final phase = switch (clock.phase) {
+    MatchClockPhase.firstHalf => l10n.matchClockFirstHalf,
+    MatchClockPhase.halfTime => l10n.matchClockHalfTime,
+    MatchClockPhase.secondHalf => l10n.matchClockSecondHalf,
+  };
+  return minute == null || clock.phase == MatchClockPhase.halfTime ? phase : '$phase · $minute';
+}
+
+/// Ações do admin no andamento: iniciar; no 1º tempo, intervalo; no
+/// intervalo, 2º tempo; e encerrar enquanto estiver em andamento.
+List<({IconData icon, String label, MatchPhase phase})> matchPhaseActions(
+  AppLocalizations l10n,
+  MatchDTO match,
+  MatchCardStatus status,
+  DateTime now,
+) {
+  if (!status.live) {
+    return [(icon: Icons.play_circle_outline_rounded, label: l10n.matchStart, phase: MatchPhase.start)];
+  }
+  final clock = MatchClock.of(match, now);
+  return [
+    if (status.halfTime)
+      (icon: Icons.play_circle_outline_rounded, label: l10n.matchStartSecondHalf, phase: MatchPhase.secondHalf)
+    else if (clock.phase == MatchClockPhase.firstHalf)
+      (icon: Icons.pause_circle_outline_rounded, label: l10n.matchHalfTime, phase: MatchPhase.halfTime),
+    (icon: Icons.stop_circle_outlined, label: l10n.matchFinish, phase: MatchPhase.finish),
+  ];
+}
+
+/// Pílula do jogo em andamento com o relógio ("1º TEMPO · 23'"), que se
+/// atualiza a cada 30 s (no intervalo fica parada). Com [now] fixo (teste),
+/// não atualiza.
+class MatchClockBadge extends StatefulWidget {
+  final MatchDTO match;
+  final bool onDark;
+  final DateTime? now;
+
+  const MatchClockBadge({super.key, required this.match, this.onDark = false, this.now});
+
+  @override
+  State<MatchClockBadge> createState() => _MatchClockBadgeState();
+}
+
+class _MatchClockBadgeState extends State<MatchClockBadge> {
+  Timer? _tick;
+
+  @override
+  void initState() {
+    super.initState();
+    _schedule();
+  }
+
+  @override
+  void didUpdateWidget(covariant MatchClockBadge oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.match != widget.match) _schedule();
+  }
+
+  void _schedule() {
+    _tick?.cancel();
+    _tick = null;
+    if (widget.now != null || widget.match.manualStatus == MatchManualStatus.halfTime) return;
+    _tick = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _tick?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final clock = MatchClock.of(widget.match, widget.now ?? DateTime.now());
+    return MatchLiveBadge(
+      onDark: widget.onDark,
+      label: matchClockLabel(AppLocalizations.of(context), clock),
+      paused: clock.phase == MatchClockPhase.halfTime,
     );
   }
 }

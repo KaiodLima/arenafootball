@@ -43,6 +43,8 @@ class _FakeMatchesRepository implements IMatchesRepository {
   Future<Either<Failure, void>> setManualStatus({
     required String matchId,
     required MatchManualStatus status,
+    String? stampField,
+    List<String> clearFields = const [],
     String? season,
   }) async =>
       const Right(null);

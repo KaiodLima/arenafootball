@@ -116,7 +116,7 @@ class MatchDetailsHeader extends StatelessWidget {
                             ),
                             const SizedBox(height: AppSizes.s6),
                             if (status.live)
-                              const MatchLiveBadge(onDark: true)
+                              MatchClockBadge(match: match, onDark: true, now: now)
                             else if (chip.isNotEmpty)
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: AppSizes.s10, vertical: AppSizes.s4),

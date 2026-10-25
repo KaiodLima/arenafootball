@@ -68,7 +68,8 @@ class MatchDetailsPage extends StatelessWidget {
           championshipLabel ?? l10n.matchDetailsTitle,
           if (match.date.trim().isNotEmpty) match.date.trim(),
         ].join('  ·  ');
-        final live = MatchCardStatus.of(match, DateTime.now()).live;
+        final now = DateTime.now();
+        final status = MatchCardStatus.of(match, now);
         final home = headerColor(homeColor);
         final away = headerColor(awayColor);
 
@@ -122,11 +123,12 @@ class MatchDetailsPage extends StatelessWidget {
                             arguments: {'match': match, 'season': season},
                           ),
                         ),
-                        CardMenuAction(
-                          icon: live ? Icons.stop_circle_outlined : Icons.play_circle_outline_rounded,
-                          label: live ? l10n.matchFinish : l10n.matchStart,
-                          onSelected: () => cubit.setLive(!live),
-                        ),
+                        for (final action in matchPhaseActions(l10n, match, status, now))
+                          CardMenuAction(
+                            icon: action.icon,
+                            label: action.label,
+                            onSelected: () => cubit.setPhase(action.phase),
+                          ),
                         CardMenuAction(
                           icon: match.isVotingOpen ? Icons.lock_outline_rounded : Icons.how_to_vote_outlined,
                           label: match.isVotingOpen ? l10n.matchesCloseVoting : l10n.matchesOpenVoting,

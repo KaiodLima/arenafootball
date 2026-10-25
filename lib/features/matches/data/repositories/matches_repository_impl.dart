@@ -60,9 +60,17 @@ class MatchesRepositoryImpl implements IMatchesRepository {
   Future<Either<Failure, void>> setManualStatus({
     required String matchId,
     required MatchManualStatus status,
+    String? stampField,
+    List<String> clearFields = const [],
     String? season,
   }) =>
-      _dataSource.setManualStatus(matchId: matchId, status: status, season: season);
+      _dataSource.setManualStatus(
+        matchId: matchId,
+        status: status,
+        stampField: stampField,
+        clearFields: clearFields,
+        season: season,
+      );
 
   @override
   Future<Either<Failure, void>> deleteMatch({required String matchId, String? season}) =>

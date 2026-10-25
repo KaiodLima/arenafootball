@@ -731,6 +731,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get matchClockFirstHalf => '1ST HALF';
+
+  @override
+  String get matchClockSecondHalf => '2ND HALF';
+
+  @override
+  String get matchClockHalfTime => 'HALF TIME';
+
+  @override
+  String get matchHalfTime => 'Half time';
+
+  @override
+  String get matchStartSecondHalf => 'Start 2nd half';
+
+  @override
+  String get voteCallBadge => 'VOTE FOR THE STAR';
+
+  @override
+  String get voteCallClosedBadge => 'VOTING CLOSED';
+
+  @override
+  String get voteCallAction => 'Vote now';
+
+  @override
+  String get voteCallResult => 'See result';
+
+  @override
+  String get resultCardFullTime => 'FULL TIME';
+
+  @override
+  String get resultCardFriendly => 'Friendly';
+
+  @override
+  String get resultCardSeeMatch => 'See match';
+
+  @override
   String get athleteStatsFriendly => 'Friendlies';
 
   @override

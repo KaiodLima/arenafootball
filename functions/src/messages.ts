@@ -176,7 +176,16 @@ export function goalMessage(news: Doc): PushMessage | null {
 /** Notícia comum publicada visível (sem gol, publicidade). */
 export function newsMessage(news: Doc): PushMessage | null {
   const tag = text(news.tag);
-  if (tag === 'gol' || tag === 'publicidade' || text(news.exibir) !== 'true') return null;
+  // Gol, resultado e votação têm card próprio (os automáticos não mandam push de notícia).
+  if (
+    tag === 'gol' ||
+    tag === 'resultado' ||
+    tag === 'votacao' ||
+    tag === 'publicidade' ||
+    text(news.exibir) !== 'true'
+  ) {
+    return null;
+  }
   const titulo = text(news.titulo);
   const region = text(news.fk_competicao);
   if (!titulo || !region) return null;

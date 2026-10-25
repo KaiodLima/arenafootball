@@ -107,13 +107,27 @@ class MatchesDataSource {
   Future<Either<Failure, void>> setVotingOpen({required String matchId, required bool isOpen, String? season}) =>
       _update(matchId, {'votacao': isOpen.toString()}, season: season);
 
-  /// Admin inicia/encerra a partida na mão (vale mais que o horário).
+  /// Admin inicia, para no intervalo, começa o 2º tempo ou encerra a partida
+  /// na mão (vale mais que o horário). [stampField] recebe a hora do servidor
+  /// (relógio de jogo: `inicioEm`, `intervaloEm`, `segundoTempoEm`);
+  /// [clearFields] são apagados (reiniciar a partida zera o relógio).
   Future<Either<Failure, void>> setManualStatus({
     required String matchId,
     required MatchManualStatus status,
+    String? stampField,
+    List<String> clearFields = const [],
     String? season,
   }) =>
-      _update(matchId, {'status': status.key, 'statusEm': FieldValue.serverTimestamp()}, season: season);
+      _update(
+        matchId,
+        {
+          'status': status.key,
+          'statusEm': FieldValue.serverTimestamp(),
+          if (stampField != null) stampField: FieldValue.serverTimestamp(),
+          for (final field in clearFields) field: FieldValue.delete(),
+        },
+        season: season,
+      );
 
   Future<Either<Failure, void>> _update(String matchId, Map<String, dynamic> fields, {String? season}) async {
     try {

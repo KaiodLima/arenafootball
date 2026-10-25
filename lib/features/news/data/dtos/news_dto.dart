@@ -11,6 +11,12 @@ class NewsDTO extends Equatable {
   /// Tag dos cards de publicidade.
   static const String adTag = 'publicidade';
 
+  /// Card automático de resultado (Cloud Function ao fim da partida).
+  static const String resultTag = 'resultado';
+
+  /// Card automático "Vote no craque" (Cloud Function ~15 min antes do fim).
+  static const String voteTag = 'votacao';
+
   final String id;
   final DateTime? date;
   final String title;
@@ -53,6 +59,18 @@ class NewsDTO extends Equatable {
   /// `id_campeonato` da competição do gol (card de gol; nulo = sem competição).
   final int? championshipId;
 
+  /// Card de resultado: a partida (`id_partida`), escudos e cores principais
+  /// dos dois times e o nome da competição (`campeonato`; vazio = amistoso).
+  final String matchId;
+  final String homeCrest;
+  final String awayCrest;
+  final String homeColor;
+  final String awayColor;
+  final String championshipTitle;
+
+  /// Card "Vote no craque": a votação da partida está aberta (`votacao`, string).
+  final bool votingOpen;
+
   const NewsDTO({
     this.id = '',
     this.date,
@@ -81,6 +99,13 @@ class NewsDTO extends Equatable {
     this.scoringTeamPrimaryColor = '',
     this.scoringTeamSecondaryColor = '',
     this.championshipId,
+    this.matchId = '',
+    this.homeCrest = '',
+    this.awayCrest = '',
+    this.homeColor = '',
+    this.awayColor = '',
+    this.championshipTitle = '',
+    this.votingOpen = false,
   });
 
   bool get hasScorer => scorerId.isNotEmpty && scorerName.isNotEmpty;
@@ -90,6 +115,10 @@ class NewsDTO extends Equatable {
   bool get isGoal => tag == goalTag;
 
   bool get isAd => tag == adTag;
+
+  bool get isResult => tag == resultTag;
+
+  bool get isVoteCall => tag == voteTag;
 
   factory NewsDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? const {};
@@ -125,6 +154,13 @@ class NewsDTO extends Equatable {
       scoringTeamPrimaryColor: data['cor_marcador']?.toString() ?? '',
       scoringTeamSecondaryColor: data['cor_marcador_secundaria']?.toString() ?? '',
       championshipId: (data['id_campeonato'] as num?)?.toInt(),
+      matchId: data['id_partida']?.toString() ?? '',
+      homeCrest: data['escudo_casa']?.toString() ?? '',
+      awayCrest: data['escudo_fora']?.toString() ?? '',
+      homeColor: data['cor_casa']?.toString() ?? '',
+      awayColor: data['cor_fora']?.toString() ?? '',
+      championshipTitle: data['campeonato']?.toString() ?? '',
+      votingOpen: data['votacao']?.toString() == 'true',
     );
   }
 
@@ -161,6 +197,13 @@ class NewsDTO extends Equatable {
       scoringTeamPrimaryColor: text('scoringTeamPrimaryColor'),
       scoringTeamSecondaryColor: text('scoringTeamSecondaryColor'),
       championshipId: (json['championshipId'] as num?)?.toInt(),
+      matchId: text('matchId'),
+      homeCrest: text('homeCrest'),
+      awayCrest: text('awayCrest'),
+      homeColor: text('homeColor'),
+      awayColor: text('awayColor'),
+      championshipTitle: text('championshipTitle'),
+      votingOpen: json['votingOpen'] == true,
     );
   }
 
@@ -193,6 +236,13 @@ class NewsDTO extends Equatable {
         'scoringTeamPrimaryColor': scoringTeamPrimaryColor,
         'scoringTeamSecondaryColor': scoringTeamSecondaryColor,
         if (championshipId != null) 'championshipId': championshipId,
+        'matchId': matchId,
+        'homeCrest': homeCrest,
+        'awayCrest': awayCrest,
+        'homeColor': homeColor,
+        'awayColor': awayColor,
+        'championshipTitle': championshipTitle,
+        'votingOpen': votingOpen,
       };
 
   /// `data` fica de fora: na criação o DataSource grava o horário do
@@ -227,6 +277,14 @@ class NewsDTO extends Equatable {
         if (scoringTeamPrimaryColor.isNotEmpty) 'cor_marcador': scoringTeamPrimaryColor,
         if (scoringTeamSecondaryColor.isNotEmpty) 'cor_marcador_secundaria': scoringTeamSecondaryColor,
         if (championshipId != null) 'id_campeonato': championshipId,
+        // Só nos cards de resultado.
+        if (matchId.isNotEmpty) 'id_partida': matchId,
+        if (homeCrest.isNotEmpty) 'escudo_casa': homeCrest,
+        if (awayCrest.isNotEmpty) 'escudo_fora': awayCrest,
+        if (homeColor.isNotEmpty) 'cor_casa': homeColor,
+        if (awayColor.isNotEmpty) 'cor_fora': awayColor,
+        if (championshipTitle.isNotEmpty) 'campeonato': championshipTitle,
+        if (isVoteCall) 'votacao': votingOpen.toString(),
       };
 
   NewsDTO copyWith({
@@ -257,6 +315,13 @@ class NewsDTO extends Equatable {
     String? scoringTeamPrimaryColor,
     String? scoringTeamSecondaryColor,
     int? championshipId,
+    String? matchId,
+    String? homeCrest,
+    String? awayCrest,
+    String? homeColor,
+    String? awayColor,
+    String? championshipTitle,
+    bool? votingOpen,
   }) {
     return NewsDTO(
       id: id ?? this.id,
@@ -286,6 +351,13 @@ class NewsDTO extends Equatable {
       scoringTeamPrimaryColor: scoringTeamPrimaryColor ?? this.scoringTeamPrimaryColor,
       scoringTeamSecondaryColor: scoringTeamSecondaryColor ?? this.scoringTeamSecondaryColor,
       championshipId: championshipId ?? this.championshipId,
+      matchId: matchId ?? this.matchId,
+      homeCrest: homeCrest ?? this.homeCrest,
+      awayCrest: awayCrest ?? this.awayCrest,
+      homeColor: homeColor ?? this.homeColor,
+      awayColor: awayColor ?? this.awayColor,
+      championshipTitle: championshipTitle ?? this.championshipTitle,
+      votingOpen: votingOpen ?? this.votingOpen,
     );
   }
 
@@ -318,5 +390,12 @@ class NewsDTO extends Equatable {
         scoringTeamPrimaryColor,
         scoringTeamSecondaryColor,
         championshipId,
+        matchId,
+        homeCrest,
+        awayCrest,
+        homeColor,
+        awayColor,
+        championshipTitle,
+        votingOpen,
       ];
 }

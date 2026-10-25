@@ -1335,6 +1335,78 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @matchClockFirstHalf.
+  ///
+  /// In pt, this message translates to:
+  /// **'1º TEMPO'**
+  String get matchClockFirstHalf;
+
+  /// No description provided for @matchClockSecondHalf.
+  ///
+  /// In pt, this message translates to:
+  /// **'2º TEMPO'**
+  String get matchClockSecondHalf;
+
+  /// No description provided for @matchClockHalfTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'INTERVALO'**
+  String get matchClockHalfTime;
+
+  /// No description provided for @matchHalfTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'Intervalo'**
+  String get matchHalfTime;
+
+  /// No description provided for @matchStartSecondHalf.
+  ///
+  /// In pt, this message translates to:
+  /// **'Iniciar 2º tempo'**
+  String get matchStartSecondHalf;
+
+  /// No description provided for @voteCallBadge.
+  ///
+  /// In pt, this message translates to:
+  /// **'VOTE NO CRAQUE'**
+  String get voteCallBadge;
+
+  /// No description provided for @voteCallClosedBadge.
+  ///
+  /// In pt, this message translates to:
+  /// **'VOTAÇÃO ENCERRADA'**
+  String get voteCallClosedBadge;
+
+  /// No description provided for @voteCallAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votar agora'**
+  String get voteCallAction;
+
+  /// No description provided for @voteCallResult.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver resultado'**
+  String get voteCallResult;
+
+  /// No description provided for @resultCardFullTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'FIM DE JOGO'**
+  String get resultCardFullTime;
+
+  /// No description provided for @resultCardFriendly.
+  ///
+  /// In pt, this message translates to:
+  /// **'Amistoso'**
+  String get resultCardFriendly;
+
+  /// No description provided for @resultCardSeeMatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver partida'**
+  String get resultCardSeeMatch;
+
   /// No description provided for @athleteStatsFriendly.
   ///
   /// In pt, this message translates to:

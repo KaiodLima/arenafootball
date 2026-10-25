@@ -7,7 +7,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/matches_filter.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/delete_match_usecase.dart';
-import 'package:arena_soccer/features/matches/domain/usecases/set_match_status_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/set_match_phase_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/toggle_match_voting_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/update_match_score_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/watch_matches_usecase.dart';
@@ -24,7 +24,7 @@ class MatchesCubit extends Cubit<MatchesState> {
   final ToggleMatchVotingUseCase toggleMatchVotingUseCase;
   final DeleteMatchUseCase deleteMatchUseCase;
   final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
-  final SetMatchStatusUseCase setMatchStatusUseCase;
+  final SetMatchPhaseUseCase setMatchPhaseUseCase;
   StreamSubscription<Either<Failure, List<MatchDTO>>>? _subscription;
   String? _region;
   String? _season;
@@ -43,7 +43,7 @@ class MatchesCubit extends Cubit<MatchesState> {
     this.toggleMatchVotingUseCase,
     this.deleteMatchUseCase,
     this.getTeamsCacheFirstUseCase,
-    this.setMatchStatusUseCase,
+    this.setMatchPhaseUseCase,
   ) : super(const LoadingMatchesState());
 
   /// Recorte (dia) que está sendo ouvido; nulo antes do primeiro [watch].
@@ -171,9 +171,9 @@ class MatchesCubit extends Cubit<MatchesState> {
     _emitIfFailed(await toggleMatchVotingUseCase(match: match, season: _season));
   }
 
-  /// Admin: inicia ([live]) ou encerra a partida na mão.
-  Future<void> setLive(MatchDTO match, bool live) async {
-    _emitIfFailed(await setMatchStatusUseCase(match: match, live: live, season: _season));
+  /// Admin: inicia, intervalo, 2º tempo ou encerra a partida na mão.
+  Future<void> setPhase(MatchDTO match, MatchPhase phase) async {
+    _emitIfFailed(await setMatchPhaseUseCase(match: match, phase: phase, season: _season));
   }
 
   Future<void> delete(MatchDTO match) async {

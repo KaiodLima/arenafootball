@@ -9,6 +9,11 @@ import 'package:arena_soccer/features/news/presentation/bloc/news_feed_state.dar
 import 'package:arena_soccer/features/news/presentation/widgets/ad_card.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/goal_card.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/news_card.dart';
+import 'package:arena_soccer/features/news/presentation/widgets/result_card.dart';
+import 'package:arena_soccer/features/news/presentation/widgets/vote_call_card.dart';
+import 'package:arena_soccer/core/firebase/season_collection.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
+import 'package:arena_soccer/utils/constants/team_colors.dart';
 import 'package:arena_soccer/features/players/presentation/player_navigation.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
@@ -162,6 +167,49 @@ class _NewsItem extends StatelessWidget {
     );
   }
 
+  /// Partida dos cards automáticos (resultado e votação), montada do card.
+  MatchDTO _matchOfCard() => MatchDTO(
+        id: news.matchId,
+        homeTeam: news.homeTeam,
+        awayTeam: news.awayTeam,
+        homeTeamId: news.homeTeamId,
+        awayTeamId: news.awayTeamId,
+        homeGoals: int.tryParse(news.homeGoals) ?? 0,
+        awayGoals: int.tryParse(news.awayGoals) ?? 0,
+        championshipId: news.championshipId ?? 0,
+        isVotingOpen: news.votingOpen,
+      );
+
+  /// Card "Vote no craque": votar (aberta) ou ver o eleito (encerrada).
+  void _openVoting(BuildContext context) {
+    Navigator.pushNamed(
+      context,
+      news.votingOpen ? AppRoutes.voteBestPlayerPage : AppRoutes.electedPlayerPage,
+      // As telas de votação exigem a temporada: sem ela no card, a atual.
+      arguments: {
+        'match': _matchOfCard(),
+        'season': news.season.isEmpty ? SeasonCollection.currentSeason : news.season
+      },
+    );
+  }
+
+  /// Detalhes da partida do card de resultado (o stream completa os dados).
+  void _openMatch(BuildContext context) {
+    Navigator.pushNamed(
+      context,
+      AppRoutes.matchDetailsPage,
+      arguments: {
+        'match': _matchOfCard(),
+        'season': news.season.isEmpty ? null : news.season,
+        'homeCrest': news.homeCrest.isEmpty ? null : news.homeCrest,
+        'awayCrest': news.awayCrest.isEmpty ? null : news.awayCrest,
+        'homeColor': colorFromHex(news.homeColor),
+        'awayColor': colorFromHex(news.awayColor),
+        'championshipLabel': news.championshipTitle.isEmpty ? null : news.championshipTitle,
+      },
+    );
+  }
+
   Future<void> _confirmDelete(BuildContext context) async {
     final cubit = BlocProvider.of<NewsFeedCubit>(context);
     final l10n = AppLocalizations.of(context);
@@ -196,6 +244,20 @@ class _NewsItem extends StatelessWidget {
             : null,
         onScorerTap: news.hasScorer ? () => _openAthlete(context, news.scorerId, news.scorerName) : null,
         onAssistantTap: news.hasAssistant ? () => _openAthlete(context, news.assistantId, news.assistantName) : null,
+      );
+    }
+    if (news.isVoteCall) {
+      return VoteCallCard(
+        news: news,
+        trailing: _adminMenu(context, onImage: true, canEdit: false),
+        onTap: news.matchId.isEmpty ? null : () => _openVoting(context),
+      );
+    }
+    if (news.isResult) {
+      return ResultCard(
+        news: news,
+        trailing: _adminMenu(context, onImage: true, canEdit: false),
+        onTap: news.matchId.isEmpty ? null : () => _openMatch(context),
       );
     }
     if (news.isAd) {
