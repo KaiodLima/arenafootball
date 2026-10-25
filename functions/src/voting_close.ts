@@ -43,3 +43,40 @@ export function shouldCloseVoting(match: Doc, season: string, now: Date = new Da
   if (!end) return false;
   return now.getTime() >= end.getTime() + CLOSE_AFTER_HOURS * 3_600_000;
 }
+
+/** Pausa suposta do intervalo e folga do encerramento automático (iguais ao app, `MatchClock`). */
+export const HALF_TIME_BREAK_MINUTES = 15;
+export const AUTO_FINISH_MARGIN_MINUTES = 30;
+
+const dateOf = (value: unknown): Date | null => {
+  const toDate = (value as { toDate?: () => Date } | null | undefined)?.toDate;
+  return typeof toDate === 'function' ? toDate.call(value) : null;
+};
+
+/**
+ * Fim esperado: 2º tempo marcado + o que falta; no intervalo, a pausa + o
+ * 2º tempo; iniciada na mão (`inicioEm`, ou `statusEm` em doc antigo) +
+ * duração; senão, horário + duração ([matchEnd]).
+ */
+export function expectedEnd(match: Doc, season: string, now: Date = new Date()): Date | null {
+  const duration = Number(match.duracao) > 0 ? Number(match.duracao) : DEFAULT_DURATION_MINUTES;
+  const secondHalfMinutes = duration - Math.round(duration / 2);
+  const minutes = (n: number) => n * 60_000;
+  const secondHalf = dateOf(match.segundoTempoEm);
+  if (secondHalf) return new Date(secondHalf.getTime() + minutes(secondHalfMinutes));
+  const halfTime = dateOf(match.intervaloEm);
+  if (text(match.status) === 'intervalo' && halfTime) {
+    return new Date(halfTime.getTime() + minutes(HALF_TIME_BREAK_MINUTES + secondHalfMinutes));
+  }
+  const start = dateOf(match.inicioEm) ?? (text(match.status) === 'andamento' ? dateOf(match.statusEm) : null);
+  if (start) return new Date(start.getTime() + minutes(duration));
+  return matchEnd(match, season, now);
+}
+
+/** Iniciada na mão e esquecida em andamento/intervalo: encerra 30 min depois do fim esperado. */
+export function shouldAutoFinish(match: Doc, season: string, now: Date = new Date()): boolean {
+  const status = text(match.status);
+  if (status !== 'andamento' && status !== 'intervalo') return false;
+  const end = expectedEnd(match, season, now);
+  return end !== null && now.getTime() >= end.getTime() + AUTO_FINISH_MARGIN_MINUTES * 60_000;
+}

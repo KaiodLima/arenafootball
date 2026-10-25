@@ -43,7 +43,7 @@ import {
 import { isLegacyVoteCollection, seasonCollections, seasonsToSweep, userPhotoPath } from './account_cleanup';
 import { claimReconcilePlan, missingEnrollmentFix, needsClaimReconcile } from './claim_reconcile';
 import { FanRankingTeam, fanRankingTotal, rankingTeamOf, sortFanRanking } from './fan_ranking';
-import { shouldCloseVoting } from './voting_close';
+import { shouldAutoFinish, shouldCloseVoting } from './voting_close';
 import {
   ResultTeam,
   recentDays,
@@ -413,7 +413,7 @@ export const dailyGames = onSchedule({ schedule: '0 9 * * *', timeZone: 'America
  * card de resultado das partidas que acabaram (`match_result.ts`).
  */
 export const closeVotings = onSchedule({ schedule: 'every 15 minutes', timeZone: 'America/Sao_Paulo' }, async () => {
-  const { db } = await admin();
+  const { db, FieldValue } = await admin();
   const season = await currentSeason();
   const collection = seasonCollection('partidas', season);
   const open = await db.collection(collection).where('votacao', '==', 'true').get();
@@ -427,6 +427,13 @@ export const closeVotings = onSchedule({ schedule: 'every 15 minutes', timeZone:
   // hoje e de ontem que já acabaram pelo horário.
   const recent = await db.collection(collection).where('data', 'in', recentDays(now)).get();
   for (const doc of recent.docs) {
+    // Iniciada na mão e esquecida em andamento: encerra (o gatilho de partidas
+    // posta os cards de votação e de resultado).
+    if (shouldAutoFinish(doc.data(), season, now)) {
+      await doc.ref.update({ status: 'encerrada', statusEm: FieldValue.serverTimestamp() });
+      logger.info('Partida encerrada automaticamente', { match: `${collection}/${doc.id}` });
+      continue;
+    }
     // ~15 min antes do fim: card "Vote no craque" (abre a votação).
     if (shouldPostVoteCard(doc.data(), season, now)) await postVoteCard(collection, season, doc.id, doc.data());
     if (shouldPostResult(doc.data(), season, now)) await postResult(collection, season, doc.id, doc.data());

@@ -86,8 +86,11 @@ test('quando postar: depois do fim, encerrada na mão, nunca duas vezes', () => 
   assert.equal(isMatchOver(match, '2026', new Date('2026-10-22T19:29:00Z')), false);
   assert.equal(isMatchOver(match, '2026', new Date('2026-10-22T19:30:00Z')), true);
   assert.equal(isMatchOver({ ...match, status: 'encerrada' }, '2026', new Date('2026-10-22T18:00:00Z')), true);
-  assert.equal(isMatchOver({ ...match, status: 'andamento' }, '2026', new Date('2026-10-22T23:00:00Z')), false);
-  assert.equal(isMatchOver({ ...match, status: 'intervalo' }, '2026', new Date('2026-10-22T23:00:00Z')), false);
+  // Em andamento/intervalo na mão: não acabou até o fim esperado + 30 min (19:30 + 30 UTC).
+  assert.equal(isMatchOver({ ...match, status: 'andamento' }, '2026', new Date('2026-10-22T19:45:00Z')), false);
+  assert.equal(isMatchOver({ ...match, status: 'intervalo' }, '2026', new Date('2026-10-22T19:45:00Z')), false);
+  // Esquecida: acabou.
+  assert.equal(isMatchOver({ ...match, status: 'andamento' }, '2026', new Date('2026-10-22T23:00:00Z')), true);
   assert.equal(shouldPostResult({ ...match, resultadoNoticia: 'resultado_m1' }, '2026', new Date('2026-10-23T00:00:00Z')), false);
 });
 

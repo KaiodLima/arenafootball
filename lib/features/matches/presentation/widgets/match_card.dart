@@ -83,10 +83,15 @@ class MatchCardStatus {
     switch (match.manualStatus) {
       case MatchManualStatus.finished:
         return const MatchCardStatus._(finished: true);
-      case MatchManualStatus.live when offset == null || offset >= 0:
-        return const MatchCardStatus._(live: true);
-      case MatchManualStatus.halfTime when offset == null || offset >= 0:
-        return const MatchCardStatus._(live: true, halfTime: true);
+      case MatchManualStatus.live || MatchManualStatus.halfTime when offset == null || offset >= 0:
+        // Esquecida em andamento/intervalo: encerra sozinha 30 min depois do fim esperado.
+        final autoEnd = MatchClock.expectedEnd(match, now)?.add(MatchClock.autoFinishMargin);
+        if (autoEnd != null && !now.isBefore(autoEnd)) return const MatchCardStatus._(finished: true);
+        return MatchCardStatus._(
+          live: true,
+          halfTime: match.manualStatus == MatchManualStatus.halfTime,
+          nextChange: autoEnd,
+        );
       default:
         break;
     }

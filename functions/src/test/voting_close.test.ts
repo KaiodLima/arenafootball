@@ -22,3 +22,26 @@ test('sem horário legível: conta do fim do dia', () => {
   assert.equal(shouldCloseVoting(noTime, '2026', new Date('2026-10-24T02:58:00Z')), false);
   assert.equal(shouldCloseVoting(noTime, '2026', new Date('2026-10-24T02:59:00Z')), true);
 });
+
+import { expectedEnd, shouldAutoFinish } from '../voting_close';
+
+const ts = (iso: string) => ({ toDate: () => new Date(iso) });
+// Real Luiz × Capão FC: 21:00 (Brasília), 40 min, iniciada na mão às 20:28.
+const forgotten = { data: '24/10', horario: '21:00', duracao: 40, status: 'andamento', inicioEm: ts('2026-10-24T23:28:00Z') };
+
+test('iniciada na mão e esquecida: encerra 30 min depois do fim esperado', () => {
+  // Fim esperado 20:28 + 40 = 21:08 (00:08 UTC); encerra a partir de 21:38.
+  assert.equal(expectedEnd(forgotten, '2026')?.toISOString(), '2026-10-25T00:08:00.000Z');
+  assert.equal(shouldAutoFinish(forgotten, '2026', new Date('2026-10-25T00:20:00Z')), false);
+  assert.equal(shouldAutoFinish(forgotten, '2026', new Date('2026-10-25T00:49:00Z')), true);
+  assert.equal(shouldAutoFinish({ ...forgotten, status: 'encerrada' }, '2026', new Date('2026-10-26T00:00:00Z')), false);
+});
+
+test('fim esperado: 2º tempo marcado e intervalo esquecido', () => {
+  const second = { ...forgotten, segundoTempoEm: ts('2026-10-24T23:55:00Z') };
+  assert.equal(expectedEnd(second, '2026')?.toISOString(), '2026-10-25T00:15:00.000Z');
+  const halfTime = { ...forgotten, status: 'intervalo', intervaloEm: ts('2026-10-24T23:50:00Z') };
+  // 23:50 + 15 de pausa + 20 do 2º tempo = 00:25 UTC.
+  assert.equal(expectedEnd(halfTime, '2026')?.toISOString(), '2026-10-25T00:25:00.000Z');
+  assert.equal(shouldAutoFinish(halfTime, '2026', new Date('2026-10-25T00:56:00Z')), true);
+});

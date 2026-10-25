@@ -20,6 +20,36 @@ class MatchClock {
 
   const MatchClock({required this.phase, required this.minute, required this.half, required this.duration});
 
+  /// Acréscimo máximo do 1º tempo sem o admin marcar o intervalo; passou
+  /// disso, o relógio segue no 2º tempo contínuo.
+  static const int firstHalfStoppageLimit = 10;
+
+  /// Pausa suposta do intervalo (fim esperado de quem ficou no intervalo).
+  static const Duration halfTimeBreak = Duration(minutes: 15);
+
+  /// Folga depois do fim esperado: partida iniciada na mão e esquecida em
+  /// andamento/intervalo é encerrada sozinha (app e functions).
+  static const Duration autoFinishMargin = Duration(minutes: 30);
+
+  /// Início marcado pelo admin (partida antiga: o `statusEm` de quando iniciou).
+  static DateTime? manualStartOf(MatchDTO match) =>
+      match.startedAt ?? (match.manualStatus == MatchManualStatus.live ? match.statusAt : null);
+
+  /// Fim esperado: 2º tempo marcado + o que falta; no intervalo, a pausa + o
+  /// 2º tempo; iniciada na mão + duração; senão, horário + duração.
+  static DateTime? expectedEnd(MatchDTO match, DateTime now) {
+    final duration = match.durationMinutes;
+    final secondHalfLength = Duration(minutes: duration - (duration / 2).round());
+    final secondHalf = match.secondHalfAt;
+    if (secondHalf != null) return secondHalf.add(secondHalfLength);
+    final halfTimeAt = match.halfTimeAt;
+    if (match.manualStatus == MatchManualStatus.halfTime && halfTimeAt != null) {
+      return halfTimeAt.add(halfTimeBreak).add(secondHalfLength);
+    }
+    final start = manualStartOf(match) ?? kickoffOf(match, now);
+    return start?.add(Duration(minutes: duration));
+  }
+
   /// "23'", com acréscimos "45+2'" (1º tempo) e "90+3'" (2º tempo); nulo no intervalo.
   String? get minuteLabel {
     final m = minute;
@@ -56,13 +86,14 @@ class MatchClock {
     final secondHalf = match.secondHalfAt;
     if (secondHalf != null) return clock(MatchClockPhase.secondHalf, half + _elapsed(secondHalf, now));
 
-    // Início marcado pelo admin (partida antiga: o `statusEm` de quando iniciou).
-    final manualStart = match.startedAt ?? (match.manualStatus == MatchManualStatus.live ? match.statusAt : null);
+    final manualStart = manualStartOf(match);
     final start = manualStart ?? kickoffOf(match, now);
     if (start == null) return clock(MatchClockPhase.firstHalf, null);
     final minute = _elapsed(start, now);
-    // Automático (admin não mexeu): passada a metade, 2º tempo contínuo.
-    if (manualStart == null && minute > half) return clock(MatchClockPhase.secondHalf, minute);
+    // Automático (admin não mexeu): passada a metade, 2º tempo contínuo. Com
+    // início manual, o 1º tempo tem acréscimo até +10 sem o intervalo marcado.
+    final limit = manualStart == null ? half : half + firstHalfStoppageLimit;
+    if (minute > limit) return clock(MatchClockPhase.secondHalf, minute);
     return clock(MatchClockPhase.firstHalf, minute);
   }
 }

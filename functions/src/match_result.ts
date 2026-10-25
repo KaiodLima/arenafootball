@@ -4,7 +4,7 @@
  * placar e um título/texto escolhidos das frases abaixo. Funções puras
  * (testes em test/match_result.test.ts); quem grava é o index.ts.
  */
-import { matchEnd } from './voting_close';
+import { matchEnd, shouldAutoFinish } from './voting_close';
 
 type Doc = Record<string, unknown>;
 
@@ -265,8 +265,9 @@ export function resultNews(
 export function isMatchOver(match: Doc, season: string, now: Date = new Date()): boolean {
   const status = text(match.status);
   if (status === 'encerrada') return true;
-  // Em andamento ou no intervalo (marcados pelo admin): ainda não acabou.
-  if (status === 'andamento' || status === 'intervalo') return false;
+  // Em andamento ou no intervalo (marcados pelo admin): só acabou se ficou
+  // esquecida (30 min depois do fim esperado).
+  if (status === 'andamento' || status === 'intervalo') return shouldAutoFinish(match, season, now);
   const end = matchEnd(match, season, now);
   return end !== null && now.getTime() >= end.getTime();
 }
