@@ -734,6 +734,118 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get achievementCategoryPredictions => 'Bolão';
+
+  @override
+  String get achievementMetricPredictions => 'Palpites pontuados';
+
+  @override
+  String get achievementMetricExactPredictions => 'Placares exatos';
+
+  @override
+  String get drawerPredictions => 'Bolão';
+
+  @override
+  String get predictionAction => 'Palpitar';
+
+  @override
+  String get predictionSheetTitle => 'Seu palpite';
+
+  @override
+  String get predictionRules =>
+      'Placar exato: 10 pts · vencedor e saldo: 7 · vencedor: 5';
+
+  @override
+  String get predictionDeadline => 'Vale até o início da partida.';
+
+  @override
+  String get predictionSave => 'Salvar palpite';
+
+  @override
+  String get predictionSaved => 'Palpite salvo!';
+
+  @override
+  String get predictionClosed => 'Palpites encerrados: a partida já começou.';
+
+  @override
+  String get predictionLoginRequired => 'Entre na sua conta para palpitar.';
+
+  @override
+  String get predictionLogin => 'Entrar';
+
+  @override
+  String get predictionSectionTitle => 'Palpite';
+
+  @override
+  String get predictionNone => 'Você ainda não palpitou nesta partida.';
+
+  @override
+  String get predictionMissed => 'Você não palpitou nesta partida.';
+
+  @override
+  String get predictionEdit => 'Alterar palpite';
+
+  @override
+  String get predictionLocked => 'Travado: a partida começou.';
+
+  @override
+  String get predictionPending => 'Aguardando a pontuação.';
+
+  @override
+  String predictionPoints(int points) {
+    return '+$points pts';
+  }
+
+  @override
+  String get predictionExact => 'Placar exato!';
+
+  @override
+  String get predictionMiss => 'Não pontuou desta vez.';
+
+  @override
+  String get predictionLate => 'Feito depois do prazo: não vale pontos.';
+
+  @override
+  String predictionCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count palpites nesta partida',
+      one: '1 palpite nesta partida',
+      zero: 'Ninguém palpitou',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get predictionRankingTitle => 'Bolão';
+
+  @override
+  String get predictionRankingEmpty =>
+      'Ninguém pontuou ainda nesta região. Palpite nas próximas partidas!';
+
+  @override
+  String get predictionRankingError =>
+      'Não foi possível carregar o ranking do bolão.';
+
+  @override
+  String get predictionRankingYou => 'Sua posição';
+
+  @override
+  String get predictionRankingNotRanked =>
+      'Você ainda não pontuou. Palpite nas partidas!';
+
+  @override
+  String predictionRankingPoints(int points) {
+    return '$points pts';
+  }
+
+  @override
+  String predictionRankingStats(int exact, int count) {
+    return '$exact exatos · $count palpites';
+  }
+
+  @override
   String get drawerFanSection => 'Torcida';
 
   @override

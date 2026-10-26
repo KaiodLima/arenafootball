@@ -7,6 +7,7 @@ import 'package:arena_soccer/features/matches/presentation/widgets/match_details
 import 'package:arena_soccer/features/matches/presentation/widgets/match_details/match_details_sections.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_card.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_goals_sheet.dart';
+import 'package:arena_soccer/features/predictions/presentation/widgets/match_prediction_card.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/card_menu_button.dart';
@@ -163,6 +164,12 @@ class MatchDetailsPage extends StatelessWidget {
                         match: match,
                         player: state.bestPlayer,
                         onTap: () => _openVoting(context, state),
+                      ),
+                      MatchPredictionCard(
+                        match: match,
+                        season: season,
+                        homeCrest: homeCrest,
+                        awayCrest: awayCrest,
                       ),
                       MatchSquadsCard(
                         match: match,

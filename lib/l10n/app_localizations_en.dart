@@ -731,6 +731,117 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get achievementCategoryPredictions => 'Prediction pool';
+
+  @override
+  String get achievementMetricPredictions => 'Scored predictions';
+
+  @override
+  String get achievementMetricExactPredictions => 'Exact scores';
+
+  @override
+  String get drawerPredictions => 'Prediction pool';
+
+  @override
+  String get predictionAction => 'Predict';
+
+  @override
+  String get predictionSheetTitle => 'Your prediction';
+
+  @override
+  String get predictionRules =>
+      'Exact score: 10 pts · winner and margin: 7 · winner: 5';
+
+  @override
+  String get predictionDeadline => 'Open until kickoff.';
+
+  @override
+  String get predictionSave => 'Save prediction';
+
+  @override
+  String get predictionSaved => 'Prediction saved!';
+
+  @override
+  String get predictionClosed => 'Predictions closed: the match has started.';
+
+  @override
+  String get predictionLoginRequired => 'Log in to make a prediction.';
+
+  @override
+  String get predictionLogin => 'Log in';
+
+  @override
+  String get predictionSectionTitle => 'Prediction';
+
+  @override
+  String get predictionNone => 'You haven\'t predicted this match yet.';
+
+  @override
+  String get predictionMissed => 'You didn\'t predict this match.';
+
+  @override
+  String get predictionEdit => 'Change prediction';
+
+  @override
+  String get predictionLocked => 'Locked: the match has started.';
+
+  @override
+  String get predictionPending => 'Waiting for scoring.';
+
+  @override
+  String predictionPoints(int points) {
+    return '+$points pts';
+  }
+
+  @override
+  String get predictionExact => 'Exact score!';
+
+  @override
+  String get predictionMiss => 'No points this time.';
+
+  @override
+  String get predictionLate => 'Made after the deadline: no points.';
+
+  @override
+  String predictionCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count predictions for this match',
+      one: '1 prediction for this match',
+      zero: 'No predictions yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get predictionRankingTitle => 'Prediction pool';
+
+  @override
+  String get predictionRankingEmpty =>
+      'Nobody has scored in this region yet. Predict the next matches!';
+
+  @override
+  String get predictionRankingError => 'Couldn\'t load the prediction ranking.';
+
+  @override
+  String get predictionRankingYou => 'Your position';
+
+  @override
+  String get predictionRankingNotRanked =>
+      'You haven\'t scored yet. Predict the matches!';
+
+  @override
+  String predictionRankingPoints(int points) {
+    return '$points pts';
+  }
+
+  @override
+  String predictionRankingStats(int exact, int count) {
+    return '$exact exact · $count predictions';
+  }
+
+  @override
   String get drawerFanSection => 'Fans';
 
   @override

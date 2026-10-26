@@ -26,6 +26,8 @@ const Map<String, IconData> achievementIcons = {
   'shield': Icons.shield_rounded,
   'flag': Icons.flag_rounded,
   'groups': Icons.groups_rounded,
+  'crystal': Icons.auto_awesome_rounded,
+  'scoreboard': Icons.scoreboard_rounded,
 };
 
 IconData achievementIcon(String key) => achievementIcons[key] ?? Icons.emoji_events_rounded;

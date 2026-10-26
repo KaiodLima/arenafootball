@@ -32,6 +32,7 @@ List<AchievementDTO> suggestedAchievements() {
   const sharing = AchievementCategory.sharing;
   const news = AchievementCategory.news;
   const athlete = AchievementCategory.athlete;
+  const predictions = AchievementCategory.predictions;
   const bronze = AchievementTier.bronze;
   const silver = AchievementTier.silver;
   const gold = AchievementTier.gold;
@@ -66,5 +67,11 @@ List<AchievementDTO> suggestedAchievements() {
         50),
     a('Dono da bola', 'Tenha o seu time aprovado no app.', athlete, 'shield', gold, AchievementMetric.teamOwner, 1,
         100),
+    a('Palpiteiro', 'Faça 10 palpites no bolão.', predictions, 'scoreboard', bronze, AchievementMetric.predictions, 10,
+        20),
+    a('Vidente', 'Acerte um placar exato no bolão.', predictions, 'crystal', silver, AchievementMetric.exactPredictions,
+        1, 40),
+    a('Pé quente', 'Acerte 10 placares exatos no bolão.', predictions, 'fire', gold, AchievementMetric.exactPredictions,
+        10, 150),
   ];
 }

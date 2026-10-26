@@ -1335,6 +1335,192 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @achievementCategoryPredictions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bolão'**
+  String get achievementCategoryPredictions;
+
+  /// No description provided for @achievementMetricPredictions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Palpites pontuados'**
+  String get achievementMetricPredictions;
+
+  /// No description provided for @achievementMetricExactPredictions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Placares exatos'**
+  String get achievementMetricExactPredictions;
+
+  /// No description provided for @drawerPredictions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bolão'**
+  String get drawerPredictions;
+
+  /// No description provided for @predictionAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Palpitar'**
+  String get predictionAction;
+
+  /// No description provided for @predictionSheetTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu palpite'**
+  String get predictionSheetTitle;
+
+  /// No description provided for @predictionRules.
+  ///
+  /// In pt, this message translates to:
+  /// **'Placar exato: 10 pts · vencedor e saldo: 7 · vencedor: 5'**
+  String get predictionRules;
+
+  /// No description provided for @predictionDeadline.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vale até o início da partida.'**
+  String get predictionDeadline;
+
+  /// No description provided for @predictionSave.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salvar palpite'**
+  String get predictionSave;
+
+  /// No description provided for @predictionSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Palpite salvo!'**
+  String get predictionSaved;
+
+  /// No description provided for @predictionClosed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Palpites encerrados: a partida já começou.'**
+  String get predictionClosed;
+
+  /// No description provided for @predictionLoginRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entre na sua conta para palpitar.'**
+  String get predictionLoginRequired;
+
+  /// No description provided for @predictionLogin.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entrar'**
+  String get predictionLogin;
+
+  /// No description provided for @predictionSectionTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Palpite'**
+  String get predictionSectionTitle;
+
+  /// No description provided for @predictionNone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você ainda não palpitou nesta partida.'**
+  String get predictionNone;
+
+  /// No description provided for @predictionMissed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você não palpitou nesta partida.'**
+  String get predictionMissed;
+
+  /// No description provided for @predictionEdit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Alterar palpite'**
+  String get predictionEdit;
+
+  /// No description provided for @predictionLocked.
+  ///
+  /// In pt, this message translates to:
+  /// **'Travado: a partida começou.'**
+  String get predictionLocked;
+
+  /// No description provided for @predictionPending.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aguardando a pontuação.'**
+  String get predictionPending;
+
+  /// No description provided for @predictionPoints.
+  ///
+  /// In pt, this message translates to:
+  /// **'+{points} pts'**
+  String predictionPoints(int points);
+
+  /// No description provided for @predictionExact.
+  ///
+  /// In pt, this message translates to:
+  /// **'Placar exato!'**
+  String get predictionExact;
+
+  /// No description provided for @predictionMiss.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não pontuou desta vez.'**
+  String get predictionMiss;
+
+  /// No description provided for @predictionLate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Feito depois do prazo: não vale pontos.'**
+  String get predictionLate;
+
+  /// No description provided for @predictionCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{Ninguém palpitou} =1{1 palpite nesta partida} other{{count} palpites nesta partida}}'**
+  String predictionCount(int count);
+
+  /// No description provided for @predictionRankingTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bolão'**
+  String get predictionRankingTitle;
+
+  /// No description provided for @predictionRankingEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ninguém pontuou ainda nesta região. Palpite nas próximas partidas!'**
+  String get predictionRankingEmpty;
+
+  /// No description provided for @predictionRankingError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar o ranking do bolão.'**
+  String get predictionRankingError;
+
+  /// No description provided for @predictionRankingYou.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua posição'**
+  String get predictionRankingYou;
+
+  /// No description provided for @predictionRankingNotRanked.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você ainda não pontuou. Palpite nas partidas!'**
+  String get predictionRankingNotRanked;
+
+  /// No description provided for @predictionRankingPoints.
+  ///
+  /// In pt, this message translates to:
+  /// **'{points} pts'**
+  String predictionRankingPoints(int points);
+
+  /// No description provided for @predictionRankingStats.
+  ///
+  /// In pt, this message translates to:
+  /// **'{exact} exatos · {count} palpites'**
+  String predictionRankingStats(int exact, int count);
+
   /// No description provided for @drawerFanSection.
   ///
   /// In pt, this message translates to:

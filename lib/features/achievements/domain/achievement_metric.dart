@@ -34,7 +34,13 @@ enum AchievementMetric {
   athleteAssists('assistenciasAtleta', countedByApp: false),
 
   /// Dono de time aprovado (0/1).
-  teamOwner('donoTime', countedByApp: false);
+  teamOwner('donoTime', countedByApp: false),
+
+  /// Palpites do bolão pontuados (feitos no prazo).
+  predictions('palpites', countedByApp: false),
+
+  /// Palpites com o placar exato.
+  exactPredictions('palpitesExatos', countedByApp: false);
 
   final String key;
 
@@ -74,7 +80,8 @@ enum AchievementCategory {
   voting('votacao'),
   sharing('compartilhar'),
   news('noticias'),
-  athlete('atleta');
+  athlete('atleta'),
+  predictions('palpites');
 
   final String key;
 

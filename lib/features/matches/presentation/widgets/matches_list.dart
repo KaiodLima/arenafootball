@@ -9,6 +9,7 @@ import 'package:arena_soccer/features/matches/presentation/widgets/match_goals_s
 import 'package:arena_soccer/features/matches/presentation/widgets/match_card.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/matches_summary_card.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/team_filter_chips.dart';
+import 'package:arena_soccer/features/predictions/presentation/widgets/prediction_sheet.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
@@ -145,6 +146,13 @@ class MatchesList extends StatelessWidget {
                 },
               ),
               // Admin: lança um card de gol desta partida (e atualiza o placar dela).
+              onPredict: () => showPredictionSheet(
+                context,
+                match: match,
+                season: season,
+                homeCrest: state.crestOf(match.homeTeam),
+                awayCrest: state.crestOf(match.awayTeam),
+              ),
               onSetPhase: isAdmin ? (phase) => BlocProvider.of<MatchesCubit>(context).setPhase(match, phase) : null,
               onGoalCard: isAdmin
                   ? () => Navigator.pushNamed(

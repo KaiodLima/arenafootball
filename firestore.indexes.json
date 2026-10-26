@@ -499,6 +499,34 @@
           "order": "DESCENDING"
         }
       ]
+    },
+    {
+      "collectionGroup": "palpites_ranking2026",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idRegiao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "pontos",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "palpites_ranking2026",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idRegiao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "pontos",
+          "order": "ASCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": []

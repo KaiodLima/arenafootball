@@ -37,6 +37,8 @@ import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
 import 'package:arena_soccer/features/highlights/presentation/bloc/highlight_form_cubit.dart';
 import 'package:arena_soccer/features/highlights/presentation/bloc/manage_highlights_cubit.dart';
 import 'package:arena_soccer/features/highlights/presentation/page/manage_highlights_page.dart';
+import 'package:arena_soccer/features/predictions/presentation/bloc/prediction_ranking_cubit.dart';
+import 'package:arena_soccer/features/predictions/presentation/page/prediction_ranking_page.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/manage_regions_cubit.dart';
 import 'package:arena_soccer/features/regions/presentation/page/manage_regions_page.dart';
 import 'package:arena_soccer/features/notifications/presentation/bloc/notifications_panel_cubit.dart';
@@ -360,6 +362,10 @@ class ArenaApp extends StatelessWidget {
         },
         AppRoutes.adminPanelPage: (_) => const AdminPanelPage(),
         AppRoutes.settingsPage: (_) => const SettingsPage(),
+        AppRoutes.predictionRankingPage: (_) => BlocProvider<PredictionRankingCubit>(
+              create: (_) => PredictionRankingCubit(sl()),
+              child: const PredictionRankingPage(),
+            ),
         AppRoutes.fanRankingPage: (_) => BlocProvider<FanRankingCubit>(
               create: (_) => FanRankingCubit(sl()),
               child: const FanRankingPage(),

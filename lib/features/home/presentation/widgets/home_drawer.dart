@@ -100,6 +100,11 @@ class HomeDrawer extends StatelessWidget {
                   title: l10n.fanRankingTitle,
                   onTap: () => _open(context, AppRoutes.fanRankingPage),
                 ),
+                _DrawerItem(
+                  icon: Icons.scoreboard_outlined,
+                  title: l10n.drawerPredictions,
+                  onTap: () => _open(context, AppRoutes.predictionRankingPage),
+                ),
                 if (user != null)
                   _DrawerItem(
                     icon: Icons.badge_outlined,

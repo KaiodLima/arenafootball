@@ -7,6 +7,7 @@ String achievementCategoryLabel(AppLocalizations l10n, AchievementCategory categ
       AchievementCategory.sharing => l10n.achievementCategorySharing,
       AchievementCategory.news => l10n.achievementCategoryNews,
       AchievementCategory.athlete => l10n.achievementCategoryAthlete,
+      AchievementCategory.predictions => l10n.achievementCategoryPredictions,
     };
 
 String achievementTierLabel(AppLocalizations l10n, AchievementTier tier) => switch (tier) {
@@ -36,4 +37,6 @@ String achievementMetricLabel(AppLocalizations l10n, AchievementMetric metric) =
       AchievementMetric.athleteGoals => l10n.achievementMetricAthleteGoals,
       AchievementMetric.athleteAssists => l10n.achievementMetricAthleteAssists,
       AchievementMetric.teamOwner => l10n.achievementMetricTeamOwner,
+      AchievementMetric.predictions => l10n.achievementMetricPredictions,
+      AchievementMetric.exactPredictions => l10n.achievementMetricExactPredictions,
     };

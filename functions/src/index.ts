@@ -53,6 +53,7 @@ import {
   shouldPostResult,
 } from './match_result';
 import { shouldPostVoteCard, voteCardNews, voteNewsId } from './vote_card';
+import { rankingDelta, rankingDocId, scorePrediction } from './predictions';
 import {
   Achievement,
   achievementFromDoc,
@@ -278,6 +279,57 @@ async function postResult(collection: string, season: string, matchId: string, m
     logger.info('Card de resultado já existia', { match: `${collection}/${matchId}`, error: String(error) });
   }
   await db.collection(collection).doc(matchId).update({ resultadoNoticia: ref.id });
+  await scorePredictions(collection, season, matchId, match);
+}
+
+/**
+ * Bolão: pontua os palpites da partida que acabou (ou cujo placar mudou) e
+ * soma no ranking da região só a diferença do que já tinha sido contado;
+ * também conta nas conquistas (palpites e placares exatos).
+ */
+async function scorePredictions(collection: string, season: string, matchId: string, match: Record<string, unknown>) {
+  const { db, FieldValue } = await admin();
+  const predictions = await db.collection(collection).doc(matchId).collection('palpites').get();
+  if (predictions.empty) return;
+  const regionId = typeof match.idRegiao === 'string' ? match.idRegiao.trim() : '';
+  const ranking = db.collection(seasonCollection('palpites_ranking', season));
+  let batch = db.batch();
+  let pending = 0;
+  for (const doc of predictions.docs) {
+    const data = doc.data();
+    const score = scorePrediction(data, match, season);
+    const delta = rankingDelta(data, score);
+    if (!delta) continue;
+    batch.update(doc.ref, { pontos: score.points, exato: score.exact, valido: score.valid });
+    if (delta.points || delta.exact || delta.counted) {
+      if (regionId) {
+        batch.set(
+          ranking.doc(rankingDocId(regionId, doc.id)),
+          {
+            uid: doc.id,
+            nome: String(data.nome ?? ''),
+            idRegiao: regionId,
+            pontos: FieldValue.increment(delta.points),
+            exatos: FieldValue.increment(delta.exact),
+            palpites: FieldValue.increment(delta.counted),
+          },
+          { merge: true },
+        );
+      }
+      // Conquistas: palpites válidos e placares exatos.
+      batch.set(
+        await progressRef(doc.id),
+        { palpites: FieldValue.increment(delta.counted), palpitesExatos: FieldValue.increment(delta.exact) },
+        { merge: true },
+      );
+    }
+    if (++pending >= 150) {
+      await batch.commit();
+      batch = db.batch();
+      pending = 0;
+    }
+  }
+  if (pending > 0) await batch.commit();
 }
 
 /** Placar/gols corrigidos depois: refaz título, texto e placar do mesmo card. */
@@ -297,6 +349,8 @@ async function updateResult(season: string, matchId: string, match: Record<strin
     gol_time_casa: news.gol_time_casa,
     gol_time_fora: news.gol_time_fora,
   });
+  // Placar corrigido: o bolão é repontuado (só a diferença vai ao ranking).
+  await scorePredictions(seasonCollection('partidas', season), season, matchId, match);
 }
 
 /** Aviso manual enviado pelo painel. */

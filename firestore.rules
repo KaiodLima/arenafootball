@@ -220,6 +220,39 @@ service cloud.firestore {
       allow delete: if isMatches() && isAdmin();
     }
 
+    // Bolão: palpite de placar (doc id = uid), leitura pública. O dono grava
+    // só o placar, o nome e a hora do servidor, enquanto a partida não
+    // começou (status manual); o prazo pelo horário a function confere ao
+    // pontuar. Pontos (`pontos`/`exato`/`valido`) só as functions gravam.
+    match /{collection}/{matchId}/palpites/{uid} {
+      function isMatches() {
+        return collection.matches('partidas([0-9]{4})?');
+      }
+      function matchOpen() {
+        let status = get(/databases/$(database)/documents/$(collection)/$(matchId)).data.get('status', '');
+        return !(status in ['andamento', 'intervalo', 'encerrada']);
+      }
+      function goals(n) {
+        return n is int && n >= 0 && n <= 99;
+      }
+      function validPrediction() {
+        let d = request.resource.data;
+        return goals(d.golsCasa) && goals(d.golsFora)
+          && d.nome is string && d.nome.size() <= 80
+          && d.atualizadoEm == request.time;
+      }
+      function own() {
+        return signedIn() && uid == request.auth.uid && isMatches();
+      }
+
+      allow read: if isMatches();
+      allow create: if own() && matchOpen() && validPrediction()
+        && request.resource.data.keys().hasOnly(['golsCasa', 'golsFora', 'nome', 'atualizadoEm']);
+      allow update: if own() && matchOpen() && validPrediction()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['golsCasa', 'golsFora', 'nome', 'atualizadoEm']);
+      allow delete: if own() && matchOpen();
+    }
+
     // "Sou jogador": pedido para entrar no elenco de um time (id do doc = uid).
     // O usuário cria, corrige enquanto pendente e reenvia depois de rejeitado
     // ou de removido do elenco,

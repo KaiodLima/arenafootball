@@ -24,6 +24,8 @@ export const METRIC_KEYS = [
   'golsAtleta',
   'assistenciasAtleta',
   'donoTime',
+  'palpites',
+  'palpitesExatos',
 ] as const;
 
 /** Ids das conquistas já desbloqueadas (gravado só pelo servidor). */

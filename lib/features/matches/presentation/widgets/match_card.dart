@@ -151,6 +151,9 @@ class MatchCard extends StatefulWidget {
   /// Admin: iniciar, intervalo, 2º tempo ou encerrar na mão (nulo = sem as ações).
   final ValueChanged<MatchPhase>? onSetPhase;
 
+  /// "Palpitar" antes do jogo (nulo = sem a pílula).
+  final VoidCallback? onPredict;
+
   /// Agora (só para teste).
   final DateTime? now;
 
@@ -173,6 +176,7 @@ class MatchCard extends StatefulWidget {
     this.championshipLabel,
     this.onGoalCard,
     this.onSetPhase,
+    this.onPredict,
     this.now,
   });
 
@@ -242,6 +246,7 @@ class _MatchCardState extends State<MatchCard> {
     final awayWon = !status.upcoming && match.awayGoals > match.homeGoals;
     final venue = match.venue.trim();
     final hasTop = championshipLabel != null || isAdmin;
+    final predict = status.upcoming && widget.onPredict != null;
 
     Widget stripe(Color color) => Container(
           width: AppSizes.s4,
@@ -381,7 +386,13 @@ class _MatchCardState extends State<MatchCard> {
                 _GoalsToggle(expanded: _expanded, onTap: () => setState(() => _expanded = !_expanded)),
                 const SizedBox(width: AppSizes.s6),
               ],
-              if (widget.showVoting) _VotingChip(isOpen: match.isVotingOpen, onTap: widget.onVotingTap),
+              if (predict) ...[
+                _PredictChip(onTap: widget.onPredict!),
+                if (widget.showVoting && match.isVotingOpen) const SizedBox(width: AppSizes.s6),
+              ],
+              // Antes do jogo, com a pílula do palpite, a votação só aparece se já estiver aberta.
+              if (widget.showVoting && (!predict || match.isVotingOpen))
+                _VotingChip(isOpen: match.isVotingOpen, onTap: widget.onVotingTap),
             ],
           ),
         ],
@@ -663,6 +674,40 @@ class _VotingChip extends StatelessWidget {
               Text(
                 isOpen ? l10n.matchesVoteAction : l10n.matchesSeeElected,
                 style: AppTypography.label(color: foreground).copyWith(fontSize: AppSizes.s12),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Pílula "Palpitar" (antes do jogo).
+class _PredictChip extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _PredictChip({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Material(
+      color: AppColors.primarySoft,
+      shape: const StadiumBorder(side: BorderSide(color: AppColors.primary)),
+      child: InkWell(
+        customBorder: const StadiumBorder(),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSizes.s10, vertical: AppSizes.s4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.scoreboard_outlined, size: AppSizes.s16, color: AppColors.primaryDark),
+              const SizedBox(width: AppSizes.s4),
+              Text(
+                l10n.predictionAction,
+                style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s12),
               ),
             ],
           ),
