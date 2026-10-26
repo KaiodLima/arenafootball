@@ -93,6 +93,8 @@ class HomeDrawer extends StatelessWidget {
                   title: l10n.drawerResults,
                   onTap: () => _open(context, AppRoutes.globalResultsPage),
                 ),
+                const SizedBox(height: AppSizes.s12),
+                _SectionLabel(l10n.drawerFanSection),
                 _DrawerItem(
                   icon: Icons.groups_rounded,
                   title: l10n.fanRankingTitle,
@@ -110,18 +112,20 @@ class HomeDrawer extends StatelessWidget {
                     title: l10n.drawerAchievements,
                     onTap: () => _open(context, AppRoutes.achievementsPage),
                   ),
-                if (user != null)
+                if (user != null) ...[
+                  const SizedBox(height: AppSizes.s12),
+                  _SectionLabel(l10n.drawerOnFieldSection),
                   _DrawerItem(
                     icon: Icons.sports_soccer_rounded,
                     title: playerTeam != null ? l10n.drawerMyPlayerProfile : l10n.playerRequestMenu,
                     onTap: () => _open(context, AppRoutes.playerRequestPage),
                   ),
-                if (user != null)
                   _DrawerItem(
                     icon: Icons.shield_rounded,
                     title: ownedTeam != null ? l10n.myTeamTitle : l10n.teamRequestMenu,
                     onTap: () => _open(context, AppRoutes.teamRequestPage),
                   ),
+                ],
                 if (isAdmin) ...[
                   const SizedBox(height: AppSizes.s12),
                   _SectionLabel(l10n.drawerAdmin),

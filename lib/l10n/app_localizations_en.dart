@@ -731,6 +731,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get drawerFanSection => 'Fans';
+
+  @override
+  String get drawerOnFieldSection => 'On the field';
+
+  @override
   String get pushActionAchievement => 'Achievement unlocked';
 
   @override

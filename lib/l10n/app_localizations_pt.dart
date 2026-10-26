@@ -734,6 +734,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get drawerFanSection => 'Torcida';
+
+  @override
+  String get drawerOnFieldSection => 'Em campo';
+
+  @override
   String get pushActionAchievement => 'Conquista desbloqueada';
 
   @override

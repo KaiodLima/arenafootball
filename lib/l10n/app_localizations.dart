@@ -1335,6 +1335,18 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @drawerFanSection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Torcida'**
+  String get drawerFanSection;
+
+  /// No description provided for @drawerOnFieldSection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Em campo'**
+  String get drawerOnFieldSection;
+
   /// No description provided for @pushActionAchievement.
   ///
   /// In pt, this message translates to:
