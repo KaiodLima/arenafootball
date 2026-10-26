@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/achievements/presentation/bloc/achievements_cubit.dart';
+import 'package:arena_soccer/features/achievements/presentation/widgets/achievement_labels.dart';
 import 'package:arena_soccer/core/utils/share_links.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:arena_soccer/app_routes.dart';
@@ -79,6 +81,9 @@ class _FanCardPageState extends State<FanCardPage> {
   FanCard _buildCard(FanCardState state) {
     final user = BlocProvider.of<SessionCubit>(context).state.user!;
     final region = BlocProvider.of<RegionCubit>(context).state.selectedRegion;
+    // Vitrine das conquistas: nível e as 3 melhores medalhas (some sem nenhuma).
+    final board = BlocProvider.of<AchievementsCubit>(context).state.board;
+    final best = board.best(limit: 3);
     return FanCard(
       name: user.name,
       photoUrl: user.photoUrl,
@@ -89,6 +94,8 @@ class _FanCardPageState extends State<FanCardPage> {
       number: fanCardNumber(user.id),
       playerTeam: BlocProvider.of<MyPlayerCubit>(context).state.teamName,
       ownedTeam: BlocProvider.of<OwnedTeamCubit>(context).state.teamName,
+      level: best.isEmpty ? null : fanLevelLabel(AppLocalizations.of(context), board.level).toUpperCase(),
+      medals: [for (final entry in best) (tier: entry.achievement.tier, icon: entry.achievement.icon)],
     );
   }
 
@@ -114,6 +121,7 @@ class _FanCardPageState extends State<FanCardPage> {
     context.watch<RegionCubit>();
     context.watch<MyPlayerCubit>();
     context.watch<OwnedTeamCubit>();
+    context.watch<AchievementsCubit>();
 
     return Scaffold(
       backgroundColor: AppColors.background,

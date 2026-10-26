@@ -6,6 +6,7 @@ import 'package:arena_soccer/features/players/presentation/widgets/player_card.d
 import 'package:arena_soccer/features/voting/domain/elected_player.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_card.dart';
+import 'package:arena_soccer/utils/components/celebration_painters.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
@@ -125,7 +126,7 @@ class _ElectedPlayerCardState extends State<ElectedPlayerCard> with TickerProvid
                           angle: _rays.value * 2 * math.pi,
                           child: Transform.scale(
                             scale: 0.6 + 0.4 * _raysIn.value,
-                            child: const CustomPaint(size: Size.square(raysSize), painter: _RaysPainter()),
+                            child: const CustomPaint(size: Size.square(raysSize), painter: RaysPainter()),
                           ),
                         ),
                       ),
@@ -164,7 +165,7 @@ class _ElectedPlayerCardState extends State<ElectedPlayerCard> with TickerProvid
                     child: IgnorePointer(
                       child: AnimatedBuilder(
                         animation: _confetti,
-                        builder: (context, _) => CustomPaint(painter: _ConfettiPainter(progress: _confetti.value)),
+                        builder: (context, _) => CustomPaint(painter: ConfettiPainter(progress: _confetti.value)),
                       ),
                     ),
                   ),
@@ -280,36 +281,6 @@ class _ElectedPlayerCardState extends State<ElectedPlayerCard> with TickerProvid
   }
 }
 
-/// Feixes dourados em volta do centro, mais fortes perto da foto.
-class _RaysPainter extends CustomPainter {
-  const _RaysPainter();
-
-  static const int _count = 14;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = size.center(Offset.zero);
-    final radius = size.shortestSide / 2;
-    final paint = Paint()
-      ..shader = RadialGradient(
-        colors: [AppColors.gold.withValues(alpha: 0.45), AppColors.gold.withValues(alpha: 0)],
-      ).createShader(Rect.fromCircle(center: center, radius: radius));
-    const half = math.pi / _count / 2.2;
-    for (var i = 0; i < _count; i++) {
-      final angle = i * 2 * math.pi / _count;
-      final path = Path()
-        ..moveTo(center.dx, center.dy)
-        ..lineTo(center.dx + radius * math.cos(angle - half), center.dy + radius * math.sin(angle - half))
-        ..lineTo(center.dx + radius * math.cos(angle + half), center.dy + radius * math.sin(angle + half))
-        ..close();
-      canvas.drawPath(path, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _RaysPainter oldDelegate) => false;
-}
-
 /// Anel dourado desenhado do topo, no sentido horário, até fechar.
 class _RingPainter extends CustomPainter {
   final double progress;
@@ -331,66 +302,4 @@ class _RingPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _RingPainter oldDelegate) => oldDelegate.progress != progress;
-}
-
-/// Uma explosão de confete (dourado, verde e branco) a partir do centro, com
-/// gravidade, giro e sumindo no fim. Partículas fixas (semente constante).
-class _ConfettiPainter extends CustomPainter {
-  final double progress;
-
-  _ConfettiPainter({required this.progress});
-
-  static final List<_Particle> _particles = _Particle.burst(42);
-
-  static const List<Color> _colors = [AppColors.gold, AppColors.primary, AppColors.primaryDark, AppColors.white];
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (progress <= 0 || progress >= 1) return;
-    final fade = progress < 0.7 ? 1.0 : (1 - progress) / 0.3;
-    for (final p in _particles) {
-      final t = progress;
-      final dx = math.cos(p.angle) * p.speed * t;
-      // Sobe rápido e cai pela gravidade.
-      final dy = math.sin(p.angle) * p.speed * t + 260 * t * t;
-      final paint = Paint()..color = _colors[p.color].withValues(alpha: fade);
-      canvas.save();
-      canvas.translate(dx, dy);
-      canvas.rotate(p.spin * t * 2 * math.pi);
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(
-            Rect.fromCenter(center: Offset.zero, width: p.size, height: p.size * 0.5), const Radius.circular(1)),
-        paint,
-      );
-      canvas.restore();
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _ConfettiPainter oldDelegate) => oldDelegate.progress != progress;
-}
-
-class _Particle {
-  final double angle;
-  final double speed;
-  final double size;
-  final double spin;
-  final int color;
-
-  const _Particle(this.angle, this.speed, this.size, this.spin, this.color);
-
-  static List<_Particle> burst(int count) {
-    final random = math.Random(7);
-    return [
-      for (var i = 0; i < count; i++)
-        _Particle(
-          // Leque para cima e para os lados (o confete não "afunda" no cartão).
-          -math.pi * (1.1 - random.nextDouble() * 1.2),
-          150 + random.nextDouble() * 170,
-          6 + random.nextDouble() * 6,
-          (random.nextDouble() - 0.5) * 4,
-          random.nextInt(4),
-        ),
-    ];
-  }
 }

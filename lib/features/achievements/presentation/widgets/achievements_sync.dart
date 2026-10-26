@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/core/services/share_service.dart';
 import 'package:arena_soccer/features/achievements/domain/achievement_metric.dart';
 import 'package:arena_soccer/features/achievements/presentation/bloc/achievements_cubit.dart';
+import 'package:arena_soccer/features/achievements/presentation/widgets/unlock_celebration_dialog.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_state.dart';
 import 'package:arena_soccer/features/player_requests/presentation/bloc/my_player_cubit.dart';
@@ -24,6 +26,9 @@ class AchievementsSync extends StatefulWidget {
 
 class _AchievementsSyncState extends State<AchievementsSync> {
   late final AchievementsCubit _cubit = BlocProvider.of<AchievementsCubit>(context);
+
+  /// Uma comemoração por vez (as próximas vêm quando o stream tira a vista).
+  bool _celebrating = false;
 
   @override
   void initState() {
@@ -58,10 +63,31 @@ class _AchievementsSyncState extends State<AchievementsSync> {
     });
   }
 
+  /// Conquista desbloqueada pelo servidor e ainda não vista: comemora (com o
+  /// app aberto) e marca como vista. "Ver conquistas" abre a tela.
+  Future<void> _celebrate(AchievementsState state) async {
+    if (_celebrating || state.unseen.isEmpty) return;
+    final navigatorContext = AppSession.navigatorKey.currentContext;
+    if (navigatorContext == null) return;
+    _celebrating = true;
+    final achievement = state.unseen.first;
+    final seeAll = await showUnlockCelebration(navigatorContext, achievement);
+    await _cubit.markSeen(achievement.id);
+    _celebrating = false;
+    if (seeAll) {
+      await AppSession.navigatorKey.currentState?.pushNamed(AppRoutes.achievementsPage);
+    }
+    if (mounted) _celebrate(_cubit.state);
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocListener(
       listeners: [
+        BlocListener<AchievementsCubit, AchievementsState>(
+          listenWhen: (previous, current) => previous.unseen.length != current.unseen.length,
+          listener: (context, state) => _celebrate(state),
+        ),
         BlocListener<SessionCubit, SessionState>(
           listener: (context, state) {
             _cubit.follow(state.user?.id);

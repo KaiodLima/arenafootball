@@ -88,6 +88,7 @@ class _HomePageState extends State<HomePage> {
       'sou_jogador' when user != null => AppRoutes.playerRequestPage,
       'solicitacoes_time' when user != null && user.isAdmin => AppRoutes.teamRequestsPanelPage,
       'meu_time' when user != null => AppRoutes.teamRequestPage,
+      'conquistas' when user != null => AppRoutes.achievementsPage,
       _ => null,
     };
     if (route != null) {

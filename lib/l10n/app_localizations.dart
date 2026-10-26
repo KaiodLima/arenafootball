@@ -1335,6 +1335,36 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @pushActionAchievement.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conquista desbloqueada'**
+  String get pushActionAchievement;
+
+  /// No description provided for @pushActionAchievementHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para quem ganhou · medalha e XP'**
+  String get pushActionAchievementHint;
+
+  /// No description provided for @achievementUnlockedTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'CONQUISTA DESBLOQUEADA!'**
+  String get achievementUnlockedTitle;
+
+  /// No description provided for @achievementSeeAll.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver conquistas'**
+  String get achievementSeeAll;
+
+  /// No description provided for @achievementCelebrationClose.
+  ///
+  /// In pt, this message translates to:
+  /// **'Continuar'**
+  String get achievementCelebrationClose;
+
   /// No description provided for @matchClockFirstHalf.
   ///
   /// In pt, this message translates to:

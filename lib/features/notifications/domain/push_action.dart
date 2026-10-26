@@ -12,7 +12,8 @@ enum PushAction {
   playerRequest('solicitacao_jogador', true),
   playerRequestAnswer('solicitacao_resposta', true),
   teamRequest('solicitacao_time', true),
-  teamRequestAnswer('solicitacao_time_resposta', true);
+  teamRequestAnswer('solicitacao_time_resposta', true),
+  achievement('conquista', true);
 
   final String key;
   final bool defaultEnabled;

@@ -731,6 +731,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get pushActionAchievement => 'Achievement unlocked';
+
+  @override
+  String get pushActionAchievementHint => 'To whoever earned it · medal and XP';
+
+  @override
+  String get achievementUnlockedTitle => 'ACHIEVEMENT UNLOCKED!';
+
+  @override
+  String get achievementSeeAll => 'See achievements';
+
+  @override
+  String get achievementCelebrationClose => 'Continue';
+
+  @override
   String get matchClockFirstHalf => '1ST HALF';
 
   @override

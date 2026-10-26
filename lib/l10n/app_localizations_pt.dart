@@ -734,6 +734,21 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get pushActionAchievement => 'Conquista desbloqueada';
+
+  @override
+  String get pushActionAchievementHint => 'Para quem ganhou · medalha e XP';
+
+  @override
+  String get achievementUnlockedTitle => 'CONQUISTA DESBLOQUEADA!';
+
+  @override
+  String get achievementSeeAll => 'Ver conquistas';
+
+  @override
+  String get achievementCelebrationClose => 'Continuar';
+
+  @override
   String get matchClockFirstHalf => '1º TEMPO';
 
   @override

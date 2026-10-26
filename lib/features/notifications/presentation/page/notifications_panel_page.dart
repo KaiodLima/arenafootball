@@ -183,6 +183,11 @@ class _NotificationsPanelPageState extends State<NotificationsPanelPage> {
         name: l10n.pushActionTeamRequestAnswer,
         description: l10n.pushActionTeamRequestAnswerHint
       ),
+    PushAction.achievement => (
+        icon: Icons.military_tech_outlined,
+        name: l10n.pushActionAchievement,
+        description: l10n.pushActionAchievementHint
+      ),
   };
 }
 

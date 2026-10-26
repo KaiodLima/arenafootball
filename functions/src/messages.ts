@@ -18,7 +18,8 @@ export type ActionKey =
   | 'solicitacao_jogador'
   | 'solicitacao_resposta'
   | 'solicitacao_time'
-  | 'solicitacao_time_resposta';
+  | 'solicitacao_time_resposta'
+  | 'conquista';
 
 /** Sem configuração gravada, vale este padrão (notícia vem desligada). */
 export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
@@ -33,6 +34,7 @@ export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
   solicitacao_resposta: true,
   solicitacao_time: true,
   solicitacao_time_resposta: true,
+  conquista: true,
 };
 
 export type Target = { topic: string } | { condition: string };
@@ -45,7 +47,7 @@ export interface PushMessage {
    * O que abre ao tocar: feed, tabelas, painel de pedidos de jogador (admin)
    * ou a situação do pedido do usuário.
    */
-  aba: 'home' | 'tabelas' | 'solicitacoes' | 'sou_jogador' | 'solicitacoes_time' | 'meu_time';
+  aba: 'home' | 'tabelas' | 'solicitacoes' | 'sou_jogador' | 'solicitacoes_time' | 'meu_time' | 'conquistas';
   regiao: string;
   alvo: Target;
   /** Imagem do push (URL https): o escudo do time no card de gol. */

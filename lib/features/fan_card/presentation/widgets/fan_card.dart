@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/achievements/domain/achievement_metric.dart';
+import 'package:arena_soccer/features/achievements/presentation/widgets/medal_badge.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/team_colors_background.dart';
@@ -27,6 +29,11 @@ class FanCard extends StatelessWidget {
   final String? playerTeam;
   final String? ownedTeam;
 
+  /// Nível do torcedor ("ULTRA") e as melhores medalhas (até 3), das
+  /// conquistas; nulo/vazio = sem a vitrine.
+  final String? level;
+  final List<({AchievementTier tier, String icon})> medals;
+
   const FanCard({
     super.key,
     required this.name,
@@ -38,6 +45,8 @@ class FanCard extends StatelessWidget {
     required this.number,
     this.playerTeam,
     this.ownedTeam,
+    this.level,
+    this.medals = const [],
   });
 
   /// Cores do time, ou o verde e branco do app.
@@ -163,22 +172,58 @@ class FanCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                      // Embaixo à esquerda (o canto direito é colorido).
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          [
-                            if (memberSince != null) l10n.fanCardSince('$memberSince'),
-                            l10n.fanCardNumber(number),
-                          ].join('   ·   '),
-                          maxLines: 1,
-                          style: AppTypography.label(color: text).copyWith(
-                            fontSize: AppSizes.s12,
-                            letterSpacing: 0.8,
-                            fontFeatures: const [FontFeature.tabularFigures()],
+                      // Embaixo à esquerda (o canto direito é colorido); à direita,
+                      // o nível e as melhores medalhas das conquistas.
+                      Row(
+                        children: [
+                          Expanded(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                [
+                                  if (memberSince != null) l10n.fanCardSince('$memberSince'),
+                                  l10n.fanCardNumber(number),
+                                ].join('   ·   '),
+                                maxLines: 1,
+                                style: AppTypography.label(color: text).copyWith(
+                                  fontSize: AppSizes.s12,
+                                  letterSpacing: 0.8,
+                                  fontFeatures: const [FontFeature.tabularFigures()],
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
+                          if (medals.isNotEmpty) ...[
+                            const SizedBox(width: AppSizes.s8),
+                            if (level != null)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: AppSizes.s6, vertical: AppSizes.s2),
+                                decoration: BoxDecoration(
+                                  color: AppColors.black.withValues(alpha: 0.35),
+                                  borderRadius: BorderRadius.circular(AppSizes.s8),
+                                ),
+                                child: Text(
+                                  level!,
+                                  style: AppTypography.label(color: AppColors.gold).copyWith(
+                                    fontSize: AppSizes.s10,
+                                    letterSpacing: 1,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                            for (final medal in medals.take(3))
+                              Padding(
+                                padding: const EdgeInsets.only(left: AppSizes.s2),
+                                child: MedalBadge(
+                                  tier: medal.tier,
+                                  icon: medal.icon,
+                                  unlocked: true,
+                                  size: AppSizes.s30,
+                                ),
+                              ),
+                          ],
+                        ],
                       ),
                     ],
                   ),

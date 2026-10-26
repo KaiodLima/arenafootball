@@ -54,6 +54,19 @@ import {
 } from './match_result';
 import { shouldPostVoteCard, voteCardNews, voteNewsId } from './vote_card';
 import {
+  Achievement,
+  achievementFromDoc,
+  achievementMessage,
+  athleteCounters,
+  changedFields,
+  countersChanged,
+  isFirstEvaluation,
+  missingServerFields,
+  newUnlocks,
+  profileCounters,
+  UNLOCKED_FIELD,
+} from './achievements';
+import {
   APP_PAGE,
   NOT_FOUND_PAGE,
   PageData,
@@ -391,6 +404,10 @@ export const onTeamRequestWritten = onDocumentWritten('solicitacoes_time/{uid}',
   if (toAdmins) await deliver(`pedido_time_${event.id}`, toAdmins, origem);
   const toUser = teamRequestAnswerMessage(uid, before, after);
   if (toUser) await deliver(`resposta_time_${event.id}`, toUser, origem);
+  // Conquista "dono de time": pedido aprovado agora.
+  if (after?.status === 'aprovada' && before?.status !== 'aprovada') {
+    await progressRef(uid).then((ref) => ref.set({ donoTime: 1 }, { merge: true }));
+  }
 });
 
 /** Todo dia às 9h: lembra os torcedores dos times que jogam hoje (temporada atual). */
@@ -571,6 +588,10 @@ export const onUserDeleted = functionsV1
       db.collection('solicitacoes_time').doc(uid),
     ]);
 
+    // Conquistas: contadores e desbloqueios da conta.
+    await db.recursiveDelete(db.collection('usuarios').doc(uid).collection('progresso'));
+    await db.recursiveDelete(db.collection('usuarios').doc(uid).collection('conquistas'));
+
     // Votos de cada temporada (partidas{ano}/{id}/votos/{uid}) e vínculos de atleta e dono.
     const seasons = seasonsToSweep((await db.doc('config/temporadas').get()).data());
     let votesDeleted = 0;
@@ -606,3 +627,118 @@ export const onUserDeleted = functionsV1
       teamsUnlinked,
     });
   });
+
+// ---------------------------------------------------------------------------
+// Conquistas: contadores do servidor e desbloqueio (lógica em achievements.ts)
+// ---------------------------------------------------------------------------
+
+/** Doc de contadores do usuário (`usuarios/{uid}/progresso/contadores`). */
+async function progressRef(uid: string): Promise<DocumentReference> {
+  const { db } = await admin();
+  return db.collection('usuarios').doc(uid).collection('progresso').doc('contadores');
+}
+
+/** Voto novo de melhor jogador (trocar o voto não conta de novo). */
+export const onVoteCreated = onDocumentCreated('{colecao}/{matchId}/votos/{uid}', async (event) => {
+  if (!/^partidas(\d{4})?$/.test(event.params.colecao)) return;
+  const { FieldValue } = await admin();
+  await (await progressRef(event.params.uid)).set({ votos: FieldValue.increment(1) }, { merge: true });
+});
+
+/** Perfil: escolheu o time do coração / pôs foto (grava só quando muda). */
+export const onUserProfileWritten = onDocumentWritten('usuarios/{uid}', async (event) => {
+  const after = event.data?.after.data();
+  if (!after) return;
+  const ref = await progressRef(event.params.uid);
+  const changes = changedFields((await ref.get()).data(), profileCounters(after));
+  if (Object.keys(changes).length) await ref.set(changes, { merge: true });
+});
+
+/** Atleta ligado à conta (jogadores da temporada atual): atleta, gols e assistências do Geral. */
+export const onPlayerWritten = onDocumentWritten('{colecao}/{playerId}', async (event) => {
+  const collection = event.params.colecao;
+  if (!/^jogadores(\d{4})?$/.test(collection)) return;
+  if (collection !== seasonCollection('jogadores', await currentSeason())) return;
+  const before = event.data?.before.data();
+  const after = event.data?.after.data();
+  const beforeUid = typeof before?.idUsuario === 'string' ? before.idUsuario : '';
+  const afterUid = typeof after?.idUsuario === 'string' ? after.idUsuario : '';
+  const relevant =
+    beforeUid !== afterUid || before?.nGols !== after?.nGols || before?.nAssistencias !== after?.nAssistencias;
+  if (!relevant) return;
+  if (afterUid) await (await progressRef(afterUid)).set(athleteCounters(after), { merge: true });
+  // A conta deixou de ser este atleta: volta a zero (as medalhas ganhas ficam).
+  if (beforeUid && beforeUid !== afterUid) {
+    await (await progressRef(beforeUid)).set(athleteCounters(undefined), { merge: true });
+  }
+});
+
+let achievementCatalogCache: { list: Achievement[]; at: number } | undefined;
+
+/** Catálogo de conquistas em cache na memória da instância (10 min). */
+async function achievementCatalog(): Promise<Achievement[]> {
+  if (achievementCatalogCache && Date.now() - achievementCatalogCache.at < 10 * 60_000) {
+    return achievementCatalogCache.list;
+  }
+  const { db } = await admin();
+  const snapshot = await db.collection('conquistas').get();
+  const list = snapshot.docs.map((doc) => achievementFromDoc(doc.id, doc.data()));
+  achievementCatalogCache = { list, at: Date.now() };
+  return list;
+}
+
+/**
+ * Contadores mudaram: desbloqueia o que foi atingido (com data e push). Conta
+ * antiga sem os campos do servidor: preenche antes (uma leitura de cada) e o
+ * novo gatilho avalia. Primeira avaliação: entra como vista e sem push.
+ */
+export const onProgressWritten = onDocumentWritten('usuarios/{uid}/progresso/contadores', async (event) => {
+  const after = event.data?.after.data();
+  if (!after) return;
+  const before = event.data?.before.data();
+  const uid = event.params.uid;
+  const { db, FieldValue } = await admin();
+  const ref = await progressRef(uid);
+
+  const missing = missingServerFields(after);
+  const fill: Record<string, number> = {};
+  if (missing.profile) Object.assign(fill, profileCounters((await db.collection('usuarios').doc(uid).get()).data()));
+  if (missing.athlete) {
+    const players = db.collection(seasonCollection('jogadores', await currentSeason()));
+    const found = await players.where('idUsuario', '==', uid).limit(1).get();
+    Object.assign(fill, athleteCounters(found.docs[0]?.data()));
+  }
+  if (missing.owner) {
+    const request = (await db.collection('solicitacoes_time').doc(uid).get()).data();
+    fill.donoTime = request?.status === 'aprovada' ? 1 : 0;
+  }
+  if (Object.keys(fill).length) {
+    await ref.set(fill, { merge: true });
+    return;
+  }
+
+  const first = isFirstEvaluation(after);
+  if (!first && !countersChanged(before, after)) return;
+  const unlocks = newUnlocks(await achievementCatalog(), after);
+  if (!unlocks.length) {
+    if (first) await ref.set({ [UNLOCKED_FIELD]: [] }, { merge: true });
+    return;
+  }
+  const batch = db.batch();
+  for (const achievement of unlocks) {
+    batch.set(db.collection('usuarios').doc(uid).collection('conquistas').doc(achievement.id), {
+      em: FieldValue.serverTimestamp(),
+      vista: first,
+    });
+  }
+  batch.set(ref, { [UNLOCKED_FIELD]: FieldValue.arrayUnion(...unlocks.map((a) => a.id)) }, { merge: true });
+  await batch.commit();
+  if (first) return;
+  for (const achievement of unlocks) {
+    await deliver(
+      `conquista_${uid}_${achievement.id}`,
+      achievementMessage(uid, achievement),
+      `usuarios/${uid}/conquistas/${achievement.id}`,
+    );
+  }
+});
