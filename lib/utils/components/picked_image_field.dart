@@ -17,7 +17,7 @@ class PickedImageField extends StatelessWidget {
   const PickedImageField({super.key, required this.file, required this.onPicked, this.currentUrl});
 
   Future<void> _pick(ImageSource source) async {
-    final picked = await ImagePicker().pickImage(source: source);
+    final picked = await ImagePicker().pickImage(source: source, imageQuality: 85, maxWidth: 1920);
     if (picked != null) onPicked(File(picked.path));
   }
 
