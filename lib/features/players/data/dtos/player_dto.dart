@@ -3,6 +3,10 @@ import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
 
+/// Gols/assistências de um atleta numa competição, contados nas partidas, e
+/// o time do lado em que ele marcou (reparo dos números).
+typedef ChampionshipStatCount = ({int goals, int assists, String teamId, String team});
+
 /// Documento das coleções `jogadores` / `jogadores{ano}`.
 ///
 /// O atleta pode jogar por times diferentes em competições diferentes:
@@ -160,6 +164,49 @@ class PlayerDTO extends Equatable {
         if (!isLegacy) teamIdsField: teamIds,
       };
 
+  /// Gols no Geral que não estão em competição nenhuma (registrados antes das
+  /// inscrições ou ajustados só no total): Geral − soma das competições.
+  /// No atleta antigo, o Geral inteiro.
+  int get unassignedGoals => _unassigned(goals, (e) => e.goals);
+
+  int get unassignedAssists => _unassigned(assists, (e) => e.assists);
+
+  int _unassigned(int total, int Function(PlayerEnrollment) of) {
+    final rest = total - enrollments.fold<int>(0, (acc, e) => acc + of(e));
+    return rest > 0 ? rest : 0;
+  }
+
+  /// Reparo: as inscrições com os números contados nas partidas ([counts]:
+  /// competição → contagem). Sobe a que tem menos que o contado, cria a que
+  /// falta (com o time do gol) e nunca baixa. Nulo se nada muda.
+  List<PlayerEnrollment>? repairedEnrollments(Map<int, ChampionshipStatCount> counts) {
+    if (counts.isEmpty) return null;
+    var changed = false;
+    final byId = {for (final e in enrollments) e.championshipId: e};
+    counts.forEach((championshipId, counted) {
+      final current = byId[championshipId];
+      if (current == null) {
+        if (counted.goals == 0 && counted.assists == 0) return;
+        byId[championshipId] = PlayerEnrollment(
+          championshipId: championshipId,
+          teamId: counted.teamId,
+          team: counted.team,
+          goals: counted.goals,
+          assists: counted.assists,
+        );
+        changed = true;
+      } else if (counted.goals > current.goals || counted.assists > current.assists) {
+        byId[championshipId] = current.copyWith(
+          goals: counted.goals > current.goals ? counted.goals : null,
+          assists: counted.assists > current.assists ? counted.assists : null,
+        );
+        changed = true;
+      }
+    });
+    if (!changed) return null;
+    return byId.values.toList()..sort((a, b) => a.championshipId.compareTo(b.championshipId));
+  }
+
   /// Valor do quesito [field] ([goalsField] ou [assistsField]).
   int statOf(String field) => field == goalsField ? goals : assists;
 
@@ -177,20 +224,29 @@ class PlayerDTO extends Equatable {
   /// ser a soma das competições, tirando os amistosos que entraram nele antes
   /// da contagem à parte (sem nunca ficar abaixo da soma), e os amistosos
   /// passam a ser [friendlyGoals]/[friendlyAssists] contados nas partidas.
-  /// Campos a gravar; nulo se já está certo. Atleta antigo: só os amistosos.
-  Map<String, int>? repairedTotals(
-      {required int stored, required int storedAssists, int friendlyGoals = 0, int friendlyAssists = 0}) {
+  /// Campos a gravar; nulo se já está certo. Atleta antigo: só os amistosos
+  /// ou, com [enrollments] novas (reparo por competição), o Geral nunca abaixo
+  /// da soma, sem descontar amistosos (que nunca entraram nele).
+  Map<String, int>? repairedTotals({
+    required int stored,
+    required int storedAssists,
+    int friendlyGoals = 0,
+    int friendlyAssists = 0,
+    List<PlayerEnrollment>? enrollments,
+  }) {
+    final list = enrollments ?? this.enrollments;
+    final adjustTotal = !isLegacy || list.isNotEmpty;
     int fixed(int value, int friendly, int sum) {
-      final withoutFriendly = value - friendly;
-      return withoutFriendly > sum ? withoutFriendly : sum;
+      final base = isLegacy ? value : value - friendly;
+      return base > sum ? base : sum;
     }
 
-    final goalsSum = enrollments.fold(0, (total, e) => total + e.goals);
-    final assistsSum = enrollments.fold(0, (total, e) => total + e.assists);
+    final goalsSum = list.fold(0, (total, e) => total + e.goals);
+    final assistsSum = list.fold(0, (total, e) => total + e.assists);
     final changes = <String, int>{
-      if (!isLegacy && fixed(stored, friendlyGoals, goalsSum) != stored)
+      if (adjustTotal && fixed(stored, friendlyGoals, goalsSum) != stored)
         goalsField: fixed(stored, friendlyGoals, goalsSum),
-      if (!isLegacy && fixed(storedAssists, friendlyAssists, assistsSum) != storedAssists)
+      if (adjustTotal && fixed(storedAssists, friendlyAssists, assistsSum) != storedAssists)
         assistsField: fixed(storedAssists, friendlyAssists, assistsSum),
       if (friendlyGoals != this.friendlyGoals) friendlyGoalsField: friendlyGoals,
       if (friendlyAssists != this.friendlyAssists) friendlyAssistsField: friendlyAssists,

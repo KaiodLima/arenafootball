@@ -734,6 +734,39 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get athleteStatsUnassigned => 'Sem competição';
+
+  @override
+  String get athleteStatsUnassignedHint => 'Registrados antes das competições';
+
+  @override
+  String athleteUnassignedSummary(int goals, int assists) {
+    String _temp0 = intl.Intl.pluralLogic(
+      goals,
+      locale: localeName,
+      other: '$goals gols',
+      one: '1 gol',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      assists,
+      locale: localeName,
+      other: '$assists assistências',
+      one: '1 assistência',
+    );
+    return '$_temp0 e $_temp1 sem competição';
+  }
+
+  @override
+  String get athleteAssign => 'Atribuir';
+
+  @override
+  String get athleteAssignTitle => 'Atribuir os números sem competição';
+
+  @override
+  String get athleteAssignNoEnrollment =>
+      'O atleta não está inscrito em competição. Para atribuir a uma, inscreva-o pelo troféu no \"Elenco geral\".';
+
+  @override
   String get partnerNewsLimitTitle => 'Limite de notícias de hoje';
 
   @override

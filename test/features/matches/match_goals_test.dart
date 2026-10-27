@@ -47,6 +47,7 @@ class _Players implements IPlayersRepository {
   Future<Either<Failure, int>> repairTotals(
     Map<String, ({int goals, int assists})> friendlyCounts, {
     String? season,
+    Map<String, Map<int, ChampionshipStatCount>> championshipCounts = const {},
   }) async =>
       const Right(0);
 

@@ -1335,6 +1335,42 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @athleteStatsUnassigned.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem competição'**
+  String get athleteStatsUnassigned;
+
+  /// No description provided for @athleteStatsUnassignedHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Registrados antes das competições'**
+  String get athleteStatsUnassignedHint;
+
+  /// No description provided for @athleteUnassignedSummary.
+  ///
+  /// In pt, this message translates to:
+  /// **'{goals, plural, =1{1 gol} other{{goals} gols}} e {assists, plural, =1{1 assistência} other{{assists} assistências}} sem competição'**
+  String athleteUnassignedSummary(int goals, int assists);
+
+  /// No description provided for @athleteAssign.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atribuir'**
+  String get athleteAssign;
+
+  /// No description provided for @athleteAssignTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atribuir os números sem competição'**
+  String get athleteAssignTitle;
+
+  /// No description provided for @athleteAssignNoEnrollment.
+  ///
+  /// In pt, this message translates to:
+  /// **'O atleta não está inscrito em competição. Para atribuir a uma, inscreva-o pelo troféu no \"Elenco geral\".'**
+  String get athleteAssignNoEnrollment;
+
   /// No description provided for @partnerNewsLimitTitle.
   ///
   /// In pt, this message translates to:

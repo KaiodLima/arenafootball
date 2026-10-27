@@ -216,6 +216,7 @@ class PlayersDataSource {
   Future<Either<Failure, int>> repairTotals(
     Map<String, ({int goals, int assists})> friendlyCounts, {
     String? season,
+    Map<String, Map<int, ChampionshipStatCount>> championshipCounts = const {},
   }) async {
     try {
       final snapshot = await _players(season).get();
@@ -225,14 +226,25 @@ class PlayersDataSource {
       for (final doc in snapshot.docs) {
         final data = doc.data();
         final friendly = friendlyCounts[doc.id];
-        final changes = PlayerDTO.fromFirestore(doc).repairedTotals(
+        final player = PlayerDTO.fromFirestore(doc);
+        // Gols por competição contados nas partidas: inscrições que faltam ou
+        // ficaram abaixo (gols antigos só no Geral).
+        final enrollments = player.repairedEnrollments(championshipCounts[doc.id] ?? const {});
+        final totals = player.repairedTotals(
           stored: (data[PlayerDTO.goalsField] as num?)?.toInt() ?? 0,
           storedAssists: (data[PlayerDTO.assistsField] as num?)?.toInt() ?? 0,
           friendlyGoals: friendly?.goals ?? 0,
           friendlyAssists: friendly?.assists ?? 0,
+          enrollments: enrollments,
         );
-        if (changes == null) continue;
-        batch.update(doc.reference, changes);
+        if (totals == null && enrollments == null) continue;
+        final ids = {for (final e in enrollments ?? const <PlayerEnrollment>[]) if (e.teamId.isNotEmpty) e.teamId};
+        batch.update(doc.reference, <Object, Object?>{
+          ...?totals,
+          if (enrollments != null)
+            for (final e in enrollments) FieldPath([PlayerEnrollment.field, PlayerEnrollment.keyOf(e.championshipId)]): e.toMap(),
+          if (ids.isNotEmpty) PlayerDTO.teamIdsField: FieldValue.arrayUnion(ids.toList()),
+        });
         fixed++;
         // Lote do Firestore: até 500 gravações.
         if (++pending == 450) {
@@ -245,6 +257,37 @@ class PlayersDataSource {
       return Right(fixed);
     } catch (e) {
       AppLogger.e('repairTotals', name: 'PlayersDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
+    }
+  }
+
+  /// Atribui gols/assistências que estão só no Geral ([PlayerDTO.unassignedGoals]):
+  /// para a competição de [enrollment], soma só na inscrição (o Geral já os
+  /// contava); sem ela, vão para os amistosos e saem do Geral. Atômico.
+  Future<Either<Failure, void>> assignUnassigned({
+    required String playerId,
+    int goals = 0,
+    int assists = 0,
+    PlayerEnrollment? enrollment,
+    String? season,
+  }) async {
+    if (goals <= 0 && assists <= 0) return const Right(null);
+    try {
+      await _players(season).doc(playerId).update(enrollment != null
+          ? {
+              ..._enrollmentFields(enrollment),
+              _enrollmentPath(enrollment.championshipId, PlayerDTO.goalsField): FieldValue.increment(goals),
+              _enrollmentPath(enrollment.championshipId, PlayerDTO.assistsField): FieldValue.increment(assists),
+            }
+          : {
+              PlayerDTO.friendlyGoalsField: FieldValue.increment(goals),
+              PlayerDTO.friendlyAssistsField: FieldValue.increment(assists),
+              PlayerDTO.goalsField: FieldValue.increment(-goals),
+              PlayerDTO.assistsField: FieldValue.increment(-assists),
+            });
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('assignUnassigned id=$playerId', name: 'PlayersDataSource', error: e);
       return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
     }
   }

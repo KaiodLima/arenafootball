@@ -731,6 +731,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get athleteStatsUnassigned => 'No competition';
+
+  @override
+  String get athleteStatsUnassignedHint => 'Recorded before the competitions';
+
+  @override
+  String athleteUnassignedSummary(int goals, int assists) {
+    String _temp0 = intl.Intl.pluralLogic(
+      goals,
+      locale: localeName,
+      other: '$goals goals',
+      one: '1 goal',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      assists,
+      locale: localeName,
+      other: '$assists assists',
+      one: '1 assist',
+    );
+    return '$_temp0 and $_temp1 without a competition';
+  }
+
+  @override
+  String get athleteAssign => 'Assign';
+
+  @override
+  String get athleteAssignTitle => 'Assign the numbers without a competition';
+
+  @override
+  String get athleteAssignNoEnrollment =>
+      'The athlete is not enrolled in any competition. To assign to one, enroll them with the trophy in the \"Full squad\".';
+
+  @override
   String get partnerNewsLimitTitle => 'Today\'s news limit';
 
   @override

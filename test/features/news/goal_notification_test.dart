@@ -211,8 +211,19 @@ class _FakePlayersRepository implements IPlayersRepository {
   Future<Either<Failure, int>> repairTotals(
     Map<String, ({int goals, int assists})> friendlyCounts, {
     String? season,
+    Map<String, Map<int, ChampionshipStatCount>> championshipCounts = const {},
   }) async =>
       const Right(0);
+
+  @override
+  Future<Either<Failure, void>> assignUnassigned({
+    required String playerId,
+    int goals = 0,
+    int assists = 0,
+    PlayerEnrollment? enrollment,
+    String? season,
+  }) async =>
+      const Right(null);
 
   @override
   Future<Either<Failure, void>> incrementStats({

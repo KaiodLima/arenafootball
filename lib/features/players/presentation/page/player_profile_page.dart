@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/utils/components/arena_button.dart';
 import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
@@ -240,9 +241,46 @@ class _Content extends StatelessWidget {
             ],
           ),
         ),
-        if (player.enrollments.isNotEmpty || player.friendlyGoals > 0 || player.friendlyAssists > 0) ...[
+        if (player.enrollments.isNotEmpty ||
+            player.friendlyGoals > 0 ||
+            player.friendlyAssists > 0 ||
+            player.unassignedGoals > 0 ||
+            player.unassignedAssists > 0) ...[
           _SectionLabel(l10n.athletePlaysFor),
           for (final enrollment in player.enrollments) _EnrollmentTile(state: state, enrollment: enrollment),
+          // Só no Geral (gols antigos, antes das competições): os números fecham.
+          if (player.unassignedGoals > 0 || player.unassignedAssists > 0)
+            ArenaCard(
+              margin: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s8),
+              padding: const EdgeInsets.all(AppSizes.s12),
+              child: Row(
+                children: [
+                  Container(
+                    width: AppSizes.s40,
+                    height: AppSizes.s40,
+                    decoration: const BoxDecoration(color: AppColors.background, shape: BoxShape.circle),
+                    child: const Icon(Icons.history_rounded, color: AppColors.textSecondary, size: AppSizes.s20),
+                  ),
+                  const SizedBox(width: AppSizes.s12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(l10n.athleteStatsUnassigned, style: AppTypography.label(color: AppColors.textPrimary)),
+                        Text(
+                          l10n.athleteStatsUnassignedHint,
+                          style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    l10n.athleteEnrollmentStats(player.unassignedGoals, player.unassignedAssists),
+                    style: AppTypography.label(color: AppColors.textSecondary).copyWith(fontSize: AppSizes.s12),
+                  ),
+                ],
+              ),
+            ),
           // Amistosos: contagem à parte, fora do Geral.
           if (player.friendlyGoals > 0 || player.friendlyAssists > 0)
             ArenaCard(
@@ -504,6 +542,21 @@ class _AdminEditorState extends State<_AdminEditor> {
     linked ? await cubit.removeFromSquad(championshipId: enrollment?.championshipId) : await cubit.delete();
   }
 
+  /// Atribui os números "Sem competição" a uma competição do atleta ou aos
+  /// amistosos.
+  Future<void> _assignUnassigned() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    final cubit = BlocProvider.of<PlayerProfileCubit>(context);
+    final choice = await showModalBottomSheet<({int championshipId, int goals, int assists})>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (_) => _AssignSheet(player: widget.player, state: widget.state),
+    );
+    if (choice == null || !mounted) return;
+    await cubit.assignUnassigned(championshipId: choice.championshipId, goals: choice.goals, assists: choice.assists);
+  }
+
   Future<void> _pickPhoto() async {
     FocusManager.instance.primaryFocus?.unfocus();
     final cubit = BlocProvider.of<PlayerProfileCubit>(context);
@@ -593,6 +646,30 @@ class _AdminEditorState extends State<_AdminEditor> {
                   hint,
                   style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
                 ),
+                if (championshipId == null && (player.unassignedGoals > 0 || player.unassignedAssists > 0)) ...[
+                  const SizedBox(height: AppSizes.s8),
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(AppSizes.s12, AppSizes.s4, AppSizes.s4, AppSizes.s4),
+                    decoration: BoxDecoration(
+                      color: AppColors.primarySoft,
+                      borderRadius: BorderRadius.circular(AppSizes.s12),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            l10n.athleteUnassignedSummary(player.unassignedGoals, player.unassignedAssists),
+                            style: AppTypography.body(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s12),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: widget.saving ? null : _assignUnassigned,
+                          child: Text(l10n.athleteAssign),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
                 const SizedBox(height: AppSizes.s12),
               ],
               CountStepper(
@@ -714,6 +791,97 @@ class _ParticipationTile extends StatelessWidget {
           if (date != null)
             Text(RelativeTime.format(date, l10n), style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
         ],
+      ),
+    );
+  }
+}
+
+/// Destino e quantidade dos números "Sem competição": uma competição do
+/// atleta ou os amistosos.
+class _AssignSheet extends StatefulWidget {
+  final PlayerDTO player;
+  final PlayerProfileState state;
+
+  const _AssignSheet({required this.player, required this.state});
+
+  @override
+  State<_AssignSheet> createState() => _AssignSheetState();
+}
+
+class _AssignSheetState extends State<_AssignSheet> {
+  late int _target =
+      widget.player.enrollments.isEmpty ? PlayerDTO.friendlyId : widget.player.enrollments.first.championshipId;
+  late int _goals = widget.player.unassignedGoals;
+  late int _assists = widget.player.unassignedAssists;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final player = widget.player;
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(AppSizes.s20, 0, AppSizes.s20, AppSizes.s20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(l10n.athleteAssignTitle, style: AppTypography.title().copyWith(fontSize: AppSizes.s18)),
+            const SizedBox(height: AppSizes.s12),
+            Wrap(
+              spacing: AppSizes.s8,
+              runSpacing: AppSizes.s8,
+              children: [
+                for (final e in player.enrollments)
+                  ArenaChoiceChip(
+                    label: widget.state.championshipTitle(e.championshipId).isEmpty
+                        ? l10n.athleteChampionshipFallback(e.championshipId)
+                        : widget.state.championshipTitle(e.championshipId),
+                    selected: _target == e.championshipId,
+                    onTap: () => setState(() => _target = e.championshipId),
+                  ),
+                ArenaChoiceChip(
+                  label: l10n.athleteStatsFriendly,
+                  selected: _target == PlayerDTO.friendlyId,
+                  onTap: () => setState(() => _target = PlayerDTO.friendlyId),
+                ),
+              ],
+            ),
+            if (player.enrollments.isEmpty) ...[
+              const SizedBox(height: AppSizes.s8),
+              Text(l10n.athleteAssignNoEnrollment, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+            ],
+            const SizedBox(height: AppSizes.s16),
+            if (player.unassignedGoals > 0) ...[
+              CountStepper(
+                icon: Icons.sports_soccer_rounded,
+                label: l10n.playersSummaryGoals,
+                value: _goals,
+                max: player.unassignedGoals,
+                onIncrement: () => setState(() => _goals = (_goals + 1).clamp(0, player.unassignedGoals)),
+                onDecrement: () => setState(() => _goals = (_goals - 1).clamp(0, player.unassignedGoals)),
+              ),
+              const SizedBox(height: AppSizes.s12),
+            ],
+            if (player.unassignedAssists > 0) ...[
+              CountStepper(
+                icon: Icons.assistant_rounded,
+                label: l10n.playersSummaryAssists,
+                value: _assists,
+                max: player.unassignedAssists,
+                onIncrement: () => setState(() => _assists = (_assists + 1).clamp(0, player.unassignedAssists)),
+                onDecrement: () => setState(() => _assists = (_assists - 1).clamp(0, player.unassignedAssists)),
+              ),
+              const SizedBox(height: AppSizes.s12),
+            ],
+            ArenaButton.primary(
+              title: l10n.athleteAssign,
+              function: _goals == 0 && _assists == 0
+                  ? null
+                  : () => Navigator.pop(context, (championshipId: _target, goals: _goals, assists: _assists)),
+            ),
+          ],
+        ),
       ),
     );
   }

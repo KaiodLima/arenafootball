@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:arena_soccer/features/players/domain/usecases/assign_unassigned_stats_usecase.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/services/storage_upload_service.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
@@ -121,8 +122,19 @@ class _FakePlayers implements IPlayersRepository {
   Future<Either<Failure, int>> repairTotals(
     Map<String, ({int goals, int assists})> friendlyCounts, {
     String? season,
+    Map<String, Map<int, ChampionshipStatCount>> championshipCounts = const {},
   }) async =>
       const Right(0);
+
+  @override
+  Future<Either<Failure, void>> assignUnassigned({
+    required String playerId,
+    int goals = 0,
+    int assists = 0,
+    PlayerEnrollment? enrollment,
+    String? season,
+  }) async =>
+      const Right(null);
 
   @override
   Future<Either<Failure, void>> incrementStats({
@@ -215,6 +227,7 @@ void main() {
       DeletePlayerUseCase(players),
       RemovePlayerFromSquadUseCase(players),
       AdjustPlayerStatsUseCase(players),
+      AssignUnassignedStatsUseCase(players),
       _NoChampionships(),
     );
   });

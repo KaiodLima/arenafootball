@@ -66,5 +66,17 @@ abstract class IPlayersRepository {
 
   /// Manutenção: acerta o Geral e grava os amistosos contados nas partidas;
   /// devolve quantos atletas mudaram.
-  Future<Either<Failure, int>> repairTotals(Map<String, ({int goals, int assists})> friendlyCounts, {String? season});
+  Future<Either<Failure, int>> repairTotals(
+    Map<String, ({int goals, int assists})> friendlyCounts, {
+    String? season,
+    Map<String, Map<int, ChampionshipStatCount>> championshipCounts = const {},
+  });
+
+  Future<Either<Failure, void>> assignUnassigned({
+    required String playerId,
+    int goals = 0,
+    int assists = 0,
+    PlayerEnrollment? enrollment,
+    String? season,
+  });
 }

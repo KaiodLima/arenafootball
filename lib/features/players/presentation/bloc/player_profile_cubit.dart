@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:either_dart/either.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/players/domain/usecases/assign_unassigned_stats_usecase.dart';
 import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/news/domain/usecases/get_player_goal_cards_cache_first_usecase.dart';
@@ -33,6 +34,7 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
   final DeletePlayerUseCase deletePlayerUseCase;
   final RemovePlayerFromSquadUseCase removePlayerFromSquadUseCase;
   final AdjustPlayerStatsUseCase adjustPlayerStatsUseCase;
+  final AssignUnassignedStatsUseCase assignUnassignedStatsUseCase;
   final GetRegionChampionshipsCacheFirstUseCase getRegionChampionshipsCacheFirstUseCase;
   StreamSubscription<Either<Failure, PlayerDTO?>>? _subscription;
   String? _season;
@@ -49,6 +51,7 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
     this.deletePlayerUseCase,
     this.removePlayerFromSquadUseCase,
     this.adjustPlayerStatsUseCase,
+    this.assignUnassignedStatsUseCase,
     this.getRegionChampionshipsCacheFirstUseCase,
   ) : super(const PlayerProfileState());
 
@@ -171,6 +174,29 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
     if (championshipId != null) return _adjustIn(player, championshipId, assists: delta);
     if (!player.isLegacy) return Future.value();
     return _save(player.copyWith(assists: max(0, player.assists + delta)));
+  }
+
+  /// Admin atribui os números "Sem competição" à competição [championshipId]
+  /// do atleta ou, com [PlayerDTO.friendlyId], aos amistosos.
+  Future<void> assignUnassigned({required int championshipId, int goals = 0, int assists = 0}) async {
+    final player = state.player;
+    if (player == null) return;
+    final friendly = championshipId == PlayerDTO.friendlyId;
+    final enrollment = friendly ? null : player.enrollmentIn(championshipId);
+    if (!friendly && enrollment == null) return;
+    emit(state.copyWith(saving: true));
+    final response = await assignUnassignedStatsUseCase(
+      player,
+      goals: goals,
+      assists: assists,
+      enrollment: enrollment,
+      season: _season,
+    );
+    if (isClosed) return;
+    response.fold(
+      (failure) => emit(ErrorPlayerProfileState(state.copyWith(saving: false), failure.toString())),
+      (_) => emit(state.copyWith(saving: false)),
+    );
   }
 
   /// Ajuste atômico nos amistosos (sem ficar negativo); mostra na hora.
