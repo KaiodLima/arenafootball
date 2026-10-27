@@ -1335,6 +1335,84 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @recompressTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Recomprimir imagens'**
+  String get recompressTitle;
+
+  /// No description provided for @recompressIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Recomprime as imagens enviadas antes da otimização (notícias, destaques, escudos, atletas, campeonatos e fotos de conta), no mesmo padrão do upload atual. Os links continuam valendo. Roda no servidor, em lotes: pode fechar a tela.'**
+  String get recompressIntro;
+
+  /// No description provided for @recompressIdle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ainda não rodou.'**
+  String get recompressIdle;
+
+  /// No description provided for @recompressRequested.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedido enviado, começando…'**
+  String get recompressRequested;
+
+  /// No description provided for @recompressRunning.
+  ///
+  /// In pt, this message translates to:
+  /// **'Recomprimindo a pasta {folder}…'**
+  String recompressRunning(String folder);
+
+  /// No description provided for @recompressDone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Concluído.'**
+  String get recompressDone;
+
+  /// No description provided for @recompressError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Parou com erro: {error}'**
+  String recompressError(String error);
+
+  /// No description provided for @recompressStats.
+  ///
+  /// In pt, this message translates to:
+  /// **'{seen} arquivos vistos · {rewritten} regravados'**
+  String recompressStats(int seen, int rewritten);
+
+  /// No description provided for @recompressSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'{saved} MB economizados (de {before} MB)'**
+  String recompressSaved(String saved, String before);
+
+  /// No description provided for @recompressStart.
+  ///
+  /// In pt, this message translates to:
+  /// **'Recomprimir'**
+  String get recompressStart;
+
+  /// No description provided for @recompressAgain.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rodar de novo'**
+  String get recompressAgain;
+
+  /// No description provided for @recompressConfirmTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Recomprimir as imagens antigas?'**
+  String get recompressConfirmTitle;
+
+  /// No description provided for @recompressConfirmMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'O servidor percorre o Storage e regrava menores as imagens grandes, no mesmo endereço. Pode levar alguns minutos.'**
+  String get recompressConfirmMessage;
+
   /// No description provided for @athleteRecentMatches.
   ///
   /// In pt, this message translates to:

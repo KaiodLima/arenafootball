@@ -98,6 +98,11 @@ class AdminPanelPage extends StatelessWidget {
                     icon: Icons.how_to_vote_outlined,
                     onTap: () => open(AppRoutes.votingRulesPage),
                   ),
+                  ShortcutTile(
+                    title: l10n.recompressTitle,
+                    icon: Icons.compress_rounded,
+                    onTap: () => open(AppRoutes.recompressImagesPage),
+                  ),
                 ]),
               ],
             ),

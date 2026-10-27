@@ -274,7 +274,7 @@ service cloud.firestore {
       }
 
       allow read: if !(collection in ['usuarios', 'config', 'notificacoes_envios', 'push_avisos', 'solicitacoes_jogador',
-        'solicitacoes_time', 'solicitacoes_parceiro', 'noticias_pendentes']);
+        'solicitacoes_time', 'solicitacoes_parceiro', 'noticias_pendentes', 'manutencao']);
       allow create: if writable() && (isAdmin() || isOwnVote()
         || (isPlayers() && ownsTeam(request.resource.data))
         || partnerCreate());
@@ -499,6 +499,12 @@ service cloud.firestore {
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['idsDestaquesVinculo', 'atualizado_em']))
         || isAdmin();
       allow delete: if (isRequester() && resource.data.status == 'pendente') || isAdmin();
+    }
+
+    // Manutenções feitas pelas functions (ex.: `manutencao/recomprimir`): só o
+    // admin pede e acompanha.
+    match /manutencao/{docId} {
+      allow read, write: if isAdmin();
     }
 
     // Temporada atual e lista do seletor: todo mundo lê (inclusive convidado),

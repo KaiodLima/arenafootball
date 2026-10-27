@@ -34,7 +34,7 @@ Clean Architecture por feature (`data/` -> `domain/` -> `presentation/`), detalh
 UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Auth/Storage
 ```
 
-## Features (22 módulos em `lib/features/`)
+## Features (23 módulos em `lib/features/`)
 
 | Feature | Conteúdo |
 |---------|----------|
@@ -58,6 +58,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | `achievements` | "Minhas conquistas" (drawer): medalhas, nível/XP, comemoração ao desbloquear e vitrine na carteirinha; `AchievementsCubit` (global, seguido pelo `AchievementsSync`); admin → "Conquistas" (catálogo e as sugeridas) |
 | `fan_ranking` | Ranking de torcidas (drawer): times da região com mais torcedores entre os usuários, lido de `ranking_torcidas/{temporada}` (uma leitura, com cache) |
 | `predictions` | Bolão grátis: palpite de placar antes do jogo (pílula "Palpitar" no card, folha com −/+, seção "Palpite" nos detalhes com os pontos ganhos) e o ranking de palpiteiros da região (drawer "Bolão": pódio, top 50 e "Sua posição" fixa) |
+| `maintenance` | Manutenções do admin feitas pelas functions: "Recomprimir imagens" (painel → Configurações) pede e acompanha ao vivo `manutencao/recomprimir` |
 | `notifications` | Painel de push do admin (liga/desliga por ação, histórico, aviso manual) + sincronia de tópicos |
 
 ## Fluxo para feature ou tela nova
@@ -122,6 +123,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | `usuarios/{uid}/conquistas/{id}` | desbloqueio gravado pelo `onProgressWritten` (em, vista); push `conquista` para `usuario_<uid>`; o app comemora as `vista: false` e marca `true` (com vibração); tocar no push (`data.tela = conquista`) abre "Minhas conquistas" e a comemoração dela (a já vista também). A 1ª avaliação de cada conta entra vista e sem push. `onUserDeleted` apaga as duas subcoleções |
 | `partidas{ano}/{id}/palpites/{uid}` | bolão: golsCasa, golsFora, nome (cópia), atualizadoEm (hora do servidor); o dono grava só esses campos enquanto a partida não está andamento/intervalo/encerrada. Ao fim da partida (e a cada placar corrigido) as functions gravam pontos, exato e valido (feito depois do horário marcado ou do `inicioEm` = inválido, 0). Pontos: exato **10**, vencedor + saldo (ou empate com outro placar) **7**, só o vencedor **5** (`functions/src/predictions.ts`) |
 | `palpites_ranking{ano}` | só as functions gravam (delta a cada pontuação), doc `<idRegiao>_<uid>`: uid, nome, idRegiao, pontos, exatos, palpites. O app lê o top 50 da região (desempate exatos e palpites no app) e a posição da conta por `count()`. Índices `idRegiao` + `pontos` (desc e asc) por coleção de temporada |
+| `manutencao/recomprimir` | recompressão das imagens antigas do Storage (só o admin lê/grava): o app grava `status: "pedido"` + `pedidoEm`; a function `onRecompressRequested` (`functions/src/recompress.ts`, `sharp`, 1 GiB) percorre `noticias/`, `destaques/`, `times/`, `jogadores/`, `campeonatos/`, `usuarios/` em lotes de 40 e grava o progresso (status rodando/concluido/erro, pasta, pageToken, vistos, regravados, bytesAntes, bytesDepois, lote — cada lote novo dispara o próximo). Recomprime no perfil do upload (600/512 PNG/1280 px), regrava no mesmo caminho e tipo mantendo o token de download (as URLs não mudam), só se ficar ≥10% menor, e marca `metadata.recomprimida`; pula PDF e arquivo < 100 KB |
 | `push_avisos` | aviso manual do admin (titulo, corpo, regiao vazia = todos, data); a function envia |
 
 `{ano}`: **2023 é a única temporada sem sufixo** (legado: `times`, `partidas`...); todas as outras usam o ano (`times2022`, `times2024`). A temporada **atual** fica em `config/temporadas` (`atual`, `lista`; leitura pública, escrita do admin), carregada no `RegionCubit.load()` e aplicada em `SeasonCollection.configure`. Sem a config, vale 2023. Para abrir a temporada nova: admin → **Temporadas** → "Iniciar temporada" (opcionalmente copia os times com a classificação zerada); nada é copiado à mão nem renomeado, e os cadastros passam a ir para as coleções do ano novo. Não comparar com o ano do relógio.

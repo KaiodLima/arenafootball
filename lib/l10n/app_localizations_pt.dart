@@ -734,6 +734,55 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get recompressTitle => 'Recomprimir imagens';
+
+  @override
+  String get recompressIntro =>
+      'Recomprime as imagens enviadas antes da otimização (notícias, destaques, escudos, atletas, campeonatos e fotos de conta), no mesmo padrão do upload atual. Os links continuam valendo. Roda no servidor, em lotes: pode fechar a tela.';
+
+  @override
+  String get recompressIdle => 'Ainda não rodou.';
+
+  @override
+  String get recompressRequested => 'Pedido enviado, começando…';
+
+  @override
+  String recompressRunning(String folder) {
+    return 'Recomprimindo a pasta $folder…';
+  }
+
+  @override
+  String get recompressDone => 'Concluído.';
+
+  @override
+  String recompressError(String error) {
+    return 'Parou com erro: $error';
+  }
+
+  @override
+  String recompressStats(int seen, int rewritten) {
+    return '$seen arquivos vistos · $rewritten regravados';
+  }
+
+  @override
+  String recompressSaved(String saved, String before) {
+    return '$saved MB economizados (de $before MB)';
+  }
+
+  @override
+  String get recompressStart => 'Recomprimir';
+
+  @override
+  String get recompressAgain => 'Rodar de novo';
+
+  @override
+  String get recompressConfirmTitle => 'Recomprimir as imagens antigas?';
+
+  @override
+  String get recompressConfirmMessage =>
+      'O servidor percorre o Storage e regrava menores as imagens grandes, no mesmo endereço. Pode levar alguns minutos.';
+
+  @override
   String get athleteRecentMatches => 'Últimas partidas';
 
   @override

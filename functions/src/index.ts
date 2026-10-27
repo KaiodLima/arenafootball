@@ -13,6 +13,18 @@
  * o carregamento pesado (gRPC do Firestore) estoura o limite de 10s da
  * análise do deploy.
  */
+import {
+  BATCH_SIZE,
+  DONE_FLAG,
+  RECOMPRESS_FOLDERS,
+  nextFolder,
+  outputFormat,
+  profileFor,
+  progressOf,
+  shouldRecompress,
+  shouldRunBatch,
+  worthReplacing,
+} from './recompress';
 import { candidateOf, electBestPlayer, rulesOf, voteOf, votingJustClosed } from './best_player';
 import type { DocumentReference, FieldValue as FieldValueType, Firestore } from 'firebase-admin/firestore';
 import type { Messaging } from 'firebase-admin/messaging';
@@ -995,3 +1007,93 @@ export const onProgressWritten = onDocumentWritten('usuarios/{uid}/progresso/con
     );
   }
 });
+
+/**
+ * Manutenção do admin: recomprime as imagens antigas do Storage em lotes.
+ * O app grava `manutencao/recomprimir` com `status: "pedido"`; cada lote
+ * grava o progresso com um `lote` novo, e essa escrita dispara o próximo,
+ * até passar por todas as pastas (`status: "concluido"`).
+ */
+export const onRecompressRequested = onDocumentWritten(
+  { document: 'manutencao/recomprimir', memory: '1GiB', timeoutSeconds: 300, maxInstances: 1 },
+  async (event) => {
+    const before = event.data?.before.data();
+    const after = event.data?.after.data();
+    if (!shouldRunBatch(before, after)) return;
+    const { db, storage, FieldValue } = await admin();
+    const ref = db.doc('manutencao/recomprimir');
+    const start = after?.status === 'pedido';
+    const progress = start
+      ? { ...progressOf(undefined), pasta: RECOMPRESS_FOLDERS[0] }
+      : progressOf(after);
+    try {
+      const sharp = (await import('sharp')).default;
+      const bucket = storage.bucket();
+      const [files, next] = await bucket.getFiles({
+        prefix: `${progress.pasta}/`,
+        maxResults: BATCH_SIZE,
+        autoPaginate: false,
+        ...(progress.pageToken ? { pageToken: progress.pageToken } : {}),
+      });
+      for (const file of files) {
+        progress.vistos += 1;
+        const meta = file.metadata;
+        const info = {
+          name: file.name,
+          contentType: String(meta.contentType ?? ''),
+          size: Number(meta.size ?? 0),
+          metadata: (meta.metadata ?? {}) as Record<string, unknown>,
+        };
+        if (!shouldRecompress(info)) continue;
+        try {
+          const [original] = await file.download();
+          const profile = profileFor(progress.pasta);
+          const resized = sharp(original, { failOn: 'none' })
+            .rotate()
+            .resize({ width: profile.size, height: profile.size, fit: 'inside', withoutEnlargement: true });
+          const format = outputFormat(info.contentType);
+          const output = await (format === 'png'
+            ? resized.png({ compressionLevel: 9, palette: true })
+            : format === 'webp'
+              ? resized.webp({ quality: profile.quality })
+              : resized.jpeg({ quality: profile.quality, mozjpeg: true })
+          ).toBuffer();
+          const custom = { ...info.metadata, [DONE_FLAG]: 'true' };
+          if (!worthReplacing(original.length, output.length)) {
+            // Não compensa: só marca para não tentar de novo.
+            await file.setMetadata({ metadata: custom });
+            continue;
+          }
+          // Mesmo caminho, tipo e token de download: as URLs gravadas continuam valendo.
+          await file.save(output, {
+            resumable: false,
+            contentType: info.contentType,
+            metadata: { cacheControl: meta.cacheControl, metadata: custom },
+          });
+          progress.regravados += 1;
+          progress.bytesAntes += original.length;
+          progress.bytesDepois += output.length;
+        } catch (error) {
+          logger.warn('Imagem não recomprimida', { file: file.name, error: String(error) });
+        }
+      }
+      const nextToken = (next as { pageToken?: string } | null)?.pageToken ?? '';
+      const folder = nextToken ? progress.pasta : nextFolder(progress.pasta);
+      await ref.set(
+        {
+          ...progress,
+          pasta: folder,
+          pageToken: nextToken,
+          status: folder ? 'rodando' : 'concluido',
+          lote: FieldValue.increment(1),
+          atualizadoEm: FieldValue.serverTimestamp(),
+          erro: '',
+        },
+        { merge: true },
+      );
+    } catch (error) {
+      logger.error('Recompressão parou', { error: String(error) });
+      await ref.set({ status: 'erro', erro: String(error), atualizadoEm: FieldValue.serverTimestamp() }, { merge: true });
+    }
+  },
+);

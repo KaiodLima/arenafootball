@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/maintenance/presentation/bloc/recompress_images_cubit.dart';
+import 'package:arena_soccer/features/maintenance/presentation/page/recompress_images_page.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/player_totals_repair_cubit.dart';
 import 'package:arena_soccer/features/achievements/data/dtos/achievement_dto.dart';
 import 'package:arena_soccer/features/achievements/presentation/bloc/achievement_form_cubit.dart';
@@ -284,6 +286,10 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.partnerRequestPage: (_) => BlocProvider<PartnerRequestCubit>(
               create: (_) => PartnerRequestCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl()),
               child: const PartnerRequestPage(),
+            ),
+        AppRoutes.recompressImagesPage: (_) => BlocProvider<RecompressImagesCubit>(
+              create: (_) => RecompressImagesCubit(sl()),
+              child: const RecompressImagesPage(),
             ),
         AppRoutes.partnerRequestsPanelPage: (_) => BlocProvider<PartnerRequestsPanelCubit>(
               create: (_) => PartnerRequestsPanelCubit(sl(), sl(), sl(), sl(), sl(), sl()),
