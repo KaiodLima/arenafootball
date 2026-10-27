@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:arena_soccer/features/partner_requests/presentation/bloc/partner_cubit.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
@@ -59,6 +60,8 @@ class _NewsTabState extends State<NewsTab> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isAdmin = context.watch<SessionCubit>().state.isAdmin;
+    // Parceiro: edita/apaga só o que publicou.
+    final partner = context.watch<PartnerCubit>().state;
     final header = widget.header;
 
     return BlocConsumer<NewsFeedCubit, NewsFeedState>(
@@ -102,7 +105,8 @@ class _NewsTabState extends State<NewsTab> {
               final bodyIndex = index - headerCount;
               if (bodyIndex >= bodyCount) return const _LoadingMoreIndicator();
               if (placeholder != null) return placeholder;
-              return _NewsItem(news: state.news[bodyIndex], isAdmin: isAdmin);
+              final news = state.news[bodyIndex];
+              return _NewsItem(news: news, isAdmin: isAdmin, canManage: isAdmin || partner.owns(news.authorId));
             },
           ),
         );
@@ -134,7 +138,10 @@ class _NewsItem extends StatelessWidget {
   final NewsDTO news;
   final bool isAdmin;
 
-  const _NewsItem({required this.news, required this.isAdmin});
+  /// Mostra editar/apagar: admin, ou o parceiro que publicou.
+  final bool canManage;
+
+  const _NewsItem({required this.news, required this.isAdmin, required this.canManage});
 
   Future<void> _openLink() async {
     final uri = Uri.tryParse(news.link);
@@ -142,7 +149,7 @@ class _NewsItem extends StatelessWidget {
   }
 
   Widget? _adminMenu(BuildContext context, {required bool onImage, required bool canEdit}) {
-    if (!isAdmin) return null;
+    if (!canManage) return null;
     final l10n = AppLocalizations.of(context);
     return CardMenuButton(
       onImage: onImage,

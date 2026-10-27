@@ -4,6 +4,8 @@ import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart'
 import 'package:arena_soccer/features/championships/presentation/bloc/standings_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/standings_state.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/page_title_bar.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/standings_criteria_editor.dart';
+import 'package:arena_soccer/features/championships/domain/standings_criterion.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/standings_table.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/stats_shortcuts_bar.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
@@ -19,7 +21,16 @@ class StandingsPage extends StatefulWidget {
   final String season;
   final String group;
 
-  const StandingsPage({super.key, required this.region, required this.season, required this.group});
+  /// Id do grupo (`grupos{ano}`): a tabela calculada fica em `tabelas{ano}/{id}`.
+  final String groupId;
+
+  const StandingsPage({
+    super.key,
+    required this.region,
+    required this.season,
+    required this.group,
+    this.groupId = '',
+  });
 
   @override
   State<StandingsPage> createState() => _StandingsPageState();
@@ -32,7 +43,8 @@ class _StandingsPageState extends State<StandingsPage> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<StandingsCubit>(context).watch(region: widget.region, group: widget.group, season: widget.season);
+    BlocProvider.of<StandingsCubit>(context)
+        .watch(region: widget.region, group: widget.group, season: widget.season, groupId: widget.groupId);
   }
 
   @override
@@ -91,6 +103,27 @@ class _StandingsPageState extends State<StandingsPage> {
                   ],
                 ),
               ),
+              if (state.automatic) ...[
+                const SizedBox(height: AppSizes.s10),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.autorenew_rounded, size: AppSizes.s16, color: AppColors.textSecondary),
+                      const SizedBox(width: AppSizes.s8),
+                      Expanded(
+                        child: Text(
+                          l10n.standingsAutomaticLegend(StandingsCriterion.effective(state.criteria)
+                              .map((c) => standingsCriterionLabel(l10n, c))
+                              .join(', ')),
+                          style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ],
           );
         },

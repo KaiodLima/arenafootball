@@ -6,6 +6,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/data/datasources/championships_datasource.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/group_dto.dart';
+import 'package:arena_soccer/features/championships/data/dtos/group_table_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/standing_dto.dart';
 import 'package:arena_soccer/features/championships/domain/repositories/championships_repository_interface.dart';
 
@@ -22,6 +23,14 @@ class ChampionshipsRepositoryImpl implements IChampionshipsRepository {
   @override
   Stream<Either<Failure, List<GroupDTO>>> watchGroups({required String region, String? season}) =>
       _dataSource.watchGroups(region: region, season: season);
+
+  @override
+  Stream<Either<Failure, GroupTableDTO?>> watchGroupTable({required String groupId, String? season}) =>
+      _dataSource.watchGroupTable(groupId: groupId, season: season);
+
+  @override
+  Future<Either<Failure, void>> requestTablesRecompute(String championshipDocId) =>
+      _dataSource.requestTablesRecompute(championshipDocId);
 
   @override
   Stream<Either<Failure, List<StandingDTO>>> watchStandings({

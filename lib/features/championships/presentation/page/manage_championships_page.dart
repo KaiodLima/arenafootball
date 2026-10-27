@@ -79,6 +79,9 @@ class _ManageChampionshipsPageState extends State<ManageChampionshipsPage> {
           if (state is ErrorManageChampionshipsState) {
             showSnackBar(context: context, message: state.errorMessage, isSuccess: false);
           }
+          if (state is RecomputeRequestedManageChampionshipsState) {
+            showSnackBar(context: context, message: l10n.championshipRecomputeRequested);
+          }
           if (state is DeletedManageChampionshipsState) {
             showSnackBar(context: context, message: l10n.championshipsManageDeleted);
           }
@@ -119,6 +122,11 @@ class _ManageChampionshipsPageState extends State<ManageChampionshipsPage> {
                         icon: Icons.edit_outlined,
                         label: l10n.commonEdit,
                         onSelected: () => _open(championship),
+                      ),
+                      CardMenuAction(
+                        icon: Icons.autorenew_rounded,
+                        label: l10n.championshipRecomputeTables,
+                        onSelected: () => _cubit.recomputeTables(championship),
                       ),
                       CardMenuAction(
                         icon: Icons.delete_outline_rounded,

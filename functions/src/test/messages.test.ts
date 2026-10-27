@@ -14,6 +14,9 @@ import {
   seasonCollection,
   teamRequestAnswerMessage,
   teamRequestMessage,
+  partnerLinkRequestMessage,
+  partnerRequestAnswerMessage,
+  partnerRequestMessage,
   targetFor,
   teamIdTopic,
   todayKey,
@@ -188,6 +191,38 @@ test('pedido de time: novo avisa admins; resposta avisa quem pediu', () => {
   assert.equal(approved?.aba, 'meu_time');
   const rejected = teamRequestAnswerMessage('AbC1', pending, { ...pending, status: 'rejeitada', motivo: 'Nome repetido' });
   assert.equal(rejected?.corpo, 'O pedido do time Riacho não foi aprovado. Motivo: Nome repetido');
+});
+
+test('pedido de parceiro: novo avisa admins; resposta e remoção avisam quem pediu', () => {
+  const pending = { nome: 'Rádio Floresta', nome_usuario: 'Kaio', regiao: 'Floresta', status: 'pendente' };
+  const created = partnerRequestMessage('P1', undefined, pending);
+  assert.equal(created?.corpo, 'Kaio quer ser parceiro: Rádio Floresta (Floresta)');
+  assert.deepEqual(created?.alvo, { topic: 'admins' });
+  assert.equal(created?.aba, 'solicitacoes_parceiro');
+  assert.equal(partnerRequestMessage('P1', pending, { ...pending, mensagem: 'x' }), null);
+
+  const approved = { ...pending, status: 'aprovada' };
+  const ok = partnerRequestAnswerMessage('P1', pending, approved);
+  assert.deepEqual(ok?.alvo, { topic: 'usuario_P1' });
+  assert.equal(ok?.aba, 'parceiro');
+  assert.equal(ok?.corpo, 'Já pode publicar no app em Floresta. Toque para ver o que está liberado.');
+  // Ajuste de permissões do parceiro aprovado não avisa.
+  assert.equal(partnerRequestAnswerMessage('P1', approved, { ...approved, limiteDestaques: 3 }), null);
+  const revoked = partnerRequestAnswerMessage('P1', approved, { ...approved, status: 'removido', motivo: 'Spam' });
+  assert.equal(revoked?.corpo, 'A sua parceria foi encerrada. Motivo: Spam');
+  const rejected = partnerRequestAnswerMessage('P1', pending, { ...pending, status: 'rejeitada' });
+  assert.equal(rejected?.corpo, 'O pedido de parceria não foi aprovado.');
+});
+
+test('parceiro pede vínculo de destaque: avisa admins só com id novo', () => {
+  const approved = { nome: 'Rádio', regiao: 'Floresta', status: 'aprovada', idsDestaquesVinculo: ['a'] };
+  const message = partnerLinkRequestMessage('P1', approved, { ...approved, idsDestaquesVinculo: ['a', 'b'] });
+  assert.equal(message?.corpo, 'Rádio diz que um destaque é dele');
+  assert.deepEqual(message?.alvo, { topic: 'admins' });
+  assert.equal(partnerLinkRequestMessage('P1', approved, { ...approved, idsDestaquesVinculo: [] }), null);
+  // Pedido ainda pendente: o aviso é o do pedido.
+  const pending = { ...approved, status: 'pendente' };
+  assert.equal(partnerLinkRequestMessage('P1', pending, { ...pending, idsDestaquesVinculo: ['a', 'b'] }), null);
 });
 
 test('pedido "Sou jogador" também avisa o dono do time', () => {

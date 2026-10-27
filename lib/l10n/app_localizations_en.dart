@@ -731,6 +731,326 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get partnerClaimTitle => 'Is any of these highlights yours?';
+
+  @override
+  String get partnerClaimHint =>
+      'These highlights have no owner in the app. Check yours: the admin confirms and they become yours, in your region.';
+
+  @override
+  String get partnerClaimPending => 'Link requested · waiting for the admin';
+
+  @override
+  String get partnerUnlinkedTitle => 'Highlights without an owner';
+
+  @override
+  String get partnerLinkRequested => 'Link request sent to the admin.';
+
+  @override
+  String partnerLinked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count highlights linked.',
+      one: '1 highlight linked.',
+      zero: 'No highlight linked (they already had an owner).',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get partnerLinksCleared => 'Link request refused.';
+
+  @override
+  String partnerLinkTitle(String name) {
+    return 'Link the highlights to $name?';
+  }
+
+  @override
+  String partnerLinkMessage(String region) {
+    return 'They will belong to the partner, only in $region, and count toward their limit (the limit goes up if needed). Old shared links to these highlights will stop opening.';
+  }
+
+  @override
+  String get partnerLinkConfirm => 'Link';
+
+  @override
+  String get partnerLinkRefuse => 'Refuse';
+
+  @override
+  String partnerClaimedList(String titles) {
+    return 'Link requested: $titles';
+  }
+
+  @override
+  String partnerClaimedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Link requested for $count highlights',
+      one: 'Link requested for 1 highlight',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get partnerClaimOnApprove => 'Approving also links them.';
+
+  @override
+  String get partnerClaimActiveHint =>
+      'Check that the highlights really are theirs.';
+
+  @override
+  String get partnerMenu => 'Become a partner';
+
+  @override
+  String get partnerMenuApproved => 'Partner area';
+
+  @override
+  String get partnerRequestTitle => 'Become a partner';
+
+  @override
+  String get partnerRequestIntro =>
+      'Do you run a sports page, store or outlet in the region? Ask to become a partner and publish news, highlights and ads in the app.';
+
+  @override
+  String get partnerNameLabel => 'Partner name (page, store, outlet)';
+
+  @override
+  String get partnerNameRequired => 'Enter the name (at least 3 letters)';
+
+  @override
+  String get partnerContactInfo =>
+      'Only the admin sees your WhatsApp, to arrange the partnership.';
+
+  @override
+  String get partnerRequestSubmit => 'Send request';
+
+  @override
+  String get partnerRequestSent => 'Request sent! The admin will review it.';
+
+  @override
+  String get partnerRequestCancelled => 'Request cancelled.';
+
+  @override
+  String get partnerPendingInfo =>
+      'Your request is with the admin. You will be notified when they answer.';
+
+  @override
+  String get partnerRejectedInfo =>
+      'The admin did not approve the request. You can fix it and send it again.';
+
+  @override
+  String get partnerRemovedInfo =>
+      'The admin ended your partnership. You can ask again.';
+
+  @override
+  String get partnerResubmit => 'Send again';
+
+  @override
+  String get partnerEdit => 'Edit request';
+
+  @override
+  String get partnerCancel => 'Cancel request';
+
+  @override
+  String get partnerCancelTitle => 'Cancel the request?';
+
+  @override
+  String partnerCancelMessage(String name) {
+    return 'The request for $name will be deleted.';
+  }
+
+  @override
+  String get partnerLoadError => 'Could not load the partner requests.';
+
+  @override
+  String partnerApprovedTitle(String region) {
+    return 'Partner in $region';
+  }
+
+  @override
+  String get partnerCanPublish => 'You can publish';
+
+  @override
+  String get partnerNothingAllowed =>
+      'The admin has not enabled any publishing for you right now.';
+
+  @override
+  String get partnerNothingAllowedShort => 'Nothing enabled';
+
+  @override
+  String partnerNewsDetail(String region) {
+    return 'News in the $region feed';
+  }
+
+  @override
+  String partnerLimitHighlights(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count highlights',
+      one: '1 highlight',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerLimitAds(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ads per day',
+      one: '1 ad per day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerUsageHighlights(int used, int limit) {
+    return '$used of $limit highlights in use';
+  }
+
+  @override
+  String partnerUsageAds(int used, int limit) {
+    return '$used of $limit ads today';
+  }
+
+  @override
+  String get partnerMyHighlights => 'My highlights';
+
+  @override
+  String get partnerNoHighlights =>
+      'You have not published any highlights yet.';
+
+  @override
+  String get partnerHighlightHidden => 'Hidden';
+
+  @override
+  String partnerHighlightDeleteTitle(String title) {
+    return 'Delete the highlight $title?';
+  }
+
+  @override
+  String get partnerHighlightDeleted => 'Highlight deleted.';
+
+  @override
+  String get partnerHighlightLimit =>
+      'You are using all your highlights. Delete one to publish another.';
+
+  @override
+  String get partnerAdLimit => 'You have already published today\'s ad.';
+
+  @override
+  String get partnerPanelTitle => 'Partners';
+
+  @override
+  String get partnerTabActive => 'Active';
+
+  @override
+  String get partnerPanelEmptyPending => 'No pending partner requests.';
+
+  @override
+  String get partnerPanelEmptyActive => 'No active partners.';
+
+  @override
+  String get partnerPanelEmptyAnswered => 'No answered requests.';
+
+  @override
+  String partnerApproveTitle(String name) {
+    return 'Approve $name?';
+  }
+
+  @override
+  String partnerApproveMessage(String region) {
+    return 'They will publish in $region: news, up to 2 highlights and 1 ad per day. You can adjust it later in Permissions.';
+  }
+
+  @override
+  String partnerApproved(String name) {
+    return '$name is now a partner.';
+  }
+
+  @override
+  String partnerRejectTitle(String name) {
+    return 'Reject $name?';
+  }
+
+  @override
+  String get partnerRevoke => 'Remove partner';
+
+  @override
+  String partnerRevokeTitle(String name) {
+    return 'Remove $name from the partners?';
+  }
+
+  @override
+  String get partnerRevoked => 'Partnership ended.';
+
+  @override
+  String partnerRequestedBy(String name) {
+    return 'Requested by $name';
+  }
+
+  @override
+  String get partnerPermissions => 'Permissions';
+
+  @override
+  String get partnerPermNews => 'News';
+
+  @override
+  String get partnerPermHighlights => 'Highlights';
+
+  @override
+  String get partnerPermAds => 'Ads';
+
+  @override
+  String get partnerHighlightLimitLabel => 'Highlights at the same time';
+
+  @override
+  String get partnerAdsPerDayLabel => 'Ads per day';
+
+  @override
+  String get partnerPermissionsSaved => 'Permissions saved.';
+
+  @override
+  String standingsAutomaticLegend(String criteria) {
+    return 'Updated automatically after each match. Tiebreakers: $criteria.';
+  }
+
+  @override
+  String get standingsCriterionWins => 'wins';
+
+  @override
+  String get standingsCriterionGoalDifference => 'goal difference';
+
+  @override
+  String get standingsCriterionGoalsFor => 'goals scored';
+
+  @override
+  String get standingsCriterionHeadToHead => 'head-to-head';
+
+  @override
+  String get standingsCriterionFewestGoalsAgainst => 'fewest goals conceded';
+
+  @override
+  String get championshipTiebreakTitle => 'Tiebreakers';
+
+  @override
+  String get championshipTiebreakHint =>
+      'After points, in this order. Drag to reorder and uncheck what doesn\'t apply.';
+
+  @override
+  String get championshipTiebreakReset => 'Use the default';
+
+  @override
+  String get championshipRecomputeTables => 'Recalculate tables';
+
+  @override
+  String get championshipRecomputeRequested =>
+      'Recalculation requested: the tables update in a moment.';
+
+  @override
   String get achievementCategoryPredictions => 'Prediction pool';
 
   @override
@@ -3043,6 +3363,20 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get pushActionTeamRequestAnswerHint =>
       'To the requester · approved or rejected';
+
+  @override
+  String get pushActionPartnerRequest => 'New partner request';
+
+  @override
+  String get pushActionPartnerRequestHint =>
+      'To admins · \"John wants to be a partner: Store X\"';
+
+  @override
+  String get pushActionPartnerRequestAnswer => 'Partner request answered';
+
+  @override
+  String get pushActionPartnerRequestAnswerHint =>
+      'To the requester · approved, rejected or partnership ended';
 
   @override
   String get teamDelete => 'Delete team';

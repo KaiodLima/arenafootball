@@ -71,6 +71,10 @@ class NewsDTO extends Equatable {
   /// Card "Vote no craque": a votação da partida está aberta (`votacao`, string).
   final bool votingOpen;
 
+  /// `idAutor`: uid de quem publicou (notícias novas). O parceiro só mexe nas
+  /// dele; vazio (antigas e automáticas) = só o admin.
+  final String authorId;
+
   const NewsDTO({
     this.id = '',
     this.date,
@@ -106,6 +110,7 @@ class NewsDTO extends Equatable {
     this.awayColor = '',
     this.championshipTitle = '',
     this.votingOpen = false,
+    this.authorId = '',
   });
 
   bool get hasScorer => scorerId.isNotEmpty && scorerName.isNotEmpty;
@@ -161,6 +166,7 @@ class NewsDTO extends Equatable {
       awayColor: data['cor_fora']?.toString() ?? '',
       championshipTitle: data['campeonato']?.toString() ?? '',
       votingOpen: data['votacao']?.toString() == 'true',
+      authorId: data['idAutor']?.toString() ?? '',
     );
   }
 
@@ -204,6 +210,7 @@ class NewsDTO extends Equatable {
       awayColor: text('awayColor'),
       championshipTitle: text('championshipTitle'),
       votingOpen: json['votingOpen'] == true,
+      authorId: text('authorId'),
     );
   }
 
@@ -243,6 +250,7 @@ class NewsDTO extends Equatable {
         'awayColor': awayColor,
         'championshipTitle': championshipTitle,
         'votingOpen': votingOpen,
+        if (authorId.isNotEmpty) 'authorId': authorId,
       };
 
   /// `data` fica de fora: na criação o DataSource grava o horário do
@@ -285,6 +293,7 @@ class NewsDTO extends Equatable {
         if (awayColor.isNotEmpty) 'cor_fora': awayColor,
         if (championshipTitle.isNotEmpty) 'campeonato': championshipTitle,
         if (isVoteCall) 'votacao': votingOpen.toString(),
+        if (authorId.isNotEmpty) 'idAutor': authorId,
       };
 
   NewsDTO copyWith({
@@ -322,6 +331,7 @@ class NewsDTO extends Equatable {
     String? awayColor,
     String? championshipTitle,
     bool? votingOpen,
+    String? authorId,
   }) {
     return NewsDTO(
       id: id ?? this.id,
@@ -358,6 +368,7 @@ class NewsDTO extends Equatable {
       awayColor: awayColor ?? this.awayColor,
       championshipTitle: championshipTitle ?? this.championshipTitle,
       votingOpen: votingOpen ?? this.votingOpen,
+      authorId: authorId ?? this.authorId,
     );
   }
 
@@ -397,5 +408,6 @@ class NewsDTO extends Equatable {
         awayColor,
         championshipTitle,
         votingOpen,
+        authorId,
       ];
 }

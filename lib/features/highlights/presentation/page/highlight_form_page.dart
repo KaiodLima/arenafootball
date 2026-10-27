@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
+import 'package:arena_soccer/features/partner_requests/presentation/bloc/partner_cubit.dart';
 import 'package:arena_soccer/core/utils/web_link.dart';
 import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
 import 'package:arena_soccer/features/highlights/presentation/bloc/highlight_form_cubit.dart';
@@ -51,7 +53,12 @@ class _HighlightFormPageState extends State<HighlightFormPage> {
     _titleController = TextEditingController(text: widget.highlight?.title);
     _linkController = TextEditingController(text: widget.highlight?.link);
     _cubit = BlocProvider.of<HighlightFormCubit>(context);
-    _cubit.load(highlight: widget.highlight);
+    // Não admin: publica como parceiro (região dele, vaga livre).
+    final isAdmin = BlocProvider.of<SessionCubit>(context).state.isAdmin;
+    _cubit.load(
+      highlight: widget.highlight,
+      partner: isAdmin ? null : BlocProvider.of<PartnerCubit>(context).state.partner,
+    );
   }
 
   @override
@@ -124,7 +131,11 @@ class _HighlightFormPageState extends State<HighlightFormPage> {
           _closeAfterRebuild();
         }
         if (state is ErrorHighlightFormState) {
-          showSnackBar(context: context, message: state.errorMessage, isSuccess: false);
+          showSnackBar(
+            context: context,
+            message: state.limitReached ? l10n.partnerHighlightLimit : state.errorMessage,
+            isSuccess: false,
+          );
         }
       },
       builder: (context, state) {

@@ -5,6 +5,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/services/storage_upload_service.dart';
 import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
 import 'package:arena_soccer/features/highlights/domain/repositories/highlights_repository_interface.dart';
+import 'package:arena_soccer/features/partner_requests/domain/partner_slots.dart';
 
 /// Cadastra um destaque: envia a imagem e grava o documento.
 class CreateHighlightUseCase {
@@ -19,6 +20,12 @@ class CreateHighlightUseCase {
       final upload = await _storage.uploadImage(file: image, folder: StorageFolder.highlights);
       if (upload.isLeft) return Left(upload.left);
       imageUrl = upload.right;
+    }
+
+    // Do parceiro (já com o id da vaga): depois dos do admin, prioridade fixa.
+    if (highlight.id.isNotEmpty) {
+      return _repository.createHighlight(
+          highlight.copyWith(imageUrl: imageUrl, priority: PartnerSlots.highlightPriority));
     }
 
     // O novo destaque entra no fim do carrossel.

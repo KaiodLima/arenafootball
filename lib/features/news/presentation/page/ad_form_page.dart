@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
+import 'package:arena_soccer/features/partner_requests/presentation/bloc/partner_cubit.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/features/news/presentation/bloc/news_form_cubit.dart';
 import 'package:arena_soccer/features/news/presentation/bloc/news_form_state.dart';
@@ -51,6 +53,11 @@ class _AdFormPageState extends State<AdFormPage> {
     _cubit.load(
       news: news,
       initialRegion: BlocProvider.of<RegionCubit>(context).state.selectedRegion,
+      authorId: BlocProvider.of<SessionCubit>(context).state.user?.id ?? '',
+      // Não admin: publica como parceiro (região dele).
+      partner: BlocProvider.of<SessionCubit>(context).state.isAdmin
+          ? null
+          : BlocProvider.of<PartnerCubit>(context).state.partner,
       tag: NewsDTO.adTag,
     );
   }
@@ -116,7 +123,11 @@ class _AdFormPageState extends State<AdFormPage> {
           _closeAfterRebuild();
         }
         if (state is ErrorNewsFormState) {
-          showSnackBar(context: context, message: state.errorMessage, isSuccess: false);
+          showSnackBar(
+            context: context,
+            message: state.limitReached ? l10n.partnerAdLimit : state.errorMessage,
+            isSuccess: false,
+          );
         }
       },
       builder: (context, state) {

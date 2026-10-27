@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:arena_soccer/features/partner_requests/domain/usecases/get_partner_slots_usecase.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/services/storage_upload_service.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
@@ -184,6 +185,7 @@ void main() {
       UpdateNewsUseCase(repository, _FakeStorage()),
       _FakeRegions(),
       _FakeHighlights(),
+      _UnusedSlots(),
     );
     await cubit.load(initialRegion: 'Floresta', tag: 'Seleção Floresta');
     expect(cubit.state.form.tag, 'Seleção Floresta');
@@ -201,4 +203,9 @@ class _FakeHighlights implements WatchHighlightsUseCase {
   @override
   Stream<Either<Failure, List<HighlightDTO>>> call() =>
       Stream.value(const Right([HighlightDTO(id: '1', title: 'Seleção Floresta', isVisible: true)]));
+}
+
+class _UnusedSlots implements GetPartnerSlotsUseCase {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

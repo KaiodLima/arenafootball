@@ -183,6 +183,16 @@ class _NotificationsPanelPageState extends State<NotificationsPanelPage> {
         name: l10n.pushActionTeamRequestAnswer,
         description: l10n.pushActionTeamRequestAnswerHint
       ),
+    PushAction.partnerRequest => (
+        icon: Icons.handshake_outlined,
+        name: l10n.pushActionPartnerRequest,
+        description: l10n.pushActionPartnerRequestHint
+      ),
+    PushAction.partnerRequestAnswer => (
+        icon: Icons.verified_user_outlined,
+        name: l10n.pushActionPartnerRequestAnswer,
+        description: l10n.pushActionPartnerRequestAnswerHint
+      ),
     PushAction.achievement => (
         icon: Icons.military_tech_outlined,
         name: l10n.pushActionAchievement,

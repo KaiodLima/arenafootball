@@ -18,7 +18,7 @@ import type { Messaging } from 'firebase-admin/messaging';
 import type { Storage } from 'firebase-admin/storage';
 import * as functionsV1 from 'firebase-functions/v1';
 import { logger, setGlobalOptions } from 'firebase-functions/v2';
-import { onDocumentCreated, onDocumentUpdated, onDocumentWritten } from 'firebase-functions/v2/firestore';
+import { onDocumentCreated, onDocumentDeleted, onDocumentUpdated, onDocumentWritten } from 'firebase-functions/v2/firestore';
 import { onRequest } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import {
@@ -36,6 +36,9 @@ import {
   playerRequestToOwnerMessage,
   teamRequestAnswerMessage,
   teamRequestMessage,
+  partnerLinkRequestMessage,
+  partnerRequestAnswerMessage,
+  partnerRequestMessage,
   seasonCollection,
   todayKey,
   votingMessage,
@@ -54,6 +57,18 @@ import {
 } from './match_result';
 import { shouldPostVoteCard, voteCardNews, voteNewsId } from './vote_card';
 import { rankingDelta, rankingDocId, scorePrediction } from './predictions';
+import {
+  GroupTeam,
+  computeTable,
+  criteriaOf,
+  groupChampionshipId,
+  groupGames,
+  groupHasAny,
+  groupTeams,
+  isFinishedMatch,
+  legacyStandingFields,
+  matchTeams,
+} from './standings';
 import {
   Achievement,
   achievementFromDoc,
@@ -175,8 +190,18 @@ async function isCurrentMatchCollection(collection: string): Promise<boolean> {
   return collection === seasonCollection('partidas', await currentSeason());
 }
 
-/** Partida cadastrada na temporada atual. */
+/** Grupo da temporada atual (`grupos{ano}`): a tabela dele é recalculada ao mudar. */
+async function isCurrentGroupCollection(collection: string): Promise<boolean> {
+  if (!/^grupos(\d{4})?$/.test(collection)) return false;
+  return collection === seasonCollection('grupos', await currentSeason());
+}
+
+/** Partida cadastrada na temporada atual (ou grupo criado: calcula a tabela). */
 export const onMatchCreated = onDocumentCreated('{colecao}/{matchId}', async (event) => {
+  if (await isCurrentGroupCollection(event.params.colecao)) {
+    await onGroupChanged(event.params.matchId, undefined, event.data?.data());
+    return;
+  }
   if (!(await isCurrentMatchCollection(event.params.colecao))) return;
   const data = event.data?.data();
   const message = data ? matchCreatedMessage(data) : null;
@@ -185,6 +210,10 @@ export const onMatchCreated = onDocumentCreated('{colecao}/{matchId}', async (ev
 
 /** Votação de melhor jogador aberta/encerrada. */
 export const onMatchUpdated = onDocumentUpdated('{colecao}/{matchId}', async (event) => {
+  if (await isCurrentGroupCollection(event.params.colecao)) {
+    await onGroupChanged(event.params.matchId, event.data?.before.data(), event.data?.after.data());
+    return;
+  }
   if (!(await isCurrentMatchCollection(event.params.colecao))) return;
   const before = event.data?.before.data();
   const after = event.data?.after.data();
@@ -280,6 +309,7 @@ async function postResult(collection: string, season: string, matchId: string, m
   }
   await db.collection(collection).doc(matchId).update({ resultadoNoticia: ref.id });
   await scorePredictions(collection, season, matchId, match);
+  await recomputeMatchGroups(season, { ...match, resultadoNoticia: ref.id });
 }
 
 /**
@@ -351,7 +381,109 @@ async function updateResult(season: string, matchId: string, match: Record<strin
   });
   // Placar corrigido: o bolão é repontuado (só a diferença vai ao ranking).
   await scorePredictions(seasonCollection('partidas', season), season, matchId, match);
+  await recomputeMatchGroups(season, match);
 }
+
+/**
+ * Classificação automática: refaz do zero a tabela dos grupos do campeonato
+ * (`tabelas{ano}/{idGrupo}`) a partir das partidas terminadas entre os times
+ * do grupo, com o desempate do campeonato, e espelha os números nas linhas
+ * antigas de `classificacao{ano}` (app antigo). [teams] = só os grupos com
+ * algum desses times; [groupId] = só esse grupo.
+ */
+async function recomputeGroups(
+  season: string,
+  championshipId: number,
+  options: { teams?: GroupTeam[]; groupId?: string } = {},
+): Promise<void> {
+  if (!(championshipId > 0)) return;
+  try {
+    const { db, FieldValue } = await admin();
+    const groupDocs = (
+      await db.collection(seasonCollection('grupos', season)).where('fk_campeonato', '==', championshipId).get()
+    ).docs.filter(
+      (doc) =>
+        (!options.groupId || doc.id === options.groupId) &&
+        (!options.teams || groupHasAny(groupTeams(doc.data()), options.teams)),
+    );
+    if (!groupDocs.length) return;
+    const [matches, championship] = await Promise.all([
+      db.collection(seasonCollection('partidas', season)).where('id_campeonato', '==', championshipId).get(),
+      db.collection('campeonatos').where('id_campeonato', '==', championshipId).limit(1).get(),
+    ]);
+    const criteria = criteriaOf(championship.docs[0]?.data().desempate);
+    const matchData = matches.docs.map((doc) => doc.data());
+    const standings = db.collection(seasonCollection('classificacao', season));
+    const batch = db.batch();
+    for (const doc of groupDocs) {
+      const group = doc.data();
+      const teams = groupTeams(group);
+      const rows = computeTable(teams, groupGames(teams, matchData, championshipId), criteria);
+      const groupName = String(group.descricao ?? '').trim();
+      batch.set(db.collection(seasonCollection('tabelas', season)).doc(doc.id), {
+        idCampeonato: championshipId,
+        grupo: groupName,
+        idRegiao: String(group.idRegiao ?? ''),
+        criterios: criteria,
+        linhas: rows,
+        atualizadoEm: FieldValue.serverTimestamp(),
+      });
+      // Espelho: só nas linhas que existem (o update falharia o lote todo).
+      const refs = rows.filter((row) => row.idTime).map((row) => standings.doc(row.idTime));
+      const existing = refs.length ? await db.getAll(...refs) : [];
+      for (const snapshot of existing) {
+        const row = rows.find((r) => r.idTime === snapshot.id);
+        if (snapshot.exists && row) batch.update(snapshot.ref, legacyStandingFields(row, groupName));
+      }
+    }
+    await batch.commit();
+    logger.info('Tabelas recalculadas', { championshipId, groups: groupDocs.map((doc) => doc.id) });
+  } catch (error) {
+    logger.error('Tabelas não recalculadas', { championshipId, error: String(error) });
+  }
+}
+
+/** Partida terminada (placar corrigido ou apagada): recalcula os grupos dos dois times. */
+async function recomputeMatchGroups(season: string, match: Record<string, unknown>): Promise<void> {
+  await recomputeGroups(season, Number(match.id_campeonato) || 0, { teams: matchTeams(match) });
+}
+
+/** Grupo editado no console: recalcula com os times novos; fora do campeonato, apaga a tabela. */
+async function onGroupChanged(groupId: string, before?: Record<string, unknown>, after?: Record<string, unknown>) {
+  const season = await currentSeason();
+  const previous = before ? groupChampionshipId(before) : 0;
+  const next = after ? groupChampionshipId(after) : 0;
+  if (next > 0) {
+    await recomputeGroups(season, next, { groupId });
+  } else if (previous > 0) {
+    const { db } = await admin();
+    await db.collection(seasonCollection('tabelas', season)).doc(groupId).delete();
+  }
+}
+
+/** Partida terminada apagada → recalcula; grupo apagado → apaga a tabela dele. */
+export const onMatchOrGroupDeleted = onDocumentDeleted('{colecao}/{docId}', async (event) => {
+  const { colecao, docId } = event.params;
+  const data = event.data?.data();
+  if (await isCurrentGroupCollection(colecao)) {
+    await onGroupChanged(docId, data, undefined);
+    return;
+  }
+  if (!data || !(await isCurrentMatchCollection(colecao)) || !isFinishedMatch(data)) return;
+  await recomputeMatchGroups(await currentSeason(), data);
+});
+
+/** Desempate trocado ou "Recalcular tabelas" (`recalcularEm`) no campeonato. */
+export const onChampionshipUpdated = onDocumentUpdated('campeonatos/{id}', async (event) => {
+  const before = event.data?.before.data();
+  const after = event.data?.after.data();
+  if (!before || !after) return;
+  const changed =
+    JSON.stringify(before.desempate ?? null) !== JSON.stringify(after.desempate ?? null) ||
+    String(before.recalcularEm?.toMillis?.() ?? '') !== String(after.recalcularEm?.toMillis?.() ?? '');
+  if (!changed) return;
+  await recomputeGroups(await currentSeason(), Number(after.id_campeonato) || 0);
+});
 
 /** Aviso manual enviado pelo painel. */
 export const onNoticeCreated = onDocumentCreated('push_avisos/{noticeId}', async (event) => {
@@ -462,6 +594,20 @@ export const onTeamRequestWritten = onDocumentWritten('solicitacoes_time/{uid}',
   if (after?.status === 'aprovada' && before?.status !== 'aprovada') {
     await progressRef(uid).then((ref) => ref.set({ donoTime: 1 }, { merge: true }));
   }
+});
+
+/** Pedido "Sou parceiro": avisa os admins (novo) e quem pediu (resposta). */
+export const onPartnerRequestWritten = onDocumentWritten('solicitacoes_parceiro/{uid}', async (event) => {
+  const uid = event.params.uid;
+  const before = event.data?.before.data();
+  const after = event.data?.after.data();
+  const origem = `solicitacoes_parceiro/${uid}`;
+  const toAdmins = partnerRequestMessage(uid, before, after);
+  if (toAdmins) await deliver(`pedido_parceiro_${event.id}`, toAdmins, origem);
+  const toUser = partnerRequestAnswerMessage(uid, before, after);
+  if (toUser) await deliver(`resposta_parceiro_${event.id}`, toUser, origem);
+  const link = partnerLinkRequestMessage(uid, before, after);
+  if (link) await deliver(`vinculo_parceiro_${event.id}`, link, origem);
 });
 
 /** Todo dia às 9h: lembra os torcedores dos times que jogam hoje (temporada atual). */
@@ -640,6 +786,7 @@ export const onUserDeleted = functionsV1
     const requestsDeleted = await deleteExisting(db, [
       db.collection('solicitacoes_jogador').doc(uid),
       db.collection('solicitacoes_time').doc(uid),
+      db.collection('solicitacoes_parceiro').doc(uid),
     ]);
 
     // Conquistas: contadores e desbloqueios da conta.

@@ -38,6 +38,12 @@ class NewsFormData extends Equatable {
   /// Fotos do álbum já salvas que continuam (edição).
   final List<String> keptImages;
 
+  /// uid de quem publica (gravado em `idAutor` nas notícias novas).
+  final String authorId;
+
+  /// Parceiro: a região é a dele (sem escolha).
+  final bool regionLocked;
+
   const NewsFormData({
     this.original,
     this.title = '',
@@ -52,6 +58,8 @@ class NewsFormData extends Equatable {
     this.coverRemoved = false,
     this.album = const [],
     this.keptImages = const [],
+    this.authorId = '',
+    this.regionLocked = false,
   });
 
   bool get isEditing => original != null;
@@ -112,6 +120,8 @@ class NewsFormData extends Equatable {
       region: selectedRegion,
       imageUrl: currentCoverUrl,
       images: keptImages,
+      // Edição mantém o autor original (o admin editando o do parceiro).
+      authorId: base.authorId.isNotEmpty ? base.authorId : authorId,
     );
   }
 
@@ -144,6 +154,8 @@ class NewsFormData extends Equatable {
       coverRemoved: coverRemoved ?? this.coverRemoved,
       album: album ?? this.album,
       keptImages: keptImages ?? this.keptImages,
+      authorId: authorId,
+      regionLocked: regionLocked,
     );
   }
 
@@ -162,6 +174,8 @@ class NewsFormData extends Equatable {
         coverRemoved,
         album,
         keptImages,
+        authorId,
+        regionLocked,
       ];
 }
 
@@ -189,8 +203,11 @@ class SuccessNewsFormState extends NewsFormState {
 class ErrorNewsFormState extends NewsFormState {
   final String errorMessage;
 
-  const ErrorNewsFormState({required super.form, required this.errorMessage});
+  /// Parceiro sem vaga livre de publicidade hoje.
+  final bool limitReached;
+
+  const ErrorNewsFormState({required super.form, required this.errorMessage, this.limitReached = false});
 
   @override
-  List<Object?> get props => [form, errorMessage];
+  List<Object?> get props => [form, errorMessage, limitReached];
 }

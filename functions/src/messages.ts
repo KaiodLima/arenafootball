@@ -19,6 +19,8 @@ export type ActionKey =
   | 'solicitacao_resposta'
   | 'solicitacao_time'
   | 'solicitacao_time_resposta'
+  | 'solicitacao_parceiro'
+  | 'solicitacao_parceiro_resposta'
   | 'conquista';
 
 /** Sem configuração gravada, vale este padrão (notícia vem desligada). */
@@ -34,6 +36,8 @@ export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
   solicitacao_resposta: true,
   solicitacao_time: true,
   solicitacao_time_resposta: true,
+  solicitacao_parceiro: true,
+  solicitacao_parceiro_resposta: true,
   conquista: true,
 };
 
@@ -47,7 +51,16 @@ export interface PushMessage {
    * O que abre ao tocar: feed, tabelas, painel de pedidos de jogador (admin)
    * ou a situação do pedido do usuário.
    */
-  aba: 'home' | 'tabelas' | 'solicitacoes' | 'sou_jogador' | 'solicitacoes_time' | 'meu_time' | 'conquistas';
+  aba:
+    | 'home'
+    | 'tabelas'
+    | 'solicitacoes'
+    | 'sou_jogador'
+    | 'solicitacoes_time'
+    | 'meu_time'
+    | 'solicitacoes_parceiro'
+    | 'parceiro'
+    | 'conquistas';
   regiao: string;
   alvo: Target;
   /** Imagem do push (URL https): o escudo do time no card de gol. */
@@ -366,6 +379,75 @@ export function teamRequestAnswerMessage(uid: string, before: Doc | undefined, a
     ),
     aba: 'meu_time',
     regiao: text(after.regiao),
+    alvo: { topic: userTopic(uid) },
+  };
+}
+
+/** Pedido "Sou parceiro" novo ou reenviado: avisa os admins. */
+export function partnerRequestMessage(uid: string, before: Doc | undefined, after: Doc | undefined): PushMessage | null {
+  if (!after || !uid || text(after.status) !== 'pendente' || text(before?.status) === 'pendente') return null;
+  const user = text(after.nome_usuario);
+  const partner = text(after.nome);
+  if (!partner) return null;
+  const region = text(after.regiao);
+  return {
+    tipo: 'solicitacao_parceiro',
+    titulo: 'Novo pedido de parceiro',
+    corpo: shorten(
+      `${user ? `${user} quer ser parceiro` : 'Pedido de parceiro'}: ${partner}${region ? ` (${region})` : ''}`,
+      240,
+    ),
+    aba: 'solicitacoes_parceiro',
+    regiao: region,
+    alvo: { topic: ADMINS_TOPIC },
+  };
+}
+
+/** Parceiro aprovado pediu vínculo com destaques sem dono: avisa os admins. */
+export function partnerLinkRequestMessage(uid: string, before: Doc | undefined, after: Doc | undefined): PushMessage | null {
+  if (!before || !after || !uid || text(after.status) !== 'aprovada') return null;
+  const ids = (value: unknown) => (Array.isArray(value) ? value.map((id) => text(id)) : []);
+  const previous = new Set(ids(before.idsDestaquesVinculo));
+  const added = ids(after.idsDestaquesVinculo).filter((id) => id && !previous.has(id));
+  if (added.length === 0) return null;
+  const partner = text(after.nome);
+  return {
+    tipo: 'solicitacao_parceiro',
+    titulo: 'Pedido de vínculo de destaque',
+    corpo: shorten(
+      `${partner || 'Um parceiro'} diz que ${added.length === 1 ? 'um destaque é dele' : `${added.length} destaques são dele`}`,
+      240,
+    ),
+    aba: 'solicitacoes_parceiro',
+    regiao: text(after.regiao),
+    alvo: { topic: ADMINS_TOPIC },
+  };
+}
+
+/** Admin aprovou, rejeitou ou encerrou a parceria: avisa só quem pediu. */
+export function partnerRequestAnswerMessage(uid: string, before: Doc | undefined, after: Doc | undefined): PushMessage | null {
+  if (!before || !after || !uid) return null;
+  const from = text(before.status);
+  const status = text(after.status);
+  const answered = from === 'pendente' && (status === 'aprovada' || status === 'rejeitada');
+  const revoked = from === 'aprovada' && status === 'removido';
+  if (!answered && !revoked) return null;
+  const reason = text(after.motivo);
+  const why = reason ? ` Motivo: ${reason}` : '';
+  const region = text(after.regiao);
+  return {
+    tipo: 'solicitacao_parceiro_resposta',
+    titulo: status === 'aprovada' ? '🤝 Você agora é parceiro!' : 'Parceria',
+    corpo: shorten(
+      status === 'aprovada'
+        ? `Já pode publicar no app${region ? ` em ${region}` : ''}. Toque para ver o que está liberado.`
+        : status === 'rejeitada'
+          ? `O pedido de parceria não foi aprovado.${why}`
+          : `A sua parceria foi encerrada.${why}`,
+      240,
+    ),
+    aba: 'parceiro',
+    regiao: region,
     alvo: { topic: userTopic(uid) },
   };
 }

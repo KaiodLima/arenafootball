@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/partner_requests/presentation/bloc/partner_cubit.dart';
 import 'package:arena_soccer/core/utils/share_links.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:arena_soccer/app_routes.dart';
@@ -78,13 +79,16 @@ class _HighlightDetailsPageState extends State<HighlightDetailsPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final highlight = widget.highlight;
-    final isAdmin = context.watch<SessionCubit>().state.isAdmin;
+    // O parceiro dono do destaque também acrescenta notícias nele.
+    final canAddNews = context.watch<SessionCubit>().state.isAdmin ||
+        (context.watch<PartnerCubit>().state.owns(highlight.authorId) &&
+            context.watch<PartnerCubit>().state.permissions.canNews);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
         backgroundColor: AppColors.background,
-        floatingActionButton: isAdmin
+        floatingActionButton: canAddNews
             ? FloatingActionButton.extended(
                 backgroundColor: AppColors.primary,
                 foregroundColor: AppColors.white,

@@ -6,6 +6,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
 import 'package:arena_soccer/features/highlights/domain/usecases/get_highlights_cache_first_usecase.dart';
 import 'package:arena_soccer/features/home/presentation/bloc/home_state.dart';
+import 'package:arena_soccer/features/partner_requests/domain/usecases/watch_pending_partner_requests_count_usecase.dart';
 import 'package:arena_soccer/features/player_requests/domain/usecases/watch_pending_player_requests_count_usecase.dart';
 import 'package:arena_soccer/features/team_requests/domain/usecases/watch_pending_team_requests_count_usecase.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_team_by_name_cache_first_usecase.dart';
@@ -15,14 +16,17 @@ class HomeCubit extends Cubit<HomeState> {
   final WatchPendingPlayerRequestsCountUseCase watchPendingPlayerRequestsCountUseCase;
   final WatchPendingTeamRequestsCountUseCase watchPendingTeamRequestsCountUseCase;
   final GetHighlightsCacheFirstUseCase getHighlightsCacheFirstUseCase;
+  final WatchPendingPartnerRequestsCountUseCase watchPendingPartnerRequestsCountUseCase;
   StreamSubscription<Either<Failure, int>>? _pendingRequests;
   StreamSubscription<Either<Failure, int>>? _pendingTeamRequests;
+  StreamSubscription<Either<Failure, int>>? _pendingPartnerRequests;
 
   HomeCubit(
     this.getTeamByNameCacheFirstUseCase,
     this.watchPendingPlayerRequestsCountUseCase,
     this.watchPendingTeamRequestsCountUseCase,
     this.getHighlightsCacheFirstUseCase,
+    this.watchPendingPartnerRequestsCountUseCase,
   ) : super(const HomeState());
 
   void selectTab(HomeTab tab) => emit(state.copyWith(tab: tab));
@@ -68,12 +72,17 @@ class HomeCubit extends Cubit<HomeState> {
     _pendingTeamRequests = watchPendingTeamRequestsCountUseCase().listen((response) {
       if (response.isRight) emit(state.copyWith(pendingTeamRequests: response.right));
     });
+    _pendingPartnerRequests?.cancel();
+    _pendingPartnerRequests = watchPendingPartnerRequestsCountUseCase().listen((response) {
+      if (response.isRight) emit(state.copyWith(pendingPartnerRequests: response.right));
+    });
   }
 
   @override
   Future<void> close() {
     _pendingRequests?.cancel();
     _pendingTeamRequests?.cancel();
+    _pendingPartnerRequests?.cancel();
     return super.close();
   }
 }

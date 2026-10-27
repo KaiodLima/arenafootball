@@ -135,8 +135,11 @@ class SuccessHighlightFormState extends HighlightFormState {
 class ErrorHighlightFormState extends HighlightFormState {
   final String errorMessage;
 
-  const ErrorHighlightFormState({required super.form, required this.errorMessage});
+  /// Parceiro sem vaga livre (limite de destaques ao mesmo tempo).
+  final bool limitReached;
+
+  const ErrorHighlightFormState({required super.form, required this.errorMessage, this.limitReached = false});
 
   @override
-  List<Object?> get props => [form, errorMessage];
+  List<Object?> get props => [form, errorMessage, limitReached];
 }

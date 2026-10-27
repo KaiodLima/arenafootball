@@ -3,6 +3,7 @@ import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/group_dto.dart';
+import 'package:arena_soccer/features/championships/data/dtos/group_table_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/standing_dto.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 
@@ -10,6 +11,10 @@ abstract class IChampionshipsRepository {
   Stream<Either<Failure, List<ChampionshipDTO>>> watchChampionships({String? region});
 
   Stream<Either<Failure, List<GroupDTO>>> watchGroups({required String region, String? season});
+
+  Stream<Either<Failure, GroupTableDTO?>> watchGroupTable({required String groupId, String? season});
+
+  Future<Either<Failure, void>> requestTablesRecompute(String championshipDocId);
 
   Stream<Either<Failure, List<StandingDTO>>> watchStandings({
     required String region,

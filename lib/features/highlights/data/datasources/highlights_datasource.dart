@@ -41,7 +41,8 @@ class HighlightsDataSource {
 
   Future<Either<Failure, void>> createHighlight(HighlightDTO highlight) async {
     try {
-      final ref = _highlights.doc();
+      // Destaque do parceiro já vem com o id da vaga (`PartnerSlots`).
+      final ref = highlight.id.isEmpty ? _highlights.doc() : _highlights.doc(highlight.id);
       await ref.set(highlight.copyWith(id: ref.id).toMap());
       return const Right(null);
     } catch (e) {
@@ -61,14 +62,15 @@ class HighlightsDataSource {
   }
 
   /// Atualiza o destaque. Renomeado ([oldTitle] diferente), as notícias
-  /// marcadas com o título antigo passam para o novo.
-  Future<Either<Failure, void>> updateHighlight(HighlightDTO highlight, {String? oldTitle}) async {
+  /// marcadas com o título antigo passam para o novo ([newsAuthorId]: só as
+  /// desse autor, quando quem edita é o parceiro).
+  Future<Either<Failure, void>> updateHighlight(HighlightDTO highlight, {String? oldTitle, String? newsAuthorId}) async {
     try {
       final writes = <void Function(WriteBatch)>[
         (batch) => batch.update(_highlights.doc(highlight.id), highlight.toMap()),
       ];
       if (oldTitle != null && oldTitle != highlight.title) {
-        final tagged = await _news.where('tag', isEqualTo: oldTitle).get();
+        final tagged = await _taggedNews(oldTitle, newsAuthorId).get();
         for (final doc in tagged.docs) {
           writes.add((batch) => batch.update(doc.reference, {'tag': highlight.title}));
         }
@@ -82,10 +84,10 @@ class HighlightsDataSource {
   }
 
   /// Exclui o destaque; as notícias marcadas com ele continuam no feed, só
-  /// perdem a marcação.
-  Future<Either<Failure, void>> deleteHighlight(HighlightDTO highlight) async {
+  /// perdem a marcação ([newsAuthorId]: só as desse autor, como no update).
+  Future<Either<Failure, void>> deleteHighlight(HighlightDTO highlight, {String? newsAuthorId}) async {
     try {
-      final tagged = await _news.where('tag', isEqualTo: highlight.title).get();
+      final tagged = await _taggedNews(highlight.title, newsAuthorId).get();
       await _commit([
         (batch) => batch.delete(_highlights.doc(highlight.id)),
         for (final doc in tagged.docs) (batch) => batch.update(doc.reference, {'tag': ''}),
@@ -119,6 +121,13 @@ class HighlightsDataSource {
       AppLogger.e('setHighlightVisible id=$id', name: 'HighlightsDataSource', error: e);
       return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
     }
+  }
+
+  /// Notícias marcadas com o destaque [title]; com [authorId], só as dele (o
+  /// parceiro não pode gravar nas dos outros).
+  Query<Map<String, dynamic>> _taggedNews(String title, String? authorId) {
+    final query = _news.where('tag', isEqualTo: title);
+    return authorId == null || authorId.isEmpty ? query : query.where('idAutor', isEqualTo: authorId);
   }
 
   /// Grava em lotes (limite de 500 operações por batch do Firestore).

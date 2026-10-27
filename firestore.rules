@@ -16,6 +16,14 @@ service cloud.firestore {
       return signedIn() && exists(path) && get(path).data.status == 'aprovada' ? get(path).data : null;
     }
 
+    // Parceiro ("Sou parceiro"): o pedido aprovado em `solicitacoes_parceiro/{uid}`
+    // traz a região (`idRegiao`) e as permissões (podeNoticias, podeDestaques,
+    // podePublicidade, limiteDestaques, limitePublicidadeDia); null = não é.
+    function partner() {
+      let path = /databases/$(database)/documents/solicitacoes_parceiro/$(request.auth.uid);
+      return signedIn() && exists(path) && get(path).data.status == 'aprovada' ? get(path).data : null;
+    }
+
     // O doc (jogador ou pedido "Sou jogador") é do time do dono? Pelo id
     // (`idTime`) quando os dois lados têm; doc antigo, sem id, pelo nome (`time`).
     // Atleta inscrito no time em alguma competição (`idsTimes`) também conta.
@@ -141,8 +149,8 @@ service cloud.firestore {
     }
 
     // Conteúdo do app: noticias, destaques, competicao, campeonatos,
-    // times{ano}, jogadores{ano}, partidas{ano}, classificacao{ano}, grupos{ano}
-    // e os votos antigos melhorjogador{timeC}{timeF} (os novos ficam em
+    // times{ano}, jogadores{ano}, partidas{ano}, classificacao{ano}, grupos{ano},
+    // tabelas{ano} (gravadas pelas functions) e os votos antigos melhorjogador{timeC}{timeF} (os novos ficam em
     // partidas{ano}/{id}/votos, regra abaixo).
     // Leitura pública (inclui o modo convidado); escrita do admin.
     // Exceções:
@@ -150,11 +158,84 @@ service cloud.firestore {
     // - o dono de time cadastra, edita e tira jogadores do próprio elenco
     //   (time antes e depois = o dele, pelo `idTime` ou, em doc antigo, pelo
     //   nome em `time`; ou sem time ao tirar do elenco) e troca
-    //   só escudo/descrição/cores do próprio time (`idDono` = uid).
+    //   só escudo/descrição/cores do próprio time (`idDono` = uid);
+    // - o parceiro publica notícias, destaques e publicidade na região dele
+    //   (`idAutor` = uid), dentro das permissões, e mexe só no que é dele. Os
+    //   limites são as vagas: destaque `dest<n>_<uid>` (n < limiteDestaques) e
+    //   publicidade `pub<n>_<uid>_<a>-<m>-<d>` (n < limitePublicidadeDia, data de
+    //   hoje em Brasília); ver `PartnerSlots` no app.
     match /{collection}/{docId} {
       function writable() {
         return !(collection in ['config', 'notificacoes_envios', 'push_avisos', 'solicitacoes_jogador',
-          'solicitacoes_time']);
+          'solicitacoes_time', 'solicitacoes_parceiro']);
+      }
+
+      // Dia de hoje em Brasília (UTC-3), igual ao `PartnerSlots.brasiliaDay`.
+      function brasiliaDay() {
+        let now = request.time - duration.value(3, 'h');
+        return string(now.year()) + '-' + string(now.month()) + '-' + string(now.day());
+      }
+
+      // Número da vaga no id do doc (`dest1_...` → 1). Só chamar depois do `matches`.
+      function slotNumber(prefix) {
+        return int(docId.split('_')[0].replace(prefix, ''));
+      }
+
+      function adSlot(p) {
+        return docId.matches('pub[0-9]_.+') && slotNumber('pub') < p.get('limitePublicidadeDia', 1)
+          && docId == 'pub' + string(slotNumber('pub')) + '_' + request.auth.uid + '_' + brasiliaDay();
+      }
+
+      function highlightSlot(p) {
+        return docId.matches('dest[0-9]_' + request.auth.uid) && slotNumber('dest') < p.get('limiteDestaques', 2);
+      }
+
+      // Notícia/publicidade do parceiro: dele, na região dele, sem os campos de
+      // gol/resultado e sem as tags reservadas.
+      function partnerNews(data, p) {
+        let tag = data.get('tag', '');
+        return collection == 'noticias'
+          && data.get('idAutor', '') == request.auth.uid
+          && data.get('idRegiao', '') == p.get('idRegiao', '-')
+          && data.keys().hasOnly(['id', 'data', 'titulo', 'descricao', 'urlImagem', 'link', 'exibir',
+            'fk_competicao', 'idRegiao', 'time_casa', 'time_fora', 'gol_time_casa', 'gol_time_fora', 'tag',
+            'images', 'idAutor'])
+          && (tag == 'publicidade'
+            ? p.get('podePublicidade', true)
+            : p.get('podeNoticias', true) && !(tag in ['gol', 'resultado', 'votacao']));
+      }
+
+      function partnerHighlight(data, p) {
+        return collection == 'destaques'
+          && p.get('podeDestaques', true)
+          && data.get('idAutor', '') == request.auth.uid
+          && data.get('idRegiao', '') == p.get('idRegiao', '-')
+          && data.keys().hasOnly(['id', 'title', 'link', 'urlImagem', 'exibir', 'priority', 'regiao', 'idRegiao',
+            'idAutor']);
+      }
+
+      function partnerCreate() {
+        let p = partner();
+        let data = request.resource.data;
+        return p != null
+          && ((partnerNews(data, p) && (data.get('tag', '') != 'publicidade' || adSlot(p)))
+            || (partnerHighlight(data, p) && highlightSlot(p) && data.get('priority', '') == '900'));
+      }
+
+      // Edita só o que é dele; a publicidade continua publicidade (a vaga) e o
+      // destaque não muda de posição (só o admin reordena).
+      function partnerUpdate() {
+        let p = partner();
+        let data = request.resource.data;
+        return p != null && resource.data.get('idAutor', '') == request.auth.uid
+          && ((partnerNews(data, p)
+              && (data.get('tag', '') == 'publicidade') == (resource.data.get('tag', '') == 'publicidade'))
+            || (partnerHighlight(data, p) && data.get('priority', '') == resource.data.get('priority', '')));
+      }
+
+      function partnerDelete() {
+        return collection in ['noticias', 'destaques'] && partner() != null
+          && resource.data.get('idAutor', '') == request.auth.uid;
       }
 
       function isOwnVote() {
@@ -170,9 +251,10 @@ service cloud.firestore {
       }
 
       allow read: if !(collection in ['usuarios', 'config', 'notificacoes_envios', 'push_avisos', 'solicitacoes_jogador',
-        'solicitacoes_time']);
+        'solicitacoes_time', 'solicitacoes_parceiro']);
       allow create: if writable() && (isAdmin() || isOwnVote()
-        || (isPlayers() && ownsTeam(request.resource.data)));
+        || (isPlayers() && ownsTeam(request.resource.data))
+        || partnerCreate());
       // As inscrições por competição nunca somem do atleta (o app antigo
       // regravava o documento inteiro sem elas): esvaziar pode, apagar não.
       function keepsEnrollments() {
@@ -200,8 +282,10 @@ service cloud.firestore {
         || (isPlayers() && joinsOwnedTeam())
         || (isTeamDoc() && signedIn() && resource.data.idDono == request.auth.uid
           && request.resource.data.diff(resource.data).affectedKeys()
-            .hasOnly(['descricao', 'urlImagem', 'corPrimaria', 'corSecundaria'])));
-      allow delete: if writable() && (isAdmin() || isOwnVote() || (isPlayers() && ownsTeam(resource.data)));
+            .hasOnly(['descricao', 'urlImagem', 'corPrimaria', 'corSecundaria']))
+        || partnerUpdate());
+      allow delete: if writable() && (isAdmin() || isOwnVote() || (isPlayers() && ownsTeam(resource.data))
+        || partnerDelete());
     }
 
     // Votos de melhor jogador da partida (id do doc = uid de quem votou):
@@ -328,6 +412,42 @@ service cloud.firestore {
       allow read: if isRequester() || isAdmin();
       allow create: if isRequester() && validSubmit();
       allow update: if (isRequester() && resource.data.status != 'aprovada' && validSubmit()) || isAdmin();
+      allow delete: if (isRequester() && resource.data.status == 'pendente') || isAdmin();
+    }
+
+    // Pedido "Sou parceiro" (id = uid): o dono cria/corrige/reenvia sempre como
+    // pendente, sem as permissões (que só o admin grava); o admin lê e responde.
+    // `idsDestaquesVinculo`: destaques sem dono que o usuário diz serem dele; o
+    // parceiro aprovado só mexe nessa lista (o vínculo quem grava é o admin).
+    match /solicitacoes_parceiro/{userId} {
+      function isRequester() {
+        return signedIn() && userId == request.auth.uid;
+      }
+
+      function validSubmit() {
+        let data = request.resource.data;
+        return data.uid == request.auth.uid
+          && data.status == 'pendente'
+          && data.keys().hasOnly(['uid', 'nome_usuario', 'email', 'nome', 'regiao', 'idRegiao', 'contato', 'mensagem',
+            'status', 'data', 'atualizado_em', 'idsDestaquesVinculo'])
+          && validClaims(data)
+          && data.nome is string && data.nome.size() >= 3 && data.nome.size() <= 40
+          && data.regiao is string && data.regiao.size() > 0
+          && data.contato is string && data.contato.size() >= 10 && data.contato.size() <= 30
+          && data.mensagem is string && data.mensagem.size() <= 200;
+      }
+
+      function validClaims(data) {
+        return !('idsDestaquesVinculo' in data)
+          || (data.idsDestaquesVinculo is list && data.idsDestaquesVinculo.size() <= 9);
+      }
+
+      allow read: if isRequester() || isAdmin();
+      allow create: if isRequester() && validSubmit();
+      allow update: if (isRequester() && resource.data.status != 'aprovada' && validSubmit())
+        || (isRequester() && validClaims(request.resource.data)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['idsDestaquesVinculo', 'atualizado_em']))
+        || isAdmin();
       allow delete: if (isRequester() && resource.data.status == 'pendente') || isAdmin();
     }
 

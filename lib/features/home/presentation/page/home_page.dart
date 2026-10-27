@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/partner_requests/presentation/bloc/partner_cubit.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/core/services/deep_link_service.dart';
@@ -88,6 +89,8 @@ class _HomePageState extends State<HomePage> {
       'sou_jogador' when user != null => AppRoutes.playerRequestPage,
       'solicitacoes_time' when user != null && user.isAdmin => AppRoutes.teamRequestsPanelPage,
       'meu_time' when user != null => AppRoutes.teamRequestPage,
+      'solicitacoes_parceiro' when user != null && user.isAdmin => AppRoutes.partnerRequestsPanelPage,
+      'parceiro' when user != null => AppRoutes.partnerRequestPage,
       'conquistas' when user != null => AppRoutes.achievementsPage,
       _ => null,
     };
@@ -182,6 +185,7 @@ class _HomePageState extends State<HomePage> {
     // Papéis da conta no menu: jogador aprovado e dono/treinador de time.
     final myPlayer = context.watch<MyPlayerCubit>().state;
     final ownedTeam = context.watch<OwnedTeamCubit>().state;
+    final partner = context.watch<PartnerCubit>().state;
     final l10n = AppLocalizations.of(context);
     final session = context.watch<SessionCubit>().state;
     final region = context.watch<RegionCubit>().state;
@@ -201,10 +205,12 @@ class _HomePageState extends State<HomePage> {
               favoriteTeamImage: home.favoriteTeamImage,
               pendingPlayerRequests: home.pendingPlayerRequests,
               pendingTeamRequests: home.pendingTeamRequests,
+              pendingPartnerRequests: home.pendingPartnerRequests,
               playerTeam: myPlayer.teamName,
               playerId: myPlayer.playerId,
               playerSeason: myPlayer.season,
               ownedTeam: ownedTeam.teamName,
+              isPartner: partner.isPartner,
               onChooseTeam: _chooseTeam,
               onLogout: _logout,
             ),
@@ -244,10 +250,13 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             bottomNavigationBar: HomeBottomBar(selected: home.tab, onSelected: _homeCubit.selectTab),
-            floatingActionButton: session.isAdmin
+            // Admin: todos os cadastros; parceiro: só o que ele pode publicar.
+            floatingActionButton: session.isAdmin || partner.permissions.canPublish && partner.isPartner
                 ? FloatingActionButton(
                     tooltip: l10n.homePublishTitle,
-                    onPressed: () => AdminPublishSheet.show(context),
+                    onPressed: () => session.isAdmin
+                        ? AdminPublishSheet.show(context)
+                        : AdminPublishSheet.showPartner(context, partner.permissions),
                     child: const Icon(Icons.add_rounded),
                   )
                 : null,

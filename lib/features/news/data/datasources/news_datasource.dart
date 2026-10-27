@@ -91,7 +91,8 @@ class NewsDataSource {
 
   Future<Either<Failure, void>> createNews(NewsDTO news) async {
     try {
-      final ref = _news.doc();
+      // Publicidade do parceiro já vem com o id da vaga do dia (`PartnerSlots`).
+      final ref = news.id.isEmpty ? _news.doc() : _news.doc(news.id);
       await ref.set({
         ...news.copyWith(id: ref.id).toMap(),
         'data': FieldValue.serverTimestamp(),

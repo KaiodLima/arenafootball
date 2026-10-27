@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:arena_soccer/features/partner_requests/domain/usecases/get_partner_slots_usecase.dart';
+import 'package:arena_soccer/features/partner_requests/domain/usecases/watch_pending_partner_requests_count_usecase.dart';
 import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/services/storage_upload_service.dart';
@@ -78,13 +80,13 @@ class _FakeRepository implements IHighlightsRepository {
   }
 
   @override
-  Future<Either<Failure, void>> updateHighlight(HighlightDTO highlight, {String? oldTitle}) async {
+  Future<Either<Failure, void>> updateHighlight(HighlightDTO highlight, {String? oldTitle, String? newsAuthorId}) async {
     updated.add('${highlight.id}:${highlight.title}<-$oldTitle');
     return _result;
   }
 
   @override
-  Future<Either<Failure, void>> deleteHighlight(HighlightDTO highlight) async {
+  Future<Either<Failure, void>> deleteHighlight(HighlightDTO highlight, {String? newsAuthorId}) async {
     deleted.add(highlight.id);
     return _result;
   }
@@ -121,6 +123,7 @@ HighlightFormCubit _formCubit(_FakeRepository repository) => HighlightFormCubit(
       CreateHighlightUseCase(repository, _FakeStorage()),
       _cacheFirst(repository),
       UpdateHighlightUseCase(repository, _FakeStorage()),
+      _UnusedSlots(),
     );
 
 class _UnusedTeam implements GetTeamByNameCacheFirstUseCase {
@@ -134,6 +137,16 @@ class _UnusedPlayerRequests implements WatchPendingPlayerRequestsCountUseCase {
 }
 
 class _UnusedTeamRequests implements WatchPendingTeamRequestsCountUseCase {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _UnusedPartnerRequests implements WatchPendingPartnerRequestsCountUseCase {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _UnusedSlots implements GetPartnerSlotsUseCase {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -232,7 +245,13 @@ void main() {
 
     test('deep link: cache válido não lê o Firestore; vencido, revalida', () async {
       final repository = _FakeRepository()..cached = CachedValue(_existing, DateTime.now());
-      final home = HomeCubit(_UnusedTeam(), _UnusedPlayerRequests(), _UnusedTeamRequests(), _cacheFirst(repository));
+      final home = HomeCubit(
+        _UnusedTeam(),
+        _UnusedPlayerRequests(),
+        _UnusedTeamRequests(),
+        _cacheFirst(repository),
+        _UnusedPartnerRequests(),
+      );
       expect((await home.findHighlight('3')).right?.title, 'Copa');
       expect(repository.remoteCalls, 0);
 

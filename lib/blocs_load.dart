@@ -6,6 +6,7 @@ import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart'
 import 'package:arena_soccer/features/auth/presentation/bloc/session_state.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/notifications/presentation/widgets/push_topics_listener.dart';
+import 'package:arena_soccer/features/partner_requests/presentation/bloc/partner_cubit.dart';
 import 'package:arena_soccer/features/player_requests/presentation/bloc/my_player_cubit.dart';
 import 'package:arena_soccer/features/team_requests/presentation/bloc/owned_team_cubit.dart';
 import 'package:arena_soccer/injection_container.dart';
@@ -46,6 +47,10 @@ class BlocsLoad extends StatelessWidget {
         // o menu mostra "Jogador do {time}".
         BlocProvider<MyPlayerCubit>(create: (_) => MyPlayerCubit(sl(), sl())),
 
+        // Parceiro ("Sou parceiro" aprovado) — global: libera notícias,
+        // destaques e publicidade na região dele, com as permissões do admin.
+        BlocProvider<PartnerCubit>(create: (_) => PartnerCubit(sl())),
+
         // Conquistas da conta logada — global: drawer, carteirinha, contagem
         // das ações (compartilhar, ler notícia) e comemoração ao desbloquear.
         BlocProvider<AchievementsCubit>(create: (_) => AchievementsCubit(sl(), sl(), sl(), sl(), sl(), sl())),
@@ -56,7 +61,8 @@ class BlocsLoad extends StatelessWidget {
   }
 }
 
-/// Faz o [OwnedTeamCubit] e o [MyPlayerCubit] seguirem a conta logada.
+/// Faz o [OwnedTeamCubit], o [MyPlayerCubit] e o [PartnerCubit] seguirem a
+/// conta logada.
 class OwnedTeamSync extends StatelessWidget {
   final Widget child;
 
@@ -69,6 +75,7 @@ class OwnedTeamSync extends StatelessWidget {
       listener: (context, state) {
         BlocProvider.of<OwnedTeamCubit>(context).follow(state.user?.id);
         BlocProvider.of<MyPlayerCubit>(context).follow(state.user?.id);
+        BlocProvider.of<PartnerCubit>(context).follow(state.user?.id);
       },
       child: child,
     );

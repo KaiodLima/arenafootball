@@ -9,5 +9,7 @@ class DeleteHighlightUseCase {
 
   DeleteHighlightUseCase(this._repository);
 
-  Future<Either<Failure, void>> call(HighlightDTO highlight) => _repository.deleteHighlight(highlight);
+  /// [newsAuthorId]: o parceiro apagando o dele (só desmarca as notícias dele).
+  Future<Either<Failure, void>> call(HighlightDTO highlight, {String? newsAuthorId}) =>
+      _repository.deleteHighlight(highlight, newsAuthorId: newsAuthorId);
 }

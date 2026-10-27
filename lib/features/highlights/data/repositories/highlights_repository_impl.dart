@@ -26,12 +26,12 @@ class HighlightsRepositoryImpl implements IHighlightsRepository {
   Stream<Either<Failure, List<HighlightDTO>>> watchAllHighlights() => _dataSource.watchAllHighlights();
 
   @override
-  Future<Either<Failure, void>> updateHighlight(HighlightDTO highlight, {String? oldTitle}) async =>
-      _invalidate(await _dataSource.updateHighlight(highlight, oldTitle: oldTitle));
+  Future<Either<Failure, void>> updateHighlight(HighlightDTO highlight, {String? oldTitle, String? newsAuthorId}) async =>
+      _invalidate(await _dataSource.updateHighlight(highlight, oldTitle: oldTitle, newsAuthorId: newsAuthorId));
 
   @override
-  Future<Either<Failure, void>> deleteHighlight(HighlightDTO highlight) async =>
-      _invalidate(await _dataSource.deleteHighlight(highlight));
+  Future<Either<Failure, void>> deleteHighlight(HighlightDTO highlight, {String? newsAuthorId}) async =>
+      _invalidate(await _dataSource.deleteHighlight(highlight, newsAuthorId: newsAuthorId));
 
   @override
   Future<Either<Failure, void>> reorderHighlights(List<String> ids) async =>

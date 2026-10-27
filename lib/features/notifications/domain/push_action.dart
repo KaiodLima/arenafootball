@@ -13,6 +13,8 @@ enum PushAction {
   playerRequestAnswer('solicitacao_resposta', true),
   teamRequest('solicitacao_time', true),
   teamRequestAnswer('solicitacao_time_resposta', true),
+  partnerRequest('solicitacao_parceiro', true),
+  partnerRequestAnswer('solicitacao_parceiro_resposta', true),
   achievement('conquista', true);
 
   final String key;

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/core/firebase/region_registry.dart';
 
 /// Documento da coleção `destaques` (carrossel do topo da home).
 class HighlightDTO extends Equatable {
@@ -12,6 +13,13 @@ class HighlightDTO extends Equatable {
   /// Ordem no carrossel. Gravada como string, como no app antigo.
   final String priority;
 
+  /// Região do destaque (`idRegiao`/`regiao`): só os do parceiro têm; vazio =
+  /// aparece em todas as regiões (os do admin).
+  final String region;
+
+  /// `idAutor`: uid do parceiro que publicou (vazio = admin).
+  final String authorId;
+
   const HighlightDTO({
     this.id = '',
     this.title = '',
@@ -19,6 +27,8 @@ class HighlightDTO extends Equatable {
     this.imageUrl = '',
     this.isVisible = false,
     this.priority = '',
+    this.region = '',
+    this.authorId = '',
   });
 
   factory HighlightDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -31,6 +41,8 @@ class HighlightDTO extends Equatable {
       // `exibir` é gravado como string ("true"/"false").
       isVisible: data['exibir']?.toString() == 'true',
       priority: data['priority']?.toString() ?? '',
+      region: RegionRegistry.nameFromDoc(data, nameKey: 'regiao'),
+      authorId: data['idAutor']?.toString() ?? '',
     );
   }
 
@@ -43,6 +55,9 @@ class HighlightDTO extends Equatable {
       imageUrl: json['imageUrl']?.toString() ?? '',
       isVisible: json['isVisible'] == true,
       priority: json['priority']?.toString() ?? '',
+      region: RegionRegistry.nameOf(json[RegionRegistry.idField]?.toString() ?? '',
+          fallback: json['region']?.toString() ?? ''),
+      authorId: json['authorId']?.toString() ?? '',
     );
   }
 
@@ -53,6 +68,9 @@ class HighlightDTO extends Equatable {
         'imageUrl': imageUrl,
         'isVisible': isVisible,
         'priority': priority,
+        if (region.isNotEmpty) RegionRegistry.idField: RegionRegistry.idOf(region),
+        if (region.isNotEmpty) 'region': region,
+        if (authorId.isNotEmpty) 'authorId': authorId,
       };
 
   Map<String, dynamic> toMap() => {
@@ -62,6 +80,8 @@ class HighlightDTO extends Equatable {
         'urlImagem': imageUrl,
         'exibir': isVisible.toString(),
         'priority': priority,
+        if (region.isNotEmpty) ...RegionRegistry.fieldsFor(region, nameKey: 'regiao'),
+        if (authorId.isNotEmpty) 'idAutor': authorId,
       };
 
   HighlightDTO copyWith({
@@ -71,6 +91,8 @@ class HighlightDTO extends Equatable {
     String? imageUrl,
     bool? isVisible,
     String? priority,
+    String? region,
+    String? authorId,
   }) {
     return HighlightDTO(
       id: id ?? this.id,
@@ -79,11 +101,13 @@ class HighlightDTO extends Equatable {
       imageUrl: imageUrl ?? this.imageUrl,
       isVisible: isVisible ?? this.isVisible,
       priority: priority ?? this.priority,
+      region: region ?? this.region,
+      authorId: authorId ?? this.authorId,
     );
   }
 
   @override
-  List<Object?> get props => [id, title, link, imageUrl, isVisible, priority];
+  List<Object?> get props => [id, title, link, imageUrl, isVisible, priority, region, authorId];
 }
 
 /// `priority` como número (string no Firestore); sem valor vai para o fim.
@@ -102,3 +126,8 @@ List<HighlightDTO> sortHighlightsByPriority(List<HighlightDTO> highlights) {
 /// `priority` gravado com 3 dígitos ("007"): a ordenação por string do
 /// carrossel fica igual à numérica.
 String highlightPriorityAt(int index) => index.toString().padLeft(3, '0');
+
+/// Destaques do carrossel na região [region]: os gerais (sem região, do
+/// admin) e os da região (dos parceiros).
+List<HighlightDTO> highlightsForRegion(List<HighlightDTO> highlights, String region) =>
+    highlights.where((h) => h.region.isEmpty || h.region == region).toList();

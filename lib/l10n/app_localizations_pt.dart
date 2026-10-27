@@ -734,6 +734,326 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get partnerClaimTitle => 'Algum destes destaques é seu?';
+
+  @override
+  String get partnerClaimHint =>
+      'São destaques sem dono no app. Marque os seus: o admin confirma e eles passam a ser seus, na sua região.';
+
+  @override
+  String get partnerClaimPending => 'Vínculo pedido · aguardando o admin';
+
+  @override
+  String get partnerUnlinkedTitle => 'Destaques sem dono';
+
+  @override
+  String get partnerLinkRequested => 'Pedido de vínculo enviado ao admin.';
+
+  @override
+  String partnerLinked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count destaques vinculados.',
+      one: '1 destaque vinculado.',
+      zero: 'Nenhum destaque vinculado (já tinham dono).',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get partnerLinksCleared => 'Pedido de vínculo recusado.';
+
+  @override
+  String partnerLinkTitle(String name) {
+    return 'Vincular os destaques a $name?';
+  }
+
+  @override
+  String partnerLinkMessage(String region) {
+    return 'Eles passam a ser do parceiro, só na região $region, e contam no limite dele (o limite sobe se faltar vaga). Links compartilhados antigos desses destaques deixam de abrir.';
+  }
+
+  @override
+  String get partnerLinkConfirm => 'Vincular';
+
+  @override
+  String get partnerLinkRefuse => 'Recusar';
+
+  @override
+  String partnerClaimedList(String titles) {
+    return 'Pediu vínculo: $titles';
+  }
+
+  @override
+  String partnerClaimedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Pediu vínculo de $count destaques',
+      one: 'Pediu vínculo de 1 destaque',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get partnerClaimOnApprove => 'Aprovar também vincula.';
+
+  @override
+  String get partnerClaimActiveHint =>
+      'Confirme se os destaques são mesmo dele.';
+
+  @override
+  String get partnerMenu => 'Sou parceiro';
+
+  @override
+  String get partnerMenuApproved => 'Área do parceiro';
+
+  @override
+  String get partnerRequestTitle => 'Sou parceiro';
+
+  @override
+  String get partnerRequestIntro =>
+      'Tem uma página, loja ou veículo de esporte na região? Peça para ser parceiro e publique notícias, destaques e publicidade no app.';
+
+  @override
+  String get partnerNameLabel => 'Nome do parceiro (página, loja, veículo)';
+
+  @override
+  String get partnerNameRequired => 'Informe o nome (mínimo de 3 letras)';
+
+  @override
+  String get partnerContactInfo =>
+      'Só o admin vê o seu WhatsApp, para combinar a parceria.';
+
+  @override
+  String get partnerRequestSubmit => 'Enviar pedido';
+
+  @override
+  String get partnerRequestSent => 'Pedido enviado! O admin vai analisar.';
+
+  @override
+  String get partnerRequestCancelled => 'Pedido cancelado.';
+
+  @override
+  String get partnerPendingInfo =>
+      'Seu pedido está com o admin. Você recebe um aviso quando ele responder.';
+
+  @override
+  String get partnerRejectedInfo =>
+      'O admin não aprovou o pedido. Você pode corrigir e enviar de novo.';
+
+  @override
+  String get partnerRemovedInfo =>
+      'O admin encerrou a sua parceria. Você pode pedir de novo.';
+
+  @override
+  String get partnerResubmit => 'Enviar de novo';
+
+  @override
+  String get partnerEdit => 'Editar pedido';
+
+  @override
+  String get partnerCancel => 'Cancelar pedido';
+
+  @override
+  String get partnerCancelTitle => 'Cancelar o pedido?';
+
+  @override
+  String partnerCancelMessage(String name) {
+    return 'O pedido de $name será apagado.';
+  }
+
+  @override
+  String get partnerLoadError =>
+      'Não foi possível carregar os pedidos de parceiro.';
+
+  @override
+  String partnerApprovedTitle(String region) {
+    return 'Parceiro em $region';
+  }
+
+  @override
+  String get partnerCanPublish => 'Você pode publicar';
+
+  @override
+  String get partnerNothingAllowed =>
+      'No momento o admin não liberou publicações para você.';
+
+  @override
+  String get partnerNothingAllowedShort => 'Nada liberado';
+
+  @override
+  String partnerNewsDetail(String region) {
+    return 'Notícias no feed de $region';
+  }
+
+  @override
+  String partnerLimitHighlights(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count destaques',
+      one: '1 destaque',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerLimitAds(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count publicidades por dia',
+      one: '1 publicidade por dia',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String partnerUsageHighlights(int used, int limit) {
+    return '$used de $limit destaques em uso';
+  }
+
+  @override
+  String partnerUsageAds(int used, int limit) {
+    return '$used de $limit publicidades hoje';
+  }
+
+  @override
+  String get partnerMyHighlights => 'Meus destaques';
+
+  @override
+  String get partnerNoHighlights => 'Você ainda não publicou destaques.';
+
+  @override
+  String get partnerHighlightHidden => 'Oculto';
+
+  @override
+  String partnerHighlightDeleteTitle(String title) {
+    return 'Apagar o destaque $title?';
+  }
+
+  @override
+  String get partnerHighlightDeleted => 'Destaque apagado.';
+
+  @override
+  String get partnerHighlightLimit =>
+      'Você já usa todos os seus destaques. Apague um para publicar outro.';
+
+  @override
+  String get partnerAdLimit => 'Você já publicou a publicidade de hoje.';
+
+  @override
+  String get partnerPanelTitle => 'Parceiros';
+
+  @override
+  String get partnerTabActive => 'Ativos';
+
+  @override
+  String get partnerPanelEmptyPending => 'Nenhum pedido de parceiro pendente.';
+
+  @override
+  String get partnerPanelEmptyActive => 'Nenhum parceiro ativo.';
+
+  @override
+  String get partnerPanelEmptyAnswered => 'Nenhum pedido respondido.';
+
+  @override
+  String partnerApproveTitle(String name) {
+    return 'Aprovar $name?';
+  }
+
+  @override
+  String partnerApproveMessage(String region) {
+    return 'Vai publicar em $region: notícias, até 2 destaques e 1 publicidade por dia. Você ajusta depois em Permissões.';
+  }
+
+  @override
+  String partnerApproved(String name) {
+    return '$name agora é parceiro.';
+  }
+
+  @override
+  String partnerRejectTitle(String name) {
+    return 'Rejeitar $name?';
+  }
+
+  @override
+  String get partnerRevoke => 'Remover parceiro';
+
+  @override
+  String partnerRevokeTitle(String name) {
+    return 'Remover $name dos parceiros?';
+  }
+
+  @override
+  String get partnerRevoked => 'Parceria encerrada.';
+
+  @override
+  String partnerRequestedBy(String name) {
+    return 'Pedido de $name';
+  }
+
+  @override
+  String get partnerPermissions => 'Permissões';
+
+  @override
+  String get partnerPermNews => 'Notícias';
+
+  @override
+  String get partnerPermHighlights => 'Destaques';
+
+  @override
+  String get partnerPermAds => 'Publicidade';
+
+  @override
+  String get partnerHighlightLimitLabel => 'Destaques ao mesmo tempo';
+
+  @override
+  String get partnerAdsPerDayLabel => 'Publicidades por dia';
+
+  @override
+  String get partnerPermissionsSaved => 'Permissões salvas.';
+
+  @override
+  String standingsAutomaticLegend(String criteria) {
+    return 'Atualizada sozinha ao fim de cada partida. Desempate: $criteria.';
+  }
+
+  @override
+  String get standingsCriterionWins => 'vitórias';
+
+  @override
+  String get standingsCriterionGoalDifference => 'saldo de gols';
+
+  @override
+  String get standingsCriterionGoalsFor => 'gols pró';
+
+  @override
+  String get standingsCriterionHeadToHead => 'confronto direto';
+
+  @override
+  String get standingsCriterionFewestGoalsAgainst => 'menos gols sofridos';
+
+  @override
+  String get championshipTiebreakTitle => 'Desempate';
+
+  @override
+  String get championshipTiebreakHint =>
+      'Depois dos pontos, nesta ordem. Arraste para reordenar e desmarque o que não vale.';
+
+  @override
+  String get championshipTiebreakReset => 'Usar o padrão';
+
+  @override
+  String get championshipRecomputeTables => 'Recalcular tabelas';
+
+  @override
+  String get championshipRecomputeRequested =>
+      'Recálculo pedido: as tabelas atualizam em instantes.';
+
+  @override
   String get achievementCategoryPredictions => 'Bolão';
 
   @override
@@ -3069,6 +3389,20 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get pushActionTeamRequestAnswerHint =>
       'Para quem pediu · aprovado ou rejeitado';
+
+  @override
+  String get pushActionPartnerRequest => 'Novo pedido de parceiro';
+
+  @override
+  String get pushActionPartnerRequestHint =>
+      'Para os admins · \"Fulano quer ser parceiro: Loja X\"';
+
+  @override
+  String get pushActionPartnerRequestAnswer => 'Resposta do pedido de parceiro';
+
+  @override
+  String get pushActionPartnerRequestAnswerHint =>
+      'Para quem pediu · aprovado, rejeitado ou parceria encerrada';
 
   @override
   String get teamDelete => 'Excluir time';

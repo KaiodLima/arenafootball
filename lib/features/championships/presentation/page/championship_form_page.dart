@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/standings_criteria_editor.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/domain/championship_rules_file.dart';
@@ -396,6 +397,13 @@ class _ChampionshipFormPageState extends State<ChampionshipFormPage> {
               ),
             ],
           ),
+        ),
+        const SizedBox(height: AppSizes.s16),
+
+        // Desempate da tabela dos grupos (as functions calculam)
+        FormSection(
+          title: l10n.championshipTiebreakTitle,
+          child: StandingsCriteriaEditor(chosen: base.tiebreakers, onChanged: _cubit.changeTiebreakers),
         ),
         const SizedBox(height: AppSizes.s16),
 

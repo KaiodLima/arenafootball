@@ -6,28 +6,47 @@ import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/features/news/domain/usecases/create_news_usecase.dart';
 import 'package:arena_soccer/features/news/domain/usecases/update_news_usecase.dart';
 import 'package:arena_soccer/features/news/presentation/bloc/news_form_state.dart';
+import 'package:arena_soccer/features/partner_requests/data/dtos/partner_request_dto.dart';
+import 'package:arena_soccer/features/partner_requests/domain/usecases/get_partner_slots_usecase.dart';
 import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
 
 /// Formulário de notícia (criar/editar) e de anúncio (tag "publicidade").
+/// O parceiro publica só na região dele, e o anúncio dele vai numa vaga do
+/// dia (`PartnerSlots`).
 class NewsFormCubit extends Cubit<NewsFormState> {
   final CreateNewsUseCase createNewsUseCase;
   final UpdateNewsUseCase updateNewsUseCase;
   final GetRegionsUseCase getRegionsUseCase;
   final WatchHighlightsUseCase watchHighlightsUseCase;
+  final GetPartnerSlotsUseCase getPartnerSlotsUseCase;
+  PartnerRequestDTO? _partner;
 
   NewsFormCubit(
     this.createNewsUseCase,
     this.updateNewsUseCase,
     this.getRegionsUseCase,
     this.watchHighlightsUseCase,
+    this.getPartnerSlotsUseCase,
   ) : super(const EditingNewsFormState());
 
   void _edit(NewsFormData form) => emit(EditingNewsFormState(form: form));
 
   /// [news] preenche o formulário para edição. [tag] fixa a tag na criação
-  /// (ex.: anúncio).
-  Future<void> load({NewsDTO? news, required String initialRegion, String tag = ''}) async {
-    final region = (news != null && news.region.isNotEmpty) ? news.region : initialRegion;
+  /// (ex.: anúncio). [authorId]: quem publica. [partner]: quem publica é o
+  /// parceiro (região fixa na dele).
+  Future<void> load({
+    NewsDTO? news,
+    required String initialRegion,
+    String tag = '',
+    String authorId = '',
+    PartnerRequestDTO? partner,
+  }) async {
+    _partner = partner;
+    final region = partner != null
+        ? partner.region
+        : (news != null && news.region.isNotEmpty)
+            ? news.region
+            : initialRegion;
     _edit(NewsFormData(
       original: news,
       title: news?.title ?? '',
@@ -38,9 +57,11 @@ class NewsFormCubit extends Cubit<NewsFormState> {
       regions: [region],
       selectedRegion: region,
       keptImages: news?.images ?? const [],
+      authorId: partner?.userId ?? authorId,
+      regionLocked: partner != null,
     ));
 
-    await Future.wait([_loadRegions(region), _loadHighlights()]);
+    await Future.wait([if (partner == null) _loadRegions(region), _loadHighlights()]);
   }
 
   Future<void> _loadRegions(String region) async {
@@ -97,9 +118,26 @@ class NewsFormCubit extends Cubit<NewsFormState> {
     if (!form.canSubmit || state is SubmittingNewsFormState) return;
     emit(SubmittingNewsFormState(form: form));
 
+    var news = form.toNews();
+    final partner = _partner;
+    if (!form.isEditing && form.isAd && partner != null) {
+      final slots = await getPartnerSlotsUseCase(partner);
+      if (isClosed) return;
+      if (slots.isLeft) {
+        emit(ErrorNewsFormState(form: form, errorMessage: slots.left.toString()));
+        return;
+      }
+      final slot = slots.right.freeAd;
+      if (slot == null) {
+        emit(ErrorNewsFormState(form: form, errorMessage: '', limitReached: true));
+        return;
+      }
+      news = news.copyWith(id: slot);
+    }
+
     final response = form.isEditing
-        ? await updateNewsUseCase(news: form.toNews(), cover: form.cover, album: form.album)
-        : await createNewsUseCase(news: form.toNews(), cover: form.cover, album: form.album);
+        ? await updateNewsUseCase(news: news, cover: form.cover, album: form.album)
+        : await createNewsUseCase(news: news, cover: form.cover, album: form.album);
     if (isClosed) return;
     response.fold(
       (failure) => emit(ErrorNewsFormState(form: form, errorMessage: failure.toString())),

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/championships/domain/standings_criterion.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
@@ -99,6 +100,9 @@ class ChampionshipFormCubit extends Cubit<ChampionshipFormState> {
   void changeTitle(String value) => _edit(_form.copyWith(base: _form.base.copyWith(title: value)));
 
   void changeDescription(String value) => _edit(_form.copyWith(base: _form.base.copyWith(description: value)));
+
+  void changeTiebreakers(List<StandingsCriterion> value) =>
+      _edit(_form.copyWith(base: _form.base.copyWith(tiebreakers: value)));
 
   void changeRulesSummary(String value) => _edit(_form.copyWith(base: _form.base.copyWith(rules: value)));
 

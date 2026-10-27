@@ -10,6 +10,7 @@ import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/group_dto.dart';
+import 'package:arena_soccer/features/championships/data/dtos/group_table_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/standing_dto.dart';
 
 class ChampionshipsDataSource {
@@ -42,6 +43,27 @@ class ChampionshipsDataSource {
           fallbackMessage: 'Não foi possível carregar os grupos.',
           logName: _logName,
         );
+  }
+
+  /// Tabela calculada do grupo (`tabelas{ano}/{idGrupo}`); nula = ainda não
+  /// calculada (grupo antigo, sem campeonato).
+  Stream<Either<Failure, GroupTableDTO?>> watchGroupTable({required String groupId, String? season}) =>
+      _firestore.collection(SeasonCollection.name('tabelas', season)).doc(groupId).snapshots().toEither(
+            (doc) => doc.exists ? GroupTableDTO.fromFirestore(doc) : null,
+            fallbackMessage: 'Não foi possível carregar a classificação.',
+            logName: _logName,
+          );
+
+  /// "Recalcular tabelas": a function refaz as tabelas dos grupos do campeonato
+  /// quando o `recalcularEm` muda.
+  Future<Either<Failure, void>> requestTablesRecompute(String championshipDocId) async {
+    try {
+      await _championships.doc(championshipDocId).update({'recalcularEm': FieldValue.serverTimestamp()});
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('requestTablesRecompute id=$championshipDocId', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível pedir o recálculo das tabelas.'));
+    }
   }
 
   /// Classificação de um grupo. Mesma consulta do app antigo (dois `where` +

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
+import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/highlights/presentation/bloc/highlights_cubit.dart';
 import 'package:arena_soccer/features/highlights/presentation/bloc/highlights_state.dart';
@@ -32,10 +34,14 @@ class _HighlightsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
+    // Gerais (admin) + os dos parceiros da região escolhida.
+    final region = context.watch<RegionCubit>().state.selectedRegion;
+
     return BlocBuilder<HighlightsCubit, HighlightsState>(
       builder: (context, state) {
+        final highlights = highlightsForRegion(state.highlights, region);
         final loading = state is LoadingHighlightsState && state.highlights.isEmpty;
-        if (!loading && state.highlights.isEmpty) return const SizedBox.shrink();
+        if (!loading && highlights.isEmpty) return const SizedBox.shrink();
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -46,11 +52,11 @@ class _HighlightsRow extends StatelessWidget {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-                itemCount: loading ? 4 : state.highlights.length,
+                itemCount: loading ? 4 : highlights.length,
                 separatorBuilder: (_, __) => const SizedBox(width: AppSizes.s8),
                 itemBuilder: (context, index) {
                   if (loading) return const HighlightAvatar.skeleton();
-                  final highlight = state.highlights[index];
+                  final highlight = highlights[index];
                   return HighlightAvatar(
                     imageUrl: highlight.imageUrl,
                     title: highlight.title,

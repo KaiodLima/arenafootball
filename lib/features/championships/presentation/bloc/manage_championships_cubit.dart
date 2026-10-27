@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/delete_championship_usecase.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/request_tables_recompute_usecase.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/watch_championships_usecase.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/manage_championships_state.dart';
 
@@ -13,10 +14,14 @@ import 'package:arena_soccer/features/championships/presentation/bloc/manage_cha
 class ManageChampionshipsCubit extends Cubit<ManageChampionshipsState> {
   final WatchChampionshipsUseCase watchChampionshipsUseCase;
   final DeleteChampionshipUseCase deleteChampionshipUseCase;
+  final RequestTablesRecomputeUseCase requestTablesRecomputeUseCase;
   StreamSubscription<Either<Failure, List<ChampionshipDTO>>>? _subscription;
 
-  ManageChampionshipsCubit(this.watchChampionshipsUseCase, this.deleteChampionshipUseCase)
-      : super(const ManageChampionshipsState());
+  ManageChampionshipsCubit(
+    this.watchChampionshipsUseCase,
+    this.deleteChampionshipUseCase,
+    this.requestTablesRecomputeUseCase,
+  ) : super(const ManageChampionshipsState());
 
   void watch({required String region}) {
     emit(state.copyWith(region: region));
@@ -39,6 +44,16 @@ class ManageChampionshipsCubit extends Cubit<ManageChampionshipsState> {
     response.fold(
       (failure) => emit(ErrorManageChampionshipsState(before, errorMessage: failure.toString())),
       (_) => emit(DeletedManageChampionshipsState(state)),
+    );
+  }
+
+  /// "Recalcular tabelas": as functions refazem as tabelas dos grupos do campeonato.
+  Future<void> recomputeTables(ChampionshipDTO championship) async {
+    final response = await requestTablesRecomputeUseCase(championship.id);
+    if (isClosed) return;
+    response.fold(
+      (failure) => emit(ErrorManageChampionshipsState(state, errorMessage: failure.toString())),
+      (_) => emit(RecomputeRequestedManageChampionshipsState(state)),
     );
   }
 

@@ -12,9 +12,9 @@ abstract class IHighlightsRepository {
 
   Stream<Either<Failure, List<HighlightDTO>>> watchAllHighlights();
 
-  Future<Either<Failure, void>> updateHighlight(HighlightDTO highlight, {String? oldTitle});
+  Future<Either<Failure, void>> updateHighlight(HighlightDTO highlight, {String? oldTitle, String? newsAuthorId});
 
-  Future<Either<Failure, void>> deleteHighlight(HighlightDTO highlight);
+  Future<Either<Failure, void>> deleteHighlight(HighlightDTO highlight, {String? newsAuthorId});
 
   Future<Either<Failure, void>> reorderHighlights(List<String> ids);
 

@@ -1335,6 +1335,492 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @partnerClaimTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Algum destes destaques é seu?'**
+  String get partnerClaimTitle;
+
+  /// No description provided for @partnerClaimHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'São destaques sem dono no app. Marque os seus: o admin confirma e eles passam a ser seus, na sua região.'**
+  String get partnerClaimHint;
+
+  /// No description provided for @partnerClaimPending.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vínculo pedido · aguardando o admin'**
+  String get partnerClaimPending;
+
+  /// No description provided for @partnerUnlinkedTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Destaques sem dono'**
+  String get partnerUnlinkedTitle;
+
+  /// No description provided for @partnerLinkRequested.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedido de vínculo enviado ao admin.'**
+  String get partnerLinkRequested;
+
+  /// No description provided for @partnerLinked.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{Nenhum destaque vinculado (já tinham dono).} =1{1 destaque vinculado.} other{{count} destaques vinculados.}}'**
+  String partnerLinked(int count);
+
+  /// No description provided for @partnerLinksCleared.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedido de vínculo recusado.'**
+  String get partnerLinksCleared;
+
+  /// No description provided for @partnerLinkTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vincular os destaques a {name}?'**
+  String partnerLinkTitle(String name);
+
+  /// No description provided for @partnerLinkMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Eles passam a ser do parceiro, só na região {region}, e contam no limite dele (o limite sobe se faltar vaga). Links compartilhados antigos desses destaques deixam de abrir.'**
+  String partnerLinkMessage(String region);
+
+  /// No description provided for @partnerLinkConfirm.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vincular'**
+  String get partnerLinkConfirm;
+
+  /// No description provided for @partnerLinkRefuse.
+  ///
+  /// In pt, this message translates to:
+  /// **'Recusar'**
+  String get partnerLinkRefuse;
+
+  /// No description provided for @partnerClaimedList.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pediu vínculo: {titles}'**
+  String partnerClaimedList(String titles);
+
+  /// No description provided for @partnerClaimedCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{Pediu vínculo de 1 destaque} other{Pediu vínculo de {count} destaques}}'**
+  String partnerClaimedCount(int count);
+
+  /// No description provided for @partnerClaimOnApprove.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aprovar também vincula.'**
+  String get partnerClaimOnApprove;
+
+  /// No description provided for @partnerClaimActiveHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confirme se os destaques são mesmo dele.'**
+  String get partnerClaimActiveHint;
+
+  /// No description provided for @partnerMenu.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sou parceiro'**
+  String get partnerMenu;
+
+  /// No description provided for @partnerMenuApproved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Área do parceiro'**
+  String get partnerMenuApproved;
+
+  /// No description provided for @partnerRequestTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sou parceiro'**
+  String get partnerRequestTitle;
+
+  /// No description provided for @partnerRequestIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tem uma página, loja ou veículo de esporte na região? Peça para ser parceiro e publique notícias, destaques e publicidade no app.'**
+  String get partnerRequestIntro;
+
+  /// No description provided for @partnerNameLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome do parceiro (página, loja, veículo)'**
+  String get partnerNameLabel;
+
+  /// No description provided for @partnerNameRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Informe o nome (mínimo de 3 letras)'**
+  String get partnerNameRequired;
+
+  /// No description provided for @partnerContactInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Só o admin vê o seu WhatsApp, para combinar a parceria.'**
+  String get partnerContactInfo;
+
+  /// No description provided for @partnerRequestSubmit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar pedido'**
+  String get partnerRequestSubmit;
+
+  /// No description provided for @partnerRequestSent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedido enviado! O admin vai analisar.'**
+  String get partnerRequestSent;
+
+  /// No description provided for @partnerRequestCancelled.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedido cancelado.'**
+  String get partnerRequestCancelled;
+
+  /// No description provided for @partnerPendingInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu pedido está com o admin. Você recebe um aviso quando ele responder.'**
+  String get partnerPendingInfo;
+
+  /// No description provided for @partnerRejectedInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'O admin não aprovou o pedido. Você pode corrigir e enviar de novo.'**
+  String get partnerRejectedInfo;
+
+  /// No description provided for @partnerRemovedInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'O admin encerrou a sua parceria. Você pode pedir de novo.'**
+  String get partnerRemovedInfo;
+
+  /// No description provided for @partnerResubmit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar de novo'**
+  String get partnerResubmit;
+
+  /// No description provided for @partnerEdit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar pedido'**
+  String get partnerEdit;
+
+  /// No description provided for @partnerCancel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cancelar pedido'**
+  String get partnerCancel;
+
+  /// No description provided for @partnerCancelTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cancelar o pedido?'**
+  String get partnerCancelTitle;
+
+  /// No description provided for @partnerCancelMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'O pedido de {name} será apagado.'**
+  String partnerCancelMessage(String name);
+
+  /// No description provided for @partnerLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar os pedidos de parceiro.'**
+  String get partnerLoadError;
+
+  /// No description provided for @partnerApprovedTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Parceiro em {region}'**
+  String partnerApprovedTitle(String region);
+
+  /// No description provided for @partnerCanPublish.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você pode publicar'**
+  String get partnerCanPublish;
+
+  /// No description provided for @partnerNothingAllowed.
+  ///
+  /// In pt, this message translates to:
+  /// **'No momento o admin não liberou publicações para você.'**
+  String get partnerNothingAllowed;
+
+  /// No description provided for @partnerNothingAllowedShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nada liberado'**
+  String get partnerNothingAllowedShort;
+
+  /// No description provided for @partnerNewsDetail.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícias no feed de {region}'**
+  String partnerNewsDetail(String region);
+
+  /// No description provided for @partnerLimitHighlights.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 destaque} other{{count} destaques}}'**
+  String partnerLimitHighlights(int count);
+
+  /// No description provided for @partnerLimitAds.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 publicidade por dia} other{{count} publicidades por dia}}'**
+  String partnerLimitAds(int count);
+
+  /// No description provided for @partnerUsageHighlights.
+  ///
+  /// In pt, this message translates to:
+  /// **'{used} de {limit} destaques em uso'**
+  String partnerUsageHighlights(int used, int limit);
+
+  /// No description provided for @partnerUsageAds.
+  ///
+  /// In pt, this message translates to:
+  /// **'{used} de {limit} publicidades hoje'**
+  String partnerUsageAds(int used, int limit);
+
+  /// No description provided for @partnerMyHighlights.
+  ///
+  /// In pt, this message translates to:
+  /// **'Meus destaques'**
+  String get partnerMyHighlights;
+
+  /// No description provided for @partnerNoHighlights.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você ainda não publicou destaques.'**
+  String get partnerNoHighlights;
+
+  /// No description provided for @partnerHighlightHidden.
+  ///
+  /// In pt, this message translates to:
+  /// **'Oculto'**
+  String get partnerHighlightHidden;
+
+  /// No description provided for @partnerHighlightDeleteTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Apagar o destaque {title}?'**
+  String partnerHighlightDeleteTitle(String title);
+
+  /// No description provided for @partnerHighlightDeleted.
+  ///
+  /// In pt, this message translates to:
+  /// **'Destaque apagado.'**
+  String get partnerHighlightDeleted;
+
+  /// No description provided for @partnerHighlightLimit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você já usa todos os seus destaques. Apague um para publicar outro.'**
+  String get partnerHighlightLimit;
+
+  /// No description provided for @partnerAdLimit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você já publicou a publicidade de hoje.'**
+  String get partnerAdLimit;
+
+  /// No description provided for @partnerPanelTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Parceiros'**
+  String get partnerPanelTitle;
+
+  /// No description provided for @partnerTabActive.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ativos'**
+  String get partnerTabActive;
+
+  /// No description provided for @partnerPanelEmptyPending.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum pedido de parceiro pendente.'**
+  String get partnerPanelEmptyPending;
+
+  /// No description provided for @partnerPanelEmptyActive.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum parceiro ativo.'**
+  String get partnerPanelEmptyActive;
+
+  /// No description provided for @partnerPanelEmptyAnswered.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum pedido respondido.'**
+  String get partnerPanelEmptyAnswered;
+
+  /// No description provided for @partnerApproveTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aprovar {name}?'**
+  String partnerApproveTitle(String name);
+
+  /// No description provided for @partnerApproveMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vai publicar em {region}: notícias, até 2 destaques e 1 publicidade por dia. Você ajusta depois em Permissões.'**
+  String partnerApproveMessage(String region);
+
+  /// No description provided for @partnerApproved.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} agora é parceiro.'**
+  String partnerApproved(String name);
+
+  /// No description provided for @partnerRejectTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rejeitar {name}?'**
+  String partnerRejectTitle(String name);
+
+  /// No description provided for @partnerRevoke.
+  ///
+  /// In pt, this message translates to:
+  /// **'Remover parceiro'**
+  String get partnerRevoke;
+
+  /// No description provided for @partnerRevokeTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Remover {name} dos parceiros?'**
+  String partnerRevokeTitle(String name);
+
+  /// No description provided for @partnerRevoked.
+  ///
+  /// In pt, this message translates to:
+  /// **'Parceria encerrada.'**
+  String get partnerRevoked;
+
+  /// No description provided for @partnerRequestedBy.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedido de {name}'**
+  String partnerRequestedBy(String name);
+
+  /// No description provided for @partnerPermissions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Permissões'**
+  String get partnerPermissions;
+
+  /// No description provided for @partnerPermNews.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícias'**
+  String get partnerPermNews;
+
+  /// No description provided for @partnerPermHighlights.
+  ///
+  /// In pt, this message translates to:
+  /// **'Destaques'**
+  String get partnerPermHighlights;
+
+  /// No description provided for @partnerPermAds.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publicidade'**
+  String get partnerPermAds;
+
+  /// No description provided for @partnerHighlightLimitLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Destaques ao mesmo tempo'**
+  String get partnerHighlightLimitLabel;
+
+  /// No description provided for @partnerAdsPerDayLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publicidades por dia'**
+  String get partnerAdsPerDayLabel;
+
+  /// No description provided for @partnerPermissionsSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Permissões salvas.'**
+  String get partnerPermissionsSaved;
+
+  /// No description provided for @standingsAutomaticLegend.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atualizada sozinha ao fim de cada partida. Desempate: {criteria}.'**
+  String standingsAutomaticLegend(String criteria);
+
+  /// No description provided for @standingsCriterionWins.
+  ///
+  /// In pt, this message translates to:
+  /// **'vitórias'**
+  String get standingsCriterionWins;
+
+  /// No description provided for @standingsCriterionGoalDifference.
+  ///
+  /// In pt, this message translates to:
+  /// **'saldo de gols'**
+  String get standingsCriterionGoalDifference;
+
+  /// No description provided for @standingsCriterionGoalsFor.
+  ///
+  /// In pt, this message translates to:
+  /// **'gols pró'**
+  String get standingsCriterionGoalsFor;
+
+  /// No description provided for @standingsCriterionHeadToHead.
+  ///
+  /// In pt, this message translates to:
+  /// **'confronto direto'**
+  String get standingsCriterionHeadToHead;
+
+  /// No description provided for @standingsCriterionFewestGoalsAgainst.
+  ///
+  /// In pt, this message translates to:
+  /// **'menos gols sofridos'**
+  String get standingsCriterionFewestGoalsAgainst;
+
+  /// No description provided for @championshipTiebreakTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desempate'**
+  String get championshipTiebreakTitle;
+
+  /// No description provided for @championshipTiebreakHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Depois dos pontos, nesta ordem. Arraste para reordenar e desmarque o que não vale.'**
+  String get championshipTiebreakHint;
+
+  /// No description provided for @championshipTiebreakReset.
+  ///
+  /// In pt, this message translates to:
+  /// **'Usar o padrão'**
+  String get championshipTiebreakReset;
+
+  /// No description provided for @championshipRecomputeTables.
+  ///
+  /// In pt, this message translates to:
+  /// **'Recalcular tabelas'**
+  String get championshipRecomputeTables;
+
+  /// No description provided for @championshipRecomputeRequested.
+  ///
+  /// In pt, this message translates to:
+  /// **'Recálculo pedido: as tabelas atualizam em instantes.'**
+  String get championshipRecomputeRequested;
+
   /// No description provided for @achievementCategoryPredictions.
   ///
   /// In pt, this message translates to:
@@ -5361,6 +5847,30 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Para quem pediu · aprovado ou rejeitado'**
   String get pushActionTeamRequestAnswerHint;
+
+  /// No description provided for @pushActionPartnerRequest.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novo pedido de parceiro'**
+  String get pushActionPartnerRequest;
+
+  /// No description provided for @pushActionPartnerRequestHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para os admins · \"Fulano quer ser parceiro: Loja X\"'**
+  String get pushActionPartnerRequestHint;
+
+  /// No description provided for @pushActionPartnerRequestAnswer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resposta do pedido de parceiro'**
+  String get pushActionPartnerRequestAnswer;
+
+  /// No description provided for @pushActionPartnerRequestAnswerHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para quem pediu · aprovado, rejeitado ou parceria encerrada'**
+  String get pushActionPartnerRequestAnswerHint;
 
   /// No description provided for @teamDelete.
   ///

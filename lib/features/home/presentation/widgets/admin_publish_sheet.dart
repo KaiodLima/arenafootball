@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/partner_requests/data/dtos/partner_request_dto.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
@@ -6,23 +7,39 @@ import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
 /// Sheet "Publicar" do admin: todos os cadastros num lugar só (substitui os
-/// FABs soltos de anúncio e gol).
+/// FABs soltos de anúncio e gol). O parceiro vê só o que pode publicar.
 class AdminPublishSheet extends StatelessWidget {
-  const AdminPublishSheet({super.key});
+  /// Nulo = admin (tudo); senão, as permissões do parceiro.
+  final PartnerPermissions? partner;
 
-  static Future<void> show(BuildContext context) {
+  const AdminPublishSheet({super.key, this.partner});
+
+  static Future<void> show(BuildContext context) => _show(context, const AdminPublishSheet());
+
+  static Future<void> showPartner(BuildContext context, PartnerPermissions permissions) =>
+      _show(context, AdminPublishSheet(partner: permissions));
+
+  static Future<void> _show(BuildContext context, AdminPublishSheet sheet) {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (_) => const SafeArea(child: AdminPublishSheet()),
+      builder: (_) => SafeArea(child: sheet),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final options = [
+    final partner = this.partner;
+    final options = partner != null
+        ? [
+            if (partner.canNews) _PublishOption(Icons.article_outlined, l10n.homePublishNews, AppRoutes.registerNewsPage),
+            if (partner.canAdsNow) _PublishOption(Icons.campaign_outlined, l10n.homePublishAd, AppRoutes.publishAdPage),
+            if (partner.canHighlightsNow)
+              _PublishOption(Icons.star_outline_rounded, l10n.homePublishHighlight, AppRoutes.registerHighlightPage),
+          ]
+        : [
       _PublishOption(Icons.article_outlined, l10n.homePublishNews, AppRoutes.registerNewsPage),
       _PublishOption(Icons.sports_soccer_rounded, l10n.homePublishGoal, AppRoutes.goalNotificationPage),
       _PublishOption(Icons.campaign_outlined, l10n.homePublishAd, AppRoutes.publishAdPage),
@@ -31,7 +48,7 @@ class AdminPublishSheet extends StatelessWidget {
       _PublishOption(Icons.scoreboard_outlined, l10n.homePublishMatch, AppRoutes.registerMatchPage),
       _PublishOption(Icons.shield_outlined, l10n.homePublishTeam, AppRoutes.registerTeamPage),
       _PublishOption(Icons.person_add_alt_outlined, l10n.homePublishPlayer, AppRoutes.registerPlayerPage),
-    ];
+          ];
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(AppSizes.s20, 0, AppSizes.s20, AppSizes.s20),

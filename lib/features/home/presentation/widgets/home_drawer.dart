@@ -20,6 +20,9 @@ class HomeDrawer extends StatelessWidget {
   /// Pedidos "Sou dono de time" pendentes (contador do item do admin).
   final int pendingTeamRequests;
 
+  /// Pedidos "Sou parceiro" pendentes (contador do item do admin).
+  final int pendingPartnerRequests;
+
   /// Time em que a conta joga ("Sou jogador" aprovado) e o atleta dela.
   final String? playerTeam;
   final String? playerId;
@@ -27,6 +30,9 @@ class HomeDrawer extends StatelessWidget {
 
   /// Time do qual a conta é dona/treinadora ("Sou dono de time" aprovado).
   final String? ownedTeam;
+
+  /// "Sou parceiro" aprovado.
+  final bool isPartner;
   final VoidCallback onChooseTeam;
   final VoidCallback onLogout;
 
@@ -36,10 +42,12 @@ class HomeDrawer extends StatelessWidget {
     this.favoriteTeamImage,
     this.pendingPlayerRequests = 0,
     this.pendingTeamRequests = 0,
+    this.pendingPartnerRequests = 0,
     this.playerTeam,
     this.playerId,
     this.playerSeason,
     this.ownedTeam,
+    this.isPartner = false,
     required this.onChooseTeam,
     required this.onLogout,
   });
@@ -130,6 +138,11 @@ class HomeDrawer extends StatelessWidget {
                     title: ownedTeam != null ? l10n.myTeamTitle : l10n.teamRequestMenu,
                     onTap: () => _open(context, AppRoutes.teamRequestPage),
                   ),
+                  _DrawerItem(
+                    icon: Icons.handshake_outlined,
+                    title: isPartner ? l10n.partnerMenuApproved : l10n.partnerMenu,
+                    onTap: () => _open(context, AppRoutes.partnerRequestPage),
+                  ),
                 ],
                 if (isAdmin) ...[
                   const SizedBox(height: AppSizes.s12),
@@ -145,6 +158,12 @@ class HomeDrawer extends StatelessWidget {
                     title: l10n.teamRequestsPanelTitle,
                     badge: pendingTeamRequests,
                     onTap: () => _open(context, AppRoutes.teamRequestsPanelPage),
+                  ),
+                  _DrawerItem(
+                    icon: Icons.handshake_outlined,
+                    title: l10n.partnerPanelTitle,
+                    badge: pendingPartnerRequests,
+                    onTap: () => _open(context, AppRoutes.partnerRequestsPanelPage),
                   ),
                   _DrawerItem(
                     icon: Icons.admin_panel_settings_outlined,

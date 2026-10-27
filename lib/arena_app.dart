@@ -66,6 +66,10 @@ import 'package:arena_soccer/features/news/presentation/page/goal_notification_p
 import 'package:arena_soccer/features/news/presentation/page/news_by_id_page.dart';
 import 'package:arena_soccer/features/news/presentation/page/news_details_page.dart';
 import 'package:arena_soccer/features/news/presentation/page/news_form_page.dart';
+import 'package:arena_soccer/features/partner_requests/presentation/bloc/partner_request_cubit.dart';
+import 'package:arena_soccer/features/partner_requests/presentation/bloc/partner_requests_panel_cubit.dart';
+import 'package:arena_soccer/features/partner_requests/presentation/page/partner_request_page.dart';
+import 'package:arena_soccer/features/partner_requests/presentation/page/partner_requests_panel_page.dart';
 import 'package:arena_soccer/features/player_requests/presentation/bloc/player_request_cubit.dart';
 import 'package:arena_soccer/features/player_requests/presentation/bloc/player_requests_panel_cubit.dart';
 import 'package:arena_soccer/features/player_requests/presentation/page/player_request_page.dart';
@@ -145,7 +149,7 @@ class ArenaApp extends StatelessWidget {
         // cobrado).
         AppRoutes.home: (_) => MultiBlocProvider(
               providers: [
-                BlocProvider<HomeCubit>(create: (_) => HomeCubit(sl(), sl(), sl(), sl())),
+                BlocProvider<HomeCubit>(create: (_) => HomeCubit(sl(), sl(), sl(), sl(), sl())),
                 BlocProvider<ChampionshipsCubit>(create: (_) => ChampionshipsCubit(sl())),
                 BlocProvider<MatchesCubit>(create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl(), sl())),
                 BlocProvider<NewsFeedCubit>(create: (_) => NewsFeedCubit(sl(), sl(), sl())),
@@ -168,7 +172,7 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.registerNewsPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<NewsFormCubit>(
-            create: (_) => NewsFormCubit(sl(), sl(), sl(), sl()),
+            create: (_) => NewsFormCubit(sl(), sl(), sl(), sl(), sl()),
             child: NewsFormPage(news: args?['news'] as NewsDTO?, tag: args?['tag'] as String?),
           );
         },
@@ -176,7 +180,7 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.publishAdPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<NewsFormCubit>(
-            create: (_) => NewsFormCubit(sl(), sl(), sl(), sl()),
+            create: (_) => NewsFormCubit(sl(), sl(), sl(), sl(), sl()),
             child: AdFormPage(news: args?['news'] as NewsDTO?),
           );
         },
@@ -206,7 +210,7 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.registerHighlightPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<HighlightFormCubit>(
-            create: (_) => HighlightFormCubit(sl(), sl(), sl()),
+            create: (_) => HighlightFormCubit(sl(), sl(), sl(), sl()),
             child: HighlightFormPage(highlight: args?['highlight'] as HighlightDTO?),
           );
         },
@@ -275,6 +279,15 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.teamRequestsPanelPage: (_) => BlocProvider<TeamRequestsPanelCubit>(
               create: (_) => TeamRequestsPanelCubit(sl(), sl(), sl(), sl(), sl()),
               child: const TeamRequestsPanelPage(),
+            ),
+        // Pedido "Sou parceiro" e, aprovado, a área do parceiro (mesma rota).
+        AppRoutes.partnerRequestPage: (_) => BlocProvider<PartnerRequestCubit>(
+              create: (_) => PartnerRequestCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl()),
+              child: const PartnerRequestPage(),
+            ),
+        AppRoutes.partnerRequestsPanelPage: (_) => BlocProvider<PartnerRequestsPanelCubit>(
+              create: (_) => PartnerRequestsPanelCubit(sl(), sl(), sl(), sl(), sl()),
+              child: const PartnerRequestsPanelPage(),
             ),
         AppRoutes.registerPlayerPage: (_) => BlocProvider<PlayerFormCubit>(
               create: (_) => PlayerFormCubit(sl(), sl(), sl(), sl(), sl()),
@@ -379,7 +392,7 @@ class ArenaApp extends StatelessWidget {
               child: const SeasonsPanelPage(),
             ),
         AppRoutes.manageChampionshipsPage: (_) => BlocProvider<ManageChampionshipsCubit>(
-              create: (_) => ManageChampionshipsCubit(sl(), sl()),
+              create: (_) => ManageChampionshipsCubit(sl(), sl(), sl()),
               child: const ManageChampionshipsPage(),
             ),
         // `championship` opcional: campeonato a editar (sem ele, cadastra um novo).
@@ -404,11 +417,12 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.standingsPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<StandingsCubit>(
-            create: (_) => StandingsCubit(sl(), sl()),
+            create: (_) => StandingsCubit(sl(), sl(), sl()),
             child: StandingsPage(
               region: args?['region'] as String,
               season: args?['season'] as String,
               group: args?['group'] as String,
+              groupId: args?['groupId'] as String? ?? '',
             ),
           );
         },

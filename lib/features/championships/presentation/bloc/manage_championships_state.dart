@@ -41,3 +41,12 @@ class DeletedManageChampionshipsState extends ManageChampionshipsState {
   DeletedManageChampionshipsState(ManageChampionshipsState from)
       : super(championships: from.championships, region: from.region, loading: false);
 }
+
+class RecomputeRequestedManageChampionshipsState extends ManageChampionshipsState {
+  RecomputeRequestedManageChampionshipsState(ManageChampionshipsState from)
+      : super(championships: from.championships, region: from.region, loading: false);
+
+  // Cada pedido é um evento novo (o snackbar aparece de novo).
+  @override
+  List<Object?> get props => [...super.props, identityHashCode(this)];
+}

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
+import 'package:arena_soccer/features/championships/domain/standings_criterion.dart';
 
 /// Abrangência do campeonato: o municipal só aceita times da região-sede; o
 /// intermunicipal, de qualquer região (e aparece em todas as dos times).
@@ -61,6 +62,9 @@ class ChampionshipDTO extends Equatable {
   /// `idsRegioes`: regiões dos times participantes + a sede ([region]).
   final List<String> regionIds;
 
+  /// `desempate`: critérios depois dos pontos, em ordem (vazio = o padrão).
+  final List<StandingsCriterion> tiebreakers;
+
   bool get isIntermunicipal => scope == ChampionshipScope.intermunicipal;
 
   const ChampionshipDTO({
@@ -83,6 +87,7 @@ class ChampionshipDTO extends Equatable {
     this.rulesFileName = '',
     this.scope = ChampionshipScope.municipal,
     this.regionIds = const [],
+    this.tiebreakers = const [],
   });
 
   factory ChampionshipDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -108,6 +113,7 @@ class ChampionshipDTO extends Equatable {
       rulesFileName: data['regulamentoNome']?.toString() ?? '',
       scope: ChampionshipScope.fromKey(data['abrangencia']?.toString()),
       regionIds: (data[regionIdsField] as List?)?.map((t) => t.toString()).toList() ?? const [],
+      tiebreakers: StandingsCriterion.fromKeys(data['desempate']),
     );
   }
 
@@ -138,6 +144,7 @@ class ChampionshipDTO extends Equatable {
       rulesFileName: json['rulesFileName']?.toString() ?? '',
       scope: ChampionshipScope.fromKey(json['scope']?.toString()),
       regionIds: list(json['regionIds']),
+      tiebreakers: StandingsCriterion.fromKeys(json['tiebreakers']),
     );
   }
 
@@ -162,6 +169,7 @@ class ChampionshipDTO extends Equatable {
         'rulesFileName': rulesFileName,
         'scope': scope.key,
         'regionIds': regionIds,
+        'tiebreakers': [for (final c in tiebreakers) c.key],
       };
 
   Map<String, dynamic> toMap() => {
@@ -183,6 +191,7 @@ class ChampionshipDTO extends Equatable {
         'regulamentoNome': rulesFileName,
         'abrangencia': scope.key,
         regionIdsField: regionIds,
+        'desempate': [for (final c in tiebreakers) c.key],
       };
 
   ChampionshipDTO copyWith({
@@ -205,6 +214,7 @@ class ChampionshipDTO extends Equatable {
     String? rulesFileName,
     ChampionshipScope? scope,
     List<String>? regionIds,
+    List<StandingsCriterion>? tiebreakers,
   }) {
     return ChampionshipDTO(
       id: id ?? this.id,
@@ -226,6 +236,7 @@ class ChampionshipDTO extends Equatable {
       rulesFileName: rulesFileName ?? this.rulesFileName,
       scope: scope ?? this.scope,
       regionIds: regionIds ?? this.regionIds,
+      tiebreakers: tiebreakers ?? this.tiebreakers,
     );
   }
 
@@ -249,6 +260,7 @@ class ChampionshipDTO extends Equatable {
         rulesUrl,
         rulesFileName,
         scope,
-        regionIds
+        regionIds,
+        tiebreakers,
       ];
 }

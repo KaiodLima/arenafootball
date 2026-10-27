@@ -14,13 +14,19 @@ class UpdateHighlightUseCase {
 
   UpdateHighlightUseCase(this._repository, this._storage);
 
-  Future<Either<Failure, void>> call({required HighlightDTO highlight, String? oldTitle, File? image}) async {
+  /// [newsAuthorId]: quem edita é o parceiro (renomeia só nas notícias dele).
+  Future<Either<Failure, void>> call({
+    required HighlightDTO highlight,
+    String? oldTitle,
+    File? image,
+    String? newsAuthorId,
+  }) async {
     var updated = highlight;
     if (image != null) {
       final upload = await _storage.uploadImage(file: image, folder: StorageFolder.highlights);
       if (upload.isLeft) return Left(upload.left);
       updated = updated.copyWith(imageUrl: upload.right);
     }
-    return _repository.updateHighlight(updated, oldTitle: oldTitle);
+    return _repository.updateHighlight(updated, oldTitle: oldTitle, newsAuthorId: newsAuthorId);
   }
 }
