@@ -62,4 +62,5 @@ test('push da conquista para a própria conta', () => {
   assert.equal(message.corpo, 'Jurado · +40 XP');
   assert.equal(message.aba, 'conquistas');
   assert.deepEqual(message.alvo, { topic: 'usuario_u1' });
+  assert.deepEqual(message.abrir, { tela: 'conquista', id: catalog[1].id });
 });

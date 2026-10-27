@@ -24,4 +24,10 @@ void main() {
     expect(target.hasScreen, isFalse);
     expect(target.isEmpty, isFalse);
   });
+
+  test('push de conquista abre a comemoração dela', () {
+    final target = PushTarget.fromData({'aba': 'conquistas', 'tela': 'conquista', 'id': 'jurado'});
+    expect(target.screen, PushTarget.achievementScreen);
+    expect(target.hasScreen, isTrue);
+  });
 }

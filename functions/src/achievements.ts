@@ -113,5 +113,7 @@ export function achievementMessage(uid: string, achievement: Achievement): PushM
     aba: 'conquistas',
     regiao: '',
     alvo: { topic: userTopic(uid) },
+    // O toque abre a comemoração desta conquista.
+    abrir: { tela: 'conquista', id: achievement.id },
   };
 }

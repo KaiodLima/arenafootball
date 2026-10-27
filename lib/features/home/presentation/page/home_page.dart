@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/achievements/presentation/bloc/achievements_cubit.dart';
+import 'package:arena_soccer/features/achievements/presentation/widgets/unlock_celebration_dialog.dart';
 import 'package:arena_soccer/core/services/push_target.dart';
 import 'package:arena_soccer/features/partner_requests/presentation/bloc/partner_cubit.dart';
 import 'package:arena_soccer/app_routes.dart';
@@ -121,6 +123,10 @@ class _HomePageState extends State<HomePage> {
       Navigator.pushNamed(context, AppRoutes.newsDetailsPage, arguments: {'newsId': target.id});
       return;
     }
+    if (target.screen == PushTarget.achievementScreen) {
+      await _openAchievement(target.id);
+      return;
+    }
     final season = target.season.isEmpty ? SeasonCollection.currentSeason : target.season;
     final match = await _homeCubit.findMatch(target.id, season: season);
     if (!mounted) return;
@@ -142,6 +148,30 @@ class _HomePageState extends State<HomePage> {
       // Temporada nula = a corrente (como os outros acessos à tela).
       arguments: {'match': match, 'season': season == SeasonCollection.currentSeason ? null : season},
     );
+  }
+
+  /// Push de conquista: "Minhas conquistas" e a comemoração dela. A ainda não
+  /// vista o `AchievementsSync` comemora sozinho; a já vista (ex.: comemorada
+  /// em outro aparelho) comemora aqui. Catálogo ainda carregando: espera até 5 s.
+  Future<void> _openAchievement(String id) async {
+    final achievements = BlocProvider.of<AchievementsCubit>(context);
+    unawaited(Navigator.pushNamed(context, AppRoutes.achievementsPage));
+    var state = achievements.state;
+    if (state.catalog.isEmpty) {
+      try {
+        state = await achievements.stream
+            .firstWhere((s) => s.catalog.isNotEmpty)
+            .timeout(const Duration(seconds: 5));
+      } catch (_) {
+        return;
+      }
+    }
+    if (!mounted || state.unlocks[id]?.seen != true) return;
+    final achievement = state.catalog.where((a) => a.id == id).firstOrNull;
+    final navigatorContext = AppSession.navigatorKey.currentContext;
+    if (achievement != null && navigatorContext != null && navigatorContext.mounted) {
+      await showUnlockCelebration(navigatorContext, achievement);
+    }
   }
 
   /// Abre o destino do link (notícia, atleta ou destaque); `/app` fica na

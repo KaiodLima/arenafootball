@@ -47,9 +47,9 @@ export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
 
 export type Target = { topic: string } | { condition: string };
 
-/** Tela que o toque abre no app (além da aba): a partida, a votação dela ou a notícia. */
+/** Tela que o toque abre no app (além da aba): a partida, a votação dela, a notícia ou a comemoração da conquista. */
 export interface OpenTarget {
-  tela: 'partida' | 'votacao' | 'noticia';
+  tela: 'partida' | 'votacao' | 'noticia' | 'conquista';
   id: string;
   temporada?: string;
 }

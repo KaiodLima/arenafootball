@@ -3,12 +3,13 @@ import 'dart:convert';
 import 'package:equatable/equatable.dart';
 
 /// Destino do toque numa notificação: a aba (`data.aba`) e, quando houver, a
-/// tela específica (`data.tela`: partida, votação ou notícia, com `id` e
+/// tela específica (`data.tela`: partida, votação, notícia ou conquista, com `id` e
 /// `temporada`), montados pelas Cloud Functions (`openData` em `messages.ts`).
 class PushTarget extends Equatable {
   static const String matchScreen = 'partida';
   static const String votingScreen = 'votacao';
   static const String newsScreen = 'noticia';
+  static const String achievementScreen = 'conquista';
 
   final String tab;
   final String screen;

@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:arena_soccer/features/achievements/data/dtos/achievement_dto.dart';
 import 'package:arena_soccer/features/achievements/presentation/widgets/achievement_labels.dart';
 import 'package:arena_soccer/features/achievements/presentation/widgets/medal_badge.dart';
@@ -12,7 +14,8 @@ import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
 /// Comemoração de conquista desbloqueada: a medalha entra com mola e fica
-/// balançando sobre raios dourados, com uma explosão de confete. Devolve true
+/// balançando sobre raios dourados, com uma explosão de confete e vibração
+/// (ao abrir e quando a medalha pousa). Devolve true
 /// se o usuário tocou em "Ver conquistas".
 Future<bool> showUnlockCelebration(BuildContext context, AchievementDTO achievement) async {
   final seeAll = await showGeneralDialog<bool>(
@@ -46,6 +49,9 @@ class _UnlockCelebrationState extends State<_UnlockCelebration> with TickerProvi
   late final Animation<double> _confetti = CurvedAnimation(parent: _reveal, curve: const Interval(0.2, 1));
   late final Animation<double> _texts = CurvedAnimation(parent: _reveal, curve: const Interval(0.35, 0.65));
 
+  /// Vibração quando a medalha "pousa" (fim da entrada com mola).
+  Timer? _landing;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -54,11 +60,14 @@ class _UnlockCelebrationState extends State<_UnlockCelebration> with TickerProvi
     } else if (_reveal.value == 0 && !_reveal.isAnimating) {
       _reveal.forward();
       _loop.repeat();
+      HapticFeedback.mediumImpact();
+      _landing = Timer(const Duration(milliseconds: 900), HapticFeedback.heavyImpact);
     }
   }
 
   @override
   void dispose() {
+    _landing?.cancel();
     _reveal.dispose();
     _loop.dispose();
     super.dispose();
