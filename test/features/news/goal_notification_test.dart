@@ -105,7 +105,12 @@ class _FakeCreateNews implements CreateNewsUseCase {
   NewsDTO? created;
 
   @override
-  Future<Either<Failure, void>> call({required NewsDTO news, File? cover, List<File> album = const []}) async {
+  Future<Either<Failure, void>> call({
+    required NewsDTO news,
+    File? cover,
+    List<File> album = const [],
+    bool forApproval = false,
+  }) async {
     created = news;
     return const Right(null);
   }

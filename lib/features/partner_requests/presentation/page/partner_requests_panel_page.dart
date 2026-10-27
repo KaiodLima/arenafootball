@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:arena_soccer/features/news/data/dtos/pending_news_dto.dart';
+import 'package:arena_soccer/features/news/presentation/widgets/news_card.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
 import 'package:arena_soccer/features/partner_requests/data/dtos/partner_request_dto.dart';
 import 'package:arena_soccer/features/partner_requests/presentation/bloc/partner_requests_panel_cubit.dart';
@@ -64,6 +66,15 @@ class _PartnerRequestsPanelPageState extends State<PartnerRequestsPanelPage> {
     if (reason != null) await _cubit.revoke(request, reason: reason);
   }
 
+  Future<void> _rejectNews(PendingNewsDTO pending, AppLocalizations l10n) async {
+    final reason = await showReasonDialog(
+      context,
+      title: l10n.partnerNewsRejectTitle,
+      confirmLabel: l10n.playerRequestsReject,
+    );
+    if (reason != null) await _cubit.rejectNews(pending, reason: reason);
+  }
+
   Future<void> _confirmLink(PartnerRequestDTO request, AppLocalizations l10n) async {
     final confirmed = await showArenaConfirm(
       context,
@@ -106,7 +117,7 @@ class _PartnerRequestsPanelPageState extends State<PartnerRequestsPanelPage> {
     final l10n = AppLocalizations.of(context);
 
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         backgroundColor: AppColors.background,
         appBar: AppBar(
@@ -119,6 +130,8 @@ class _PartnerRequestsPanelPageState extends State<PartnerRequestsPanelPage> {
             style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s20),
           ),
           bottom: TabBar(
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
             indicatorColor: AppColors.primary,
             labelColor: AppColors.white,
             unselectedLabelColor: AppColors.whiteSoft,
@@ -128,6 +141,11 @@ class _PartnerRequestsPanelPageState extends State<PartnerRequestsPanelPage> {
                 builder: (context, count) => Tab(
                   text: count == 0 ? l10n.playerRequestsTabPending : '${l10n.playerRequestsTabPending} ($count)',
                 ),
+              ),
+              BlocSelector<PartnerRequestsPanelCubit, PartnerRequestsPanelState, int>(
+                selector: (state) => state.pendingNews.length,
+                builder: (context, count) =>
+                    Tab(text: count == 0 ? l10n.partnerTabNews : '${l10n.partnerTabNews} ($count)'),
               ),
               Tab(text: l10n.partnerTabActive),
               Tab(text: l10n.playerRequestsTabAnswered),
@@ -149,6 +167,8 @@ class _PartnerRequestsPanelPageState extends State<PartnerRequestsPanelPage> {
                   PartnerRequestsNotice.permissionsSaved => l10n.partnerPermissionsSaved,
                   PartnerRequestsNotice.linked => l10n.partnerLinked(state.count),
                   PartnerRequestsNotice.linksCleared => l10n.partnerLinksCleared,
+                  PartnerRequestsNotice.newsApproved => l10n.partnerNewsApproved,
+                  PartnerRequestsNotice.newsRejected => l10n.partnerNewsRejected,
                 },
               );
             }
@@ -189,6 +209,23 @@ class _PartnerRequestsPanelPageState extends State<PartnerRequestsPanelPage> {
             return TabBarView(
               children: [
                 list(state.pending, l10n.partnerPanelEmptyPending, _CardMode.pending),
+                state.pendingNews.isEmpty
+                    ? ArenaEmptyState(message: l10n.partnerPanelEmptyNews, icon: Icons.article_outlined)
+                    : ListView.separated(
+                        padding: const EdgeInsets.all(AppSizes.s16),
+                        itemCount: state.pendingNews.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: AppSizes.s12),
+                        itemBuilder: (context, index) {
+                          final pending = state.pendingNews[index];
+                          return _PendingNewsCard(
+                            pending: pending,
+                            partnerName: state.partnerName(pending.news.authorId),
+                            busy: state.busy.contains(pending.id),
+                            onApprove: () => _cubit.approveNews(pending),
+                            onReject: () => _rejectNews(pending, l10n),
+                          );
+                        },
+                      ),
                 list(state.active, l10n.partnerPanelEmptyActive, _CardMode.active),
                 list(state.answered, l10n.partnerPanelEmptyAnswered, _CardMode.answered),
               ],
@@ -201,6 +238,76 @@ class _PartnerRequestsPanelPageState extends State<PartnerRequestsPanelPage> {
 }
 
 enum _CardMode { pending, active, answered }
+
+/// Notícia de parceiro além do limite do dia: prévia e aprovar/rejeitar.
+class _PendingNewsCard extends StatelessWidget {
+  final PendingNewsDTO pending;
+  final String partnerName;
+  final bool busy;
+  final VoidCallback onApprove;
+  final VoidCallback onReject;
+
+  const _PendingNewsCard({
+    required this.pending,
+    required this.partnerName,
+    required this.busy,
+    required this.onApprove,
+    required this.onReject,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final news = pending.news;
+    final date = playerRequestDate(context, pending.createdAt);
+    return Container(
+      padding: const EdgeInsets.all(AppSizes.s16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSizes.cardRadius),
+        border: Border.all(color: AppColors.greyLight),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          NewsCard(news: news),
+          const SizedBox(height: AppSizes.s8),
+          Text(
+            [
+              if (partnerName.isNotEmpty) partnerName,
+              news.region,
+              if (date.isNotEmpty) date,
+            ].join(' · '),
+            style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+          ),
+          const SizedBox(height: AppSizes.s10),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: busy ? null : onReject,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.danger,
+                    side: const BorderSide(color: AppColors.danger),
+                  ),
+                  child: Text(l10n.playerRequestsReject),
+                ),
+              ),
+              const SizedBox(width: AppSizes.s8),
+              Expanded(
+                child: FilledButton(
+                  onPressed: busy ? null : onApprove,
+                  style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
+                  child: Text(l10n.partnerNewsPublish),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class _RequestCard extends StatelessWidget {
   final PartnerRequestDTO request;
@@ -284,7 +391,7 @@ class _RequestCard extends StatelessWidget {
             const SizedBox(height: AppSizes.s8),
             Text(
               [
-                if (permissions.canNews) l10n.partnerPermNews,
+                if (permissions.canNews) l10n.partnerLimitNews(permissions.newsPerDay),
                 if (permissions.canHighlightsNow) l10n.partnerLimitHighlights(permissions.highlightLimit),
                 if (permissions.canAdsNow) l10n.partnerLimitAds(permissions.adsPerDay),
                 if (!permissions.canPublish) l10n.partnerNothingAllowedShort,
@@ -428,6 +535,12 @@ class _PartnerPermissionsSheetState extends State<PartnerPermissionsSheet> {
               value: _permissions.canNews,
               onChanged: (value) => setState(() => _permissions = _permissions.copyWith(canNews: value)),
             ),
+            if (_permissions.canNews)
+              _LimitStepper(
+                label: l10n.partnerNewsPerDayLabel,
+                value: _permissions.newsPerDay,
+                onChanged: (value) => setState(() => _permissions = _permissions.copyWith(newsPerDay: value)),
+              ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(l10n.partnerPermHighlights, style: AppTypography.body()),

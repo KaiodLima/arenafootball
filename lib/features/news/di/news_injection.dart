@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:arena_soccer/features/news/domain/usecases/pending_news_usecase.dart';
 import 'package:arena_soccer/features/news/data/datasources/news_datasource.dart';
 import 'package:arena_soccer/features/news/data/repositories/news_repository_impl.dart';
 import 'package:arena_soccer/features/news/domain/repositories/news_repository_interface.dart';
@@ -37,6 +38,7 @@ void registerNewsDependencies() {
   _sl.registerLazySingleton(() => DeleteNewsUseCase(_sl()));
   _sl.registerLazySingleton(() => GetPlayerGoalCardsUseCase(_sl()));
   _sl.registerLazySingleton(() => GetNewsByIdUseCase(_sl()));
+  _sl.registerLazySingleton(() => PendingNewsUseCase(_sl()));
 
   // Cache local (ver `cacheFirst`)
   _sl.registerLazySingleton(() => GetCachedGoalCardsUseCase(_sl()));

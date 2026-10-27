@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/news/data/dtos/pending_news_dto.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
@@ -130,6 +131,7 @@ class _PartnerRequestPageState extends State<PartnerRequestPage> {
               PartnerRequestNotice.cancelled => l10n.partnerRequestCancelled,
               PartnerRequestNotice.highlightDeleted => l10n.partnerHighlightDeleted,
               PartnerRequestNotice.linkRequested => l10n.partnerLinkRequested,
+              PartnerRequestNotice.pendingNewsDeleted => l10n.partnerPendingNewsDeleted,
             },
           );
         }
@@ -184,6 +186,7 @@ class _PartnerRequestPageState extends State<PartnerRequestPage> {
                   onPublish: _publish,
                   onDeleteHighlight: (highlight) => _confirmDeleteHighlight(highlight, l10n),
                   onToggleLink: _cubit.toggleLinkRequest,
+                  onDeletePending: _cubit.deletePendingNews,
                 ),
               _ => _StatusView(
                   request: request!,
@@ -383,12 +386,14 @@ class _PartnerArea extends StatelessWidget {
   final Future<void> Function(String route, {Object? arguments}) onPublish;
   final ValueChanged<HighlightDTO> onDeleteHighlight;
   final ValueChanged<String> onToggleLink;
+  final ValueChanged<PendingNewsDTO> onDeletePending;
 
   const _PartnerArea({
     required this.state,
     required this.onPublish,
     required this.onDeleteHighlight,
     required this.onToggleLink,
+    required this.onDeletePending,
   });
 
   @override
@@ -426,7 +431,9 @@ class _PartnerArea extends StatelessWidget {
                 _PublishRow(
                   icon: Icons.article_outlined,
                   label: l10n.homePublishNews,
-                  detail: l10n.partnerNewsDetail(partner.region),
+                  detail: slots == null
+                      ? l10n.partnerNewsDetail(partner.region)
+                      : l10n.partnerUsageNews(slots.usedNews, permissions.newsPerDay),
                   onTap: () => onPublish(AppRoutes.registerNewsPage),
                 ),
               if (permissions.canHighlightsNow)
@@ -490,6 +497,41 @@ class _PartnerArea extends StatelessWidget {
                         ),
                     ],
                   ),
+          ),
+        ],
+        if (state.pendingNews.isNotEmpty) ...[
+          const SizedBox(height: AppSizes.s16),
+          FormSection(
+            title: l10n.partnerPendingNewsTitle,
+            child: Column(
+              children: [
+                for (final pending in state.pendingNews)
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(
+                      pending.isPending ? Icons.hourglass_top_rounded : Icons.block_rounded,
+                      color: pending.isPending ? AppColors.primaryDark : AppColors.danger,
+                    ),
+                    title: Text(pending.news.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: AppTypography.body()),
+                    subtitle: Text(
+                      pending.isPending
+                          ? l10n.partnerPendingNewsWaiting
+                          : pending.reason.isEmpty
+                              ? l10n.partnerPendingNewsRejected
+                              : l10n.playerRequestReason(pending.reason),
+                      style: AppTypography.subtitle().copyWith(
+                        fontSize: AppSizes.s12,
+                        color: pending.isPending ? null : AppColors.danger,
+                      ),
+                    ),
+                    trailing: IconButton(
+                      tooltip: l10n.commonDelete,
+                      icon: const Icon(Icons.delete_outline_rounded, color: AppColors.danger),
+                      onPressed: () => onDeletePending(pending),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ],
         if (state.unlinkedHighlights.isNotEmpty) ...[

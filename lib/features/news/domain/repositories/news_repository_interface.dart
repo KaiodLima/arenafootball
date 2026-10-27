@@ -1,4 +1,5 @@
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/features/news/data/dtos/pending_news_dto.dart';
 import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
@@ -19,6 +20,18 @@ abstract class INewsRepository {
   Future<Either<Failure, void>> updateNews(NewsDTO news);
 
   Future<Either<Failure, void>> deleteNews(String id);
+
+  Future<Either<Failure, void>> createPendingNews(NewsDTO news);
+
+  Stream<Either<Failure, List<PendingNewsDTO>>> watchMyPendingNews(String authorId);
+
+  Stream<Either<Failure, List<PendingNewsDTO>>> watchPendingNews();
+
+  Future<Either<Failure, void>> approvePendingNews(PendingNewsDTO pending);
+
+  Future<Either<Failure, void>> rejectPendingNews({required String id, required String reason});
+
+  Future<Either<Failure, void>> deletePendingNews(String id);
 
   Future<Either<Failure, List<NewsDTO>>> getGoalCardsByPlayer(String playerId);
 

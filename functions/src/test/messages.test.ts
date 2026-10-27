@@ -15,6 +15,8 @@ import {
   teamRequestAnswerMessage,
   teamRequestMessage,
   partnerLinkRequestMessage,
+  pendingNewsAnswerMessage,
+  pendingNewsMessage,
   partnerRequestAnswerMessage,
   partnerRequestMessage,
   targetFor,
@@ -223,6 +225,20 @@ test('parceiro pede vínculo de destaque: avisa admins só com id novo', () => {
   // Pedido ainda pendente: o aviso é o do pedido.
   const pending = { ...approved, status: 'pendente' };
   assert.equal(partnerLinkRequestMessage('P1', pending, { ...pending, idsDestaquesVinculo: ['a', 'b'] }), null);
+});
+
+test('notícia pendente: chegada avisa admins; resposta avisa o parceiro', () => {
+  const pending = { titulo: 'Final', fk_competicao: 'Floresta', idAutor: 'P1', status: 'pendente' };
+  const created = pendingNewsMessage(undefined, pending);
+  assert.deepEqual(created?.alvo, { topic: 'admins' });
+  assert.equal(created?.aba, 'noticias_pendentes');
+  assert.equal(pendingNewsMessage(pending, { ...pending, titulo: 'x' }), null);
+  const approved = pendingNewsAnswerMessage(pending, { ...pending, status: 'aprovada' });
+  assert.deepEqual(approved?.alvo, { topic: 'usuario_P1' });
+  assert.equal(approved?.corpo, '"Final" já está no feed.');
+  const rejected = pendingNewsAnswerMessage(pending, { ...pending, status: 'rejeitada', motivo: 'Repetida' });
+  assert.equal(rejected?.corpo, '"Final" não foi aprovada. Motivo: Repetida');
+  assert.equal(pendingNewsAnswerMessage(pending, undefined), null);
 });
 
 test('pedido "Sou jogador" também avisa o dono do time', () => {

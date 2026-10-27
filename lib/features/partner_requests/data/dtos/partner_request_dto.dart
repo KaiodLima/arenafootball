@@ -8,6 +8,7 @@ import 'package:arena_soccer/features/player_requests/data/dtos/player_request_d
 class PartnerPermissions extends Equatable {
   static const int defaultHighlightLimit = 2;
   static const int defaultAdsPerDay = 1;
+  static const int defaultNewsPerDay = 3;
 
   /// Teto dos limites no painel (as vagas viram ids de documento).
   static const int maxLimit = 9;
@@ -23,12 +24,17 @@ class PartnerPermissions extends Equatable {
   /// `limitePublicidadeDia`: publicidades por dia (horário de Brasília).
   final int adsPerDay;
 
+  /// `limiteNoticiasDia`: notícias por dia direto no feed; as seguintes vão
+  /// para o admin aprovar (`noticias_pendentes`).
+  final int newsPerDay;
+
   const PartnerPermissions({
     this.canNews = true,
     this.canHighlights = true,
     this.canAds = true,
     this.highlightLimit = defaultHighlightLimit,
     this.adsPerDay = defaultAdsPerDay,
+    this.newsPerDay = defaultNewsPerDay,
   });
 
   /// Sem os campos (pedido nunca aprovado), os padrões.
@@ -40,6 +46,7 @@ class PartnerPermissions extends Equatable {
       canAds: data['podePublicidade'] as bool? ?? true,
       highlightLimit: limit('limiteDestaques', defaultHighlightLimit),
       adsPerDay: limit('limitePublicidadeDia', defaultAdsPerDay),
+      newsPerDay: limit('limiteNoticiasDia', defaultNewsPerDay),
     );
   }
 
@@ -49,6 +56,7 @@ class PartnerPermissions extends Equatable {
         'podePublicidade': canAds,
         'limiteDestaques': highlightLimit,
         'limitePublicidadeDia': adsPerDay,
+        'limiteNoticiasDia': newsPerDay,
       };
 
   bool get canHighlightsNow => canHighlights && highlightLimit > 0;
@@ -64,6 +72,7 @@ class PartnerPermissions extends Equatable {
     bool? canAds,
     int? highlightLimit,
     int? adsPerDay,
+    int? newsPerDay,
   }) {
     return PartnerPermissions(
       canNews: canNews ?? this.canNews,
@@ -71,11 +80,12 @@ class PartnerPermissions extends Equatable {
       canAds: canAds ?? this.canAds,
       highlightLimit: (highlightLimit ?? this.highlightLimit).clamp(0, maxLimit),
       adsPerDay: (adsPerDay ?? this.adsPerDay).clamp(0, maxLimit),
+      newsPerDay: (newsPerDay ?? this.newsPerDay).clamp(0, maxLimit),
     );
   }
 
   @override
-  List<Object?> get props => [canNews, canHighlights, canAds, highlightLimit, adsPerDay];
+  List<Object?> get props => [canNews, canHighlights, canAds, highlightLimit, adsPerDay, newsPerDay];
 }
 
 /// Documento de `solicitacoes_parceiro/{uid}`: pedido "Sou parceiro" (sub

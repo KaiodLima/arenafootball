@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:either_dart/either.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/news/data/dtos/pending_news_dto.dart';
+import 'package:arena_soccer/features/news/domain/usecases/pending_news_usecase.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
 import 'package:arena_soccer/features/highlights/domain/usecases/delete_highlight_usecase.dart';
@@ -28,9 +30,11 @@ class PartnerRequestCubit extends Cubit<PartnerRequestState> {
   final WatchAllHighlightsUseCase watchAllHighlightsUseCase;
   final DeleteHighlightUseCase deleteHighlightUseCase;
   final PartnerHighlightLinksUseCase partnerHighlightLinksUseCase;
+  final PendingNewsUseCase pendingNewsUseCase;
 
   StreamSubscription<Either<Failure, PartnerRequestDTO?>>? _subscription;
   StreamSubscription<Either<Failure, List<HighlightDTO>>>? _highlights;
+  StreamSubscription<Either<Failure, List<PendingNewsDTO>>>? _pendingNews;
   late String _userId;
   late String _userName;
   late String _email;
@@ -45,6 +49,7 @@ class PartnerRequestCubit extends Cubit<PartnerRequestState> {
     this.watchAllHighlightsUseCase,
     this.deleteHighlightUseCase,
     this.partnerHighlightLinksUseCase,
+    this.pendingNewsUseCase,
   ) : super(const LoadingPartnerRequestState());
 
   Future<void> start({
@@ -98,6 +103,7 @@ class PartnerRequestCubit extends Cubit<PartnerRequestState> {
     }
     final approved = request?.isApproved ?? false;
     if (approved && (!wasApproved || permissionsChanged)) refreshSlots();
+    if (approved && _pendingNews == null) _watchPendingNews();
   }
 
   PartnerRequestForm _formFrom(PartnerRequestDTO request, PartnerRequestForm form) => form.copyWith(
@@ -116,6 +122,7 @@ class PartnerRequestCubit extends Cubit<PartnerRequestState> {
       slots: state.slots,
       highlights: state.highlights,
       unlinkedHighlights: state.unlinkedHighlights,
+      pendingNews: state.pendingNews,
     ));
   }
 
@@ -136,8 +143,35 @@ class PartnerRequestCubit extends Cubit<PartnerRequestState> {
         slots: state.slots,
         highlights: mine,
         unlinkedHighlights: unlinked,
+        pendingNews: state.pendingNews,
       ));
     });
+  }
+
+  /// Notícias do parceiro esperando o admin (as aprovadas já estão no feed).
+  void _watchPendingNews() {
+    _pendingNews = pendingNewsUseCase.watchMine(_userId).listen((response) {
+      if (isClosed || response.isLeft) return;
+      emit(ReadyPartnerRequestState(
+        request: state.request,
+        form: state.form,
+        editing: state.editing,
+        slots: state.slots,
+        highlights: state.highlights,
+        unlinkedHighlights: state.unlinkedHighlights,
+        pendingNews: response.right.where((n) => n.status != PendingNewsStatus.approved).toList(),
+      ));
+    });
+  }
+
+  Future<void> deletePendingNews(PendingNewsDTO pending) async {
+    final current = state;
+    final response = await pendingNewsUseCase.delete(pending.id);
+    if (isClosed) return;
+    response.fold(
+      (failure) => emit(ErrorPartnerRequestState(current, errorMessage: failure.toString())),
+      (_) => emit(NoticePartnerRequestState(state, notice: PartnerRequestNotice.pendingNewsDeleted)),
+    );
   }
 
   /// Vagas usadas (ao abrir e ao voltar das telas de publicar). Falha só
@@ -154,6 +188,7 @@ class PartnerRequestCubit extends Cubit<PartnerRequestState> {
       slots: response.right,
       highlights: state.highlights,
       unlinkedHighlights: state.unlinkedHighlights,
+      pendingNews: state.pendingNews,
     ));
   }
 
@@ -254,6 +289,7 @@ class PartnerRequestCubit extends Cubit<PartnerRequestState> {
   Future<void> close() {
     _subscription?.cancel();
     _highlights?.cancel();
+    _pendingNews?.cancel();
     return super.close();
   }
 }

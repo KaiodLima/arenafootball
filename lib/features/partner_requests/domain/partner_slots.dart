@@ -5,8 +5,15 @@
 /// - Destaque: `dest<n>_<uid>` (n < `limiteDestaques`); apagar libera a vaga.
 /// - Publicidade: `pub<n>_<uid>_<a>-<m>-<d>` (n < `limitePublicidadeDia`, data
 ///   de hoje em Brasília, sem zeros à esquerda — igual ao `firestore.rules`).
+/// - Notícia: `not<n>_<uid>_<a>-<m>-<d>` (n < `limiteNoticiasDia`); sem vaga, a
+///   notícia vai para o admin aprovar (`noticias_pendentes`).
 class PartnerSlots {
   const PartnerSlots._();
+
+  /// Marcadores das vagas do dia já usadas (`vagas_parceiro/{id da vaga}`):
+  /// gravados junto com a notícia/publicidade e nunca apagados pelo parceiro,
+  /// assim apagar a publicação não devolve a vaga no mesmo dia.
+  static const String markersCollection = 'vagas_parceiro';
 
   /// `priority` do destaque do parceiro: depois dos do admin.
   static const String highlightPriority = '900';
@@ -27,6 +34,11 @@ class PartnerSlots {
   static List<String> adIds(String userId, int limit, DateTime now) =>
       [for (var slot = 0; slot < limit; slot++) adId(userId, slot, now)];
 
+  static String newsId(String userId, int slot, DateTime now) => 'not${slot}_${userId}_${brasiliaDay(now)}';
+
+  static List<String> newsIds(String userId, int limit, DateTime now) =>
+      [for (var slot = 0; slot < limit; slot++) newsId(userId, slot, now)];
+
   /// Primeira vaga de [candidates] fora de [taken] (nula = limite atingido).
   static String? firstFree(List<String> candidates, Set<String> taken) {
     for (final id in candidates) {
@@ -42,12 +54,16 @@ class PartnerSlotUsage {
   final Set<String> takenHighlights;
   final List<String> adIds;
   final Set<String> takenAds;
+  final List<String> newsIds;
+  final Set<String> takenNews;
 
   const PartnerSlotUsage({
     this.highlightIds = const [],
     this.takenHighlights = const {},
     this.adIds = const [],
     this.takenAds = const {},
+    this.newsIds = const [],
+    this.takenNews = const {},
   });
 
   int get usedHighlights => highlightIds.where(takenHighlights.contains).length;
@@ -57,6 +73,10 @@ class PartnerSlotUsage {
   String? get freeHighlight => PartnerSlots.firstFree(highlightIds, takenHighlights);
 
   String? get freeAd => PartnerSlots.firstFree(adIds, takenAds);
+
+  int get usedNews => newsIds.where(takenNews.contains).length;
+
+  String? get freeNews => PartnerSlots.firstFree(newsIds, takenNews);
 }
 
 /// Vínculo de destaques sem dono ao parceiro (feito pelo admin): cada destaque

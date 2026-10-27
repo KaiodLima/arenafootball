@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:either_dart/either.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/news/data/dtos/pending_news_dto.dart';
+import 'package:arena_soccer/features/news/domain/usecases/pending_news_usecase.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
 import 'package:arena_soccer/features/highlights/domain/usecases/watch_all_highlights_usecase.dart';
@@ -20,8 +22,10 @@ class PartnerRequestsPanelCubit extends Cubit<PartnerRequestsPanelState> {
   final UpdatePartnerPermissionsUseCase updatePartnerPermissionsUseCase;
   final PartnerHighlightLinksUseCase partnerHighlightLinksUseCase;
   final WatchAllHighlightsUseCase watchAllHighlightsUseCase;
+  final PendingNewsUseCase pendingNewsUseCase;
   StreamSubscription<Either<Failure, List<PartnerRequestDTO>>>? _subscription;
   StreamSubscription<Either<Failure, List<HighlightDTO>>>? _highlights;
+  StreamSubscription<Either<Failure, List<PendingNewsDTO>>>? _pendingNews;
 
   PartnerRequestsPanelCubit(
     this.watchPartnerRequestsUseCase,
@@ -29,6 +33,7 @@ class PartnerRequestsPanelCubit extends Cubit<PartnerRequestsPanelState> {
     this.updatePartnerPermissionsUseCase,
     this.partnerHighlightLinksUseCase,
     this.watchAllHighlightsUseCase,
+    this.pendingNewsUseCase,
   ) : super(const PartnerRequestsPanelState());
 
   void watch() {
@@ -46,6 +51,36 @@ class PartnerRequestsPanelCubit extends Cubit<PartnerRequestsPanelState> {
       if (isClosed || response.isLeft) return;
       emit(state.copyWith(highlightTitles: {for (final h in response.right) h.id: h.title}));
     });
+    _pendingNews?.cancel();
+    _pendingNews = pendingNewsUseCase.watchPending().listen((response) {
+      if (isClosed) return;
+      response.fold(
+        (failure) => emit(ErrorPartnerRequestsPanelState(state, errorMessage: failure.toString())),
+        (pending) => emit(state.copyWith(pendingNews: pending)),
+      );
+    });
+  }
+
+  /// Publica a notícia pendente no feed.
+  Future<void> approveNews(PendingNewsDTO pending) => _runNews(
+      pending, PartnerRequestsNotice.newsApproved, () => pendingNewsUseCase.approve(pending));
+
+  Future<void> rejectNews(PendingNewsDTO pending, {String reason = ''}) => _runNews(
+      pending, PartnerRequestsNotice.newsRejected, () => pendingNewsUseCase.reject(pending.id, reason: reason));
+
+  Future<void> _runNews(
+    PendingNewsDTO pending,
+    PartnerRequestsNotice notice,
+    Future<Either<Failure, void>> Function() action,
+  ) async {
+    _setBusy(pending.id, true);
+    final response = await action();
+    if (isClosed) return;
+    _setBusy(pending.id, false);
+    response.fold(
+      (failure) => emit(ErrorPartnerRequestsPanelState(state, errorMessage: failure.toString())),
+      (_) => emit(NoticePartnerRequestsPanelState(state, notice: notice, name: pending.news.title)),
+    );
   }
 
   /// Aprova e, se pediu, já vincula os destaques.
@@ -107,6 +142,7 @@ class PartnerRequestsPanelCubit extends Cubit<PartnerRequestsPanelState> {
   Future<void> close() {
     _subscription?.cancel();
     _highlights?.cancel();
+    _pendingNews?.cancel();
     return super.close();
   }
 }

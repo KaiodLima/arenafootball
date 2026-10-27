@@ -18,12 +18,16 @@ class HomeState extends Equatable {
   /// Pedidos "Sou parceiro" aguardando resposta (só para o admin).
   final int pendingPartnerRequests;
 
+  /// Notícias de parceiros esperando aprovação (só para o admin).
+  final int pendingPartnerNews;
+
   const HomeState({
     this.tab = HomeTab.news,
     this.favoriteTeamImage,
     this.pendingPlayerRequests = 0,
     this.pendingTeamRequests = 0,
     this.pendingPartnerRequests = 0,
+    this.pendingPartnerNews = 0,
   });
 
   HomeState copyWith({
@@ -32,6 +36,7 @@ class HomeState extends Equatable {
     int? pendingPlayerRequests,
     int? pendingTeamRequests,
     int? pendingPartnerRequests,
+    int? pendingPartnerNews,
   }) {
     return HomeState(
       tab: tab ?? this.tab,
@@ -39,9 +44,10 @@ class HomeState extends Equatable {
       pendingPlayerRequests: pendingPlayerRequests ?? this.pendingPlayerRequests,
       pendingTeamRequests: pendingTeamRequests ?? this.pendingTeamRequests,
       pendingPartnerRequests: pendingPartnerRequests ?? this.pendingPartnerRequests,
+      pendingPartnerNews: pendingPartnerNews ?? this.pendingPartnerNews,
     );
   }
 
   @override
-  List<Object?> get props => [tab, favoriteTeamImage, pendingPlayerRequests, pendingTeamRequests, pendingPartnerRequests];
+  List<Object?> get props => [tab, favoriteTeamImage, pendingPlayerRequests, pendingTeamRequests, pendingPartnerRequests, pendingPartnerNews];
 }

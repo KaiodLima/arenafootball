@@ -1,4 +1,5 @@
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/features/news/data/dtos/pending_news_dto.dart';
 import 'package:arena_soccer/core/cache/cache_keys.dart';
 import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
@@ -28,6 +29,27 @@ class NewsRepositoryImpl implements INewsRepository {
 
   @override
   Future<Either<Failure, void>> createNews(NewsDTO news) async => _invalidate(await _dataSource.createNews(news));
+
+  @override
+  Future<Either<Failure, void>> createPendingNews(NewsDTO news) => _dataSource.createPendingNews(news);
+
+  @override
+  Stream<Either<Failure, List<PendingNewsDTO>>> watchMyPendingNews(String authorId) =>
+      _dataSource.watchMyPendingNews(authorId);
+
+  @override
+  Stream<Either<Failure, List<PendingNewsDTO>>> watchPendingNews() => _dataSource.watchPendingNews();
+
+  @override
+  Future<Either<Failure, void>> approvePendingNews(PendingNewsDTO pending) async =>
+      _invalidate(await _dataSource.approvePendingNews(pending));
+
+  @override
+  Future<Either<Failure, void>> rejectPendingNews({required String id, required String reason}) =>
+      _dataSource.rejectPendingNews(id: id, reason: reason);
+
+  @override
+  Future<Either<Failure, void>> deletePendingNews(String id) => _dataSource.deletePendingNews(id);
 
   @override
   Future<Either<Failure, void>> updateNews(NewsDTO news) async =>

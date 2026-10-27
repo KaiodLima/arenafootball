@@ -105,6 +105,21 @@ class _NewsFormPageState extends State<NewsFormPage> {
     _cubit.submit();
   }
 
+  /// Parceiro sem vaga de notícia hoje: manda para o admin aprovar?
+  Future<void> _askApproval(int limit, AppLocalizations l10n) async {
+    final send = await showArenaConfirm(
+      context,
+      title: l10n.partnerNewsLimitTitle,
+      message: l10n.partnerNewsLimitMessage(limit),
+      confirmLabel: l10n.partnerNewsSendForApproval,
+      cancelLabel: l10n.commonCancel,
+      icon: Icons.pending_actions_rounded,
+      tone: ArenaAlertTone.primary,
+    );
+    if (!mounted) return;
+    send ? await _cubit.submitForApproval() : _cubit.keepEditing();
+  }
+
   String? _titleError(NewsFormData form, AppLocalizations l10n) {
     final error = form.titleError;
     if (error == NewsTitleError.required) return _showErrors ? l10n.newsTitleRequired : null;
@@ -167,9 +182,17 @@ class _NewsFormPageState extends State<NewsFormPage> {
     return BlocConsumer<NewsFormCubit, NewsFormState>(
       listener: (context, state) {
         if (state is SuccessNewsFormState) {
-          showSnackBar(context: context, message: _isEditing ? l10n.newsUpdated : l10n.newsCreated);
+          showSnackBar(
+            context: context,
+            message: state.pendingApproval
+                ? l10n.partnerNewsSentForApproval
+                : _isEditing
+                    ? l10n.newsUpdated
+                    : l10n.newsCreated,
+          );
           _closeAfterRebuild();
         }
+        if (state is NewsLimitNewsFormState) _askApproval(state.limit, l10n);
         if (state is ErrorNewsFormState) {
           showSnackBar(
             context: context,

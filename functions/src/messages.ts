@@ -21,6 +21,8 @@ export type ActionKey =
   | 'solicitacao_time_resposta'
   | 'solicitacao_parceiro'
   | 'solicitacao_parceiro_resposta'
+  | 'noticia_parceiro'
+  | 'noticia_parceiro_resposta'
   | 'conquista';
 
 /** Sem configuração gravada, vale este padrão (notícia vem desligada). */
@@ -38,6 +40,8 @@ export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
   solicitacao_time_resposta: true,
   solicitacao_parceiro: true,
   solicitacao_parceiro_resposta: true,
+  noticia_parceiro: true,
+  noticia_parceiro_resposta: true,
   conquista: true,
 };
 
@@ -60,6 +64,7 @@ export interface PushMessage {
     | 'meu_time'
     | 'solicitacoes_parceiro'
     | 'parceiro'
+    | 'noticias_pendentes'
     | 'conquistas';
   regiao: string;
   alvo: Target;
@@ -421,6 +426,43 @@ export function partnerLinkRequestMessage(uid: string, before: Doc | undefined, 
     aba: 'solicitacoes_parceiro',
     regiao: text(after.regiao),
     alvo: { topic: ADMINS_TOPIC },
+  };
+}
+
+/** Notícia de parceiro além do limite do dia chegou: avisa os admins. */
+export function pendingNewsMessage(before: Doc | undefined, after: Doc | undefined): PushMessage | null {
+  if (before || !after || text(after.status) !== 'pendente') return null;
+  const title = text(after.titulo);
+  return {
+    tipo: 'noticia_parceiro',
+    titulo: 'Notícia de parceiro para aprovar',
+    corpo: shorten(title ? `"${title}" passou do limite do dia e espera a sua aprovação.` : 'Uma notícia espera a sua aprovação.', 240),
+    aba: 'noticias_pendentes',
+    regiao: text(after.fk_competicao),
+    alvo: { topic: ADMINS_TOPIC },
+  };
+}
+
+/** Admin publicou ou rejeitou a notícia pendente: avisa o parceiro. */
+export function pendingNewsAnswerMessage(before: Doc | undefined, after: Doc | undefined): PushMessage | null {
+  if (!before || !after || text(before.status) !== 'pendente') return null;
+  const status = text(after.status);
+  const author = text(after.idAutor);
+  if (!author || (status !== 'aprovada' && status !== 'rejeitada')) return null;
+  const title = text(after.titulo);
+  const reason = text(after.motivo);
+  return {
+    tipo: 'noticia_parceiro_resposta',
+    titulo: status === 'aprovada' ? '✅ Notícia publicada' : 'Notícia não aprovada',
+    corpo: shorten(
+      status === 'aprovada'
+        ? `"${title}" já está no feed.`
+        : `"${title}" não foi aprovada.${reason ? ` Motivo: ${reason}` : ''}`,
+      240,
+    ),
+    aba: 'parceiro',
+    regiao: text(after.fk_competicao),
+    alvo: { topic: userTopic(author) },
   };
 }
 

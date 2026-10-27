@@ -120,16 +120,20 @@ class NewsFormCubit extends Cubit<NewsFormState> {
 
     var news = form.toNews();
     final partner = _partner;
-    if (!form.isEditing && form.isAd && partner != null) {
+    // Parceiro: notícia nova e publicidade vão na vaga do dia. Sem vaga, a
+    // publicidade para; a notícia pode ir para o admin aprovar.
+    if (!form.isEditing && partner != null) {
       final slots = await getPartnerSlotsUseCase(partner);
       if (isClosed) return;
       if (slots.isLeft) {
         emit(ErrorNewsFormState(form: form, errorMessage: slots.left.toString()));
         return;
       }
-      final slot = slots.right.freeAd;
+      final slot = form.isAd ? slots.right.freeAd : slots.right.freeNews;
       if (slot == null) {
-        emit(ErrorNewsFormState(form: form, errorMessage: '', limitReached: true));
+        emit(form.isAd
+            ? ErrorNewsFormState(form: form, errorMessage: '', limitReached: true)
+            : NewsLimitNewsFormState(form: form, limit: partner.permissions.newsPerDay));
         return;
       }
       news = news.copyWith(id: slot);
@@ -144,4 +148,25 @@ class NewsFormCubit extends Cubit<NewsFormState> {
       (_) => emit(SuccessNewsFormState(form: form)),
     );
   }
+
+  /// Parceiro sem vaga de notícia hoje confirmou: vai para o admin aprovar.
+  Future<void> submitForApproval() async {
+    final form = state.form;
+    if (_partner == null || form.isEditing || form.isAd || state is SubmittingNewsFormState) return;
+    emit(SubmittingNewsFormState(form: form));
+    final response = await createNewsUseCase(
+      news: form.toNews(),
+      cover: form.cover,
+      album: form.album,
+      forApproval: true,
+    );
+    if (isClosed) return;
+    response.fold(
+      (failure) => emit(ErrorNewsFormState(form: form, errorMessage: failure.toString())),
+      (_) => emit(SuccessNewsFormState(form: form, pendingApproval: true)),
+    );
+  }
+
+  /// Desistiu de mandar para aprovação: volta a editar.
+  void keepEditing() => _edit(state.form);
 }

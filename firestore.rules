@@ -161,13 +161,15 @@ service cloud.firestore {
     //   só escudo/descrição/cores do próprio time (`idDono` = uid);
     // - o parceiro publica notícias, destaques e publicidade na região dele
     //   (`idAutor` = uid), dentro das permissões, e mexe só no que é dele. Os
-    //   limites são as vagas: destaque `dest<n>_<uid>` (n < limiteDestaques) e
-    //   publicidade `pub<n>_<uid>_<a>-<m>-<d>` (n < limitePublicidadeDia, data de
-    //   hoje em Brasília); ver `PartnerSlots` no app.
+    //   limites são as vagas: destaque `dest<n>_<uid>` (n < limiteDestaques),
+    //   publicidade `pub<n>_<uid>_<a>-<m>-<d>` (n < limitePublicidadeDia) e notícia
+    //   `not<n>_<uid>_<a>-<m>-<d>` (n < limiteNoticiasDia, padrão 3), com a data de
+    //   hoje em Brasília; ver `PartnerSlots` no app. Passou do limite de notícias,
+    //   ela vai para `noticias_pendentes` (regra abaixo) e o admin aprova.
     match /{collection}/{docId} {
       function writable() {
         return !(collection in ['config', 'notificacoes_envios', 'push_avisos', 'solicitacoes_jogador',
-          'solicitacoes_time', 'solicitacoes_parceiro']);
+          'solicitacoes_time', 'solicitacoes_parceiro', 'noticias_pendentes']);
       }
 
       // Dia de hoje em Brasília (UTC-3), igual ao `PartnerSlots.brasiliaDay`.
@@ -184,6 +186,11 @@ service cloud.firestore {
       function adSlot(p) {
         return docId.matches('pub[0-9]_.+') && slotNumber('pub') < p.get('limitePublicidadeDia', 1)
           && docId == 'pub' + string(slotNumber('pub')) + '_' + request.auth.uid + '_' + brasiliaDay();
+      }
+
+      function newsSlot(p) {
+        return docId.matches('not[0-9]_.+') && slotNumber('not') < p.get('limiteNoticiasDia', 3)
+          && docId == 'not' + string(slotNumber('not')) + '_' + request.auth.uid + '_' + brasiliaDay();
       }
 
       function highlightSlot(p) {
@@ -214,11 +221,27 @@ service cloud.firestore {
             'idAutor']);
       }
 
+      // Marcador da vaga do dia (`vagas_parceiro/{id}`): gravado no mesmo lote da
+      // notícia/publicidade e nunca apagado pelo parceiro; vaga com marcador =
+      // usada, mesmo que a publicação seja apagada.
+      function markerPath() {
+        return /databases/$(database)/documents/vagas_parceiro/$(docId);
+      }
+
+      function daySlot(p) {
+        return docId.matches('pub[0-9]_.+') ? adSlot(p) : newsSlot(p);
+      }
+
       function partnerCreate() {
         let p = partner();
         let data = request.resource.data;
         return p != null
-          && ((partnerNews(data, p) && (data.get('tag', '') != 'publicidade' || adSlot(p)))
+          && ((partnerNews(data, p) && (data.get('tag', '') == 'publicidade' ? adSlot(p) : newsSlot(p))
+              && !exists(markerPath()) && existsAfter(markerPath()))
+            || (collection == 'vagas_parceiro' && daySlot(p)
+              && request.resource.data.keys().hasOnly(['idAutor', 'criadoEm'])
+              && request.resource.data.idAutor == request.auth.uid
+              && existsAfter(/databases/$(database)/documents/noticias/$(docId)))
             || (partnerHighlight(data, p) && highlightSlot(p) && data.get('priority', '') == '900'));
       }
 
@@ -251,7 +274,7 @@ service cloud.firestore {
       }
 
       allow read: if !(collection in ['usuarios', 'config', 'notificacoes_envios', 'push_avisos', 'solicitacoes_jogador',
-        'solicitacoes_time', 'solicitacoes_parceiro']);
+        'solicitacoes_time', 'solicitacoes_parceiro', 'noticias_pendentes']);
       allow create: if writable() && (isAdmin() || isOwnVote()
         || (isPlayers() && ownsTeam(request.resource.data))
         || partnerCreate());
@@ -413,6 +436,33 @@ service cloud.firestore {
       allow create: if isRequester() && validSubmit();
       allow update: if (isRequester() && resource.data.status != 'aprovada' && validSubmit()) || isAdmin();
       allow delete: if (isRequester() && resource.data.status == 'pendente') || isAdmin();
+    }
+
+    // Notícia do parceiro além do limite do dia: espera o admin. O parceiro
+    // cria (pendente, dele, na região dele, sem tags reservadas) e lê/apaga as
+    // dele; só o admin responde (aprovar publica em `noticias`).
+    match /noticias_pendentes/{newsId} {
+      function validPending() {
+        let p = partner();
+        let data = request.resource.data;
+        return p != null && p.get('podeNoticias', true)
+          && data.get('idAutor', '') == request.auth.uid
+          && data.get('idRegiao', '') == p.get('idRegiao', '-')
+          && data.get('status', '') == 'pendente'
+          && !(data.get('tag', '') in ['gol', 'resultado', 'votacao', 'publicidade'])
+          && data.keys().hasOnly(['id', 'data', 'criadoEm', 'status', 'titulo', 'descricao', 'urlImagem', 'link',
+            'exibir', 'fk_competicao', 'idRegiao', 'time_casa', 'time_fora', 'gol_time_casa', 'gol_time_fora', 'tag',
+            'images', 'idAutor']);
+      }
+
+      function isAuthor() {
+        return signedIn() && resource.data.get('idAutor', '') == request.auth.uid;
+      }
+
+      allow read: if isAuthor() || isAdmin();
+      allow create: if validPending();
+      allow update: if isAdmin();
+      allow delete: if isAuthor() || isAdmin();
     }
 
     // Pedido "Sou parceiro" (id = uid): o dono cria/corrige/reenvia sempre como

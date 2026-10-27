@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/features/news/data/dtos/pending_news_dto.dart';
 import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
 import 'package:arena_soccer/features/partner_requests/data/dtos/partner_request_dto.dart';
 import 'package:arena_soccer/features/partner_requests/domain/partner_slots.dart';
@@ -74,6 +75,9 @@ class PartnerRequestState extends Equatable {
   /// Destaques sem dono (sem `idAutor`): o usuário pode pedir o vínculo.
   final List<HighlightDTO> unlinkedHighlights;
 
+  /// Notícias do parceiro esperando o admin (e as rejeitadas).
+  final List<PendingNewsDTO> pendingNews;
+
   const PartnerRequestState({
     this.request,
     this.form = const PartnerRequestForm(),
@@ -81,12 +85,13 @@ class PartnerRequestState extends Equatable {
     this.slots,
     this.highlights = const [],
     this.unlinkedHighlights = const [],
+    this.pendingNews = const [],
   });
 
   bool get showForm => request == null || editing;
 
   @override
-  List<Object?> get props => [request, form, editing, slots?.takenHighlights, slots?.takenAds, highlights, unlinkedHighlights];
+  List<Object?> get props => [request, form, editing, slots?.takenHighlights, slots?.takenAds, highlights, unlinkedHighlights, pendingNews];
 }
 
 class LoadingPartnerRequestState extends PartnerRequestState {
@@ -101,6 +106,7 @@ class ReadyPartnerRequestState extends PartnerRequestState {
     super.slots,
     super.highlights,
     super.unlinkedHighlights,
+    super.pendingNews,
   });
 }
 
@@ -113,11 +119,12 @@ class SubmittingPartnerRequestState extends PartnerRequestState {
           slots: from.slots,
           highlights: from.highlights,
           unlinkedHighlights: from.unlinkedHighlights,
+          pendingNews: from.pendingNews,
         );
 }
 
 /// Aviso de ação concluída (o snackbar mostra pelo [notice]).
-enum PartnerRequestNotice { submitted, cancelled, highlightDeleted, linkRequested }
+enum PartnerRequestNotice { submitted, cancelled, highlightDeleted, linkRequested, pendingNewsDeleted }
 
 class NoticePartnerRequestState extends PartnerRequestState {
   final PartnerRequestNotice notice;
@@ -126,11 +133,14 @@ class NoticePartnerRequestState extends PartnerRequestState {
       : super(
           request: from.request,
           form: from.form,
-          editing: (notice == PartnerRequestNotice.highlightDeleted || notice == PartnerRequestNotice.linkRequested) &&
+          editing: (notice == PartnerRequestNotice.highlightDeleted ||
+                  notice == PartnerRequestNotice.linkRequested ||
+                  notice == PartnerRequestNotice.pendingNewsDeleted) &&
               from.editing,
           slots: from.slots,
           highlights: from.highlights,
           unlinkedHighlights: from.unlinkedHighlights,
+          pendingNews: from.pendingNews,
         );
 
   @override
@@ -148,6 +158,7 @@ class ErrorPartnerRequestState extends PartnerRequestState {
           slots: from.slots,
           highlights: from.highlights,
           unlinkedHighlights: from.unlinkedHighlights,
+          pendingNews: from.pendingNews,
         );
 
   @override

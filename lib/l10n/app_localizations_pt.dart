@@ -734,6 +734,91 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get partnerNewsLimitTitle => 'Limite de notícias de hoje';
+
+  @override
+  String partnerNewsLimitMessage(int limit) {
+    String _temp0 = intl.Intl.pluralLogic(
+      limit,
+      locale: localeName,
+      other: 'Você já publicou as $limit notícias de hoje.',
+      one: 'Você já publicou a notícia de hoje.',
+    );
+    return '$_temp0 Enviar esta para o admin aprovar?';
+  }
+
+  @override
+  String get partnerNewsSendForApproval => 'Enviar para aprovação';
+
+  @override
+  String get partnerNewsSentForApproval =>
+      'Notícia enviada para o admin aprovar.';
+
+  @override
+  String partnerUsageNews(int used, int limit) {
+    return '$used de $limit notícias hoje';
+  }
+
+  @override
+  String partnerLimitNews(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count notícias por dia',
+      one: '1 notícia por dia',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get partnerPendingNewsTitle => 'Aguardando o admin';
+
+  @override
+  String get partnerPendingNewsWaiting => 'Esperando aprovação';
+
+  @override
+  String get partnerPendingNewsRejected => 'Não aprovada';
+
+  @override
+  String get partnerPendingNewsDeleted => 'Notícia apagada.';
+
+  @override
+  String get partnerTabNews => 'Notícias';
+
+  @override
+  String get partnerPanelEmptyNews => 'Nenhuma notícia esperando aprovação.';
+
+  @override
+  String get partnerNewsPublish => 'Publicar';
+
+  @override
+  String get partnerNewsApproved => 'Notícia publicada no feed.';
+
+  @override
+  String get partnerNewsRejected => 'Notícia rejeitada.';
+
+  @override
+  String get partnerNewsRejectTitle => 'Rejeitar a notícia?';
+
+  @override
+  String get partnerNewsPerDayLabel =>
+      'Notícias por dia (as demais passam por você)';
+
+  @override
+  String get pushActionPartnerNews => 'Notícia de parceiro para aprovar';
+
+  @override
+  String get pushActionPartnerNewsHint =>
+      'Para os admins · parceiro passou do limite de notícias do dia';
+
+  @override
+  String get pushActionPartnerNewsAnswer => 'Resposta da notícia do parceiro';
+
+  @override
+  String get pushActionPartnerNewsAnswerHint =>
+      'Para o parceiro · notícia publicada ou rejeitada';
+
+  @override
   String get partnerClaimTitle => 'Algum destes destaques é seu?';
 
   @override
@@ -966,7 +1051,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String partnerApproveMessage(String region) {
-    return 'Vai publicar em $region: notícias, até 2 destaques e 1 publicidade por dia. Você ajusta depois em Permissões.';
+    return 'Vai publicar em $region: 3 notícias por dia (as demais passam por você), até 2 destaques e 1 publicidade por dia. Você ajusta depois em Permissões.';
   }
 
   @override

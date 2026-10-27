@@ -91,6 +91,7 @@ class _HomePageState extends State<HomePage> {
       'meu_time' when user != null => AppRoutes.teamRequestPage,
       'solicitacoes_parceiro' when user != null && user.isAdmin => AppRoutes.partnerRequestsPanelPage,
       'parceiro' when user != null => AppRoutes.partnerRequestPage,
+      'noticias_pendentes' when user != null && user.isAdmin => AppRoutes.partnerRequestsPanelPage,
       'conquistas' when user != null => AppRoutes.achievementsPage,
       _ => null,
     };
@@ -205,7 +206,7 @@ class _HomePageState extends State<HomePage> {
               favoriteTeamImage: home.favoriteTeamImage,
               pendingPlayerRequests: home.pendingPlayerRequests,
               pendingTeamRequests: home.pendingTeamRequests,
-              pendingPartnerRequests: home.pendingPartnerRequests,
+              pendingPartnerRequests: home.pendingPartnerRequests + home.pendingPartnerNews,
               playerTeam: myPlayer.teamName,
               playerId: myPlayer.playerId,
               playerSeason: myPlayer.season,

@@ -197,7 +197,23 @@ class SubmittingNewsFormState extends NewsFormState {
 }
 
 class SuccessNewsFormState extends NewsFormState {
-  const SuccessNewsFormState({required super.form});
+  /// Foi para o admin aprovar (notícia do parceiro além do limite do dia).
+  final bool pendingApproval;
+
+  const SuccessNewsFormState({required super.form, this.pendingApproval = false});
+
+  @override
+  List<Object?> get props => [form, pendingApproval];
+}
+
+/// Parceiro sem vaga de notícia hoje: a página pergunta se manda para o admin.
+class NewsLimitNewsFormState extends NewsFormState {
+  final int limit;
+
+  const NewsLimitNewsFormState({required super.form, required this.limit});
+
+  @override
+  List<Object?> get props => [form, limit];
 }
 
 class ErrorNewsFormState extends NewsFormState {

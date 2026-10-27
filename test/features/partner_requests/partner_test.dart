@@ -29,6 +29,13 @@ const _partner = PartnerRequestDTO(
 
 class _NewsRepository implements INewsRepository {
   NewsDTO? created;
+  NewsDTO? pending;
+
+  @override
+  Future<Either<Failure, void>> createPendingNews(NewsDTO news) async {
+    pending = news;
+    return const Right(null);
+  }
 
   @override
   Future<Either<Failure, void>> createNews(NewsDTO news) async {
@@ -62,14 +69,17 @@ class _NoRegions implements GetRegionsUseCase {
 
 class _Slots implements GetPartnerSlotsUseCase {
   final Set<String> takenAds;
+  final Set<String> takenNews;
 
-  _Slots(this.takenAds);
+  _Slots(this.takenAds, {this.takenNews = const {}});
 
   @override
   Future<Either<Failure, PartnerSlotUsage>> call(PartnerRequestDTO partner, {DateTime? now}) async => Right(
         PartnerSlotUsage(
           adIds: PartnerSlots.adIds(partner.userId, partner.permissions.adsPerDay, DateTime.utc(2026, 10, 26, 15)),
           takenAds: takenAds,
+          newsIds: PartnerSlots.newsIds(partner.userId, partner.permissions.newsPerDay, DateTime.utc(2026, 10, 26, 15)),
+          takenNews: takenNews,
         ),
       );
 }
@@ -81,6 +91,7 @@ void main() {
       expect(PartnerPermissions.fromMap(const {}), permissions);
       expect(permissions.highlightLimit, 2);
       expect(permissions.adsPerDay, 1);
+      expect(permissions.newsPerDay, 3);
     });
 
     test('lê, grava e limita a 0..9', () {
@@ -232,6 +243,53 @@ void main() {
       );
       expect(full.slots, isEmpty);
       expect(full.highlightLimit, 9);
+    });
+  });
+
+
+  group('limite de notícias por dia', () {
+    NewsFormCubit cubitOf(_NewsRepository repository, _Slots slots) => NewsFormCubit(
+          CreateNewsUseCase(repository, _Storage()),
+          UpdateNewsUseCase(repository, _Storage()),
+          _NoRegions(),
+          _Highlights(),
+          slots,
+        );
+
+    test('vagas do dia e o uso', () {
+      expect(PartnerSlots.newsIds('p1', 3, DateTime.utc(2026, 10, 26, 15)),
+          ['not0_p1_2026-10-26', 'not1_p1_2026-10-26', 'not2_p1_2026-10-26']);
+      const usage = PartnerSlotUsage(newsIds: ['not0_p1_d', 'not1_p1_d'], takenNews: {'not0_p1_d'});
+      expect(usage.usedNews, 1);
+      expect(usage.freeNews, 'not1_p1_d');
+    });
+
+    test('com vaga: vai direto para o feed na vaga', () async {
+      final repository = _NewsRepository();
+      final cubit = cubitOf(repository, _Slots(const {}));
+      await cubit.load(initialRegion: 'Floresta', partner: _partner);
+      cubit.changeTitle('Final da copa');
+      await cubit.submit();
+      expect(repository.created?.id, 'not0_p1_2026-10-26');
+      await cubit.close();
+    });
+
+    test('sem vaga: pergunta e, confirmado, vai para o admin aprovar', () async {
+      final repository = _NewsRepository();
+      final full = {'not0_p1_2026-10-26', 'not1_p1_2026-10-26', 'not2_p1_2026-10-26'};
+      final cubit = cubitOf(repository, _Slots(const {}, takenNews: full));
+      await cubit.load(initialRegion: 'Floresta', partner: _partner);
+      cubit.changeTitle('Quarta notícia');
+      await cubit.submit();
+      expect(cubit.state, isA<NewsLimitNewsFormState>());
+      expect((cubit.state as NewsLimitNewsFormState).limit, 3);
+      expect(repository.created, isNull);
+
+      await cubit.submitForApproval();
+      expect(repository.pending?.title, 'Quarta notícia');
+      expect(repository.pending?.authorId, 'p1');
+      expect((cubit.state as SuccessNewsFormState).pendingApproval, isTrue);
+      await cubit.close();
     });
   });
 

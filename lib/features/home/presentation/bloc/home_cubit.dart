@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:either_dart/either.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/news/data/dtos/pending_news_dto.dart';
+import 'package:arena_soccer/features/news/domain/usecases/pending_news_usecase.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
 import 'package:arena_soccer/features/highlights/domain/usecases/get_highlights_cache_first_usecase.dart';
@@ -17,9 +19,11 @@ class HomeCubit extends Cubit<HomeState> {
   final WatchPendingTeamRequestsCountUseCase watchPendingTeamRequestsCountUseCase;
   final GetHighlightsCacheFirstUseCase getHighlightsCacheFirstUseCase;
   final WatchPendingPartnerRequestsCountUseCase watchPendingPartnerRequestsCountUseCase;
+  final PendingNewsUseCase pendingNewsUseCase;
   StreamSubscription<Either<Failure, int>>? _pendingRequests;
   StreamSubscription<Either<Failure, int>>? _pendingTeamRequests;
   StreamSubscription<Either<Failure, int>>? _pendingPartnerRequests;
+  StreamSubscription<Either<Failure, List<PendingNewsDTO>>>? _pendingPartnerNews;
 
   HomeCubit(
     this.getTeamByNameCacheFirstUseCase,
@@ -27,6 +31,7 @@ class HomeCubit extends Cubit<HomeState> {
     this.watchPendingTeamRequestsCountUseCase,
     this.getHighlightsCacheFirstUseCase,
     this.watchPendingPartnerRequestsCountUseCase,
+    this.pendingNewsUseCase,
   ) : super(const HomeState());
 
   void selectTab(HomeTab tab) => emit(state.copyWith(tab: tab));
@@ -76,6 +81,10 @@ class HomeCubit extends Cubit<HomeState> {
     _pendingPartnerRequests = watchPendingPartnerRequestsCountUseCase().listen((response) {
       if (response.isRight) emit(state.copyWith(pendingPartnerRequests: response.right));
     });
+    _pendingPartnerNews?.cancel();
+    _pendingPartnerNews = pendingNewsUseCase.watchPending().listen((response) {
+      if (response.isRight) emit(state.copyWith(pendingPartnerNews: response.right.length));
+    });
   }
 
   @override
@@ -83,6 +92,7 @@ class HomeCubit extends Cubit<HomeState> {
     _pendingRequests?.cancel();
     _pendingTeamRequests?.cancel();
     _pendingPartnerRequests?.cancel();
+    _pendingPartnerNews?.cancel();
     return super.close();
   }
 }

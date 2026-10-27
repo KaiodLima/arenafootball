@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/features/partner_requests/domain/partner_slots.dart';
+import 'package:arena_soccer/features/news/data/dtos/pending_news_dto.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/errors/firebase_error.dart';
@@ -91,12 +93,20 @@ class NewsDataSource {
 
   Future<Either<Failure, void>> createNews(NewsDTO news) async {
     try {
-      // Publicidade do parceiro já vem com o id da vaga do dia (`PartnerSlots`).
-      final ref = news.id.isEmpty ? _news.doc() : _news.doc(news.id);
-      await ref.set({
-        ...news.copyWith(id: ref.id).toMap(),
-        'data': FieldValue.serverTimestamp(),
-      });
+      if (news.id.isEmpty) {
+        final ref = _news.doc();
+        await ref.set({...news.copyWith(id: ref.id).toMap(), 'data': FieldValue.serverTimestamp()});
+        return const Right(null);
+      }
+      // Notícia/publicidade do parceiro: já vem com o id da vaga do dia
+      // (`PartnerSlots`) e grava junto o marcador da vaga.
+      final batch = _firestore.batch()
+        ..set(_news.doc(news.id), {...news.toMap(), 'data': FieldValue.serverTimestamp()})
+        ..set(_firestore.collection(PartnerSlots.markersCollection).doc(news.id), {
+          'idAutor': news.authorId,
+          'criadoEm': FieldValue.serverTimestamp(),
+        });
+      await batch.commit();
       return const Right(null);
     } catch (e) {
       AppLogger.e('createNews tag=${news.tag}', name: 'NewsDataSource', error: e);
@@ -149,4 +159,87 @@ class NewsDataSource {
       return Left(mapFirebaseError(e, fallbackMessage: _loadFallback));
     }
   }
+
+  // ---------------------------------------------------------------- pendentes
+
+  CollectionReference<Map<String, dynamic>> get _pending => _firestore.collection('noticias_pendentes');
+
+  /// Notícia do parceiro além do limite do dia: espera o admin.
+  Future<Either<Failure, void>> createPendingNews(NewsDTO news) async {
+    try {
+      final ref = _pending.doc();
+      await ref.set({
+        ...PendingNewsDTO(news: news.copyWith(id: ref.id)).toSubmitMap(),
+        'data': FieldValue.serverTimestamp(),
+        'criadoEm': FieldValue.serverTimestamp(),
+      });
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('createPendingNews', name: 'NewsDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível enviar a notícia para aprovação.'));
+    }
+  }
+
+  /// Pendentes e respondidas do parceiro [authorId].
+  Stream<Either<Failure, List<PendingNewsDTO>>> watchMyPendingNews(String authorId) {
+    return _pending.where('idAutor', isEqualTo: authorId).snapshots().toEither(
+          (snapshot) => _sortPending(snapshot.docs.map(PendingNewsDTO.fromFirestore).toList()),
+          fallbackMessage: _loadFallback,
+          logName: 'NewsDataSource',
+        );
+  }
+
+  /// Só as que esperam o admin.
+  Stream<Either<Failure, List<PendingNewsDTO>>> watchPendingNews() {
+    return _pending.where('status', isEqualTo: PendingNewsStatus.pending.key).snapshots().toEither(
+          (snapshot) => _sortPending(snapshot.docs.map(PendingNewsDTO.fromFirestore).toList()),
+          fallbackMessage: _loadFallback,
+          logName: 'NewsDataSource',
+        );
+  }
+
+  /// Mais antigas primeiro (ordena no app: sem índice composto).
+  List<PendingNewsDTO> _sortPending(List<PendingNewsDTO> items) => items
+    ..sort((a, b) => (a.createdAt ?? DateTime(3000)).compareTo(b.createdAt ?? DateTime(3000)));
+
+  /// Admin aprova: publica em `noticias` (hora do servidor, autor do parceiro)
+  /// e marca a pendente, numa escrita só.
+  Future<Either<Failure, void>> approvePendingNews(PendingNewsDTO pending) async {
+    try {
+      final ref = _news.doc();
+      final batch = _firestore.batch()
+        ..set(ref, {...pending.news.copyWith(id: ref.id).toMap(), 'data': FieldValue.serverTimestamp()})
+        ..update(_pending.doc(pending.id), {
+          'status': PendingNewsStatus.approved.key,
+          'idNoticia': ref.id,
+          'motivo': '',
+        });
+      await batch.commit();
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('approvePendingNews id=${pending.id}', name: 'NewsDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível publicar a notícia.'));
+    }
+  }
+
+  Future<Either<Failure, void>> rejectPendingNews({required String id, required String reason}) async {
+    try {
+      await _pending.doc(id).update({'status': PendingNewsStatus.rejected.key, 'motivo': reason});
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('rejectPendingNews id=$id', name: 'NewsDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível rejeitar a notícia.'));
+    }
+  }
+
+  Future<Either<Failure, void>> deletePendingNews(String id) async {
+    try {
+      await _pending.doc(id).delete();
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('deletePendingNews id=$id', name: 'NewsDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _deleteFallback));
+    }
+  }
+
 }

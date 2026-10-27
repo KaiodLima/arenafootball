@@ -149,7 +149,7 @@ class ArenaApp extends StatelessWidget {
         // cobrado).
         AppRoutes.home: (_) => MultiBlocProvider(
               providers: [
-                BlocProvider<HomeCubit>(create: (_) => HomeCubit(sl(), sl(), sl(), sl(), sl())),
+                BlocProvider<HomeCubit>(create: (_) => HomeCubit(sl(), sl(), sl(), sl(), sl(), sl())),
                 BlocProvider<ChampionshipsCubit>(create: (_) => ChampionshipsCubit(sl())),
                 BlocProvider<MatchesCubit>(create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl(), sl())),
                 BlocProvider<NewsFeedCubit>(create: (_) => NewsFeedCubit(sl(), sl(), sl())),
@@ -282,11 +282,11 @@ class ArenaApp extends StatelessWidget {
             ),
         // Pedido "Sou parceiro" e, aprovado, a área do parceiro (mesma rota).
         AppRoutes.partnerRequestPage: (_) => BlocProvider<PartnerRequestCubit>(
-              create: (_) => PartnerRequestCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl()),
+              create: (_) => PartnerRequestCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl()),
               child: const PartnerRequestPage(),
             ),
         AppRoutes.partnerRequestsPanelPage: (_) => BlocProvider<PartnerRequestsPanelCubit>(
-              create: (_) => PartnerRequestsPanelCubit(sl(), sl(), sl(), sl(), sl()),
+              create: (_) => PartnerRequestsPanelCubit(sl(), sl(), sl(), sl(), sl(), sl()),
               child: const PartnerRequestsPanelPage(),
             ),
         AppRoutes.registerPlayerPage: (_) => BlocProvider<PlayerFormCubit>(

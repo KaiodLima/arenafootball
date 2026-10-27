@@ -15,6 +15,8 @@ enum PushAction {
   teamRequestAnswer('solicitacao_time_resposta', true),
   partnerRequest('solicitacao_parceiro', true),
   partnerRequestAnswer('solicitacao_parceiro_resposta', true),
+  partnerNews('noticia_parceiro', true),
+  partnerNewsAnswer('noticia_parceiro_resposta', true),
   achievement('conquista', true);
 
   final String key;

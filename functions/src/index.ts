@@ -37,6 +37,8 @@ import {
   teamRequestAnswerMessage,
   teamRequestMessage,
   partnerLinkRequestMessage,
+  pendingNewsAnswerMessage,
+  pendingNewsMessage,
   partnerRequestAnswerMessage,
   partnerRequestMessage,
   seasonCollection,
@@ -610,6 +612,17 @@ export const onPartnerRequestWritten = onDocumentWritten('solicitacoes_parceiro/
   if (link) await deliver(`vinculo_parceiro_${event.id}`, link, origem);
 });
 
+/** Notícia de parceiro além do limite do dia: avisa os admins e, respondida, o parceiro. */
+export const onPendingNewsWritten = onDocumentWritten('noticias_pendentes/{id}', async (event) => {
+  const before = event.data?.before.data();
+  const after = event.data?.after.data();
+  const origem = `noticias_pendentes/${event.params.id}`;
+  const toAdmins = pendingNewsMessage(before, after);
+  if (toAdmins) await deliver(`noticia_pendente_${event.id}`, toAdmins, origem);
+  const toAuthor = pendingNewsAnswerMessage(before, after);
+  if (toAuthor) await deliver(`noticia_pendente_resposta_${event.id}`, toAuthor, origem);
+});
+
 /** Todo dia às 9h: lembra os torcedores dos times que jogam hoje (temporada atual). */
 export const dailyGames = onSchedule({ schedule: '0 9 * * *', timeZone: 'America/Sao_Paulo' }, async () => {
   const today = todayKey();
@@ -787,6 +800,8 @@ export const onUserDeleted = functionsV1
       db.collection('solicitacoes_jogador').doc(uid),
       db.collection('solicitacoes_time').doc(uid),
       db.collection('solicitacoes_parceiro').doc(uid),
+      // Notícias do parceiro esperando aprovação.
+      ...(await db.collection('noticias_pendentes').where('idAutor', '==', uid).get()).docs.map((doc) => doc.ref),
     ]);
 
     // Conquistas: contadores e desbloqueios da conta.

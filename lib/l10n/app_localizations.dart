@@ -1335,6 +1335,132 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @partnerNewsLimitTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Limite de notícias de hoje'**
+  String get partnerNewsLimitTitle;
+
+  /// No description provided for @partnerNewsLimitMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'{limit, plural, =1{Você já publicou a notícia de hoje.} other{Você já publicou as {limit} notícias de hoje.}} Enviar esta para o admin aprovar?'**
+  String partnerNewsLimitMessage(int limit);
+
+  /// No description provided for @partnerNewsSendForApproval.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar para aprovação'**
+  String get partnerNewsSendForApproval;
+
+  /// No description provided for @partnerNewsSentForApproval.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícia enviada para o admin aprovar.'**
+  String get partnerNewsSentForApproval;
+
+  /// No description provided for @partnerUsageNews.
+  ///
+  /// In pt, this message translates to:
+  /// **'{used} de {limit} notícias hoje'**
+  String partnerUsageNews(int used, int limit);
+
+  /// No description provided for @partnerLimitNews.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 notícia por dia} other{{count} notícias por dia}}'**
+  String partnerLimitNews(int count);
+
+  /// No description provided for @partnerPendingNewsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aguardando o admin'**
+  String get partnerPendingNewsTitle;
+
+  /// No description provided for @partnerPendingNewsWaiting.
+  ///
+  /// In pt, this message translates to:
+  /// **'Esperando aprovação'**
+  String get partnerPendingNewsWaiting;
+
+  /// No description provided for @partnerPendingNewsRejected.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não aprovada'**
+  String get partnerPendingNewsRejected;
+
+  /// No description provided for @partnerPendingNewsDeleted.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícia apagada.'**
+  String get partnerPendingNewsDeleted;
+
+  /// No description provided for @partnerTabNews.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícias'**
+  String get partnerTabNews;
+
+  /// No description provided for @partnerPanelEmptyNews.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma notícia esperando aprovação.'**
+  String get partnerPanelEmptyNews;
+
+  /// No description provided for @partnerNewsPublish.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publicar'**
+  String get partnerNewsPublish;
+
+  /// No description provided for @partnerNewsApproved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícia publicada no feed.'**
+  String get partnerNewsApproved;
+
+  /// No description provided for @partnerNewsRejected.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícia rejeitada.'**
+  String get partnerNewsRejected;
+
+  /// No description provided for @partnerNewsRejectTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rejeitar a notícia?'**
+  String get partnerNewsRejectTitle;
+
+  /// No description provided for @partnerNewsPerDayLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícias por dia (as demais passam por você)'**
+  String get partnerNewsPerDayLabel;
+
+  /// No description provided for @pushActionPartnerNews.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícia de parceiro para aprovar'**
+  String get pushActionPartnerNews;
+
+  /// No description provided for @pushActionPartnerNewsHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para os admins · parceiro passou do limite de notícias do dia'**
+  String get pushActionPartnerNewsHint;
+
+  /// No description provided for @pushActionPartnerNewsAnswer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resposta da notícia do parceiro'**
+  String get pushActionPartnerNewsAnswer;
+
+  /// No description provided for @pushActionPartnerNewsAnswerHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para o parceiro · notícia publicada ou rejeitada'**
+  String get pushActionPartnerNewsAnswerHint;
+
   /// No description provided for @partnerClaimTitle.
   ///
   /// In pt, this message translates to:
@@ -1674,7 +1800,7 @@ abstract class AppLocalizations {
   /// No description provided for @partnerApproveMessage.
   ///
   /// In pt, this message translates to:
-  /// **'Vai publicar em {region}: notícias, até 2 destaques e 1 publicidade por dia. Você ajusta depois em Permissões.'**
+  /// **'Vai publicar em {region}: 3 notícias por dia (as demais passam por você), até 2 destaques e 1 publicidade por dia. Você ajusta depois em Permissões.'**
   String partnerApproveMessage(String region);
 
   /// No description provided for @partnerApproved.
