@@ -47,6 +47,29 @@ export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
 
 export type Target = { topic: string } | { condition: string };
 
+/** Tela que o toque abre no app (além da aba): a partida, a votação dela ou a notícia. */
+export interface OpenTarget {
+  tela: 'partida' | 'votacao' | 'noticia';
+  id: string;
+  temporada?: string;
+}
+
+/** Partida do push (id do doc e temporada); sem id, só a aba. */
+export interface MatchRef {
+  id: string;
+  season: string;
+}
+
+function openMatch(tela: 'partida' | 'votacao', ref: MatchRef | undefined): { abrir?: OpenTarget } {
+  return ref?.id ? { abrir: { tela, id: ref.id, temporada: ref.season } } : {};
+}
+
+/** Campos de `data` do FCM (só strings) com a tela a abrir. */
+export function openData(target: OpenTarget | undefined): Record<string, string> {
+  if (!target?.id) return {};
+  return { tela: target.tela, id: target.id, ...(target.temporada ? { temporada: target.temporada } : {}) };
+}
+
 export interface PushMessage {
   tipo: ActionKey;
   titulo: string;
@@ -68,6 +91,8 @@ export interface PushMessage {
     | 'conquistas';
   regiao: string;
   alvo: Target;
+  /** Tela específica (partida, votação, notícia); sem ela, só a aba. */
+  abrir?: OpenTarget;
   /** Imagem do push (URL https): o escudo do time no card de gol. */
   imagem?: string;
 }
@@ -166,8 +191,8 @@ function shorten(value: string, max: number): string {
   return value.length <= max ? value : `${value.slice(0, max - 1).trimEnd()}…`;
 }
 
-/** Card de gol (noticias com tag "gol"). */
-export function goalMessage(news: Doc): PushMessage | null {
+/** Card de gol (noticias com tag "gol"). Ligado a uma partida (`id_partida`), abre ela. */
+export function goalMessage(news: Doc, currentSeason = ''): PushMessage | null {
   const home = text(news.time_casa);
   const away = text(news.time_fora);
   const region = text(news.fk_competicao);
@@ -189,12 +214,13 @@ export function goalMessage(news: Doc): PushMessage | null {
     aba: 'home',
     regiao: region,
     alvo,
+    ...openMatch('partida', { id: text(news.id_partida), season: text(news.temporada) || currentSeason }),
     ...(crest.startsWith('https://') ? { imagem: crest } : {}),
   };
 }
 
-/** Notícia comum publicada visível (sem gol, publicidade). */
-export function newsMessage(news: Doc): PushMessage | null {
+/** Notícia comum publicada visível (sem gol, publicidade); [id] abre a notícia. */
+export function newsMessage(news: Doc, id = ''): PushMessage | null {
   const tag = text(news.tag);
   // Gol, resultado e votação têm card próprio (os automáticos não mandam push de notícia).
   if (
@@ -216,6 +242,7 @@ export function newsMessage(news: Doc): PushMessage | null {
     aba: 'home',
     regiao: region,
     alvo: { topic: regionTopicOf(news) },
+    ...(id ? { abrir: { tela: 'noticia' as const, id } } : {}),
   };
 }
 
@@ -231,7 +258,7 @@ function matchTeams(match: Doc) {
 }
 
 /** Partida cadastrada. */
-export function matchCreatedMessage(match: Doc): PushMessage | null {
+export function matchCreatedMessage(match: Doc, ref?: MatchRef): PushMessage | null {
   const { home, away, homeId, awayId, region, regionTopicName } = matchTeams(match);
   const alvo = gameTarget(regionTopicName, home, away, homeId, awayId);
   if (!home || !away || !alvo) return null;
@@ -244,11 +271,12 @@ export function matchCreatedMessage(match: Doc): PushMessage | null {
     aba: 'tabelas',
     regiao: region,
     alvo,
+    ...openMatch('partida', ref),
   };
 }
 
 /** Votação de melhor jogador aberta ou encerrada (`votacao` é string). */
-export function votingMessage(before: Doc, after: Doc): PushMessage | null {
+export function votingMessage(before: Doc, after: Doc, ref?: MatchRef): PushMessage | null {
   const was = text(before.votacao) === 'true';
   const is = text(after.votacao) === 'true';
   if (was === is) return null;
@@ -263,6 +291,7 @@ export function votingMessage(before: Doc, after: Doc): PushMessage | null {
         aba: 'tabelas',
         regiao: region,
         alvo,
+        ...openMatch('votacao', ref),
       }
     : {
         tipo: 'votacao_encerrada',
@@ -271,11 +300,12 @@ export function votingMessage(before: Doc, after: Doc): PushMessage | null {
         aba: 'tabelas',
         regiao: region,
         alvo,
+        ...openMatch('votacao', ref),
       };
 }
 
 /** Lembrete do dia: só para os torcedores dos dois times. */
-export function dailyGameMessage(match: Doc): PushMessage | null {
+export function dailyGameMessage(match: Doc, ref?: MatchRef): PushMessage | null {
   const { home, away, homeId, awayId, region } = matchTeams(match);
   const alvo = targetFor([...teamTopics(home, homeId), ...teamTopics(away, awayId)]);
   if (!home || !away || !alvo) return null;
@@ -287,6 +317,7 @@ export function dailyGameMessage(match: Doc): PushMessage | null {
     aba: 'tabelas',
     regiao: region,
     alvo,
+    ...openMatch('partida', ref),
   };
 }
 

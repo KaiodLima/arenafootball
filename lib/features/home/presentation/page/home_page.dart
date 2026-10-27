@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/services/push_target.dart';
 import 'package:arena_soccer/features/partner_requests/presentation/bloc/partner_cubit.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
@@ -47,7 +48,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   late final HomeCubit _homeCubit;
-  StreamSubscription<String>? _pushTabs;
+  StreamSubscription<PushTarget>? _pushTabs;
   StreamSubscription<DeepLinkTarget>? _deepLinks;
 
   @override
@@ -62,8 +63,8 @@ class _HomePageState extends State<HomePage> {
     final push = sl<PushService>();
     push.requestPermission();
     PushTopicsListener.syncNow(context);
-    _openPushTab(push.takePendingTab());
-    _pushTabs = push.tabRequests.listen(_openPushTab);
+    _openPushTab(push.takePending());
+    _pushTabs = push.targets.listen(_openPushTab);
 
     // Links compartilhados: o que abriu o app e os que chegam com ele aberto.
     final deepLinks = sl<DeepLinkService>();
@@ -81,8 +82,13 @@ class _HomePageState extends State<HomePage> {
   /// `aba` do payload: "tabelas" abre a aba de partidas; "solicitacoes" o
   /// painel de pedidos de jogador (admin); "sou_jogador" a situação do pedido
   /// do usuário; o resto, o feed.
-  void _openPushTab(String? tab) {
-    if (tab == null) return;
+  void _openPushTab(PushTarget? target) {
+    if (target == null) return;
+    if (target.hasScreen) {
+      _openPushScreen(target);
+      return;
+    }
+    final tab = target.tab;
     final user = BlocProvider.of<SessionCubit>(context).state.user;
     final route = switch (tab) {
       'solicitacoes' when user != null && user.isAdmin => AppRoutes.playerRequestsPanelPage,
@@ -103,6 +109,39 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     _homeCubit.selectTab(tab == 'tabelas' ? HomeTab.tables : HomeTab.news);
+  }
+
+  /// Push com tela: a notícia, ou a partida (detalhes) / a votação dela (votar
+  /// se aberta, o eleito se encerrada). Partida não encontrada: a aba.
+  Future<void> _openPushScreen(PushTarget target) async {
+    // Pode vir do initState (push que abriu o app): navega depois do frame.
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return;
+    if (target.screen == PushTarget.newsScreen) {
+      Navigator.pushNamed(context, AppRoutes.newsDetailsPage, arguments: {'newsId': target.id});
+      return;
+    }
+    final season = target.season.isEmpty ? SeasonCollection.currentSeason : target.season;
+    final match = await _homeCubit.findMatch(target.id, season: season);
+    if (!mounted) return;
+    if (match == null) {
+      _openPushTab(PushTarget(tab: target.tab));
+      return;
+    }
+    if (target.screen == PushTarget.votingScreen) {
+      Navigator.pushNamed(
+        context,
+        match.isVotingOpen ? AppRoutes.voteBestPlayerPage : AppRoutes.electedPlayerPage,
+        arguments: {'match': match, 'season': season},
+      );
+      return;
+    }
+    Navigator.pushNamed(
+      context,
+      AppRoutes.matchDetailsPage,
+      // Temporada nula = a corrente (como os outros acessos à tela).
+      arguments: {'match': match, 'season': season == SeasonCollection.currentSeason ? null : season},
+    );
   }
 
   /// Abre o destino do link (notícia, atleta ou destaque); `/app` fica na

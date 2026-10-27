@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/watch_match_usecase.dart';
 import 'package:arena_soccer/features/news/domain/usecases/pending_news_usecase.dart';
 import 'package:arena_soccer/features/partner_requests/domain/usecases/get_partner_slots_usecase.dart';
 import 'package:arena_soccer/features/partner_requests/domain/usecases/watch_pending_partner_requests_count_usecase.dart';
@@ -147,6 +148,11 @@ class _UnusedPartnerRequests implements WatchPendingPartnerRequestsCountUseCase 
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+class _UnusedWatchMatch implements WatchMatchUseCase {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 class _UnusedPendingNews implements PendingNewsUseCase {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -258,6 +264,7 @@ void main() {
         _cacheFirst(repository),
         _UnusedPartnerRequests(),
         _UnusedPendingNews(),
+        _UnusedWatchMatch(),
       );
       expect((await home.findHighlight('3')).right?.title, 'Copa');
       expect(repository.remoteCalls, 0);

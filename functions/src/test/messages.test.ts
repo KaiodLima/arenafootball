@@ -8,6 +8,7 @@ import {
   matchCreatedMessage,
   currentSeasonOf,
   newsMessage,
+  openData,
   playerRequestAnswerMessage,
   playerRequestMessage,
   playerRequestToOwnerMessage,
@@ -239,6 +240,22 @@ test('notícia pendente: chegada avisa admins; resposta avisa o parceiro', () =>
   const rejected = pendingNewsAnswerMessage(pending, { ...pending, status: 'rejeitada', motivo: 'Repetida' });
   assert.equal(rejected?.corpo, '"Final" não foi aprovada. Motivo: Repetida');
   assert.equal(pendingNewsAnswerMessage(pending, undefined), null);
+});
+
+test('toque abre a tela certa: partida, votação ou notícia', () => {
+  const match = { timeC: 'A', timeF: 'B', fk_competicao: 'Floresta', votacao: 'false' };
+  const ref = { id: 'm1', season: '2026' };
+  assert.deepEqual(matchCreatedMessage(match, ref)?.abrir, { tela: 'partida', id: 'm1', temporada: '2026' });
+  assert.deepEqual(votingMessage(match, { ...match, votacao: 'true' }, ref)?.abrir, { tela: 'votacao', id: 'm1', temporada: '2026' });
+  assert.equal(matchCreatedMessage(match)?.abrir, undefined);
+  assert.deepEqual(dailyGameMessage(match, ref)?.abrir?.tela, 'partida');
+  const goal = { tag: 'gol', time_casa: 'A', time_fora: 'B', fk_competicao: 'Floresta', id_partida: 'm1' };
+  assert.deepEqual(goalMessage(goal, '2026')?.abrir, { tela: 'partida', id: 'm1', temporada: '2026' });
+  assert.equal(goalMessage({ ...goal, id_partida: '' }, '2026')?.abrir, undefined);
+  const news = { titulo: 'Final', fk_competicao: 'Floresta', exibir: 'true' };
+  assert.deepEqual(newsMessage(news, 'n1')?.abrir, { tela: 'noticia', id: 'n1' });
+  assert.deepEqual(openData({ tela: 'votacao', id: 'm1', temporada: '2026' }), { tela: 'votacao', id: 'm1', temporada: '2026' });
+  assert.deepEqual(openData(undefined), {});
 });
 
 test('pedido "Sou jogador" também avisa o dono do time', () => {

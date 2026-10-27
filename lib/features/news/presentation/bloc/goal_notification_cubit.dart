@@ -273,6 +273,8 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
         scoringTeamId: form.teamIdOf(form.scoringTeam),
         scoringTeamPrimaryColor: form.teamOf(form.scoringTeam)?.primaryColor ?? '',
         scoringTeamSecondaryColor: form.teamOf(form.scoringTeam)?.secondaryColor ?? '',
+        // Ligado à partida: o push do gol abre ela (`id_partida`).
+        matchId: form.updateMatch ? form.linkedMatch?.id ?? '' : '',
         championshipId: form.championshipId,
       ),
     );

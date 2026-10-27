@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:either_dart/either.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/watch_match_usecase.dart';
 import 'package:arena_soccer/features/news/data/dtos/pending_news_dto.dart';
 import 'package:arena_soccer/features/news/domain/usecases/pending_news_usecase.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
@@ -20,6 +22,7 @@ class HomeCubit extends Cubit<HomeState> {
   final GetHighlightsCacheFirstUseCase getHighlightsCacheFirstUseCase;
   final WatchPendingPartnerRequestsCountUseCase watchPendingPartnerRequestsCountUseCase;
   final PendingNewsUseCase pendingNewsUseCase;
+  final WatchMatchUseCase watchMatchUseCase;
   StreamSubscription<Either<Failure, int>>? _pendingRequests;
   StreamSubscription<Either<Failure, int>>? _pendingTeamRequests;
   StreamSubscription<Either<Failure, int>>? _pendingPartnerRequests;
@@ -32,6 +35,7 @@ class HomeCubit extends Cubit<HomeState> {
     this.getHighlightsCacheFirstUseCase,
     this.watchPendingPartnerRequestsCountUseCase,
     this.pendingNewsUseCase,
+    this.watchMatchUseCase,
   ) : super(const HomeState());
 
   void selectTab(HomeTab tab) => emit(state.copyWith(tab: tab));
@@ -49,6 +53,13 @@ class HomeCubit extends Cubit<HomeState> {
         },
       );
     }
+  }
+
+  /// Partida de um push (gol, votação, jogo do dia); nula se não existe ou
+  /// a leitura falhar (o push cai na aba).
+  Future<MatchDTO?> findMatch(String id, {String? season}) async {
+    final response = await watchMatchUseCase(matchId: id, season: season).first;
+    return response.fold((_) => null, (match) => match);
   }
 
   /// Destaque de um deep link (`/destaque/<id>`); nulo se não existe mais.

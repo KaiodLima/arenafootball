@@ -149,7 +149,7 @@ class ArenaApp extends StatelessWidget {
         // cobrado).
         AppRoutes.home: (_) => MultiBlocProvider(
               providers: [
-                BlocProvider<HomeCubit>(create: (_) => HomeCubit(sl(), sl(), sl(), sl(), sl(), sl())),
+                BlocProvider<HomeCubit>(create: (_) => HomeCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl())),
                 BlocProvider<ChampionshipsCubit>(create: (_) => ChampionshipsCubit(sl())),
                 BlocProvider<MatchesCubit>(create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl(), sl())),
                 BlocProvider<NewsFeedCubit>(create: (_) => NewsFeedCubit(sl(), sl(), sl())),

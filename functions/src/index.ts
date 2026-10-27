@@ -31,6 +31,7 @@ import {
   manualMessage,
   matchCreatedMessage,
   newsMessage,
+  openData,
   playerRequestAnswerMessage,
   playerRequestMessage,
   playerRequestToOwnerMessage,
@@ -150,7 +151,12 @@ async function deliver(logId: string, message: PushMessage, origem: string): Pro
         body: message.corpo,
         ...(message.imagem ? { imageUrl: message.imagem } : {}),
       },
-      data: { tipo: message.tipo, aba: message.aba, ...(message.imagem ? { imagem: message.imagem } : {}) },
+      data: {
+        tipo: message.tipo,
+        aba: message.aba,
+        ...openData(message.abrir),
+        ...(message.imagem ? { imagem: message.imagem } : {}),
+      },
       android: {
         priority: 'high',
         notification: { channelId: ANDROID_CHANNEL, icon: 'ic_stat_arena', color: '#4CAF50' },
@@ -167,7 +173,7 @@ async function deliver(logId: string, message: PushMessage, origem: string): Pro
 export const onNewsCreated = onDocumentCreated('noticias/{newsId}', async (event) => {
   const data = event.data?.data();
   if (!data) return;
-  const message = data.tag === 'gol' ? goalMessage(data) : newsMessage(data);
+  const message = data.tag === 'gol' ? goalMessage(data, await currentSeason()) : newsMessage(data, event.params.newsId);
   if (message) await deliver(`${message.tipo}_${event.id}`, message, `noticias/${event.params.newsId}`);
 });
 
@@ -206,7 +212,7 @@ export const onMatchCreated = onDocumentCreated('{colecao}/{matchId}', async (ev
   }
   if (!(await isCurrentMatchCollection(event.params.colecao))) return;
   const data = event.data?.data();
-  const message = data ? matchCreatedMessage(data) : null;
+  const message = data ? matchCreatedMessage(data, { id: event.params.matchId, season: await currentSeason() }) : null;
   if (message) await deliver(`partida_${event.id}`, message, `${event.params.colecao}/${event.params.matchId}`);
 });
 
@@ -219,7 +225,8 @@ export const onMatchUpdated = onDocumentUpdated('{colecao}/{matchId}', async (ev
   if (!(await isCurrentMatchCollection(event.params.colecao))) return;
   const before = event.data?.before.data();
   const after = event.data?.after.data();
-  const message = before && after ? votingMessage(before, after) : null;
+  const message =
+    before && after ? votingMessage(before, after, { id: event.params.matchId, season: await currentSeason() }) : null;
   if (message) {
     await deliver(`${message.tipo}_${event.id}`, message, `${event.params.colecao}/${event.params.matchId}`);
   }
@@ -630,7 +637,7 @@ export const dailyGames = onSchedule({ schedule: '0 9 * * *', timeZone: 'America
   const collection = seasonCollection('partidas', await currentSeason());
   const matches = await db.collection(collection).where('data', '==', today).get();
   for (const doc of matches.docs) {
-    const message = dailyGameMessage(doc.data());
+    const message = dailyGameMessage(doc.data(), { id: doc.id, season: await currentSeason() });
     if (message) await deliver(`jogo_do_dia_${today.replace('/', '-')}_${doc.id}`, message, `${collection}/${doc.id}`);
   }
 });

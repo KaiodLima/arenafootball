@@ -352,7 +352,7 @@ void main() {
       expect([createNews.created!.homeGoals, createNews.created!.awayGoals], ['1', '0']);
       // Sem autor: nenhum campo novo no documento.
       expect(createNews.created!.toMap().keys,
-          isNot(anyOf(contains('autor_gol_id'), contains('assistencia_id'), contains('temporada'))));
+          isNot(anyOf(contains('autor_gol_id'), contains('assistencia_id'), contains('temporada'), contains('id_partida'))));
       expect(matches.updates, 0);
       expect(cubit.state, isA<SuccessGoalNotificationState>());
     });
@@ -362,6 +362,8 @@ void main() {
       cubit.incrementHome();
       await cubit.submit();
       expect(matches.updates, 1);
+      // Ligado à partida: o push do gol abre ela.
+      expect(createNews.created!.toMap()['id_partida'], _today.id);
       final state = cubit.state as SuccessGoalNotificationState;
       expect(state.matchUpdated, isTrue);
       expect(state.form.todayMatches.first.homeGoals, 2);

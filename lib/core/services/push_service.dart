@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:arena_soccer/core/services/push_target.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
 
 /// Assinatura de tópicos (o [PushService] real; um fake nos testes).
@@ -47,15 +48,16 @@ class PushTopicSync {
 
 /// Notificações push (FCM): permissão, exibição com o app aberto (no Android
 /// o FCM só mostra sozinho em segundo plano; no iOS o sistema mostra também em
-/// primeiro plano), toque (abre a aba do `data.aba`) e tópicos. Nunca derruba
+/// primeiro plano), toque (abre a aba do `data.aba` ou a tela do `data.tela`,
+/// ver [PushTarget]) e tópicos. Nunca derruba
 /// o app: falhas só vão para o log.
 class PushService implements TopicClient {
   static const String channelId = 'arena_default';
 
   final FirebaseMessaging _messaging;
   final FlutterLocalNotificationsPlugin _local;
-  final _tabRequests = StreamController<String>.broadcast();
-  String? _pendingTab;
+  final _targets = StreamController<PushTarget>.broadcast();
+  PushTarget? _pending;
   int _nextId = 0;
 
   static bool get _isIOS => defaultTargetPlatform == TargetPlatform.iOS;
@@ -63,14 +65,14 @@ class PushService implements TopicClient {
   PushService(this._messaging, [FlutterLocalNotificationsPlugin? local])
       : _local = local ?? FlutterLocalNotificationsPlugin();
 
-  /// Aba pedida por um toque em notificação com o app já aberto.
-  Stream<String> get tabRequests => _tabRequests.stream;
+  /// Destino pedido por um toque em notificação com o app já aberto.
+  Stream<PushTarget> get targets => _targets.stream;
 
-  /// Aba da notificação que abriu o app (uma vez só).
-  String? takePendingTab() {
-    final tab = _pendingTab;
-    _pendingTab = null;
-    return tab;
+  /// Destino da notificação que abriu o app (uma vez só).
+  PushTarget? takePending() {
+    final target = _pending;
+    _pending = null;
+    return target;
   }
 
   Future<void> init() async {
@@ -85,7 +87,7 @@ class PushService implements TopicClient {
             requestSoundPermission: false,
           ),
         ),
-        onDidReceiveNotificationResponse: (response) => _openTab(response.payload),
+        onDidReceiveNotificationResponse: (response) => _open(PushTarget.fromPayload(response.payload)),
       );
       await _local
           .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
@@ -99,9 +101,9 @@ class PushService implements TopicClient {
         await _messaging.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true);
       }
       FirebaseMessaging.onMessage.listen(_showForeground);
-      FirebaseMessaging.onMessageOpenedApp.listen((message) => _openTab(message.data['aba']?.toString()));
+      FirebaseMessaging.onMessageOpenedApp.listen((message) => _open(PushTarget.fromData(message.data)));
       final initial = await _messaging.getInitialMessage();
-      _pendingTab = initial?.data['aba']?.toString();
+      if (initial != null) _pending = PushTarget.fromData(initial.data);
     } catch (e) {
       AppLogger.e('init', name: 'PushService', error: e);
     }
@@ -117,8 +119,8 @@ class PushService implements TopicClient {
     }
   }
 
-  void _openTab(String? tab) {
-    if (tab != null && tab.isNotEmpty) _tabRequests.add(tab);
+  void _open(PushTarget? target) {
+    if (target != null && !target.isEmpty) _targets.add(target);
   }
 
   Future<void> _showForeground(RemoteMessage message) async {
@@ -146,7 +148,7 @@ class PushService implements TopicClient {
             largeIcon: largeIcon,
           ),
         ),
-        payload: message.data['aba']?.toString(),
+        payload: PushTarget.fromData(message.data).toPayload(),
       );
     } catch (e) {
       AppLogger.e('show', name: 'PushService', error: e);
