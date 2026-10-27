@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/app_routes.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
+import 'package:arena_soccer/features/players/presentation/player_match_stats.dart';
+import 'package:arena_soccer/features/players/presentation/widgets/recent_matches_chart.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
 import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
@@ -59,7 +63,12 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
   @override
   void initState() {
     super.initState();
-    _cubit.watch(playerId: widget.playerId, season: widget.season, initial: widget.initial);
+    _cubit.watch(
+      playerId: widget.playerId,
+      season: widget.season,
+      initial: widget.initial,
+      seasons: BlocProvider.of<RegionCubit>(context).state.seasons,
+    );
   }
 
   /// Card do atleta com as estatísticas (o texto vira a legenda).
@@ -306,6 +315,7 @@ class _Content extends StatelessWidget {
               ),
             ),
         ],
+        _AthleteExtras(state: state, player: player, season: season),
         if (isAdmin) _AdminEditor(player: player, saving: state.saving, state: state),
         _SectionLabel(l10n.athleteParticipations),
         if (state.participations.isEmpty)
@@ -716,6 +726,94 @@ class _AdminEditorState extends State<_AdminEditor> {
             ],
           ),
         ),
+      ],
+    );
+  }
+}
+
+/// Últimas partidas (gráfico), troféus de craque e histórico por temporada.
+class _AthleteExtras extends StatelessWidget {
+  final PlayerProfileState state;
+  final PlayerDTO player;
+
+  /// Temporada da tela (nula = a atual).
+  final String? season;
+
+  const _AthleteExtras({required this.state, required this.player, required this.season});
+
+  void _openMatch(BuildContext context, MatchDTO match) {
+    Navigator.pushNamed(context, AppRoutes.matchDetailsPage, arguments: {'match': match, 'season': season});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final stats = PlayerMatchStats.lastMatches(state.regionMatches, player, now: DateTime.now());
+    final current = season ?? SeasonCollection.currentSeason;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (stats.isNotEmpty) ...[
+          _SectionLabel(l10n.athleteRecentMatches),
+          ArenaCard(
+            margin: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s8),
+            padding: const EdgeInsets.all(AppSizes.s16),
+            child: RecentMatchesChart(stats: stats, onTap: (s) => _openMatch(context, s.match)),
+          ),
+        ],
+        if (state.awards.isNotEmpty) ...[
+          _SectionLabel(l10n.athleteAwardsTitle(state.awards.length)),
+          for (final match in state.awards)
+            ArenaCard(
+              margin: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s8),
+              padding: EdgeInsets.zero,
+              child: ListTile(
+                onTap: () => _openMatch(context, match),
+                leading: const Icon(Icons.emoji_events_rounded, color: AppColors.googleYellow, size: AppSizes.s30),
+                title: Text('${match.homeTeam} ${match.homeGoals} × ${match.awayGoals} ${match.awayTeam}',
+                    style: AppTypography.label(color: AppColors.textPrimary)),
+                subtitle: Text(
+                  [l10n.athleteAwardLabel, if (match.date.isNotEmpty) match.date].join(' · '),
+                  style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+                ),
+                trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary),
+              ),
+            ),
+        ],
+        if (state.history.length > 1 || (state.history.isNotEmpty && state.history.first.season != current)) ...[
+          _SectionLabel(l10n.athleteHistory),
+          for (final row in state.history)
+            ArenaCard(
+              margin: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s8),
+              padding: EdgeInsets.zero,
+              child: ListTile(
+                onTap: row.season == current
+                    ? null
+                    : () => openAthlete(context, {
+                          'playerId': row.player.id,
+                          'season': row.season == SeasonCollection.currentSeason ? null : row.season,
+                          'name': row.player.name,
+                        }),
+                leading: CircleAvatar(
+                  backgroundColor: row.season == current ? AppColors.primary : AppColors.primarySoft,
+                  child: Text(
+                    row.season.length > 2 ? row.season.substring(row.season.length - 2) : row.season,
+                    style: AppTypography.label(color: row.season == current ? AppColors.white : AppColors.primaryDark),
+                  ),
+                ),
+                title: Text(l10n.athleteHistorySeason(row.season, row.player.team),
+                    style: AppTypography.label(color: AppColors.textPrimary)),
+                subtitle: Text(
+                  l10n.athleteHistoryStats(row.player.goals, row.player.assists, row.awards),
+                  style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+                ),
+                trailing: row.season == current
+                    ? null
+                    : const Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary),
+              ),
+            ),
+        ],
       ],
     );
   }

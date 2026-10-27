@@ -731,6 +731,48 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get athleteRecentMatches => 'Recent matches';
+
+  @override
+  String athleteChartTooltip(String opponent, int goals, int assists) {
+    return 'Against $opponent: $goals goals, $assists assists';
+  }
+
+  @override
+  String athleteAwardsTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Player of the match · $count times',
+      one: 'Player of the match · once',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get athleteAwardLabel => 'Player of the match';
+
+  @override
+  String get athleteHistory => 'History';
+
+  @override
+  String athleteHistorySeason(String season, String team) {
+    return 'Season $season · $team';
+  }
+
+  @override
+  String athleteHistoryStats(int goals, int assists, int awards) {
+    String _temp0 = intl.Intl.pluralLogic(
+      awards,
+      locale: localeName,
+      other: '$awards trophies',
+      one: '1 trophy',
+      zero: 'no trophies',
+    );
+    return '$goals goals · $assists assists · $_temp0';
+  }
+
+  @override
   String get athleteStatsUnassigned => 'No competition';
 
   @override

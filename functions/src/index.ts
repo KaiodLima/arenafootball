@@ -13,6 +13,7 @@
  * o carregamento pesado (gRPC do Firestore) estoura o limite de 10s da
  * análise do deploy.
  */
+import { candidateOf, electBestPlayer, rulesOf, voteOf, votingJustClosed } from './best_player';
 import type { DocumentReference, FieldValue as FieldValueType, Firestore } from 'firebase-admin/firestore';
 import type { Messaging } from 'firebase-admin/messaging';
 import type { Storage } from 'firebase-admin/storage';
@@ -237,6 +238,8 @@ export const onMatchUpdated = onDocumentUpdated('{colecao}/{matchId}', async (ev
   if (justFinished && shouldPostVoteCard(after, await currentSeason())) {
     await postVoteCard(colecao, await currentSeason(), matchId, after);
   }
+  // Votação fechou: apura e grava o craque da partida (troféu no perfil do atleta).
+  if (votingJustClosed(before, after)) await recordBestPlayer(colecao, await currentSeason(), matchId);
   // Votação abriu/fechou: o card de votação acompanha ("Votar agora" / "Ver resultado").
   if (after.votacaoNoticia && before.votacao !== after.votacao) {
     const { db } = await admin();
@@ -253,6 +256,33 @@ export const onMatchUpdated = onDocumentUpdated('{colecao}/{matchId}', async (ev
     await updateResult(await currentSeason(), matchId, after);
   }
 });
+
+/**
+ * Craque da partida: lê os votos e as regras, acha o atleta eleito e grava
+ * `craque` na partida (sem eleito, apaga). Reabrir e fechar de novo refaz.
+ */
+async function recordBestPlayer(collection: string, season: string, matchId: string) {
+  try {
+    const { db, FieldValue } = await admin();
+    const matchRef = db.collection(collection).doc(matchId);
+    const [votesSnap, config] = await Promise.all([matchRef.collection('votos').get(), db.doc('config/votacao').get()]);
+    const votes = votesSnap.docs.map((doc) => voteOf(doc.id, doc.data()));
+    // Só os atletas votados (o voto grava o nome como no cadastro): até 30 por consulta.
+    const names = [...new Set(votes.map((v) => v.name).filter((n) => n.trim()))];
+    const candidates = [];
+    for (let i = 0; i < names.length; i += 30) {
+      const players = await db
+        .collection(seasonCollection('jogadores', season))
+        .where('nome', 'in', names.slice(i, i + 30))
+        .get();
+      candidates.push(...players.docs.map((doc) => candidateOf(doc.id, doc.data())));
+    }
+    const best = electBestPlayer(votes, candidates, rulesOf(config.data()));
+    await matchRef.update({ craque: best ?? FieldValue.delete() });
+  } catch (error) {
+    logger.error('Falha ao apurar o craque', { collection, matchId, error: String(error) });
+  }
+}
 
 /**
  * Posta o card "Vote no craque" (uma vez por partida), marca a partida e abre

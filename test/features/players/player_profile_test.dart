@@ -3,6 +3,11 @@ import 'dart:io';
 
 import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_usecase.dart';
+import 'package:arena_soccer/features/players/domain/player_season_summary.dart';
+import 'package:arena_soccer/features/players/domain/usecases/get_player_awards_usecase.dart';
+import 'package:arena_soccer/features/players/domain/usecases/get_player_season_history_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/assign_unassigned_stats_usecase.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/services/storage_upload_service.dart';
@@ -41,6 +46,10 @@ const _all = [
 ];
 
 class _FakePlayers implements IPlayersRepository {
+
+  @override
+  Future<Either<Failure, PlayerDTO?>> getPlayerByUser({required String userId, String? season}) async =>
+      const Right(null);
   @override
   Future<Either<Failure, void>> setChampionships(
     PlayerDTO player, {
@@ -229,6 +238,9 @@ void main() {
       AdjustPlayerStatsUseCase(players),
       AssignUnassignedStatsUseCase(players),
       _NoChampionships(),
+      _NoRegionMatches(),
+      _NoAwards(),
+      _NoHistory(),
     );
   });
 
@@ -351,4 +363,20 @@ void main() {
     expect(cubit.state, isA<ErrorPlayerProfileState>());
     expect(cubit.state.player, isNull);
   });
+}
+
+class _NoRegionMatches implements GetRegionMatchesUseCase {
+  @override
+  Future<Either<Failure, List<MatchDTO>>> call({required String region, String? season}) async => const Right([]);
+}
+
+class _NoAwards implements GetPlayerAwardsUseCase {
+  @override
+  Future<Either<Failure, List<MatchDTO>>> call({required String playerId, String? season}) async => const Right([]);
+}
+
+class _NoHistory implements GetPlayerSeasonHistoryUseCase {
+  @override
+  Future<Either<Failure, List<PlayerSeasonSummary>>> call({required String userId, required List<String> seasons}) async =>
+      const Right([]);
 }

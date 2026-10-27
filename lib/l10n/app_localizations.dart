@@ -1335,6 +1335,48 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @athleteRecentMatches.
+  ///
+  /// In pt, this message translates to:
+  /// **'Últimas partidas'**
+  String get athleteRecentMatches;
+
+  /// No description provided for @athleteChartTooltip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Contra {opponent}: {goals} gols, {assists} assist.'**
+  String athleteChartTooltip(String opponent, int goals, int assists);
+
+  /// No description provided for @athleteAwardsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{Craque da partida · 1 vez} other{Craque da partida · {count} vezes}}'**
+  String athleteAwardsTitle(int count);
+
+  /// No description provided for @athleteAwardLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Craque da partida'**
+  String get athleteAwardLabel;
+
+  /// No description provided for @athleteHistory.
+  ///
+  /// In pt, this message translates to:
+  /// **'Histórico'**
+  String get athleteHistory;
+
+  /// No description provided for @athleteHistorySeason.
+  ///
+  /// In pt, this message translates to:
+  /// **'Temporada {season} · {team}'**
+  String athleteHistorySeason(String season, String team);
+
+  /// No description provided for @athleteHistoryStats.
+  ///
+  /// In pt, this message translates to:
+  /// **'{goals} gols · {assists} assist. · {awards, plural, =0{nenhum troféu} =1{1 troféu} other{{awards} troféus}}'**
+  String athleteHistoryStats(int goals, int assists, int awards);
+
   /// No description provided for @athleteStatsUnassigned.
   ///
   /// In pt, this message translates to:

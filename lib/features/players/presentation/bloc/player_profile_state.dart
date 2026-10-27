@@ -1,4 +1,6 @@
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
+import 'package:arena_soccer/features/players/domain/player_season_summary.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
@@ -31,6 +33,15 @@ class PlayerProfileState extends Equatable {
   final List<TeamDTO> teams;
   final List<ChampionshipDTO> championships;
 
+  /// Partidas da região do time na temporada (gráfico "Últimas partidas").
+  final List<MatchDTO> regionMatches;
+
+  /// Partidas em que foi eleito o craque (troféus).
+  final List<MatchDTO> awards;
+
+  /// Temporadas do atleta com conta vinculada (vazio sem conta).
+  final List<PlayerSeasonSummary> history;
+
   const PlayerProfileState({
     this.player,
     this.team,
@@ -41,6 +52,9 @@ class PlayerProfileState extends Equatable {
     this.saving = false,
     this.teams = const [],
     this.championships = const [],
+    this.regionMatches = const [],
+    this.awards = const [],
+    this.history = const [],
   });
 
   /// Nome da competição pelo `id_campeonato` (vazio se não carregou).
@@ -71,6 +85,9 @@ class PlayerProfileState extends Equatable {
     bool? saving,
     List<TeamDTO>? teams,
     List<ChampionshipDTO>? championships,
+    List<MatchDTO>? regionMatches,
+    List<MatchDTO>? awards,
+    List<PlayerSeasonSummary>? history,
   }) {
     return PlayerProfileState(
       player: player ?? this.player,
@@ -82,12 +99,28 @@ class PlayerProfileState extends Equatable {
       saving: saving ?? this.saving,
       teams: teams ?? this.teams,
       championships: championships ?? this.championships,
+      regionMatches: regionMatches ?? this.regionMatches,
+      awards: awards ?? this.awards,
+      history: history ?? this.history,
     );
   }
 
   @override
   List<Object?> get props =>
-      [player, team, goalsRank, assistsRank, participations, notFound, saving, teams, championships];
+      [
+        player,
+        team,
+        goalsRank,
+        assistsRank,
+        participations,
+        notFound,
+        saving,
+        teams,
+        championships,
+        regionMatches,
+        awards,
+        history,
+      ];
 }
 
 /// Uma falha de leitura ou de gravação (a tela mostra no snackbar, ou o
@@ -103,6 +136,11 @@ class ErrorPlayerProfileState extends PlayerProfileState {
           assistsRank: base.assistsRank,
           participations: base.participations,
           notFound: base.notFound,
+          teams: base.teams,
+          championships: base.championships,
+          regionMatches: base.regionMatches,
+          awards: base.awards,
+          history: base.history,
         );
 
   @override
@@ -134,6 +172,11 @@ class RemovedFromSquadPlayerProfileState extends PlayerProfileState {
           assistsRank: base.assistsRank,
           participations: base.participations,
           notFound: base.notFound,
+          teams: base.teams,
+          championships: base.championships,
+          regionMatches: base.regionMatches,
+          awards: base.awards,
+          history: base.history,
         );
 
   @override

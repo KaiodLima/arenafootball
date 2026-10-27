@@ -35,6 +35,14 @@ const _today = MatchDTO(
 );
 
 class _FakeMatchesRepository implements IMatchesRepository {
+
+  @override
+  Future<Either<Failure, List<MatchDTO>>> getElectedMatches({required String playerId, String? season}) async =>
+      const Right([]);
+
+  @override
+  Future<Either<Failure, int>> countElectedMatches({required String playerId, String? season}) async =>
+      const Right(0);
   bool failUpdate = false;
   int updates = 0;
   final appended = <MatchGoal>[];
@@ -171,6 +179,10 @@ class _FakeChampionships implements GetRegionChampionshipsCacheFirstUseCase {
 }
 
 class _FakePlayersRepository implements IPlayersRepository {
+
+  @override
+  Future<Either<Failure, PlayerDTO?>> getPlayerByUser({required String userId, String? season}) async =>
+      const Right(null);
   @override
   Future<Either<Failure, void>> setChampionships(
     PlayerDTO player, {

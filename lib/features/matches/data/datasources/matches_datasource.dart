@@ -148,4 +148,28 @@ class MatchesDataSource {
       return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível excluir a partida.'));
     }
   }
+
+  /// Partidas em que [playerId] foi eleito o craque (troféus do perfil).
+  Future<Either<Failure, List<MatchDTO>>> getElectedMatches({required String playerId, String? season}) async {
+    try {
+      final result = await _matches(season).where('${MatchDTO.electedField}.idJogador', isEqualTo: playerId).get();
+      return Right(result.docs.map(MatchDTO.fromFirestore).toList());
+    } catch (e) {
+      AppLogger.e('getElectedMatches id=$playerId', name: 'MatchesDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível carregar os troféus.'));
+    }
+  }
+
+  /// Quantas vezes [playerId] foi o craque na temporada (`count()`, uma leitura).
+  Future<Either<Failure, int>> countElectedMatches({required String playerId, String? season}) async {
+    try {
+      final result =
+          await _matches(season).where('${MatchDTO.electedField}.idJogador', isEqualTo: playerId).count().get();
+      return Right(result.count ?? 0);
+    } catch (e) {
+      AppLogger.e('countElectedMatches id=$playerId', name: 'MatchesDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível carregar os troféus.'));
+    }
+  }
+
 }

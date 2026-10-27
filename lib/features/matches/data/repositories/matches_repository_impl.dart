@@ -75,4 +75,12 @@ class MatchesRepositoryImpl implements IMatchesRepository {
   @override
   Future<Either<Failure, void>> deleteMatch({required String matchId, String? season}) =>
       _dataSource.deleteMatch(matchId: matchId, season: season);
+
+  @override
+  Future<Either<Failure, List<MatchDTO>>> getElectedMatches({required String playerId, String? season}) =>
+      _dataSource.getElectedMatches(playerId: playerId, season: season);
+
+  @override
+  Future<Either<Failure, int>> countElectedMatches({required String playerId, String? season}) =>
+      _dataSource.countElectedMatches(playerId: playerId, season: season);
 }

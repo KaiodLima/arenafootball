@@ -138,4 +138,8 @@ class PlayersRepositoryImpl implements IPlayersRepository {
     if (response.isRight) await _cache.deleteWhere(CacheKeys.isRankingKey);
     return response;
   }
+
+  @override
+  Future<Either<Failure, PlayerDTO?>> getPlayerByUser({required String userId, String? season}) =>
+      _dataSource.getPlayerByUser(userId: userId, season: season);
 }

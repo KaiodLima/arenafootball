@@ -32,6 +32,9 @@ class MatchDTO extends Equatable {
   static const int defaultDurationMinutes = 90;
 
   /// Id do documento (gravado também em `id_partida`).
+  /// Campo do craque eleito (mapa {nome, idJogador, idTime, votos, percentual}).
+  static const String electedField = 'craque';
+
   final String id;
 
   /// Nomes dos times (cópia para exibir; o vínculo é pelos ids).
@@ -58,6 +61,11 @@ class MatchDTO extends Equatable {
   final bool isVotingOpen;
   final String votingTitle;
   final String bestPlayer;
+
+  /// `craque`: eleito pelos votos, gravado pelas functions quando a votação
+  /// fecha (id em `jogadores{ano}` e nome); vazio = sem eleito ou antiga.
+  final String electedPlayerId;
+  final String electedPlayerName;
 
   /// `quantidadeVotos`: gravado como string.
   final String votesCount;
@@ -103,6 +111,8 @@ class MatchDTO extends Equatable {
     this.isVotingOpen = false,
     this.votingTitle = '',
     this.bestPlayer = '',
+    this.electedPlayerId = '',
+    this.electedPlayerName = '',
     this.votesCount = '',
     this.registeredAt,
     this.regionIds = const [],
@@ -139,6 +149,8 @@ class MatchDTO extends Equatable {
       isVotingOpen: data['votacao'] == 'true',
       votingTitle: data['tituloVotacao']?.toString() ?? '',
       bestPlayer: data['melhorJogador']?.toString() ?? '',
+      electedPlayerId: (data[electedField] as Map?)?['idJogador']?.toString() ?? '',
+      electedPlayerName: (data[electedField] as Map?)?['nome']?.toString() ?? '',
       votesCount: data['quantidadeVotos']?.toString() ?? '',
       registeredAt: registeredAt is Timestamp ? registeredAt.toDate() : null,
       regionIds: (data[regionIdsField] as List?)?.map((id) => id.toString()).toList() ?? const [],
@@ -221,6 +233,8 @@ class MatchDTO extends Equatable {
       isVotingOpen: isVotingOpen ?? this.isVotingOpen,
       votingTitle: votingTitle ?? this.votingTitle,
       bestPlayer: bestPlayer ?? this.bestPlayer,
+      electedPlayerId: electedPlayerId,
+      electedPlayerName: electedPlayerName,
       votesCount: votesCount ?? this.votesCount,
       registeredAt: registeredAt ?? this.registeredAt,
       regionIds: regionIds ?? this.regionIds,
@@ -252,6 +266,8 @@ class MatchDTO extends Equatable {
         isVotingOpen: isVotingOpen,
         votingTitle: votingTitle,
         bestPlayer: bestPlayer,
+        electedPlayerId: electedPlayerId,
+        electedPlayerName: electedPlayerName,
         votesCount: votesCount,
         registeredAt: registeredAt,
         regionIds: regionIds,
@@ -279,6 +295,8 @@ class MatchDTO extends Equatable {
         isVotingOpen,
         votingTitle,
         bestPlayer,
+        electedPlayerId,
+        electedPlayerName,
         votesCount,
         registeredAt,
         regionIds,

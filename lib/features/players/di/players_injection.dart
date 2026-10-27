@@ -1,4 +1,6 @@
 import 'package:get_it/get_it.dart';
+import 'package:arena_soccer/features/players/domain/usecases/get_player_awards_usecase.dart';
+import 'package:arena_soccer/features/players/domain/usecases/get_player_season_history_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/assign_unassigned_stats_usecase.dart';
 import 'package:arena_soccer/features/players/data/datasources/players_datasource.dart';
 import 'package:arena_soccer/features/players/data/repositories/players_repository_impl.dart';
@@ -41,6 +43,8 @@ void registerPlayersDependencies() {
   _sl.registerLazySingleton(() => EnrollPlayerUseCase(_sl()));
   _sl.registerLazySingleton(() => AdjustPlayerStatsUseCase(_sl()));
   _sl.registerLazySingleton(() => AssignUnassignedStatsUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetPlayerSeasonHistoryUseCase(_sl(), _sl()));
+  _sl.registerLazySingleton(() => GetPlayerAwardsUseCase(_sl()));
   _sl.registerLazySingleton(() => RepairPlayerTotalsUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => WatchUserPlayerUseCase(_sl()));
   _sl.registerLazySingleton(() => SetPlayerChampionshipsUseCase(_sl()));

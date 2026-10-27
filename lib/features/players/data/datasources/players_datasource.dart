@@ -484,4 +484,16 @@ class PlayersDataSource {
       }.toList(),
     };
   }
+
+  /// Atleta da conta [userId] na temporada [season] (histórico); nulo se não jogou.
+  Future<Either<Failure, PlayerDTO?>> getPlayerByUser({required String userId, String? season}) async {
+    try {
+      final result = await _players(season).where('idUsuario', isEqualTo: userId).limit(1).get();
+      return Right(result.docs.isEmpty ? null : PlayerDTO.fromFirestore(result.docs.first));
+    } catch (e) {
+      AppLogger.e('getPlayerByUser uid=$userId season=$season', name: 'PlayersDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _loadFallback));
+    }
+  }
+
 }

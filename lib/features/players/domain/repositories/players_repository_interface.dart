@@ -79,4 +79,6 @@ abstract class IPlayersRepository {
     PlayerEnrollment? enrollment,
     String? season,
   });
+
+  Future<Either<Failure, PlayerDTO?>> getPlayerByUser({required String userId, String? season});
 }

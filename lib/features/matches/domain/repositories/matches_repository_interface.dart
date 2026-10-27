@@ -42,4 +42,8 @@ abstract class IMatchesRepository {
   });
 
   Future<Either<Failure, void>> deleteMatch({required String matchId, String? season});
+
+  Future<Either<Failure, List<MatchDTO>>> getElectedMatches({required String playerId, String? season});
+
+  Future<Either<Failure, int>> countElectedMatches({required String playerId, String? season});
 }
