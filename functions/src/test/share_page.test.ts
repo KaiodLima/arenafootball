@@ -6,6 +6,7 @@ import {
   openAppHref,
   parseSharePath,
   renderSharePage,
+  schemeHref,
 } from '../share_page';
 
 test('caminhos válidos e inválidos', () => {
@@ -46,4 +47,15 @@ test('atleta: números da temporada; sem foto usa a logo no Open Graph', () => {
   assert.equal(data.description, '1 gol e 3 assistências na temporada 2026 · Lava Jato.');
   const html = renderSharePage(data, { kind: 'atleta', season: '2026', id: 'p1' }, '/atleta/2026/p1');
   assert.ok(html.includes('content="https://arenasoccerflutter.web.app/logo.png"'));
+});
+
+test('as duas lojas na página e o esquema do app para o iPhone', () => {
+  const share = { kind: 'noticia' as const, id: 'n1' };
+  const html = renderSharePage(newsPageData({ titulo: 'Final' }), share, '/noticia/n1');
+  assert.ok(html.includes('href="https://play.google.com/store/apps/details?id=com.caiolima.arenafootball"'));
+  assert.ok(html.includes('href="https://apps.apple.com/us/app/arena-football/id6823678208"'));
+  assert.equal(schemeHref(share), 'arenafootball://noticia/n1');
+  assert.ok(html.includes('"arenafootball://noticia/n1"'));
+  // Capa inteira, sem corte.
+  assert.ok(html.includes('object-fit:contain'));
 });

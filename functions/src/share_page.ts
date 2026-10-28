@@ -2,14 +2,16 @@
  * Páginas públicas dos links compartilhados (arenasoccerflutter.web.app):
  * `/noticia/<id>`, `/atleta/<temporada>/<idJogador>`, `/destaque/<id>` e
  * `/app`. Têm as meta tags Open Graph (prévia do link no WhatsApp/redes), um
- * resumo do conteúdo e o botão que abre o app (ou a Play Store, sem o app).
+ * resumo do conteúdo, o botão que abre o app (sem o app, a loja do aparelho)
+ * e os links das duas lojas.
  * Funções puras: o handler HTTP fica no index.ts.
  */
 
 export const SITE_URL = 'https://arenasoccerflutter.web.app';
 export const APP_PACKAGE = 'com.caiolima.arenafootball';
 export const PLAY_STORE_URL = `https://play.google.com/store/apps/details?id=${APP_PACKAGE}`;
-/** Esquema do app (o mesmo do intent-filter no AndroidManifest). */
+export const APP_STORE_URL = 'https://apps.apple.com/us/app/arena-football/id6823678208';
+/** Esquema do app (o mesmo do intent-filter no AndroidManifest e do Info.plist do iOS). */
 export const APP_SCHEME = 'arenafootball';
 
 export type SharePath =
@@ -56,6 +58,34 @@ export function openAppHref(share: SharePath): string {
     `intent://${appPath(share)}#Intent;scheme=${APP_SCHEME};package=${APP_PACKAGE};` +
     `S.browser_fallback_url=${encodeURIComponent(PLAY_STORE_URL)};end`
   );
+}
+
+/** Link do esquema do app (`arenafootball://<caminho>`): o botão no iPhone. */
+export function schemeHref(share: SharePath): string {
+  return `${APP_SCHEME}://${appPath(share)}`;
+}
+
+/**
+ * Script do botão "Abrir no app" no iPhone/iPad (o `intent://` é só do
+ * Android): tenta o esquema do app e, se a página continuar visível depois de
+ * 1,5 s (app não instalado), vai para a App Store.
+ */
+function iosOpenScript(scheme: string): string {
+  return `<script>
+(function(){
+  var ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  if(!ios)return;
+  var open=document.getElementById('open');
+  open.addEventListener('click',function(e){
+    e.preventDefault();
+    var start=Date.now();
+    window.location.href=${JSON.stringify(scheme)};
+    setTimeout(function(){
+      if(!document.hidden&&Date.now()-start<3000)window.location.href=${JSON.stringify(APP_STORE_URL)};
+    },1500);
+  });
+})();
+</script>`;
 }
 
 export interface PageData {
@@ -130,7 +160,8 @@ export function renderSharePage(data: PageData, share: SharePath, path: string):
   const url = escapeHtml(`${SITE_URL}${path}`);
   const image = escapeHtml(data.image || `${SITE_URL}/logo.png`);
   const open = escapeHtml(openAppHref(share));
-  const store = escapeHtml(PLAY_STORE_URL);
+  const playStore = escapeHtml(PLAY_STORE_URL);
+  const appStore = escapeHtml(APP_STORE_URL);
   const photo = data.image ? `<img class="photo" src="${image}" alt="">` : '';
   return `<!doctype html>
 <html lang="pt-BR">
@@ -152,14 +183,16 @@ export function renderSharePage(data: PageData, share: SharePath, path: string):
   header img{height:28px}
   main{max-width:560px;margin:0 auto;padding:16px}
   .card{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.08)}
-  .photo{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;background:#E0E0E0}
+  .photo{width:100%;height:auto;max-height:80vh;object-fit:contain;display:block;background:#111}
   .body{padding:18px}
   .kicker{font-size:13px;font-weight:700;color:#2D5E2D;text-transform:uppercase;letter-spacing:.06em}
   h1{font-size:22px;line-height:1.25;margin:8px 0 10px}
   p{font-size:16px;line-height:1.5;color:#46564B;margin:0}
   .open{display:block;margin:20px 0 10px;padding:15px;border-radius:14px;background:#4CAF50;color:#fff;
     text-align:center;font-weight:700;font-size:17px;text-decoration:none}
-  .store{display:block;text-align:center;color:#2D5E2D;font-size:14px}
+  .stores{text-align:center;color:#46564B;font-size:14px}
+  .store{display:inline-block;margin:6px 4px;padding:9px 14px;border-radius:10px;border:1px solid #B7CBB8;
+    color:#1B431C;font-weight:600;text-decoration:none;background:#fff}
 </style>
 </head>
 <body>
@@ -173,9 +206,14 @@ export function renderSharePage(data: PageData, share: SharePath, path: string):
       <p>${description}</p>
     </div>
   </div>
-  <a class="open" href="${open}">Abrir no app Arena Football</a>
-  <a class="store" href="${store}">Ainda não tem o app? Baixe na Play Store</a>
+  <a class="open" id="open" href="${open}">Abrir no app Arena Football</a>
+  <div class="stores">
+    Ainda não tem o app?<br>
+    <a class="store" href="${playStore}">Baixar na Play Store</a>
+    <a class="store" href="${appStore}">Baixar na App Store</a>
+  </div>
 </main>
+${iosOpenScript(schemeHref(share))}
 </body>
 </html>`;
 }

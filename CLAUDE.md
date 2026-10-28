@@ -163,7 +163,7 @@ Push: tópico `regiaoid_<id>` (o app assina também o `regiao_<slug>` do nome na
 ## Links compartilhados e deep links
 
 - **Links públicos:** `https://arenasoccerflutter.web.app/noticia/<id>`, `/atleta/<temporada>/<idJogador>`, `/destaque/<id>` e `/app` (montados em `lib/core/utils/share_links.dart`; todo texto de compartilhar termina com um deles).
-- **Página do link:** Hosting (`hosting/public`) reescreve essas rotas para a function `sharePage` (`functions/src/share_page.ts`), que devolve HTML com Open Graph (prévia no WhatsApp) e o botão `intent://…` que abre o app (`arenafootball://<caminho>`) ou a Play Store. Cache de 10 min no CDN (`s-maxage=600`).
+- **Página do link:** Hosting (`hosting/public`) reescreve essas rotas para a function `sharePage` (`functions/src/share_page.ts`), que devolve HTML com Open Graph (prévia no WhatsApp), a capa inteira (sem corte) e o botão "Abrir no app": no Android o `intent://…` (`arenafootball://<caminho>`, sem o app vai para a Play Store); no iPhone/iPad um script tenta o esquema `arenafootball://` (registrado no `Info.plist`) e, sem o app, vai para a App Store (`APP_STORE_URL`). Os links das duas lojas ficam sempre visíveis. O card de compartilhar do app (`NewsShareCard`) mostra a capa inteira sobre um fundo desfocado dela. Cache de 10 min no CDN (`s-maxage=600`).
 - **App:** `DeepLinkService` (`lib/core/services/deep_link_service.dart`, pacote `app_links`) recebe o link (App Links `https://arenasoccerflutter.web.app` + esquema `arenafootball://`, no `AndroidManifest`) e a home abre a tela. `hosting/public/.well-known/assetlinks.json` precisa do SHA-256 da chave de debug **e** do da assinatura da Play Store.
 - **Deploy:** `firebase deploy --only "hosting,functions"`.
 
