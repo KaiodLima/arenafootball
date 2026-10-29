@@ -7,7 +7,7 @@
 export type Doc = Record<string, unknown>;
 
 /** Pastas percorridas, em ordem (as do `StorageFolder` do app). */
-export const RECOMPRESS_FOLDERS = ['noticias', 'destaques', 'times', 'jogadores', 'campeonatos', 'usuarios'] as const;
+export const RECOMPRESS_FOLDERS = ['noticias', 'destaques', 'times', 'jogadores', 'campeonatos', 'usuarios', 'album'] as const;
 
 /** Arquivos por lote (cada lote é uma execução da function). */
 export const BATCH_SIZE = 40;
@@ -33,6 +33,7 @@ export function profileFor(folder: string): Profile {
   switch (folder) {
     case 'usuarios':
     case 'jogadores':
+    case 'album':
       return { size: 600, quality: 80, png: false };
     case 'times':
       return { size: 512, quality: 80, png: true };

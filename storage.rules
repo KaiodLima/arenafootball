@@ -10,7 +10,7 @@ service firebase.storage {
       allow read: if true;
       allow write: if request.auth != null
         && request.resource.size < 10 * 1024 * 1024
-        && ((folder in ['noticias', 'destaques', 'times', 'jogadores', 'campeonatos', 'usuarios']
+        && ((folder in ['noticias', 'destaques', 'times', 'jogadores', 'campeonatos', 'usuarios', 'album']
             && request.resource.contentType.matches('image/.*'))
           || (folder == 'campeonatos' && request.resource.contentType == 'application/pdf'));
     }

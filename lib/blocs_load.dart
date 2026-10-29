@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/album/presentation/bloc/album_event_cubit.dart';
 import 'package:arena_soccer/features/achievements/presentation/bloc/achievements_cubit.dart';
 import 'package:arena_soccer/features/achievements/presentation/widgets/achievements_sync.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
@@ -51,6 +52,10 @@ class BlocsLoad extends StatelessWidget {
         // destaques e publicidade na região dele, com as permissões do admin.
         BlocProvider<PartnerCubit>(create: (_) => PartnerCubit(sl())),
 
+        // Álbum de figurinhas (evento do admin) — global: o selo flutuante da
+        // home e o pacotinho do dia da conta.
+        BlocProvider<AlbumEventCubit>(create: (_) => AlbumEventCubit(sl())),
+
         // Conquistas da conta logada — global: drawer, carteirinha, contagem
         // das ações (compartilhar, ler notícia) e comemoração ao desbloquear.
         BlocProvider<AchievementsCubit>(create: (_) => AchievementsCubit(sl(), sl(), sl(), sl(), sl(), sl())),
@@ -71,11 +76,13 @@ class OwnedTeamSync extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocListener<SessionCubit, SessionState>(
-      listenWhen: (previous, current) => previous.user?.id != current.user?.id,
+      listenWhen: (previous, current) =>
+          previous.user?.id != current.user?.id || previous.isAdmin != current.isAdmin,
       listener: (context, state) {
         BlocProvider.of<OwnedTeamCubit>(context).follow(state.user?.id);
         BlocProvider.of<MyPlayerCubit>(context).follow(state.user?.id);
         BlocProvider.of<PartnerCubit>(context).follow(state.user?.id);
+        BlocProvider.of<AlbumEventCubit>(context).follow(state.user?.id, isAdmin: state.isAdmin);
       },
       child: child,
     );

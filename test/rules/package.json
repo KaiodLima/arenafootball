@@ -1,0 +1,13 @@
+{
+  "name": "arena-firestore-rules-tests",
+  "private": true,
+  "type": "module",
+  "description": "Testes das regras do Firestore no emulador: firebase emulators:exec --only firestore --project demo-arena \"node test/rules/run.mjs\"",
+  "scripts": {
+    "test": "node run.mjs"
+  },
+  "dependencies": {
+    "@firebase/rules-unit-testing": "^3.0.4",
+    "firebase": "^10.14.1"
+  }
+}

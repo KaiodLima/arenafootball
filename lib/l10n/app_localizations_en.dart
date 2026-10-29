@@ -731,6 +731,351 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get albumBadgeOpen => 'Open!';
+
+  @override
+  String get albumAdminModeOff => 'Off';
+
+  @override
+  String get albumAdminModeTest => 'Test (admin only)';
+
+  @override
+  String get albumAdminModeAll => 'Everyone';
+
+  @override
+  String get albumAdminTesting =>
+      'Album in test mode: only you (admin) can see it.';
+
+  @override
+  String get albumAdminTestTag => 'TEST';
+
+  @override
+  String get albumPackTapToOpen => 'Tap or swipe to open';
+
+  @override
+  String get albumPackTapNext => 'Tap to continue';
+
+  @override
+  String get albumPackSkipAll => 'Skip';
+
+  @override
+  String albumPackCounter(int index, int total) {
+    return '$index of $total';
+  }
+
+  @override
+  String albumPackStickers(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stickers',
+      one: '1 sticker',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String albumPackNewCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count new',
+      one: '1 new',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String albumPackRepeatedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duplicates',
+      one: '1 duplicate',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String albumDetailPosition(int index, int total) {
+    return '$index of $total collected';
+  }
+
+  @override
+  String albumDetailPage(int page, int total) {
+    return 'Page $page of $total';
+  }
+
+  @override
+  String get albumDetailCrest => 'Crest';
+
+  @override
+  String get albumDetailAthlete => 'Athlete';
+
+  @override
+  String albumDetailYouHave(int count) {
+    return 'You have ×$count';
+  }
+
+  @override
+  String get albumDetailSeeAthlete => 'See athlete';
+
+  @override
+  String get albumDetailShare => 'Share';
+
+  @override
+  String albumDetailShareText(int number, String name, String event) {
+    return 'I got sticker No. $number – $name in the $event album!';
+  }
+
+  @override
+  String get albumPackReady => 'Your pack is here!';
+
+  @override
+  String get albumPackReadyHint => '5 free stickers, every day.';
+
+  @override
+  String get albumPackDone => 'Today\'s pack opened';
+
+  @override
+  String albumNextPackIn(String time) {
+    return 'Next pack in $time';
+  }
+
+  @override
+  String get albumTabTeams => 'Teams';
+
+  @override
+  String albumTabDuplicates(int count) {
+    return 'Duplicates ($count)';
+  }
+
+  @override
+  String get albumNoDuplicates => 'No duplicates yet.';
+
+  @override
+  String get albumCompleted => 'complete';
+
+  @override
+  String get albumStatCollected => 'collected';
+
+  @override
+  String get albumStatMissing => 'missing';
+
+  @override
+  String get albumStatDuplicates => 'duplicates';
+
+  @override
+  String get albumPageCompleteStamp => 'PAGE COMPLETE';
+
+  @override
+  String albumStickerCaption(int number, String team) {
+    return 'No. $number · $team';
+  }
+
+  @override
+  String get albumAdminNewEventMessage =>
+      'Name the album. Then you pick the teams and generate the stickers.';
+
+  @override
+  String get albumAdminEventTitleShort => 'The name needs at least 3 letters.';
+
+  @override
+  String get albumTitle => 'Sticker album';
+
+  @override
+  String get albumNoEvent => 'No active album right now.';
+
+  @override
+  String get albumEmpty => 'The album has no stickers yet.';
+
+  @override
+  String albumProgress(int collected, int total) {
+    return '$collected of $total stickers';
+  }
+
+  @override
+  String albumDuplicates(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duplicates',
+      one: '1 duplicate',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get albumOpenPack => 'Open today\'s pack';
+
+  @override
+  String get albumComeBackTomorrow => 'New pack tomorrow';
+
+  @override
+  String get albumPackOpeningShort => 'Opening…';
+
+  @override
+  String get albumPackBadge => '1 pack!';
+
+  @override
+  String get albumPackLabel => 'Arena\npack';
+
+  @override
+  String get albumPackOpening => 'Opening the pack…';
+
+  @override
+  String albumPackResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count new stickers!',
+      one: '1 new sticker!',
+      zero: 'Only duplicates this time!',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get albumPackStick => 'Stick in the album';
+
+  @override
+  String get albumPackSkip => 'Tap to see them all';
+
+  @override
+  String get albumPackFailed => 'Could not open the pack. Try again.';
+
+  @override
+  String get albumStickerNew => 'NEW!';
+
+  @override
+  String get albumStickerRepeated => 'Duplicate';
+
+  @override
+  String albumPageProgress(int collected, int total) {
+    return '$collected of $total';
+  }
+
+  @override
+  String get albumPageComplete => 'Complete';
+
+  @override
+  String get albumAdminTitle => 'Sticker album';
+
+  @override
+  String get albumAdminIntro =>
+      'Create the event, pick the teams and generate the stickers from the squads. When on, everyone sees it with a free daily pack. One active event at a time.';
+
+  @override
+  String get albumAdminEmpty => 'No events yet.';
+
+  @override
+  String get albumAdminNewEvent => 'New event';
+
+  @override
+  String get albumAdminCreate => 'Create';
+
+  @override
+  String get albumAdminEventTitle => 'Event name';
+
+  @override
+  String get albumAdminEventTitleHint => 'E.g. Floresta Cup 2026';
+
+  @override
+  String get albumAdminEventDescription => 'Description (optional)';
+
+  @override
+  String get albumAdminEventData => 'Event';
+
+  @override
+  String albumAdminEventInfo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count teams',
+      one: '1 team',
+      zero: 'No teams',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get albumAdminTeams => 'Album teams (pages)';
+
+  @override
+  String albumAdminTeamStickers(String team, int count) {
+    return '$team · $count stickers';
+  }
+
+  @override
+  String get albumAdminGenerate => 'Generate from squad';
+
+  @override
+  String get albumAdminAddSticker => 'New sticker';
+
+  @override
+  String albumAdminEditSticker(int number) {
+    return 'Sticker $number';
+  }
+
+  @override
+  String get albumAdminPhoto => 'Photo';
+
+  @override
+  String get albumAdminStickerName => 'Name on the sticker';
+
+  @override
+  String get albumAdminStickerOrder => 'Order on the page';
+
+  @override
+  String get albumAdminSaved => 'Event saved.';
+
+  @override
+  String get albumAdminActivated => 'Album on: everyone can see it now.';
+
+  @override
+  String get albumAdminDeactivated => 'Album off.';
+
+  @override
+  String get albumAdminDeleted => 'Event deleted.';
+
+  @override
+  String albumAdminGenerated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stickers created.',
+      one: '1 sticker created.',
+      zero: 'No new stickers (the squad is already in the album).',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get albumAdminStickerSaved => 'Sticker saved.';
+
+  @override
+  String get albumAdminStickerDeleted => 'Sticker deleted.';
+
+  @override
+  String albumAdminDeleteTitle(String title) {
+    return 'Delete the event $title?';
+  }
+
+  @override
+  String get albumAdminDeleteMessage =>
+      'The event and its stickers disappear from the app. Fans\' collections are kept, but without the album.';
+
+  @override
+  String get achievementMetricAlbumStickers =>
+      'Different stickers in the album';
+
+  @override
+  String get achievementMetricAlbumPages => 'Complete team pages in the album';
+
+  @override
+  String get achievementMetricAlbumComplete => 'Complete album';
+
+  @override
   String get recompressTitle => 'Recompress images';
 
   @override

@@ -20,6 +20,9 @@ class StorageFolder {
 
   /// Banner e regulamento (PDF) dos campeonatos.
   static const String championships = 'campeonatos';
+
+  /// Fotos das figurinhas do álbum (evento).
+  static const String album = 'album';
 }
 
 /// Tipo e extensão da imagem pela extensão do arquivo local. Sem extensão
@@ -62,7 +65,7 @@ class ImageUploadProfile {
   static const ImageUploadProfile cover = ImageUploadProfile(size: 1280);
 
   static ImageUploadProfile forFolder(String folder) => switch (folder) {
-        StorageFolder.users || StorageFolder.players => photo,
+        StorageFolder.users || StorageFolder.players || StorageFolder.album => photo,
         StorageFolder.teams => crest,
         _ => cover,
       };

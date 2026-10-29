@@ -734,6 +734,353 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get albumBadgeOpen => 'Abrir!';
+
+  @override
+  String get albumAdminModeOff => 'Desligado';
+
+  @override
+  String get albumAdminModeTest => 'Teste (só admin)';
+
+  @override
+  String get albumAdminModeAll => 'Para todos';
+
+  @override
+  String get albumAdminTesting => 'Álbum em teste: só você (admin) vê.';
+
+  @override
+  String get albumAdminTestTag => 'TESTE';
+
+  @override
+  String get albumPackTapToOpen => 'Toque ou arraste para abrir';
+
+  @override
+  String get albumPackTapNext => 'Toque para continuar';
+
+  @override
+  String get albumPackSkipAll => 'Pular';
+
+  @override
+  String albumPackCounter(int index, int total) {
+    return '$index de $total';
+  }
+
+  @override
+  String albumPackStickers(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count figurinhas',
+      one: '1 figurinha',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String albumPackNewCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count novas',
+      one: '1 nova',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String albumPackRepeatedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count repetidas',
+      one: '1 repetida',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String albumDetailPosition(int index, int total) {
+    return '$index de $total coladas';
+  }
+
+  @override
+  String albumDetailPage(int page, int total) {
+    return 'Página $page de $total';
+  }
+
+  @override
+  String get albumDetailCrest => 'Escudo';
+
+  @override
+  String get albumDetailAthlete => 'Atleta';
+
+  @override
+  String albumDetailYouHave(int count) {
+    return 'Você tem ×$count';
+  }
+
+  @override
+  String get albumDetailSeeAthlete => 'Ver atleta';
+
+  @override
+  String get albumDetailShare => 'Compartilhar';
+
+  @override
+  String albumDetailShareText(int number, String name, String event) {
+    return 'Tirei a figurinha Nº $number – $name no álbum $event!';
+  }
+
+  @override
+  String get albumPackReady => 'Seu pacotinho chegou!';
+
+  @override
+  String get albumPackReadyHint => '5 figurinhas grátis, todo dia.';
+
+  @override
+  String get albumPackDone => 'Pacotinho de hoje aberto';
+
+  @override
+  String albumNextPackIn(String time) {
+    return 'Próximo pacote em $time';
+  }
+
+  @override
+  String get albumTabTeams => 'Times';
+
+  @override
+  String albumTabDuplicates(int count) {
+    return 'Repetidas ($count)';
+  }
+
+  @override
+  String get albumNoDuplicates => 'Nenhuma repetida ainda.';
+
+  @override
+  String get albumCompleted => 'completo';
+
+  @override
+  String get albumStatCollected => 'coladas';
+
+  @override
+  String get albumStatMissing => 'faltam';
+
+  @override
+  String get albumStatDuplicates => 'repetidas';
+
+  @override
+  String get albumPageCompleteStamp => 'PÁGINA COMPLETA';
+
+  @override
+  String albumStickerCaption(int number, String team) {
+    return 'Nº $number · $team';
+  }
+
+  @override
+  String get albumAdminNewEventMessage =>
+      'Dê um nome ao álbum. Depois você escolhe os times e gera as figurinhas.';
+
+  @override
+  String get albumAdminEventTitleShort =>
+      'O nome precisa de pelo menos 3 letras.';
+
+  @override
+  String get albumTitle => 'Álbum de figurinhas';
+
+  @override
+  String get albumNoEvent => 'Nenhum álbum ativo no momento.';
+
+  @override
+  String get albumEmpty => 'O álbum ainda não tem figurinhas.';
+
+  @override
+  String albumProgress(int collected, int total) {
+    return '$collected de $total figurinhas';
+  }
+
+  @override
+  String albumDuplicates(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count repetidas',
+      one: '1 repetida',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get albumOpenPack => 'Abrir pacotinho do dia';
+
+  @override
+  String get albumComeBackTomorrow => 'Novo pacotinho amanhã';
+
+  @override
+  String get albumPackOpeningShort => 'Abrindo…';
+
+  @override
+  String get albumPackBadge => '1 pacote!';
+
+  @override
+  String get albumPackLabel => 'Pacotinho\nArena';
+
+  @override
+  String get albumPackOpening => 'Abrindo o pacotinho…';
+
+  @override
+  String albumPackResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count figurinhas novas!',
+      one: '1 figurinha nova!',
+      zero: 'Só repetidas desta vez!',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get albumPackStick => 'Colar no álbum';
+
+  @override
+  String get albumPackSkip => 'Toque para ver todas';
+
+  @override
+  String get albumPackFailed =>
+      'Não foi possível abrir o pacotinho. Tente de novo.';
+
+  @override
+  String get albumStickerNew => 'NOVA!';
+
+  @override
+  String get albumStickerRepeated => 'Repetida';
+
+  @override
+  String albumPageProgress(int collected, int total) {
+    return '$collected de $total';
+  }
+
+  @override
+  String get albumPageComplete => 'Completa';
+
+  @override
+  String get albumAdminTitle => 'Álbum de figurinhas';
+
+  @override
+  String get albumAdminIntro =>
+      'Crie o evento, escolha os times e gere as figurinhas do elenco. Ligado, aparece para todos com o pacotinho grátis do dia. Um evento ativo por vez.';
+
+  @override
+  String get albumAdminEmpty => 'Nenhum evento criado.';
+
+  @override
+  String get albumAdminNewEvent => 'Novo evento';
+
+  @override
+  String get albumAdminCreate => 'Criar';
+
+  @override
+  String get albumAdminEventTitle => 'Nome do evento';
+
+  @override
+  String get albumAdminEventTitleHint => 'Ex.: Copa Floresta 2026';
+
+  @override
+  String get albumAdminEventDescription => 'Descrição (opcional)';
+
+  @override
+  String get albumAdminEventData => 'Evento';
+
+  @override
+  String albumAdminEventInfo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count times',
+      one: '1 time',
+      zero: 'Nenhum time',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get albumAdminTeams => 'Times do álbum (páginas)';
+
+  @override
+  String albumAdminTeamStickers(String team, int count) {
+    return '$team · $count figurinhas';
+  }
+
+  @override
+  String get albumAdminGenerate => 'Gerar do elenco';
+
+  @override
+  String get albumAdminAddSticker => 'Nova figurinha';
+
+  @override
+  String albumAdminEditSticker(int number) {
+    return 'Figurinha $number';
+  }
+
+  @override
+  String get albumAdminPhoto => 'Foto';
+
+  @override
+  String get albumAdminStickerName => 'Nome na figurinha';
+
+  @override
+  String get albumAdminStickerOrder => 'Ordem na página';
+
+  @override
+  String get albumAdminSaved => 'Evento salvo.';
+
+  @override
+  String get albumAdminActivated => 'Álbum ligado: já aparece para todos.';
+
+  @override
+  String get albumAdminDeactivated => 'Álbum desligado.';
+
+  @override
+  String get albumAdminDeleted => 'Evento apagado.';
+
+  @override
+  String albumAdminGenerated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count figurinhas criadas.',
+      one: '1 figurinha criada.',
+      zero: 'Nenhuma figurinha nova (o elenco já está no álbum).',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get albumAdminStickerSaved => 'Figurinha salva.';
+
+  @override
+  String get albumAdminStickerDeleted => 'Figurinha apagada.';
+
+  @override
+  String albumAdminDeleteTitle(String title) {
+    return 'Apagar o evento $title?';
+  }
+
+  @override
+  String get albumAdminDeleteMessage =>
+      'O evento e as figurinhas somem do app. As coleções dos torcedores ficam guardadas, mas sem o álbum.';
+
+  @override
+  String get achievementMetricAlbumStickers =>
+      'Figurinhas diferentes coladas no álbum';
+
+  @override
+  String get achievementMetricAlbumPages =>
+      'Páginas de time completas no álbum';
+
+  @override
+  String get achievementMetricAlbumComplete => 'Álbum completo';
+
+  @override
   String get recompressTitle => 'Recomprimir imagens';
 
   @override

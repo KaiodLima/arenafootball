@@ -40,7 +40,16 @@ enum AchievementMetric {
   predictions('palpites', countedByApp: false),
 
   /// Palpites com o placar exato.
-  exactPredictions('palpitesExatos', countedByApp: false);
+  exactPredictions('palpitesExatos', countedByApp: false),
+
+  /// Figurinhas diferentes coladas no álbum (evento).
+  albumStickers('albumFigurinhas', countedByApp: false),
+
+  /// Páginas de time completas no álbum.
+  albumPages('albumPaginas', countedByApp: false),
+
+  /// Álbum completo (0/1).
+  albumComplete('albumCompleto', countedByApp: false);
 
   final String key;
 
@@ -57,7 +66,7 @@ enum AchievementMetric {
   }
 
   /// Métricas de sim/não: a meta é sempre 1.
-  bool get isBoolean => this == favoriteTeam || this == cardPhoto || this == athlete || this == teamOwner;
+  bool get isBoolean => this == favoriteTeam || this == cardPhoto || this == athlete || this == teamOwner || this == albumComplete;
 }
 
 /// Nível da medalha (cor e brilho).

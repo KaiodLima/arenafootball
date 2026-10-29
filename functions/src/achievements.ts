@@ -26,6 +26,9 @@ export const METRIC_KEYS = [
   'donoTime',
   'palpites',
   'palpitesExatos',
+  'albumFigurinhas',
+  'albumPaginas',
+  'albumCompleto',
 ] as const;
 
 /** Ids das conquistas já desbloqueadas (gravado só pelo servidor). */
