@@ -734,6 +734,53 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get albumPackTapToOpen => 'Toque ou arraste para abrir';
+
+  @override
+  String get albumPackTapNext => 'Toque para continuar';
+
+  @override
+  String get albumPackSkipAll => 'Pular';
+
+  @override
+  String albumPackCounter(int index, int total) {
+    return '$index de $total';
+  }
+
+  @override
+  String albumPackStickers(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count figurinhas',
+      one: '1 figurinha',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String albumPackNewCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count novas',
+      one: '1 nova',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String albumPackRepeatedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count repetidas',
+      one: '1 repetida',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String albumDetailPosition(int index, int total) {
     return '$index de $total coladas';
   }

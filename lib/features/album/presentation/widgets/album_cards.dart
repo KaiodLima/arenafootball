@@ -18,7 +18,10 @@ class PackCard extends StatefulWidget {
   final bool opening;
   final VoidCallback onOpen;
 
-  const PackCard({super.key, required this.available, required this.opening, required this.onOpen});
+  /// Toque longo no cartão (a prévia da abertura, só em debug).
+  final VoidCallback? onLongPress;
+
+  const PackCard({super.key, required this.available, required this.opening, required this.onOpen, this.onLongPress});
 
   @override
   State<PackCard> createState() => _PackCardState();
@@ -79,7 +82,7 @@ class _PackCardState extends State<PackCard> {
     );
     if (available) pack = Shimmer(child: pack);
 
-    return Container(
+    final card = Container(
       padding: const EdgeInsets.all(AppSizes.s16),
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -132,6 +135,7 @@ class _PackCardState extends State<PackCard> {
         ],
       ),
     );
+    return widget.onLongPress == null ? card : GestureDetector(onLongPress: widget.onLongPress, child: card);
   }
 }
 

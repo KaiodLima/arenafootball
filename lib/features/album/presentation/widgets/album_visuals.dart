@@ -212,3 +212,33 @@ class RaysPainter extends CustomPainter {
   @override
   bool shouldRepaint(RaysPainter old) => old.color != color || old.rays != rays;
 }
+
+/// Recorte serrilhado em cima e embaixo (pacote laminado).
+class ZigzagClipper extends CustomClipper<Path> {
+  final double tooth;
+
+  const ZigzagClipper({this.tooth = 8});
+
+  @override
+  Path getClip(Size size) {
+    final teeth = math.max(1, (size.width / tooth).round());
+    final step = size.width / teeth;
+    final half = tooth / 2;
+    final path = Path()..moveTo(0, half);
+    for (var i = 0; i < teeth; i++) {
+      path
+        ..lineTo(step * i + step / 2, 0)
+        ..lineTo(step * (i + 1), half);
+    }
+    path.lineTo(size.width, size.height - half);
+    for (var i = teeth; i > 0; i--) {
+      path
+        ..lineTo(step * i - step / 2, size.height)
+        ..lineTo(step * (i - 1), size.height - half);
+    }
+    return path..close();
+  }
+
+  @override
+  bool shouldReclip(ZigzagClipper old) => old.tooth != tooth;
+}

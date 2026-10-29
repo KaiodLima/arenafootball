@@ -1335,6 +1335,48 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @albumPackTapToOpen.
+  ///
+  /// In pt, this message translates to:
+  /// **'Toque ou arraste para abrir'**
+  String get albumPackTapToOpen;
+
+  /// No description provided for @albumPackTapNext.
+  ///
+  /// In pt, this message translates to:
+  /// **'Toque para continuar'**
+  String get albumPackTapNext;
+
+  /// No description provided for @albumPackSkipAll.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pular'**
+  String get albumPackSkipAll;
+
+  /// No description provided for @albumPackCounter.
+  ///
+  /// In pt, this message translates to:
+  /// **'{index} de {total}'**
+  String albumPackCounter(int index, int total);
+
+  /// No description provided for @albumPackStickers.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 figurinha} other{{count} figurinhas}}'**
+  String albumPackStickers(int count);
+
+  /// No description provided for @albumPackNewCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 nova} other{{count} novas}}'**
+  String albumPackNewCount(int count);
+
+  /// No description provided for @albumPackRepeatedCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 repetida} other{{count} repetidas}}'**
+  String albumPackRepeatedCount(int count);
+
   /// No description provided for @albumDetailPosition.
   ///
   /// In pt, this message translates to:

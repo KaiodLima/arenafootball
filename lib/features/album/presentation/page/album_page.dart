@@ -1,6 +1,10 @@
+import 'dart:math' as math;
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
+import 'package:arena_soccer/features/album/data/dtos/album_dtos.dart';
 import 'package:arena_soccer/features/album/presentation/bloc/album_cubit.dart';
 import 'package:arena_soccer/features/album/presentation/bloc/album_event_cubit.dart';
 import 'package:arena_soccer/features/album/presentation/widgets/album_cards.dart';
@@ -58,6 +62,28 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
     Navigator.pushNamed(context, AppRoutes.albumPagesPage, arguments: {'cubit': _cubit, 'index': index});
   }
 
+  /// Só em debug: a abertura com um pacote simulado (5 figurinhas sorteadas
+  /// do catálogo; novas = as que a conta não tem). Não grava nada.
+  void _previewPack(AlbumState state) {
+    if (state.stickers.isEmpty) return;
+    final random = math.Random();
+    final ids = [
+      for (var i = 0; i < (state.event?.perPack ?? 5); i++) state.stickers[random.nextInt(state.stickers.length)].id
+    ];
+    showPackOpening(
+      context,
+      pack: AlbumPackDTO(
+        id: 'preview',
+        status: AlbumPackStatus.opened,
+        stickers: ids,
+        newOnes: ids.where((id) => !state.album.has(id)).toSet().toList(),
+      ),
+      stickerOf: state.sticker,
+      frameOf: (sticker) => albumStyleOf(state, sticker.teamId),
+      eventTitle: state.event?.title ?? '',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -78,6 +104,7 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
             pack: state.pack,
             stickerOf: state.sticker,
             frameOf: (sticker) => albumStyleOf(state, sticker.teamId),
+            eventTitle: state.event?.title ?? '',
           );
         }
       },
@@ -120,7 +147,12 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
                 SliverPadding(
                   padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, 0),
                   sliver: SliverToBoxAdapter(
-                    child: PackCard(available: state.packAvailable, opening: state.opening, onOpen: _cubit.openPack),
+                    child: PackCard(
+                      available: state.packAvailable,
+                      opening: state.opening,
+                      onOpen: _cubit.openPack,
+                      onLongPress: kDebugMode ? () => _previewPack(state) : null,
+                    ),
                   ),
                 ),
                 SliverPadding(

@@ -731,6 +731,53 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get albumPackTapToOpen => 'Tap or swipe to open';
+
+  @override
+  String get albumPackTapNext => 'Tap to continue';
+
+  @override
+  String get albumPackSkipAll => 'Skip';
+
+  @override
+  String albumPackCounter(int index, int total) {
+    return '$index of $total';
+  }
+
+  @override
+  String albumPackStickers(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stickers',
+      one: '1 sticker',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String albumPackNewCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count new',
+      one: '1 new',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String albumPackRepeatedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duplicates',
+      one: '1 duplicate',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String albumDetailPosition(int index, int total) {
     return '$index of $total collected';
   }
