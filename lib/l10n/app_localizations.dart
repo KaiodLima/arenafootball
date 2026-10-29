@@ -1335,6 +1335,36 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @albumAdminModeOff.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desligado'**
+  String get albumAdminModeOff;
+
+  /// No description provided for @albumAdminModeTest.
+  ///
+  /// In pt, this message translates to:
+  /// **'Teste (só admin)'**
+  String get albumAdminModeTest;
+
+  /// No description provided for @albumAdminModeAll.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para todos'**
+  String get albumAdminModeAll;
+
+  /// No description provided for @albumAdminTesting.
+  ///
+  /// In pt, this message translates to:
+  /// **'Álbum em teste: só você (admin) vê.'**
+  String get albumAdminTesting;
+
+  /// No description provided for @albumAdminTestTag.
+  ///
+  /// In pt, this message translates to:
+  /// **'TESTE'**
+  String get albumAdminTestTag;
+
   /// No description provided for @albumPackTapToOpen.
   ///
   /// In pt, this message translates to:

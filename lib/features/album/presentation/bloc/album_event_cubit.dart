@@ -12,15 +12,17 @@ import 'package:arena_soccer/features/album/domain/usecases/album_usecase.dart';
 class AlbumEventState extends Equatable {
   final AlbumEventDTO? event;
   final String userId;
+  final bool isAdmin;
   final bool packAvailable;
 
-  const AlbumEventState({this.event, this.userId = '', this.packAvailable = false});
+  const AlbumEventState({this.event, this.userId = '', this.isAdmin = false, this.packAvailable = false});
 
-  /// Mostra o botão flutuante: evento ativo e conta logada.
-  bool get visible => event != null && userId.isNotEmpty;
+  /// Mostra o botão flutuante: evento ativo e conta logada; em teste, só
+  /// para o admin.
+  bool get visible => event != null && userId.isNotEmpty && (!event!.adminOnly || isAdmin);
 
   @override
-  List<Object?> get props => [event, userId, packAvailable];
+  List<Object?> get props => [event, userId, isAdmin, packAvailable];
 }
 
 /// Global: segue o evento ativo e o pacote do dia da conta logada (o
@@ -31,22 +33,24 @@ class AlbumEventCubit extends Cubit<AlbumEventState> {
   StreamSubscription<Either<Failure, AlbumEventDTO?>>? _event;
   StreamSubscription<Either<Failure, AlbumPackDTO?>>? _pack;
   String _userId = '';
+  bool _isAdmin = false;
   bool _started = false;
 
   AlbumEventCubit(this.albumUseCase) : super(const AlbumEventState());
 
-  void follow(String? userId) {
+  void follow(String? userId, {bool isAdmin = false}) {
     _userId = userId ?? '';
+    _isAdmin = isAdmin;
     if (!_started) {
       _started = true;
       _event = albumUseCase.watchActiveEvent().listen((response) {
         if (isClosed) return;
         final event = response.fold((_) => null, (e) => e);
         if (event?.id != state.event?.id) _watchPack(event);
-        emit(AlbumEventState(event: event, userId: _userId, packAvailable: state.packAvailable));
+        emit(AlbumEventState(event: event, userId: _userId, isAdmin: _isAdmin, packAvailable: state.packAvailable));
       });
     }
-    emit(AlbumEventState(event: state.event, userId: _userId, packAvailable: state.packAvailable));
+    emit(AlbumEventState(event: state.event, userId: _userId, isAdmin: _isAdmin, packAvailable: state.packAvailable));
     _watchPack(state.event);
   }
 
@@ -57,13 +61,13 @@ class AlbumEventCubit extends Cubit<AlbumEventState> {
     _pack?.cancel();
     _pack = null;
     if (event == null || _userId.isEmpty) {
-      if (state.packAvailable) emit(AlbumEventState(event: event, userId: _userId));
+      if (state.packAvailable) emit(AlbumEventState(event: event, userId: _userId, isAdmin: _isAdmin));
       return;
     }
     _pack = albumUseCase.watchTodayPack(userId: _userId, eventId: event.id).listen((response) {
       if (isClosed) return;
       final available = response.fold((_) => false, (pack) => pack == null);
-      emit(AlbumEventState(event: state.event, userId: _userId, packAvailable: available));
+      emit(AlbumEventState(event: state.event, userId: _userId, isAdmin: _isAdmin, packAvailable: available));
     });
   }
 

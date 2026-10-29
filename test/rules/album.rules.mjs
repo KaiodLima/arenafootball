@@ -12,6 +12,7 @@ export default async function run(env, check) {
   await seed('usuarios/admin', { idUsuario: 'admin', admin: true });
   await seed('album_eventos/ev1', { titulo: 'Copa', ativo: true });
   await seed('album_eventos/ev2', { titulo: 'Velha', ativo: false });
+  await seed('album_eventos/ev3', { titulo: 'Teste', ativo: true, somenteAdmin: true });
   await seed('album_eventos/ev1/figurinhas/f1', { idTime: 't1', nome: 'Escudo' });
   await seed('usuarios/u2/album/ev1', { figurinhas: { f1: 1 } });
 
@@ -33,6 +34,8 @@ export default async function run(env, check) {
   await check('pacote já aberto pelo app recusado', assertFails(setDoc(doc(u2, `album_pacotes/ev1_u2_${today}`), pack({ uid: 'u2', status: 'aberto' }))));
   await check('evento desligado recusado', assertFails(setDoc(doc(u2, `album_pacotes/ev2_u2_${today}`), pack({ uid: 'u2', idEvento: 'ev2' }))));
   await check('com figurinhas escolhidas recusado', assertFails(setDoc(doc(u2, `album_pacotes/ev1_u2_${today}`), pack({ uid: 'u2', figurinhas: ['f1'] }))));
+  await check('evento em teste: usuário não pede pacote', assertFails(setDoc(doc(u2, `album_pacotes/ev3_u2_${today}`), pack({ uid: 'u2', idEvento: 'ev3' }))));
+  await check('evento em teste: admin pede pacote', assertSucceeds(setDoc(doc(admin, `album_pacotes/ev3_admin_${today}`), pack({ uid: 'admin', idEvento: 'ev3' }))));
   await check('lê o próprio pacote', assertSucceeds(getDoc(doc(u1, `album_pacotes/ev1_u1_${today}`))));
   await check('não lê o pacote de outro', assertFails(getDoc(doc(u2, `album_pacotes/ev1_u1_${today}`))));
 

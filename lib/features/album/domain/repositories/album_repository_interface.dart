@@ -17,7 +17,7 @@ abstract class IAlbumRepository {
 
   Future<Either<Failure, String>> saveEvent(AlbumEventDTO event);
 
-  Future<Either<Failure, void>> setActive({required String eventId, required bool active});
+  Future<Either<Failure, void>> setMode({required String eventId, required AlbumEventMode mode});
 
   Future<Either<Failure, void>> deleteEvent(String eventId);
 

@@ -1,6 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
+/// Estado do evento no painel: desligado, em teste (só o admin vê) ou
+/// liberado para todos.
+enum AlbumEventMode { off, test, all }
+
 /// `album_eventos/{id}`: o evento do álbum de figurinhas (um ativo por vez).
 class AlbumEventDTO extends Equatable {
   static const int defaultPerPack = 5;
@@ -9,6 +13,9 @@ class AlbumEventDTO extends Equatable {
   final String title;
   final String description;
   final bool active;
+
+  /// Modo teste (`somenteAdmin`): ativo, mas só o admin vê.
+  final bool adminOnly;
 
   /// Times do álbum (páginas), na ordem; [teams] = nomes (cópia).
   final List<String> teamIds;
@@ -21,6 +28,7 @@ class AlbumEventDTO extends Equatable {
     this.title = '',
     this.description = '',
     this.active = false,
+    this.adminOnly = false,
     this.teamIds = const [],
     this.teams = const [],
     this.perPack = defaultPerPack,
@@ -35,6 +43,7 @@ class AlbumEventDTO extends Equatable {
       title: data['titulo']?.toString() ?? '',
       description: data['descricao']?.toString() ?? '',
       active: data['ativo'] == true,
+      adminOnly: data['somenteAdmin'] == true,
       teamIds: list('idsTimes'),
       teams: list('times'),
       perPack: (data['porPacote'] as num?)?.toInt() ?? defaultPerPack,
@@ -46,10 +55,17 @@ class AlbumEventDTO extends Equatable {
         'titulo': title,
         'descricao': description,
         'ativo': active,
+        'somenteAdmin': adminOnly,
         'idsTimes': teamIds,
         'times': teams,
         'porPacote': perPack,
       };
+
+  AlbumEventMode get mode => !active
+      ? AlbumEventMode.off
+      : adminOnly
+          ? AlbumEventMode.test
+          : AlbumEventMode.all;
 
   /// Nome do time [teamId] (cópia gravada no evento).
   String teamName(String teamId) {
@@ -71,6 +87,7 @@ class AlbumEventDTO extends Equatable {
       title: title ?? this.title,
       description: description ?? this.description,
       active: active ?? this.active,
+      adminOnly: adminOnly,
       teamIds: teamIds ?? this.teamIds,
       teams: teams ?? this.teams,
       perPack: perPack ?? this.perPack,
@@ -79,7 +96,7 @@ class AlbumEventDTO extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, title, description, active, teamIds, teams, perPack, createdAt];
+  List<Object?> get props => [id, title, description, active, adminOnly, teamIds, teams, perPack, createdAt];
 }
 
 /// Tipo da figurinha: o escudo do time ou um atleta.

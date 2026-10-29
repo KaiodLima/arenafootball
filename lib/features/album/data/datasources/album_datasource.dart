@@ -104,8 +104,10 @@ class AlbumDataSource {
     }
   }
 
-  /// Liga [eventId] e desliga os outros (um ativo por vez); [active] falso só desliga.
-  Future<Either<Failure, void>> setActive({required String eventId, required bool active}) async {
+  /// Põe [eventId] no [mode] (teste/todos desligam os outros: um ativo por
+  /// vez; desligado só desliga).
+  Future<Either<Failure, void>> setMode({required String eventId, required AlbumEventMode mode}) async {
+    final active = mode != AlbumEventMode.off;
     try {
       final batch = _firestore.batch();
       if (active) {
@@ -114,11 +116,11 @@ class AlbumDataSource {
           if (doc.id != eventId) batch.update(doc.reference, {'ativo': false});
         }
       }
-      batch.update(_events.doc(eventId), {'ativo': active});
+      batch.update(_events.doc(eventId), {'ativo': active, 'somenteAdmin': mode == AlbumEventMode.test});
       await batch.commit();
       return const Right(null);
     } catch (e) {
-      AppLogger.e('setActive $eventId', name: _logName, error: e);
+      AppLogger.e('setMode $eventId', name: _logName, error: e);
       return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
     }
   }

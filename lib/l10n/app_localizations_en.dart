@@ -731,6 +731,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get albumAdminModeOff => 'Off';
+
+  @override
+  String get albumAdminModeTest => 'Test (admin only)';
+
+  @override
+  String get albumAdminModeAll => 'Everyone';
+
+  @override
+  String get albumAdminTesting =>
+      'Album in test mode: only you (admin) can see it.';
+
+  @override
+  String get albumAdminTestTag => 'TEST';
+
+  @override
   String get albumPackTapToOpen => 'Tap or swipe to open';
 
   @override

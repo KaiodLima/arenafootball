@@ -138,4 +138,26 @@ void main() {
     expect(StickerName.teamCode('Ás'), 'AS');
     expect(StickerName.teamCode(''), '');
   });
+
+  test('evento em teste: selo só para o admin', () async {
+    final useCase = _AlbumUseCase();
+    final cubit = AlbumEventCubit(useCase)..follow('u1');
+    useCase.event.add(Right(_event.copyWith().adminOnlyCopy()));
+    await Future<void>.delayed(Duration.zero);
+    expect(cubit.state.visible, isFalse);
+
+    cubit.follow('u1', isAdmin: true);
+    expect(cubit.state.visible, isTrue);
+    await cubit.close();
+  });
+
+  test('modo do evento: desligado, teste e para todos', () {
+    expect(const AlbumEventDTO().mode, AlbumEventMode.off);
+    expect(const AlbumEventDTO(active: true, adminOnly: true).mode, AlbumEventMode.test);
+    expect(const AlbumEventDTO(active: true).mode, AlbumEventMode.all);
+  });
+}
+
+extension on AlbumEventDTO {
+  AlbumEventDTO adminOnlyCopy() => AlbumEventDTO(id: id, title: title, active: true, adminOnly: true, teamIds: teamIds);
 }

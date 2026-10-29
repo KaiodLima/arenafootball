@@ -34,8 +34,8 @@ class AlbumRepositoryImpl implements IAlbumRepository {
   Future<Either<Failure, String>> saveEvent(AlbumEventDTO event) => _dataSource.saveEvent(event);
 
   @override
-  Future<Either<Failure, void>> setActive({required String eventId, required bool active}) =>
-      _dataSource.setActive(eventId: eventId, active: active);
+  Future<Either<Failure, void>> setMode({required String eventId, required AlbumEventMode mode}) =>
+      _dataSource.setMode(eventId: eventId, mode: mode);
 
   @override
   Future<Either<Failure, void>> deleteEvent(String eventId) => _dataSource.deleteEvent(eventId);

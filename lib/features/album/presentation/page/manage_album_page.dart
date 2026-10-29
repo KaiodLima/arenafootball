@@ -7,6 +7,7 @@ import 'package:arena_soccer/features/album/domain/album_layout.dart';
 import 'package:arena_soccer/features/album/presentation/bloc/manage_album_cubit.dart';
 import 'package:arena_soccer/features/album/presentation/widgets/sticker_card.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
 import 'package:arena_soccer/utils/components/arena_card.dart';
@@ -82,6 +83,7 @@ class _ManageAlbumPageState extends State<ManageAlbumPage> {
   String _notice(NoticeManageAlbumState state, AppLocalizations l10n) => switch (state.notice) {
         ManageAlbumNotice.saved => l10n.albumAdminSaved,
         ManageAlbumNotice.activated => l10n.albumAdminActivated,
+        ManageAlbumNotice.testing => l10n.albumAdminTesting,
         ManageAlbumNotice.deactivated => l10n.albumAdminDeactivated,
         ManageAlbumNotice.deleted => l10n.albumAdminDeleted,
         ManageAlbumNotice.generated => l10n.albumAdminGenerated(state.count),
@@ -150,27 +152,64 @@ class _ManageAlbumPageState extends State<ManageAlbumPage> {
                                 ArenaCard(
                                   margin: const EdgeInsets.only(bottom: AppSizes.s10),
                                   padding: EdgeInsets.zero,
-                                  child: ListTile(
-                                    onTap: () => _cubit.edit(event),
-                                    title: Text(event.title, style: AppTypography.label(color: AppColors.textPrimary)),
-                                    subtitle: Text(
-                                      l10n.albumAdminEventInfo(event.teamIds.length),
-                                      style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
-                                    ),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Switch(
-                                          value: event.active,
-                                          onChanged: state.busy ? null : (value) => _cubit.setActive(event, value),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      ListTile(
+                                        onTap: () => _cubit.edit(event),
+                                        title: Row(
+                                          children: [
+                                            Flexible(
+                                              child: Text(
+                                                event.title,
+                                                style: AppTypography.label(color: AppColors.textPrimary),
+                                              ),
+                                            ),
+                                            if (event.mode == AlbumEventMode.test) ...[
+                                              const SizedBox(width: AppSizes.s8),
+                                              const _TestTag(),
+                                            ],
+                                          ],
                                         ),
-                                        IconButton(
+                                        subtitle: Text(
+                                          l10n.albumAdminEventInfo(event.teamIds.length),
+                                          style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+                                        ),
+                                        trailing: IconButton(
                                           tooltip: l10n.commonDelete,
                                           icon: const Icon(Icons.delete_outline_rounded, color: AppColors.danger),
                                           onPressed: state.busy ? null : () => _confirmDelete(event, l10n),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                      // Desligado · Teste (só admin) · Para todos.
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s12),
+                                        child: Wrap(
+                                          spacing: AppSizes.s8,
+                                          runSpacing: AppSizes.s8,
+                                          children: [
+                                            for (final mode in AlbumEventMode.values)
+                                              ArenaChoiceChip(
+                                                label: switch (mode) {
+                                                  AlbumEventMode.off => l10n.albumAdminModeOff,
+                                                  AlbumEventMode.test => l10n.albumAdminModeTest,
+                                                  AlbumEventMode.all => l10n.albumAdminModeAll,
+                                                },
+                                                icon: switch (mode) {
+                                                  AlbumEventMode.off => Icons.visibility_off_outlined,
+                                                  AlbumEventMode.test => Icons.science_outlined,
+                                                  AlbumEventMode.all => Icons.public_rounded,
+                                                },
+                                                selected: event.mode == mode,
+                                                onTap: () {
+                                                  if (!state.busy && event.mode != mode) _cubit.setMode(event, mode);
+                                                },
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                             ],
@@ -467,6 +506,23 @@ class _StickerSheetState extends State<_StickerSheet> {
               ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Etiqueta "TESTE" do evento que só o admin vê.
+class _TestTag extends StatelessWidget {
+  const _TestTag();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.s6, vertical: AppSizes.s2),
+      decoration: BoxDecoration(color: AppColors.warning, borderRadius: BorderRadius.circular(AppSizes.s6)),
+      child: Text(
+        AppLocalizations.of(context).albumAdminTestTag,
+        style: AppTypography.label(color: AppColors.black).copyWith(fontSize: AppSizes.s10, fontWeight: FontWeight.w900),
       ),
     );
   }

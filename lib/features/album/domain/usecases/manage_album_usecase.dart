@@ -21,8 +21,8 @@ class ManageAlbumUseCase {
 
   Future<Either<Failure, String>> saveEvent(AlbumEventDTO event) => _repository.saveEvent(event);
 
-  Future<Either<Failure, void>> setActive(String eventId, bool active) =>
-      _repository.setActive(eventId: eventId, active: active);
+  Future<Either<Failure, void>> setMode(String eventId, AlbumEventMode mode) =>
+      _repository.setMode(eventId: eventId, mode: mode);
 
   Future<Either<Failure, void>> deleteEvent(String eventId) => _repository.deleteEvent(eventId);
 

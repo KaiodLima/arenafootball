@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
@@ -62,7 +61,7 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
     Navigator.pushNamed(context, AppRoutes.albumPagesPage, arguments: {'cubit': _cubit, 'index': index});
   }
 
-  /// Só em debug: a abertura com um pacote simulado (5 figurinhas sorteadas
+  /// Só o admin: a abertura com um pacote simulado (5 figurinhas sorteadas
   /// do catálogo; novas = as que a conta não tem). Não grava nada.
   void _previewPack(AlbumState state) {
     if (state.stickers.isEmpty) return;
@@ -87,6 +86,7 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final isAdmin = BlocProvider.of<SessionCubit>(context).state.isAdmin;
 
     return BlocConsumer<AlbumCubit, AlbumState>(
       listener: (context, state) async {
@@ -151,7 +151,7 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
                       available: state.packAvailable,
                       opening: state.opening,
                       onOpen: _cubit.openPack,
-                      onLongPress: kDebugMode ? () => _previewPack(state) : null,
+                      onLongPress: isAdmin ? () => _previewPack(state) : null,
                     ),
                   ),
                 ),

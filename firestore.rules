@@ -528,8 +528,13 @@ service cloud.firestore {
         && request.resource.data.status == 'pedido'
         && request.resource.data.pedidoEm == request.time
         && packId == request.resource.data.idEvento + '_' + request.auth.uid + '_' + today()
-        && get(/databases/$(database)/documents/album_eventos/$(request.resource.data.idEvento)).data.ativo == true;
+        && albumOpenFor(get(/databases/$(database)/documents/album_eventos/$(request.resource.data.idEvento)).data);
       allow update, delete: if false;
+
+      // Evento ligado; em teste (`somenteAdmin`), só o admin pede pacote.
+      function albumOpenFor(event) {
+        return event.ativo == true && (event.get('somenteAdmin', false) != true || isAdmin());
+      }
     }
 
     // Manutenções feitas pelas functions (ex.: `manutencao/recomprimir`): só o
