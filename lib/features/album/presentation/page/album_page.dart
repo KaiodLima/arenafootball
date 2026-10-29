@@ -1,35 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:arena_soccer/features/album/data/dtos/album_dtos.dart';
-import 'package:arena_soccer/features/album/domain/album_layout.dart';
+import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/album/presentation/bloc/album_cubit.dart';
 import 'package:arena_soccer/features/album/presentation/bloc/album_event_cubit.dart';
+import 'package:arena_soccer/features/album/presentation/widgets/album_cards.dart';
+import 'package:arena_soccer/features/album/presentation/widgets/album_visuals.dart';
 import 'package:arena_soccer/features/album/presentation/widgets/pack_opening_dialog.dart';
-import 'package:arena_soccer/features/album/presentation/widgets/sticker_tile.dart';
+import 'package:arena_soccer/features/album/presentation/widgets/sticker_card.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
-import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/constants/team_colors.dart';
 
-/// Álbum de figurinhas do evento ativo: progresso, o pacotinho do dia e uma
-/// página por time com os espaços numerados.
+/// Cor do time da figurinha (selo e faixa); sem cor, o verde do app.
+Color albumAccentOf(AlbumState state, String teamId) =>
+    colorFromHex(state.teams[teamId]?.primaryColor ?? '') ?? AppColors.primary;
+
+/// Capa do álbum (no estilo dos álbuns digitais): o herói com o anel de
+/// progresso, o pacotinho do dia, o índice dos times (cada um abre as páginas)
+/// e a aba das repetidas.
 class StickerAlbumPage extends StatefulWidget {
   const StickerAlbumPage({super.key});
 
   @override
-  State<StickerAlbumPage> createState() => _AlbumPageState();
+  State<StickerAlbumPage> createState() => _StickerAlbumPageState();
 }
 
-class _AlbumPageState extends State<StickerAlbumPage> {
+class _StickerAlbumPageState extends State<StickerAlbumPage> {
   late final AlbumCubit _cubit;
-  final _pages = PageController();
-  int _page = 0;
+  bool _duplicatesTab = false;
 
   @override
   void initState() {
@@ -40,17 +44,8 @@ class _AlbumPageState extends State<StickerAlbumPage> {
     if (event != null && user != null) _cubit.start(event: event, userId: user.id);
   }
 
-  @override
-  void dispose() {
-    _pages.dispose();
-    super.dispose();
-  }
-
-  Color _frameOf(AlbumState state, StickerDTO sticker) =>
-      colorFromHex(state.teams[sticker.teamId]?.primaryColor ?? '') ?? AppColors.primary;
-
-  void _goTo(int index) {
-    _pages.animateToPage(index, duration: const Duration(milliseconds: 350), curve: Curves.easeOutCubic);
+  void _openPages(int index) {
+    Navigator.pushNamed(context, AppRoutes.albumPagesPage, arguments: {'cubit': _cubit, 'index': index});
   }
 
   @override
@@ -72,223 +67,221 @@ class _AlbumPageState extends State<StickerAlbumPage> {
             context,
             pack: state.pack,
             stickerOf: state.sticker,
-            frameOf: (sticker) => _frameOf(state, sticker),
+            frameOf: (sticker) => albumAccentOf(state, sticker.teamId),
           );
         }
       },
       builder: (context, state) {
         final event = state.event;
+        if (event == null) {
+          return Scaffold(
+            appBar: AppBar(backgroundColor: AppColors.primaryDark, foregroundColor: AppColors.white),
+            body: ArenaEmptyState(message: l10n.albumNoEvent, icon: Icons.collections_bookmark_outlined),
+          );
+        }
         final pages = state.pages;
-        final total = state.stickers.length;
+        final duplicates = [
+          for (final s in state.stickers)
+            if (state.album.countOf(s.id) > 1) s,
+        ];
 
         return Scaffold(
           backgroundColor: AppColors.background,
-          appBar: AppBar(
-            backgroundColor: AppColors.primaryDark,
-            foregroundColor: AppColors.white,
-            surfaceTintColor: AppColors.transparent,
-            titleSpacing: 0,
-            title: Text(
-              event?.title ?? l10n.albumTitle,
-              style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s20),
-            ),
-          ),
-          body: event == null
-              ? ArenaEmptyState(message: l10n.albumNoEvent, icon: Icons.collections_bookmark_outlined)
-              : state.loading
-                  ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
-                  : Column(
+          body: CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                pinned: true,
+                expandedHeight: AppSizes.s250,
+                backgroundColor: AppColors.primaryDark,
+                foregroundColor: AppColors.white,
+                surfaceTintColor: AppColors.transparent,
+                title: Text(
+                  event.title,
+                  style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s18),
+                ),
+                flexibleSpace: FlexibleSpaceBar(
+                  collapseMode: CollapseMode.parallax,
+                  background: _Hero(state: state),
+                ),
+              ),
+              if (state.loading)
+                const SliverFillRemaining(child: Center(child: CircularProgressIndicator(color: AppColors.primary)))
+              else ...[
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, 0),
+                  sliver: SliverToBoxAdapter(
+                    child: PackCard(available: state.packAvailable, opening: state.opening, onOpen: _cubit.openPack),
+                  ),
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s20, AppSizes.s16, AppSizes.s12),
+                  sliver: SliverToBoxAdapter(
+                    child: Row(
                       children: [
-                        _Header(state: state, total: total, onOpen: _cubit.openPack),
-                        if (pages.isEmpty)
-                          Expanded(child: ArenaEmptyState(message: l10n.albumEmpty, icon: Icons.style_outlined))
-                        else ...[
-                          SizedBox(
-                            height: AppSizes.s48,
-                            child: ListView.separated(
-                              scrollDirection: Axis.horizontal,
-                              padding: const EdgeInsets.symmetric(horizontal: AppSizes.s16, vertical: AppSizes.s6),
-                              itemCount: pages.length,
-                              separatorBuilder: (_, __) => const SizedBox(width: AppSizes.s8),
-                              itemBuilder: (context, i) => ArenaChoiceChip(
-                                label: pages[i].team,
-                                icon: pages[i].isComplete(state.album) ? Icons.verified_rounded : null,
-                                selected: i == _page,
-                                onTap: () => _goTo(i),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: PageView.builder(
-                              controller: _pages,
-                              itemCount: pages.length,
-                              onPageChanged: (i) => setState(() => _page = i),
-                              itemBuilder: (context, i) => _TeamPage(
-                                page: pages[i],
-                                state: state,
-                                frame: pages[i].stickers.isEmpty
-                                    ? AppColors.primary
-                                    : _frameOf(state, pages[i].stickers.first),
-                              ),
-                            ),
-                          ),
-                        ],
+                        ArenaChoiceChip(
+                          label: l10n.albumTabTeams,
+                          icon: Icons.grid_view_rounded,
+                          selected: !_duplicatesTab,
+                          onTap: () => setState(() => _duplicatesTab = false),
+                        ),
+                        const SizedBox(width: AppSizes.s8),
+                        ArenaChoiceChip(
+                          label: l10n.albumTabDuplicates(duplicates.length),
+                          icon: Icons.copy_all_rounded,
+                          selected: _duplicatesTab,
+                          onTap: () => setState(() => _duplicatesTab = true),
+                        ),
                       ],
                     ),
+                  ),
+                ),
+                if (!_duplicatesTab && pages.isEmpty)
+                  SliverToBoxAdapter(child: ArenaEmptyState(message: l10n.albumEmpty, icon: Icons.style_outlined))
+                else if (!_duplicatesTab)
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s32),
+                    sliver: SliverGrid.builder(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        mainAxisSpacing: AppSizes.s12,
+                        crossAxisSpacing: AppSizes.s12,
+                        childAspectRatio: 0.78,
+                      ),
+                      itemCount: pages.length,
+                      itemBuilder: (context, i) => TeamIndexCard(
+                        page: pages[i],
+                        album: state.album,
+                        crestUrl: state.teams[pages[i].teamId]?.imageUrl ?? '',
+                        accent: albumAccentOf(state, pages[i].teamId),
+                        onTap: () => _openPages(i),
+                      ),
+                    ),
+                  )
+                else if (duplicates.isEmpty)
+                  SliverToBoxAdapter(
+                    child: ArenaEmptyState(message: l10n.albumNoDuplicates, icon: Icons.copy_all_outlined),
+                  )
+                else
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s6, AppSizes.s16, AppSizes.s32),
+                    sliver: SliverGrid.builder(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        mainAxisSpacing: AppSizes.s16,
+                        crossAxisSpacing: AppSizes.s12,
+                        childAspectRatio: 3 / 4,
+                      ),
+                      itemCount: duplicates.length,
+                      itemBuilder: (context, i) => StickerCard(
+                        sticker: duplicates[i],
+                        accent: albumAccentOf(state, duplicates[i].teamId),
+                        count: state.album.countOf(duplicates[i].id),
+                      ),
+                    ),
+                  ),
+              ],
+            ],
+          ),
         );
       },
     );
   }
 }
 
-/// Progresso, repetidas e o botão do pacote do dia.
-class _Header extends StatelessWidget {
+/// Herói da capa: fundo escuro com listras diagonais, o anel com a % e os
+/// números (coladas, faltam, repetidas).
+class _Hero extends StatelessWidget {
   final AlbumState state;
-  final int total;
-  final VoidCallback onOpen;
 
-  const _Header({required this.state, required this.total, required this.onOpen});
+  const _Hero({required this.state});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final total = state.stickers.length;
     final collected = state.collected;
-    final duplicates = state.album.duplicates(state.stickers);
+    final percent = total == 0 ? 0 : (collected * 100 / total).floor();
 
-    return Container(
-      margin: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, AppSizes.s4),
-      padding: const EdgeInsets.all(AppSizes.s16),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [AppColors.primaryMedium, AppColors.primaryDark]),
-        borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  l10n.albumProgress(collected, total),
-                  style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s18),
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        const DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [AppColors.primaryDark, AppColors.primaryMedium],
+            ),
+          ),
+        ),
+        CustomPaint(painter: StripesPainter(color: AppColors.white.withValues(alpha: 0.04), diagonal: true)),
+        SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(AppSizes.s20, AppSizes.s60, AppSizes.s20, AppSizes.s20),
+            child: Row(
+              children: [
+                AlbumProgressRing(
+                  value: total == 0 ? 0 : collected / total,
+                  size: AppSizes.s120,
+                  stroke: AppSizes.s10,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('$percent%', style: AppTypography.display(color: AppColors.white)),
+                      Text(
+                        l10n.albumCompleted,
+                        style: AppTypography.subtitle(color: AppColors.whiteSoft).copyWith(fontSize: AppSizes.s12),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              if (duplicates > 0)
-                Text(
-                  l10n.albumDuplicates(duplicates),
-                  style: AppTypography.label(color: AppColors.whiteSoft).copyWith(fontSize: AppSizes.s12),
+                const SizedBox(width: AppSizes.s20),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _Stat(value: collected, label: l10n.albumStatCollected, color: AppColors.googleYellow),
+                      _Stat(value: total - collected, label: l10n.albumStatMissing, color: AppColors.white),
+                      _Stat(
+                        value: state.album.duplicates(state.stickers),
+                        label: l10n.albumStatDuplicates,
+                        color: AppColors.whiteSoft,
+                      ),
+                    ],
+                  ),
                 ),
-            ],
-          ),
-          const SizedBox(height: AppSizes.s8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(AppSizes.s6),
-            child: TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0, end: total == 0 ? 0 : collected / total),
-              duration: const Duration(milliseconds: 600),
-              builder: (context, value, _) => LinearProgressIndicator(
-                value: value,
-                minHeight: AppSizes.s8,
-                backgroundColor: AppColors.whiteMuted,
-                color: AppColors.googleYellow,
-              ),
+              ],
             ),
           ),
-          const SizedBox(height: AppSizes.s12),
-          FilledButton.icon(
-            onPressed: state.packAvailable ? onOpen : null,
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.googleYellow,
-              foregroundColor: AppColors.black,
-              disabledBackgroundColor: AppColors.whiteMuted,
-              disabledForegroundColor: AppColors.whiteSoft,
-              padding: const EdgeInsets.symmetric(vertical: AppSizes.s12),
-            ),
-            icon: state.opening
-                ? const SizedBox.square(
-                    dimension: AppSizes.s18,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.black),
-                  )
-                : Icon(state.packAvailable ? Icons.card_giftcard_rounded : Icons.schedule_rounded),
-            label: Text(
-              state.opening
-                  ? l10n.albumPackOpeningShort
-                  : state.packAvailable
-                      ? l10n.albumOpenPack
-                      : l10n.albumComeBackTomorrow,
-              style: AppTypography.label(color: state.packAvailable ? AppColors.black : AppColors.whiteSoft),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
 
-/// Página de um time: cabeçalho (escudo, nome, progresso, selo de completa) e
-/// a grade de espaços.
-class _TeamPage extends StatelessWidget {
-  final AlbumTeamPage page;
-  final AlbumState state;
-  final Color frame;
+class _Stat extends StatelessWidget {
+  final int value;
+  final String label;
+  final Color color;
 
-  const _TeamPage({required this.page, required this.state, required this.frame});
+  const _Stat({required this.value, required this.label, required this.color});
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final complete = page.isComplete(state.album);
-    final crest = state.teams[page.teamId]?.imageUrl ?? '';
-
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s8, AppSizes.s16, AppSizes.s32),
-      children: [
-        Row(
-          children: [
-            TeamCrest(imageUrl: crest, size: AppSizes.s40),
-            const SizedBox(width: AppSizes.s12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(page.team, style: AppTypography.title().copyWith(fontSize: AppSizes.s18)),
-                  Text(
-                    l10n.albumPageProgress(page.collected(state.album), page.stickers.length),
-                    style: AppTypography.subtitle(),
-                  ),
-                ],
-              ),
-            ),
-            if (complete)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: AppSizes.s10, vertical: AppSizes.s4),
-                decoration: BoxDecoration(color: frame, borderRadius: BorderRadius.circular(AppSizes.s20)),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.verified_rounded, color: AppColors.white, size: AppSizes.s16),
-                    const SizedBox(width: AppSizes.s4),
-                    Text(l10n.albumPageComplete,
-                        style: AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s12)),
-                  ],
-                ),
-              ),
-          ],
-        ),
-        const SizedBox(height: AppSizes.s16),
-        GridView.count(
-          crossAxisCount: 3,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: AppSizes.s12,
-          crossAxisSpacing: AppSizes.s12,
-          childAspectRatio: 3 / 4,
-          children: [
-            for (final sticker in page.stickers)
-              StickerTile(sticker: sticker, count: state.album.countOf(sticker.id), frame: frame),
-          ],
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSizes.s2),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
+        children: [
+          SizedBox(
+            width: AppSizes.s48,
+            child: Text('$value', style: AppTypography.title(color: color).copyWith(fontSize: AppSizes.s22)),
+          ),
+          Text(label, style: AppTypography.subtitle(color: AppColors.whiteSoft)),
+        ],
+      ),
     );
   }
 }

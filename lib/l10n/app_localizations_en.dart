@@ -731,6 +731,51 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get albumPackReady => 'Your pack is here!';
+
+  @override
+  String get albumPackReadyHint => '5 free stickers, every day.';
+
+  @override
+  String get albumPackDone => 'Today\'s pack opened';
+
+  @override
+  String albumNextPackIn(String time) {
+    return 'Next pack in $time';
+  }
+
+  @override
+  String get albumTabTeams => 'Teams';
+
+  @override
+  String albumTabDuplicates(int count) {
+    return 'Duplicates ($count)';
+  }
+
+  @override
+  String get albumNoDuplicates => 'No duplicates yet.';
+
+  @override
+  String get albumCompleted => 'complete';
+
+  @override
+  String get albumStatCollected => 'collected';
+
+  @override
+  String get albumStatMissing => 'missing';
+
+  @override
+  String get albumStatDuplicates => 'duplicates';
+
+  @override
+  String get albumPageCompleteStamp => 'PAGE COMPLETE';
+
+  @override
+  String albumStickerCaption(int number, String team) {
+    return 'No. $number · $team';
+  }
+
+  @override
   String get albumAdminNewEventMessage =>
       'Name the album. Then you pick the teams and generate the stickers.';
 

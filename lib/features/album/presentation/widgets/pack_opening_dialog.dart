@@ -4,7 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:arena_soccer/features/album/data/dtos/album_dtos.dart';
-import 'package:arena_soccer/features/album/presentation/widgets/sticker_tile.dart';
+import 'package:arena_soccer/features/album/presentation/widgets/sticker_card.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
 import 'package:arena_soccer/utils/components/celebration_painters.dart';
@@ -248,7 +248,7 @@ class _RevealCard extends StatelessWidget {
               child: front && sticker != null
                   ? Column(
                       children: [
-                        StickerTile(sticker: sticker, count: 1, frame: frameOf(sticker)),
+                        StickerCard(sticker: sticker, accent: frameOf(sticker)),
                         const SizedBox(height: AppSizes.s6),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s2),

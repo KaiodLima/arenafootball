@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/album/data/dtos/album_dtos.dart';
 import 'package:arena_soccer/features/album/domain/album_layout.dart';
 import 'package:arena_soccer/features/album/presentation/bloc/manage_album_cubit.dart';
-import 'package:arena_soccer/features/album/presentation/widgets/sticker_tile.dart';
+import 'package:arena_soccer/features/album/presentation/widgets/sticker_card.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
@@ -346,7 +346,7 @@ class _TeamStickers extends StatelessWidget {
               childAspectRatio: 3 / 4,
               children: [
                 for (final sticker in page.stickers)
-                  StickerTile(sticker: sticker, count: 1, frame: AppColors.primary, onTap: () => onEdit(sticker)),
+                  StickerCard(sticker: sticker, accent: AppColors.primary, onTap: () => onEdit(sticker)),
               ],
             ),
           ],

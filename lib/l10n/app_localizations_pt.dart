@@ -734,6 +734,51 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get albumPackReady => 'Seu pacotinho chegou!';
+
+  @override
+  String get albumPackReadyHint => '5 figurinhas grátis, todo dia.';
+
+  @override
+  String get albumPackDone => 'Pacotinho de hoje aberto';
+
+  @override
+  String albumNextPackIn(String time) {
+    return 'Próximo pacote em $time';
+  }
+
+  @override
+  String get albumTabTeams => 'Times';
+
+  @override
+  String albumTabDuplicates(int count) {
+    return 'Repetidas ($count)';
+  }
+
+  @override
+  String get albumNoDuplicates => 'Nenhuma repetida ainda.';
+
+  @override
+  String get albumCompleted => 'completo';
+
+  @override
+  String get albumStatCollected => 'coladas';
+
+  @override
+  String get albumStatMissing => 'faltam';
+
+  @override
+  String get albumStatDuplicates => 'repetidas';
+
+  @override
+  String get albumPageCompleteStamp => 'PÁGINA COMPLETA';
+
+  @override
+  String albumStickerCaption(int number, String team) {
+    return 'Nº $number · $team';
+  }
+
+  @override
   String get albumAdminNewEventMessage =>
       'Dê um nome ao álbum. Depois você escolhe os times e gera as figurinhas.';
 

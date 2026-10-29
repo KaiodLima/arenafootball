@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/album/presentation/page/album_pages_page.dart';
 import 'package:arena_soccer/features/album/presentation/bloc/album_cubit.dart';
 import 'package:arena_soccer/features/album/presentation/bloc/manage_album_cubit.dart';
 import 'package:arena_soccer/features/album/presentation/page/album_page.dart';
@@ -295,6 +296,14 @@ class ArenaApp extends StatelessWidget {
               create: (_) => AlbumCubit(sl(), sl()),
               child: const StickerAlbumPage(),
             ),
+        // Páginas do álbum: o mesmo AlbumCubit da capa (sem leitura nova).
+        AppRoutes.albumPagesPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+          return BlocProvider<AlbumCubit>.value(
+            value: args['cubit'] as AlbumCubit,
+            child: AlbumPagesPage(initialPage: args['index'] as int? ?? 0),
+          );
+        },
         AppRoutes.manageAlbumPage: (_) => BlocProvider<ManageAlbumCubit>(
               create: (_) => ManageAlbumCubit(sl(), sl(), sl()),
               child: const ManageAlbumPage(),

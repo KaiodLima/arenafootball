@@ -1335,6 +1335,84 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @albumPackReady.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu pacotinho chegou!'**
+  String get albumPackReady;
+
+  /// No description provided for @albumPackReadyHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'5 figurinhas grátis, todo dia.'**
+  String get albumPackReadyHint;
+
+  /// No description provided for @albumPackDone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pacotinho de hoje aberto'**
+  String get albumPackDone;
+
+  /// No description provided for @albumNextPackIn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Próximo pacote em {time}'**
+  String albumNextPackIn(String time);
+
+  /// No description provided for @albumTabTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Times'**
+  String get albumTabTeams;
+
+  /// No description provided for @albumTabDuplicates.
+  ///
+  /// In pt, this message translates to:
+  /// **'Repetidas ({count})'**
+  String albumTabDuplicates(int count);
+
+  /// No description provided for @albumNoDuplicates.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma repetida ainda.'**
+  String get albumNoDuplicates;
+
+  /// No description provided for @albumCompleted.
+  ///
+  /// In pt, this message translates to:
+  /// **'completo'**
+  String get albumCompleted;
+
+  /// No description provided for @albumStatCollected.
+  ///
+  /// In pt, this message translates to:
+  /// **'coladas'**
+  String get albumStatCollected;
+
+  /// No description provided for @albumStatMissing.
+  ///
+  /// In pt, this message translates to:
+  /// **'faltam'**
+  String get albumStatMissing;
+
+  /// No description provided for @albumStatDuplicates.
+  ///
+  /// In pt, this message translates to:
+  /// **'repetidas'**
+  String get albumStatDuplicates;
+
+  /// No description provided for @albumPageCompleteStamp.
+  ///
+  /// In pt, this message translates to:
+  /// **'PÁGINA COMPLETA'**
+  String get albumPageCompleteStamp;
+
+  /// No description provided for @albumStickerCaption.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nº {number} · {team}'**
+  String albumStickerCaption(int number, String team);
+
   /// No description provided for @albumAdminNewEventMessage.
   ///
   /// In pt, this message translates to:

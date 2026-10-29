@@ -98,4 +98,11 @@ void main() {
     expect(cubit.state.visible, isFalse);
     await cubit.close();
   });
+
+  test('contagem do próximo pacote: até a meia-noite de Brasília', () {
+    // 20h UTC = 17h em Brasília → faltam 7h.
+    expect(AlbumPackId.untilNext(DateTime.utc(2026, 10, 28, 20)), const Duration(hours: 7));
+    // 2h30 UTC = 23h30 do dia anterior em Brasília → 30 min.
+    expect(AlbumPackId.untilNext(DateTime.utc(2026, 10, 28, 2, 30)), const Duration(minutes: 30));
+  });
 }

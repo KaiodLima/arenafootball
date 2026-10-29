@@ -8,4 +8,11 @@ class AlbumPackId {
 
   static String of({required String eventId, required String userId, required DateTime now}) =>
       '${eventId}_${userId}_${PartnerSlots.brasiliaDay(now)}';
+
+  /// Quanto falta para o próximo pacote: a meia-noite de Brasília (UTC-3).
+  static Duration untilNext(DateTime now) {
+    final local = now.toUtc().subtract(const Duration(hours: 3));
+    final midnight = DateTime.utc(local.year, local.month, local.day + 1);
+    return midnight.difference(local);
+  }
 }
