@@ -156,6 +156,14 @@ void main() {
     expect(const AlbumEventDTO(active: true, adminOnly: true).mode, AlbumEventMode.test);
     expect(const AlbumEventDTO(active: true).mode, AlbumEventMode.all);
   });
+
+  test('selo da home: contagem curta até o próximo pacote', () {
+    expect(AlbumPackId.shortLabel(const Duration(hours: 7, minutes: 12)), '7h12');
+    expect(AlbumPackId.shortLabel(const Duration(hours: 7, minutes: 5)), '7h05');
+    expect(AlbumPackId.shortLabel(const Duration(hours: 3)), '3h');
+    expect(AlbumPackId.shortLabel(const Duration(minutes: 45)), '45min');
+    expect(AlbumPackId.shortLabel(const Duration(seconds: 20)), '1min');
+  });
 }
 
 extension on AlbumEventDTO {

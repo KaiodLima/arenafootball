@@ -1335,6 +1335,12 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @albumBadgeOpen.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abrir!'**
+  String get albumBadgeOpen;
+
   /// No description provided for @albumAdminModeOff.
   ///
   /// In pt, this message translates to:

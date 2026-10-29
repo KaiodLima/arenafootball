@@ -227,6 +227,7 @@
   "matchCardHideGoals": "Hide goals",
   "matchCardToday": "TODAY",
   "matchCardTomorrow": "TOMORROW",
+  "albumBadgeOpen": "Open!",
   "albumAdminModeOff": "Off",
   "albumAdminModeTest": "Test (admin only)",
   "albumAdminModeAll": "Everyone",

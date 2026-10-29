@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:arena_soccer/features/partner_requests/domain/partner_slots.dart';
 
 /// Pacotinho do dia do álbum: o id do doc é `<evento>_<uid>_<a-m-d>` (dia em
@@ -14,5 +16,13 @@ class AlbumPackId {
     final local = now.toUtc().subtract(const Duration(hours: 3));
     final midnight = DateTime.utc(local.year, local.month, local.day + 1);
     return midnight.difference(local);
+  }
+
+  /// Contagem curta do selo da home: "7h12", "7h" ou "45min".
+  static String shortLabel(Duration left) {
+    final hours = left.inHours;
+    final minutes = left.inMinutes % 60;
+    if (hours == 0) return '${math.max(1, minutes)}min';
+    return minutes == 0 ? '${hours}h' : '${hours}h${minutes.toString().padLeft(2, '0')}';
   }
 }

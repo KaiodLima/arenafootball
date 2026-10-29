@@ -731,6 +731,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get albumBadgeOpen => 'Open!';
+
+  @override
   String get albumAdminModeOff => 'Off';
 
   @override
