@@ -17,6 +17,7 @@ import 'package:arena_soccer/utils/components/circle_photo_picker.dart';
 import 'package:arena_soccer/utils/components/form_section.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
+import 'package:arena_soccer/utils/constants/team_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
@@ -310,6 +311,16 @@ class _TeamStickers extends StatelessWidget {
 
   const _TeamStickers({required this.page, required this.state, required this.cubit, required this.onEdit});
 
+  /// Cores e escudo do time (os times que o painel já carregou).
+  StickerStyle get _style {
+    final team = state.teams.where((t) => t.id == page.teamId).firstOrNull;
+    return StickerStyle(
+      accent: colorFromHex(team?.primaryColor ?? '') ?? AppColors.primary,
+      secondary: colorFromHex(team?.secondaryColor ?? ''),
+      crestUrl: team?.imageUrl ?? '',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -346,7 +357,7 @@ class _TeamStickers extends StatelessWidget {
               childAspectRatio: 3 / 4,
               children: [
                 for (final sticker in page.stickers)
-                  StickerCard(sticker: sticker, accent: AppColors.primary, onTap: () => onEdit(sticker)),
+                  StickerCard(sticker: sticker, style: _style, onTap: () => onEdit(sticker)),
               ],
             ),
           ],

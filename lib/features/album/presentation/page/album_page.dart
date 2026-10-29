@@ -21,6 +21,16 @@ import 'package:arena_soccer/utils/constants/team_colors.dart';
 Color albumAccentOf(AlbumState state, String teamId) =>
     colorFromHex(state.teams[teamId]?.primaryColor ?? '') ?? AppColors.primary;
 
+/// Cores e escudo do time para desenhar a figurinha.
+StickerStyle albumStyleOf(AlbumState state, String teamId) {
+  final team = state.teams[teamId];
+  return StickerStyle(
+    accent: albumAccentOf(state, teamId),
+    secondary: colorFromHex(team?.secondaryColor ?? ''),
+    crestUrl: team?.imageUrl ?? '',
+  );
+}
+
 /// Capa do álbum (no estilo dos álbuns digitais): o herói com o anel de
 /// progresso, o pacotinho do dia, o índice dos times (cada um abre as páginas)
 /// e a aba das repetidas.
@@ -67,7 +77,7 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
             context,
             pack: state.pack,
             stickerOf: state.sticker,
-            frameOf: (sticker) => albumAccentOf(state, sticker.teamId),
+            frameOf: (sticker) => albumStyleOf(state, sticker.teamId),
           );
         }
       },
@@ -174,7 +184,7 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
                       itemCount: duplicates.length,
                       itemBuilder: (context, i) => StickerCard(
                         sticker: duplicates[i],
-                        accent: albumAccentOf(state, duplicates[i].teamId),
+                        style: albumStyleOf(state, duplicates[i].teamId),
                         count: state.album.countOf(duplicates[i].id),
                       ),
                     ),

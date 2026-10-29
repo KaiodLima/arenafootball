@@ -65,7 +65,8 @@ class _StickerDetailPageState extends State<StickerDetailPage> {
           _controller = PageController(initialPage: _index);
         }
         final current = stickers[_index.clamp(0, stickers.length - 1)];
-        final accent = albumAccentOf(state, widget.teamId);
+        final style = albumStyleOf(state, widget.teamId);
+        final accent = style.accent;
         final crestUrl = state.teams[widget.teamId]?.imageUrl ?? '';
         final eventTitle = state.event?.title ?? '';
 
@@ -93,6 +94,7 @@ class _StickerDetailPageState extends State<StickerDetailPage> {
                         itemBuilder: (context, i) => Center(
                           child: _TiltCard(
                             sticker: stickers[i],
+                            style: style,
                             accent: accent,
                             crestUrl: crestUrl,
                             eventTitle: eventTitle,
@@ -104,6 +106,7 @@ class _StickerDetailPageState extends State<StickerDetailPage> {
                     _Dots(count: stickers.length, index: _index, color: accent),
                     _InfoPanel(
                       sticker: current,
+                      style: style,
                       accent: accent,
                       crestUrl: crestUrl,
                       eventTitle: eventTitle,
@@ -217,6 +220,7 @@ class _TopBar extends StatelessWidget {
 /// gestos), então deslizar para os lados continua folheando.
 class _TiltCard extends StatefulWidget {
   final StickerDTO sticker;
+  final StickerStyle style;
   final Color accent;
   final String crestUrl;
   final String eventTitle;
@@ -224,6 +228,7 @@ class _TiltCard extends StatefulWidget {
 
   const _TiltCard({
     required this.sticker,
+    required this.style,
     required this.accent,
     required this.crestUrl,
     required this.eventTitle,
@@ -324,7 +329,7 @@ class _TiltCardState extends State<_TiltCard> with TickerProviderStateMixin {
                       sheen: tilt.dx,
                     ),
                   )
-                : StickerCard(sticker: widget.sticker, accent: widget.accent, heroTag: heroTag, sheen: tilt.dx);
+                : StickerCard(sticker: widget.sticker, style: widget.style, heroTag: heroTag, sheen: tilt.dx);
 
             return SizedBox.fromSize(
               size: size,
@@ -514,6 +519,7 @@ class _Dots extends StatelessWidget {
 /// repetidas, página) e as ações. Sobe com fade ao abrir.
 class _InfoPanel extends StatelessWidget {
   final StickerDTO sticker;
+  final StickerStyle style;
   final Color accent;
   final String crestUrl;
   final String eventTitle;
@@ -523,6 +529,7 @@ class _InfoPanel extends StatelessWidget {
 
   const _InfoPanel({
     required this.sticker,
+    required this.style,
     required this.accent,
     required this.crestUrl,
     required this.eventTitle,
@@ -538,7 +545,7 @@ class _InfoPanel extends StatelessWidget {
       title: l10n.albumDetailShare,
       fileName: 'figurinha_${sticker.number}',
       shareText: stickerShareText(l10n, sticker, eventTitle),
-      preview: _SharePreview(sticker: sticker, accent: accent, eventTitle: eventTitle),
+      preview: _SharePreview(sticker: sticker, style: style, eventTitle: eventTitle),
     );
   }
 
@@ -663,14 +670,15 @@ class _Chip extends StatelessWidget {
 /// Imagem compartilhada: a figurinha sobre o fundo do time, com o álbum.
 class _SharePreview extends StatelessWidget {
   final StickerDTO sticker;
-  final Color accent;
+  final StickerStyle style;
   final String eventTitle;
 
-  const _SharePreview({required this.sticker, required this.accent, required this.eventTitle});
+  const _SharePreview({required this.sticker, required this.style, required this.eventTitle});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final accent = style.accent;
     return Container(
       padding: const EdgeInsets.all(AppSizes.s24),
       decoration: BoxDecoration(
@@ -688,7 +696,7 @@ class _SharePreview extends StatelessWidget {
             style: AppTypography.label(color: AppColors.whiteSoft).copyWith(letterSpacing: 1.2),
           ),
           const SizedBox(height: AppSizes.s16),
-          SizedBox(width: AppSizes.s200, child: StickerCard(sticker: sticker, accent: accent, sheen: 0)),
+          SizedBox(width: AppSizes.s200, child: StickerCard(sticker: sticker, style: style, sheen: 0)),
           const SizedBox(height: AppSizes.s16),
           Text(sticker.name, style: AppTypography.title(color: AppColors.white)),
           Text(

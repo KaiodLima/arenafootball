@@ -6,6 +6,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/album/data/dtos/album_dtos.dart';
 import 'package:arena_soccer/features/album/domain/album_layout.dart';
 import 'package:arena_soccer/features/album/domain/album_pack_id.dart';
+import 'package:arena_soccer/features/album/domain/sticker_name.dart';
 import 'package:arena_soccer/features/album/domain/usecases/album_usecase.dart';
 import 'package:arena_soccer/features/album/presentation/bloc/album_event_cubit.dart';
 import 'package:arena_soccer/features/album/presentation/page/sticker_detail_page.dart';
@@ -122,5 +123,19 @@ void main() {
     final l10n = lookupAppLocalizations(const Locale('pt'));
     const sticker = StickerDTO(id: 'a1', number: 12, name: 'Ana', team: 'Alfa');
     expect(stickerShareText(l10n, sticker, 'Copa'), 'Tirei a figurinha Nº 12 – Ana no álbum Copa!\n$appLink');
+  });
+
+  test('figurinha: primeiro nome pequeno e sobrenome em destaque', () {
+    expect(StickerName.split('Carlos Eduardo Silva'), ('Carlos', 'Silva'));
+    expect(StickerName.split('  Reginaldo '), ('', 'Reginaldo'));
+    expect(StickerName.split(''), ('', ''));
+  });
+
+  test('figurinha: sigla de 3 letras do time', () {
+    expect(StickerName.teamCode('Lava Jato FC'), 'LAV');
+    expect(StickerName.teamCode('São Paulo'), 'SAO');
+    expect(StickerName.teamCode('Esporte Clube Vila Nova Unida'), 'VNU');
+    expect(StickerName.teamCode('Ás'), 'AS');
+    expect(StickerName.teamCode(''), '');
   });
 }

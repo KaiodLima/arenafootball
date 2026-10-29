@@ -1,19 +1,34 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/features/album/data/dtos/album_dtos.dart';
+import 'package:arena_soccer/features/album/domain/sticker_name.dart';
 import 'package:arena_soccer/features/album/presentation/widgets/album_visuals.dart';
+import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// Figurinha colada (estilo Panini): borda branca de papel, foto cobrindo,
-/// gradiente embaixo com o nome, o número num selo no canto e, no escudo, o
-/// brilho holográfico ("foil"). [count] > 1 mostra "×N".
+/// Cores e escudo do time de uma figurinha. Sem [secondary], o card usa um
+/// tom mais escuro do [accent].
+class StickerStyle {
+  final Color accent;
+  final Color? secondary;
+  final String crestUrl;
+
+  const StickerStyle({required this.accent, this.secondary, this.crestUrl = ''});
+
+  Color get second => secondary ?? darken(accent, 0.25);
+}
+
+/// Figurinha colada no estilo Panini: papel branco em volta, fundo nas cores
+/// do time com listras e o escudo apagado atrás, o atleta em destaque, o
+/// número e o escudo nos cantos, o time na vertical e a placa inclinada com
+/// o primeiro nome pequeno, o SOBRENOME grande e a sigla do time. O escudo é
+/// a "brilhante" (raios + foil). Tudo escala pela largura (grade ou detalhe).
+/// [count] > 1 mostra "×N".
 class StickerCard extends StatelessWidget {
   final StickerDTO sticker;
-
-  /// Cor do time (selo do número e faixa do nome).
-  final Color accent;
+  final StickerStyle style;
   final int count;
   final VoidCallback? onTap;
 
@@ -27,7 +42,7 @@ class StickerCard extends StatelessWidget {
   const StickerCard({
     super.key,
     required this.sticker,
-    required this.accent,
+    required this.style,
     this.count = 1,
     this.onTap,
     this.heroTag,
@@ -40,74 +55,25 @@ class StickerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget card = AspectRatio(
       aspectRatio: 3 / 4,
-      child: Container(
-        padding: const EdgeInsets.all(AppSizes.s4),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(AppSizes.s10),
-          boxShadow: [
-            BoxShadow(color: AppColors.black.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(AppSizes.s6),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [accent.withValues(alpha: 0.35), darken(accent, 0.2)],
-                  ),
-                ),
-              ),
-              _Photo(sticker: sticker, accent: accent),
-              // Faixa do nome.
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(AppSizes.s6, AppSizes.s16, AppSizes.s6, AppSizes.s4),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [AppColors.transparent, AppColors.black.withValues(alpha: 0.75)],
-                    ),
-                  ),
-                  child: Text(
-                    sticker.name.toUpperCase(),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: AppTypography.label(color: AppColors.white).copyWith(
-                      fontSize: AppSizes.s10,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.4,
-                    ),
-                  ),
-                ),
-              ),
-              // Número.
-              Positioned(
-                top: AppSizes.s4,
-                left: AppSizes.s4,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSizes.s6, vertical: AppSizes.s2),
-                  decoration: BoxDecoration(color: accent, borderRadius: BorderRadius.circular(AppSizes.s6)),
-                  child: Text(
-                    '${sticker.number}',
-                    style: AppTypography.label(color: AppColors.white)
-                        .copyWith(fontSize: AppSizes.s10, fontWeight: FontWeight.w900),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+      child: LayoutBuilder(
+        builder: (context, box) {
+          // Escala: 1 = card de 100 px de largura (grade de 3 colunas).
+          final k = box.maxWidth / 100;
+          return Container(
+            padding: EdgeInsets.all(AppSizes.s2 + AppSizes.s2 * k),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(AppSizes.s8 * k),
+              boxShadow: [
+                BoxShadow(color: AppColors.black.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(AppSizes.s6 * k),
+              child: _Face(sticker: sticker, style: style, k: k),
+            ),
+          );
+        },
       ),
     );
     final sheen = this.sheen;
@@ -177,32 +143,300 @@ class StickerCard extends StatelessWidget {
   }
 }
 
-class _Photo extends StatelessWidget {
-  final StickerDTO sticker;
-  final Color accent;
+/// Texto legível sobre [color] (preto em cor clara, branco em escura).
+Color _onColor(Color color) => color.computeLuminance() > 0.6 ? AppColors.black : AppColors.white;
 
-  const _Photo({required this.sticker, required this.accent});
+/// Frente da figurinha (dentro do papel), com as medidas × [k].
+class _Face extends StatelessWidget {
+  final StickerDTO sticker;
+  final StickerStyle style;
+  final double k;
+
+  const _Face({required this.sticker, required this.style, required this.k});
 
   @override
   Widget build(BuildContext context) {
     final crest = sticker.kind == StickerKind.crest;
-    final placeholder = Icon(
-      crest ? Icons.shield_rounded : Icons.person_rounded,
-      color: AppColors.white.withValues(alpha: 0.6),
-      size: AppSizes.s40,
+    final accent = style.accent;
+    final second = style.second;
+    final deep = darken(accent, 0.22);
+    return LayoutBuilder(
+      builder: (context, box) {
+        final plate = box.maxHeight * 0.25;
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            // Fundo: cor do time, textura e (no escudo) os raios.
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color.lerp(accent, AppColors.white, 0.12)!, deep],
+                ),
+              ),
+            ),
+            if (crest)
+              CustomPaint(painter: RaysPainter(color: AppColors.white.withValues(alpha: 0.1)))
+            else
+              CustomPaint(
+                painter: StripesPainter(color: AppColors.white.withValues(alpha: 0.07), width: 6 * k, diagonal: true),
+              ),
+            // Marca d'água: o escudo grande e apagado atrás do atleta.
+            if (!crest && style.crestUrl.isNotEmpty)
+              Positioned(
+                top: box.maxHeight * 0.08,
+                left: -box.maxWidth * 0.1,
+                right: -box.maxWidth * 0.1,
+                bottom: plate,
+                child: Opacity(opacity: 0.14, child: _Image(url: style.crestUrl, contain: true)),
+              ),
+            // Atleta (ou o escudo grande na brilhante).
+            if (crest)
+              Positioned(
+                top: box.maxHeight * 0.12,
+                left: box.maxWidth * 0.14,
+                right: box.maxWidth * 0.14,
+                bottom: plate + box.maxHeight * 0.04,
+                child: _Image(url: sticker.imageUrl, contain: true, icon: Icons.shield_rounded, k: k),
+              )
+            else
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: plate * 0.55,
+                child: _Image(url: sticker.imageUrl, icon: Icons.person_rounded, k: k),
+              ),
+            // Funde a foto na placa.
+            if (!crest)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: plate * 0.5,
+                height: box.maxHeight * 0.2,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [AppColors.transparent, deep.withValues(alpha: 0.85)],
+                    ),
+                  ),
+                ),
+              ),
+            // Time na vertical, na lateral (como o país nas Panini).
+            if (!crest && sticker.team.isNotEmpty)
+              Positioned(
+                left: AppSizes.s2 * k,
+                top: box.maxHeight * 0.24,
+                bottom: plate + AppSizes.s4 * k,
+                child: RotatedBox(
+                  quarterTurns: 3,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      sticker.team.toUpperCase(),
+                      maxLines: 1,
+                      style: AppTypography.label(color: AppColors.white.withValues(alpha: 0.55)).copyWith(
+                        fontSize: AppSizes.s8 * k,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: AppSizes.s1 * k,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            // Número.
+            Positioned(
+              top: AppSizes.s4 * k,
+              left: AppSizes.s4 * k,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: AppSizes.s4 * k, vertical: AppSizes.s1 * k),
+                decoration: BoxDecoration(
+                  color: second,
+                  borderRadius: BorderRadius.circular(AppSizes.s4 * k),
+                  border: Border.all(color: AppColors.white, width: AppSizes.s1 * k),
+                ),
+                child: Text(
+                  '${sticker.number}',
+                  style: AppTypography.label(color: _onColor(second))
+                      .copyWith(fontSize: AppSizes.s10 * k, fontWeight: FontWeight.w900, height: 1.1),
+                ),
+              ),
+            ),
+            // Escudo pequeno no canto.
+            if (!crest && style.crestUrl.isNotEmpty)
+              Positioned(
+                top: AppSizes.s4 * k,
+                right: AppSizes.s4 * k,
+                child: Container(
+                  width: AppSizes.s20 * k,
+                  height: AppSizes.s20 * k,
+                  padding: EdgeInsets.all(AppSizes.s2 * k),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [BoxShadow(color: AppColors.black.withValues(alpha: 0.25), blurRadius: 3 * k)],
+                  ),
+                  child: _Image(url: style.crestUrl, contain: true),
+                ),
+              ),
+            // Placa do nome.
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: plate,
+              child: _NamePlate(sticker: sticker, accent: deep, second: second, k: k),
+            ),
+          ],
+        );
+      },
     );
-    if (sticker.imageUrl.isEmpty) return Center(child: placeholder);
-    return Padding(
-      padding:
-          crest ? const EdgeInsets.fromLTRB(AppSizes.s12, AppSizes.s20, AppSizes.s12, AppSizes.s24) : EdgeInsets.zero,
-      child: CachedNetworkImage(
-        imageUrl: sticker.imageUrl,
-        fit: crest ? BoxFit.contain : BoxFit.cover,
-        alignment: Alignment.topCenter,
-        fadeInDuration: const Duration(milliseconds: 150),
-        placeholder: (_, __) => Center(child: placeholder),
-        errorWidget: (_, __, ___) => Center(child: placeholder),
-      ),
+  }
+}
+
+/// Placa inclinada: filete da cor secundária, a faixa do time com o primeiro
+/// nome pequeno e o SOBRENOME grande, e a aba escura com a sigla.
+class _NamePlate extends StatelessWidget {
+  final StickerDTO sticker;
+  final Color accent;
+  final Color second;
+  final double k;
+
+  const _NamePlate({required this.sticker, required this.accent, required this.second, required this.k});
+
+  @override
+  Widget build(BuildContext context) {
+    final crest = sticker.kind == StickerKind.crest;
+    final (first, main) = crest
+        ? (AppLocalizations.of(context).albumDetailCrest, sticker.team.isEmpty ? sticker.name : sticker.team)
+        : StickerName.split(sticker.name);
+    final code = StickerName.teamCode(sticker.team);
+    final slant = AppSizes.s8 * k;
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        ClipPath(clipper: _SlantClipper(slant: slant), child: ColoredBox(color: second)),
+        ClipPath(
+          clipper: _SlantClipper(slant: slant, inset: AppSizes.s2 * k),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [accent, darken(accent, 0.12)],
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(AppSizes.s6 * k, slant, AppSizes.s4 * k, AppSizes.s2 * k),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (first.isNotEmpty)
+                      Text(
+                        crest ? first.toUpperCase() : first,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.label(color: AppColors.white.withValues(alpha: 0.8)).copyWith(
+                          fontSize: AppSizes.s8 * k,
+                          fontWeight: FontWeight.w600,
+                          height: 1.1,
+                          letterSpacing: crest ? AppSizes.s1 * k : 0,
+                        ),
+                      ),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        main.toUpperCase(),
+                        maxLines: 1,
+                        style: AppTypography.label(color: AppColors.white).copyWith(
+                          fontSize: AppSizes.s12 * k,
+                          fontWeight: FontWeight.w900,
+                          height: 1.05,
+                          letterSpacing: AppSizes.s1 * k * 0.3,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (code.isNotEmpty) ...[
+                SizedBox(width: AppSizes.s2 * k),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: AppSizes.s2 * k * 1.5, vertical: AppSizes.s1 * k),
+                  decoration: BoxDecoration(
+                    color: AppColors.black.withValues(alpha: 0.35),
+                    borderRadius: BorderRadius.circular(AppSizes.s2 * k),
+                  ),
+                  child: Text(
+                    code,
+                    style: AppTypography.label(color: AppColors.white).copyWith(
+                      fontSize: AppSizes.s8 * k,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: AppSizes.s1 * k * 0.5,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Recorte com a borda de cima inclinada (sobe da esquerda para a direita);
+/// [inset] desce a borda (o filete aparece por cima).
+class _SlantClipper extends CustomClipper<Path> {
+  final double slant;
+  final double inset;
+
+  const _SlantClipper({required this.slant, this.inset = 0});
+
+  @override
+  Path getClip(Size size) => Path()
+    ..moveTo(0, slant + inset)
+    ..lineTo(size.width, inset)
+    ..lineTo(size.width, size.height)
+    ..lineTo(0, size.height)
+    ..close();
+
+  @override
+  bool shouldReclip(_SlantClipper old) => old.slant != slant || old.inset != inset;
+}
+
+class _Image extends StatelessWidget {
+  final String url;
+  final bool contain;
+  final IconData? icon;
+  final double k;
+
+  const _Image({required this.url, this.contain = false, this.icon, this.k = 1});
+
+  @override
+  Widget build(BuildContext context) {
+    final placeholder = icon == null
+        ? const SizedBox.shrink()
+        : Center(child: Icon(icon, color: AppColors.white.withValues(alpha: 0.6), size: AppSizes.s40 * k));
+    if (url.isEmpty) return placeholder;
+    return CachedNetworkImage(
+      imageUrl: url,
+      fit: contain ? BoxFit.contain : BoxFit.cover,
+      alignment: contain ? Alignment.center : Alignment.topCenter,
+      fadeInDuration: const Duration(milliseconds: 150),
+      placeholder: (_, __) => placeholder,
+      errorWidget: (_, __, ___) => placeholder,
     );
   }
 }

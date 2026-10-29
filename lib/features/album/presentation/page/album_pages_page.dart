@@ -153,7 +153,7 @@ class _TeamSpread extends StatelessWidget {
     final team = state.teams[page.teamId];
     final primary = colorFromHex(team?.primaryColor ?? '') ?? AppColors.primary;
     final secondary = colorFromHex(team?.secondaryColor ?? '') ?? AppColors.primaryDark;
-    final accent = albumAccentOf(state, page.teamId);
+    final style = albumStyleOf(state, page.teamId);
     final collected = page.collected(state.album);
     final complete = page.isComplete(state.album);
 
@@ -235,7 +235,7 @@ class _TeamSpread extends StatelessWidget {
                       state.album.has(sticker.id)
                           ? StickerCard(
                               sticker: sticker,
-                              accent: accent,
+                              style: style,
                               count: state.album.countOf(sticker.id),
                               heroTag: 'sticker_${sticker.id}',
                               onTap: () => Navigator.pushNamed(

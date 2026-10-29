@@ -182,3 +182,33 @@ Color darken(Color color, double amount) {
   final hsl = HSLColor.fromColor(color);
   return hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0)).toColor();
 }
+
+/// Raios saindo do centro (fundo da figurinha brilhante do escudo).
+class RaysPainter extends CustomPainter {
+  final Color color;
+  final int rays;
+
+  const RaysPainter({required this.color, this.rays = 16});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height * 0.42);
+    final radius = size.longestSide;
+    final paint = Paint()..color = color;
+    final step = math.pi * 2 / rays;
+    for (var i = 0; i < rays; i++) {
+      final a = i * step;
+      canvas.drawPath(
+        Path()
+          ..moveTo(center.dx, center.dy)
+          ..lineTo(center.dx + radius * math.cos(a), center.dy + radius * math.sin(a))
+          ..lineTo(center.dx + radius * math.cos(a + step / 2), center.dy + radius * math.sin(a + step / 2))
+          ..close(),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(RaysPainter old) => old.color != color || old.rays != rays;
+}

@@ -19,7 +19,7 @@ Future<void> showPackOpening(
   BuildContext context, {
   required AlbumPackDTO pack,
   required StickerDTO? Function(String id) stickerOf,
-  required Color Function(StickerDTO sticker) frameOf,
+  required StickerStyle Function(StickerDTO sticker) frameOf,
 }) {
   return showGeneralDialog<void>(
     context: context,
@@ -35,7 +35,7 @@ Future<void> showPackOpening(
 class _PackOpening extends StatefulWidget {
   final AlbumPackDTO pack;
   final StickerDTO? Function(String id) stickerOf;
-  final Color Function(StickerDTO sticker) frameOf;
+  final StickerStyle Function(StickerDTO sticker) frameOf;
 
   const _PackOpening({required this.pack, required this.stickerOf, required this.frameOf});
 
@@ -221,7 +221,7 @@ class _RevealCard extends StatelessWidget {
   final bool visible;
   final StickerDTO? sticker;
   final bool isNew;
-  final Color Function(StickerDTO sticker) frameOf;
+  final StickerStyle Function(StickerDTO sticker) frameOf;
 
   const _RevealCard(
       {super.key, required this.visible, required this.sticker, required this.isNew, required this.frameOf});
@@ -248,7 +248,7 @@ class _RevealCard extends StatelessWidget {
               child: front && sticker != null
                   ? Column(
                       children: [
-                        StickerCard(sticker: sticker, accent: frameOf(sticker)),
+                        StickerCard(sticker: sticker, style: frameOf(sticker)),
                         const SizedBox(height: AppSizes.s6),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s2),
