@@ -39,4 +39,7 @@ String achievementMetricLabel(AppLocalizations l10n, AchievementMetric metric) =
       AchievementMetric.teamOwner => l10n.achievementMetricTeamOwner,
       AchievementMetric.predictions => l10n.achievementMetricPredictions,
       AchievementMetric.exactPredictions => l10n.achievementMetricExactPredictions,
+      AchievementMetric.albumStickers => l10n.achievementMetricAlbumStickers,
+      AchievementMetric.albumPages => l10n.achievementMetricAlbumPages,
+      AchievementMetric.albumComplete => l10n.achievementMetricAlbumComplete,
     };

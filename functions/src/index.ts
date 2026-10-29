@@ -13,6 +13,7 @@
  * o carregamento pesado (gRPC do Firestore) estoura o limite de 10s da
  * análise do deploy.
  */
+import { albumOf, applyPack, drawPack, parsePackId, perPackOf, stickerOf } from './album';
 import {
   BATCH_SIZE,
   DONE_FLAG,
@@ -856,6 +857,9 @@ export const onUserDeleted = functionsV1
     // Conquistas: contadores e desbloqueios da conta.
     await db.recursiveDelete(db.collection('usuarios').doc(uid).collection('progresso'));
     await db.recursiveDelete(db.collection('usuarios').doc(uid).collection('conquistas'));
+    // Álbum de figurinhas: a coleção da conta e os pacotes pedidos.
+    await db.recursiveDelete(db.collection('usuarios').doc(uid).collection('album'));
+    await deleteExisting(db, (await db.collection('album_pacotes').where('uid', '==', uid).get()).docs.map((d) => d.ref));
 
     // Votos de cada temporada (partidas{ano}/{id}/votos/{uid}) e vínculos de atleta e dono.
     const seasons = seasonsToSweep((await db.doc('config/temporadas').get()).data());
@@ -1097,3 +1101,48 @@ export const onRecompressRequested = onDocumentWritten(
     }
   },
 );
+
+/**
+ * Pacotinho do dia do álbum de figurinhas: o app cria `album_pacotes/{id}`
+ * (`<evento>_<uid>_<dia>`, um por dia pelas regras) e aqui sorteia as
+ * figurinhas, cola no álbum da conta e soma nas métricas das conquistas.
+ */
+export const onAlbumPackRequested = onDocumentCreated('album_pacotes/{packId}', async (event) => {
+  const parsed = parsePackId(event.params.packId);
+  if (!parsed || event.data?.data()?.status !== 'pedido') return;
+  const { db, FieldValue } = await admin();
+  const packRef = db.collection('album_pacotes').doc(event.params.packId);
+  try {
+    const eventRef = db.collection('album_eventos').doc(parsed.eventId);
+    const albumRef = db.collection('usuarios').doc(parsed.uid).collection('album').doc(parsed.eventId);
+    const [eventSnap, catalog, albumSnap] = await Promise.all([
+      eventRef.get(),
+      eventRef.collection('figurinhas').get(),
+      albumRef.get(),
+    ]);
+    if (eventSnap.data()?.ativo !== true || catalog.empty) {
+      await packRef.update({ status: 'recusado', abertoEm: FieldValue.serverTimestamp() });
+      return;
+    }
+    const stickers = catalog.docs.map((doc) => stickerOf(doc.id, doc.data()));
+    const drawn = drawPack(stickers, perPackOf(eventSnap.data()));
+    const before = albumOf(albumSnap.data());
+    const { album, novas, newPages, justCompleted } = applyPack(before, drawn, stickers);
+    const batch = db.batch();
+    batch.update(packRef, { status: 'aberto', figurinhas: drawn, novas, abertoEm: FieldValue.serverTimestamp() });
+    batch.set(albumRef, { ...album, ultimoPacote: FieldValue.serverTimestamp() }, { merge: true });
+    batch.set(
+      await progressRef(parsed.uid),
+      {
+        albumFigurinhas: FieldValue.increment(novas.length),
+        albumPaginas: FieldValue.increment(newPages.length),
+        ...(justCompleted ? { albumCompleto: 1 } : {}),
+      },
+      { merge: true },
+    );
+    await batch.commit();
+  } catch (error) {
+    logger.error('Falha ao abrir o pacote', { pack: event.params.packId, error: String(error) });
+    await packRef.update({ status: 'erro' }).catch(() => undefined);
+  }
+});

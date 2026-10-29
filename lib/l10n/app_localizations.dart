@@ -1335,6 +1335,300 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @albumTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Álbum de figurinhas'**
+  String get albumTitle;
+
+  /// No description provided for @albumNoEvent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum álbum ativo no momento.'**
+  String get albumNoEvent;
+
+  /// No description provided for @albumEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'O álbum ainda não tem figurinhas.'**
+  String get albumEmpty;
+
+  /// No description provided for @albumProgress.
+  ///
+  /// In pt, this message translates to:
+  /// **'{collected} de {total} figurinhas'**
+  String albumProgress(int collected, int total);
+
+  /// No description provided for @albumDuplicates.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 repetida} other{{count} repetidas}}'**
+  String albumDuplicates(int count);
+
+  /// No description provided for @albumOpenPack.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abrir pacotinho do dia'**
+  String get albumOpenPack;
+
+  /// No description provided for @albumComeBackTomorrow.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novo pacotinho amanhã'**
+  String get albumComeBackTomorrow;
+
+  /// No description provided for @albumPackOpeningShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abrindo…'**
+  String get albumPackOpeningShort;
+
+  /// No description provided for @albumPackBadge.
+  ///
+  /// In pt, this message translates to:
+  /// **'1 pacote!'**
+  String get albumPackBadge;
+
+  /// No description provided for @albumPackLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pacotinho\nArena'**
+  String get albumPackLabel;
+
+  /// No description provided for @albumPackOpening.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abrindo o pacotinho…'**
+  String get albumPackOpening;
+
+  /// No description provided for @albumPackResult.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{Só repetidas desta vez!} =1{1 figurinha nova!} other{{count} figurinhas novas!}}'**
+  String albumPackResult(int count);
+
+  /// No description provided for @albumPackStick.
+  ///
+  /// In pt, this message translates to:
+  /// **'Colar no álbum'**
+  String get albumPackStick;
+
+  /// No description provided for @albumPackSkip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Toque para ver todas'**
+  String get albumPackSkip;
+
+  /// No description provided for @albumPackFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível abrir o pacotinho. Tente de novo.'**
+  String get albumPackFailed;
+
+  /// No description provided for @albumStickerNew.
+  ///
+  /// In pt, this message translates to:
+  /// **'NOVA!'**
+  String get albumStickerNew;
+
+  /// No description provided for @albumStickerRepeated.
+  ///
+  /// In pt, this message translates to:
+  /// **'Repetida'**
+  String get albumStickerRepeated;
+
+  /// No description provided for @albumPageProgress.
+  ///
+  /// In pt, this message translates to:
+  /// **'{collected} de {total}'**
+  String albumPageProgress(int collected, int total);
+
+  /// No description provided for @albumPageComplete.
+  ///
+  /// In pt, this message translates to:
+  /// **'Completa'**
+  String get albumPageComplete;
+
+  /// No description provided for @albumAdminTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Álbum de figurinhas'**
+  String get albumAdminTitle;
+
+  /// No description provided for @albumAdminIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Crie o evento, escolha os times e gere as figurinhas do elenco. Ligado, aparece para todos com o pacotinho grátis do dia. Um evento ativo por vez.'**
+  String get albumAdminIntro;
+
+  /// No description provided for @albumAdminEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum evento criado.'**
+  String get albumAdminEmpty;
+
+  /// No description provided for @albumAdminNewEvent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novo evento'**
+  String get albumAdminNewEvent;
+
+  /// No description provided for @albumAdminCreate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Criar'**
+  String get albumAdminCreate;
+
+  /// No description provided for @albumAdminEventTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome do evento'**
+  String get albumAdminEventTitle;
+
+  /// No description provided for @albumAdminEventTitleHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ex.: Copa Floresta 2026'**
+  String get albumAdminEventTitleHint;
+
+  /// No description provided for @albumAdminEventDescription.
+  ///
+  /// In pt, this message translates to:
+  /// **'Descrição (opcional)'**
+  String get albumAdminEventDescription;
+
+  /// No description provided for @albumAdminEventData.
+  ///
+  /// In pt, this message translates to:
+  /// **'Evento'**
+  String get albumAdminEventData;
+
+  /// No description provided for @albumAdminEventInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{Nenhum time} =1{1 time} other{{count} times}}'**
+  String albumAdminEventInfo(int count);
+
+  /// No description provided for @albumAdminTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Times do álbum (páginas)'**
+  String get albumAdminTeams;
+
+  /// No description provided for @albumAdminTeamStickers.
+  ///
+  /// In pt, this message translates to:
+  /// **'{team} · {count} figurinhas'**
+  String albumAdminTeamStickers(String team, int count);
+
+  /// No description provided for @albumAdminGenerate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gerar do elenco'**
+  String get albumAdminGenerate;
+
+  /// No description provided for @albumAdminAddSticker.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nova figurinha'**
+  String get albumAdminAddSticker;
+
+  /// No description provided for @albumAdminEditSticker.
+  ///
+  /// In pt, this message translates to:
+  /// **'Figurinha {number}'**
+  String albumAdminEditSticker(int number);
+
+  /// No description provided for @albumAdminPhoto.
+  ///
+  /// In pt, this message translates to:
+  /// **'Foto'**
+  String get albumAdminPhoto;
+
+  /// No description provided for @albumAdminStickerName.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome na figurinha'**
+  String get albumAdminStickerName;
+
+  /// No description provided for @albumAdminStickerOrder.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ordem na página'**
+  String get albumAdminStickerOrder;
+
+  /// No description provided for @albumAdminSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Evento salvo.'**
+  String get albumAdminSaved;
+
+  /// No description provided for @albumAdminActivated.
+  ///
+  /// In pt, this message translates to:
+  /// **'Álbum ligado: já aparece para todos.'**
+  String get albumAdminActivated;
+
+  /// No description provided for @albumAdminDeactivated.
+  ///
+  /// In pt, this message translates to:
+  /// **'Álbum desligado.'**
+  String get albumAdminDeactivated;
+
+  /// No description provided for @albumAdminDeleted.
+  ///
+  /// In pt, this message translates to:
+  /// **'Evento apagado.'**
+  String get albumAdminDeleted;
+
+  /// No description provided for @albumAdminGenerated.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{Nenhuma figurinha nova (o elenco já está no álbum).} =1{1 figurinha criada.} other{{count} figurinhas criadas.}}'**
+  String albumAdminGenerated(int count);
+
+  /// No description provided for @albumAdminStickerSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Figurinha salva.'**
+  String get albumAdminStickerSaved;
+
+  /// No description provided for @albumAdminStickerDeleted.
+  ///
+  /// In pt, this message translates to:
+  /// **'Figurinha apagada.'**
+  String get albumAdminStickerDeleted;
+
+  /// No description provided for @albumAdminDeleteTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Apagar o evento {title}?'**
+  String albumAdminDeleteTitle(String title);
+
+  /// No description provided for @albumAdminDeleteMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'O evento e as figurinhas somem do app. As coleções dos torcedores ficam guardadas, mas sem o álbum.'**
+  String get albumAdminDeleteMessage;
+
+  /// No description provided for @achievementMetricAlbumStickers.
+  ///
+  /// In pt, this message translates to:
+  /// **'Figurinhas diferentes coladas no álbum'**
+  String get achievementMetricAlbumStickers;
+
+  /// No description provided for @achievementMetricAlbumPages.
+  ///
+  /// In pt, this message translates to:
+  /// **'Páginas de time completas no álbum'**
+  String get achievementMetricAlbumPages;
+
+  /// No description provided for @achievementMetricAlbumComplete.
+  ///
+  /// In pt, this message translates to:
+  /// **'Álbum completo'**
+  String get achievementMetricAlbumComplete;
+
   /// No description provided for @recompressTitle.
   ///
   /// In pt, this message translates to:

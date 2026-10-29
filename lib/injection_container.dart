@@ -26,6 +26,7 @@ import 'package:arena_soccer/features/stats/di/stats_injection.dart';
 import 'package:arena_soccer/features/team_requests/di/team_requests_injection.dart';
 import 'package:arena_soccer/features/partner_requests/di/partner_requests_injection.dart';
 import 'package:arena_soccer/features/maintenance/di/maintenance_injection.dart';
+import 'package:arena_soccer/features/album/di/album_injection.dart';
 import 'package:arena_soccer/features/teams/di/teams_injection.dart';
 import 'package:arena_soccer/features/voting/di/voting_injection.dart';
 
@@ -42,6 +43,7 @@ Future<void> init() async {
   registerTeamRequestsDependencies();
   registerPartnerRequestsDependencies();
   registerMaintenanceDependencies();
+  registerAlbumDependencies();
   registerChampionshipsDependencies();
   registerMatchesDependencies();
   registerVotingDependencies();

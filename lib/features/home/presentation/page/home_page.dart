@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/album/presentation/widgets/album_floating_badge.dart';
 import 'package:arena_soccer/features/achievements/presentation/bloc/achievements_cubit.dart';
 import 'package:arena_soccer/features/achievements/presentation/widgets/unlock_celebration_dialog.dart';
 import 'package:arena_soccer/core/services/push_target.dart';
@@ -159,9 +160,7 @@ class _HomePageState extends State<HomePage> {
     var state = achievements.state;
     if (state.catalog.isEmpty) {
       try {
-        state = await achievements.stream
-            .firstWhere((s) => s.catalog.isNotEmpty)
-            .timeout(const Duration(seconds: 5));
+        state = await achievements.stream.firstWhere((s) => s.catalog.isNotEmpty).timeout(const Duration(seconds: 5));
       } catch (_) {
         return;
       }
@@ -284,39 +283,47 @@ class _HomePageState extends State<HomePage> {
               onChooseTeam: _chooseTeam,
               onLogout: _logout,
             ),
-            body: Column(
+            // Selo flutuante do álbum de figurinhas por cima (só com o evento ativo).
+            body: Stack(
               children: [
-                HomeHeader(
-                  user: session.user,
-                  region: region.selectedRegion,
-                  favoriteTeamImage: home.favoriteTeamImage,
-                  showSeason: showSeason,
-                  onOpenMenu: () => _scaffoldKey.currentState?.openDrawer(),
-                ),
-                Expanded(
-                  // A folha clara sobe sobre o header (cantos arredondados por cima do
-                  // gradiente) e cresce o mesmo tanto, para continuar encostada na barra.
-                  child: LayoutBuilder(
-                    builder: (context, constraints) => OverflowBox(
-                      alignment: Alignment.topCenter,
-                      maxHeight: constraints.maxHeight + AppSizes.sheetOverlap,
-                      child: Transform.translate(
-                        offset: const Offset(0, -AppSizes.sheetOverlap),
-                        child: Container(
-                          decoration: const BoxDecoration(
-                            color: AppColors.background,
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(AppSizes.radiusLarge)),
-                          ),
-                          clipBehavior: Clip.antiAlias,
-                          child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 250),
-                            child: _tabContent(home.tab, region, l10n),
+                Positioned.fill(
+                  child: Column(
+                    children: [
+                      HomeHeader(
+                        user: session.user,
+                        region: region.selectedRegion,
+                        favoriteTeamImage: home.favoriteTeamImage,
+                        showSeason: showSeason,
+                        onOpenMenu: () => _scaffoldKey.currentState?.openDrawer(),
+                      ),
+                      Expanded(
+                        // A folha clara sobe sobre o header (cantos arredondados por cima do
+                        // gradiente) e cresce o mesmo tanto, para continuar encostada na barra.
+                        child: LayoutBuilder(
+                          builder: (context, constraints) => OverflowBox(
+                            alignment: Alignment.topCenter,
+                            maxHeight: constraints.maxHeight + AppSizes.sheetOverlap,
+                            child: Transform.translate(
+                              offset: const Offset(0, -AppSizes.sheetOverlap),
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                  color: AppColors.background,
+                                  borderRadius: BorderRadius.vertical(top: Radius.circular(AppSizes.radiusLarge)),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 250),
+                                  child: _tabContent(home.tab, region, l10n),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
+                const Positioned.fill(child: AlbumFloatingBadge()),
               ],
             ),
             bottomNavigationBar: HomeBottomBar(selected: home.tab, onSelected: _homeCubit.selectTab),

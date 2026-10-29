@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/album/presentation/bloc/album_cubit.dart';
+import 'package:arena_soccer/features/album/presentation/bloc/manage_album_cubit.dart';
+import 'package:arena_soccer/features/album/presentation/page/album_page.dart';
+import 'package:arena_soccer/features/album/presentation/page/manage_album_page.dart';
 import 'package:arena_soccer/features/maintenance/presentation/bloc/recompress_images_cubit.dart';
 import 'package:arena_soccer/features/maintenance/presentation/page/recompress_images_page.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/player_totals_repair_cubit.dart';
@@ -286,6 +290,14 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.partnerRequestPage: (_) => BlocProvider<PartnerRequestCubit>(
               create: (_) => PartnerRequestCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl()),
               child: const PartnerRequestPage(),
+            ),
+        AppRoutes.albumPage: (_) => BlocProvider<AlbumCubit>(
+              create: (_) => AlbumCubit(sl(), sl()),
+              child: const StickerAlbumPage(),
+            ),
+        AppRoutes.manageAlbumPage: (_) => BlocProvider<ManageAlbumCubit>(
+              create: (_) => ManageAlbumCubit(sl(), sl(), sl()),
+              child: const ManageAlbumPage(),
             ),
         AppRoutes.recompressImagesPage: (_) => BlocProvider<RecompressImagesCubit>(
               create: (_) => RecompressImagesCubit(sl()),
