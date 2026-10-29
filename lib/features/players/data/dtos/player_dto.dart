@@ -164,6 +164,10 @@ class PlayerDTO extends Equatable {
         if (!isLegacy) teamIdsField: teamIds,
       };
 
+  /// Participações em gol na temporada: gols + assistências do Geral (o card
+  /// de compartilhar; não depende de o gol ter card no feed).
+  int get goalParticipations => goals + assists;
+
   /// Gols no Geral que não estão em competição nenhuma (registrados antes das
   /// inscrições ou ajustados só no total): Geral − soma das competições.
   /// No atleta antigo, o Geral inteiro.

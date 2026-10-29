@@ -111,4 +111,10 @@ void main() {
       expect(repo.assigned, (goals: 1, assists: 0, enrollment: null));
     });
   });
+
+  test('participações em gol do card: gols + assistências, com ou sem card no feed', () {
+    const player = PlayerDTO(name: 'Reginaldo', team: 'Riacho', goals: 2);
+    expect(player.goalParticipations, 2);
+    expect(const PlayerDTO(name: 'X', team: 'Y', goals: 1, assists: 3).goalParticipations, 4);
+  });
 }

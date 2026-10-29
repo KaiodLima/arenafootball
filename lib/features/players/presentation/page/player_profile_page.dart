@@ -89,7 +89,8 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
           season: widget.season ?? BlocProvider.of<RegionCubit>(context).state.selectedSeason,
           goalsRank: state.goalsRank,
           assistsRank: state.assistsRank,
-          participations: state.participations.length,
+          // Gols + assistências (os números do card), com ou sem card no feed.
+          participations: player.goalParticipations,
         ),
       ),
       shareText: '${l10n.athleteShareText(player.name, player.team, player.goals, player.assists)}\n'
