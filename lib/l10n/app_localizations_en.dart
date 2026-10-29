@@ -731,6 +731,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get albumAdminNewEventMessage =>
+      'Name the album. Then you pick the teams and generate the stickers.';
+
+  @override
+  String get albumAdminEventTitleShort => 'The name needs at least 3 letters.';
+
+  @override
   String get albumTitle => 'Sticker album';
 
   @override

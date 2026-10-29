@@ -1335,6 +1335,18 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @albumAdminNewEventMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dê um nome ao álbum. Depois você escolhe os times e gera as figurinhas.'**
+  String get albumAdminNewEventMessage;
+
+  /// No description provided for @albumAdminEventTitleShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'O nome precisa de pelo menos 3 letras.'**
+  String get albumAdminEventTitleShort;
+
   /// No description provided for @albumTitle.
   ///
   /// In pt, this message translates to:

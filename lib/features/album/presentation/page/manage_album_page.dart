@@ -12,6 +12,7 @@ import 'package:arena_soccer/utils/components/arena_button.dart';
 import 'package:arena_soccer/utils/components/arena_card.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/arena_input_decoration.dart';
+import 'package:arena_soccer/utils/components/arena_text_field.dart';
 import 'package:arena_soccer/utils/components/circle_photo_picker.dart';
 import 'package:arena_soccer/utils/components/form_section.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
@@ -37,12 +38,32 @@ class _ManageAlbumPageState extends State<ManageAlbumPage> {
     _cubit = BlocProvider.of<ManageAlbumCubit>(context)..watch();
   }
 
+  /// "Novo evento": folha de alerta do app com o campo do nome.
   Future<void> _newEvent(AppLocalizations l10n) async {
-    final title = await showDialog<String>(
-      context: context,
-      builder: (_) => const _TitleDialog(),
+    final controller = TextEditingController();
+    final confirmed = await showArenaConfirm(
+      context,
+      header: l10n.albumAdminNewEvent,
+      title: l10n.albumAdminNewEvent,
+      message: l10n.albumAdminNewEventMessage,
+      icon: Icons.collections_bookmark_outlined,
+      confirmLabel: l10n.albumAdminCreate,
+      content: ArenaTextField(
+        controller: controller,
+        autofocus: true,
+        labelText: l10n.albumAdminEventTitle,
+        hintText: l10n.albumAdminEventTitleHint,
+      ),
     );
-    if (title != null && title.trim().length >= 3) await _cubit.saveEvent(AlbumEventDTO(title: title.trim()));
+    final title = controller.text.trim();
+    // Descarta depois da animação de fechar (o campo ainda está na tela).
+    Future<void>.delayed(const Duration(milliseconds: 500), controller.dispose);
+    if (!confirmed || !mounted) return;
+    if (title.length < 3) {
+      showSnackBar(context: context, message: l10n.albumAdminEventTitleShort, isSuccess: false);
+      return;
+    }
+    await _cubit.saveEvent(AlbumEventDTO(title: title));
   }
 
   Future<void> _confirmDelete(AlbumEventDTO event, AppLocalizations l10n) async {
@@ -436,41 +457,6 @@ class _StickerSheetState extends State<_StickerSheet> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _TitleDialog extends StatefulWidget {
-  const _TitleDialog();
-
-  @override
-  State<_TitleDialog> createState() => _TitleDialogState();
-}
-
-class _TitleDialogState extends State<_TitleDialog> {
-  final _controller = TextEditingController();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return AlertDialog(
-      title: Text(l10n.albumAdminNewEvent),
-      content: TextField(
-        controller: _controller,
-        autofocus: true,
-        maxLength: 40,
-        decoration: arenaInputDecoration(label: l10n.albumAdminEventTitle, hintText: l10n.albumAdminEventTitleHint),
-      ),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.commonCancel)),
-        TextButton(onPressed: () => Navigator.pop(context, _controller.text), child: Text(l10n.albumAdminCreate)),
-      ],
     );
   }
 }

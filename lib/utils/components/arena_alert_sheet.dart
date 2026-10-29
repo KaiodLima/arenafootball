@@ -79,7 +79,11 @@ Future<T?> _show<T>(BuildContext context, Widget sheet) async {
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(AppSizes.s16)),
     ),
-    builder: (_) => sheet,
+    // Folha com campo: sobe junto com o teclado.
+    builder: (context) => Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: sheet,
+    ),
   );
   FocusManager.instance.primaryFocus?.unfocus();
   return result;

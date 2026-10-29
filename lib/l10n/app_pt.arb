@@ -388,6 +388,8 @@
   "matchCardHideGoals": "Ocultar gols",
   "matchCardToday": "HOJE",
   "matchCardTomorrow": "AMANHÃ",
+  "albumAdminNewEventMessage": "Dê um nome ao álbum. Depois você escolhe os times e gera as figurinhas.",
+  "albumAdminEventTitleShort": "O nome precisa de pelo menos 3 letras.",
   "albumTitle": "Álbum de figurinhas",
   "albumNoEvent": "Nenhum álbum ativo no momento.",
   "albumEmpty": "O álbum ainda não tem figurinhas.",

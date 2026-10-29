@@ -227,6 +227,8 @@
   "matchCardHideGoals": "Hide goals",
   "matchCardToday": "TODAY",
   "matchCardTomorrow": "TOMORROW",
+  "albumAdminNewEventMessage": "Name the album. Then you pick the teams and generate the stickers.",
+  "albumAdminEventTitleShort": "The name needs at least 3 letters.",
   "albumTitle": "Sticker album",
   "albumNoEvent": "No active album right now.",
   "albumEmpty": "The album has no stickers yet.",

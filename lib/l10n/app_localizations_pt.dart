@@ -734,6 +734,14 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get albumAdminNewEventMessage =>
+      'Dê um nome ao álbum. Depois você escolhe os times e gera as figurinhas.';
+
+  @override
+  String get albumAdminEventTitleShort =>
+      'O nome precisa de pelo menos 3 letras.';
+
+  @override
   String get albumTitle => 'Álbum de figurinhas';
 
   @override
