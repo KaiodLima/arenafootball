@@ -70,7 +70,12 @@ class StickerCard extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(AppSizes.s6 * k),
-              child: _Face(sticker: sticker, style: style, k: k),
+              // Material: estilo de texto certo também no diálogo do
+              // pacotinho e no voo do Hero (sem ele, sublinhado amarelo).
+              child: Material(
+                type: MaterialType.transparency,
+                child: _Face(sticker: sticker, style: style, k: k),
+              ),
             ),
           );
         },
@@ -332,31 +337,32 @@ class _NamePlate extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: EdgeInsets.fromLTRB(AppSizes.s6 * k, slant, AppSizes.s4 * k, AppSizes.s2 * k),
+          padding: EdgeInsets.fromLTRB(AppSizes.s6 * k, slant * 0.6, AppSizes.s4 * k, AppSizes.s2 * k),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // As duas linhas encolhem juntas para caber na placa (nome
+              // longo ou placa baixa).
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (first.isNotEmpty)
-                      Text(
-                        crest ? first.toUpperCase() : first,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTypography.label(color: AppColors.white.withValues(alpha: 0.8)).copyWith(
-                          fontSize: AppSizes.s8 * k,
-                          fontWeight: FontWeight.w600,
-                          height: 1.1,
-                          letterSpacing: crest ? AppSizes.s1 * k : 0,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (first.isNotEmpty)
+                        Text(
+                          crest ? first.toUpperCase() : first,
+                          maxLines: 1,
+                          style: AppTypography.label(color: AppColors.white.withValues(alpha: 0.8)).copyWith(
+                            fontSize: AppSizes.s8 * k,
+                            fontWeight: FontWeight.w600,
+                            height: 1.1,
+                            letterSpacing: crest ? AppSizes.s1 * k : 0,
+                          ),
                         ),
-                      ),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Text(
+                      Text(
                         main.toUpperCase(),
                         maxLines: 1,
                         style: AppTypography.label(color: AppColors.white).copyWith(
@@ -366,8 +372,8 @@ class _NamePlate extends StatelessWidget {
                           letterSpacing: AppSizes.s1 * k * 0.3,
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               if (code.isNotEmpty) ...[
