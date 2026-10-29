@@ -1335,6 +1335,54 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @albumDetailPosition.
+  ///
+  /// In pt, this message translates to:
+  /// **'{index} de {total} coladas'**
+  String albumDetailPosition(int index, int total);
+
+  /// No description provided for @albumDetailPage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Página {page} de {total}'**
+  String albumDetailPage(int page, int total);
+
+  /// No description provided for @albumDetailCrest.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escudo'**
+  String get albumDetailCrest;
+
+  /// No description provided for @albumDetailAthlete.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atleta'**
+  String get albumDetailAthlete;
+
+  /// No description provided for @albumDetailYouHave.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você tem ×{count}'**
+  String albumDetailYouHave(int count);
+
+  /// No description provided for @albumDetailSeeAthlete.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver atleta'**
+  String get albumDetailSeeAthlete;
+
+  /// No description provided for @albumDetailShare.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compartilhar'**
+  String get albumDetailShare;
+
+  /// No description provided for @albumDetailShareText.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tirei a figurinha Nº {number} – {name} no álbum {event}!'**
+  String albumDetailShareText(int number, String name, String event);
+
   /// No description provided for @albumPackReady.
   ///
   /// In pt, this message translates to:

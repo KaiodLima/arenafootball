@@ -2,10 +2,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/album/domain/album_layout.dart';
 import 'package:arena_soccer/features/album/presentation/bloc/album_cubit.dart';
 import 'package:arena_soccer/features/album/presentation/page/album_page.dart';
-import 'package:arena_soccer/features/album/presentation/widgets/album_cards.dart';
 import 'package:arena_soccer/features/album/presentation/widgets/album_visuals.dart';
 import 'package:arena_soccer/features/album/presentation/widgets/sticker_card.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
@@ -238,11 +238,14 @@ class _TeamSpread extends StatelessWidget {
                               accent: accent,
                               count: state.album.countOf(sticker.id),
                               heroTag: 'sticker_${sticker.id}',
-                              onTap: () => showStickerZoom(
+                              onTap: () => Navigator.pushNamed(
                                 context,
-                                sticker: sticker,
-                                accent: accent,
-                                heroTag: 'sticker_${sticker.id}',
+                                AppRoutes.stickerDetailPage,
+                                arguments: {
+                                  'cubit': context.read<AlbumCubit>(),
+                                  'teamId': page.teamId,
+                                  'stickerId': sticker.id,
+                                },
                               ),
                             )
                           : EmptySlot(sticker: sticker),

@@ -734,6 +734,38 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String albumDetailPosition(int index, int total) {
+    return '$index de $total coladas';
+  }
+
+  @override
+  String albumDetailPage(int page, int total) {
+    return 'Página $page de $total';
+  }
+
+  @override
+  String get albumDetailCrest => 'Escudo';
+
+  @override
+  String get albumDetailAthlete => 'Atleta';
+
+  @override
+  String albumDetailYouHave(int count) {
+    return 'Você tem ×$count';
+  }
+
+  @override
+  String get albumDetailSeeAthlete => 'Ver atleta';
+
+  @override
+  String get albumDetailShare => 'Compartilhar';
+
+  @override
+  String albumDetailShareText(int number, String name, String event) {
+    return 'Tirei a figurinha Nº $number – $name no álbum $event!';
+  }
+
+  @override
   String get albumPackReady => 'Seu pacotinho chegou!';
 
   @override

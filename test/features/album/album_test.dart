@@ -8,6 +8,10 @@ import 'package:arena_soccer/features/album/domain/album_layout.dart';
 import 'package:arena_soccer/features/album/domain/album_pack_id.dart';
 import 'package:arena_soccer/features/album/domain/usecases/album_usecase.dart';
 import 'package:arena_soccer/features/album/presentation/bloc/album_event_cubit.dart';
+import 'package:arena_soccer/features/album/presentation/page/sticker_detail_page.dart';
+import 'package:arena_soccer/core/utils/share_links.dart';
+import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:flutter/widgets.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 
 class _AlbumUseCase implements AlbumUseCase {
@@ -104,5 +108,19 @@ void main() {
     expect(AlbumPackId.untilNext(DateTime.utc(2026, 10, 28, 20)), const Duration(hours: 7));
     // 2h30 UTC = 23h30 do dia anterior em Brasília → 30 min.
     expect(AlbumPackId.untilNext(DateTime.utc(2026, 10, 28, 2, 30)), const Duration(minutes: 30));
+  });
+
+  test('detalhe: folheia só as coladas da página, na ordem', () {
+    final album = UserAlbumDTO.fromMap(const {'figurinhas': {'a0': 1, 'a2': 2}});
+    final page = AlbumLayout.pages(_event, _stickers)[1];
+    final collected = page.collectedStickers(album);
+    expect(collected.map((s) => s.id), ['a0', 'a2']);
+    expect(collected.indexWhere((s) => s.id == 'a2'), 1);
+  });
+
+  test('texto de compartilhar a figurinha termina com o link do app', () {
+    final l10n = lookupAppLocalizations(const Locale('pt'));
+    const sticker = StickerDTO(id: 'a1', number: 12, name: 'Ana', team: 'Alfa');
+    expect(stickerShareText(l10n, sticker, 'Copa'), 'Tirei a figurinha Nº 12 – Ana no álbum Copa!\n$appLink');
   });
 }

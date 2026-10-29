@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/features/album/data/dtos/album_dtos.dart';
 import 'package:arena_soccer/features/album/domain/album_layout.dart';
 import 'package:arena_soccer/features/album/domain/album_pack_id.dart';
 import 'package:arena_soccer/features/album/presentation/widgets/album_visuals.dart';
-import 'package:arena_soccer/features/album/presentation/widgets/sticker_card.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
@@ -218,61 +216,4 @@ class TeamIndexCard extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Figurinha ampliada: vira (verso → frente) e mostra nome, time e número.
-Future<void> showStickerZoom(
-  BuildContext context, {
-  required StickerDTO sticker,
-  required Color accent,
-  required Object heroTag,
-}) {
-  return showGeneralDialog<void>(
-    context: context,
-    barrierDismissible: true,
-    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-    barrierColor: AppColors.black.withValues(alpha: 0.8),
-    transitionDuration: const Duration(milliseconds: 250),
-    pageBuilder: (context, _, __) {
-      final l10n = AppLocalizations.of(context);
-      return SafeArea(
-        child: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          behavior: HitTestBehavior.opaque,
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: AppSizes.s250,
-                  child: TweenAnimationBuilder<double>(
-                    tween: Tween(begin: 0, end: 1),
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.easeOutBack,
-                    builder: (context, t, child) => Transform(
-                      alignment: Alignment.center,
-                      transform: Matrix4.identity()
-                        ..setEntry(3, 2, 0.0015)
-                        ..rotateY(math.pi * 2 * (1 - t)),
-                      child: child,
-                    ),
-                    child: StickerCard(sticker: sticker, accent: accent, heroTag: heroTag),
-                  ),
-                ),
-                const SizedBox(height: AppSizes.s16),
-                Text(
-                  sticker.name,
-                  style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s20),
-                ),
-                Text(
-                  l10n.albumStickerCaption(sticker.number, sticker.team),
-                  style: AppTypography.subtitle(color: AppColors.whiteSoft),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    },
-  );
 }

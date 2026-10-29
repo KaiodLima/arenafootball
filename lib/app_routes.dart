@@ -54,6 +54,7 @@ class AppRoutes {
   static const String recompressImagesPage = '/recompress_images_page';
   static const String albumPage = '/album_page';
   static const String albumPagesPage = '/album_pages_page';
+  static const String stickerDetailPage = '/sticker_detail_page';
   static const String manageAlbumPage = '/manage_album_page';
   static const String manageChampionshipsPage = '/manage_championships_page';
   static const String championshipFormPage = '/championship_form_page';

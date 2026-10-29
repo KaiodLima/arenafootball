@@ -20,6 +20,10 @@ class StickerCard extends StatelessWidget {
   /// Tag do Hero (ampliar); nula = sem Hero.
   final Object? heroTag;
 
+  /// Reflexo guiado pela inclinação (-1 a 1, tela de detalhe); nulo = o
+  /// brilho em loop (só no escudo).
+  final double? sheen;
+
   const StickerCard({
     super.key,
     required this.sticker,
@@ -27,6 +31,7 @@ class StickerCard extends StatelessWidget {
     this.count = 1,
     this.onTap,
     this.heroTag,
+    this.sheen,
   });
 
   bool get _foil => sticker.kind == StickerKind.crest;
@@ -105,7 +110,41 @@ class StickerCard extends StatelessWidget {
         ),
       ),
     );
-    if (_foil) card = Shimmer(holographic: true, child: card);
+    final sheen = this.sheen;
+    if (sheen != null) {
+      card = Stack(
+        fit: StackFit.passthrough,
+        children: [
+          card,
+          Positioned.fill(
+            child: IgnorePointer(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(AppSizes.s10),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment(-1.6 + sheen * 1.6, -1),
+                      end: Alignment(0.4 + sheen * 1.6, 1),
+                      colors: _foil
+                          ? [
+                              AppColors.transparent,
+                              AppColors.teamPink.withValues(alpha: 0.3),
+                              AppColors.googleYellow.withValues(alpha: 0.35),
+                              AppColors.teamBlue.withValues(alpha: 0.3),
+                              AppColors.transparent,
+                            ]
+                          : [AppColors.transparent, AppColors.white.withValues(alpha: 0.35), AppColors.transparent],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    } else if (_foil) {
+      card = Shimmer(holographic: true, child: card);
+    }
     if (heroTag != null) card = Hero(tag: heroTag!, child: card);
 
     return GestureDetector(

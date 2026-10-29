@@ -15,6 +15,9 @@ class AlbumTeamPage extends Equatable {
 
   bool isComplete(UserAlbumDTO album) => stickers.isNotEmpty && collected(album) == stickers.length;
 
+  /// Figurinhas coladas da página, na ordem (o "folhear" da tela de detalhe).
+  List<StickerDTO> collectedStickers(UserAlbumDTO album) => stickers.where((s) => album.has(s.id)).toList();
+
   @override
   List<Object?> get props => [teamId, team, stickers];
 }
