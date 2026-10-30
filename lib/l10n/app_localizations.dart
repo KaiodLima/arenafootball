@@ -1335,6 +1335,37 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @playerRequestAlreadyInChampionship.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você já está no elenco do {team} na {championship}. Na mesma competição só dá para jogar por um time; escolha outra competição.'**
+  String playerRequestAlreadyInChampionship(String team, String championship);
+
+  /// No description provided for @playerRequestsMergeTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Juntar os cadastros?'**
+  String get playerRequestsMergeTitle;
+
+  /// No description provided for @playerRequestsMergeMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Esta conta já é do atleta {current} ({team} · {goals, plural, =1{1 gol} other{{goals} gols}}). Juntar com {claimed} ({claimedTeam})? Fica um atleta só, com o time e os números de cada competição; o cadastro de {current} some.'**
+  String playerRequestsMergeMessage(String current, String team, int goals,
+      String claimed, String claimedTeam);
+
+  /// No description provided for @playerRequestsMergeConfirm.
+  ///
+  /// In pt, this message translates to:
+  /// **'Juntar'**
+  String get playerRequestsMergeConfirm;
+
+  /// No description provided for @playerRequestsMerged.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cadastros juntados: {name} agora está ligado à conta.'**
+  String playerRequestsMerged(String name);
+
   /// No description provided for @albumBadgeOpen.
   ///
   /// In pt, this message translates to:

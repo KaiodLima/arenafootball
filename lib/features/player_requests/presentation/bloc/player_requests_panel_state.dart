@@ -79,11 +79,15 @@ class ApprovedPlayerRequestsPanelState extends PlayerRequestsPanelState {
   final String name;
   final String team;
 
-  ApprovedPlayerRequestsPanelState(PlayerRequestsPanelState from, {required this.name, required this.team})
+  /// Aprovado juntando o atleta que a conta já tinha.
+  final bool merged;
+
+  ApprovedPlayerRequestsPanelState(PlayerRequestsPanelState from,
+      {required this.name, required this.team, this.merged = false})
       : super(requests: from.requests, teams: from.teams, players: from.players, busy: from.busy);
 
   @override
-  List<Object?> get props => [...super.props, name, team];
+  List<Object?> get props => [...super.props, name, team, merged];
 }
 
 class RejectedPlayerRequestsPanelState extends PlayerRequestsPanelState {
@@ -94,4 +98,17 @@ class RejectedPlayerRequestsPanelState extends PlayerRequestsPanelState {
 class UpdatedPlayerRequestsPanelState extends PlayerRequestsPanelState {
   UpdatedPlayerRequestsPanelState(PlayerRequestsPanelState from)
       : super(requests: from.requests, teams: from.teams, players: from.players, busy: from.busy);
+}
+
+/// A conta do pedido de vínculo já tem outro atleta ([current]): a página
+/// pergunta se junta os dois.
+class MergeNeededPlayerRequestsPanelState extends PlayerRequestsPanelState {
+  final PlayerRequestDTO request;
+  final PlayerDTO current;
+
+  MergeNeededPlayerRequestsPanelState(PlayerRequestsPanelState from, {required this.request, required this.current})
+      : super(requests: from.requests, teams: from.teams, players: from.players, busy: from.busy);
+
+  @override
+  List<Object?> get props => [...super.props, request, current];
 }

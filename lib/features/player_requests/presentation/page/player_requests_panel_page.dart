@@ -50,6 +50,28 @@ class _PlayerRequestsPanelPageState extends State<PlayerRequestsPanelPage> {
     if (confirmed) await _cubit.approve(request);
   }
 
+  /// A conta já tem outro atleta: juntar os dois no reivindicado.
+  Future<void> _confirmMerge(MergeNeededPlayerRequestsPanelState state, AppLocalizations l10n) async {
+    final request = state.request;
+    final current = state.current;
+    final claimed = state.players.where((p) => p.id == request.claimedPlayerId).firstOrNull;
+    final confirmed = await showArenaConfirm(
+      context,
+      title: l10n.playerRequestsMergeTitle,
+      message: l10n.playerRequestsMergeMessage(
+        current.name,
+        current.team,
+        current.goals,
+        claimed?.name ?? request.name,
+        request.team,
+      ),
+      confirmLabel: l10n.playerRequestsMergeConfirm,
+      icon: Icons.merge_rounded,
+      tone: ArenaAlertTone.primary,
+    );
+    if (confirmed) await _cubit.approve(request, mergePlayerId: current.id);
+  }
+
   Future<void> _confirmReject(PlayerRequestDTO request, AppLocalizations l10n) async {
     final reason = await showDialog<String>(
       context: context,
@@ -105,8 +127,14 @@ class _PlayerRequestsPanelPageState extends State<PlayerRequestsPanelPage> {
               showSnackBar(context: context, message: state.errorMessage, isSuccess: false);
             }
             if (state is ApprovedPlayerRequestsPanelState) {
-              showSnackBar(context: context, message: l10n.playerRequestsApproved(state.name, state.team));
+              showSnackBar(
+                context: context,
+                message: state.merged
+                    ? l10n.playerRequestsMerged(state.name)
+                    : l10n.playerRequestsApproved(state.name, state.team),
+              );
             }
+            if (state is MergeNeededPlayerRequestsPanelState) _confirmMerge(state, l10n);
             if (state is RejectedPlayerRequestsPanelState) {
               showSnackBar(context: context, message: l10n.playerRequestsRejected);
             }

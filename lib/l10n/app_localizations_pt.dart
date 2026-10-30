@@ -734,6 +734,34 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String playerRequestAlreadyInChampionship(String team, String championship) {
+    return 'Você já está no elenco do $team na $championship. Na mesma competição só dá para jogar por um time; escolha outra competição.';
+  }
+
+  @override
+  String get playerRequestsMergeTitle => 'Juntar os cadastros?';
+
+  @override
+  String playerRequestsMergeMessage(String current, String team, int goals,
+      String claimed, String claimedTeam) {
+    String _temp0 = intl.Intl.pluralLogic(
+      goals,
+      locale: localeName,
+      other: '$goals gols',
+      one: '1 gol',
+    );
+    return 'Esta conta já é do atleta $current ($team · $_temp0). Juntar com $claimed ($claimedTeam)? Fica um atleta só, com o time e os números de cada competição; o cadastro de $current some.';
+  }
+
+  @override
+  String get playerRequestsMergeConfirm => 'Juntar';
+
+  @override
+  String playerRequestsMerged(String name) {
+    return 'Cadastros juntados: $name agora está ligado à conta.';
+  }
+
+  @override
   String get albumBadgeOpen => 'Abrir!';
 
   @override

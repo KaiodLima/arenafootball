@@ -9,6 +9,7 @@ import 'package:arena_soccer/features/player_requests/data/dtos/player_request_d
 import 'package:arena_soccer/features/players/data/datasources/players_datasource.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_merge.dart';
 
 /// Pedidos "Sou jogador" (`solicitacoes_jogador/{uid}`). O usuário grava o
 /// próprio pedido; o admin edita, aprova (cria o jogador) ou rejeita.
@@ -17,6 +18,18 @@ const String claimTakenCode = 'claim-taken';
 
 /// Aprovação de vínculo recusada: a conta já tem outro atleta na temporada.
 const String claimAccountHasPlayerCode = 'claim-account-has-player';
+
+/// Aprovação recusada: o atleta já joga por outro time nessa competição.
+const String enrollmentConflictCode = 'enrollment-conflict';
+
+/// Vínculo com a conta que já tem outro atleta ([current]) na temporada: o
+/// admin confirma a junção (`approve(mergePlayerId: current.id)`).
+class PlayerMergeNeeded extends ErrorWithMessage {
+  final PlayerDTO current;
+
+  PlayerMergeNeeded(this.current)
+      : super('Esta conta já tem outro atleta nesta temporada.', code: claimAccountHasPlayerCode);
+}
 
 class PlayerRequestsDataSource {
   final FirebaseFirestore _firestore;
@@ -132,11 +145,14 @@ class PlayerRequestsDataSource {
   }
 
   /// Aprova o pedido, numa escrita só com a marcação do pedido. Pedido de
-  /// vínculo: liga a conta ao atleta reivindicado (mantém nome e números).
-  /// Se a conta já tem atleta na temporada (saiu de outro elenco), reaproveita
-  /// ele: troca time, nome, posição e foto e mantém gols e assistências.
-  /// Senão, cria.
-  Future<Either<Failure, String>> approve(PlayerRequestDTO request) async {
+  /// vínculo: liga a conta ao atleta reivindicado (mantém nome e números); se
+  /// a conta já tem outro atleta na temporada, devolve [PlayerMergeNeeded] e,
+  /// com [mergePlayerId] (o admin confirmou), junta os dois ([_merge]).
+  /// Se a conta já tem atleta (saiu de outro elenco), reaproveita ele: troca
+  /// time, nome, posição e foto e mantém gols e assistências. Senão, cria.
+  /// Em toda aprovação: atleta já inscrito na competição do pedido por outro
+  /// time = recusado (um time por competição na temporada).
+  Future<Either<Failure, String>> approve(PlayerRequestDTO request, {String? mergePlayerId}) async {
     try {
       final players = _firestore.collection(SeasonCollection.name('jogadores', request.season));
       final teamId = await _teamIdOf(request);
@@ -156,24 +172,34 @@ class PlayerRequestsDataSource {
         if (!claimed.exists || (owner.isNotEmpty && owner != request.userId)) {
           return Left(ErrorWithMessage('Este atleta já foi vinculado a outra conta.', code: claimTakenCode));
         }
-        if (existing.docs.isNotEmpty && existing.docs.first.id != playerRef.id) {
-          return Left(
-              ErrorWithMessage('Esta conta já tem outro atleta nesta temporada.', code: claimAccountHasPlayerCode));
+        final other = existing.docs.isNotEmpty && existing.docs.first.id != playerRef.id ? existing.docs.first : null;
+        if (other != null) {
+          if (mergePlayerId != other.id) return Left(PlayerMergeNeeded(PlayerDTO.fromFirestore(other)));
+          return _merge(request, claimed: claimed, other: other, teamId: teamId, enrollment: enrollment);
         }
+        final claimedPlayer = PlayerDTO.fromFirestore(claimed);
+        final conflict = enrollment == null
+            ? null
+            : PlayerMerge.conflictIn(claimedPlayer, enrollment.championshipId, teamId, request.team);
+        if (conflict != null) return Left(await _conflictFailure(conflict));
         batch.update(playerRef, {
           'idUsuario': request.userId,
           if (enrollment == null) ...{'time': request.team, 'idTime': teamId},
-          if (enrollment != null) ...PlayersDataSource.enrollFields(PlayerDTO.fromFirestore(claimed), enrollment),
+          if (enrollment != null) ...PlayersDataSource.enrollFields(claimedPlayer, enrollment),
           if (request.position != null) 'posicao': request.position!.key,
           if (request.imageUrl.isNotEmpty) 'urlImagem': request.imageUrl,
         });
       } else if (existing.docs.isNotEmpty) {
         playerRef = existing.docs.first.reference;
+        final current = PlayerDTO.fromFirestore(existing.docs.first);
+        final conflict = enrollment == null
+            ? null
+            : PlayerMerge.conflictIn(current, enrollment.championshipId, teamId, request.team);
+        if (conflict != null) return Left(await _conflictFailure(conflict));
         batch.update(playerRef, {
           'nome': request.name,
           if (enrollment == null) ...{'time': request.team, 'idTime': teamId},
-          if (enrollment != null)
-            ...PlayersDataSource.enrollFields(PlayerDTO.fromFirestore(existing.docs.first), enrollment),
+          if (enrollment != null) ...PlayersDataSource.enrollFields(current, enrollment),
           'posicao': request.position?.key ?? '',
           if (request.imageUrl.isNotEmpty) 'urlImagem': request.imageUrl,
         });
@@ -191,18 +217,149 @@ class PlayerRequestsDataSource {
         );
         batch.set(playerRef, player.toMap());
       }
-      batch.update(_requests.doc(request.userId), {
-        'status': PlayerRequestStatus.approved.key,
-        'idJogador': playerRef.id,
-        'motivo': '',
-        'atualizado_em': FieldValue.serverTimestamp(),
-      });
+      batch.update(_requests.doc(request.userId), _approvedFields(playerRef.id));
       await batch.commit();
       return Right(playerRef.id);
     } catch (e) {
       AppLogger.e('approve uid=${request.userId}', name: _logName, error: e);
       return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível aprovar a solicitação.'));
     }
+  }
+
+  Map<String, Object> _approvedFields(String playerId) => {
+        'status': PlayerRequestStatus.approved.key,
+        'idJogador': playerId,
+        'motivo': '',
+        'atualizado_em': FieldValue.serverTimestamp(),
+      };
+
+  /// Junta o atleta que a conta já tinha ([other]) no reivindicado
+  /// ([claimed]): inscrições com o time e os números de cada competição,
+  /// Geral e amistosos somados (`PlayerMerge`). As referências ao [other]
+  /// (cards de gol, listas `gols` e craque das partidas, figurinhas) passam
+  /// para o [claimed] antes; por último, num lote só, o [claimed] gravado, o
+  /// [other] apagado e o pedido aprovado.
+  Future<Either<Failure, String>> _merge(
+    PlayerRequestDTO request, {
+    required DocumentSnapshot<Map<String, dynamic>> claimed,
+    required DocumentSnapshot<Map<String, dynamic>> other,
+    required String teamId,
+    required PlayerEnrollment? enrollment,
+  }) async {
+    final source = PlayerDTO.fromFirestore(other);
+    final result = PlayerMerge.merge(target: PlayerDTO.fromFirestore(claimed), source: source);
+    if (result.conflict != null) return Left(await _conflictFailure(result.conflict!));
+    var merged = result.merged!;
+    if (enrollment != null) {
+      final conflict = PlayerMerge.conflictIn(merged, enrollment.championshipId, teamId, request.team);
+      if (conflict != null) return Left(await _conflictFailure(conflict));
+      merged = PlayerMerge.withEnrollment(merged, enrollment);
+    }
+    // Time principal: o do reivindicado; pedido sem competição (ou atleta sem
+    // time) fica com o time do pedido, como na aprovação comum.
+    if (enrollment == null || (merged.team.trim().isEmpty && merged.teamId.isEmpty)) {
+      merged = merged.copyWith(team: request.team, teamId: teamId);
+    }
+    merged = merged.copyWith(
+      userId: request.userId,
+      position: request.position?.key ?? merged.position,
+      imageUrl: request.imageUrl.isNotEmpty ? request.imageUrl : merged.imageUrl,
+    );
+
+    final hasStats = source.goals + source.assists + source.friendlyGoals + source.friendlyAssists > 0;
+    await _repointReferences(
+      season: request.season,
+      from: other.id,
+      to: claimed.id,
+      teamIds: source.teamIds,
+      withStats: hasStats,
+    );
+
+    final batch = _firestore.batch()
+      ..update(claimed.reference, merged.toMap())
+      ..delete(other.reference)
+      ..update(_requests.doc(request.userId), _approvedFields(claimed.id));
+    await batch.commit();
+    AppLogger.d('approve merge uid=${request.userId} ${other.id} -> ${claimed.id}', name: _logName);
+    return Right(claimed.id);
+  }
+
+  /// Troca o atleta [from] por [to] onde ele é citado: craque das partidas e
+  /// figurinhas do álbum sempre; com números ([withStats]), também os cards de
+  /// gol e as listas `gols` das partidas dos times dele.
+  Future<void> _repointReferences({
+    required String season,
+    required String from,
+    required String to,
+    required List<String> teamIds,
+    required bool withStats,
+  }) async {
+    final updates = <(DocumentReference<Map<String, dynamic>>, Map<String, Object?>)>[];
+    final matches = _firestore.collection(SeasonCollection.name('partidas', season));
+
+    final crowned = await matches.where('craque.idJogador', isEqualTo: from).get();
+    for (final doc in crowned.docs) {
+      updates.add((doc.reference, {'craque.idJogador': to}));
+    }
+
+    final events = await _firestore.collection('album_eventos').get();
+    for (final event in events.docs) {
+      final stickers = await event.reference.collection('figurinhas').where('idJogador', isEqualTo: from).get();
+      for (final doc in stickers.docs) {
+        updates.add((doc.reference, {'idJogador': to}));
+      }
+    }
+
+    if (withStats) {
+      final news = _firestore.collection('noticias');
+      for (final field in const ['autor_gol_id', 'assistencia_id']) {
+        final cards = await news.where(field, isEqualTo: from).get();
+        for (final doc in cards.docs) {
+          updates.add((doc.reference, {field: to}));
+        }
+      }
+      final seen = <String>{};
+      for (var i = 0; i < teamIds.length; i += 30) {
+        final ids = teamIds.sublist(i, i + 30 > teamIds.length ? teamIds.length : i + 30);
+        for (final side in const ['idTimeC', 'idTimeF']) {
+          final games = await matches.where(side, whereIn: ids).get();
+          for (final doc in games.docs) {
+            if (!seen.add(doc.id)) continue;
+            final goals = PlayerMerge.repointGoals(doc.data()['gols'], from, to);
+            if (goals != null) updates.add((doc.reference, {'gols': goals}));
+          }
+        }
+      }
+    }
+
+    for (var i = 0; i < updates.length; i += 400) {
+      final batch = _firestore.batch();
+      for (final (ref, data) in updates.skip(i).take(400)) {
+        batch.update(ref, data);
+      }
+      await batch.commit();
+    }
+  }
+
+  /// Recusa por conflito de competição, com o nome dela.
+  Future<Failure> _conflictFailure(EnrollmentConflict conflict) async {
+    var title = 'nessa competição';
+    try {
+      final found = await _firestore
+          .collection('campeonatos')
+          .where('id_campeonato', isEqualTo: conflict.championshipId)
+          .limit(1)
+          .get();
+      final name = found.docs.isEmpty ? '' : found.docs.first.data()['titulo']?.toString() ?? '';
+      if (name.isNotEmpty) title = 'em $name';
+    } catch (e) {
+      AppLogger.e('conflict title ${conflict.championshipId}', name: _logName, error: e);
+    }
+    return ErrorWithMessage(
+      'O atleta já joga pelo ${conflict.currentTeam} $title e não pode jogar também pelo ${conflict.otherTeam} '
+      'na mesma competição.',
+      code: enrollmentConflictCode,
+    );
   }
 
   Future<Either<Failure, void>> reject({required String userId, required String reason}) async {

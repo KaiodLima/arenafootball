@@ -10,5 +10,6 @@ class ApprovePlayerRequestUseCase {
 
   ApprovePlayerRequestUseCase(this._repository);
 
-  Future<Either<Failure, String>> call(PlayerRequestDTO request) => _repository.approve(request);
+  Future<Either<Failure, String>> call(PlayerRequestDTO request, {String? mergePlayerId}) =>
+      _repository.approve(request, mergePlayerId: mergePlayerId);
 }

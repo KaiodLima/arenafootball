@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
+import 'package:arena_soccer/features/player_requests/presentation/bloc/my_player_cubit.dart';
+import 'package:arena_soccer/features/player_requests/presentation/bloc/my_player_state.dart';
 import 'package:arena_soccer/features/player_requests/presentation/bloc/player_request_cubit.dart';
 import 'package:arena_soccer/features/player_requests/presentation/bloc/player_request_state.dart';
 import 'package:arena_soccer/features/player_requests/presentation/widgets/player_claim_selector.dart';
@@ -56,6 +58,7 @@ class _PlayerRequestPageState extends State<PlayerRequestPage> {
       email: user.email,
       initialRegion: BlocProvider.of<RegionCubit>(context).state.selectedRegion,
     );
+    _cubit.setAccountPlayer(BlocProvider.of<MyPlayerCubit>(context).state.player);
   }
 
   @override
@@ -111,6 +114,14 @@ class _PlayerRequestPageState extends State<PlayerRequestPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
+    return BlocListener<MyPlayerCubit, MyPlayerState>(
+      listenWhen: (previous, current) => previous.player != current.player,
+      listener: (context, state) => _cubit.setAccountPlayer(state.player),
+      child: _content(l10n),
+    );
+  }
+
+  Widget _content(AppLocalizations l10n) {
     return BlocConsumer<PlayerRequestCubit, PlayerRequestState>(
       listenWhen: (previous, current) =>
           current is SubmittedPlayerRequestState ||
@@ -225,6 +236,11 @@ class _PlayerRequestPageState extends State<PlayerRequestPage> {
             ],
           ),
           if (error == PlayerRequestFormError.championship) _ErrorText(l10n.playerRequestChampionshipRequired),
+          if (error == PlayerRequestFormError.alreadyInChampionship)
+            _ErrorText(l10n.playerRequestAlreadyInChampionship(
+              form.enrollmentInSelected!.team,
+              form.selectedChampionship?.title ?? '',
+            )),
         ],
         const SizedBox(height: AppSizes.s16),
         TeamChoiceSelector(

@@ -287,21 +287,75 @@ service cloud.firestore {
       // Dono aprova o "Sou jogador" de quem já é atleta de outro time (outra
       // competição): só acrescenta a inscrição no time dele, e só se o pedido
       // da conta é para o time dele. O time principal só muda se estava vazio.
+      // Um time por competição: só a inscrição da competição do pedido muda, e
+      // só se ainda não existia ou já era do time do dono.
       function joinsOwnedTeam() {
         let owned = ownedTeam();
         let uid = resource.data.get('idUsuario', '');
         let changed = request.resource.data.diff(resource.data).affectedKeys();
+        let req = get(/databases/$(database)/documents/solicitacoes_jogador/$(uid)).data;
         return owned != null && uid != '' && ownsTeam(request.resource.data)
           && changed.hasOnly(['inscricoes', 'idsTimes', 'nome', 'posicao', 'urlImagem', 'time', 'idTime'])
           && (!changed.hasAny(['time', 'idTime']) || noTeam(resource.data))
-          && get(/databases/$(database)/documents/solicitacoes_jogador/$(uid)).data.get('idTime', '') == owned.get('idTime', '-');
+          && req.get('idTime', '') == owned.get('idTime', '-')
+          && onlyRequestEnrollment(req, owned);
+      }
+
+      function onlyRequestEnrollment(req, owned) {
+        let before = resource.data.get('inscricoes', {});
+        let after = request.resource.data.get('inscricoes', {});
+        let key = 'c' + string(req.get('idCampeonato', -1));
+        return after.diff(before).affectedKeys().hasOnly([key])
+          && (!(key in before) || before[key].get('idTime', '') == owned.get('idTime', '-'));
+      }
+
+      // Dono editando o atleta do elenco dele: só as inscrições do próprio
+      // time mudam (a de outro time, noutra competição, fica como está) e a
+      // nova é do time dele. As regras não têm laço: até 8 inscrições.
+      function ownEnrollmentsOnly() {
+        let owned = ownedTeam();
+        let id = owned == null ? '-' : owned.get('idTime', '-');
+        let before = resource.data.get('inscricoes', {});
+        let after = request.resource.data.get('inscricoes', {});
+        let changed = after.diff(before).affectedKeys();
+        let old = before.keys();
+        let now = after.keys();
+        return changed.size() == 0 || (old.size() <= 8 && now.size() <= 8
+          && (old.size() < 1 || keepsOther(old[0], before, after, changed, id))
+          && (old.size() < 2 || keepsOther(old[1], before, after, changed, id))
+          && (old.size() < 3 || keepsOther(old[2], before, after, changed, id))
+          && (old.size() < 4 || keepsOther(old[3], before, after, changed, id))
+          && (old.size() < 5 || keepsOther(old[4], before, after, changed, id))
+          && (old.size() < 6 || keepsOther(old[5], before, after, changed, id))
+          && (old.size() < 7 || keepsOther(old[6], before, after, changed, id))
+          && (old.size() < 8 || keepsOther(old[7], before, after, changed, id))
+          && (now.size() < 1 || addsOwn(now[0], before, after, id))
+          && (now.size() < 2 || addsOwn(now[1], before, after, id))
+          && (now.size() < 3 || addsOwn(now[2], before, after, id))
+          && (now.size() < 4 || addsOwn(now[3], before, after, id))
+          && (now.size() < 5 || addsOwn(now[4], before, after, id))
+          && (now.size() < 6 || addsOwn(now[5], before, after, id))
+          && (now.size() < 7 || addsOwn(now[6], before, after, id))
+          && (now.size() < 8 || addsOwn(now[7], before, after, id)));
+      }
+
+      // Inscrição que já existia: se é de outro time, não muda.
+      function keepsOther(key, before, after, changed, id) {
+        return !(key in changed) || (before[key].get('idTime', '') == id
+          && (!(key in after) || after[key].get('idTime', '') == id));
+      }
+
+      // Inscrição nova: só pelo time do dono.
+      function addsOwn(key, before, after, id) {
+        return key in before || after[key].get('idTime', '') == id;
       }
 
       // Atleta sem time ('') pode entrar no elenco do dono (aprovação do "Sou jogador").
       allow update: if writable() && keepsEnrollments() && (isAdmin() || isOwnVote()
         || (isPlayers()
           && (ownsTeam(resource.data) || noTeam(resource.data))
-          && (ownsTeam(request.resource.data) || noTeam(request.resource.data)))
+          && (ownsTeam(request.resource.data) || noTeam(request.resource.data))
+          && ownEnrollmentsOnly())
         || (isPlayers() && joinsOwnedTeam())
         || (isTeamDoc() && signedIn() && resource.data.idDono == request.auth.uid
           && request.resource.data.diff(resource.data).affectedKeys()

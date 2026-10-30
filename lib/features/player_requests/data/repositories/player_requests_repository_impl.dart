@@ -32,7 +32,8 @@ class PlayerRequestsRepositoryImpl implements IPlayerRequestsRepository {
   Future<Either<Failure, void>> update(PlayerRequestDTO request) => _dataSource.update(request);
 
   @override
-  Future<Either<Failure, String>> approve(PlayerRequestDTO request) => _dataSource.approve(request);
+  Future<Either<Failure, String>> approve(PlayerRequestDTO request, {String? mergePlayerId}) =>
+      _dataSource.approve(request, mergePlayerId: mergePlayerId);
 
   @override
   Future<Either<Failure, void>> reject({required String userId, required String reason}) =>

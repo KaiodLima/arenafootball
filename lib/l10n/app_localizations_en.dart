@@ -731,6 +731,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String playerRequestAlreadyInChampionship(String team, String championship) {
+    return 'You are already in the $team squad for $championship. You can only play for one team per competition; choose another competition.';
+  }
+
+  @override
+  String get playerRequestsMergeTitle => 'Merge the records?';
+
+  @override
+  String playerRequestsMergeMessage(String current, String team, int goals,
+      String claimed, String claimedTeam) {
+    String _temp0 = intl.Intl.pluralLogic(
+      goals,
+      locale: localeName,
+      other: '$goals goals',
+      one: '1 goal',
+    );
+    return 'This account already owns the athlete $current ($team · $_temp0). Merge with $claimed ($claimedTeam)? One athlete remains, with the team and stats of each competition; the $current record is removed.';
+  }
+
+  @override
+  String get playerRequestsMergeConfirm => 'Merge';
+
+  @override
+  String playerRequestsMerged(String name) {
+    return 'Records merged: $name is now linked to the account.';
+  }
+
+  @override
   String get albumBadgeOpen => 'Open!';
 
   @override

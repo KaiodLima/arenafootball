@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:either_dart/either.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
+import 'package:arena_soccer/features/player_requests/data/datasources/player_requests_datasource.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
 import 'package:arena_soccer/features/player_requests/domain/usecases/approve_player_request_usecase.dart';
 import 'package:arena_soccer/features/player_requests/domain/usecases/reject_player_request_usecase.dart';
@@ -77,14 +78,22 @@ class PlayerRequestsPanelCubit extends Cubit<PlayerRequestsPanelState> {
     emit(_ready(busy: ids));
   }
 
-  Future<void> approve(PlayerRequestDTO request) async {
+  /// [mergePlayerId]: o admin confirmou juntar o atleta que a conta já tinha.
+  Future<void> approve(PlayerRequestDTO request, {String? mergePlayerId}) async {
     _setBusy(request.userId, true);
-    final response = await approvePlayerRequestUseCase(request);
+    final response = await approvePlayerRequestUseCase(request, mergePlayerId: mergePlayerId);
     if (isClosed) return;
     _setBusy(request.userId, false);
     response.fold(
-      (failure) => emit(ErrorPlayerRequestsPanelState(state, errorMessage: failure.toString())),
-      (_) => emit(ApprovedPlayerRequestsPanelState(state, name: request.name, team: request.team)),
+      (failure) => emit(failure is PlayerMergeNeeded
+          ? MergeNeededPlayerRequestsPanelState(state, request: request, current: failure.current)
+          : ErrorPlayerRequestsPanelState(state, errorMessage: failure.toString())),
+      (_) => emit(ApprovedPlayerRequestsPanelState(
+        state,
+        name: request.name,
+        team: request.team,
+        merged: mergePlayerId != null,
+      )),
     );
     // O novo jogador entra no aviso de nome repetido.
     if (response.isRight) _loadReferences();

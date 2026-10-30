@@ -18,7 +18,7 @@ abstract class IPlayerRequestsRepository {
   Future<Either<Failure, void>> update(PlayerRequestDTO request);
 
   /// Devolve o id do jogador criado.
-  Future<Either<Failure, String>> approve(PlayerRequestDTO request);
+  Future<Either<Failure, String>> approve(PlayerRequestDTO request, {String? mergePlayerId});
 
   Future<Either<Failure, void>> reject({required String userId, required String reason});
 }

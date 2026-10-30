@@ -32,6 +32,7 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
   late String _userName;
   late String _email;
   late String _initialRegion;
+  PlayerDTO? _accountPlayer;
 
   PlayerRequestCubit(
     this.watchMyPlayerRequestUseCase,
@@ -58,6 +59,15 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
 
   Future<void> retry() => _load();
 
+  /// Atleta da conta (do `MyPlayerCubit`, sem leitura nova): barra pedir outro
+  /// time numa competição em que ele já está.
+  void setAccountPlayer(PlayerDTO? player) {
+    _accountPlayer = player;
+    if (state is ReadyPlayerRequestState || state.form.regions.isNotEmpty) {
+      _updateForm(state.form.copyWith(accountPlayer: () => player));
+    }
+  }
+
   Future<void> _load() async {
     emit(const LoadingPlayerRequestState());
     final regions = await getRegionsUseCase();
@@ -68,7 +78,9 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
     }
     final list = regions.right;
     final region = list.contains(_initialRegion) ? _initialRegion : list.first;
-    emit(ReadyPlayerRequestState(form: PlayerRequestForm(regions: list, selectedRegion: region, name: _userName)));
+    emit(ReadyPlayerRequestState(
+      form: PlayerRequestForm(regions: list, selectedRegion: region, name: _userName, accountPlayer: _accountPlayer),
+    ));
 
     _subscription?.cancel();
     _subscription = watchMyPlayerRequestUseCase(_userId).listen(_onRequest);
