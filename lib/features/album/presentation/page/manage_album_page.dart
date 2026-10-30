@@ -447,6 +447,7 @@ class _StickerSheet extends StatefulWidget {
 class _StickerSheetState extends State<_StickerSheet> {
   late final _name = TextEditingController(text: widget.sticker.name);
   late final _order = TextEditingController(text: '${widget.sticker.order}');
+  late bool _rare = widget.sticker.rare;
   File? _image;
   bool _removed = false;
 
@@ -502,6 +503,14 @@ class _StickerSheetState extends State<_StickerSheet> {
               keyboardType: TextInputType.number,
               decoration: arenaInputDecoration(label: l10n.albumAdminStickerOrder, icon: Icons.format_list_numbered),
             ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              value: _rare,
+              onChanged: (value) => setState(() => _rare = value),
+              secondary: const Icon(Icons.auto_awesome_rounded, color: AppColors.gold),
+              title: Text(l10n.albumAdminStickerRare, style: AppTypography.label(color: AppColors.textPrimary)),
+              subtitle: Text(l10n.albumAdminStickerRareHint, style: AppTypography.subtitle()),
+            ),
             const SizedBox(height: AppSizes.s20),
             ArenaButton.primary(
               title: l10n.commonSave,
@@ -512,6 +521,7 @@ class _StickerSheetState extends State<_StickerSheet> {
                           widget.sticker.copyWith(
                             name: _name.text.trim(),
                             order: int.tryParse(_order.text.trim()) ?? widget.sticker.order,
+                            rare: _rare,
                             imageUrl: _removed && _image == null ? '' : null,
                           ),
                           image: _image,

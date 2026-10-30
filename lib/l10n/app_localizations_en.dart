@@ -731,6 +731,52 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get albumTabRanking => 'Ranking';
+
+  @override
+  String get albumRankingHint =>
+      'Who has the most different stickers. Tie: who got there first.';
+
+  @override
+  String get albumRankingRefresh => 'Refresh';
+
+  @override
+  String get albumRankingEmpty => 'Nobody has opened a pack yet. Be the first!';
+
+  @override
+  String get albumRankingYou => 'You';
+
+  @override
+  String get albumRankingComplete => 'Complete ✓';
+
+  @override
+  String get albumRankingMyPosition => 'Your position';
+
+  @override
+  String get albumRankingNotYet => 'Open your first pack to join the ranking.';
+
+  @override
+  String get albumRareTag => 'RARE';
+
+  @override
+  String get albumRareLabel => 'Rare';
+
+  @override
+  String get albumStickerRareNew => 'RARE!';
+
+  @override
+  String albumStatRares(int total) {
+    return 'rare of $total';
+  }
+
+  @override
+  String get albumAdminStickerRare => 'Rare sticker';
+
+  @override
+  String get albumAdminStickerRareHint =>
+      'Much less likely in a pack, with a golden frame.';
+
+  @override
   String get regionPickerTitle => 'Choose a region';
 
   @override

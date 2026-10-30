@@ -18,6 +18,19 @@ class AlbumUseCase {
   Stream<Either<Failure, UserAlbumDTO>> watchMyAlbum({required String userId, required String eventId}) =>
       _repository.watchMyAlbum(userId: userId, eventId: eventId);
 
+  /// Ranking de colecionadores: top 50, a linha da conta e a posição dela
+  /// (quem tem mais coladas + 1; dentro do top 50, a posição na lista).
+  Future<Either<Failure, AlbumRankingView>> getRanking({required String eventId, required String userId}) async {
+    final top = await _repository.getTopCollectors(eventId);
+    if (top.isLeft) return Left(top.left);
+    final index = top.right.indexWhere((e) => e.userId == userId);
+    if (index >= 0) return Right(AlbumRankingView(top: top.right, me: top.right[index], myPosition: index + 1));
+    final me = await _repository.getCollector(eventId, userId);
+    if (me.isLeft || me.right == null) return Right(AlbumRankingView(top: top.right));
+    final ahead = await _repository.collectorsAhead(eventId, me.right!.collected);
+    return Right(AlbumRankingView(top: top.right, me: me.right, myPosition: ahead.isRight ? ahead.right + 1 : null));
+  }
+
   /// O pacote pedido (o sorteio do servidor chega por aqui).
   Stream<Either<Failure, AlbumPackDTO?>> watchPack(String packId) => _repository.watchPack(packId);
 
@@ -33,3 +46,13 @@ class AlbumUseCase {
     return response.map((_) => packId);
   }
 }
+
+/// Ranking pronto para a tela: o top e a conta (nula = ainda não coleciona).
+class AlbumRankingView {
+  final List<AlbumRankingEntryDTO> top;
+  final AlbumRankingEntryDTO? me;
+  final int? myPosition;
+
+  const AlbumRankingView({this.top = const [], this.me, this.myPosition});
+}
+

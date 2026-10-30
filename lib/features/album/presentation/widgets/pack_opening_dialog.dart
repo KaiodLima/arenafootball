@@ -119,6 +119,11 @@ class _PackOpeningState extends State<_PackOpening> with TickerProviderStateMixi
     if (_isNew(i)) {
       HapticFeedback.heavyImpact();
       _confetti.forward(from: 0);
+      // Rara nova: vibração dupla.
+      if (widget.stickerOf(_ids[i])?.rare ?? false) {
+        await Future<void>.delayed(const Duration(milliseconds: 140));
+        HapticFeedback.heavyImpact();
+      }
     }
   }
 
@@ -590,7 +595,7 @@ class _RevealStage extends StatelessWidget {
                     clipBehavior: Clip.none,
                     children: [
                       // Explosão dourada atrás da nova.
-                      if (isNew && front)
+                      if ((isNew || (sticker?.rare ?? false)) && front)
                         IgnorePointer(
                           child: AnimatedBuilder(
                             animation: rays,
@@ -599,7 +604,10 @@ class _RevealStage extends StatelessWidget {
                             child: SizedBox.square(
                               dimension: width * 1.9,
                               child: CustomPaint(
-                                painter: RaysPainter(color: AppColors.googleYellow.withValues(alpha: 0.22), rays: 14),
+                                painter: RaysPainter(
+                                  color: AppColors.googleYellow.withValues(alpha: (sticker?.rare ?? false) ? 0.38 : 0.22),
+                                  rays: (sticker?.rare ?? false) ? 20 : 14,
+                                ),
                               ),
                             ),
                           ),
@@ -639,7 +647,7 @@ class _RevealStage extends StatelessWidget {
                             duration: const Duration(milliseconds: 450),
                             curve: Curves.elasticOut,
                             builder: (context, s, child) => Transform.scale(scale: s, child: child),
-                            child: _Badge(isNew: isNew, large: true),
+                            child: _Badge(isNew: isNew, rare: sticker?.rare ?? false, large: true),
                           ),
                         ),
                     ],
@@ -747,9 +755,12 @@ class _CardBack extends StatelessWidget {
 /// Selo dourado "NOVA!" ou o discreto "Repetida".
 class _Badge extends StatelessWidget {
   final bool isNew;
+
+  /// Rara nova: "RARA!" com o brilho mais forte.
+  final bool rare;
   final bool large;
 
-  const _Badge({required this.isNew, this.large = false});
+  const _Badge({required this.isNew, this.rare = false, this.large = false});
 
   @override
   Widget build(BuildContext context) {
@@ -760,7 +771,13 @@ class _Badge extends StatelessWidget {
         vertical: large ? AppSizes.s6 : AppSizes.s2,
       ),
       decoration: BoxDecoration(
-        gradient: isNew ? const LinearGradient(colors: [AppColors.googleYellow, AppColors.teamOrange]) : null,
+        gradient: isNew
+            ? LinearGradient(
+                colors: rare
+                    ? const [AppColors.gold, AppColors.teamPink, AppColors.teamOrange]
+                    : const [AppColors.googleYellow, AppColors.teamOrange],
+              )
+            : null,
         color: isNew ? null : AppColors.black.withValues(alpha: 0.55),
         borderRadius: BorderRadius.circular(AppSizes.s20),
         border: Border.all(color: AppColors.white, width: large ? AppSizes.s2 : AppSizes.s1),
@@ -769,7 +786,9 @@ class _Badge extends StatelessWidget {
         ],
       ),
       child: Text(
-        isNew ? l10n.albumStickerNew : l10n.albumStickerRepeated,
+        isNew
+            ? (rare ? l10n.albumStickerRareNew : l10n.albumStickerNew)
+            : l10n.albumStickerRepeated,
         style: AppTypography.label(color: isNew ? AppColors.black : AppColors.white).copyWith(
           fontSize: large ? AppSizes.s16 : AppSizes.s10,
           fontWeight: FontWeight.w900,
@@ -901,7 +920,7 @@ class _SummaryStage extends StatelessWidget {
                                   child: StickerCard(sticker: stickers[i]!, style: frameOf(stickers[i]!)),
                                 ),
                               ),
-                              Positioned(top: -AppSizes.s10, child: _Badge(isNew: isNew[i])),
+                              Positioned(top: -AppSizes.s10, child: _Badge(isNew: isNew[i], rare: stickers[i]!.rare)),
                             ],
                           ),
                         ),

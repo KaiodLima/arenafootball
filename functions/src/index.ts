@@ -23,6 +23,7 @@ import {
   nextPackAt,
   parsePackId,
   perPackOf,
+  rankingEntry,
   stickerOf,
 } from './album';
 import {
@@ -897,6 +898,9 @@ export const onUserDeleted = functionsV1
     await db.recursiveDelete(db.collection('usuarios').doc(uid).collection('conquistas'));
     // Álbum de figurinhas: a coleção da conta e os pacotes pedidos.
     await db.recursiveDelete(db.collection('usuarios').doc(uid).collection('album'));
+    // E as linhas dele nos rankings dos álbuns (poucos eventos).
+    const albumEvents = await db.collection('album_eventos').get();
+    await deleteExisting(db, albumEvents.docs.map((e) => e.ref.collection('ranking').doc(uid)));
     await deleteExisting(db, (await db.collection('album_pacotes').where('uid', '==', uid).get()).docs.map((d) => d.ref));
 
     // Votos de cada temporada (partidas{ano}/{id}/votos/{uid}) e vínculos de atleta e dono.
@@ -1155,10 +1159,13 @@ export const onAlbumPackRequested = onDocumentCreated('album_pacotes/{packId}', 
   try {
     const eventRef = db.collection('album_eventos').doc(parsed.eventId);
     const albumRef = db.collection('usuarios').doc(parsed.uid).collection('album').doc(parsed.eventId);
-    const [eventSnap, catalog, albumSnap] = await Promise.all([
+    const rankingRef = eventRef.collection('ranking').doc(parsed.uid);
+    const [eventSnap, catalog, albumSnap, rankingSnap, profileSnap] = await Promise.all([
       eventRef.get(),
       eventRef.collection('figurinhas').get(),
       albumRef.get(),
+      rankingRef.get(),
+      db.collection('usuarios').doc(parsed.uid).get(),
     ]);
     const requestedAt = dateOf(event.data?.data()?.pedidoEm) ?? new Date();
     // Confere de novo a sequência e as 24 h (as regras já barram).
@@ -1176,6 +1183,19 @@ export const onAlbumPackRequested = onDocumentCreated('album_pacotes/{packId}', 
       albumRef,
       { ...album, pacotes: parsed.n, ultimoPacote: requestedAt, avisoEm: nextPackAt(requestedAt) },
       { merge: true },
+    );
+    // Ranking de colecionadores do álbum (leitura pública).
+    const profile = profileSnap.data() ?? {};
+    batch.set(
+      rankingRef,
+      rankingEntry(
+        parsed.uid,
+        rankingSnap.data(),
+        album,
+        stickers,
+        { nome: String(profile.nome ?? ''), urlImagem: String(profile.urlImagem ?? '') },
+        new Date(),
+      ),
     );
     batch.set(
       await progressRef(parsed.uid),

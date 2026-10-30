@@ -43,6 +43,10 @@ export default async function run(env, check) {
   await check('lê o próprio pacote', assertSucceeds(getDoc(doc(u1, 'album_pacotes/ev1_u1_1'))));
   await check('não lê o pacote de outro', assertFails(getDoc(doc(u2, 'album_pacotes/ev1_u1_1'))));
 
+  await seed('album_eventos/ev1/ranking/u2', { uid: 'u2', nome: 'Bia', coladas: 1 });
+  await check('ranking público', assertSucceeds(getDoc(doc(anon, 'album_eventos/ev1/ranking/u2'))));
+  await check('dono não mexe no ranking', assertFails(setDoc(doc(u2, 'album_eventos/ev1/ranking/u2'), { coladas: 99 })));
+  await check('admin não grava ranking (só as functions)', assertFails(setDoc(doc(admin, 'album_eventos/ev1/ranking/u1'), { coladas: 1 })));
   await check('dono lê o álbum', assertSucceeds(getDoc(doc(u2, 'usuarios/u2/album/ev1'))));
   await check('não lê o álbum de outro', assertFails(getDoc(doc(u1, 'usuarios/u2/album/ev1'))));
   await check('dono não cola figurinha na mão', assertFails(setDoc(doc(u2, 'usuarios/u2/album/ev1'), { figurinhas: { f1: 99 } })));

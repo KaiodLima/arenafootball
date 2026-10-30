@@ -10,7 +10,12 @@ export type Doc = Record<string, unknown>;
 export interface Sticker {
   id: string;
   teamId: string;
+  /** Rara (marcada pelo admin): sai com peso [RARE_WEIGHT] no sorteio. */
+  rare?: boolean;
 }
+
+/** Peso da figurinha rara no sorteio (a comum vale 1): ~5× mais difícil. */
+export const RARE_WEIGHT = 0.2;
 
 export interface AlbumProgress {
   /** idFig → quantidade (repetidas contam). */
@@ -89,14 +94,57 @@ export function albumPackMessage(uid: string, eventTitle: string, perPack: numbe
   };
 }
 
-/** Sorteia [count] figurinhas (chance igual, pode repetir). [random] em [0, 1). */
+/**
+ * Sorteia [count] figurinhas (pode repetir). Comum pesa 1 e rara
+ * [RARE_WEIGHT]; com todas do mesmo tipo, chance igual. [random] em [0, 1).
+ */
 export function drawPack(stickers: Sticker[], count: number, random: () => number = Math.random): string[] {
   if (stickers.length === 0 || count <= 0) return [];
+  const weights = stickers.map((s) => (s.rare ? RARE_WEIGHT : 1));
+  const total = weights.reduce((sum, w) => sum + w, 0);
   const drawn: string[] = [];
   for (let i = 0; i < count; i++) {
-    drawn.push(stickers[Math.min(stickers.length - 1, Math.floor(random() * stickers.length))].id);
+    let r = random() * total;
+    let index = stickers.length - 1;
+    for (let j = 0; j < stickers.length; j++) {
+      r -= weights[j];
+      if (r < 0) {
+        index = j;
+        break;
+      }
+    }
+    drawn.push(stickers[index].id);
   }
   return drawn;
+}
+
+/**
+ * Linha do colecionador em `album_eventos/{evento}/ranking/{uid}` depois do
+ * pacote: coladas, raras diferentes coladas e completo. [alcancadoEm] (o
+ * desempate: quem chegou primeiro) só muda quando as coladas sobem;
+ * [completoEm] fica na 1ª vez que completa.
+ */
+export function rankingEntry(
+  uid: string,
+  before: Doc | undefined,
+  album: AlbumProgress,
+  stickers: Sticker[],
+  profile: { nome: string; urlImagem: string },
+  now: Date,
+): Doc {
+  const previous = typeof before?.coladas === 'number' ? before.coladas : -1;
+  const rares = stickers.filter((s) => s.rare && album.figurinhas[s.id]).length;
+  return {
+    uid,
+    nome: profile.nome,
+    urlImagem: profile.urlImagem,
+    coladas: album.coladas,
+    raras: rares,
+    completo: album.completo,
+    completoEm: before?.completoEm ?? (album.completo ? now : null),
+    alcancadoEm: album.coladas > previous || !before?.alcancadoEm ? now : before.alcancadoEm,
+    atualizadoEm: now,
+  };
 }
 
 /** Álbum gravado (campos ausentes = vazio). */
@@ -152,7 +200,7 @@ export function applyPack(
 
 /** Figurinha do catálogo (doc de `album_eventos/{id}/figurinhas`). */
 export function stickerOf(id: string, data: Doc): Sticker {
-  return { id, teamId: text(data.idTime) };
+  return { id, teamId: text(data.idTime), rare: data.rara === true };
 }
 
 /** Figurinhas por pacote do evento (1 a 10; sem o campo, 5). */

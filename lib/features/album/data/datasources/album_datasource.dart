@@ -57,6 +57,41 @@ class AlbumDataSource {
         );
   }
 
+  CollectionReference<Map<String, dynamic>> _ranking(String eventId) => _events.doc(eventId).collection('ranking');
+
+  /// Top [limit] colecionadores do álbum (uma leitura por linha; sem stream).
+  Future<Either<Failure, List<AlbumRankingEntryDTO>>> getTopCollectors(String eventId, {int limit = 50}) async {
+    try {
+      final snapshot = await _ranking(eventId).orderBy('coladas', descending: true).limit(limit).get();
+      return Right(AlbumRankingEntryDTO.sorted(snapshot.docs.map(AlbumRankingEntryDTO.fromFirestore).toList()));
+    } catch (e) {
+      AppLogger.e('getTopCollectors $eventId', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _loadFallback));
+    }
+  }
+
+  /// A linha da conta no ranking (nula = ainda não abriu pacote).
+  Future<Either<Failure, AlbumRankingEntryDTO?>> getCollector(String eventId, String userId) async {
+    try {
+      final doc = await _ranking(eventId).doc(userId).get();
+      return Right(doc.exists ? AlbumRankingEntryDTO.fromFirestore(doc) : null);
+    } catch (e) {
+      AppLogger.e('getCollector $eventId', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _loadFallback));
+    }
+  }
+
+  /// Quantos têm mais coladas que [collected] (`count()`: uma leitura a cada mil).
+  Future<Either<Failure, int>> collectorsAhead(String eventId, int collected) async {
+    try {
+      final result = await _ranking(eventId).where('coladas', isGreaterThan: collected).count().get();
+      return Right(result.count ?? 0);
+    } catch (e) {
+      AppLogger.e('collectorsAhead $eventId', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _loadFallback));
+    }
+  }
+
   /// Pacote [packId] (nulo = ainda não pedido hoje).
   Stream<Either<Failure, AlbumPackDTO?>> watchPack(String packId) {
     return _firestore.collection('album_pacotes').doc(packId).snapshots().toEither(

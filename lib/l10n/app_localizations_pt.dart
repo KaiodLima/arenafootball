@@ -734,6 +734,54 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get albumTabRanking => 'Ranking';
+
+  @override
+  String get albumRankingHint =>
+      'Quem tem mais figurinhas diferentes coladas. Empate: quem chegou primeiro.';
+
+  @override
+  String get albumRankingRefresh => 'Atualizar';
+
+  @override
+  String get albumRankingEmpty =>
+      'Ninguém abriu pacotinho ainda. Seja o primeiro!';
+
+  @override
+  String get albumRankingYou => 'Você';
+
+  @override
+  String get albumRankingComplete => 'Completo ✓';
+
+  @override
+  String get albumRankingMyPosition => 'Sua posição';
+
+  @override
+  String get albumRankingNotYet =>
+      'Abra seu primeiro pacotinho para entrar no ranking.';
+
+  @override
+  String get albumRareTag => 'RARA';
+
+  @override
+  String get albumRareLabel => 'Rara';
+
+  @override
+  String get albumStickerRareNew => 'RARA!';
+
+  @override
+  String albumStatRares(int total) {
+    return 'raras de $total';
+  }
+
+  @override
+  String get albumAdminStickerRare => 'Figurinha rara';
+
+  @override
+  String get albumAdminStickerRareHint =>
+      'Sai bem menos no pacotinho e tem a moldura dourada.';
+
+  @override
   String get regionPickerTitle => 'Escolha a região';
 
   @override

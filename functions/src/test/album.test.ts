@@ -11,6 +11,8 @@ import {
   packId,
   parsePackId,
   perPackOf,
+  rankingEntry,
+  stickerOf,
 } from '../album';
 
 const stickers = [
@@ -71,3 +73,44 @@ test('cola o pacote: novas, repetidas, páginas e álbum completo', () => {
   assert.equal(second.album.completo, true);
   assert.equal(second.justCompleted, true);
 });
+
+test('rara sai bem menos: peso 0,2 contra 1 da comum', () => {
+  const pool = [
+    { id: 'c1', teamId: 't' },
+    { id: 'c2', teamId: 't' },
+    { id: 'r1', teamId: 't', rare: true },
+  ];
+  // Total 2,2: [0, 1) c1, [1, 2) c2, [2, 2,2) r1.
+  assert.deepEqual(drawPack(pool, 3, (() => { const s = [0.1, 0.5, 0.95]; let i = 0; return () => s[i++]; })()), ['c1', 'c2', 'r1']);
+  let seed = 7;
+  const random = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+  const many = drawPack(pool, 5000, random);
+  const rares = many.filter((id) => id === 'r1').length;
+  assert.ok(rares > 300 && rares < 650, `raras: ${rares}`); // ~9% (0,2/2,2)
+  // Só raras: chance igual entre elas.
+  assert.deepEqual(drawPack([{ id: 'a', teamId: 't', rare: true }], 2), ['a', 'a']);
+  assert.equal(stickerOf('x', { idTime: 't', rara: true }).rare, true);
+  assert.equal(stickerOf('y', { idTime: 't' }).rare, false);
+});
+
+test('ranking: coladas, raras e desempate por quem chegou primeiro', () => {
+  const pool = [
+    { id: 'a', teamId: 't' },
+    { id: 'r', teamId: 't', rare: true },
+  ];
+  const t1 = new Date(Date.UTC(2026, 9, 1));
+  const t2 = new Date(Date.UTC(2026, 9, 2));
+  const profile = { nome: 'Ana', urlImagem: '' };
+  const first = rankingEntry('u1', undefined, albumOf({ figurinhas: { a: 1 } }), pool, profile, t1);
+  assert.equal(first.coladas, 1);
+  assert.equal(first.raras, 0);
+  assert.equal(first.alcancadoEm, t1);
+  // Só repetidas: a contagem não sobe, o desempate não muda.
+  const same = rankingEntry('u1', first, albumOf({ figurinhas: { a: 2 } }), pool, profile, t2);
+  assert.equal(same.alcancadoEm, t1);
+  // Completou com a rara.
+  const done = rankingEntry('u1', same, albumOf({ figurinhas: { a: 2, r: 1 }, completo: true, coladas: 2 }), pool, profile, t2);
+  assert.equal(done.raras, 1);
+  assert.equal(done.alcancadoEm, t2);
+});
+

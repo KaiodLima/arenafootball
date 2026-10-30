@@ -26,6 +26,18 @@ class AlbumRepositoryImpl implements IAlbumRepository {
   Stream<Either<Failure, AlbumPackDTO?>> watchPack(String packId) => _dataSource.watchPack(packId);
 
   @override
+  Future<Either<Failure, List<AlbumRankingEntryDTO>>> getTopCollectors(String eventId) =>
+      _dataSource.getTopCollectors(eventId);
+
+  @override
+  Future<Either<Failure, AlbumRankingEntryDTO?>> getCollector(String eventId, String userId) =>
+      _dataSource.getCollector(eventId, userId);
+
+  @override
+  Future<Either<Failure, int>> collectorsAhead(String eventId, int collected) =>
+      _dataSource.collectorsAhead(eventId, collected);
+
+  @override
   Future<Either<Failure, void>> requestPack(
           {required String packId, required String userId, required String eventId}) =>
       _dataSource.requestPack(packId: packId, userId: userId, eventId: eventId);

@@ -13,6 +13,12 @@ abstract class IAlbumRepository {
 
   Stream<Either<Failure, AlbumPackDTO?>> watchPack(String packId);
 
+  Future<Either<Failure, List<AlbumRankingEntryDTO>>> getTopCollectors(String eventId);
+
+  Future<Either<Failure, AlbumRankingEntryDTO?>> getCollector(String eventId, String userId);
+
+  Future<Either<Failure, int>> collectorsAhead(String eventId, int collected);
+
   Future<Either<Failure, void>> requestPack({required String packId, required String userId, required String eventId});
 
   Future<Either<Failure, String>> saveEvent(AlbumEventDTO event);

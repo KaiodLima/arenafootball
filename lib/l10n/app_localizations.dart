@@ -1335,6 +1335,90 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @albumTabRanking.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ranking'**
+  String get albumTabRanking;
+
+  /// No description provided for @albumRankingHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem tem mais figurinhas diferentes coladas. Empate: quem chegou primeiro.'**
+  String get albumRankingHint;
+
+  /// No description provided for @albumRankingRefresh.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atualizar'**
+  String get albumRankingRefresh;
+
+  /// No description provided for @albumRankingEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ninguém abriu pacotinho ainda. Seja o primeiro!'**
+  String get albumRankingEmpty;
+
+  /// No description provided for @albumRankingYou.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você'**
+  String get albumRankingYou;
+
+  /// No description provided for @albumRankingComplete.
+  ///
+  /// In pt, this message translates to:
+  /// **'Completo ✓'**
+  String get albumRankingComplete;
+
+  /// No description provided for @albumRankingMyPosition.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua posição'**
+  String get albumRankingMyPosition;
+
+  /// No description provided for @albumRankingNotYet.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abra seu primeiro pacotinho para entrar no ranking.'**
+  String get albumRankingNotYet;
+
+  /// No description provided for @albumRareTag.
+  ///
+  /// In pt, this message translates to:
+  /// **'RARA'**
+  String get albumRareTag;
+
+  /// No description provided for @albumRareLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rara'**
+  String get albumRareLabel;
+
+  /// No description provided for @albumStickerRareNew.
+  ///
+  /// In pt, this message translates to:
+  /// **'RARA!'**
+  String get albumStickerRareNew;
+
+  /// No description provided for @albumStatRares.
+  ///
+  /// In pt, this message translates to:
+  /// **'raras de {total}'**
+  String albumStatRares(int total);
+
+  /// No description provided for @albumAdminStickerRare.
+  ///
+  /// In pt, this message translates to:
+  /// **'Figurinha rara'**
+  String get albumAdminStickerRare;
+
+  /// No description provided for @albumAdminStickerRareHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sai bem menos no pacotinho e tem a moldura dourada.'**
+  String get albumAdminStickerRareHint;
+
   /// No description provided for @regionPickerTitle.
   ///
   /// In pt, this message translates to:

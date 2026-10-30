@@ -49,7 +49,8 @@ class StickerCard extends StatelessWidget {
     this.sheen,
   });
 
-  bool get _foil => sticker.kind == StickerKind.crest;
+  /// Brilho holográfico: o escudo e as raras.
+  bool get _foil => sticker.kind == StickerKind.crest || sticker.rare;
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +63,15 @@ class StickerCard extends StatelessWidget {
           return Container(
             padding: EdgeInsets.all(AppSizes.s2 + AppSizes.s2 * k),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              // Rara: o papel é dourado.
+              color: sticker.rare ? null : AppColors.white,
+              gradient: sticker.rare
+                  ? const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [AppColors.gold, AppColors.googleYellow, AppColors.teamOrange, AppColors.gold],
+                    )
+                  : null,
               borderRadius: BorderRadius.circular(AppSizes.s8 * k),
               boxShadow: [
                 BoxShadow(color: AppColors.black.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))
@@ -124,6 +133,7 @@ class StickerCard extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           card,
+          if (sticker.rare) const Positioned(bottom: -AppSizes.s6, left: 0, right: 0, child: Center(child: RareTag())),
           if (count > 1)
             Positioned(
               top: -AppSizes.s6,
@@ -447,6 +457,28 @@ class _Image extends StatelessWidget {
   }
 }
 
+/// Selo "★ RARA" (figurinha rara: embaixo do card, sobre a borda).
+class RareTag extends StatelessWidget {
+  const RareTag({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.s6, vertical: AppSizes.s1),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(colors: [AppColors.gold, AppColors.teamOrange]),
+        borderRadius: BorderRadius.circular(AppSizes.s10),
+        border: Border.all(color: AppColors.white, width: AppSizes.s1),
+        boxShadow: [BoxShadow(color: AppColors.gold.withValues(alpha: 0.5), blurRadius: AppSizes.s6)],
+      ),
+      child: Text(
+        '★ ${AppLocalizations.of(context).albumRareTag}',
+        style: AppTypography.label(color: AppColors.black).copyWith(fontSize: AppSizes.s8, fontWeight: FontWeight.w900),
+      ),
+    );
+  }
+}
+
 /// Espaço vazio (estilo Panini) sobre o fundo escuro da página: moldura
 /// tracejada, número grande e o nome de quem falta.
 class EmptySlot extends StatelessWidget {
@@ -457,10 +489,12 @@ class EmptySlot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final crest = sticker.kind == StickerKind.crest;
+    final rare = sticker.rare;
     return AspectRatio(
       aspectRatio: 3 / 4,
       child: CustomPaint(
-        painter: _DashedBorderPainter(color: AppColors.white.withValues(alpha: 0.45)),
+        // Rara: moldura dourada e a estrela (o colecionador sabe o que falta).
+        painter: _DashedBorderPainter(color: rare ? AppColors.gold : AppColors.white.withValues(alpha: 0.45)),
         child: Container(
           decoration: BoxDecoration(
             color: AppColors.white.withValues(alpha: 0.08),
@@ -471,8 +505,12 @@ class EmptySlot extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                crest ? Icons.shield_outlined : Icons.person_outline_rounded,
-                color: AppColors.white.withValues(alpha: 0.35),
+                rare
+                    ? Icons.star_rounded
+                    : crest
+                        ? Icons.shield_outlined
+                        : Icons.person_outline_rounded,
+                color: rare ? AppColors.gold : AppColors.white.withValues(alpha: 0.35),
                 size: AppSizes.s24,
               ),
               Text(

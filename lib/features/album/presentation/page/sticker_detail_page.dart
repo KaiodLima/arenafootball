@@ -602,6 +602,7 @@ class _InfoPanel extends StatelessWidget {
                 runSpacing: AppSizes.s8,
                 children: [
                   _Chip(icon: Icons.tag_rounded, label: '${sticker.number}', color: accent),
+                  if (sticker.rare) _Chip(icon: Icons.auto_awesome_rounded, label: l10n.albumRareLabel, color: AppColors.gold),
                   _Chip(
                     icon: crest ? Icons.shield_rounded : Icons.person_rounded,
                     label: crest ? l10n.albumDetailCrest : l10n.albumDetailAthlete,

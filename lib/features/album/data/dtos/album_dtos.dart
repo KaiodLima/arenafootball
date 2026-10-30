@@ -127,6 +127,10 @@ class StickerDTO extends Equatable {
   /// Ordem na página do time.
   final int order;
 
+  /// Rara (`rara`, marcada pelo admin): sai bem menos no pacotinho e tem a
+  /// moldura dourada.
+  final bool rare;
+
   const StickerDTO({
     this.id = '',
     this.number = 0,
@@ -137,6 +141,7 @@ class StickerDTO extends Equatable {
     this.playerId = '',
     this.imageUrl = '',
     this.order = 0,
+    this.rare = false,
   });
 
   factory StickerDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -151,6 +156,7 @@ class StickerDTO extends Equatable {
       playerId: data['idJogador']?.toString() ?? '',
       imageUrl: data['urlImagem']?.toString() ?? '',
       order: (data['ordem'] as num?)?.toInt() ?? 0,
+      rare: data['rara'] == true,
     );
   }
 
@@ -163,9 +169,10 @@ class StickerDTO extends Equatable {
         if (playerId.isNotEmpty) 'idJogador': playerId,
         'urlImagem': imageUrl,
         'ordem': order,
+        'rara': rare,
       };
 
-  StickerDTO copyWith({String? id, int? number, String? name, String? imageUrl, int? order}) {
+  StickerDTO copyWith({String? id, int? number, String? name, String? imageUrl, int? order, bool? rare}) {
     return StickerDTO(
       id: id ?? this.id,
       number: number ?? this.number,
@@ -176,11 +183,12 @@ class StickerDTO extends Equatable {
       playerId: playerId,
       imageUrl: imageUrl ?? this.imageUrl,
       order: order ?? this.order,
+      rare: rare ?? this.rare,
     );
   }
 
   @override
-  List<Object?> get props => [id, number, kind, name, teamId, team, playerId, imageUrl, order];
+  List<Object?> get props => [id, number, kind, name, teamId, team, playerId, imageUrl, order, rare];
 }
 
 /// `usuarios/{uid}/album/{idEvento}`: as figurinhas da conta (só as functions
@@ -285,3 +293,57 @@ class AlbumPackDTO extends Equatable {
   @override
   List<Object?> get props => [id, status, stickers, newOnes];
 }
+
+/// `album_eventos/{evento}/ranking/{uid}`: o colecionador no ranking do
+/// álbum (gravado pelas functions a cada pacote; leitura pública).
+class AlbumRankingEntryDTO extends Equatable {
+  final String userId;
+  final String name;
+  final String imageUrl;
+
+  /// Figurinhas diferentes coladas e, entre elas, as raras.
+  final int collected;
+  final int rares;
+  final bool complete;
+
+  /// Quando chegou na contagem atual (desempate: quem chegou primeiro).
+  final DateTime? reachedAt;
+
+  const AlbumRankingEntryDTO({
+    required this.userId,
+    this.name = '',
+    this.imageUrl = '',
+    this.collected = 0,
+    this.rares = 0,
+    this.complete = false,
+    this.reachedAt,
+  });
+
+  factory AlbumRankingEntryDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+    final data = doc.data() ?? const {};
+    return AlbumRankingEntryDTO(
+      userId: doc.id,
+      name: data['nome']?.toString() ?? '',
+      imageUrl: data['urlImagem']?.toString() ?? '',
+      collected: (data['coladas'] as num?)?.toInt() ?? 0,
+      rares: (data['raras'] as num?)?.toInt() ?? 0,
+      complete: data['completo'] == true,
+      reachedAt: (data['alcancadoEm'] as Timestamp?)?.toDate(),
+    );
+  }
+
+  /// Ordem do ranking: mais coladas; empate = quem chegou primeiro; depois o nome.
+  static List<AlbumRankingEntryDTO> sorted(List<AlbumRankingEntryDTO> entries) => [...entries]..sort((a, b) {
+      final byCount = b.collected.compareTo(a.collected);
+      if (byCount != 0) return byCount;
+      final at = a.reachedAt;
+      final bt = b.reachedAt;
+      if (at != null && bt != null && at != bt) return at.compareTo(bt);
+      if ((at == null) != (bt == null)) return at == null ? 1 : -1;
+      return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+    });
+
+  @override
+  List<Object?> get props => [userId, name, imageUrl, collected, rares, complete, reachedAt];
+}
+

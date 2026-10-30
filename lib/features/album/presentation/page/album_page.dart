@@ -7,6 +7,7 @@ import 'package:arena_soccer/features/album/data/dtos/album_dtos.dart';
 import 'package:arena_soccer/features/album/presentation/bloc/album_cubit.dart';
 import 'package:arena_soccer/features/album/presentation/bloc/album_event_cubit.dart';
 import 'package:arena_soccer/features/album/presentation/widgets/album_cards.dart';
+import 'package:arena_soccer/features/album/presentation/widgets/album_ranking.dart';
 import 'package:arena_soccer/features/album/presentation/widgets/album_visuals.dart';
 import 'package:arena_soccer/features/album/presentation/widgets/pack_opening_dialog.dart';
 import 'package:arena_soccer/features/album/presentation/widgets/sticker_card.dart';
@@ -46,7 +47,7 @@ class StickerAlbumPage extends StatefulWidget {
 
 class _StickerAlbumPageState extends State<StickerAlbumPage> {
   late final AlbumCubit _cubit;
-  bool _duplicatesTab = false;
+  _CoverTab _tab = _CoverTab.teams;
 
   @override
   void initState() {
@@ -122,8 +123,12 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
             if (state.album.countOf(s.id) > 1) s,
         ];
 
+        final ranking = state.ranking;
         return Scaffold(
           backgroundColor: AppColors.background,
+          bottomNavigationBar: _tab == _CoverTab.ranking && ranking != null
+              ? AlbumMyPositionBar(view: ranking, total: state.stickers.length)
+              : null,
           body: CustomScrollView(
             slivers: [
               SliverAppBar(
@@ -159,28 +164,38 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
                 SliverPadding(
                   padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s20, AppSizes.s16, AppSizes.s12),
                   sliver: SliverToBoxAdapter(
-                    child: Row(
+                    child: Wrap(
+                      spacing: AppSizes.s8,
+                      runSpacing: AppSizes.s8,
                       children: [
                         ArenaChoiceChip(
                           label: l10n.albumTabTeams,
                           icon: Icons.grid_view_rounded,
-                          selected: !_duplicatesTab,
-                          onTap: () => setState(() => _duplicatesTab = false),
+                          selected: _tab == _CoverTab.teams,
+                          onTap: () => setState(() => _tab = _CoverTab.teams),
                         ),
-                        const SizedBox(width: AppSizes.s8),
                         ArenaChoiceChip(
                           label: l10n.albumTabDuplicates(duplicates.length),
                           icon: Icons.copy_all_rounded,
-                          selected: _duplicatesTab,
-                          onTap: () => setState(() => _duplicatesTab = true),
+                          selected: _tab == _CoverTab.duplicates,
+                          onTap: () => setState(() => _tab = _CoverTab.duplicates),
+                        ),
+                        ArenaChoiceChip(
+                          label: l10n.albumTabRanking,
+                          icon: Icons.emoji_events_outlined,
+                          selected: _tab == _CoverTab.ranking,
+                          onTap: () {
+                            setState(() => _tab = _CoverTab.ranking);
+                            _cubit.loadRanking();
+                          },
                         ),
                       ],
                     ),
                   ),
                 ),
-                if (!_duplicatesTab && pages.isEmpty)
+                if (_tab == _CoverTab.teams && pages.isEmpty)
                   SliverToBoxAdapter(child: ArenaEmptyState(message: l10n.albumEmpty, icon: Icons.style_outlined))
-                else if (!_duplicatesTab)
+                else if (_tab == _CoverTab.teams)
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s32),
                     sliver: SliverGrid.builder(
@@ -197,6 +212,19 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
                         crestUrl: state.teams[pages[i].teamId]?.imageUrl ?? '',
                         accent: albumAccentOf(state, pages[i].teamId),
                         onTap: () => _openPages(i),
+                      ),
+                    ),
+                  )
+                else if (_tab == _CoverTab.ranking)
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s32),
+                    sliver: SliverToBoxAdapter(
+                      child: AlbumRankingSection(
+                        view: state.ranking,
+                        loading: state.rankingLoading,
+                        total: state.stickers.length,
+                        userId: BlocProvider.of<SessionCubit>(context).state.user?.id ?? '',
+                        onRefresh: () => _cubit.loadRanking(force: true),
                       ),
                     ),
                   )
@@ -244,6 +272,7 @@ class _Hero extends StatelessWidget {
     final total = state.stickers.length;
     final collected = state.collected;
     final percent = total == 0 ? 0 : (collected * 100 / total).floor();
+    final rares = state.stickers.where((s) => s.rare).toList();
 
     return Stack(
       fit: StackFit.expand,
@@ -291,6 +320,12 @@ class _Hero extends StatelessWidget {
                         label: l10n.albumStatDuplicates,
                         color: AppColors.whiteSoft,
                       ),
+                      if (rares.isNotEmpty)
+                        _Stat(
+                          value: rares.where((s) => state.album.has(s.id)).length,
+                          label: l10n.albumStatRares(rares.length),
+                          color: AppColors.gold,
+                        ),
                     ],
                   ),
                 ),
@@ -328,3 +363,7 @@ class _Stat extends StatelessWidget {
     );
   }
 }
+
+/// Abas da capa: índice dos times, repetidas e o ranking de colecionadores.
+enum _CoverTab { teams, duplicates, ranking }
+

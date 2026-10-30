@@ -29,6 +29,10 @@ class AlbumState extends Equatable {
   /// Times da temporada (cores e escudo das páginas), pelo id.
   final Map<String, TeamDTO> teams;
 
+  /// Ranking de colecionadores (carregado ao abrir a aba; nulo = ainda não).
+  final AlbumRankingView? ranking;
+  final bool rankingLoading;
+
   const AlbumState({
     this.event,
     this.stickers = const [],
@@ -38,6 +42,8 @@ class AlbumState extends Equatable {
     this.loading = true,
     this.opening = false,
     this.teams = const {},
+    this.ranking,
+    this.rankingLoading = false,
   });
 
   List<AlbumTeamPage> get pages => event == null ? const [] : AlbumLayout.pages(event!, stickers);
@@ -66,6 +72,8 @@ class AlbumState extends Equatable {
     bool? loading,
     bool? opening,
     Map<String, TeamDTO>? teams,
+    AlbumRankingView? Function()? ranking,
+    bool? rankingLoading,
   }) {
     return AlbumState(
       event: event ?? this.event,
@@ -76,11 +84,14 @@ class AlbumState extends Equatable {
       loading: loading ?? this.loading,
       opening: opening ?? this.opening,
       teams: teams ?? this.teams,
+      ranking: ranking != null ? ranking() : this.ranking,
+      rankingLoading: rankingLoading ?? this.rankingLoading,
     );
   }
 
   @override
-  List<Object?> get props => [event, stickers, album, todayPack, packReady, loading, opening, teams];
+  List<Object?> get props =>
+      [event, stickers, album, todayPack, packReady, loading, opening, teams, ranking, rankingLoading];
 }
 
 /// O pacote acabou de abrir: a tela mostra a animação com [pack].
@@ -96,6 +107,7 @@ class PackOpenedAlbumState extends AlbumState {
           packReady: from.packReady,
           loading: false,
           teams: from.teams,
+          ranking: from.ranking,
         );
 
   @override
@@ -114,6 +126,7 @@ class ErrorAlbumState extends AlbumState {
           packReady: from.packReady,
           loading: false,
           teams: from.teams,
+          ranking: from.ranking,
         );
 
   @override
@@ -187,6 +200,20 @@ class AlbumCubit extends Cubit<AlbumState> {
       return;
     }
     emit(next);
+  }
+
+  /// Ranking de colecionadores (uma leitura do top 50 + a posição da conta).
+  /// Já carregado: só com [force] (atualizar).
+  Future<void> loadRanking({bool force = false}) async {
+    final event = state.event;
+    if (event == null || state.rankingLoading || (state.ranking != null && !force)) return;
+    emit(state.copyWith(rankingLoading: true));
+    final response = await albumUseCase.getRanking(eventId: event.id, userId: _userId);
+    if (isClosed) return;
+    response.fold(
+      (failure) => emit(ErrorAlbumState(state.copyWith(rankingLoading: false), failure.toString())),
+      (view) => emit(state.copyWith(ranking: () => view, rankingLoading: false)),
+    );
   }
 
   /// Pede o próximo pacote; a animação começa quando o servidor sorteia.
