@@ -6,6 +6,8 @@ import 'package:arena_soccer/features/teams/presentation/bloc/teams_cubit.dart';
 import 'package:arena_soccer/features/teams/presentation/bloc/teams_state.dart';
 import 'package:arena_soccer/features/teams/presentation/widgets/team_card.dart';
 import 'package:arena_soccer/injection_container.dart';
+import 'package:arena_soccer/core/services/tour_service.dart';
+import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
@@ -26,8 +28,29 @@ class TeamsTab extends StatelessWidget {
   }
 }
 
-class _TeamsList extends StatelessWidget {
+class _TeamsList extends StatefulWidget {
   const _TeamsList();
+
+  @override
+  State<_TeamsList> createState() => _TeamsListState();
+}
+
+class _TeamsListState extends State<_TeamsList> {
+  final _firstTeam = GlobalKey();
+  bool _tourRequested = false;
+
+  /// Tour da aba na 1ª visita (com a lista na tela).
+  void _requestTour() {
+    if (_tourRequested) return;
+    _tourRequested = true;
+    final l10n = AppLocalizations.of(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      sl<TourService>().show(context, TourIds.teams, () => [
+            TourStep(target: _firstTeam, icon: Icons.shield_rounded, title: l10n.tourTeamsTitle, body: l10n.tourTeamsBody),
+          ]);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +63,7 @@ class _TeamsList extends StatelessWidget {
         }
         if (state is ErrorTeamsState && state.teams.isEmpty) return ArenaEmptyState.error(message: l10n.teamsLoadError);
         if (state.teams.isEmpty) return ArenaEmptyState(message: l10n.teamsEmpty, icon: Icons.shield_outlined);
+        _requestTour();
 
         return ListView.builder(
           physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
@@ -47,10 +71,11 @@ class _TeamsList extends StatelessWidget {
           itemCount: state.teams.length,
           itemBuilder: (context, index) {
             final team = state.teams[index];
-            return TeamCard(
+            final card = TeamCard(
               team: team,
               onTap: () => openTeamRoster(context, {'team': team}),
             );
+            return index == 0 ? KeyedSubtree(key: _firstTeam, child: card) : card;
           },
         );
       },

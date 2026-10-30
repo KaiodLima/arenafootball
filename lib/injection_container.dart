@@ -9,6 +9,7 @@ import 'package:arena_soccer/features/predictions/di/predictions_injection.dart'
 import 'package:arena_soccer/features/achievements/di/achievements_injection.dart';
 import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/services/preferences_service.dart';
+import 'package:arena_soccer/core/services/tour_service.dart';
 import 'package:arena_soccer/core/services/storage_upload_service.dart';
 import 'package:arena_soccer/features/fan_ranking/di/fan_ranking_injection.dart';
 import 'package:arena_soccer/features/global_results/di/global_results_injection.dart';
@@ -75,6 +76,7 @@ void _registerExternal() {
   sl.registerLazySingleton(() => GoogleSignIn.instance);
   sl.registerLazySingleton(() => http.Client());
   sl.registerLazySingleton(() => PreferencesService());
+  sl.registerLazySingleton(() => TourService(sl()));
   sl.registerLazySingleton(() => StorageUploadService(sl()));
   // Caixa aberta no `initCache()` (main), antes daqui.
   sl.registerLazySingleton(() => CacheStore(Hive.box<String>(CacheStore.boxName)));

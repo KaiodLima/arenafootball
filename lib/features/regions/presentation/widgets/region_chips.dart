@@ -15,7 +15,11 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 class RegionChips extends StatelessWidget {
   final bool showSeason;
 
-  const RegionChips({super.key, this.showSeason = false});
+  /// Âncoras do tour da home (botão da região e chip da temporada).
+  final GlobalKey? regionKey;
+  final GlobalKey? seasonKey;
+
+  const RegionChips({super.key, this.showSeason = false, this.regionKey, this.seasonKey});
 
   @override
   Widget build(BuildContext context) {
@@ -41,11 +45,13 @@ class RegionChips extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(child: _RegionButton(region: state.selectedRegion, onTap: pick)),
+                Expanded(
+                  child: KeyedSubtree(key: regionKey, child: _RegionButton(region: state.selectedRegion, onTap: pick)),
+                ),
                 if (showSeason) ...[
                   const SizedBox(width: AppSizes.s8),
                   // Mesma altura do botão da região (a Row estica os dois).
-                  _SeasonChip(state: state, onSelected: cubit.selectSeason),
+                  KeyedSubtree(key: seasonKey, child: _SeasonChip(state: state, onSelected: cubit.selectSeason)),
                 ],
               ],
             ),

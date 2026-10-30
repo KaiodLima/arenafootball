@@ -18,7 +18,10 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 /// "Abrir!"); sem, fica discreto com a contagem até o próximo. Arrastável:
 /// ao soltar, gruda na borda mais próxima. O toque abre o álbum.
 class AlbumFloatingBadge extends StatefulWidget {
-  const AlbumFloatingBadge({super.key});
+  /// Âncora do tour da home.
+  final GlobalKey? tourKey;
+
+  const AlbumFloatingBadge({super.key, this.tourKey});
 
   @override
   State<AlbumFloatingBadge> createState() => _AlbumFloatingBadgeState();
@@ -122,6 +125,7 @@ class _AlbumFloatingBadgeState extends State<AlbumFloatingBadge> with TickerProv
                       button: true,
                       label: l10n.albumTitle,
                       child: SizedBox(
+                        key: widget.tourKey,
                         width: _width,
                         height: _height,
                         child: AnimatedBuilder(

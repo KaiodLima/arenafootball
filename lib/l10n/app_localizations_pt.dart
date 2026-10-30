@@ -734,6 +734,170 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get tourSkip => 'Pular';
+
+  @override
+  String get tourNext => 'Próximo';
+
+  @override
+  String get tourDone => 'Entendi';
+
+  @override
+  String tourWelcomeTitle(String name) {
+    return 'Bem-vindo à Arena, $name! ⚽';
+  }
+
+  @override
+  String get tourWelcomeSubtitle => 'O futebol da sua região, num lugar só.';
+
+  @override
+  String get tourWelcomeItemNews => 'Notícias, jogos e placares da sua região';
+
+  @override
+  String get tourWelcomeItemPlay => 'Palpites, votação do craque e conquistas';
+
+  @override
+  String get tourWelcomeItemAlbum => 'Álbum de figurinhas com pacotinho grátis';
+
+  @override
+  String get tourWelcomeStart => 'Fazer tour rápido (30 s)';
+
+  @override
+  String get tourWelcomeLater => 'Agora não';
+
+  @override
+  String get tourHomeRegionTitle => 'Sua região';
+
+  @override
+  String get tourHomeRegionBody =>
+      'Escolha a cidade aqui. Notícias, jogos, times e campeonatos mostram só o que é de lá.';
+
+  @override
+  String get tourHomeTabsTitle => 'Tudo em 4 abas';
+
+  @override
+  String get tourHomeTabsBody =>
+      'Notícias, campeonatos, times com os elencos e a tabela de jogos com os placares.';
+
+  @override
+  String get tourHomeMenuTitle => 'Seu menu';
+
+  @override
+  String get tourHomeMenuBody =>
+      'Carteirinha, conquistas, bolão, ranking de torcidas e o \"Sou jogador\" para entrar no elenco do seu time.';
+
+  @override
+  String get tourHomeAlbumTitle => 'Álbum de figurinhas';
+
+  @override
+  String get tourHomeAlbumBody =>
+      'Um pacotinho grátis a cada 24 h. Arraste o selo para onde preferir.';
+
+  @override
+  String get tourDrawerProfileTitle => 'Seu perfil';
+
+  @override
+  String get tourDrawerProfileBody =>
+      'Seu time do coração e a sua carteirinha de torcedor.';
+
+  @override
+  String get tourDrawerPredictionsTitle => 'Bolão';
+
+  @override
+  String get tourDrawerPredictionsBody =>
+      'Dê palpites grátis nos jogos e dispute o ranking da região.';
+
+  @override
+  String get tourDrawerAchievementsTitle => 'Conquistas';
+
+  @override
+  String get tourDrawerAchievementsBody => 'Ganhe medalhas e XP usando o app.';
+
+  @override
+  String get tourDrawerPlayerTitle => 'Sou jogador';
+
+  @override
+  String get tourDrawerPlayerBody =>
+      'Joga num time da região? Peça para entrar no elenco e tenha seu perfil de atleta.';
+
+  @override
+  String get tourTablesFilterTitle => 'Escolha a competição';
+
+  @override
+  String get tourTablesFilterBody =>
+      'Veja os jogos de uma competição ou de todas de uma vez.';
+
+  @override
+  String get tourTablesShortcutsTitle => 'Atalhos';
+
+  @override
+  String get tourTablesShortcutsBody =>
+      'Todos os jogos, os grupos com a classificação e a artilharia.';
+
+  @override
+  String get tourTablesDayTitle => 'Jogos do dia';
+
+  @override
+  String get tourTablesDayBody =>
+      'Ontem, hoje e amanhã. Toque num jogo para ver os gols, votar no craque e dar seu palpite.';
+
+  @override
+  String get tourTeamsTitle => 'Os times da região';
+
+  @override
+  String get tourTeamsBody =>
+      'Toque num time para ver o elenco, os atletas e os números de cada competição.';
+
+  @override
+  String get tourChampionshipsTitle => 'Campeonatos';
+
+  @override
+  String get tourChampionshipsBody =>
+      'Toque para ver regulamento, premiação, grupos e a classificação, que se atualiza sozinha.';
+
+  @override
+  String get tourChampionshipsShortcutsTitle => 'Atalhos da competição';
+
+  @override
+  String get tourChampionshipsShortcutsBody =>
+      'Grupos, artilharia e regulamento do campeonato em destaque.';
+
+  @override
+  String get tourAlbumPackTitle => 'Pacotinho grátis';
+
+  @override
+  String get tourAlbumPackBody =>
+      'Um a cada 24 h, com figurinhas novas. A gente avisa quando o próximo chegar.';
+
+  @override
+  String get tourAlbumPagesTitle => 'Páginas dos times';
+
+  @override
+  String get tourAlbumPagesBody =>
+      'Toque num time para ver as figurinhas coladas e o que falta para completar a página.';
+
+  @override
+  String get tourAlbumTabsTitle => 'Repetidas e ranking';
+
+  @override
+  String get tourAlbumTabsBody =>
+      'Veja suas repetidas e dispute o ranking de colecionadores.';
+
+  @override
+  String get settingsHelpSection => 'Ajuda';
+
+  @override
+  String get settingsReplayTours => 'Rever tutoriais';
+
+  @override
+  String get settingsReplayToursHint =>
+      'As dicas de cada tela aparecem de novo';
+
+  @override
+  String get settingsReplayToursDone =>
+      'Pronto! As dicas vão aparecer de novo.';
+
+  @override
   String get albumTabRanking => 'Ranking';
 
   @override

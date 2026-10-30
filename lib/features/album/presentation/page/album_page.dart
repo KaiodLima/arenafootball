@@ -12,6 +12,9 @@ import 'package:arena_soccer/features/album/presentation/widgets/album_visuals.d
 import 'package:arena_soccer/features/album/presentation/widgets/pack_opening_dialog.dart';
 import 'package:arena_soccer/features/album/presentation/widgets/sticker_card.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
+import 'package:arena_soccer/core/services/tour_service.dart';
+import 'package:arena_soccer/injection_container.dart';
+import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
@@ -48,6 +51,25 @@ class StickerAlbumPage extends StatefulWidget {
 class _StickerAlbumPageState extends State<StickerAlbumPage> {
   late final AlbumCubit _cubit;
   _CoverTab _tab = _CoverTab.teams;
+  final _tourPack = GlobalKey();
+  final _tourFirstTeam = GlobalKey();
+  final _tourTabs = GlobalKey();
+  bool _tourRequested = false;
+
+  /// Tour do álbum na 1ª visita (com a capa carregada).
+  void _requestTour() {
+    if (_tourRequested) return;
+    _tourRequested = true;
+    final l10n = AppLocalizations.of(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      sl<TourService>().show(context, TourIds.album, () => [
+            TourStep(target: _tourPack, icon: Icons.card_giftcard_rounded, title: l10n.tourAlbumPackTitle, body: l10n.tourAlbumPackBody),
+            TourStep(target: _tourFirstTeam, icon: Icons.menu_book_rounded, title: l10n.tourAlbumPagesTitle, body: l10n.tourAlbumPagesBody),
+            TourStep(target: _tourTabs, icon: Icons.emoji_events_rounded, title: l10n.tourAlbumTabsTitle, body: l10n.tourAlbumTabsBody),
+          ]);
+    });
+  }
 
   @override
   void initState() {
@@ -118,6 +140,7 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
           );
         }
         final pages = state.pages;
+        if (!state.loading) _requestTour();
         final duplicates = [
           for (final s in state.stickers)
             if (state.album.countOf(s.id) > 1) s,
@@ -153,6 +176,7 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
                   padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, 0),
                   sliver: SliverToBoxAdapter(
                     child: PackCard(
+                      key: _tourPack,
                       available: state.packAvailable,
                       opening: state.opening,
                       onOpen: _cubit.openPack,
@@ -165,6 +189,7 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
                   padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s20, AppSizes.s16, AppSizes.s12),
                   sliver: SliverToBoxAdapter(
                     child: Wrap(
+                      key: _tourTabs,
                       spacing: AppSizes.s8,
                       runSpacing: AppSizes.s8,
                       children: [
@@ -207,6 +232,7 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
                       ),
                       itemCount: pages.length,
                       itemBuilder: (context, i) => TeamIndexCard(
+                        key: i == 0 ? _tourFirstTeam : null,
                         page: pages[i],
                         album: state.album,
                         crestUrl: state.teams[pages[i].teamId]?.imageUrl ?? '',

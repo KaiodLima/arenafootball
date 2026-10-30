@@ -18,6 +18,11 @@ class HomeHeader extends StatelessWidget {
   final bool showSeason;
   final VoidCallback onOpenMenu;
 
+  /// Âncoras do tour da home.
+  final GlobalKey? menuKey;
+  final GlobalKey? regionKey;
+  final GlobalKey? seasonKey;
+
   const HomeHeader({
     super.key,
     required this.user,
@@ -25,6 +30,9 @@ class HomeHeader extends StatelessWidget {
     required this.favoriteTeamImage,
     required this.showSeason,
     required this.onOpenMenu,
+    this.menuKey,
+    this.regionKey,
+    this.seasonKey,
   });
 
   @override
@@ -47,10 +55,13 @@ class HomeHeader extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: AppSizes.s16),
                 child: Row(
                   children: [
-                    _CircleButton(
-                      tooltip: l10n.homeOpenMenu,
-                      onTap: onOpenMenu,
-                      child: const Icon(Icons.menu_rounded, color: AppColors.white),
+                    KeyedSubtree(
+                      key: menuKey,
+                      child: _CircleButton(
+                        tooltip: l10n.homeOpenMenu,
+                        onTap: onOpenMenu,
+                        child: const Icon(Icons.menu_rounded, color: AppColors.white),
+                      ),
                     ),
                     Expanded(
                       child: Center(child: Image.asset(AppImages.logo, height: AppSizes.s36)),
@@ -90,7 +101,7 @@ class HomeHeader extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSizes.s16),
-              RegionChips(showSeason: showSeason),
+              RegionChips(showSeason: showSeason, regionKey: regionKey, seasonKey: seasonKey),
             ],
           ),
         ),

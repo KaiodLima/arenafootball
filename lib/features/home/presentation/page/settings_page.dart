@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/auth/presentation/widgets/delete_account_sheet.dart';
+import 'package:arena_soccer/core/services/tour_service.dart';
+import 'package:arena_soccer/injection_container.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_card.dart';
 import 'package:arena_soccer/utils/components/section_header.dart';
@@ -39,6 +41,42 @@ class SettingsPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, AppSizes.s32),
         children: [
+          SectionHeader(title: l10n.settingsHelpSection),
+          ArenaCard(
+            padding: const EdgeInsets.symmetric(horizontal: AppSizes.s16, vertical: AppSizes.s14),
+            onTap: () async {
+              await sl<TourService>().reset();
+              if (context.mounted) showSnackBar(context: context, message: l10n.settingsReplayToursDone);
+            },
+            child: Row(
+              children: [
+                Container(
+                  width: AppSizes.s36,
+                  height: AppSizes.s36,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(AppSizes.s10),
+                  ),
+                  child: const Icon(Icons.tips_and_updates_outlined, color: AppColors.primary, size: AppSizes.s20),
+                ),
+                const SizedBox(width: AppSizes.s14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.settingsReplayTours,
+                        style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s16),
+                      ),
+                      Text(l10n.settingsReplayToursHint, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary, size: AppSizes.s20),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSizes.s16),
           SectionHeader(title: l10n.settingsAccountSection),
           ArenaCard(
             padding: const EdgeInsets.symmetric(horizontal: AppSizes.s16, vertical: AppSizes.s14),

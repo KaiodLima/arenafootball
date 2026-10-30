@@ -36,6 +36,9 @@ class HomeDrawer extends StatelessWidget {
   final VoidCallback onChooseTeam;
   final VoidCallback onLogout;
 
+  /// Âncoras do tour do menu (nulo = sem tour).
+  final HomeDrawerTourKeys? tourKeys;
+
   const HomeDrawer({
     super.key,
     this.user,
@@ -50,6 +53,7 @@ class HomeDrawer extends StatelessWidget {
     this.isPartner = false,
     required this.onChooseTeam,
     required this.onLogout,
+    this.tourKeys,
   });
 
   void _open(BuildContext context, String route) {
@@ -71,7 +75,9 @@ class HomeDrawer extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
-          _ProfileHeader(
+          KeyedSubtree(
+            key: tourKeys?.header,
+            child: _ProfileHeader(
             user: user,
             favoriteTeamImage: favoriteTeamImage,
             playerTeam: playerTeam,
@@ -90,6 +96,7 @@ class HomeDrawer extends StatelessWidget {
               Navigator.pop(context);
               onChooseTeam();
             },
+            ),
           ),
           Expanded(
             child: ListView(
@@ -108,10 +115,13 @@ class HomeDrawer extends StatelessWidget {
                   title: l10n.fanRankingTitle,
                   onTap: () => _open(context, AppRoutes.fanRankingPage),
                 ),
-                _DrawerItem(
+                KeyedSubtree(
+                  key: tourKeys?.predictions,
+                  child: _DrawerItem(
                   icon: Icons.scoreboard_outlined,
                   title: l10n.drawerPredictions,
                   onTap: () => _open(context, AppRoutes.predictionRankingPage),
+                ),
                 ),
                 if (user != null)
                   _DrawerItem(
@@ -120,18 +130,24 @@ class HomeDrawer extends StatelessWidget {
                     onTap: () => _open(context, AppRoutes.fanCardPage),
                   ),
                 if (user != null)
-                  _DrawerItem(
+                  KeyedSubtree(
+                    key: tourKeys?.achievements,
+                    child: _DrawerItem(
                     icon: Icons.military_tech_outlined,
                     title: l10n.drawerAchievements,
                     onTap: () => _open(context, AppRoutes.achievementsPage),
                   ),
+                  ),
                 if (user != null) ...[
                   const SizedBox(height: AppSizes.s12),
                   _SectionLabel(l10n.drawerOnFieldSection),
-                  _DrawerItem(
+                  KeyedSubtree(
+                    key: tourKeys?.player,
+                    child: _DrawerItem(
                     icon: Icons.sports_soccer_rounded,
                     title: playerTeam != null ? l10n.drawerMyPlayerProfile : l10n.playerRequestMenu,
                     onTap: () => _open(context, AppRoutes.playerRequestPage),
+                  ),
                   ),
                   _DrawerItem(
                     icon: Icons.shield_rounded,
@@ -484,3 +500,12 @@ class _RoleBadge extends StatelessWidget {
     );
   }
 }
+
+/// Âncoras do tour do menu (criadas pela home).
+class HomeDrawerTourKeys {
+  final header = GlobalKey();
+  final predictions = GlobalKey();
+  final achievements = GlobalKey();
+  final player = GlobalKey();
+}
+

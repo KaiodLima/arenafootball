@@ -13,6 +13,9 @@ import 'package:arena_soccer/features/matches/presentation/bloc/matches_state.da
 import 'package:arena_soccer/features/matches/presentation/widgets/match_day_switch.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
+import 'package:arena_soccer/core/services/tour_service.dart';
+import 'package:arena_soccer/injection_container.dart';
+import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/section_header.dart';
@@ -68,6 +71,9 @@ class _ChampionshipMatchesState extends State<_ChampionshipMatches> {
   /// enquanto o app está aberto (a home recria a aba ao trocar de região).
   static final Map<String, int?> _remembered = {};
 
+  /// Âncora do tour da aba (filtro de competição).
+  final _filterKey = GlobalKey();
+
   Future<void> _pick(List<ChampionshipDTO> options, int? current, String key) async {
     final l10n = AppLocalizations.of(context);
     final picked = await showChampionshipPickerSheet(
@@ -107,6 +113,7 @@ class _ChampionshipMatchesState extends State<_ChampionshipMatches> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s12, AppSizes.s16, 0),
                 child: ChampionshipSelectTile(
+                  key: _filterKey,
                   label: l10n.matchesChampionshipFilter,
                   championship: championship,
                   noneLabel: l10n.matchesAllChampionships,
@@ -125,6 +132,7 @@ class _ChampionshipMatchesState extends State<_ChampionshipMatches> {
                     : (MatchDTO match) => titles[match.championshipId] ?? l10n.matchesFriendly,
                 region: region.selectedRegion,
                 season: region.selectedSeason,
+                filterKey: _filterKey,
               ),
             ),
           ],
@@ -150,7 +158,11 @@ class _DayMatches extends StatefulWidget {
     required this.championshipLabelOf,
     required this.region,
     required this.season,
+    this.filterKey,
   });
+
+  /// Âncora do filtro de competição (do pai), para o tour da aba.
+  final GlobalKey? filterKey;
 
   @override
   State<_DayMatches> createState() => _DayMatchesState();
@@ -158,12 +170,31 @@ class _DayMatches extends StatefulWidget {
 
 class _DayMatchesState extends State<_DayMatches> {
   late MatchesFilter _day;
+  final _shortcutsKey = GlobalKey();
+  final _dayKey = GlobalKey();
+
+  /// Tour da aba na 1ª visita.
+  void _showTour() {
+    final l10n = AppLocalizations.of(context);
+    sl<TourService>().show(
+      context,
+      TourIds.tables,
+      () => [
+        if (widget.filterKey != null)
+          TourStep(target: widget.filterKey!, icon: Icons.emoji_events_rounded, title: l10n.tourTablesFilterTitle, body: l10n.tourTablesFilterBody),
+        TourStep(target: _shortcutsKey, icon: Icons.apps_rounded, title: l10n.tourTablesShortcutsTitle, body: l10n.tourTablesShortcutsBody),
+        TourStep(target: _dayKey, icon: Icons.sports_soccer_rounded, title: l10n.tourTablesDayTitle, body: l10n.tourTablesDayBody),
+      ],
+      delay: const Duration(milliseconds: 700),
+    );
+  }
 
   /// O cubit da home ignora o pedido se já ouve esta competição/região/ano
   /// (volta à aba); o dia na tela é o que ele já estava mostrando.
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _showTour());
     final cubit = BlocProvider.of<MatchesCubit>(context);
     final resumed = cubit.isWatching(
       championshipId: widget.championshipId,
@@ -201,13 +232,14 @@ class _DayMatchesState extends State<_DayMatches> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _Shortcuts(
+            key: _shortcutsKey,
             championshipId: widget.championshipId,
             championships: widget.championships,
             region: widget.region,
             season: widget.season,
           ),
           const SizedBox(height: AppSizes.s20),
-          MatchDaySwitch(selected: _day, onChanged: _selectDay),
+          MatchDaySwitch(key: _dayKey, selected: _day, onChanged: _selectDay),
           const SizedBox(height: AppSizes.s16),
           BlocSelector<MatchesCubit, MatchesState, int>(
             selector: (state) => state is LoadingMatchesState ? -1 : state.visibleMatches.length,
@@ -234,6 +266,7 @@ class _Shortcuts extends StatelessWidget {
   final String season;
 
   const _Shortcuts({
+    super.key,
     required this.championshipId,
     required this.championships,
     required this.region,

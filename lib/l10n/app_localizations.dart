@@ -1335,6 +1335,294 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @tourSkip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pular'**
+  String get tourSkip;
+
+  /// No description provided for @tourNext.
+  ///
+  /// In pt, this message translates to:
+  /// **'Próximo'**
+  String get tourNext;
+
+  /// No description provided for @tourDone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entendi'**
+  String get tourDone;
+
+  /// No description provided for @tourWelcomeTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bem-vindo à Arena, {name}! ⚽'**
+  String tourWelcomeTitle(String name);
+
+  /// No description provided for @tourWelcomeSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'O futebol da sua região, num lugar só.'**
+  String get tourWelcomeSubtitle;
+
+  /// No description provided for @tourWelcomeItemNews.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícias, jogos e placares da sua região'**
+  String get tourWelcomeItemNews;
+
+  /// No description provided for @tourWelcomeItemPlay.
+  ///
+  /// In pt, this message translates to:
+  /// **'Palpites, votação do craque e conquistas'**
+  String get tourWelcomeItemPlay;
+
+  /// No description provided for @tourWelcomeItemAlbum.
+  ///
+  /// In pt, this message translates to:
+  /// **'Álbum de figurinhas com pacotinho grátis'**
+  String get tourWelcomeItemAlbum;
+
+  /// No description provided for @tourWelcomeStart.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fazer tour rápido (30 s)'**
+  String get tourWelcomeStart;
+
+  /// No description provided for @tourWelcomeLater.
+  ///
+  /// In pt, this message translates to:
+  /// **'Agora não'**
+  String get tourWelcomeLater;
+
+  /// No description provided for @tourHomeRegionTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua região'**
+  String get tourHomeRegionTitle;
+
+  /// No description provided for @tourHomeRegionBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha a cidade aqui. Notícias, jogos, times e campeonatos mostram só o que é de lá.'**
+  String get tourHomeRegionBody;
+
+  /// No description provided for @tourHomeTabsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tudo em 4 abas'**
+  String get tourHomeTabsTitle;
+
+  /// No description provided for @tourHomeTabsBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícias, campeonatos, times com os elencos e a tabela de jogos com os placares.'**
+  String get tourHomeTabsBody;
+
+  /// No description provided for @tourHomeMenuTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu menu'**
+  String get tourHomeMenuTitle;
+
+  /// No description provided for @tourHomeMenuBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Carteirinha, conquistas, bolão, ranking de torcidas e o \"Sou jogador\" para entrar no elenco do seu time.'**
+  String get tourHomeMenuBody;
+
+  /// No description provided for @tourHomeAlbumTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Álbum de figurinhas'**
+  String get tourHomeAlbumTitle;
+
+  /// No description provided for @tourHomeAlbumBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Um pacotinho grátis a cada 24 h. Arraste o selo para onde preferir.'**
+  String get tourHomeAlbumBody;
+
+  /// No description provided for @tourDrawerProfileTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu perfil'**
+  String get tourDrawerProfileTitle;
+
+  /// No description provided for @tourDrawerProfileBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu time do coração e a sua carteirinha de torcedor.'**
+  String get tourDrawerProfileBody;
+
+  /// No description provided for @tourDrawerPredictionsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bolão'**
+  String get tourDrawerPredictionsTitle;
+
+  /// No description provided for @tourDrawerPredictionsBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dê palpites grátis nos jogos e dispute o ranking da região.'**
+  String get tourDrawerPredictionsBody;
+
+  /// No description provided for @tourDrawerAchievementsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conquistas'**
+  String get tourDrawerAchievementsTitle;
+
+  /// No description provided for @tourDrawerAchievementsBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ganhe medalhas e XP usando o app.'**
+  String get tourDrawerAchievementsBody;
+
+  /// No description provided for @tourDrawerPlayerTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sou jogador'**
+  String get tourDrawerPlayerTitle;
+
+  /// No description provided for @tourDrawerPlayerBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Joga num time da região? Peça para entrar no elenco e tenha seu perfil de atleta.'**
+  String get tourDrawerPlayerBody;
+
+  /// No description provided for @tourTablesFilterTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha a competição'**
+  String get tourTablesFilterTitle;
+
+  /// No description provided for @tourTablesFilterBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Veja os jogos de uma competição ou de todas de uma vez.'**
+  String get tourTablesFilterBody;
+
+  /// No description provided for @tourTablesShortcutsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atalhos'**
+  String get tourTablesShortcutsTitle;
+
+  /// No description provided for @tourTablesShortcutsBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos os jogos, os grupos com a classificação e a artilharia.'**
+  String get tourTablesShortcutsBody;
+
+  /// No description provided for @tourTablesDayTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogos do dia'**
+  String get tourTablesDayTitle;
+
+  /// No description provided for @tourTablesDayBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ontem, hoje e amanhã. Toque num jogo para ver os gols, votar no craque e dar seu palpite.'**
+  String get tourTablesDayBody;
+
+  /// No description provided for @tourTeamsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os times da região'**
+  String get tourTeamsTitle;
+
+  /// No description provided for @tourTeamsBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Toque num time para ver o elenco, os atletas e os números de cada competição.'**
+  String get tourTeamsBody;
+
+  /// No description provided for @tourChampionshipsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeonatos'**
+  String get tourChampionshipsTitle;
+
+  /// No description provided for @tourChampionshipsBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Toque para ver regulamento, premiação, grupos e a classificação, que se atualiza sozinha.'**
+  String get tourChampionshipsBody;
+
+  /// No description provided for @tourChampionshipsShortcutsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atalhos da competição'**
+  String get tourChampionshipsShortcutsTitle;
+
+  /// No description provided for @tourChampionshipsShortcutsBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grupos, artilharia e regulamento do campeonato em destaque.'**
+  String get tourChampionshipsShortcutsBody;
+
+  /// No description provided for @tourAlbumPackTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pacotinho grátis'**
+  String get tourAlbumPackTitle;
+
+  /// No description provided for @tourAlbumPackBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Um a cada 24 h, com figurinhas novas. A gente avisa quando o próximo chegar.'**
+  String get tourAlbumPackBody;
+
+  /// No description provided for @tourAlbumPagesTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Páginas dos times'**
+  String get tourAlbumPagesTitle;
+
+  /// No description provided for @tourAlbumPagesBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Toque num time para ver as figurinhas coladas e o que falta para completar a página.'**
+  String get tourAlbumPagesBody;
+
+  /// No description provided for @tourAlbumTabsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Repetidas e ranking'**
+  String get tourAlbumTabsTitle;
+
+  /// No description provided for @tourAlbumTabsBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Veja suas repetidas e dispute o ranking de colecionadores.'**
+  String get tourAlbumTabsBody;
+
+  /// No description provided for @settingsHelpSection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ajuda'**
+  String get settingsHelpSection;
+
+  /// No description provided for @settingsReplayTours.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rever tutoriais'**
+  String get settingsReplayTours;
+
+  /// No description provided for @settingsReplayToursHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'As dicas de cada tela aparecem de novo'**
+  String get settingsReplayToursHint;
+
+  /// No description provided for @settingsReplayToursDone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pronto! As dicas vão aparecer de novo.'**
+  String get settingsReplayToursDone;
+
   /// No description provided for @albumTabRanking.
   ///
   /// In pt, this message translates to:

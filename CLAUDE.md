@@ -62,6 +62,11 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 | `maintenance` | Manutenções do admin feitas pelas functions: "Recomprimir imagens" (painel → Configurações) pede e acompanha ao vivo `manutencao/recomprimir` |
 | `notifications` | Painel de push do admin (liga/desliga por ação, histórico, aviso manual) + sincronia de tópicos |
 
+## Tutoriais (tours)
+
+- Boas-vindas no 1º login (`showWelcomeSheet`, na home) e **dicas no contexto**: spotlight que escurece a tela, destaca o elemento real e explica num cartão (`lib/utils/components/tour/`: `TourStep`, `showTourOverlay`, `TourLayout`). Cada tour aparece uma vez, na 1ª visita (home, menu, abas Tabelas/Times/Campeonatos, álbum); vistos guardados no aparelho (`PreferencesService`), "Rever tutoriais" em Configurações zera.
+- Tour novo: um id em `TourIds` (`lib/core/services/tour_service.dart`), `GlobalKey`s **do State da tela** nos alvos (nunca static: as abas da home convivem no `AnimatedSwitcher`) e `sl<TourService>().show(context, id, () => [TourStep(...)])` depois do 1º frame com o conteúdo na tela. Alvo fora da tela é pulado; tour sem alvo não conta como visto.
+
 ## Fluxo para feature ou tela nova
 
 1. Criar as pastas da feature (`data/{datasources,repositories,dtos}`, `domain/{repositories,usecases}`, `presentation/{bloc,page,widgets}`, `di/`).

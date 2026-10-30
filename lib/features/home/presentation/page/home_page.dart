@@ -33,6 +33,9 @@ import 'package:arena_soccer/features/regions/presentation/bloc/region_state.dar
 import 'package:arena_soccer/features/team_requests/presentation/bloc/owned_team_cubit.dart';
 import 'package:arena_soccer/features/teams/presentation/widgets/teams_tab.dart';
 import 'package:arena_soccer/injection_container.dart';
+import 'package:arena_soccer/core/services/tour_service.dart';
+import 'package:arena_soccer/utils/components/tour/tour_step.dart';
+import 'package:arena_soccer/utils/components/tour/welcome_sheet.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/section_header.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
@@ -50,6 +53,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  // Âncoras dos tours (home e menu).
+  final _tourRegion = GlobalKey();
+  final _tourSeason = GlobalKey();
+  final _tourMenu = GlobalKey();
+  final _tourTabs = GlobalKey();
+  final _tourAlbum = GlobalKey();
+  final _drawerTour = HomeDrawerTourKeys();
   late final HomeCubit _homeCubit;
   StreamSubscription<PushTarget>? _pushTabs;
   StreamSubscription<DeepLinkTarget>? _deepLinks;
@@ -73,6 +84,66 @@ class _HomePageState extends State<HomePage> {
     final deepLinks = sl<DeepLinkService>();
     _openDeepLink(deepLinks.takePending());
     _deepLinks = deepLinks.targets.listen(_openDeepLink);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => _startTours());
+  }
+
+  /// Primeiro login: a boas-vindas e, se aceitar, o tour da home; depois
+  /// (ou sem login) o tour da home na 1ª visita.
+  Future<void> _startTours() async {
+    final tours = sl<TourService>();
+    final user = BlocProvider.of<SessionCubit>(context).state.user;
+    if (user != null && !await tours.isSeen(TourIds.welcome)) {
+      await tours.markSeen(TourIds.welcome);
+      await Future<void>.delayed(const Duration(milliseconds: 600));
+      if (!mounted) return;
+      final start = await showWelcomeSheet(
+        context,
+        name: user.name.trim().split(' ').first,
+        crestUrl: _homeCubit.state.favoriteTeamImage,
+      );
+      if (!start) {
+        await tours.markSeen(TourIds.home);
+        return;
+      }
+    }
+    if (!mounted) return;
+    await tours.show(context, TourIds.home, () => _homeSteps(AppLocalizations.of(context)));
+  }
+
+  List<TourStep> _homeSteps(AppLocalizations l10n) => [
+        TourStep(target: _tourRegion, icon: Icons.location_on_rounded, title: l10n.tourHomeRegionTitle, body: l10n.tourHomeRegionBody),
+        TourStep(target: _tourTabs, icon: Icons.explore_rounded, title: l10n.tourHomeTabsTitle, body: l10n.tourHomeTabsBody, padding: 0),
+        TourStep(
+          target: _tourMenu,
+          icon: Icons.menu_rounded,
+          title: l10n.tourHomeMenuTitle,
+          body: l10n.tourHomeMenuBody,
+          shape: TourShape.circle,
+        ),
+        TourStep(
+          target: _tourAlbum,
+          icon: Icons.collections_bookmark_rounded,
+          title: l10n.tourHomeAlbumTitle,
+          body: l10n.tourHomeAlbumBody,
+        ),
+      ];
+
+  /// 1ª vez que abre o menu: o tour dele (quando o menu termina de abrir).
+  void _onDrawerChanged(bool open) {
+    if (!open) return;
+    final l10n = AppLocalizations.of(context);
+    sl<TourService>().show(
+      context,
+      TourIds.drawer,
+      () => [
+        TourStep(target: _drawerTour.header, icon: Icons.badge_rounded, title: l10n.tourDrawerProfileTitle, body: l10n.tourDrawerProfileBody, padding: 0),
+        TourStep(target: _drawerTour.predictions, icon: Icons.scoreboard_rounded, title: l10n.tourDrawerPredictionsTitle, body: l10n.tourDrawerPredictionsBody, padding: 2),
+        TourStep(target: _drawerTour.achievements, icon: Icons.military_tech_rounded, title: l10n.tourDrawerAchievementsTitle, body: l10n.tourDrawerAchievementsBody, padding: 2),
+        TourStep(target: _drawerTour.player, icon: Icons.sports_soccer_rounded, title: l10n.tourDrawerPlayerTitle, body: l10n.tourDrawerPlayerBody, padding: 2),
+      ],
+      delay: const Duration(milliseconds: 400),
+    );
   }
 
   @override
@@ -270,6 +341,7 @@ class _HomePageState extends State<HomePage> {
           child: Scaffold(
             key: _scaffoldKey,
             backgroundColor: AppColors.background,
+            onDrawerChanged: _onDrawerChanged,
             drawer: HomeDrawer(
               user: session.user,
               favoriteTeamImage: home.favoriteTeamImage,
@@ -283,6 +355,7 @@ class _HomePageState extends State<HomePage> {
               isPartner: partner.isPartner,
               onChooseTeam: _chooseTeam,
               onLogout: _logout,
+              tourKeys: _drawerTour,
             ),
             // Selo flutuante do álbum de figurinhas por cima (só com o evento ativo).
             body: Stack(
@@ -296,6 +369,9 @@ class _HomePageState extends State<HomePage> {
                         favoriteTeamImage: home.favoriteTeamImage,
                         showSeason: showSeason,
                         onOpenMenu: () => _scaffoldKey.currentState?.openDrawer(),
+                        menuKey: _tourMenu,
+                        regionKey: _tourRegion,
+                        seasonKey: _tourSeason,
                       ),
                       Expanded(
                         // A folha clara sobe sobre o header (cantos arredondados por cima do
@@ -324,10 +400,13 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 ),
-                const Positioned.fill(child: AlbumFloatingBadge()),
+                Positioned.fill(child: AlbumFloatingBadge(tourKey: _tourAlbum)),
               ],
             ),
-            bottomNavigationBar: HomeBottomBar(selected: home.tab, onSelected: _homeCubit.selectTab),
+            bottomNavigationBar: KeyedSubtree(
+              key: _tourTabs,
+              child: HomeBottomBar(selected: home.tab, onSelected: _homeCubit.selectTab),
+            ),
             // Admin: todos os cadastros; parceiro: só o que ele pode publicar.
             floatingActionButton: session.isAdmin || partner.permissions.canPublish && partner.isPartner
                 ? FloatingActionButton(

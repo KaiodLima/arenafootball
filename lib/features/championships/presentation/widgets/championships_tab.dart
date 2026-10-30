@@ -10,6 +10,9 @@ import 'package:arena_soccer/features/championships/presentation/widgets/champio
 import 'package:arena_soccer/features/championships/presentation/widgets/championship_rules_launcher.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
+import 'package:arena_soccer/core/services/tour_service.dart';
+import 'package:arena_soccer/injection_container.dart';
+import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/section_header.dart';
@@ -51,6 +54,23 @@ class _ChampionshipsList extends StatefulWidget {
 class _ChampionshipsListState extends State<_ChampionshipsList> {
   final _pageController = PageController();
   int _page = 0;
+  final _heroKey = GlobalKey();
+  final _shortcutsKey = GlobalKey();
+  bool _tourRequested = false;
+
+  /// Tour da aba na 1ª visita (com o campeonato na tela).
+  void _requestTour() {
+    if (_tourRequested) return;
+    _tourRequested = true;
+    final l10n = AppLocalizations.of(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      sl<TourService>().show(context, TourIds.championships, () => [
+            TourStep(target: _heroKey, icon: Icons.emoji_events_rounded, title: l10n.tourChampionshipsTitle, body: l10n.tourChampionshipsBody),
+            TourStep(target: _shortcutsKey, icon: Icons.apps_rounded, title: l10n.tourChampionshipsShortcutsTitle, body: l10n.tourChampionshipsShortcutsBody),
+          ]);
+    });
+  }
 
   @override
   void dispose() {
@@ -90,12 +110,14 @@ class _ChampionshipsListState extends State<_ChampionshipsList> {
         final featuredIds = featured.map((c) => c.id).toSet();
         final previous = sorted.where((c) => !featuredIds.contains(c.id)).toList();
         final current = featured[_page.clamp(0, featured.length - 1)];
+        _requestTour();
 
         return ListView(
           physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
           padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s20, AppSizes.s16, AppSizes.s100),
           children: [
             LayoutBuilder(
+              key: _heroKey,
               builder: (context, constraints) => SizedBox(
                 // Mesma proporção do card (4:3).
                 height: constraints.maxWidth * 3 / 4,
@@ -133,7 +155,7 @@ class _ChampionshipsListState extends State<_ChampionshipsList> {
               ),
             ],
             const SizedBox(height: AppSizes.s16),
-            _Shortcuts(championship: current),
+            KeyedSubtree(key: _shortcutsKey, child: _Shortcuts(championship: current)),
             if (previous.isNotEmpty) ...[
               const SizedBox(height: AppSizes.s20),
               SectionHeader(title: l10n.championshipsPrevious),

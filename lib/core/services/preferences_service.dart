@@ -10,6 +10,26 @@ class PreferencesService {
   /// Id da região escolhida (o nome pode mudar; o id não).
   static const String _regionIdKey = 'regiaoPadraoId';
 
+  /// Tutoriais (tours) já vistos neste aparelho.
+  static const String _seenToursKey = 'tutoriaisVistos';
+
+  Future<Set<String>> getSeenTours() async {
+    final prefs = await SharedPreferences.getInstance();
+    return (prefs.getStringList(_seenToursKey) ?? const []).toSet();
+  }
+
+  Future<void> markTourSeen(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final seen = (prefs.getStringList(_seenToursKey) ?? const []).toSet()..add(id);
+    await prefs.setStringList(_seenToursKey, seen.toList());
+  }
+
+  /// "Rever tutoriais": todos voltam a aparecer.
+  Future<void> resetTours() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_seenToursKey);
+  }
+
   /// Ids das regiões escolhidas por último (seletor da home).
   static const String _recentRegionIdsKey = 'regioesRecentesIds';
 

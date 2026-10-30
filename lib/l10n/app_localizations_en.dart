@@ -731,6 +731,170 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get tourSkip => 'Skip';
+
+  @override
+  String get tourNext => 'Next';
+
+  @override
+  String get tourDone => 'Got it';
+
+  @override
+  String tourWelcomeTitle(String name) {
+    return 'Welcome to Arena, $name! ⚽';
+  }
+
+  @override
+  String get tourWelcomeSubtitle =>
+      'Your region\'s football, all in one place.';
+
+  @override
+  String get tourWelcomeItemNews => 'News, games and scores from your region';
+
+  @override
+  String get tourWelcomeItemPlay =>
+      'Predictions, man of the match votes and achievements';
+
+  @override
+  String get tourWelcomeItemAlbum => 'Sticker album with a free pack';
+
+  @override
+  String get tourWelcomeStart => 'Take a quick tour (30 s)';
+
+  @override
+  String get tourWelcomeLater => 'Not now';
+
+  @override
+  String get tourHomeRegionTitle => 'Your region';
+
+  @override
+  String get tourHomeRegionBody =>
+      'Pick the city here. News, games, teams and competitions show only what is from there.';
+
+  @override
+  String get tourHomeTabsTitle => 'Everything in 4 tabs';
+
+  @override
+  String get tourHomeTabsBody =>
+      'News, competitions, teams with their squads and the fixtures with scores.';
+
+  @override
+  String get tourHomeMenuTitle => 'Your menu';
+
+  @override
+  String get tourHomeMenuBody =>
+      'Fan card, achievements, predictions, fan ranking and \"I\'m a player\" to join your team\'s squad.';
+
+  @override
+  String get tourHomeAlbumTitle => 'Sticker album';
+
+  @override
+  String get tourHomeAlbumBody =>
+      'A free pack every 24 h. Drag the badge wherever you like.';
+
+  @override
+  String get tourDrawerProfileTitle => 'Your profile';
+
+  @override
+  String get tourDrawerProfileBody => 'Your favorite team and your fan card.';
+
+  @override
+  String get tourDrawerPredictionsTitle => 'Predictions';
+
+  @override
+  String get tourDrawerPredictionsBody =>
+      'Make free score predictions and climb your region\'s ranking.';
+
+  @override
+  String get tourDrawerAchievementsTitle => 'Achievements';
+
+  @override
+  String get tourDrawerAchievementsBody =>
+      'Earn medals and XP by using the app.';
+
+  @override
+  String get tourDrawerPlayerTitle => 'I\'m a player';
+
+  @override
+  String get tourDrawerPlayerBody =>
+      'Play for a local team? Ask to join the squad and get your athlete profile.';
+
+  @override
+  String get tourTablesFilterTitle => 'Pick the competition';
+
+  @override
+  String get tourTablesFilterBody =>
+      'See the games of one competition or all of them at once.';
+
+  @override
+  String get tourTablesShortcutsTitle => 'Shortcuts';
+
+  @override
+  String get tourTablesShortcutsBody =>
+      'All games, the groups with the standings and the top scorers.';
+
+  @override
+  String get tourTablesDayTitle => 'Games of the day';
+
+  @override
+  String get tourTablesDayBody =>
+      'Yesterday, today and tomorrow. Tap a game to see the goals, vote and make your prediction.';
+
+  @override
+  String get tourTeamsTitle => 'Your region\'s teams';
+
+  @override
+  String get tourTeamsBody =>
+      'Tap a team to see the squad, the athletes and their stats in each competition.';
+
+  @override
+  String get tourChampionshipsTitle => 'Competitions';
+
+  @override
+  String get tourChampionshipsBody =>
+      'Tap to see rules, prizes, groups and the standings, which update by themselves.';
+
+  @override
+  String get tourChampionshipsShortcutsTitle => 'Competition shortcuts';
+
+  @override
+  String get tourChampionshipsShortcutsBody =>
+      'Groups, top scorers and rules of the featured competition.';
+
+  @override
+  String get tourAlbumPackTitle => 'Free pack';
+
+  @override
+  String get tourAlbumPackBody =>
+      'One every 24 h, with new stickers. We\'ll let you know when the next one is ready.';
+
+  @override
+  String get tourAlbumPagesTitle => 'Team pages';
+
+  @override
+  String get tourAlbumPagesBody =>
+      'Tap a team to see your stickers and what\'s missing to complete the page.';
+
+  @override
+  String get tourAlbumTabsTitle => 'Duplicates and ranking';
+
+  @override
+  String get tourAlbumTabsBody =>
+      'See your duplicates and compete in the collectors\' ranking.';
+
+  @override
+  String get settingsHelpSection => 'Help';
+
+  @override
+  String get settingsReplayTours => 'Replay tutorials';
+
+  @override
+  String get settingsReplayToursHint => 'Each screen\'s tips show up again';
+
+  @override
+  String get settingsReplayToursDone => 'Done! The tips will show up again.';
+
+  @override
   String get albumTabRanking => 'Ranking';
 
   @override
