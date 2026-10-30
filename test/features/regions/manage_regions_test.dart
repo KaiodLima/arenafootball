@@ -61,6 +61,9 @@ class _FakeRepository implements IRegionsRepository {
   Future<void> saveRegion(String region) async {}
 
   @override
+  Future<List<String>> getRecentRegions() async => const [];
+
+  @override
   Future<String?> getSavedSeason() async => null;
 
   @override

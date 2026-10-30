@@ -40,7 +40,7 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 |---------|----------|
 | `splash` | Restaura a sessão (auto-login) e decide entre home e login |
 | `auth` | Login (e-mail, Google e Apple; Apple só no iOS), cadastro de usuário, excluir conta (menu; reautentica e apaga no Auth, a function `onUserDeleted` limpa os dados), `SessionCubit` (global) |
-| `regions` | Regiões (`competicao`) + região/temporada escolhidas, `RegionCubit` (global); painel do admin "Regiões" (criar, renomear, excluir só vazia e a manutenção "Vincular regiões por id") |
+| `regions` | Regiões (`competicao`) + região/temporada escolhidas, `RegionCubit` (global); seletor da home = botão com a região atual que abre a folha `showRegionPicker` (busca sem acento, recentes guardadas por id no aparelho, lista alfabética; `RegionChoices`); painel do admin "Regiões" (criar, renomear, excluir só vazia e a manutenção "Vincular regiões por id") |
 | `home` | Casca: AppBar, drawer, barra inferior com as 4 abas, atalhos do admin |
 | `news` | Feed (aba HOME), detalhe, cadastro/edição, notificação de gol, anúncio |
 | `highlights` | Carrossel de destaques, detalhe, cadastro |

@@ -2,107 +2,103 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_state.dart';
+import 'package:arena_soccer/features/regions/presentation/widgets/region_picker_sheet.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// Chips de região (sobre o header escuro da home), ligados ao [RegionCubit]
-/// global. As regiões rolam na horizontal (a escolhida sempre fica à vista);
-/// com [showSeason], o seletor de temporada fica fixo à direita, fora da
-/// rolagem, para não sumir quando houver muitas regiões.
-class RegionChips extends StatefulWidget {
+/// Seletor de região da home (sobre o header escuro), ligado ao
+/// [RegionCubit] global: um botão com a região atual que abre a folha com
+/// busca, recentes e a lista toda (`showRegionPicker`). Com [showSeason], o
+/// seletor de temporada fica ao lado.
+class RegionChips extends StatelessWidget {
   final bool showSeason;
 
   const RegionChips({super.key, this.showSeason = false});
 
   @override
-  State<RegionChips> createState() => _RegionChipsState();
-}
-
-class _RegionChipsState extends State<RegionChips> {
-  final _selectedKey = GlobalKey();
-
-  @override
-  void initState() {
-    super.initState();
-    _revealSelected();
-  }
-
-  /// Rola até a região escolhida (depois do frame, quando o chip já existe).
-  void _revealSelected() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final chip = _selectedKey.currentContext;
-      if (!mounted || chip == null) return;
-      Scrollable.ensureVisible(
-        chip,
-        alignment: 0.5,
-        alignmentPolicy: ScrollPositionAlignmentPolicy.explicit,
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeOut,
-      );
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return BlocConsumer<RegionCubit, RegionState>(
-      listenWhen: (previous, current) =>
-          previous.selectedRegion != current.selectedRegion || previous.regions != current.regions,
-      listener: (_, __) => _revealSelected(),
+    return BlocBuilder<RegionCubit, RegionState>(
       builder: (context, state) {
         final cubit = BlocProvider.of<RegionCubit>(context);
         final regions = state.regions.isEmpty ? [state.selectedRegion] : state.regions;
 
-        final list = ListView(
-          scrollDirection: Axis.horizontal,
-          padding: EdgeInsets.only(left: AppSizes.s20, right: widget.showSeason ? AppSizes.s24 : AppSizes.s20),
-          children: [
-            for (final region in regions)
-              Padding(
-                padding: const EdgeInsets.only(right: AppSizes.s8),
-                child: _Chip(
-                  key: region == state.selectedRegion ? _selectedKey : null,
-                  label: region,
-                  selected: region == state.selectedRegion,
-                  onTap: () => cubit.selectRegion(region),
-                ),
-              ),
-          ],
-        );
+        Future<void> pick() async {
+          final region = await showRegionPicker(
+            context,
+            regions: regions,
+            selected: state.selectedRegion,
+            recent: state.recentRegions,
+          );
+          if (region != null && region != state.selectedRegion) await cubit.selectRegion(region);
+        }
 
         return SizedBox(
-          height: AppSizes.s40,
-          child: widget.showSeason
-              ? Row(
-                  // Mesma altura dos chips de região (na lista, eles já ocupam os 40).
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Degradê na borda direita: indica que há mais regiões.
-                    Expanded(
-                      child: ShaderMask(
-                        blendMode: BlendMode.dstIn,
-                        shaderCallback: (bounds) => const LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [AppColors.black, AppColors.black, AppColors.transparent],
-                          stops: [0, 0.88, 1],
-                        ).createShader(bounds),
-                        child: list,
-                      ),
-                    ),
-                    Center(
-                      child: Container(width: 1, height: AppSizes.s24, color: AppColors.white.withValues(alpha: 0.25)),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: AppSizes.s8, right: AppSizes.s20),
-                      child: _SeasonChip(state: state, onSelected: cubit.selectSeason),
-                    ),
-                  ],
-                )
-              : list,
+          height: AppSizes.s44,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSizes.s20),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(child: _RegionButton(region: state.selectedRegion, onTap: pick)),
+                if (showSeason) ...[
+                  const SizedBox(width: AppSizes.s8),
+                  // Mesma altura do botão da região (a Row estica os dois).
+                  _SeasonChip(state: state, onSelected: cubit.selectSeason),
+                ],
+              ],
+            ),
+          ),
         );
       },
+    );
+  }
+}
+
+/// Pílula com a região atual: 📍, o nome e "Trocar ▾".
+class _RegionButton extends StatelessWidget {
+  final String region;
+  final VoidCallback onTap;
+
+  const _RegionButton({required this.region, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Semantics(
+      button: true,
+      label: l10n.regionPickerTitle,
+      child: Material(
+        color: AppColors.white.withValues(alpha: 0.12),
+        shape: StadiumBorder(side: BorderSide(color: AppColors.white.withValues(alpha: 0.3))),
+        child: InkWell(
+          customBorder: const StadiumBorder(),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.only(left: AppSizes.s12, right: AppSizes.s12),
+            child: Row(
+              children: [
+                const Icon(Icons.location_on_rounded, color: AppColors.gold, size: AppSizes.s20),
+                const SizedBox(width: AppSizes.s6),
+                Expanded(
+                  child: Text(
+                    region,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s16),
+                  ),
+                ),
+                Text(
+                  l10n.regionPickerChange,
+                  style: AppTypography.label(color: AppColors.whiteSoft).copyWith(fontSize: AppSizes.s12),
+                ),
+                const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.whiteSoft, size: AppSizes.s20),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -115,7 +111,6 @@ class _Chip extends StatelessWidget {
   final Widget? trailing;
 
   const _Chip({
-    super.key,
     required this.label,
     required this.selected,
     required this.onTap,

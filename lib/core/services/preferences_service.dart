@@ -10,6 +10,19 @@ class PreferencesService {
   /// Id da região escolhida (o nome pode mudar; o id não).
   static const String _regionIdKey = 'regiaoPadraoId';
 
+  /// Ids das regiões escolhidas por último (seletor da home).
+  static const String _recentRegionIdsKey = 'regioesRecentesIds';
+
+  Future<List<String>> getRecentRegionIds() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList(_recentRegionIdsKey) ?? const [];
+  }
+
+  Future<void> setRecentRegionIds(List<String> ids) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_recentRegionIdsKey, ids);
+  }
+
   Future<String?> getRegion() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_regionKey);

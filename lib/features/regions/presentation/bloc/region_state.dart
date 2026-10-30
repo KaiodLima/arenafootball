@@ -10,11 +10,15 @@ class RegionState extends Equatable {
   final String selectedSeason;
   final List<String> seasons;
 
+  /// Regiões escolhidas por último (a atual pode estar entre elas).
+  final List<String> recentRegions;
+
   const RegionState({
     this.regions = const [],
     this.selectedRegion = GetRegionPreferencesUseCase.defaultRegion,
     this.selectedSeason = SeasonCollection.fallbackSeason,
     this.seasons = SeasonCollection.fallbackSeasons,
+    this.recentRegions = const [],
   });
 
   RegionState copyWith({
@@ -22,15 +26,17 @@ class RegionState extends Equatable {
     String? selectedRegion,
     String? selectedSeason,
     List<String>? seasons,
+    List<String>? recentRegions,
   }) {
     return RegionState(
       regions: regions ?? this.regions,
       selectedRegion: selectedRegion ?? this.selectedRegion,
       selectedSeason: selectedSeason ?? this.selectedSeason,
       seasons: seasons ?? this.seasons,
+      recentRegions: recentRegions ?? this.recentRegions,
     );
   }
 
   @override
-  List<Object?> get props => [regions, selectedRegion, selectedSeason, seasons];
+  List<Object?> get props => [regions, selectedRegion, selectedSeason, seasons, recentRegions];
 }

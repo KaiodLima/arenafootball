@@ -31,6 +31,9 @@ abstract class IRegionsRepository {
 
   Future<void> saveRegion(String region);
 
+  /// Regiões escolhidas por último (nomes atuais), a mais recente primeiro.
+  Future<List<String>> getRecentRegions();
+
   Future<String?> getSavedSeason();
 
   Future<void> saveSeason(String season);

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
+import 'package:arena_soccer/features/regions/domain/region_choices.dart';
 import 'package:arena_soccer/features/regions/domain/usecases/get_region_preferences_usecase.dart';
 import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
 import 'package:arena_soccer/features/regions/domain/usecases/save_region_usecase.dart';
@@ -90,13 +91,14 @@ class RegionCubit extends Cubit<RegionState> {
       selectedRegion: region,
       selectedSeason: season,
       seasons: seasons.seasons,
+      recentRegions: preferences.recent,
       // Sem a lista, o seletor mostra só a região salva; não bloqueia o app.
       regions: regions.isEmpty ? [region] : regions,
     ));
   }
 
   Future<void> selectRegion(String region) async {
-    emit(state.copyWith(selectedRegion: region));
+    emit(state.copyWith(selectedRegion: region, recentRegions: RegionChoices.push(state.recentRegions, region)));
     await saveRegionUseCase(region);
   }
 

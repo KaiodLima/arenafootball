@@ -1335,6 +1335,42 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @regionPickerTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha a região'**
+  String get regionPickerTitle;
+
+  /// No description provided for @regionPickerSearch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Buscar região'**
+  String get regionPickerSearch;
+
+  /// No description provided for @regionPickerRecent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Recentes'**
+  String get regionPickerRecent;
+
+  /// No description provided for @regionPickerAll.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todas as regiões'**
+  String get regionPickerAll;
+
+  /// No description provided for @regionPickerChange.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar'**
+  String get regionPickerChange;
+
+  /// No description provided for @regionPickerEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma região com esse nome'**
+  String get regionPickerEmpty;
+
   /// No description provided for @albumAdminGenerateTitle.
   ///
   /// In pt, this message translates to:

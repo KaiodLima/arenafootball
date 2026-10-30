@@ -734,6 +734,24 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get regionPickerTitle => 'Escolha a região';
+
+  @override
+  String get regionPickerSearch => 'Buscar região';
+
+  @override
+  String get regionPickerRecent => 'Recentes';
+
+  @override
+  String get regionPickerAll => 'Todas as regiões';
+
+  @override
+  String get regionPickerChange => 'Trocar';
+
+  @override
+  String get regionPickerEmpty => 'Nenhuma região com esse nome';
+
+  @override
   String albumAdminGenerateTitle(String team) {
     return 'Gerar figurinhas do $team';
   }

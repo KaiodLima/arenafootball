@@ -6,6 +6,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/services/preferences_service.dart';
 import 'package:arena_soccer/features/regions/data/datasources/regions_datasource.dart';
 import 'package:arena_soccer/features/regions/domain/region_usage.dart';
+import 'package:arena_soccer/features/regions/domain/region_choices.dart';
 import 'package:arena_soccer/features/regions/domain/repositories/regions_repository_interface.dart';
 
 class RegionsRepositoryImpl implements IRegionsRepository {
@@ -76,9 +77,20 @@ class RegionsRepositoryImpl implements IRegionsRepository {
 
   @override
   Future<void> saveRegion(String region) async {
+    final id = RegionRegistry.idOf(region);
     await _preferences.setRegion(region);
-    await _preferences.setRegionId(RegionRegistry.idOf(region));
+    await _preferences.setRegionId(id);
+    // Recentes pelo id: a região renomeada continua lá, com o nome novo.
+    if (id.isNotEmpty) {
+      await _preferences.setRecentRegionIds(RegionChoices.push(await _preferences.getRecentRegionIds(), id));
+    }
   }
+
+  @override
+  Future<List<String>> getRecentRegions() async => [
+        for (final id in await _preferences.getRecentRegionIds())
+          if (RegionRegistry.nameOf(id).isNotEmpty) RegionRegistry.nameOf(id),
+      ];
 
   @override
   Future<String?> getSavedSeason() => _preferences.getSeason();
