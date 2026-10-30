@@ -67,6 +67,19 @@ class AlbumLayout {
     return changed;
   }
 
+  /// Elenco do time [teamId]/[team] na competição [championshipId] (nula =
+  /// elenco geral): a mesma regra das chips do elenco (`PlayerDTO.playsIn`;
+  /// atleta antigo, sem inscrições, conta em toda competição do time).
+  static List<PlayerDTO> squadIn(
+    List<PlayerDTO> players, {
+    required int? championshipId,
+    required String teamId,
+    required String team,
+  }) {
+    if (championshipId == null) return players;
+    return players.where((p) => p.playsIn(championshipId, teamId: teamId, teamName: team)).toList();
+  }
+
   /// Figurinhas novas do time a partir do elenco: o escudo (se ainda não tem)
   /// e cada atleta que ainda não está no álbum (pelo id), com a foto atual.
   static List<StickerDTO> fromSquad({

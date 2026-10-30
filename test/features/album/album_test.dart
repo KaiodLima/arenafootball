@@ -14,21 +14,18 @@ import 'package:arena_soccer/core/utils/share_links.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:flutter/widgets.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
 
 class _AlbumUseCase implements AlbumUseCase {
   final event = StreamController<Either<Failure, AlbumEventDTO?>>.broadcast();
-  final pack = StreamController<Either<Failure, AlbumPackDTO?>>.broadcast();
+  final album = StreamController<Either<Failure, UserAlbumDTO>>.broadcast();
 
   @override
   Stream<Either<Failure, AlbumEventDTO?>> watchActiveEvent() => event.stream;
 
   @override
-  Stream<Either<Failure, AlbumPackDTO?>> watchTodayPack({
-    required String userId,
-    required String eventId,
-    DateTime? now,
-  }) =>
-      pack.stream;
+  Stream<Either<Failure, UserAlbumDTO>> watchMyAlbum({required String userId, required String eventId}) =>
+      album.stream;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -80,23 +77,30 @@ void main() {
     expect(pages[0].isComplete(album), isFalse);
   });
 
-  test('id do pacote do dia igual ao das functions e das regras', () {
-    expect(AlbumPackId.of(eventId: 'ev1', userId: 'u1', now: DateTime.utc(2026, 10, 28, 2)), 'ev1_u1_2026-10-27');
+  test('id do próximo pacote igual ao das functions e das regras', () {
+    expect(AlbumPackId.next(eventId: 'ev1', userId: 'u1', opened: 0), 'ev1_u1_1');
+    expect(AlbumPackId.next(eventId: 'copa_2026', userId: 'u1', opened: 4), 'copa_2026_u1_5');
   });
 
-  test('selo flutuante: evento ativo + conta; pacote disponível sem o doc de hoje', () async {
+  test('selo flutuante: evento ativo + conta; liberado 24 h depois do último', () async {
     final useCase = _AlbumUseCase();
     final cubit = AlbumEventCubit(useCase)..follow('u1');
     useCase.event.add(const Right(_event));
     await Future<void>.delayed(Duration.zero);
-    useCase.pack.add(const Right(null));
+    useCase.album.add(const Right(UserAlbumDTO()));
     await Future<void>.delayed(Duration.zero);
     expect(cubit.state.visible, isTrue);
     expect(cubit.state.packAvailable, isTrue);
 
-    useCase.pack.add(const Right(AlbumPackDTO(id: 'p', status: AlbumPackStatus.opened)));
+    final last = DateTime.now().subtract(const Duration(hours: 1));
+    useCase.album.add(Right(UserAlbumDTO(packs: 1, lastPackAt: last)));
     await Future<void>.delayed(Duration.zero);
     expect(cubit.state.packAvailable, isFalse);
+    expect(cubit.state.nextPackAt, last.add(const Duration(hours: 24)));
+
+    useCase.album.add(Right(UserAlbumDTO(packs: 1, lastPackAt: DateTime.now().subtract(const Duration(hours: 25)))));
+    await Future<void>.delayed(Duration.zero);
+    expect(cubit.state.packAvailable, isTrue);
 
     useCase.event.add(const Right(null));
     await Future<void>.delayed(Duration.zero);
@@ -104,11 +108,16 @@ void main() {
     await cubit.close();
   });
 
-  test('contagem do próximo pacote: até a meia-noite de Brasília', () {
-    // 20h UTC = 17h em Brasília → faltam 7h.
-    expect(AlbumPackId.untilNext(DateTime.utc(2026, 10, 28, 20)), const Duration(hours: 7));
-    // 2h30 UTC = 23h30 do dia anterior em Brasília → 30 min.
-    expect(AlbumPackId.untilNext(DateTime.utc(2026, 10, 28, 2, 30)), const Duration(minutes: 30));
+  test('um pacote a cada 24 h, contadas do último (não acumula)', () {
+    // Abriu às 14h: o próximo libera amanhã às 14h.
+    final last = DateTime.utc(2026, 10, 28, 17);
+    expect(AlbumPackId.nextAt(last), DateTime.utc(2026, 10, 29, 17));
+    expect(AlbumPackId.isAvailable(null, last), isTrue);
+    expect(AlbumPackId.isAvailable(last, DateTime.utc(2026, 10, 29, 16, 59)), isFalse);
+    expect(AlbumPackId.isAvailable(last, DateTime.utc(2026, 10, 29, 17)), isTrue);
+    expect(AlbumPackId.untilNext(last, DateTime.utc(2026, 10, 29, 10)), const Duration(hours: 7));
+    expect(AlbumPackId.untilNext(last, DateTime.utc(2026, 10, 31)), Duration.zero);
+    expect(AlbumPackId.leftUntil(null, last), Duration.zero);
   });
 
   test('detalhe: folheia só as coladas da página, na ordem', () {
@@ -163,6 +172,39 @@ void main() {
     expect(AlbumPackId.shortLabel(const Duration(hours: 3)), '3h');
     expect(AlbumPackId.shortLabel(const Duration(minutes: 45)), '45min');
     expect(AlbumPackId.shortLabel(const Duration(seconds: 20)), '1min');
+  });
+
+  test('gerar do elenco: só os inscritos na competição pelo time', () {
+    const players = [
+      // Inscrito na Copa (3) pelo Alfa.
+      PlayerDTO(
+        id: 'p1',
+        name: 'Ana',
+        team: 'Alfa',
+        teamId: 'tA',
+        enrollments: [PlayerEnrollment(championshipId: 3, teamId: 'tA', team: 'Alfa')],
+        hasEnrollmentField: true,
+      ),
+      // Na Copa pelo Beta (está no elenco geral do Alfa por outra competição).
+      PlayerDTO(
+        id: 'p2',
+        name: 'Bia',
+        team: 'Alfa',
+        teamId: 'tA',
+        enrollments: [
+          PlayerEnrollment(championshipId: 3, teamId: 'tB', team: 'Beta'),
+          PlayerEnrollment(championshipId: 5, teamId: 'tA', team: 'Alfa'),
+        ],
+        hasEnrollmentField: true,
+      ),
+      // Atleta antigo do Alfa: conta em toda competição do time.
+      PlayerDTO(id: 'p3', name: 'Caio', team: 'Alfa', teamId: 'tA'),
+    ];
+    List<String> ids(int? championship) =>
+        AlbumLayout.squadIn(players, championshipId: championship, teamId: 'tA', team: 'Alfa').map((p) => p.id).toList();
+    expect(ids(3), ['p1', 'p3']);
+    expect(ids(5), ['p2', 'p3']);
+    expect(ids(null), ['p1', 'p2', 'p3']);
   });
 }
 

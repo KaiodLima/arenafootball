@@ -102,6 +102,7 @@ class _HomePageState extends State<HomePage> {
       'parceiro' when user != null => AppRoutes.partnerRequestPage,
       'noticias_pendentes' when user != null && user.isAdmin => AppRoutes.partnerRequestsPanelPage,
       'conquistas' when user != null => AppRoutes.achievementsPage,
+      'album' when user != null => AppRoutes.albumPage,
       _ => null,
     };
     if (route != null) {

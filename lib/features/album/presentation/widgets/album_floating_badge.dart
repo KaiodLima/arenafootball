@@ -45,12 +45,10 @@ class _AlbumFloatingBadgeState extends State<AlbumFloatingBadge> with TickerProv
 
   Timer? _shakeTimer;
   Timer? _clockTimer;
-  Duration _left = Duration.zero;
 
   @override
   void initState() {
     super.initState();
-    _tick();
     _clockTimer = Timer.periodic(const Duration(minutes: 1), (_) => _tick());
     _snap.addListener(() {
       final t = Curves.easeOutBack.transform(_snap.value);
@@ -71,7 +69,8 @@ class _AlbumFloatingBadgeState extends State<AlbumFloatingBadge> with TickerProv
   }
 
   void _tick() {
-    if (mounted) setState(() => _left = AlbumPackId.untilNext(DateTime.now()));
+    // A contagem é calculada no build; aqui só redesenha.
+    if (mounted) setState(() {});
   }
 
   @override
@@ -170,7 +169,11 @@ class _AlbumFloatingBadgeState extends State<AlbumFloatingBadge> with TickerProv
                                   bottom: 0,
                                   child: _Pill(
                                     available: available,
-                                    label: available ? l10n.albumBadgeOpen : AlbumPackId.shortLabel(_left),
+                                    label: available
+                                        ? l10n.albumBadgeOpen
+                                        : AlbumPackId.shortLabel(
+                                            AlbumPackId.leftUntil(state.nextPackAt, DateTime.now()),
+                                          ),
                                   ),
                                 ),
                               ],

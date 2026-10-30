@@ -1,6 +1,17 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { albumOf, applyPack, brasiliaDay, drawPack, packId, parsePackId, perPackOf } from '../album';
+import {
+  albumOf,
+  albumPackMessage,
+  applyPack,
+  brasiliaDay,
+  canOpenPack,
+  drawPack,
+  nextPackAt,
+  packId,
+  parsePackId,
+  perPackOf,
+} from '../album';
 
 const stickers = [
   { id: 'a1', teamId: 'tA' },
@@ -8,12 +19,33 @@ const stickers = [
   { id: 'b1', teamId: 'tB' },
 ];
 
-test('id do pacote do dia (Brasília) e leitura de volta', () => {
-  const now = new Date(Date.UTC(2026, 9, 28, 2)); // 23h do dia 27 em Brasília
-  assert.equal(brasiliaDay(now), '2026-10-27');
-  assert.equal(packId('copa_2026', 'u1', now), 'copa_2026_u1_2026-10-27');
-  assert.deepEqual(parsePackId('copa_2026_u1_2026-10-27'), { eventId: 'copa_2026', uid: 'u1', day: '2026-10-27' });
-  assert.equal(parsePackId('semdia'), null);
+test('id do pacote em sequência e leitura de volta', () => {
+  assert.equal(brasiliaDay(new Date(Date.UTC(2026, 9, 28, 2))), '2026-10-27');
+  assert.equal(packId('copa_2026', 'u1', 3), 'copa_2026_u1_3');
+  assert.deepEqual(parsePackId('copa_2026_u1_3'), { eventId: 'copa_2026', uid: 'u1', n: 3 });
+  assert.equal(parsePackId('copa_u1_2026-10-27'), null);
+  assert.equal(parsePackId('copa_u1_0'), null);
+  assert.equal(parsePackId('semnumero'), null);
+});
+
+test('um pacote a cada 24 h, contadas do último pedido (não acumula)', () => {
+  const last = new Date(Date.UTC(2026, 9, 28, 17)); // 14h em Brasília
+  assert.equal(nextPackAt(last).toISOString(), '2026-10-29T17:00:00.000Z');
+  const album = { pacotes: 2, ultimoPacote: last };
+  assert.equal(canOpenPack(undefined, 1, last), true);
+  assert.equal(canOpenPack(album, 3, new Date(Date.UTC(2026, 9, 29, 16, 59))), false);
+  assert.equal(canOpenPack(album, 3, new Date(Date.UTC(2026, 9, 29, 17))), true);
+  // Dois dias sem abrir: continua sendo um pacote só (o próximo da sequência).
+  assert.equal(canOpenPack(album, 4, new Date(Date.UTC(2026, 9, 31, 17))), false);
+  assert.equal(canOpenPack({ pacotes: 2, ultimoPacote: { toDate: () => last } }, 3, nextPackAt(last)), true);
+});
+
+test('push do pacotinho: para a conta, abre o álbum', () => {
+  const message = albumPackMessage('u1', 'Copa Floresta', 5);
+  assert.equal(message.tipo, 'album_pacote');
+  assert.deepEqual(message.alvo, { topic: 'usuario_u1' });
+  assert.equal(message.aba, 'album');
+  assert.match(message.corpo, /5 figurinhas grátis .*Copa Floresta/);
 });
 
 test('sorteio: tamanho certo e só figurinhas do evento', () => {

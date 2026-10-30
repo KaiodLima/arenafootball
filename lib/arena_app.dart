@@ -314,7 +314,7 @@ class ArenaApp extends StatelessWidget {
           );
         },
         AppRoutes.manageAlbumPage: (_) => BlocProvider<ManageAlbumCubit>(
-              create: (_) => ManageAlbumCubit(sl(), sl(), sl()),
+              create: (_) => ManageAlbumCubit(sl(), sl(), sl(), sl()),
               child: const ManageAlbumPage(),
             ),
         AppRoutes.recompressImagesPage: (_) => BlocProvider<RecompressImagesCubit>(

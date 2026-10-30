@@ -734,6 +734,21 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String albumAdminGenerateTitle(String team) {
+    return 'Gerar figurinhas do $team';
+  }
+
+  @override
+  String get albumAdminGenerateWhich =>
+      'De qual elenco? Quem já tem figurinha não é repetido.';
+
+  @override
+  String get albumAdminGenerateAll => 'Elenco geral';
+
+  @override
+  String get albumAdminGenerateConfirm => 'Gerar';
+
+  @override
   String playerRequestAlreadyInChampionship(String team, String championship) {
     return 'Você já está no elenco do $team na $championship. Na mesma competição só dá para jogar por um time; escolha outra competição.';
   }
@@ -1760,6 +1775,13 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get pushActionAchievementHint => 'Para quem ganhou · medalha e XP';
+
+  @override
+  String get pushActionAlbumPack => 'Pacotinho liberado';
+
+  @override
+  String get pushActionAlbumPackHint =>
+      'Para quem coleciona · 24 h depois do último pacote';
 
   @override
   String get achievementUnlockedTitle => 'CONQUISTA DESBLOQUEADA!';

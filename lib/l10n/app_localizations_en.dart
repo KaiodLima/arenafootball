@@ -731,6 +731,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String albumAdminGenerateTitle(String team) {
+    return 'Generate stickers for $team';
+  }
+
+  @override
+  String get albumAdminGenerateWhich =>
+      'From which squad? Athletes who already have a sticker are skipped.';
+
+  @override
+  String get albumAdminGenerateAll => 'Full squad';
+
+  @override
+  String get albumAdminGenerateConfirm => 'Generate';
+
+  @override
   String playerRequestAlreadyInChampionship(String team, String championship) {
     return 'You are already in the $team squad for $championship. You can only play for one team per competition; choose another competition.';
   }
@@ -1753,6 +1768,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pushActionAchievementHint => 'To whoever earned it · medal and XP';
+
+  @override
+  String get pushActionAlbumPack => 'Sticker pack ready';
+
+  @override
+  String get pushActionAlbumPackHint =>
+      'To collectors · 24 h after their last pack';
 
   @override
   String get achievementUnlockedTitle => 'ACHIEVEMENT UNLOCKED!';

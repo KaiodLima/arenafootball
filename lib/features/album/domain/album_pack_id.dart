@@ -1,21 +1,37 @@
 import 'dart:math' as math;
 
-import 'package:arena_soccer/features/partner_requests/domain/partner_slots.dart';
-
-/// Pacotinho do dia do álbum: o id do doc é `<evento>_<uid>_<a-m-d>` (dia em
-/// Brasília), o que garante um por dia pelas regras do Firestore (igual a
-/// `packId` em `functions/src/album.ts`).
+/// Pacotinho do álbum: um a cada 24 h por conta, contadas do último pedido
+/// (não acumula). O id do doc é `<evento>_<uid>_<n>`, n = pacotes já abertos
+/// + 1: as regras do Firestore conferem a sequência e as 24 h (igual a
+/// `packId`/`canOpenPack` em `functions/src/album.ts`).
 class AlbumPackId {
   const AlbumPackId._();
 
-  static String of({required String eventId, required String userId, required DateTime now}) =>
-      '${eventId}_${userId}_${PartnerSlots.brasiliaDay(now)}';
+  static const Duration interval = Duration(hours: 24);
 
-  /// Quanto falta para o próximo pacote: a meia-noite de Brasília (UTC-3).
-  static Duration untilNext(DateTime now) {
-    final local = now.toUtc().subtract(const Duration(hours: 3));
-    final midnight = DateTime.utc(local.year, local.month, local.day + 1);
-    return midnight.difference(local);
+  /// Id do próximo pacote da conta, que já abriu [opened].
+  static String next({required String eventId, required String userId, required int opened}) =>
+      '${eventId}_${userId}_${opened + 1}';
+
+  /// Quando libera o próximo (nulo = nunca abriu: já liberado).
+  static DateTime? nextAt(DateTime? lastPack) => lastPack?.add(interval);
+
+  static bool isAvailable(DateTime? lastPack, DateTime now) {
+    final next = nextAt(lastPack);
+    return next == null || !now.isBefore(next);
+  }
+
+  /// Quanto falta para o próximo (zero se já liberado).
+  static Duration untilNext(DateTime? lastPack, DateTime now) {
+    final next = nextAt(lastPack);
+    if (next == null || !now.isBefore(next)) return Duration.zero;
+    return next.difference(now);
+  }
+
+  /// Quanto falta até [nextAt] (zero se já passou ou nulo).
+  static Duration leftUntil(DateTime? nextAt, DateTime now) {
+    if (nextAt == null || !now.isBefore(nextAt)) return Duration.zero;
+    return nextAt.difference(now);
   }
 
   /// Contagem curta do selo da home: "7h12", "7h" ou "45min".

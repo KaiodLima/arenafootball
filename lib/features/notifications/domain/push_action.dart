@@ -17,7 +17,8 @@ enum PushAction {
   partnerRequestAnswer('solicitacao_parceiro_resposta', true),
   partnerNews('noticia_parceiro', true),
   partnerNewsAnswer('noticia_parceiro_resposta', true),
-  achievement('conquista', true);
+  achievement('conquista', true),
+  albumPack('album_pacote', true);
 
   final String key;
   final bool defaultEnabled;

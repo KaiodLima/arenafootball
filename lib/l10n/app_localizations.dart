@@ -1335,6 +1335,30 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @albumAdminGenerateTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gerar figurinhas do {team}'**
+  String albumAdminGenerateTitle(String team);
+
+  /// No description provided for @albumAdminGenerateWhich.
+  ///
+  /// In pt, this message translates to:
+  /// **'De qual elenco? Quem já tem figurinha não é repetido.'**
+  String get albumAdminGenerateWhich;
+
+  /// No description provided for @albumAdminGenerateAll.
+  ///
+  /// In pt, this message translates to:
+  /// **'Elenco geral'**
+  String get albumAdminGenerateAll;
+
+  /// No description provided for @albumAdminGenerateConfirm.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gerar'**
+  String get albumAdminGenerateConfirm;
+
   /// No description provided for @playerRequestAlreadyInChampionship.
   ///
   /// In pt, this message translates to:
@@ -2853,6 +2877,18 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Para quem ganhou · medalha e XP'**
   String get pushActionAchievementHint;
+
+  /// No description provided for @pushActionAlbumPack.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pacotinho liberado'**
+  String get pushActionAlbumPack;
+
+  /// No description provided for @pushActionAlbumPackHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para quem coleciona · 24 h depois do último pacote'**
+  String get pushActionAlbumPackHint;
 
   /// No description provided for @achievementUnlockedTitle.
   ///

@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/album/data/dtos/album_dtos.dart';
 import 'package:arena_soccer/features/album/domain/album_layout.dart';
+import 'package:arena_soccer/features/album/domain/album_pack_id.dart';
 import 'package:arena_soccer/features/album/domain/usecases/album_usecase.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
@@ -15,8 +16,11 @@ class AlbumState extends Equatable {
   final List<StickerDTO> stickers;
   final UserAlbumDTO album;
 
-  /// Pacote de hoje (nulo = ainda disponível).
+  /// Pacote pedido agora (acompanhado até o sorteio do servidor).
   final AlbumPackDTO? todayPack;
+
+  /// Já passaram 24 h do último pacote (ou nunca abriu).
+  final bool packReady;
   final bool loading;
 
   /// Pacote pedido, esperando o sorteio do servidor.
@@ -30,6 +34,7 @@ class AlbumState extends Equatable {
     this.stickers = const [],
     this.album = const UserAlbumDTO(),
     this.todayPack,
+    this.packReady = false,
     this.loading = true,
     this.opening = false,
     this.teams = const {},
@@ -39,7 +44,10 @@ class AlbumState extends Equatable {
 
   int get collected => album.collected(stickers);
 
-  bool get packAvailable => todayPack == null && !opening;
+  bool get packAvailable => packReady && !opening;
+
+  /// Quando libera o próximo pacote (nulo = já liberado / nunca abriu).
+  DateTime? get nextPackAt => AlbumPackId.nextAt(album.lastPackAt);
 
   /// Figurinha pelo id (nula se saiu do catálogo).
   StickerDTO? sticker(String id) {
@@ -54,6 +62,7 @@ class AlbumState extends Equatable {
     List<StickerDTO>? stickers,
     UserAlbumDTO? album,
     AlbumPackDTO? Function()? todayPack,
+    bool? packReady,
     bool? loading,
     bool? opening,
     Map<String, TeamDTO>? teams,
@@ -63,6 +72,7 @@ class AlbumState extends Equatable {
       stickers: stickers ?? this.stickers,
       album: album ?? this.album,
       todayPack: todayPack != null ? todayPack() : this.todayPack,
+      packReady: packReady ?? this.packReady,
       loading: loading ?? this.loading,
       opening: opening ?? this.opening,
       teams: teams ?? this.teams,
@@ -70,7 +80,7 @@ class AlbumState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [event, stickers, album, todayPack, loading, opening, teams];
+  List<Object?> get props => [event, stickers, album, todayPack, packReady, loading, opening, teams];
 }
 
 /// O pacote acabou de abrir: a tela mostra a animação com [pack].
@@ -83,6 +93,7 @@ class PackOpenedAlbumState extends AlbumState {
           stickers: from.stickers,
           album: from.album,
           todayPack: from.todayPack,
+          packReady: from.packReady,
           loading: false,
           teams: from.teams,
         );
@@ -100,6 +111,7 @@ class ErrorAlbumState extends AlbumState {
           stickers: from.stickers,
           album: from.album,
           todayPack: from.todayPack,
+          packReady: from.packReady,
           loading: false,
           teams: from.teams,
         );
@@ -114,6 +126,8 @@ class AlbumCubit extends Cubit<AlbumState> {
   final AlbumUseCase albumUseCase;
   final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
   final List<StreamSubscription<Object?>> _subscriptions = [];
+  StreamSubscription<Either<Failure, AlbumPackDTO?>>? _pack;
+  Timer? _readyTimer;
   late String _userId;
 
   AlbumCubit(this.albumUseCase, this.getTeamsCacheFirstUseCase) : super(const AlbumState());
@@ -132,8 +146,8 @@ class AlbumCubit extends Cubit<AlbumState> {
       ..add(albumUseCase.watchMyAlbum(userId: userId, eventId: event.id).listen((response) {
         if (isClosed || response.isLeft) return;
         emit(state.copyWith(album: response.right));
-      }))
-      ..add(albumUseCase.watchTodayPack(userId: userId, eventId: event.id).listen(_onPack));
+        _scheduleReady();
+      }));
     _loadTeams();
   }
 
@@ -142,6 +156,19 @@ class AlbumCubit extends Cubit<AlbumState> {
     final response = await getTeamsCacheFirstUseCase().last;
     if (isClosed || response.isLeft) return;
     emit(state.copyWith(teams: {for (final team in response.right) team.id: team}));
+  }
+
+  /// Libera o pacote exatamente 24 h depois do último (com a tela aberta).
+  void _scheduleReady() {
+    _readyTimer?.cancel();
+    final now = DateTime.now();
+    final ready = AlbumPackId.isAvailable(state.album.lastPackAt, now);
+    if (ready != state.packReady) emit(state.copyWith(packReady: ready));
+    if (!ready) {
+      _readyTimer = Timer(AlbumPackId.untilNext(state.album.lastPackAt, now), () {
+        if (!isClosed) _scheduleReady();
+      });
+    }
   }
 
   void _onPack(Either<Failure, AlbumPackDTO?> response) {
@@ -162,14 +189,20 @@ class AlbumCubit extends Cubit<AlbumState> {
     emit(next);
   }
 
-  /// Pede o pacote do dia; a animação começa quando o servidor sorteia.
+  /// Pede o próximo pacote; a animação começa quando o servidor sorteia.
   Future<void> openPack() async {
     final event = state.event;
     if (event == null || !state.packAvailable) return;
-    emit(state.copyWith(opening: true));
-    final response = await albumUseCase.openTodayPack(userId: _userId, eventId: event.id);
+    emit(state.copyWith(opening: true, todayPack: () => null));
+    final response = await albumUseCase.openPack(userId: _userId, eventId: event.id, opened: state.album.packs);
     if (isClosed) return;
-    if (response.isLeft) emit(ErrorAlbumState(state.copyWith(opening: false), response.left.toString()));
+    response.fold(
+      (failure) => emit(ErrorAlbumState(state.copyWith(opening: false), failure.toString())),
+      (packId) {
+        _pack?.cancel();
+        _pack = albumUseCase.watchPack(packId).listen(_onPack);
+      },
+    );
   }
 
   @override
@@ -177,6 +210,8 @@ class AlbumCubit extends Cubit<AlbumState> {
     for (final s in _subscriptions) {
       s.cancel();
     }
+    _pack?.cancel();
+    _readyTimer?.cancel();
     return super.close();
   }
 }

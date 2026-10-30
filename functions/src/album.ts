@@ -1,7 +1,9 @@
 /**
- * Álbum de figurinhas (evento do admin): o pacotinho grátis do dia é sorteado
- * aqui, no servidor (o app só pede). Funções puras; quem grava é o index.ts.
+ * Álbum de figurinhas (evento do admin): o pacotinho grátis é sorteado aqui,
+ * no servidor (o app só pede). Um pacote a cada 24 h por conta, contadas do
+ * último pedido (não acumula). Funções puras; quem grava é o index.ts.
  */
+import { PushMessage, userTopic } from './messages';
 
 export type Doc = Record<string, unknown>;
 
@@ -31,20 +33,60 @@ export function brasiliaDay(now: Date): string {
   return `${local.getUTCFullYear()}-${local.getUTCMonth() + 1}-${local.getUTCDate()}`;
 }
 
-/** Id do pacote do dia: `<evento>_<uid>_<a-m-d>`. */
-export function packId(eventId: string, uid: string, now: Date): string {
-  return `${eventId}_${uid}_${brasiliaDay(now)}`;
+/** Intervalo entre dois pacotes da mesma conta. */
+export const PACK_INTERVAL_MS = 24 * 3600 * 1000;
+
+/** Id do [n]-ésimo pacote da conta no evento: `<evento>_<uid>_<n>` (n = pacotes + 1). */
+export function packId(eventId: string, uid: string, n: number): string {
+  return `${eventId}_${uid}_${n}`;
 }
 
-/** Evento e uid do id do pacote (o uid não tem "_"; o evento pode ter). */
-export function parsePackId(id: string): { eventId: string; uid: string; day: string } | null {
+/** Evento, uid e número do id do pacote (o uid não tem "_"; o evento pode ter). */
+export function parsePackId(id: string): { eventId: string; uid: string; n: number } | null {
   const parts = id.split('_');
   if (parts.length < 3) return null;
-  const day = parts[parts.length - 1];
+  const last = parts[parts.length - 1];
   const uid = parts[parts.length - 2];
   const eventId = parts.slice(0, -2).join('_');
-  if (!eventId || !uid || !/^\d{4}-\d{1,2}-\d{1,2}$/.test(day)) return null;
-  return { eventId, uid, day };
+  if (!eventId || !uid || !/^[1-9]\d*$/.test(last)) return null;
+  return { eventId, uid, n: Number(last) };
+}
+
+/** Quando libera o próximo pacote, a partir do último pedido. */
+export function nextPackAt(last: Date): Date {
+  return new Date(last.getTime() + PACK_INTERVAL_MS);
+}
+
+/**
+ * O pedido [n] feito em [requestedAt] vale: é o próximo da sequência
+ * (`pacotes + 1`) e já passaram 24 h do último (ou é o primeiro).
+ */
+export function canOpenPack(album: Doc | undefined, n: number, requestedAt: Date): boolean {
+  const opened = typeof album?.pacotes === 'number' ? album.pacotes : 0;
+  if (n !== opened + 1) return false;
+  const last = dateOf(album?.ultimoPacote);
+  return last === null || requestedAt.getTime() >= nextPackAt(last).getTime();
+}
+
+/** Timestamp do Firestore (ou Date) → Date; nulo se não for data. */
+export function dateOf(value: unknown): Date | null {
+  if (value instanceof Date) return value;
+  const toDate = (value as { toDate?: () => Date } | null | undefined)?.toDate;
+  return typeof toDate === 'function' ? toDate.call(value) : null;
+}
+
+/** Push "pacotinho liberado" para a própria conta; o toque abre o álbum. */
+export function albumPackMessage(uid: string, eventTitle: string, perPack: number): PushMessage {
+  return {
+    tipo: 'album_pacote',
+    titulo: '🎁 Seu pacotinho chegou!',
+    corpo: eventTitle
+      ? `${perPack} figurinhas grátis te esperando no álbum ${eventTitle}.`
+      : `${perPack} figurinhas grátis te esperando no álbum.`,
+    aba: 'album',
+    regiao: '',
+    alvo: { topic: userTopic(uid) },
+  };
 }
 
 /** Sorteia [count] figurinhas (chance igual, pode repetir). [random] em [0, 1). */

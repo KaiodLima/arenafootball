@@ -13,7 +13,18 @@
  * o carregamento pesado (gRPC do Firestore) estoura o limite de 10s da
  * análise do deploy.
  */
-import { albumOf, applyPack, drawPack, parsePackId, perPackOf, stickerOf } from './album';
+import {
+  albumOf,
+  albumPackMessage,
+  applyPack,
+  canOpenPack,
+  dateOf,
+  drawPack,
+  nextPackAt,
+  parsePackId,
+  perPackOf,
+  stickerOf,
+} from './album';
 import {
   BATCH_SIZE,
   DONE_FLAG,
@@ -718,7 +729,34 @@ export const closeVotings = onSchedule({ schedule: 'every 15 minutes', timeZone:
     if (shouldPostVoteCard(doc.data(), season, now)) await postVoteCard(collection, season, doc.id, doc.data());
     if (shouldPostResult(doc.data(), season, now)) await postResult(collection, season, doc.id, doc.data());
   }
+  // Na mesma rodada: push de quem tem pacotinho liberado (24 h depois do último).
+  await notifyAlbumPacks(now);
 });
+
+/**
+ * Pacotinhos liberados: os álbuns com `avisoEm` vencido recebem o push
+ * "Seu pacotinho chegou!" (se o evento ainda está ligado) e perdem o
+ * `avisoEm` (um aviso por pacote). Lê só os vencidos.
+ */
+async function notifyAlbumPacks(now: Date): Promise<void> {
+  const { db, FieldValue } = await admin();
+  const due = await db.collectionGroup('album').where('avisoEm', '<=', now).limit(200).get();
+  const events = new Map<string, Record<string, unknown> | undefined>();
+  for (const doc of due.docs) {
+    const uid = doc.ref.parent.parent?.id;
+    if (!uid) continue;
+    if (!events.has(doc.id)) events.set(doc.id, (await db.collection('album_eventos').doc(doc.id).get()).data());
+    const albumEvent = events.get(doc.id);
+    if (albumEvent?.ativo === true) {
+      await deliver(
+        `album_pacote_${uid}_${doc.id}_${doc.data().pacotes ?? 0}`,
+        albumPackMessage(uid, String(albumEvent.titulo ?? ''), perPackOf(albumEvent)),
+        `usuarios/${uid}/album/${doc.id}`,
+      );
+    }
+    await doc.ref.update({ avisoEm: FieldValue.delete() });
+  }
+}
 
 /**
  * A cada hora: ranking de torcidas da temporada atual. Conta os torcedores de
@@ -1103,9 +1141,11 @@ export const onRecompressRequested = onDocumentWritten(
 );
 
 /**
- * Pacotinho do dia do álbum de figurinhas: o app cria `album_pacotes/{id}`
- * (`<evento>_<uid>_<dia>`, um por dia pelas regras) e aqui sorteia as
- * figurinhas, cola no álbum da conta e soma nas métricas das conquistas.
+ * Pacotinho do álbum de figurinhas: o app cria `album_pacotes/{id}`
+ * (`<evento>_<uid>_<n>`, n = pacotes + 1; as regras exigem 24 h desde o
+ * último) e aqui sorteia as figurinhas, cola no álbum da conta, marca quando
+ * libera o próximo (`avisoEm`, o push do `closeVotings`) e soma nas métricas
+ * das conquistas.
  */
 export const onAlbumPackRequested = onDocumentCreated('album_pacotes/{packId}', async (event) => {
   const parsed = parsePackId(event.params.packId);
@@ -1120,7 +1160,9 @@ export const onAlbumPackRequested = onDocumentCreated('album_pacotes/{packId}', 
       eventRef.collection('figurinhas').get(),
       albumRef.get(),
     ]);
-    if (eventSnap.data()?.ativo !== true || catalog.empty) {
+    const requestedAt = dateOf(event.data?.data()?.pedidoEm) ?? new Date();
+    // Confere de novo a sequência e as 24 h (as regras já barram).
+    if (eventSnap.data()?.ativo !== true || catalog.empty || !canOpenPack(albumSnap.data(), parsed.n, requestedAt)) {
       await packRef.update({ status: 'recusado', abertoEm: FieldValue.serverTimestamp() });
       return;
     }
@@ -1130,7 +1172,11 @@ export const onAlbumPackRequested = onDocumentCreated('album_pacotes/{packId}', 
     const { album, novas, newPages, justCompleted } = applyPack(before, drawn, stickers);
     const batch = db.batch();
     batch.update(packRef, { status: 'aberto', figurinhas: drawn, novas, abertoEm: FieldValue.serverTimestamp() });
-    batch.set(albumRef, { ...album, ultimoPacote: FieldValue.serverTimestamp() }, { merge: true });
+    batch.set(
+      albumRef,
+      { ...album, pacotes: parsed.n, ultimoPacote: requestedAt, avisoEm: nextPackAt(requestedAt) },
+      { merge: true },
+    );
     batch.set(
       await progressRef(parsed.uid),
       {

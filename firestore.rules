@@ -569,10 +569,15 @@ service cloud.firestore {
 
     // Pacotinho do dia (id `<evento>_<uid>_<a-m-d>`, dia em Brasília): o dono pede
     // só o de hoje, de evento ativo; as functions sorteiam. Um por dia pelo id.
+    // Pacotinho: `<evento>_<uid>_<n>`, n = pacotes já abertos + 1 (o mesmo n
+    // duas vezes cai no doc que já existe), e só 24 h depois do último pedido
+    // (`ultimoPacote`, gravado pelas functions). Não acumula.
     match /album_pacotes/{packId} {
-      function today() {
-        let now = request.time - duration.value(3, 'h');
-        return string(now.year()) + '-' + string(now.month()) + '-' + string(now.day());
+      function packAllowed(eventId) {
+        let path = /databases/$(database)/documents/usuarios/$(request.auth.uid)/album/$(eventId);
+        let album = exists(path) ? get(path).data : {};
+        return packId == eventId + '_' + request.auth.uid + '_' + string(album.get('pacotes', 0) + 1)
+          && (!('ultimoPacote' in album) || request.time >= album.ultimoPacote + duration.value(24, 'h'));
       }
 
       allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
@@ -581,7 +586,7 @@ service cloud.firestore {
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.status == 'pedido'
         && request.resource.data.pedidoEm == request.time
-        && packId == request.resource.data.idEvento + '_' + request.auth.uid + '_' + today()
+        && packAllowed(request.resource.data.idEvento)
         && albumOpenFor(get(/databases/$(database)/documents/album_eventos/$(request.resource.data.idEvento)).data);
       allow update, delete: if false;
 

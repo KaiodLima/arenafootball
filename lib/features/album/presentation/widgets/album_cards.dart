@@ -18,10 +18,20 @@ class PackCard extends StatefulWidget {
   final bool opening;
   final VoidCallback onOpen;
 
-  /// Toque longo no cartão (a prévia da abertura, só em debug).
+  /// Toque longo no cartão (a prévia da abertura, só o admin).
   final VoidCallback? onLongPress;
 
-  const PackCard({super.key, required this.available, required this.opening, required this.onOpen, this.onLongPress});
+  /// Quando libera o próximo pacote (contagem); nulo = liberado.
+  final DateTime? nextPackAt;
+
+  const PackCard({
+    super.key,
+    required this.available,
+    required this.opening,
+    required this.onOpen,
+    this.onLongPress,
+    this.nextPackAt,
+  });
 
   @override
   State<PackCard> createState() => _PackCardState();
@@ -39,7 +49,7 @@ class _PackCardState extends State<PackCard> {
   }
 
   void _tick() {
-    if (mounted) setState(() => _left = AlbumPackId.untilNext(DateTime.now()));
+    if (mounted) setState(() => _left = AlbumPackId.leftUntil(widget.nextPackAt, DateTime.now()));
   }
 
   @override

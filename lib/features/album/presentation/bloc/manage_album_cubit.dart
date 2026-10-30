@@ -5,9 +5,12 @@ import 'package:either_dart/either.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
+import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/features/album/data/dtos/album_dtos.dart';
 import 'package:arena_soccer/features/album/domain/album_layout.dart';
 import 'package:arena_soccer/features/album/domain/usecases/manage_album_usecase.dart';
+import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/get_season_championships_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
@@ -24,6 +27,9 @@ class ManageAlbumState extends Equatable {
 
   /// Times da temporada (escolha das páginas e o escudo).
   final List<TeamDTO> teams;
+
+  /// Competições da temporada ("Gerar do elenco" por competição).
+  final List<ChampionshipDTO> championships;
   final bool loading;
   final bool busy;
 
@@ -32,17 +38,26 @@ class ManageAlbumState extends Equatable {
     this.editing,
     this.stickers = const [],
     this.teams = const [],
+    this.championships = const [],
     this.loading = true,
     this.busy = false,
   });
 
   List<AlbumTeamPage> get pages => editing == null ? const [] : AlbumLayout.pages(editing!, stickers);
 
+  /// Competições em que o time [teamId] está inscrito.
+  List<ChampionshipDTO> championshipsOf(String teamId) {
+    final team = teams.where((t) => t.id == teamId).firstOrNull;
+    final name = team?.name ?? editing?.teamName(teamId) ?? '';
+    return championships.where((c) => c.hasTeam(id: teamId, name: name)).toList();
+  }
+
   ManageAlbumState copyWith({
     List<AlbumEventDTO>? events,
     AlbumEventDTO? Function()? editing,
     List<StickerDTO>? stickers,
     List<TeamDTO>? teams,
+    List<ChampionshipDTO>? championships,
     bool? loading,
     bool? busy,
   }) {
@@ -51,13 +66,14 @@ class ManageAlbumState extends Equatable {
       editing: editing != null ? editing() : this.editing,
       stickers: stickers ?? this.stickers,
       teams: teams ?? this.teams,
+      championships: championships ?? this.championships,
       loading: loading ?? this.loading,
       busy: busy ?? this.busy,
     );
   }
 
   @override
-  List<Object?> get props => [events, editing, stickers, teams, loading, busy];
+  List<Object?> get props => [events, editing, stickers, teams, championships, loading, busy];
 }
 
 class NoticeManageAlbumState extends ManageAlbumState {
@@ -70,6 +86,7 @@ class NoticeManageAlbumState extends ManageAlbumState {
           editing: from.editing,
           stickers: from.stickers,
           teams: from.teams,
+          championships: from.championships,
           loading: false,
         );
 
@@ -86,6 +103,7 @@ class ErrorManageAlbumState extends ManageAlbumState {
           editing: from.editing,
           stickers: from.stickers,
           teams: from.teams,
+          championships: from.championships,
           loading: false,
         );
 
@@ -100,11 +118,16 @@ class ManageAlbumCubit extends Cubit<ManageAlbumState> {
   final ManageAlbumUseCase manageAlbumUseCase;
   final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
   final WatchTeamPlayersUseCase watchTeamPlayersUseCase;
+  final GetSeasonChampionshipsUseCase getSeasonChampionshipsUseCase;
   StreamSubscription<Either<Failure, List<AlbumEventDTO>>>? _events;
   StreamSubscription<Either<Failure, List<StickerDTO>>>? _stickers;
 
-  ManageAlbumCubit(this.manageAlbumUseCase, this.getTeamsCacheFirstUseCase, this.watchTeamPlayersUseCase)
-      : super(const ManageAlbumState());
+  ManageAlbumCubit(
+    this.manageAlbumUseCase,
+    this.getTeamsCacheFirstUseCase,
+    this.watchTeamPlayersUseCase,
+    this.getSeasonChampionshipsUseCase,
+  ) : super(const ManageAlbumState());
 
   void watch() {
     _events?.cancel();
@@ -120,6 +143,14 @@ class ManageAlbumCubit extends Cubit<ManageAlbumState> {
       );
     });
     _loadTeams();
+    _loadChampionships();
+  }
+
+  /// Competições da temporada atual. Falha: "Gerar do elenco" usa o geral.
+  Future<void> _loadChampionships() async {
+    final response = await getSeasonChampionshipsUseCase(SeasonCollection.currentSeason);
+    if (isClosed || response.isLeft) return;
+    emit(state.copyWith(championships: response.right));
   }
 
   /// Times da temporada atual (todas as regiões). Falha só esvazia a escolha.
@@ -180,7 +211,9 @@ class ManageAlbumCubit extends Cubit<ManageAlbumState> {
   }
 
   /// "Gerar do elenco": escudo + atletas do time que ainda não estão no álbum.
-  Future<void> generateFromSquad(String teamId) async {
+  /// Figurinhas do elenco do time; [championshipId] = só os inscritos nessa
+  /// competição pelo time (nulo = elenco geral).
+  Future<void> generateFromSquad(String teamId, {int? championshipId}) async {
     final event = state.editing;
     if (event == null || event.id.isEmpty) return;
     final team = state.teams.where((t) => t.id == teamId).firstOrNull;
@@ -196,7 +229,7 @@ class ManageAlbumCubit extends Cubit<ManageAlbumState> {
       teamId: teamId,
       team: teamName,
       crestUrl: team?.imageUrl ?? '',
-      players: players.right,
+      players: AlbumLayout.squadIn(players.right, championshipId: championshipId, teamId: teamId, team: teamName),
       existing: state.stickers,
     );
     final response = await manageAlbumUseCase.addStickers(event: event, added: added);

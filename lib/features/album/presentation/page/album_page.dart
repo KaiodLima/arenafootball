@@ -152,6 +152,7 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
                       opening: state.opening,
                       onOpen: _cubit.openPack,
                       onLongPress: isAdmin ? () => _previewPack(state) : null,
+                      nextPackAt: state.nextPackAt,
                     ),
                   ),
                 ),

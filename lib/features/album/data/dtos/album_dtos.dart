@@ -190,7 +190,18 @@ class UserAlbumDTO extends Equatable {
   final List<String> completedPages;
   final bool complete;
 
-  const UserAlbumDTO({this.counts = const {}, this.completedPages = const [], this.complete = false});
+  /// Pacotes já abertos (`pacotes`) e a hora do último pedido
+  /// (`ultimoPacote`): o próximo libera 24 h depois (`AlbumPackId`).
+  final int packs;
+  final DateTime? lastPackAt;
+
+  const UserAlbumDTO({
+    this.counts = const {},
+    this.completedPages = const [],
+    this.complete = false,
+    this.packs = 0,
+    this.lastPackAt,
+  });
 
   factory UserAlbumDTO.fromMap(Map<String, dynamic> data) {
     final raw = data['figurinhas'] as Map? ?? const {};
@@ -202,6 +213,8 @@ class UserAlbumDTO extends Equatable {
       },
       completedPages: (data['paginasCompletas'] as List?)?.map((e) => e.toString()).toList() ?? const [],
       complete: data['completo'] == true,
+      packs: (data['pacotes'] as num?)?.toInt() ?? 0,
+      lastPackAt: (data['ultimoPacote'] as Timestamp?)?.toDate(),
     );
   }
 
@@ -217,7 +230,7 @@ class UserAlbumDTO extends Equatable {
       stickers.fold(0, (acc, s) => acc + (countOf(s.id) > 1 ? countOf(s.id) - 1 : 0));
 
   @override
-  List<Object?> get props => [counts, completedPages, complete];
+  List<Object?> get props => [counts, completedPages, complete, packs, lastPackAt];
 }
 
 /// Situação do pacote do dia (`status`).

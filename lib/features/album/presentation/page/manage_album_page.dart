@@ -6,6 +6,8 @@ import 'package:arena_soccer/features/album/data/dtos/album_dtos.dart';
 import 'package:arena_soccer/features/album/domain/album_layout.dart';
 import 'package:arena_soccer/features/album/presentation/bloc/manage_album_cubit.dart';
 import 'package:arena_soccer/features/album/presentation/widgets/sticker_card.dart';
+import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/core/utils/search_text.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
@@ -360,6 +362,24 @@ class _TeamStickers extends StatelessWidget {
     );
   }
 
+  /// "Gerar do elenco": time com competições escolhe o elenco (geral ou de
+  /// uma competição); sem competição, gera do geral direto.
+  Future<void> _generate(BuildContext context) async {
+    final championships = state.championshipsOf(page.teamId);
+    if (championships.isEmpty) return cubit.generateFromSquad(page.teamId);
+    final eventTitle = foldForSearch(state.editing?.title ?? '');
+    final initial = championships.where((c) => foldForSearch(c.title) == eventTitle).firstOrNull;
+    final choice = await showModalBottomSheet<_SquadChoice>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSizes.radiusLarge)),
+      ),
+      builder: (_) => _SquadSheet(team: page.team, championships: championships, initial: initial?.championshipId),
+    );
+    if (choice != null) await cubit.generateFromSquad(page.teamId, championshipId: choice.championshipId);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -372,7 +392,7 @@ class _TeamStickers extends StatelessWidget {
             spacing: AppSizes.s8,
             children: [
               OutlinedButton.icon(
-                onPressed: state.busy ? null : () => cubit.generateFromSquad(page.teamId),
+                onPressed: state.busy ? null : () => _generate(context),
                 icon: const Icon(Icons.groups_rounded, size: AppSizes.s18),
                 label: Text(l10n.albumAdminGenerate),
               ),
@@ -523,6 +543,73 @@ class _TestTag extends StatelessWidget {
       child: Text(
         AppLocalizations.of(context).albumAdminTestTag,
         style: AppTypography.label(color: AppColors.black).copyWith(fontSize: AppSizes.s10, fontWeight: FontWeight.w900),
+      ),
+    );
+  }
+}
+
+/// Elenco escolhido para gerar (nulo = elenco geral).
+class _SquadChoice {
+  final int? championshipId;
+
+  const _SquadChoice(this.championshipId);
+}
+
+/// Folha "Gerar figurinhas do {time}": elenco geral ou o de uma competição.
+class _SquadSheet extends StatefulWidget {
+  final String team;
+  final List<ChampionshipDTO> championships;
+  final int? initial;
+
+  const _SquadSheet({required this.team, required this.championships, required this.initial});
+
+  @override
+  State<_SquadSheet> createState() => _SquadSheetState();
+}
+
+class _SquadSheetState extends State<_SquadSheet> {
+  late int? _selected = widget.initial;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(AppSizes.s20, AppSizes.s20, AppSizes.s20, AppSizes.s16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.albumAdminGenerateTitle(widget.team), style: AppTypography.title().copyWith(fontSize: AppSizes.s20)),
+            const SizedBox(height: AppSizes.s4),
+            Text(l10n.albumAdminGenerateWhich, style: AppTypography.subtitle()),
+            const SizedBox(height: AppSizes.s16),
+            Wrap(
+              spacing: AppSizes.s8,
+              runSpacing: AppSizes.s8,
+              children: [
+                ArenaChoiceChip(
+                  label: l10n.albumAdminGenerateAll,
+                  icon: Icons.groups_rounded,
+                  selected: _selected == null,
+                  onTap: () => setState(() => _selected = null),
+                ),
+                for (final c in widget.championships)
+                  ArenaChoiceChip(
+                    label: c.title,
+                    icon: Icons.emoji_events_outlined,
+                    selected: _selected == c.championshipId,
+                    onTap: () => setState(() => _selected = c.championshipId),
+                  ),
+              ],
+            ),
+            const SizedBox(height: AppSizes.s20),
+            ArenaButton.primary(
+              title: l10n.albumAdminGenerateConfirm,
+              function: () => Navigator.pop(context, _SquadChoice(_selected)),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -208,6 +208,11 @@ class _NotificationsPanelPageState extends State<NotificationsPanelPage> {
         name: l10n.pushActionAchievement,
         description: l10n.pushActionAchievementHint
       ),
+    PushAction.albumPack => (
+        icon: Icons.card_giftcard_outlined,
+        name: l10n.pushActionAlbumPack,
+        description: l10n.pushActionAlbumPackHint
+      ),
   };
 }
 

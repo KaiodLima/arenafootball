@@ -38,7 +38,8 @@ test('formato mantido e só regrava se ganhar 10%', () => {
 test('pastas em ordem e fim; progresso padrão', () => {
   assert.equal(nextFolder(''), 'noticias');
   assert.equal(nextFolder('noticias'), 'destaques');
-  assert.equal(nextFolder('usuarios'), '');
+  assert.equal(nextFolder('usuarios'), 'album');
+  assert.equal(nextFolder('album'), '');
   assert.equal(progressOf(undefined).vistos, 0);
   assert.equal(progressOf({ status: 'rodando', vistos: 5 }).vistos, 5);
 });
