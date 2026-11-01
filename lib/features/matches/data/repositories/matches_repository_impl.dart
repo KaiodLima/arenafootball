@@ -87,6 +87,22 @@ class MatchesRepositoryImpl implements IMatchesRepository {
       );
 
   @override
+  Future<Either<Failure, void>> delayMatch({
+    required String matchId,
+    required String newTime,
+    required String originalTime,
+    required bool resetClock,
+    String? season,
+  }) =>
+      _dataSource.delayMatch(
+        matchId: matchId,
+        newTime: newTime,
+        originalTime: originalTime,
+        resetClock: resetClock,
+        season: season,
+      );
+
+  @override
   Future<Either<Failure, void>> deleteMatch({required String matchId, String? season}) =>
       _dataSource.deleteMatch(matchId: matchId, season: season);
 

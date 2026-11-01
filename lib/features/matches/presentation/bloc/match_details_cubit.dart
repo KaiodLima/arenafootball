@@ -10,6 +10,7 @@ import 'package:arena_soccer/features/matches/domain/usecases/toggle_match_votin
 import 'package:arena_soccer/features/matches/domain/usecases/watch_match_usecase.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/delay_match_usecase.dart';
 
 /// Detalhes da partida: a partida ao vivo, os elencos dos dois lados (na
 /// competição da partida) e o lado escolhido na seção "Elencos".
@@ -78,6 +79,7 @@ class MatchDetailsCubit extends Cubit<MatchDetailsState> {
   final WatchTeamPlayersUseCase watchTeamPlayersUseCase;
   final ToggleMatchVotingUseCase toggleMatchVotingUseCase;
   final SetMatchPhaseUseCase setMatchPhaseUseCase;
+  final DelayMatchUseCase delayMatchUseCase;
   StreamSubscription? _subscription;
   String? _season;
 
@@ -85,7 +87,8 @@ class MatchDetailsCubit extends Cubit<MatchDetailsState> {
     this.watchMatchUseCase,
     this.watchTeamPlayersUseCase,
     this.toggleMatchVotingUseCase,
-    this.setMatchPhaseUseCase, {
+    this.setMatchPhaseUseCase,
+    this.delayMatchUseCase, {
     required MatchDTO match,
   }) : super(MatchDetailsState(match: match));
 
@@ -132,6 +135,16 @@ class MatchDetailsCubit extends Cubit<MatchDetailsState> {
   /// Admin: inicia, intervalo, 2º tempo ou encerra a partida na mão.
   Future<void> setPhase(MatchPhase phase) async {
     final response = await setMatchPhaseUseCase(match: state.match, phase: phase, season: _season);
+    if (isClosed) return;
+    response.fold(
+      (failure) => emit(state.copyWith(errorMessage: () => failure.toString())),
+      (updated) => emit(state.copyWith(match: updated, errorMessage: () => null)),
+    );
+  }
+
+  /// Admin: a partida atrasou e começa às [newTime].
+  Future<void> delay(String newTime) async {
+    final response = await delayMatchUseCase(match: state.match, newTime: newTime, season: _season);
     if (isClosed) return;
     response.fold(
       (failure) => emit(state.copyWith(errorMessage: () => failure.toString())),

@@ -17,6 +17,8 @@ test('15 min antes do fim: posta; antes disso, não', () => {
   // Fim: 15:00 Brasília + 90 min = 19:30 UTC; card a partir de 19:15 UTC.
   assert.equal(shouldPostVoteCard(match, '2026', new Date('2026-10-22T19:14:00Z')), false);
   assert.equal(shouldPostVoteCard(match, '2026', new Date('2026-10-22T19:15:00Z')), true);
+  // Pausada até começar: não posta.
+  assert.equal(shouldPostVoteCard({ ...match, status: 'aguardando' }, '2026', new Date('2026-10-22T19:20:00Z')), false);
 });
 
 test('encerrada na mão: posta; já postado ou jogo antigo: não', () => {

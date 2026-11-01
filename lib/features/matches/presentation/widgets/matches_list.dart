@@ -18,6 +18,8 @@ import 'package:arena_soccer/utils/constants/team_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/delay_match_sheet.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/set_match_phase_usecase.dart';
 
 /// Lista de partidas do [MatchesCubit] do contexto (usada pela aba de
 /// tabelas, com as partidas do dia, e pela tela "todos os jogos"). Com
@@ -166,6 +168,16 @@ class MatchesList extends StatelessWidget {
                 awayCrest: state.crestOf(match.awayTeam),
               ),
               onSetPhase: isAdmin ? (phase) => BlocProvider.of<MatchesCubit>(context).setPhase(match, phase) : null,
+              onDelay: isAdmin
+                  ? () => showDelayMatchSheet(
+                        context,
+                        match: match,
+                        canStartNow: canStartMatchNow(match, MatchCardStatus.of(match, DateTime.now())),
+                        onDelay: (time) => BlocProvider.of<MatchesCubit>(context).delay(match, time),
+                        onStartNow: () => BlocProvider.of<MatchesCubit>(context).setPhase(match, MatchPhase.start),
+                        onPause: () => BlocProvider.of<MatchesCubit>(context).setPhase(match, MatchPhase.wait),
+                      )
+                  : null,
               onGoalCard: isAdmin
                   ? () => Navigator.pushNamed(
                         context,

@@ -16,6 +16,10 @@ enum MatchPhase {
 
   /// "Encerrar partida".
   finish,
+
+  /// "Pausar até começar" (atrasou sem horário novo): aguardando, sem relógio,
+  /// até o admin iniciar.
+  wait,
 }
 
 /// Admin muda a fase da partida na mão: grava o `status` e a hora do
@@ -35,6 +39,7 @@ class SetMatchPhaseUseCase {
       MatchPhase.halfTime => (MatchManualStatus.halfTime, halfTimeField, const <String>[]),
       MatchPhase.secondHalf => (MatchManualStatus.live, secondHalfField, const <String>[]),
       MatchPhase.finish => (MatchManualStatus.finished, null, const <String>[]),
+      MatchPhase.wait => (MatchManualStatus.waiting, null, const [startedField, halfTimeField, secondHalfField]),
     };
     final response = await _repository.setManualStatus(
       matchId: match.id,
@@ -50,6 +55,9 @@ class SetMatchPhaseUseCase {
           MatchPhase.halfTime => match.copyWith(manualStatus: status, halfTimeAt: now),
           MatchPhase.secondHalf => match.copyWith(manualStatus: status, secondHalfAt: now),
           MatchPhase.finish => match.copyWith(manualStatus: status),
+          MatchPhase.wait => match
+              .withDelay(match.time, originalTime: match.originalTime, resetClock: true)
+              .copyWith(manualStatus: status, statusAt: now),
         });
   }
 }

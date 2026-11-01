@@ -29,6 +29,9 @@ class MatchCardStatus {
   /// Intervalo marcado pelo admin (conta como em andamento, relógio parado).
   final bool halfTime;
 
+  /// Pausada pelo admin até começar ("Atrasou" → pausar): sem relógio.
+  final bool waiting;
+
   /// Dias até a partida (0 = hoje, 1 = amanhã); só vale antes do jogo.
   final int dayOffset;
 
@@ -40,6 +43,7 @@ class MatchCardStatus {
     this.live = false,
     this.finished = false,
     this.halfTime = false,
+    this.waiting = false,
     this.dayOffset = 0,
     this.nextChange,
   });
@@ -95,6 +99,10 @@ class MatchCardStatus {
     switch (match.manualStatus) {
       case MatchManualStatus.finished:
         return const MatchCardStatus._(finished: true);
+      case MatchManualStatus.waiting:
+        // Esquecida pausada: passado o dia, conta como encerrada.
+        if (offset != null && offset < 0) return const MatchCardStatus._(finished: true);
+        return MatchCardStatus._(waiting: true, dayOffset: offset ?? 0);
       case MatchManualStatus.live || MatchManualStatus.halfTime when offset == null || offset >= 0:
         // Esquecida em andamento/intervalo: encerra sozinha 30 min depois do fim esperado.
         final autoEnd = MatchClock.expectedEnd(match, now)?.add(MatchClock.autoFinishMargin);
@@ -149,6 +157,9 @@ class MatchCard extends StatefulWidget {
 
   /// "Gerenciar partida" (súmula); nulo = sem o item.
   final VoidCallback? onManage;
+
+  /// "Atrasou" (novo horário); nulo = sem o item.
+  final VoidCallback? onDelay;
   final VoidCallback onDelete;
 
   /// Mostra o botão de votação (falso na prévia do cadastro).
@@ -180,6 +191,7 @@ class MatchCard extends StatefulWidget {
     required this.onToggleVoting,
     required this.onEditScore,
     this.onManage,
+    this.onDelay,
     required this.onDelete,
     this.homeCrest,
     this.awayCrest,
@@ -310,6 +322,12 @@ class _MatchCardState extends State<MatchCard> {
                           label: l10n.matchesEditScore,
                           onSelected: widget.onEditScore,
                         ),
+                        if (widget.onDelay != null && canDelayMatch(match, status))
+                          CardMenuAction(
+                            icon: Icons.schedule_rounded,
+                            label: l10n.matchDelay,
+                            onSelected: widget.onDelay!,
+                          ),
                         if (widget.onSetPhase != null)
                           for (final action in matchPhaseActions(l10n, match, status, now))
                             CardMenuAction(
@@ -458,18 +476,35 @@ class _Center extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final time = match.time.trim();
-    final big = status.upcoming ? (time.isEmpty ? '--:--' : time) : '${match.homeGoals} × ${match.awayGoals}';
-    final small = status.upcoming
-        ? switch (status.dayOffset) {
-            0 => l10n.matchCardToday,
-            1 => l10n.matchCardTomorrow,
-            _ => match.date.trim(),
-          }
-        : status.finished
-            ? l10n.matchCardFinished
-            : time;
-    // Antes do jogo (verde) e encerrada (cinza) vão numa pílula.
-    final pill = status.upcoming || status.finished;
+    final beforeKickoff = status.upcoming || status.waiting;
+    final big = beforeKickoff ? (time.isEmpty ? '--:--' : time) : '${match.homeGoals} × ${match.awayGoals}';
+    // Atrasada ou pausada (antes do jogo): pílula âmbar e o horário antigo embaixo.
+    final delayed = (status.upcoming && match.delayed) || status.waiting;
+    final small = status.waiting
+        ? l10n.matchCardWaiting
+        : delayed
+        ? l10n.matchCardDelayed
+        : status.upcoming
+            ? switch (status.dayOffset) {
+                0 => l10n.matchCardToday,
+                1 => l10n.matchCardTomorrow,
+                _ => match.date.trim(),
+              }
+            : status.finished
+                ? l10n.matchCardFinished
+                : time;
+    // Antes do jogo (verde), atrasada/pausada (âmbar) e encerrada (cinza) vão numa pílula.
+    final pill = beforeKickoff || status.finished;
+    final pillColor = delayed
+        ? AppColors.warning.withValues(alpha: 0.2)
+        : status.upcoming
+            ? AppColors.primarySoft
+            : AppColors.greyLight;
+    final pillText = delayed
+        ? AppColors.teamOrange
+        : status.upcoming
+            ? AppColors.primaryDark
+            : AppColors.textSecondary;
     return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: AppSizes.s100),
       child: Padding(
@@ -479,7 +514,7 @@ class _Center extends StatelessWidget {
             Text(
               big,
               maxLines: 1,
-              style: AppTypography.display(color: status.upcoming ? AppColors.primaryDark : AppColors.textPrimary)
+              style: AppTypography.display(color: beforeKickoff ? AppColors.primaryDark : AppColors.textPrimary)
                   .copyWith(fontSize: AppSizes.s28, fontFeatures: const [FontFeature.tabularFigures()]),
             ),
             if (status.live) ...[
@@ -490,17 +525,24 @@ class _Center extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s2),
                 decoration: pill
-                    ? BoxDecoration(
-                        color: status.upcoming ? AppColors.primarySoft : AppColors.greyLight,
-                        borderRadius: BorderRadius.circular(AppSizes.s8),
-                      )
+                    ? BoxDecoration(color: pillColor, borderRadius: BorderRadius.circular(AppSizes.s8))
                     : null,
                 child: Text(
                   small,
-                  style: AppTypography.label(color: status.upcoming ? AppColors.primaryDark : AppColors.textSecondary)
-                      .copyWith(fontSize: AppSizes.s12, letterSpacing: pill ? 0.8 : 0),
+                  style: AppTypography.label(color: pillText).copyWith(fontSize: AppSizes.s12, letterSpacing: pill ? 0.8 : 0),
                 ),
               ),
+              if (delayed && match.delayed)
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSizes.s2),
+                  child: Text(
+                    l10n.matchCardWas(match.originalTime.trim()),
+                    style: AppTypography.subtitle().copyWith(
+                      fontSize: AppSizes.s12,
+                      decoration: TextDecoration.lineThrough,
+                    ),
+                  ),
+                ),
             ],
           ],
         ),
@@ -814,6 +856,18 @@ String matchClockLabel(AppLocalizations l10n, MatchClock clock) {
 
 /// Ações do admin no andamento: iniciar; no 1º tempo, intervalo; no
 /// intervalo, 2º tempo; e encerrar enquanto estiver em andamento.
+/// "Atrasou" no menu do admin: partida de hoje ainda no 1º tempo (ou antes).
+bool canDelayMatch(MatchDTO match, MatchCardStatus status) =>
+    !status.finished &&
+    !status.halfTime &&
+    match.halfTimeAt == null &&
+    match.secondHalfAt == null &&
+    (status.live || status.waiting || (status.upcoming && status.dayOffset == 0));
+
+/// "Começou agora" na folha do atraso: em andamento só pelo horário.
+bool canStartMatchNow(MatchDTO match, MatchCardStatus status) =>
+    status.live && match.manualStatus == MatchManualStatus.none;
+
 List<({IconData icon, String label, MatchPhase phase})> matchPhaseActions(
   AppLocalizations l10n,
   MatchDTO match,
@@ -825,6 +879,10 @@ List<({IconData icon, String label, MatchPhase phase})> matchPhaseActions(
   }
   final clock = MatchClock.of(match, now);
   return [
+    // "Em andamento" só pelo horário (ninguém iniciou): atrasou? Um toque
+    // quando a bola rolar zera o relógio.
+    if (match.manualStatus == MatchManualStatus.none)
+      (icon: Icons.play_circle_outline_rounded, label: l10n.matchStartNow, phase: MatchPhase.start),
     if (status.halfTime)
       (icon: Icons.play_circle_outline_rounded, label: l10n.matchStartSecondHalf, phase: MatchPhase.secondHalf)
     else if (clock.phase == MatchClockPhase.firstHalf)

@@ -1335,6 +1335,84 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @matchDelay.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atrasou'**
+  String get matchDelay;
+
+  /// No description provided for @matchDelayTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novo horário'**
+  String get matchDelayTitle;
+
+  /// No description provided for @matchDelayCurrent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Marcada para {time}'**
+  String matchDelayCurrent(String time);
+
+  /// No description provided for @matchDelayPlus.
+  ///
+  /// In pt, this message translates to:
+  /// **'+{minutes} min'**
+  String matchDelayPlus(int minutes);
+
+  /// No description provided for @matchDelayHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'O card mostra a partida como atrasada e o relógio, o bolão e a votação passam a contar do novo horário.'**
+  String get matchDelayHint;
+
+  /// No description provided for @matchDelayStartedNow.
+  ///
+  /// In pt, this message translates to:
+  /// **'Começou agora'**
+  String get matchDelayStartedNow;
+
+  /// No description provided for @matchDelayedTo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Horário alterado para {time}'**
+  String matchDelayedTo(String time);
+
+  /// No description provided for @matchStartNow.
+  ///
+  /// In pt, this message translates to:
+  /// **'Iniciar agora'**
+  String get matchStartNow;
+
+  /// No description provided for @matchCardDelayed.
+  ///
+  /// In pt, this message translates to:
+  /// **'ATRASADA'**
+  String get matchCardDelayed;
+
+  /// No description provided for @matchCardWaiting.
+  ///
+  /// In pt, this message translates to:
+  /// **'AGUARDANDO'**
+  String get matchCardWaiting;
+
+  /// No description provided for @matchDelayPause.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pausar até começar'**
+  String get matchDelayPause;
+
+  /// No description provided for @matchPausedNotice.
+  ///
+  /// In pt, this message translates to:
+  /// **'Partida pausada até o início'**
+  String get matchPausedNotice;
+
+  /// No description provided for @matchCardWas.
+  ///
+  /// In pt, this message translates to:
+  /// **'era {time}'**
+  String matchCardWas(String time);
+
   /// No description provided for @reportLive.
   ///
   /// In pt, this message translates to:

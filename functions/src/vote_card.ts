@@ -106,6 +106,8 @@ export function voteCardNews(
  */
 export function shouldPostVoteCard(match: Doc, season: string, now: Date = new Date()): boolean {
   if (text(match.votacaoNoticia)) return false;
+  // Pausada pelo admin até começar: o fim pelo horário não vale.
+  if (text(match.status) === 'aguardando') return false;
   const end = matchEnd(match, season, now);
   if (end && now.getTime() > end.getTime() + VOTE_CARD_STALE_HOURS * 3_600_000) return false;
   if (text(match.status) === 'encerrada') return true;

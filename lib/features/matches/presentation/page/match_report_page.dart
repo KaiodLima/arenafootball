@@ -26,6 +26,9 @@ import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/delay_match_sheet.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/match_card.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/set_match_phase_usecase.dart';
 
 /// Súmula da partida (admin), no molde dos "match centers" (FotMob,
 /// SofaScore): cabeçalho com as cores dos times, placar, status e as etapas
@@ -255,6 +258,14 @@ class MatchReportPage extends StatelessWidget {
                       awayColor: _away,
                       busy: state.busy,
                       onPhase: cubit.setPhase,
+                      onDelay: () => showDelayMatchSheet(
+                        context,
+                        match: match,
+                        canStartNow: canStartMatchNow(match, MatchCardStatus.of(match, DateTime.now())),
+                        onDelay: cubit.delay,
+                        onStartNow: () => cubit.setPhase(MatchPhase.start),
+                        onPause: () => cubit.setPhase(MatchPhase.wait),
+                      ),
                     ),
                   ),
                   SliverToBoxAdapter(

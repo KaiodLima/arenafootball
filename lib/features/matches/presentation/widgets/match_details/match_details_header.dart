@@ -38,7 +38,11 @@ class MatchDetailsHeader extends StatelessWidget {
     final homeWon = !status.upcoming && match.homeGoals > match.awayGoals;
     final awayWon = !status.upcoming && match.awayGoals > match.homeGoals;
     final time = match.time.trim();
-    final chip = status.upcoming
+    final chip = status.waiting
+        ? l10n.matchCardWaiting
+        : status.upcoming && match.delayed
+        ? '${l10n.matchCardDelayed} · ${l10n.matchCardWas(match.originalTime.trim())}'
+        : status.upcoming
         ? switch (status.dayOffset) {
             0 => l10n.matchCardToday,
             1 => l10n.matchCardTomorrow,

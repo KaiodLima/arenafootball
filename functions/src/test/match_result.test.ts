@@ -85,6 +85,8 @@ test('quando postar: depois do fim, encerrada na mão, nunca duas vezes', () => 
   // 15:00 Brasília + 90 min = 19:30 UTC.
   assert.equal(isMatchOver(match, '2026', new Date('2026-10-22T19:29:00Z')), false);
   assert.equal(isMatchOver(match, '2026', new Date('2026-10-22T19:30:00Z')), true);
+  // Pausada até começar: não acabou, mesmo depois do horário + duração.
+  assert.equal(isMatchOver({ ...match, status: 'aguardando' }, '2026', new Date('2026-10-22T23:00:00Z')), false);
   assert.equal(isMatchOver({ ...match, status: 'encerrada' }, '2026', new Date('2026-10-22T18:00:00Z')), true);
   // Em andamento/intervalo na mão: não acabou até o fim esperado + 30 min (19:30 + 30 UTC).
   assert.equal(isMatchOver({ ...match, status: 'andamento' }, '2026', new Date('2026-10-22T19:45:00Z')), false);

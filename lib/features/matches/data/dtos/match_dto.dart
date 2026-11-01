@@ -11,7 +11,10 @@ enum MatchManualStatus {
 
   /// Intervalo marcado pelo admin: relógio parado entre os tempos.
   halfTime('intervalo'),
-  finished('encerrada');
+  finished('encerrada'),
+
+  /// Atrasou sem horário novo: pausada até o admin iniciar (sem relógio).
+  waiting('aguardando');
 
   final String key;
 
@@ -50,6 +53,10 @@ class MatchDTO extends Equatable {
   /// Data no formato "dd/MM" digitado pelo admin (é texto, não Timestamp).
   final String date;
   final String time;
+
+  /// `horarioOriginal`: o 1º horário cadastrado, gravado quando o admin
+  /// atrasa a partida ("Atrasou"); vazio = nunca atrasou.
+  final String originalTime;
   final String venue;
 
   /// `id_campeonato`: número do campeonato da região.
@@ -111,6 +118,7 @@ class MatchDTO extends Equatable {
     this.awayTeamId = '',
     this.date = '',
     this.time = '',
+    this.originalTime = '',
     this.venue = '',
     this.championshipId = 0,
     this.region = '',
@@ -156,6 +164,7 @@ class MatchDTO extends Equatable {
       awayTeamId: data['idTimeF']?.toString() ?? '',
       date: data['data']?.toString() ?? '',
       time: data['horario']?.toString() ?? '',
+      originalTime: data['horarioOriginal']?.toString() ?? '',
       venue: data['local']?.toString() ?? '',
       championshipId: _int(data['id_campeonato']),
       region: RegionRegistry.nameFromDoc(data),
@@ -193,6 +202,7 @@ class MatchDTO extends Equatable {
         'idTimeF': awayTeamId,
         'data': date,
         'horario': time,
+        if (originalTime.isNotEmpty) 'horarioOriginal': originalTime,
         'local': venue,
         'id_campeonato': championshipId,
         ...RegionRegistry.fieldsFor(region),
@@ -221,6 +231,7 @@ class MatchDTO extends Equatable {
     String? awayTeamId,
     String? date,
     String? time,
+    String? originalTime,
     String? venue,
     int? championshipId,
     String? region,
@@ -252,6 +263,7 @@ class MatchDTO extends Equatable {
       awayTeamId: awayTeamId ?? this.awayTeamId,
       date: date ?? this.date,
       time: time ?? this.time,
+      originalTime: originalTime ?? this.originalTime,
       venue: venue ?? this.venue,
       championshipId: championshipId ?? this.championshipId,
       region: region ?? this.region,
@@ -289,6 +301,7 @@ class MatchDTO extends Equatable {
         awayTeamId: awayTeamId,
         date: date,
         time: time,
+        originalTime: originalTime,
         venue: venue,
         championshipId: championshipId,
         region: region,
@@ -313,6 +326,46 @@ class MatchDTO extends Equatable {
         notes: notes,
       );
 
+  /// Atrasou: novo horário [newTime] (guardando o 1º em [originalTime]) e,
+  /// com [resetClock], volta para antes do jogo (sem status nem relógio).
+  MatchDTO withDelay(String newTime, {required String originalTime, required bool resetClock}) => MatchDTO(
+        id: id,
+        homeTeam: homeTeam,
+        awayTeam: awayTeam,
+        homeTeamId: homeTeamId,
+        awayTeamId: awayTeamId,
+        date: date,
+        time: newTime,
+        originalTime: originalTime,
+        venue: venue,
+        championshipId: championshipId,
+        region: region,
+        homeGoals: homeGoals,
+        awayGoals: awayGoals,
+        isVotingOpen: isVotingOpen,
+        votingTitle: votingTitle,
+        bestPlayer: bestPlayer,
+        electedPlayerId: electedPlayerId,
+        electedPlayerName: electedPlayerName,
+        votesCount: votesCount,
+        registeredAt: registeredAt,
+        regionIds: regionIds,
+        goals: goals,
+        durationMinutes: durationMinutes,
+        manualStatus: resetClock ? MatchManualStatus.none : manualStatus,
+        startedAt: resetClock ? null : startedAt,
+        halfTimeAt: resetClock ? null : halfTimeAt,
+        secondHalfAt: resetClock ? null : secondHalfAt,
+        statusAt: resetClock ? null : statusAt,
+        bookings: bookings,
+        lineup: lineup,
+        referee: referee,
+        notes: notes,
+      );
+
+  /// Começa depois do horário cadastrado (o admin marcou "Atrasou").
+  bool get delayed => originalTime.trim().isNotEmpty && originalTime.trim() != time.trim();
+
   @override
   List<Object?> get props => [
         id,
@@ -322,6 +375,7 @@ class MatchDTO extends Equatable {
         awayTeamId,
         date,
         time,
+        originalTime,
         venue,
         championshipId,
         region,

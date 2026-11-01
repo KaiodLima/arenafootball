@@ -16,6 +16,7 @@ import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/delay_match_usecase.dart';
 
 const _dudu = PlayerDTO(id: 'dudu', name: 'Dudu', team: 'Lava Jato', teamId: '1', position: 'atacante');
 const _ana = PlayerDTO(id: 'ana', name: 'Ana', team: 'Lava Jato', teamId: '1', position: 'meia');
@@ -75,6 +76,11 @@ class _SetStatus implements SetMatchPhaseUseCase {
   }
 }
 
+class _Delay implements DelayMatchUseCase {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 class _Toggle implements ToggleMatchVotingUseCase {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -100,7 +106,7 @@ void main() {
   test('cubit: começa com a partida recebida, carrega elencos e o stream atualiza', () async {
     final watch = _WatchMatch();
     final setStatus = _SetStatus();
-    final cubit = MatchDetailsCubit(watch, _Squads(), _Toggle(), setStatus, match: _match);
+    final cubit = MatchDetailsCubit(watch, _Squads(), _Toggle(), setStatus, _Delay(), match: _match);
     expect(cubit.state.match, _match);
     await cubit.start(season: '2026');
     expect(cubit.state.squadsLoading, isFalse);

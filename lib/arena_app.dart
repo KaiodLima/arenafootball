@@ -161,7 +161,7 @@ class ArenaApp extends StatelessWidget {
               providers: [
                 BlocProvider<HomeCubit>(create: (_) => HomeCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl())),
                 BlocProvider<ChampionshipsCubit>(create: (_) => ChampionshipsCubit(sl())),
-                BlocProvider<MatchesCubit>(create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl(), sl())),
+                BlocProvider<MatchesCubit>(create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl())),
                 BlocProvider<NewsFeedCubit>(create: (_) => NewsFeedCubit(sl(), sl(), sl())),
               ],
               child: const HomePage(),
@@ -319,7 +319,7 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.matchReportPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
           return BlocProvider<MatchReportCubit>(
-            create: (_) => MatchReportCubit(sl(), sl(), sl(), sl(), sl())
+            create: (_) => MatchReportCubit(sl(), sl(), sl(), sl(), sl(), sl())
               ..load(match: args['match'] as MatchDTO, season: args['season'] as String?),
             child: MatchReportPage(
               homeCrest: args['homeCrest'] as String?,
@@ -389,7 +389,7 @@ class ArenaApp extends StatelessWidget {
           final season = args['season'] as String?;
           return BlocProvider<MatchDetailsCubit>(
             create: (_) =>
-                MatchDetailsCubit(sl(), sl(), sl(), sl(), match: args['match'] as MatchDTO)..start(season: season),
+                MatchDetailsCubit(sl(), sl(), sl(), sl(), sl(), match: args['match'] as MatchDTO)..start(season: season),
             child: MatchDetailsPage(
               season: season,
               homeCrest: args['homeCrest'] as String?,
@@ -404,7 +404,7 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.matchesPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<MatchesCubit>(
-            create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl(), sl()),
+            create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl()),
             child: MatchesPage(
               championshipId: args?['championshipId'] as int?,
               region: args?['region'] as String?,

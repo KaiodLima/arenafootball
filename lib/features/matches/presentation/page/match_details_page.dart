@@ -16,6 +16,8 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/constants/team_colors.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/delay_match_sheet.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/set_match_phase_usecase.dart';
 
 /// Detalhes da partida: cabeçalho com as cores dos dois times, escudos e
 /// placar (antes do jogo, o horário), depois os gols em linha do tempo, o
@@ -140,6 +142,19 @@ class MatchDetailsPage extends StatelessWidget {
                             arguments: {'match': match, 'season': season},
                           ),
                         ),
+                        if (canDelayMatch(match, status))
+                          CardMenuAction(
+                            icon: Icons.schedule_rounded,
+                            label: l10n.matchDelay,
+                            onSelected: () => showDelayMatchSheet(
+                              context,
+                              match: match,
+                              canStartNow: canStartMatchNow(match, status),
+                              onDelay: cubit.delay,
+                              onStartNow: () => cubit.setPhase(MatchPhase.start),
+                              onPause: () => cubit.setPhase(MatchPhase.wait),
+                            ),
+                          ),
                         for (final action in matchPhaseActions(l10n, match, status, now))
                           CardMenuAction(
                             icon: action.icon,

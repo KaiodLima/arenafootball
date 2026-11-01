@@ -734,6 +734,54 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get matchDelay => 'Atrasou';
+
+  @override
+  String get matchDelayTitle => 'Novo horário';
+
+  @override
+  String matchDelayCurrent(String time) {
+    return 'Marcada para $time';
+  }
+
+  @override
+  String matchDelayPlus(int minutes) {
+    return '+$minutes min';
+  }
+
+  @override
+  String get matchDelayHint =>
+      'O card mostra a partida como atrasada e o relógio, o bolão e a votação passam a contar do novo horário.';
+
+  @override
+  String get matchDelayStartedNow => 'Começou agora';
+
+  @override
+  String matchDelayedTo(String time) {
+    return 'Horário alterado para $time';
+  }
+
+  @override
+  String get matchStartNow => 'Iniciar agora';
+
+  @override
+  String get matchCardDelayed => 'ATRASADA';
+
+  @override
+  String get matchCardWaiting => 'AGUARDANDO';
+
+  @override
+  String get matchDelayPause => 'Pausar até começar';
+
+  @override
+  String get matchPausedNotice => 'Partida pausada até o início';
+
+  @override
+  String matchCardWas(String time) {
+    return 'era $time';
+  }
+
+  @override
   String get reportLive => 'Ao vivo';
 
   @override

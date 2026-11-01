@@ -44,6 +44,15 @@ abstract class IMatchesRepository {
     String? season,
   });
 
+  /// "Atrasou": novo horário, guardando o original.
+  Future<Either<Failure, void>> delayMatch({
+    required String matchId,
+    required String newTime,
+    required String originalTime,
+    required bool resetClock,
+    String? season,
+  });
+
   Future<Either<Failure, void>> deleteMatch({required String matchId, String? season});
 
   Future<Either<Failure, List<MatchDTO>>> getElectedMatches({required String playerId, String? season});

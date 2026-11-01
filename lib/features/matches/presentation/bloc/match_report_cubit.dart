@@ -14,6 +14,7 @@ import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
 import 'package:arena_soccer/features/players/domain/usecases/create_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/delay_match_usecase.dart';
 
 /// Situação do atleta na escalação.
 enum LineupRole { none, starter, sub }
@@ -193,6 +194,7 @@ class MatchReportCubit extends Cubit<MatchReportState> {
   final SetMatchPhaseUseCase setMatchPhaseUseCase;
   final ToggleMatchVotingUseCase toggleMatchVotingUseCase;
   final CreatePlayerUseCase createPlayerUseCase;
+  final DelayMatchUseCase delayMatchUseCase;
   String? _season;
 
   MatchReportCubit(
@@ -201,6 +203,7 @@ class MatchReportCubit extends Cubit<MatchReportState> {
     this.setMatchPhaseUseCase,
     this.toggleMatchVotingUseCase,
     this.createPlayerUseCase,
+    this.delayMatchUseCase,
   ) : super(const MatchReportState());
 
   Future<void> load({required MatchDTO match, String? season, String Function()? newId}) async {
@@ -404,6 +407,29 @@ class MatchReportCubit extends Cubit<MatchReportState> {
     response.fold(
       (failure) => emit(state.copyWith(busy: false, errorMessage: () => failure.toString())),
       (updated) => emit(state.copyWith(busy: false, match: updated, notice: () => MatchReportNotice.phaseChanged)),
+    );
+  }
+
+  /// "Atrasou": grava já o novo horário (no original e no editado, sem
+  /// contar como mudança da súmula) e, iniciada antes da hora, zera o relógio.
+  Future<void> delay(String newTime) async {
+    final match = state.match;
+    if (match == null || state.busy) return;
+    emit(state.copyWith(busy: true));
+    final response = await delayMatchUseCase(match: state.original ?? match, newTime: newTime, season: _season);
+    if (isClosed) return;
+    response.fold(
+      (failure) => emit(state.copyWith(busy: false, errorMessage: () => failure.toString())),
+      (updated) => emit(state.copyWith(
+        busy: false,
+        original: updated.copyWith(goals: state.original?.goals),
+        match: match.withDelay(
+          updated.time,
+          originalTime: updated.originalTime,
+          resetClock: DelayMatchUseCase.resetsClock(match),
+        ),
+        notice: () => MatchReportNotice.phaseChanged,
+      )),
     );
   }
 

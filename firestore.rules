@@ -391,7 +391,8 @@ service cloud.firestore {
       }
       function matchOpen() {
         let status = get(/databases/$(database)/documents/$(collection)/$(matchId)).data.get('status', '');
-        return !(status in ['andamento', 'intervalo', 'encerrada']);
+        // "aguardando" = pausada pelo admin: o prazo (horário marcado) já passou.
+        return !(status in ['andamento', 'intervalo', 'encerrada', 'aguardando']);
       }
       function goals(n) {
         return n is int && n >= 0 && n <= 99;

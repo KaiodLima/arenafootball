@@ -37,6 +37,9 @@ class ReportHeader extends StatelessWidget {
   final bool busy;
   final ValueChanged<MatchPhase> onPhase;
 
+  /// "Atrasou" (novo horário); aparece só enquanto dá para atrasar.
+  final VoidCallback? onDelay;
+
   const ReportHeader({
     super.key,
     required this.match,
@@ -46,6 +49,7 @@ class ReportHeader extends StatelessWidget {
     required this.awayColor,
     required this.busy,
     required this.onPhase,
+    this.onDelay,
   });
 
   @override
@@ -116,6 +120,16 @@ class ReportHeader extends StatelessWidget {
               ),
             const SizedBox(height: AppSizes.s14),
             _Stages(stage: stage),
+            if (onDelay != null && canDelayMatch(match, status))
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton.icon(
+                  onPressed: busy ? null : onDelay,
+                  style: TextButton.styleFrom(foregroundColor: AppColors.gold, visualDensity: VisualDensity.compact),
+                  icon: const Icon(Icons.schedule_rounded, size: AppSizes.s18),
+                  label: Text(match.delayed ? '${l10n.matchDelay} · ${l10n.matchCardWas(match.originalTime.trim())}' : l10n.matchDelay),
+                ),
+              ),
             if (actions.isNotEmpty) ...[
               const SizedBox(height: AppSizes.s12),
               Row(
@@ -139,8 +153,8 @@ class ReportHeader extends StatelessWidget {
                       label: Text(actions.first.label),
                     ),
                   ),
-                  // Segundo passo possível (encerrar durante o jogo), mais discreto.
-                  for (final action in actions.skip(1))
+                  // Último passo possível (encerrar durante o jogo), mais discreto.
+                  for (final action in actions.length > 1 ? [actions.last] : const <({IconData icon, String label, MatchPhase phase})>[])
                     Padding(
                       padding: const EdgeInsets.only(left: AppSizes.s8),
                       child: OutlinedButton.icon(
@@ -252,7 +266,11 @@ class _StatusPillState extends State<_StatusPill> with SingleTickerProviderState
       ReportStage.firstHalf || ReportStage.secondHalf => minute == null ? l10n.reportLive : '${l10n.reportLive} · $minute',
       ReportStage.halfTime => l10n.reportHalfTime,
       ReportStage.finished => l10n.reportFinished,
-      ReportStage.before => widget.match.time.isEmpty ? l10n.reportNotStarted : widget.match.time,
+      ReportStage.before => widget.match.manualStatus == MatchManualStatus.waiting
+          ? l10n.matchCardWaiting
+          : widget.match.time.isEmpty
+              ? l10n.reportNotStarted
+              : widget.match.time,
     };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSizes.s10, vertical: AppSizes.s4),

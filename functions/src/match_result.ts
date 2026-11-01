@@ -267,6 +267,8 @@ export function resultNews(
 export function isMatchOver(match: Doc, season: string, now: Date = new Date()): boolean {
   const status = text(match.status);
   if (status === 'encerrada') return true;
+  // Pausada pelo admin ("Atrasou" → pausar): ainda não começou.
+  if (status === 'aguardando') return false;
   // Em andamento ou no intervalo (marcados pelo admin): só acabou se ficou
   // esquecida (30 min depois do fim esperado).
   if (status === 'andamento' || status === 'intervalo') return shouldAutoFinish(match, season, now);

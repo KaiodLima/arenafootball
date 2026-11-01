@@ -13,6 +13,7 @@ import 'package:arena_soccer/features/matches/domain/usecases/update_match_score
 import 'package:arena_soccer/features/matches/domain/usecases/watch_matches_usecase.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/matches_state.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/delay_match_usecase.dart';
 
 /// Partidas de um campeonato em tempo real + ações do admin (placar,
 /// abrir/fechar votação, excluir). As ações gravam na mesma temporada da
@@ -25,6 +26,7 @@ class MatchesCubit extends Cubit<MatchesState> {
   final DeleteMatchUseCase deleteMatchUseCase;
   final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
   final SetMatchPhaseUseCase setMatchPhaseUseCase;
+  final DelayMatchUseCase delayMatchUseCase;
   StreamSubscription<Either<Failure, List<MatchDTO>>>? _subscription;
   String? _region;
   String? _season;
@@ -44,6 +46,7 @@ class MatchesCubit extends Cubit<MatchesState> {
     this.deleteMatchUseCase,
     this.getTeamsCacheFirstUseCase,
     this.setMatchPhaseUseCase,
+    this.delayMatchUseCase,
   ) : super(const LoadingMatchesState());
 
   /// Recorte (dia) que está sendo ouvido; nulo antes do primeiro [watch].
@@ -174,6 +177,11 @@ class MatchesCubit extends Cubit<MatchesState> {
   /// Admin: inicia, intervalo, 2º tempo ou encerra a partida na mão.
   Future<void> setPhase(MatchDTO match, MatchPhase phase) async {
     _emitIfFailed(await setMatchPhaseUseCase(match: match, phase: phase, season: _season));
+  }
+
+  /// Admin: a partida atrasou e começa às [newTime].
+  Future<void> delay(MatchDTO match, String newTime) async {
+    _emitIfFailed(await delayMatchUseCase(match: match, newTime: newTime, season: _season));
   }
 
   Future<void> delete(MatchDTO match) async {

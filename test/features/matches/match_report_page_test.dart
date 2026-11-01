@@ -13,6 +13,7 @@ import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/domain/usecases/create_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/delay_match_usecase.dart';
 
 class _Squads implements WatchTeamPlayersUseCase {
   @override
@@ -24,6 +25,11 @@ class _Squads implements WatchTeamPlayersUseCase {
 }
 
 class _Save implements SaveMatchReportUseCase {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _Delay implements DelayMatchUseCase {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -48,7 +54,7 @@ void main() {
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 2.75;
     addTearDown(tester.view.reset);
-    final cubit = MatchReportCubit(_Squads(), _Save(), _Phase(), _Voting(), _Create());
+    final cubit = MatchReportCubit(_Squads(), _Save(), _Phase(), _Voting(), _Create(), _Delay());
     await cubit.load(
       match: const MatchDTO(id: 'm1', homeTeam: 'Alfa', awayTeam: 'Beta', homeTeamId: 'tA', awayTeamId: 'tB', venue: 'Campo'),
     );

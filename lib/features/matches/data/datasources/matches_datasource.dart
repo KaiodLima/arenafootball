@@ -159,6 +159,27 @@ class MatchesDataSource {
         season: season,
       );
 
+  /// "Atrasou": grava o novo `horario` e o `horarioOriginal`; com
+  /// [resetClock] (iniciada antes da hora) apaga o status e o relógio.
+  Future<Either<Failure, void>> delayMatch({
+    required String matchId,
+    required String newTime,
+    required String originalTime,
+    required bool resetClock,
+    String? season,
+  }) =>
+      _update(
+        matchId,
+        {
+          'horario': newTime,
+          'horarioOriginal': originalTime,
+          if (resetClock)
+            for (final field in const ['status', 'statusEm', 'inicioEm', 'intervaloEm', 'segundoTempoEm'])
+              field: FieldValue.delete(),
+        },
+        season: season,
+      );
+
   Future<Either<Failure, void>> _update(String matchId, Map<String, dynamic> fields, {String? season}) async {
     try {
       await _matches(season).doc(matchId).update(fields);
