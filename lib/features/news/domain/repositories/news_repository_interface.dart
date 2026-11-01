@@ -35,6 +35,8 @@ abstract class INewsRepository {
 
   Future<Either<Failure, List<NewsDTO>>> getGoalCardsByPlayer(String playerId);
 
+  Future<Either<Failure, List<NewsDTO>>> getGoalCardsByGoalIds(List<String> goalIds);
+
   /// Cache local dos cards de gol do jogador. Nunca falha: sem cache = `Right(null)`.
   Future<Either<Failure, CachedValue<List<NewsDTO>>?>> getCachedGoalCards(String playerId);
 

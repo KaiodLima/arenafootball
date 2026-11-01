@@ -64,6 +64,10 @@ class NewsRepositoryImpl implements INewsRepository {
       _dataSource.getGoalCardsByPlayer(playerId);
 
   @override
+  Future<Either<Failure, List<NewsDTO>>> getGoalCardsByGoalIds(List<String> goalIds) =>
+      _dataSource.getGoalCardsByGoalIds(goalIds);
+
+  @override
   Future<Either<Failure, CachedValue<List<NewsDTO>>?>> getCachedGoalCards(String playerId) => _cache.read(
         CacheKeys.goalCards(playerId),
         (json) => [for (final item in json as List) NewsDTO.fromCache(Map<String, dynamic>.from(item as Map))],

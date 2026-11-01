@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/matches/domain/match_squads.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/publish_goal_cards_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/update_match_goals_usecase.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
@@ -21,6 +22,12 @@ class MatchGoalsState extends Equatable {
   final bool saved;
   final String? errorMessage;
 
+  /// Publicar card de gol no feed para os gols novos (ligado por padrão).
+  final bool publishCards;
+
+  /// Cards de gol publicados ao salvar (o aviso de "salvo" conta).
+  final int publishedCards;
+
   const MatchGoalsState({
     this.match,
     this.original = const [],
@@ -30,6 +37,8 @@ class MatchGoalsState extends Equatable {
     this.saving = false,
     this.saved = false,
     this.errorMessage,
+    this.publishCards = true,
+    this.publishedCards = 0,
   });
 
   int get homeGoals => goals.where((g) => g.side == MatchSide.home).length;
@@ -43,6 +52,12 @@ class MatchGoalsState extends Equatable {
   /// Algo mudou desde que abriu.
   bool get dirty => goals.length != original.length || !goals.every(original.contains);
 
+  /// Gols novos desde que abriu (os que viram card).
+  int get newGoals {
+    final ids = {for (final g in original) g.id};
+    return goals.where((g) => !ids.contains(g.id)).length;
+  }
+
   MatchGoalsState copyWith({
     MatchDTO? match,
     List<MatchGoal>? original,
@@ -52,6 +67,8 @@ class MatchGoalsState extends Equatable {
     bool? saving,
     bool? saved,
     String? Function()? errorMessage,
+    bool? publishCards,
+    int? publishedCards,
   }) {
     return MatchGoalsState(
       match: match ?? this.match,
@@ -62,11 +79,14 @@ class MatchGoalsState extends Equatable {
       saving: saving ?? this.saving,
       saved: saved ?? this.saved,
       errorMessage: errorMessage != null ? errorMessage() : this.errorMessage,
+      publishCards: publishCards ?? this.publishCards,
+      publishedCards: publishedCards ?? this.publishedCards,
     );
   }
 
   @override
-  List<Object?> get props => [match, original, goals, homeSquad, awaySquad, saving, saved, errorMessage];
+  List<Object?> get props =>
+      [match, original, goals, homeSquad, awaySquad, saving, saved, errorMessage, publishCards, publishedCards];
 }
 
 /// "Editar placar": cada gol com autor e assistência (do elenco do lado na
@@ -74,9 +94,15 @@ class MatchGoalsState extends Equatable {
 class MatchGoalsCubit extends Cubit<MatchGoalsState> {
   final WatchTeamPlayersUseCase watchTeamPlayersUseCase;
   final UpdateMatchGoalsUseCase updateMatchGoalsUseCase;
+
+  /// Cards de gol dos gols novos (nulo = não publica).
+  final PublishGoalCardsUseCase? publishGoalCardsUseCase;
   String? _season;
 
-  MatchGoalsCubit(this.watchTeamPlayersUseCase, this.updateMatchGoalsUseCase) : super(const MatchGoalsState());
+  MatchGoalsCubit(this.watchTeamPlayersUseCase, this.updateMatchGoalsUseCase, [this.publishGoalCardsUseCase])
+      : super(const MatchGoalsState());
+
+  void togglePublishCards(bool value) => emit(state.copyWith(publishCards: value));
 
   /// [newId] só para teste.
   Future<void> load({required MatchDTO match, String? season, String Function()? newId}) async {
@@ -150,9 +176,25 @@ class MatchGoalsCubit extends Cubit<MatchGoalsState> {
       season: _season,
     );
     if (isClosed) return;
-    response.fold(
-      (failure) => emit(state.copyWith(saving: false, errorMessage: () => failure.toString())),
-      (updated) => emit(state.copyWith(match: updated, original: state.goals, saving: false, saved: true)),
-    );
+    if (response.isLeft) {
+      emit(state.copyWith(saving: false, errorMessage: () => response.left.toString()));
+      return;
+    }
+    // Placar salvo: os cards de gol (novos, removidos e editados).
+    var published = 0;
+    final publish = publishGoalCardsUseCase;
+    if (publish != null && state.publishCards) {
+      final cards = await publish(match: match, before: state.original, after: state.goals, season: _season);
+      if (isClosed) return;
+      // O placar já foi salvo: a falha do card só avisa.
+      published = cards.fold((_) => -1, (count) => count);
+    }
+    emit(state.copyWith(
+      match: response.right,
+      original: state.goals,
+      saving: false,
+      saved: true,
+      publishedCards: published,
+    ));
   }
 }

@@ -137,6 +137,22 @@ class NewsDataSource {
     }
   }
 
+  /// Cards de gol ligados aos gols [goalIds] (`id_gol`, até 30 por consulta).
+  Future<Either<Failure, List<NewsDTO>>> getGoalCardsByGoalIds(List<String> goalIds) async {
+    try {
+      final cards = <NewsDTO>[];
+      for (var i = 0; i < goalIds.length; i += 30) {
+        final chunk = goalIds.sublist(i, i + 30 > goalIds.length ? goalIds.length : i + 30);
+        final snapshot = await _news.where('id_gol', whereIn: chunk).get();
+        cards.addAll(snapshot.docs.map(NewsDTO.fromFirestore));
+      }
+      return Right(cards);
+    } catch (e) {
+      AppLogger.e('getGoalCardsByGoalIds', name: 'NewsDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _loadFallback));
+    }
+  }
+
   /// Cards de gol em que o jogador marcou ou deu o passe, mais recentes
   /// primeiro. Duas consultas por igualdade (sem índice composto), juntadas
   /// no app.

@@ -75,6 +75,10 @@ class NewsDTO extends Equatable {
   /// dele; vazio (antigas e automáticas) = só o admin.
   final String authorId;
 
+  /// Card de gol lançado pelo "Editar placar": o id do gol na lista `gols`
+  /// da partida (`id_gol`), para apagar/atualizar o card junto com o gol.
+  final String goalId;
+
   const NewsDTO({
     this.id = '',
     this.date,
@@ -111,6 +115,7 @@ class NewsDTO extends Equatable {
     this.championshipTitle = '',
     this.votingOpen = false,
     this.authorId = '',
+    this.goalId = '',
   });
 
   bool get hasScorer => scorerId.isNotEmpty && scorerName.isNotEmpty;
@@ -167,6 +172,7 @@ class NewsDTO extends Equatable {
       championshipTitle: data['campeonato']?.toString() ?? '',
       votingOpen: data['votacao']?.toString() == 'true',
       authorId: data['idAutor']?.toString() ?? '',
+      goalId: data['id_gol']?.toString() ?? '',
     );
   }
 
@@ -294,6 +300,7 @@ class NewsDTO extends Equatable {
         if (championshipTitle.isNotEmpty) 'campeonato': championshipTitle,
         if (isVoteCall) 'votacao': votingOpen.toString(),
         if (authorId.isNotEmpty) 'idAutor': authorId,
+        if (goalId.isNotEmpty) 'id_gol': goalId,
       };
 
   NewsDTO copyWith({
@@ -332,6 +339,7 @@ class NewsDTO extends Equatable {
     String? championshipTitle,
     bool? votingOpen,
     String? authorId,
+    String? goalId,
   }) {
     return NewsDTO(
       id: id ?? this.id,
@@ -369,6 +377,7 @@ class NewsDTO extends Equatable {
       championshipTitle: championshipTitle ?? this.championshipTitle,
       votingOpen: votingOpen ?? this.votingOpen,
       authorId: authorId ?? this.authorId,
+      goalId: goalId ?? this.goalId,
     );
   }
 

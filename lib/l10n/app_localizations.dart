@@ -1335,6 +1335,30 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @matchGoalsPublishCards.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{Publicar card do gol novo} other{Publicar cards dos {count} gols novos}}'**
+  String matchGoalsPublishCards(int count);
+
+  /// No description provided for @matchGoalsPublishCardsHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aparece no feed e manda o push \"GOL!\". Desligue para lançar o placar de um jogo antigo em silêncio.'**
+  String get matchGoalsPublishCardsHint;
+
+  /// No description provided for @matchGoalsSavedWithCards.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{Placar salvo · 1 card de gol publicado} other{Placar salvo · {count} cards de gol publicados}}'**
+  String matchGoalsSavedWithCards(int count);
+
+  /// No description provided for @matchGoalsSavedCardsFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Placar salvo, mas não deu para publicar o card de gol.'**
+  String get matchGoalsSavedCardsFailed;
+
   /// No description provided for @tourSkip.
   ///
   /// In pt, this message translates to:

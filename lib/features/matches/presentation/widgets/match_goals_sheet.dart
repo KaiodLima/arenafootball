@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/publish_goal_cards_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/update_match_goals_usecase.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/match_goals_cubit.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/goal_scorer_sheet.dart';
@@ -32,7 +33,11 @@ Future<bool> showMatchGoalsSheet(
     useSafeArea: true,
     showDragHandle: true,
     builder: (_) => BlocProvider<MatchGoalsCubit>(
-      create: (_) => MatchGoalsCubit(sl<WatchTeamPlayersUseCase>(), sl<UpdateMatchGoalsUseCase>())
+      create: (_) => MatchGoalsCubit(
+        sl<WatchTeamPlayersUseCase>(),
+        sl<UpdateMatchGoalsUseCase>(),
+        sl<PublishGoalCardsUseCase>(),
+      )
         ..load(match: match, season: season),
       child: _MatchGoalsSheet(homeCrest: homeCrest, awayCrest: awayCrest),
     ),
@@ -102,7 +107,12 @@ class _MatchGoalsSheet extends StatelessWidget {
     return BlocConsumer<MatchGoalsCubit, MatchGoalsState>(
       listener: (context, state) {
         if (state.saved) {
-          showSnackBar(context: context, message: l10n.matchGoalsSaved);
+          final message = switch (state.publishedCards) {
+            < 0 => l10n.matchGoalsSavedCardsFailed,
+            0 => l10n.matchGoalsSaved,
+            final n => l10n.matchGoalsSavedWithCards(n),
+          };
+          showSnackBar(context: context, message: message, isSuccess: state.publishedCards >= 0);
           Navigator.pop(context, true);
         } else if (state.errorMessage != null) {
           showSnackBar(context: context, message: state.errorMessage!, isSuccess: false);
@@ -165,6 +175,19 @@ class _MatchGoalsSheet extends StatelessWidget {
                     ],
                   ),
                 ),
+                // Gols novos viram card de gol no feed (com o push "GOL!").
+                if (state.newGoals > 0)
+                  SwitchListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: AppSizes.s20),
+                    value: state.publishCards,
+                    onChanged: BlocProvider.of<MatchGoalsCubit>(context).togglePublishCards,
+                    secondary: const Icon(Icons.campaign_rounded, color: AppColors.primary),
+                    title: Text(
+                      l10n.matchGoalsPublishCards(state.newGoals),
+                      style: AppTypography.label(color: AppColors.textPrimary),
+                    ),
+                    subtitle: Text(l10n.matchGoalsPublishCardsHint, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+                  ),
                 ArenaSubmitBar(
                   title: l10n.matchGoalsSave,
                   loading: state.saving,

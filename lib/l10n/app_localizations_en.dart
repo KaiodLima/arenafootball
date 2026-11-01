@@ -731,6 +731,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String matchGoalsPublishCards(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Publish cards for the $count new goals',
+      one: 'Publish a card for the new goal',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get matchGoalsPublishCardsHint =>
+      'Shows up in the feed and sends the \"GOAL!\" push. Turn it off to log an old game quietly.';
+
+  @override
+  String matchGoalsSavedWithCards(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Score saved · $count goal cards published',
+      one: 'Score saved · 1 goal card published',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get matchGoalsSavedCardsFailed =>
+      'Score saved, but the goal card could not be published.';
+
+  @override
   String get tourSkip => 'Skip';
 
   @override
