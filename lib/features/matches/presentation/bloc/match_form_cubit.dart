@@ -10,6 +10,7 @@ import 'package:arena_soccer/features/matches/presentation/bloc/match_form_state
 import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/match_time.dart';
 
 /// Cadastro de partida (admin). As partidas já cadastradas na região
 /// alimentam as sugestões (horários e locais) e o aviso de conflito.
@@ -37,7 +38,7 @@ class MatchFormCubit extends Cubit<MatchFormState> {
     _edit(state.form.copyWith(
       regions: [initialRegion],
       selectedRegion: initialRegion,
-      date: WatchMatchesUseCase.formatMatchDate(now ?? DateTime.now()),
+      date: WatchMatchesUseCase.formatMatchDate(MatchTime.today(now ?? DateTime.now())),
     ));
     final loadRegion = _loadRegionData(initialRegion);
 

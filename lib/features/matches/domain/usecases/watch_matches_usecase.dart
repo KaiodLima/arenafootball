@@ -3,6 +3,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/matches_filter.dart';
 import 'package:arena_soccer/features/matches/domain/repositories/matches_repository_interface.dart';
+import 'package:arena_soccer/features/matches/domain/match_time.dart';
 
 /// Partidas de um campeonato na temporada (sem [championshipId]: de todas as
 /// competições e amistosos), das mais recentes para as mais antigas. Com ontem/hoje/amanhã ([MatchesFilter.dayOffset]), só as daquele
@@ -25,7 +26,8 @@ class WatchMatchesUseCase {
     DateTime? now,
   }) {
     final offset = filter.dayOffset;
-    final base = now ?? DateTime.now();
+    // Dia de Brasília (o das partidas), qualquer que seja o fuso do aparelho.
+    final base = MatchTime.today(now ?? DateTime.now());
     // Construtor com dia somado (não Duration): atravessa mês/ano e horário de verão.
     final day = offset == null ? null : formatMatchDate(DateTime(base.year, base.month, base.day + offset));
     return _repository.watchMatches(season: season, region: region).map(

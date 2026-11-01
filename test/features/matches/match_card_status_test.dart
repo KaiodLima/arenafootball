@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_card.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/features/matches/domain/match_time.dart';
 
 final _now = DateTime(2026, 10, 22, 15, 30);
 
@@ -50,7 +51,7 @@ void main() {
   test('em andamento do horário até horário + duração (90 sem o campo)', () {
     final live = _status(time: '15:00');
     expect(live.live, isTrue);
-    expect(live.nextChange, DateTime(2026, 10, 22, 16, 30));
+    expect(live.nextChange, MatchTime.instant(2026, 10, 22, 16, 30));
     expect(_status(time: '15:45', now: DateTime(2026, 10, 22, 17, 16)).live, isFalse);
     expect(_status(time: '15:45', now: DateTime(2026, 10, 22, 17, 16)).finished, isTrue);
     expect(_status(time: '16:00').live, isFalse);

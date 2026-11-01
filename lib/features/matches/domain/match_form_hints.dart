@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
+import 'package:arena_soccer/features/matches/domain/match_time.dart';
 
 /// Tipo de conflito de um cadastro de partida com as já existentes.
 enum MatchConflictType {
@@ -79,7 +80,7 @@ class MatchFormHints {
 
   /// Atalhos de data: hoje, amanhã e o próximo sábado e domingo (sem repetir).
   static List<DateTime> quickDates(DateTime now) {
-    final today = DateTime(now.year, now.month, now.day);
+    final today = MatchTime.today(now);
     final dates = <DateTime>[today, today.add(const Duration(days: 1))];
     for (final weekday in [DateTime.saturday, DateTime.sunday]) {
       var day = today;

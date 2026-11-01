@@ -13,6 +13,7 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/constants/team_colors.dart';
+import 'package:arena_soccer/features/matches/domain/match_time.dart';
 
 /// Momento da partida para o centro do card: antes do jogo (horário grande e
 /// o dia), em andamento (do horário até horário + duração, ou iniciada na mão
@@ -52,27 +53,38 @@ class MatchCardStatus {
     final month = parts.length > 1 ? int.tryParse(parts[1].trim()) : null;
     if (day == null || month == null) return null;
     final year = parts.length > 2 ? int.tryParse(parts[2].trim()) : null;
-    final today = DateTime.utc(now.year, now.month, now.day);
-    var date = DateTime.utc(year ?? now.year, month, day);
+    // "Hoje" é o dia em Brasília, qualquer que seja o fuso do aparelho.
+    final local = MatchTime.today(now);
+    final today = DateTime.utc(local.year, local.month, local.day);
+    var date = DateTime.utc(year ?? local.year, month, day);
     // Data sem ano: janeiro visto em dezembro é do ano que vem.
-    if (year == null && date.difference(today).inDays < -180) date = DateTime.utc(now.year + 1, month, day);
+    if (year == null && date.difference(today).inDays < -180) date = DateTime.utc(local.year + 1, month, day);
     return date.difference(today).inDays;
   }
 
-  /// Hora "HH:mm" da partida no dia de [now]; nula se não der para ler.
-  static DateTime? _kickoff(MatchDTO match, DateTime now) {
+  /// Hora e minuto de "HH:mm"; nulo se não der para ler.
+  static (int, int)? _hourMinute(MatchDTO match) {
     final time = match.time.split(':');
     final hour = int.tryParse(time.first.trim());
     final minute = time.length > 1 ? int.tryParse(time[1].trim()) : 0;
     if (hour == null || minute == null) return null;
-    return DateTime(now.year, now.month, now.day, hour, minute);
+    return (hour, minute);
+  }
+
+  /// Instante do horário da partida (de Brasília) no dia de hoje; nulo se não der para ler.
+  static DateTime? _kickoff(MatchDTO match, DateTime now) {
+    final time = _hourMinute(match);
+    if (time == null) return null;
+    final today = MatchTime.today(now);
+    return MatchTime.instant(today.year, today.month, today.day, time.$1, time.$2);
   }
 
   /// "15:45 – 17:15" (horário até o fim pela duração); só o horário se não der para ler.
   static String timeRange(MatchDTO match) {
     final time = match.time.trim();
-    final start = _kickoff(match, DateTime(2000));
-    if (start == null) return time;
+    final hourMinute = _hourMinute(match);
+    if (hourMinute == null) return time;
+    final start = DateTime(2000, 1, 1, hourMinute.$1, hourMinute.$2);
     final end = start.add(Duration(minutes: match.durationMinutes));
     String two(int n) => n.toString().padLeft(2, '0');
     return '$time – ${two(end.hour)}:${two(end.minute)}';

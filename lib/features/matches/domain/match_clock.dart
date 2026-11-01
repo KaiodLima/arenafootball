@@ -1,4 +1,5 @@
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
+import 'package:arena_soccer/features/matches/domain/match_time.dart';
 
 /// Tempo de jogo do relógio.
 enum MatchClockPhase { firstHalf, halfTime, secondHalf }
@@ -63,7 +64,7 @@ class MatchClock {
     return minutes < 0 ? 1 : minutes + 1;
   }
 
-  /// Hora marcada da partida ("dd/MM" ou "dd/MM/aaaa" + "HH:mm"), no fuso do aparelho.
+  /// Instante da hora marcada ("dd/MM" ou "dd/MM/aaaa" + "HH:mm", horário de Brasília).
   static DateTime? kickoffOf(MatchDTO match, DateTime now) {
     final date = match.date.split('/');
     final time = match.time.split(':');
@@ -73,7 +74,7 @@ class MatchClock {
     final hour = int.tryParse(time.first.trim());
     final minute = time.length > 1 ? int.tryParse(time[1].trim()) : 0;
     if (day == null || month == null || hour == null || minute == null) return null;
-    return DateTime(year ?? now.year, month, day, hour, minute);
+    return MatchTime.instant(year ?? MatchTime.today(now).year, month, day, hour, minute);
   }
 
   static MatchClock of(MatchDTO match, DateTime now) {
