@@ -104,3 +104,11 @@ test('dias recentes em Brasília', () => {
   // 02h UTC do dia 23 ainda é dia 22 em Brasília.
   assert.deepEqual(recentDays(new Date('2026-10-23T02:00:00Z')), ['22/10', '21/10']);
 });
+
+test('card de resultado aparece no feed de cada região envolvida', () => {
+  const base = { timeC: 'Alfa', timeF: 'Beta', golTimeCasa: 1, golTimeFora: 0, idRegiao: 'r1', fk_competicao: 'Centro' };
+  const between = resultNews({ ...base, idsRegioes: ['r2', 'r3', 'r1', 'r2'] }, 'm1', '2026');
+  assert.deepEqual(between.idsRegioes, ['r2', 'r3', 'r1']);
+  assert.equal(between.idRegiao, 'r1');
+  assert.equal('idsRegioes' in resultNews(base, 'm1', '2026'), false);
+});

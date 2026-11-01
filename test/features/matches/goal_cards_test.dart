@@ -106,6 +106,7 @@ void main() {
       awayTeamId: 'tB',
       championshipId: 7,
       region: 'Floresta',
+      regionIds: ['r1', 'r2'],
     );
     final news = _News(const [
       NewsDTO(id: 'n1', tag: NewsDTO.goalTag, goalId: 'g1', scorerId: 'ana', scorerName: 'ANA'),
@@ -130,5 +131,7 @@ void main() {
     expect(card.scoringTeamCrest, 'https://alfa');
     expect(card.scoringTeamPrimaryColor, '#FF0000');
     expect(card.toMap()['id_gol'], 'g3');
+    // Times de regiões diferentes: o card aparece no feed das duas.
+    expect(card.toMap()['idsRegioes'], ['r1', 'r2']);
   });
 }

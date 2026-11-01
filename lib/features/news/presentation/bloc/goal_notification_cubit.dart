@@ -276,6 +276,7 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
         // Ligado à partida: o push do gol abre ela (`id_partida`).
         matchId: form.updateMatch ? form.linkedMatch?.id ?? '' : '',
         championshipId: form.championshipId,
+        regionIds: form.regionIds,
       ),
     );
     if (isClosed) return;

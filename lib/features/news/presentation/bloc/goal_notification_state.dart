@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
@@ -124,6 +125,20 @@ class GoalFormData extends Equatable {
   String teamIdOf(String? teamName) => TeamDirectory(teams).idOf(name: teamName ?? '');
 
   /// Time de nome [teamName] na lista carregada (escudo e cores).
+  /// Regiões do jogo para o card aparecer no feed de cada uma: as da partida
+  /// ligada; sem partida, as dos dois times e a escolhida (só se forem
+  /// diferentes; vazio = uma região só).
+  List<String> get regionIds {
+    final match = updateMatch ? linkedMatch : null;
+    if (match != null) return match.regionIds;
+    final ids = {
+      RegionRegistry.idOf(teamOf(homeTeam)?.region ?? ''),
+      RegionRegistry.idOf(teamOf(awayTeam)?.region ?? ''),
+      RegionRegistry.idOf(selectedRegion ?? ''),
+    }..remove('');
+    return ids.length > 1 ? ids.toList() : const [];
+  }
+
   TeamDTO? teamOf(String? teamName) {
     if (teamName == null) return null;
     for (final team in teams) {

@@ -8,6 +8,9 @@ class NewsDTO extends Equatable {
   /// Tag dos cards de gol (placar ao vivo).
   static const String goalTag = 'gol';
 
+  /// Regiões envolvidas (cards de partida entre regiões diferentes).
+  static const String regionIdsField = 'idsRegioes';
+
   /// Tag dos cards de publicidade.
   static const String adTag = 'publicidade';
 
@@ -79,6 +82,10 @@ class NewsDTO extends Equatable {
   /// da partida (`id_gol`), para apagar/atualizar o card junto com o gol.
   final String goalId;
 
+  /// Cards da partida (gol, resultado, votação) entre times de regiões
+  /// diferentes: as regiões envolvidas (`idsRegioes`); o feed de cada uma mostra.
+  final List<String> regionIds;
+
   const NewsDTO({
     this.id = '',
     this.date,
@@ -116,6 +123,7 @@ class NewsDTO extends Equatable {
     this.votingOpen = false,
     this.authorId = '',
     this.goalId = '',
+    this.regionIds = const [],
   });
 
   bool get hasScorer => scorerId.isNotEmpty && scorerName.isNotEmpty;
@@ -173,6 +181,7 @@ class NewsDTO extends Equatable {
       votingOpen: data['votacao']?.toString() == 'true',
       authorId: data['idAutor']?.toString() ?? '',
       goalId: data['id_gol']?.toString() ?? '',
+      regionIds: (data[regionIdsField] as List?)?.map((id) => id.toString()).toList() ?? const [],
     );
   }
 
@@ -301,6 +310,7 @@ class NewsDTO extends Equatable {
         if (isVoteCall) 'votacao': votingOpen.toString(),
         if (authorId.isNotEmpty) 'idAutor': authorId,
         if (goalId.isNotEmpty) 'id_gol': goalId,
+        if (regionIds.isNotEmpty) regionIdsField: regionIds,
       };
 
   NewsDTO copyWith({
@@ -340,6 +350,7 @@ class NewsDTO extends Equatable {
     bool? votingOpen,
     String? authorId,
     String? goalId,
+    List<String>? regionIds,
   }) {
     return NewsDTO(
       id: id ?? this.id,
@@ -378,6 +389,7 @@ class NewsDTO extends Equatable {
       votingOpen: votingOpen ?? this.votingOpen,
       authorId: authorId ?? this.authorId,
       goalId: goalId ?? this.goalId,
+      regionIds: regionIds ?? this.regionIds,
     );
   }
 

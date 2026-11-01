@@ -90,6 +90,7 @@ class PublishGoalCardsUseCase {
       matchId: match.id,
       championshipId: match.championshipId > 0 ? match.championshipId : null,
       goalId: goal.id,
+      regionIds: match.regionIds,
     );
   }
 }

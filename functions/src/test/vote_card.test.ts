@@ -41,3 +41,8 @@ test('frases preenchidas e estáveis; campos do card', () => {
   assert.equal(news.votacao, 'true');
   assert.equal(news.escudo_casa, 'lj.png');
 });
+
+test('card "Vote no craque" leva as regiões da partida', () => {
+  const news = voteCardNews({ timeC: 'Alfa', timeF: 'Beta', idRegiao: 'r1', idsRegioes: ['r1', 'r2'] }, 'm1', '2026');
+  assert.deepEqual(news.idsRegioes, ['r1', 'r2']);
+});

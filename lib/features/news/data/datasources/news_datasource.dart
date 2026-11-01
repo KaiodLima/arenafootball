@@ -30,7 +30,8 @@ class NewsDataSource {
 
   Query<Map<String, dynamic>> _feedQuery(String? region) {
     Query<Map<String, dynamic>> query = _news;
-    if (region != null) query = RegionRegistry.where(query, region);
+    // A região da notícia ou, nos cards de partida entre regiões, uma das envolvidas.
+    if (region != null) query = RegionRegistry.whereRegionOrIn(query, region, listField: NewsDTO.regionIdsField);
     return query.orderBy('data', descending: true);
   }
 

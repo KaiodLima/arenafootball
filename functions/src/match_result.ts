@@ -258,6 +258,8 @@ export function resultNews(
     campeonato: options.championshipTitle ?? '',
     fk_competicao: text(match.fk_competicao),
     ...(text(match.idRegiao) ? { idRegiao: text(match.idRegiao) } : {}),
+    // Times de regiões diferentes: o card aparece no feed de cada uma.
+    ...matchRegionIds(match),
   };
 }
 
@@ -295,3 +297,10 @@ export function recentDays(now: Date = new Date()): string[] {
   };
   return [key(now), key(new Date(now.getTime() - 24 * 3_600_000))];
 }
+
+/** `idsRegioes` da partida (regiões dos times e a da competição), quando há. */
+function matchRegionIds(match: Doc): { idsRegioes?: string[] } {
+  const ids = Array.isArray(match.idsRegioes) ? match.idsRegioes.map((id) => text(id)).filter((id) => id !== '') : [];
+  return ids.length > 0 ? { idsRegioes: [...new Set(ids)] } : {};
+}
+

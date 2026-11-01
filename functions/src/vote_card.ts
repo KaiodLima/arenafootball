@@ -95,6 +95,8 @@ export function voteCardNews(
     campeonato: options.championshipTitle ?? '',
     fk_competicao: text(match.fk_competicao),
     ...(text(match.idRegiao) ? { idRegiao: text(match.idRegiao) } : {}),
+    // Times de regiões diferentes: o card aparece no feed de cada uma.
+    ...matchRegionIds(match),
   };
 }
 
@@ -109,3 +111,10 @@ export function shouldPostVoteCard(match: Doc, season: string, now: Date = new D
   if (text(match.status) === 'encerrada') return true;
   return end !== null && now.getTime() >= end.getTime() - VOTE_CARD_LEAD_MINUTES * 60_000;
 }
+
+/** `idsRegioes` da partida (regiões dos times e a da competição), quando há. */
+function matchRegionIds(match: Doc): { idsRegioes?: string[] } {
+  const ids = Array.isArray(match.idsRegioes) ? match.idsRegioes.map((id) => text(id)).filter((id) => id !== '') : [];
+  return ids.length > 0 ? { idsRegioes: [...new Set(ids)] } : {};
+}
+
