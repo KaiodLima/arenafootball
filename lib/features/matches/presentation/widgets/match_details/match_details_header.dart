@@ -156,6 +156,26 @@ class MatchDetailsHeader extends StatelessWidget {
                       ],
                     ),
                   ],
+                  // Árbitro da súmula.
+                  if (match.referee.trim().isNotEmpty) ...[
+                    const SizedBox(height: AppSizes.s6),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.sports_rounded, size: AppSizes.s16, color: AppColors.white.withValues(alpha: 0.85)),
+                        const SizedBox(width: AppSizes.s4),
+                        Flexible(
+                          child: Text(
+                            AppLocalizations.of(context).matchDetailsReferee(match.referee.trim()),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTypography.label(color: AppColors.white.withValues(alpha: 0.9))
+                                .copyWith(fontSize: AppSizes.s12, fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),

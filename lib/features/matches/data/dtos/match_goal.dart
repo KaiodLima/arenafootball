@@ -25,6 +25,9 @@ class MatchGoal extends Equatable {
   final String assistantId;
   final String assistantName;
 
+  /// Minuto do gol (`minuto`, súmula); nulo em gols sem minuto.
+  final int? minute;
+
   const MatchGoal({
     required this.id,
     required this.side,
@@ -32,6 +35,7 @@ class MatchGoal extends Equatable {
     this.scorerName = '',
     this.assistantId = '',
     this.assistantName = '',
+    this.minute,
   });
 
   static final Random _random = Random();
@@ -54,6 +58,7 @@ class MatchGoal extends Equatable {
       scorerName: text('jogador'),
       assistantId: text('idAssistencia'),
       assistantName: text('assistencia'),
+      minute: (data['minuto'] as num?)?.toInt(),
     );
   }
 
@@ -64,6 +69,7 @@ class MatchGoal extends Equatable {
         'jogador': scorerName,
         'idAssistencia': hasAssistant ? assistantId : '',
         'assistencia': hasAssistant ? assistantName : '',
+        if (minute != null) 'minuto': minute,
       };
 
   static List<MatchGoal> listFrom(Object? raw) => raw is List
@@ -149,7 +155,13 @@ class MatchGoal extends Equatable {
     return [for (final key in order) (scorer: names[key]!, count: counts[key]!, assists: assists[key] ?? const [])];
   }
 
-  MatchGoal copyWith({String? scorerId, String? scorerName, String? assistantId, String? assistantName}) {
+  MatchGoal copyWith({
+    String? scorerId,
+    String? scorerName,
+    String? assistantId,
+    String? assistantName,
+    int? Function()? minute,
+  }) {
     return MatchGoal(
       id: id,
       side: side,
@@ -157,9 +169,10 @@ class MatchGoal extends Equatable {
       scorerName: scorerName ?? this.scorerName,
       assistantId: assistantId ?? this.assistantId,
       assistantName: assistantName ?? this.assistantName,
+      minute: minute != null ? minute() : this.minute,
     );
   }
 
   @override
-  List<Object?> get props => [id, side, scorerId, scorerName, assistantId, assistantName];
+  List<Object?> get props => [id, side, scorerId, scorerName, assistantId, assistantName, minute];
 }

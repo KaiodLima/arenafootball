@@ -37,6 +37,20 @@ class MatchesRepositoryImpl implements IMatchesRepository {
       _dataSource.updateGoals(matchId: matchId, goals: goals, season: season);
 
   @override
+  Future<Either<Failure, void>> updateReport(MatchDTO match, {String? season}) => _dataSource.updateReport(
+        matchId: match.id,
+        bookings: match.bookings,
+        lineup: match.lineup,
+        referee: match.referee,
+        notes: match.notes,
+        date: match.date,
+        time: match.time,
+        durationMinutes: match.durationMinutes,
+        venue: match.venue,
+        season: season,
+      );
+
+  @override
   Future<Either<Failure, void>> appendGoal({
     required String matchId,
     required MatchGoal goal,

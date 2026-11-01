@@ -734,6 +734,319 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get reportLive => 'Ao vivo';
+
+  @override
+  String get reportHalfTime => 'Intervalo';
+
+  @override
+  String get reportFinished => 'Encerrado';
+
+  @override
+  String get reportNotStarted => 'Não iniciado';
+
+  @override
+  String get reportStageBefore => 'Antes';
+
+  @override
+  String get reportStageFirstHalf => '1º T';
+
+  @override
+  String get reportStageHalfTime => 'Intervalo';
+
+  @override
+  String get reportStageSecondHalf => '2º T';
+
+  @override
+  String get reportStageEnd => 'Fim';
+
+  @override
+  String get reportGoal => 'Gol';
+
+  @override
+  String reportGoalOf(String team) {
+    return 'Gol do $team';
+  }
+
+  @override
+  String reportGoalBy(String name) {
+    return 'Gol de $name';
+  }
+
+  @override
+  String get reportWhoAssisted => 'Quem deu o passe?';
+
+  @override
+  String get reportNoAssist => 'Sem assistência';
+
+  @override
+  String get reportGoalNoScorer => 'Sem autor';
+
+  @override
+  String get reportNoEvents =>
+      'Nenhum lance ainda. Use os botões acima para lançar gols e cartões.';
+
+  @override
+  String get reportNoMinute => 'Sem minuto';
+
+  @override
+  String get reportFirstHalf => '1º tempo';
+
+  @override
+  String get reportSecondHalf => '2º tempo';
+
+  @override
+  String get reportEditEvent => 'Editar lance';
+
+  @override
+  String get reportDeleteEvent => 'Apagar lance';
+
+  @override
+  String get reportUndo => 'Desfazer';
+
+  @override
+  String get reportNotRelated => 'Não relacionados';
+
+  @override
+  String reportStarters(int count) {
+    return 'Titulares $count/11';
+  }
+
+  @override
+  String reportSubs(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count reservas',
+      one: '1 reserva',
+      zero: 'Nenhum reserva',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reportStarter => 'Titular';
+
+  @override
+  String get reportSub => 'Reserva';
+
+  @override
+  String get reportWhen => 'Quando';
+
+  @override
+  String get reportWhere => 'Onde';
+
+  @override
+  String get reportRefereeing => 'Arbitragem';
+
+  @override
+  String get reportVoting => 'Votação do craque';
+
+  @override
+  String get reportVotingOpen => 'Aberta agora';
+
+  @override
+  String get reportVotingClosed => 'Fechada';
+
+  @override
+  String get reportNotesHint => 'Ocorrências, expulsões, atrasos, W.O....';
+
+  @override
+  String reportChanges(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mudanças',
+      one: '1 mudança',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reportPublishCards => 'Publicar card de gol no feed';
+
+  @override
+  String get reportSave => 'Salvar';
+
+  @override
+  String get athleteBookings => 'Cartões na temporada';
+
+  @override
+  String get matchDetailsStarters => 'Titulares';
+
+  @override
+  String get matchDetailsSubs => 'Reservas';
+
+  @override
+  String matchDetailsReferee(String name) {
+    return 'Árbitro: $name';
+  }
+
+  @override
+  String get matchReportManage => 'Gerenciar partida';
+
+  @override
+  String get matchReportTitle => 'Súmula';
+
+  @override
+  String get matchReportTabEvents => 'Lances';
+
+  @override
+  String get matchReportTabLineup => 'Escalação';
+
+  @override
+  String get matchReportTabGame => 'Jogo';
+
+  @override
+  String get matchReportSave => 'Salvar súmula';
+
+  @override
+  String get matchReportSaved => 'Súmula salva.';
+
+  @override
+  String matchReportSavedWithCards(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Súmula salva · $count cards de gol publicados',
+      one: 'Súmula salva · 1 card de gol publicado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get matchReportDiscardTitle => 'Sair sem salvar?';
+
+  @override
+  String get matchReportDiscardMessage =>
+      'As mudanças da súmula (lances, escalação e dados do jogo) serão perdidas.';
+
+  @override
+  String get matchReportDiscard => 'Sair sem salvar';
+
+  @override
+  String get matchReportAddGoal => '+ Gol';
+
+  @override
+  String get matchReportAddBooking => '+ Cartão';
+
+  @override
+  String get matchReportNoEvents =>
+      'Nenhum lance ainda. Lance os gols e os cartões aqui.';
+
+  @override
+  String get matchReportSwipeHint =>
+      'Toque num gol para editar; arraste um lance para o lado para apagar.';
+
+  @override
+  String get matchReportGoalNoScorer => 'Gol (sem autor)';
+
+  @override
+  String matchReportAssist(String name) {
+    return 'assist. $name';
+  }
+
+  @override
+  String get matchReportSecondYellow => '2º amarelo';
+
+  @override
+  String get matchReportGoalTitle => 'Gol';
+
+  @override
+  String get matchReportBookingTitle => 'Cartão';
+
+  @override
+  String get matchReportScorer => 'Autor do gol';
+
+  @override
+  String get matchReportPlayer => 'Atleta';
+
+  @override
+  String get matchReportAssistant => 'Assistência (opcional)';
+
+  @override
+  String get matchReportNone => 'Nenhum';
+
+  @override
+  String get matchReportYellow => 'Amarelo';
+
+  @override
+  String get matchReportRed => 'Vermelho';
+
+  @override
+  String get matchReportMinute => 'Minuto';
+
+  @override
+  String get matchReportAdd => 'Adicionar';
+
+  @override
+  String get matchReportNoSquad =>
+      'Nenhum atleta no elenco deste time nesta competição. Adicione pela aba Escalação.';
+
+  @override
+  String matchReportLineupCount(int starters, int subs) {
+    return '$starters titulares · $subs reservas';
+  }
+
+  @override
+  String get matchReportLineupHint =>
+      'Marque T (titular) ou R (reserva); toque no número para trocar a camisa.';
+
+  @override
+  String get matchReportStarterShort => 'T';
+
+  @override
+  String get matchReportSubShort => 'R';
+
+  @override
+  String get matchReportAddPlayer => 'Adicionar atleta';
+
+  @override
+  String get matchReportAddPlayerHint =>
+      'Ele entra no elenco do time nesta competição e na escalação.';
+
+  @override
+  String get matchReportPlayerAdded => 'Atleta cadastrado e escalado.';
+
+  @override
+  String get matchReportPlayerName => 'Nome do atleta';
+
+  @override
+  String get matchReportPhoto => 'Foto';
+
+  @override
+  String matchReportShirtNumber(String name) {
+    return 'Número da camisa de $name';
+  }
+
+  @override
+  String get matchReportDate => 'Data';
+
+  @override
+  String get matchReportTime => 'Horário';
+
+  @override
+  String get matchReportDuration => 'Duração (minutos)';
+
+  @override
+  String get matchReportVenue => 'Local';
+
+  @override
+  String get matchReportReferee => 'Árbitro';
+
+  @override
+  String get matchReportNotes => 'Observações da súmula';
+
+  @override
+  String get matchReportVoting => 'Votação do craque aberta';
+
+  @override
+  String get matchReportVotingHint => 'Abre ou fecha na hora para todos.';
+
+  @override
+  String get commonCardSettings => 'Configurações';
+
+  @override
   String matchGoalsPublishCards(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

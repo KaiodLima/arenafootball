@@ -7,6 +7,9 @@ import 'package:arena_soccer/features/player_requests/data/dtos/player_request_d
 import 'package:arena_soccer/features/player_requests/presentation/widgets/player_request_labels.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/player_card.dart';
+import 'package:arena_soccer/features/matches/domain/match_report.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_report_dtos.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/booking_icon.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_card.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
@@ -76,13 +79,19 @@ class MatchGoalsTimeline extends StatelessWidget {
     final upcoming = MatchCardStatus.of(match, now ?? DateTime.now()).upcoming;
     final hasScorers = goals.any((g) => g.hasScorer);
 
+    // Gols e cartões da súmula em ordem de minuto; os gols levam o placar.
+    final events = MatchReport.timeline(goals, match.bookings);
     var home = 0;
     var away = 0;
     final rows = <Widget>[];
-    for (var i = 0; i < goals.length; i++) {
-      final goal = goals[i];
-      goal.side == MatchSide.home ? home++ : away++;
-      rows.add(_TimelineRow(goal: goal, score: '$home-$away', isFirst: i == 0, isLast: i == goals.length - 1));
+    for (var i = 0; i < events.length; i++) {
+      final event = events[i];
+      String? score;
+      if (event.isGoal) {
+        event.side == MatchSide.home ? home++ : away++;
+        score = '$home-$away';
+      }
+      rows.add(_TimelineRow(event: event, score: score, isFirst: i == 0, isLast: i == events.length - 1));
     }
 
     return ArenaCard(
@@ -90,8 +99,11 @@ class MatchGoalsTimeline extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _SectionTitle(icon: Icons.sports_soccer_rounded, title: l10n.matchCardGoals),
-          if (goals.isEmpty)
+          _SectionTitle(
+            icon: Icons.sports_soccer_rounded,
+            title: match.bookings.isEmpty ? l10n.matchCardGoals : l10n.matchReportTabEvents,
+          ),
+          if (events.isEmpty)
             _Hint(upcoming ? l10n.matchDetailsNotStarted : l10n.matchDetailsNoGoals)
           else ...[
             ...rows,
@@ -104,48 +116,58 @@ class MatchGoalsTimeline extends StatelessWidget {
 }
 
 class _TimelineRow extends StatelessWidget {
-  final MatchGoal goal;
-  final String score;
+  final ReportEvent event;
+
+  /// Placar depois do gol; nulo nos cartões (o meio mostra o cartão).
+  final String? score;
   final bool isFirst;
   final bool isLast;
 
-  const _TimelineRow({required this.goal, required this.score, required this.isFirst, required this.isLast});
+  const _TimelineRow({required this.event, required this.score, required this.isFirst, required this.isLast});
 
   @override
   Widget build(BuildContext context) {
-    final isHome = goal.side == MatchSide.home;
+    final isHome = event.side == MatchSide.home;
+    final score = this.score;
+    final booking = event.booking;
+    Widget text(bool alignEnd) => booking == null
+        ? _GoalText(goal: event.goal!, alignEnd: alignEnd)
+        : _BookingText(booking: booking, alignEnd: alignEnd);
     Widget line(bool visible) => Expanded(
           child: Container(width: AppSizes.s2, color: visible ? AppColors.greyLight : AppColors.transparent),
         );
     return IntrinsicHeight(
       child: Row(
         children: [
-          Expanded(child: isHome ? _GoalText(goal: goal, alignEnd: true) : const SizedBox.shrink()),
+          Expanded(child: isHome ? text(true) : const SizedBox.shrink()),
           SizedBox(
             width: AppSizes.s64,
             child: Column(
               children: [
                 line(!isFirst),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s4),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryDark,
-                    borderRadius: BorderRadius.circular(AppSizes.s12),
-                  ),
-                  child: Text(
-                    score,
-                    style: AppTypography.label(color: AppColors.white).copyWith(
-                      fontSize: AppSizes.s12,
-                      fontWeight: FontWeight.w800,
-                      fontFeatures: const [FontFeature.tabularFigures()],
+                if (score == null)
+                  BookingIcon(type: booking!.type, size: AppSizes.s20)
+                else
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s4),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryDark,
+                      borderRadius: BorderRadius.circular(AppSizes.s12),
+                    ),
+                    child: Text(
+                      score,
+                      style: AppTypography.label(color: AppColors.white).copyWith(
+                        fontSize: AppSizes.s12,
+                        fontWeight: FontWeight.w800,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
                     ),
                   ),
-                ),
                 line(!isLast),
               ],
             ),
           ),
-          Expanded(child: isHome ? const SizedBox.shrink() : _GoalText(goal: goal, alignEnd: false)),
+          Expanded(child: isHome ? const SizedBox.shrink() : text(false)),
         ],
       ),
     );
@@ -162,9 +184,10 @@ class _GoalText extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final textAlign = alignEnd ? TextAlign.right : TextAlign.left;
+    final minute = goal.minute == null ? '' : "${goal.minute}' ";
     final name = Flexible(
       child: Text(
-        goal.hasScorer ? goal.scorerName : l10n.matchDetailsUnknownScorer,
+        '$minute${goal.hasScorer ? goal.scorerName : l10n.matchDetailsUnknownScorer}',
         textAlign: textAlign,
         style: AppTypography.label(color: goal.hasScorer ? AppColors.textPrimary : AppColors.textSecondary)
             .copyWith(fontSize: AppSizes.s14, fontWeight: FontWeight.w700),
@@ -188,6 +211,36 @@ class _GoalText extends StatelessWidget {
               textAlign: textAlign,
               style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
             ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Cartão na linha do tempo: "34' Fulano" e, no vermelho de 2º amarelo, o aviso.
+class _BookingText extends StatelessWidget {
+  final MatchBooking booking;
+  final bool alignEnd;
+
+  const _BookingText({required this.booking, required this.alignEnd});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final minute = booking.minute == null ? '' : "${booking.minute}' ";
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSizes.s10),
+      child: Column(
+        crossAxisAlignment: alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            '$minute${booking.playerName}',
+            textAlign: alignEnd ? TextAlign.right : TextAlign.left,
+            style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s14),
+          ),
+          if (booking.secondYellow)
+            Text(l10n.matchReportSecondYellow, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
         ],
       ),
     );
@@ -357,6 +410,21 @@ class MatchSquadsCard extends StatelessWidget {
             )
           else if (lines.isEmpty)
             _Hint(l10n.matchDetailsNoSquad)
+          else if (match.lineup.of(selectedSide).isNotEmpty)
+            // Escalação da súmula: titulares e reservas, com o número.
+            for (final starters in [true, false]) ...[
+              if (match.lineup.of(selectedSide).any((e) => e.starter == starters))
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSizes.s8, bottom: AppSizes.s4),
+                  child: Text(
+                    (starters ? l10n.matchDetailsStarters : l10n.matchDetailsSubs).toUpperCase(),
+                    style: AppTypography.label(color: AppColors.textSecondary).copyWith(fontSize: AppSizes.s12),
+                  ),
+                ),
+              for (final entry in match.lineup.of(selectedSide).where((e) => e.starter == starters))
+                for (final line in lines.where((l) => l.player.id == entry.playerId))
+                  _PlayerRow(line: line, number: entry.number, onTap: () => onPlayerTap(line.player)),
+            ]
           else
             for (final line in lines) _PlayerRow(line: line, onTap: () => onPlayerTap(line.player)),
         ],
@@ -415,7 +483,10 @@ class _PlayerRow extends StatelessWidget {
   final MatchPlayerLine line;
   final VoidCallback onTap;
 
-  const _PlayerRow({required this.line, required this.onTap});
+  /// Número da camisa na escalação da súmula.
+  final int? number;
+
+  const _PlayerRow({required this.line, required this.onTap, this.number});
 
   @override
   Widget build(BuildContext context) {
@@ -429,6 +500,14 @@ class _PlayerRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: AppSizes.s8, horizontal: AppSizes.s4),
         child: Row(
           children: [
+            if (number != null)
+              SizedBox(
+                width: AppSizes.s28,
+                child: Text(
+                  '$number',
+                  style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s16),
+                ),
+              ),
             PlayerAvatar(player: player, size: AppSizes.s40),
             const SizedBox(width: AppSizes.s12),
             Expanded(

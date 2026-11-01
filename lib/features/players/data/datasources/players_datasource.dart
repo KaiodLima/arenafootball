@@ -149,7 +149,8 @@ class PlayersDataSource {
   /// (o app antigo fazia `add()` + `set()`).
   Future<Either<Failure, void>> createPlayer(PlayerDTO player, {String? season}) async {
     try {
-      final ref = _players(season).doc();
+      // Id já gerado (cadastro rápido da súmula) ou um novo.
+      final ref = player.id.isEmpty ? _players(season).doc() : _players(season).doc(player.id);
       await ref.set(player.copyWith(id: ref.id).toMap());
       return const Right(null);
     } catch (e) {

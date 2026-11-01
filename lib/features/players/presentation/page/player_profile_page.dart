@@ -22,6 +22,9 @@ import 'package:arena_soccer/features/players/presentation/widgets/player_card.d
 import 'package:arena_soccer/features/players/presentation/widgets/player_photo_dialog.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/team_requests/presentation/bloc/owned_team_cubit.dart';
+import 'package:arena_soccer/features/matches/domain/match_report.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_report_dtos.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/booking_icon.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_card.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
@@ -751,6 +754,8 @@ class _AthleteExtras extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final stats = PlayerMatchStats.lastMatches(state.regionMatches, player, now: DateTime.now());
     final current = season ?? SeasonCollection.currentSeason;
+    // Cartões das súmulas, nas partidas que a tela já carregou.
+    final bookings = MatchReport.bookingsOf(state.regionMatches, player.id);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -763,6 +768,24 @@ class _AthleteExtras extends StatelessWidget {
             child: RecentMatchesChart(stats: stats, onTap: (s) => _openMatch(context, s.match)),
           ),
         ],
+        if (bookings.yellow + bookings.red > 0)
+          ArenaCard(
+            margin: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s8),
+            padding: const EdgeInsets.symmetric(horizontal: AppSizes.s16, vertical: AppSizes.s12),
+            child: Row(
+              children: [
+                Text(l10n.athleteBookings, style: AppTypography.label(color: AppColors.textPrimary)),
+                const Spacer(),
+                const BookingIcon(type: BookingType.yellow),
+                const SizedBox(width: AppSizes.s6),
+                Text('${bookings.yellow}', style: AppTypography.label(color: AppColors.textPrimary)),
+                const SizedBox(width: AppSizes.s16),
+                const BookingIcon(type: BookingType.red),
+                const SizedBox(width: AppSizes.s6),
+                Text('${bookings.red}', style: AppTypography.label(color: AppColors.textPrimary)),
+              ],
+            ),
+          ),
         if (state.awards.isNotEmpty) ...[
           _SectionLabel(l10n.athleteAwardsTitle(state.awards.length)),
           for (final match in state.awards)

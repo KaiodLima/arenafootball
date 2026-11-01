@@ -131,6 +131,18 @@ class MatchesList extends StatelessWidget {
               onVotingTap: () => _openVoting(context, match),
               onToggleVoting: () => BlocProvider.of<MatchesCubit>(context).toggleVoting(match),
               onEditScore: () => _editScore(context, match),
+              onManage: () => Navigator.pushNamed(
+                context,
+                AppRoutes.matchReportPage,
+                arguments: {
+                  'match': match,
+                  'season': season,
+                  'homeCrest': state.crestOf(match.homeTeam),
+                  'awayCrest': state.crestOf(match.awayTeam),
+                  'homeColor': colorFromHex(state.colorOf(match.homeTeam) ?? ''),
+                  'awayColor': colorFromHex(state.colorOf(match.awayTeam) ?? ''),
+                },
+              ),
               onDelete: () => _confirmDelete(context, match),
               onTap: () => Navigator.pushNamed(
                 context,

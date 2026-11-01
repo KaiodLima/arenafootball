@@ -10,6 +10,7 @@ import 'package:arena_soccer/features/matches/domain/usecases/toggle_match_votin
 import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/get_today_matches_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/publish_goal_cards_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/save_match_report_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/update_match_score_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/watch_match_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/watch_matches_usecase.dart';
@@ -30,6 +31,7 @@ void registerMatchesDependencies() {
   _sl.registerLazySingleton(() => UpdateMatchScoreUseCase(_sl()));
   _sl.registerLazySingleton(() => UpdateMatchGoalsUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => PublishGoalCardsUseCase(_sl(), _sl(), _sl()));
+  _sl.registerLazySingleton(() => SaveMatchReportUseCase(_sl(), _sl(), _sl()));
   _sl.registerLazySingleton(() => GetTodayMatchesUseCase(_sl()));
   _sl.registerLazySingleton(() => GetRegionMatchesUseCase(_sl()));
   _sl.registerLazySingleton(() => ToggleMatchVotingUseCase(_sl()));

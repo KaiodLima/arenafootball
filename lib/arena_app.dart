@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/album/presentation/page/album_pages_page.dart';
 import 'package:arena_soccer/features/album/presentation/page/sticker_detail_page.dart';
+import 'package:arena_soccer/features/matches/presentation/page/match_report_page.dart';
+import 'package:arena_soccer/features/matches/presentation/bloc/match_report_cubit.dart';
 import 'package:arena_soccer/features/album/presentation/bloc/album_cubit.dart';
 import 'package:arena_soccer/features/album/presentation/bloc/manage_album_cubit.dart';
 import 'package:arena_soccer/features/album/presentation/page/album_page.dart';
@@ -311,6 +313,20 @@ class ArenaApp extends StatelessWidget {
           return BlocProvider<AlbumCubit>.value(
             value: args['cubit'] as AlbumCubit,
             child: StickerDetailPage(teamId: args['teamId'] as String, stickerId: args['stickerId'] as String),
+          );
+        },
+        // Súmula da partida (admin): args {match, season, homeCrest, awayCrest}.
+        AppRoutes.matchReportPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+          return BlocProvider<MatchReportCubit>(
+            create: (_) => MatchReportCubit(sl(), sl(), sl(), sl(), sl())
+              ..load(match: args['match'] as MatchDTO, season: args['season'] as String?),
+            child: MatchReportPage(
+              homeCrest: args['homeCrest'] as String?,
+              awayCrest: args['awayCrest'] as String?,
+              homeColor: args['homeColor'] as Color?,
+              awayColor: args['awayColor'] as Color?,
+            ),
           );
         },
         AppRoutes.manageAlbumPage: (_) => BlocProvider<ManageAlbumCubit>(

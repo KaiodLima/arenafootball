@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_report_dtos.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
 
 /// Início/fim marcado na mão pelo admin (`status`); vale mais que o horário.
@@ -95,6 +96,13 @@ class MatchDTO extends Equatable {
   final DateTime? secondHalfAt;
   final DateTime? statusAt;
 
+  /// Súmula: cartões (`cartoes`), escalação (`escalacao`), árbitro
+  /// (`arbitro`) e observações (`observacoes`); vazios em partidas sem súmula.
+  final List<MatchBooking> bookings;
+  final MatchLineup lineup;
+  final String referee;
+  final String notes;
+
   const MatchDTO({
     this.id = '',
     required this.homeTeam,
@@ -123,7 +131,14 @@ class MatchDTO extends Equatable {
     this.halfTimeAt,
     this.secondHalfAt,
     this.statusAt,
+    this.bookings = const [],
+    this.lineup = const MatchLineup(),
+    this.referee = '',
+    this.notes = '',
   });
+
+  static const String bookingsField = 'cartoes';
+  static const String lineupField = 'escalacao';
 
   static DateTime? _time(Object? value) => value is Timestamp ? value.toDate() : null;
 
@@ -161,6 +176,10 @@ class MatchDTO extends Equatable {
       halfTimeAt: _time(data['intervaloEm']),
       secondHalfAt: _time(data['segundoTempoEm']),
       statusAt: _time(data['statusEm']),
+      bookings: MatchBooking.listFrom(data[bookingsField]),
+      lineup: MatchLineup.fromMap(data[lineupField]),
+      referee: data['arbitro']?.toString() ?? '',
+      notes: data['observacoes']?.toString() ?? '',
     );
   }
 
@@ -188,6 +207,10 @@ class MatchDTO extends Equatable {
         if (goals.isNotEmpty) goalsField: [for (final g in goals) g.toMap()],
         'duracao': durationMinutes,
         if (manualStatus != MatchManualStatus.none) 'status': manualStatus.key,
+        if (bookings.isNotEmpty) bookingsField: [for (final b in bookings) b.toMap()],
+        if (!lineup.isEmpty) lineupField: lineup.toMap(),
+        if (referee.isNotEmpty) 'arbitro': referee,
+        if (notes.isNotEmpty) 'observacoes': notes,
       };
 
   MatchDTO copyWith({
@@ -216,6 +239,10 @@ class MatchDTO extends Equatable {
     DateTime? halfTimeAt,
     DateTime? secondHalfAt,
     DateTime? statusAt,
+    List<MatchBooking>? bookings,
+    MatchLineup? lineup,
+    String? referee,
+    String? notes,
   }) {
     return MatchDTO(
       id: id ?? this.id,
@@ -245,6 +272,10 @@ class MatchDTO extends Equatable {
       halfTimeAt: halfTimeAt ?? this.halfTimeAt,
       secondHalfAt: secondHalfAt ?? this.secondHalfAt,
       statusAt: statusAt ?? this.statusAt,
+      bookings: bookings ?? this.bookings,
+      lineup: lineup ?? this.lineup,
+      referee: referee ?? this.referee,
+      notes: notes ?? this.notes,
     );
   }
 
@@ -276,6 +307,10 @@ class MatchDTO extends Equatable {
         manualStatus: MatchManualStatus.live,
         startedAt: startedAt,
         statusAt: statusAt,
+        bookings: bookings,
+        lineup: lineup,
+        referee: referee,
+        notes: notes,
       );
 
   @override
@@ -307,5 +342,9 @@ class MatchDTO extends Equatable {
         halfTimeAt,
         secondHalfAt,
         statusAt,
+        bookings,
+        lineup,
+        referee,
+        notes,
       ];
 }

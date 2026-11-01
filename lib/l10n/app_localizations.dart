@@ -1335,6 +1335,540 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @reportLive.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ao vivo'**
+  String get reportLive;
+
+  /// No description provided for @reportHalfTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'Intervalo'**
+  String get reportHalfTime;
+
+  /// No description provided for @reportFinished.
+  ///
+  /// In pt, this message translates to:
+  /// **'Encerrado'**
+  String get reportFinished;
+
+  /// No description provided for @reportNotStarted.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não iniciado'**
+  String get reportNotStarted;
+
+  /// No description provided for @reportStageBefore.
+  ///
+  /// In pt, this message translates to:
+  /// **'Antes'**
+  String get reportStageBefore;
+
+  /// No description provided for @reportStageFirstHalf.
+  ///
+  /// In pt, this message translates to:
+  /// **'1º T'**
+  String get reportStageFirstHalf;
+
+  /// No description provided for @reportStageHalfTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'Intervalo'**
+  String get reportStageHalfTime;
+
+  /// No description provided for @reportStageSecondHalf.
+  ///
+  /// In pt, this message translates to:
+  /// **'2º T'**
+  String get reportStageSecondHalf;
+
+  /// No description provided for @reportStageEnd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fim'**
+  String get reportStageEnd;
+
+  /// No description provided for @reportGoal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol'**
+  String get reportGoal;
+
+  /// No description provided for @reportGoalOf.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol do {team}'**
+  String reportGoalOf(String team);
+
+  /// No description provided for @reportGoalBy.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol de {name}'**
+  String reportGoalBy(String name);
+
+  /// No description provided for @reportWhoAssisted.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem deu o passe?'**
+  String get reportWhoAssisted;
+
+  /// No description provided for @reportNoAssist.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem assistência'**
+  String get reportNoAssist;
+
+  /// No description provided for @reportGoalNoScorer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem autor'**
+  String get reportGoalNoScorer;
+
+  /// No description provided for @reportNoEvents.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum lance ainda. Use os botões acima para lançar gols e cartões.'**
+  String get reportNoEvents;
+
+  /// No description provided for @reportNoMinute.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem minuto'**
+  String get reportNoMinute;
+
+  /// No description provided for @reportFirstHalf.
+  ///
+  /// In pt, this message translates to:
+  /// **'1º tempo'**
+  String get reportFirstHalf;
+
+  /// No description provided for @reportSecondHalf.
+  ///
+  /// In pt, this message translates to:
+  /// **'2º tempo'**
+  String get reportSecondHalf;
+
+  /// No description provided for @reportEditEvent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar lance'**
+  String get reportEditEvent;
+
+  /// No description provided for @reportDeleteEvent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Apagar lance'**
+  String get reportDeleteEvent;
+
+  /// No description provided for @reportUndo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desfazer'**
+  String get reportUndo;
+
+  /// No description provided for @reportNotRelated.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não relacionados'**
+  String get reportNotRelated;
+
+  /// No description provided for @reportStarters.
+  ///
+  /// In pt, this message translates to:
+  /// **'Titulares {count}/11'**
+  String reportStarters(int count);
+
+  /// No description provided for @reportSubs.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{Nenhum reserva} =1{1 reserva} other{{count} reservas}}'**
+  String reportSubs(int count);
+
+  /// No description provided for @reportStarter.
+  ///
+  /// In pt, this message translates to:
+  /// **'Titular'**
+  String get reportStarter;
+
+  /// No description provided for @reportSub.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reserva'**
+  String get reportSub;
+
+  /// No description provided for @reportWhen.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quando'**
+  String get reportWhen;
+
+  /// No description provided for @reportWhere.
+  ///
+  /// In pt, this message translates to:
+  /// **'Onde'**
+  String get reportWhere;
+
+  /// No description provided for @reportRefereeing.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arbitragem'**
+  String get reportRefereeing;
+
+  /// No description provided for @reportVoting.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votação do craque'**
+  String get reportVoting;
+
+  /// No description provided for @reportVotingOpen.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aberta agora'**
+  String get reportVotingOpen;
+
+  /// No description provided for @reportVotingClosed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fechada'**
+  String get reportVotingClosed;
+
+  /// No description provided for @reportNotesHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ocorrências, expulsões, atrasos, W.O....'**
+  String get reportNotesHint;
+
+  /// No description provided for @reportChanges.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 mudança} other{{count} mudanças}}'**
+  String reportChanges(int count);
+
+  /// No description provided for @reportPublishCards.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publicar card de gol no feed'**
+  String get reportPublishCards;
+
+  /// No description provided for @reportSave.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salvar'**
+  String get reportSave;
+
+  /// No description provided for @athleteBookings.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cartões na temporada'**
+  String get athleteBookings;
+
+  /// No description provided for @matchDetailsStarters.
+  ///
+  /// In pt, this message translates to:
+  /// **'Titulares'**
+  String get matchDetailsStarters;
+
+  /// No description provided for @matchDetailsSubs.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reservas'**
+  String get matchDetailsSubs;
+
+  /// No description provided for @matchDetailsReferee.
+  ///
+  /// In pt, this message translates to:
+  /// **'Árbitro: {name}'**
+  String matchDetailsReferee(String name);
+
+  /// No description provided for @matchReportManage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gerenciar partida'**
+  String get matchReportManage;
+
+  /// No description provided for @matchReportTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Súmula'**
+  String get matchReportTitle;
+
+  /// No description provided for @matchReportTabEvents.
+  ///
+  /// In pt, this message translates to:
+  /// **'Lances'**
+  String get matchReportTabEvents;
+
+  /// No description provided for @matchReportTabLineup.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escalação'**
+  String get matchReportTabLineup;
+
+  /// No description provided for @matchReportTabGame.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogo'**
+  String get matchReportTabGame;
+
+  /// No description provided for @matchReportSave.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salvar súmula'**
+  String get matchReportSave;
+
+  /// No description provided for @matchReportSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Súmula salva.'**
+  String get matchReportSaved;
+
+  /// No description provided for @matchReportSavedWithCards.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{Súmula salva · 1 card de gol publicado} other{Súmula salva · {count} cards de gol publicados}}'**
+  String matchReportSavedWithCards(int count);
+
+  /// No description provided for @matchReportDiscardTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sair sem salvar?'**
+  String get matchReportDiscardTitle;
+
+  /// No description provided for @matchReportDiscardMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'As mudanças da súmula (lances, escalação e dados do jogo) serão perdidas.'**
+  String get matchReportDiscardMessage;
+
+  /// No description provided for @matchReportDiscard.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sair sem salvar'**
+  String get matchReportDiscard;
+
+  /// No description provided for @matchReportAddGoal.
+  ///
+  /// In pt, this message translates to:
+  /// **'+ Gol'**
+  String get matchReportAddGoal;
+
+  /// No description provided for @matchReportAddBooking.
+  ///
+  /// In pt, this message translates to:
+  /// **'+ Cartão'**
+  String get matchReportAddBooking;
+
+  /// No description provided for @matchReportNoEvents.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum lance ainda. Lance os gols e os cartões aqui.'**
+  String get matchReportNoEvents;
+
+  /// No description provided for @matchReportSwipeHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Toque num gol para editar; arraste um lance para o lado para apagar.'**
+  String get matchReportSwipeHint;
+
+  /// No description provided for @matchReportGoalNoScorer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol (sem autor)'**
+  String get matchReportGoalNoScorer;
+
+  /// No description provided for @matchReportAssist.
+  ///
+  /// In pt, this message translates to:
+  /// **'assist. {name}'**
+  String matchReportAssist(String name);
+
+  /// No description provided for @matchReportSecondYellow.
+  ///
+  /// In pt, this message translates to:
+  /// **'2º amarelo'**
+  String get matchReportSecondYellow;
+
+  /// No description provided for @matchReportGoalTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gol'**
+  String get matchReportGoalTitle;
+
+  /// No description provided for @matchReportBookingTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cartão'**
+  String get matchReportBookingTitle;
+
+  /// No description provided for @matchReportScorer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Autor do gol'**
+  String get matchReportScorer;
+
+  /// No description provided for @matchReportPlayer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atleta'**
+  String get matchReportPlayer;
+
+  /// No description provided for @matchReportAssistant.
+  ///
+  /// In pt, this message translates to:
+  /// **'Assistência (opcional)'**
+  String get matchReportAssistant;
+
+  /// No description provided for @matchReportNone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum'**
+  String get matchReportNone;
+
+  /// No description provided for @matchReportYellow.
+  ///
+  /// In pt, this message translates to:
+  /// **'Amarelo'**
+  String get matchReportYellow;
+
+  /// No description provided for @matchReportRed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vermelho'**
+  String get matchReportRed;
+
+  /// No description provided for @matchReportMinute.
+  ///
+  /// In pt, this message translates to:
+  /// **'Minuto'**
+  String get matchReportMinute;
+
+  /// No description provided for @matchReportAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar'**
+  String get matchReportAdd;
+
+  /// No description provided for @matchReportNoSquad.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum atleta no elenco deste time nesta competição. Adicione pela aba Escalação.'**
+  String get matchReportNoSquad;
+
+  /// No description provided for @matchReportLineupCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{starters} titulares · {subs} reservas'**
+  String matchReportLineupCount(int starters, int subs);
+
+  /// No description provided for @matchReportLineupHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Marque T (titular) ou R (reserva); toque no número para trocar a camisa.'**
+  String get matchReportLineupHint;
+
+  /// No description provided for @matchReportStarterShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'T'**
+  String get matchReportStarterShort;
+
+  /// No description provided for @matchReportSubShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'R'**
+  String get matchReportSubShort;
+
+  /// No description provided for @matchReportAddPlayer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar atleta'**
+  String get matchReportAddPlayer;
+
+  /// No description provided for @matchReportAddPlayerHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ele entra no elenco do time nesta competição e na escalação.'**
+  String get matchReportAddPlayerHint;
+
+  /// No description provided for @matchReportPlayerAdded.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atleta cadastrado e escalado.'**
+  String get matchReportPlayerAdded;
+
+  /// No description provided for @matchReportPlayerName.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome do atleta'**
+  String get matchReportPlayerName;
+
+  /// No description provided for @matchReportPhoto.
+  ///
+  /// In pt, this message translates to:
+  /// **'Foto'**
+  String get matchReportPhoto;
+
+  /// No description provided for @matchReportShirtNumber.
+  ///
+  /// In pt, this message translates to:
+  /// **'Número da camisa de {name}'**
+  String matchReportShirtNumber(String name);
+
+  /// No description provided for @matchReportDate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Data'**
+  String get matchReportDate;
+
+  /// No description provided for @matchReportTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'Horário'**
+  String get matchReportTime;
+
+  /// No description provided for @matchReportDuration.
+  ///
+  /// In pt, this message translates to:
+  /// **'Duração (minutos)'**
+  String get matchReportDuration;
+
+  /// No description provided for @matchReportVenue.
+  ///
+  /// In pt, this message translates to:
+  /// **'Local'**
+  String get matchReportVenue;
+
+  /// No description provided for @matchReportReferee.
+  ///
+  /// In pt, this message translates to:
+  /// **'Árbitro'**
+  String get matchReportReferee;
+
+  /// No description provided for @matchReportNotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Observações da súmula'**
+  String get matchReportNotes;
+
+  /// No description provided for @matchReportVoting.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votação do craque aberta'**
+  String get matchReportVoting;
+
+  /// No description provided for @matchReportVotingHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abre ou fecha na hora para todos.'**
+  String get matchReportVotingHint;
+
+  /// No description provided for @commonCardSettings.
+  ///
+  /// In pt, this message translates to:
+  /// **'Configurações'**
+  String get commonCardSettings;
+
   /// No description provided for @matchGoalsPublishCards.
   ///
   /// In pt, this message translates to:

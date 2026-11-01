@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:either_dart/either.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_report_dtos.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/errors/firebase_error.dart';
 import 'package:arena_soccer/core/firebase/either_stream.dart';
@@ -99,6 +100,35 @@ class MatchesDataSource {
           MatchDTO.goalsField: FieldValue.arrayUnion([goal.toMap()]),
           'golTimeCasa': homeGoals,
           'golTimeFora': awayGoals,
+        },
+        season: season,
+      );
+
+  /// Súmula: cartões, escalação, árbitro, observações e os dados do jogo
+  /// (data, horário, duração, local), numa gravação.
+  Future<Either<Failure, void>> updateReport({
+    required String matchId,
+    required List<MatchBooking> bookings,
+    required MatchLineup lineup,
+    required String referee,
+    required String notes,
+    required String date,
+    required String time,
+    required int durationMinutes,
+    required String venue,
+    String? season,
+  }) =>
+      _update(
+        matchId,
+        {
+          MatchDTO.bookingsField: [for (final b in bookings) b.toMap()],
+          MatchDTO.lineupField: lineup.toMap(),
+          'arbitro': referee.trim(),
+          'observacoes': notes.trim(),
+          'data': date,
+          'horario': time,
+          'duracao': durationMinutes,
+          'local': venue.trim(),
         },
         season: season,
       );

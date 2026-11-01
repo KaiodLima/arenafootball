@@ -731,6 +731,319 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get reportLive => 'Live';
+
+  @override
+  String get reportHalfTime => 'Half-time';
+
+  @override
+  String get reportFinished => 'Full time';
+
+  @override
+  String get reportNotStarted => 'Not started';
+
+  @override
+  String get reportStageBefore => 'Before';
+
+  @override
+  String get reportStageFirstHalf => '1st H';
+
+  @override
+  String get reportStageHalfTime => 'Break';
+
+  @override
+  String get reportStageSecondHalf => '2nd H';
+
+  @override
+  String get reportStageEnd => 'End';
+
+  @override
+  String get reportGoal => 'Goal';
+
+  @override
+  String reportGoalOf(String team) {
+    return '$team goal';
+  }
+
+  @override
+  String reportGoalBy(String name) {
+    return 'Goal by $name';
+  }
+
+  @override
+  String get reportWhoAssisted => 'Who gave the assist?';
+
+  @override
+  String get reportNoAssist => 'No assist';
+
+  @override
+  String get reportGoalNoScorer => 'No scorer';
+
+  @override
+  String get reportNoEvents =>
+      'No events yet. Use the buttons above to log goals and cards.';
+
+  @override
+  String get reportNoMinute => 'No minute';
+
+  @override
+  String get reportFirstHalf => '1st half';
+
+  @override
+  String get reportSecondHalf => '2nd half';
+
+  @override
+  String get reportEditEvent => 'Edit event';
+
+  @override
+  String get reportDeleteEvent => 'Delete event';
+
+  @override
+  String get reportUndo => 'Undo';
+
+  @override
+  String get reportNotRelated => 'Not selected';
+
+  @override
+  String reportStarters(int count) {
+    return 'Starters $count/11';
+  }
+
+  @override
+  String reportSubs(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count substitutes',
+      one: '1 substitute',
+      zero: 'No substitutes',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reportStarter => 'Starter';
+
+  @override
+  String get reportSub => 'Bench';
+
+  @override
+  String get reportWhen => 'When';
+
+  @override
+  String get reportWhere => 'Where';
+
+  @override
+  String get reportRefereeing => 'Refereeing';
+
+  @override
+  String get reportVoting => 'Man of the match vote';
+
+  @override
+  String get reportVotingOpen => 'Open now';
+
+  @override
+  String get reportVotingClosed => 'Closed';
+
+  @override
+  String get reportNotesHint => 'Incidents, send-offs, delays, walkovers...';
+
+  @override
+  String reportChanges(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count changes',
+      one: '1 change',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reportPublishCards => 'Publish goal card in the feed';
+
+  @override
+  String get reportSave => 'Save';
+
+  @override
+  String get athleteBookings => 'Cards this season';
+
+  @override
+  String get matchDetailsStarters => 'Starters';
+
+  @override
+  String get matchDetailsSubs => 'Substitutes';
+
+  @override
+  String matchDetailsReferee(String name) {
+    return 'Referee: $name';
+  }
+
+  @override
+  String get matchReportManage => 'Manage match';
+
+  @override
+  String get matchReportTitle => 'Match report';
+
+  @override
+  String get matchReportTabEvents => 'Events';
+
+  @override
+  String get matchReportTabLineup => 'Lineup';
+
+  @override
+  String get matchReportTabGame => 'Game';
+
+  @override
+  String get matchReportSave => 'Save report';
+
+  @override
+  String get matchReportSaved => 'Report saved.';
+
+  @override
+  String matchReportSavedWithCards(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Report saved · $count goal cards published',
+      one: 'Report saved · 1 goal card published',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get matchReportDiscardTitle => 'Leave without saving?';
+
+  @override
+  String get matchReportDiscardMessage =>
+      'The report changes (events, lineup and game data) will be lost.';
+
+  @override
+  String get matchReportDiscard => 'Leave without saving';
+
+  @override
+  String get matchReportAddGoal => '+ Goal';
+
+  @override
+  String get matchReportAddBooking => '+ Card';
+
+  @override
+  String get matchReportNoEvents => 'No events yet. Add goals and cards here.';
+
+  @override
+  String get matchReportSwipeHint =>
+      'Tap a goal to edit; swipe an event aside to delete it.';
+
+  @override
+  String get matchReportGoalNoScorer => 'Goal (no scorer)';
+
+  @override
+  String matchReportAssist(String name) {
+    return 'assist $name';
+  }
+
+  @override
+  String get matchReportSecondYellow => '2nd yellow';
+
+  @override
+  String get matchReportGoalTitle => 'Goal';
+
+  @override
+  String get matchReportBookingTitle => 'Card';
+
+  @override
+  String get matchReportScorer => 'Scorer';
+
+  @override
+  String get matchReportPlayer => 'Player';
+
+  @override
+  String get matchReportAssistant => 'Assist (optional)';
+
+  @override
+  String get matchReportNone => 'None';
+
+  @override
+  String get matchReportYellow => 'Yellow';
+
+  @override
+  String get matchReportRed => 'Red';
+
+  @override
+  String get matchReportMinute => 'Minute';
+
+  @override
+  String get matchReportAdd => 'Add';
+
+  @override
+  String get matchReportNoSquad =>
+      'No players in this team\'s squad for this competition. Add them in the Lineup tab.';
+
+  @override
+  String matchReportLineupCount(int starters, int subs) {
+    return '$starters starters · $subs substitutes';
+  }
+
+  @override
+  String get matchReportLineupHint =>
+      'Mark S (starter) or B (bench); tap the number to change the shirt.';
+
+  @override
+  String get matchReportStarterShort => 'S';
+
+  @override
+  String get matchReportSubShort => 'B';
+
+  @override
+  String get matchReportAddPlayer => 'Add player';
+
+  @override
+  String get matchReportAddPlayerHint =>
+      'They join the team\'s squad in this competition and the lineup.';
+
+  @override
+  String get matchReportPlayerAdded => 'Player added and selected.';
+
+  @override
+  String get matchReportPlayerName => 'Player name';
+
+  @override
+  String get matchReportPhoto => 'Photo';
+
+  @override
+  String matchReportShirtNumber(String name) {
+    return '$name\'s shirt number';
+  }
+
+  @override
+  String get matchReportDate => 'Date';
+
+  @override
+  String get matchReportTime => 'Time';
+
+  @override
+  String get matchReportDuration => 'Duration (minutes)';
+
+  @override
+  String get matchReportVenue => 'Venue';
+
+  @override
+  String get matchReportReferee => 'Referee';
+
+  @override
+  String get matchReportNotes => 'Report notes';
+
+  @override
+  String get matchReportVoting => 'Man of the match voting open';
+
+  @override
+  String get matchReportVotingHint =>
+      'Opens or closes right away for everyone.';
+
+  @override
+  String get commonCardSettings => 'Settings';
+
+  @override
   String matchGoalsPublishCards(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

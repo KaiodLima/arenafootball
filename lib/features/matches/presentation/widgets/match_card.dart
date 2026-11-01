@@ -134,6 +134,9 @@ class MatchCard extends StatefulWidget {
   final VoidCallback onVotingTap;
   final VoidCallback onToggleVoting;
   final VoidCallback onEditScore;
+
+  /// "Gerenciar partida" (súmula); nulo = sem o item.
+  final VoidCallback? onManage;
   final VoidCallback onDelete;
 
   /// Mostra o botão de votação (falso na prévia do cadastro).
@@ -164,6 +167,7 @@ class MatchCard extends StatefulWidget {
     required this.onVotingTap,
     required this.onToggleVoting,
     required this.onEditScore,
+    this.onManage,
     required this.onDelete,
     this.homeCrest,
     this.awayCrest,
@@ -278,6 +282,12 @@ class _MatchCardState extends State<MatchCard> {
                   if (isAdmin)
                     CardMenuButton(
                       actions: [
+                        if (widget.onManage != null)
+                          CardMenuAction(
+                            icon: Icons.assignment_rounded,
+                            label: l10n.matchReportManage,
+                            onSelected: widget.onManage!,
+                          ),
                         CardMenuAction(
                           icon: match.isVotingOpen ? Icons.lock_outline_rounded : Icons.how_to_vote_outlined,
                           label: match.isVotingOpen ? l10n.matchesCloseVoting : l10n.matchesOpenVoting,

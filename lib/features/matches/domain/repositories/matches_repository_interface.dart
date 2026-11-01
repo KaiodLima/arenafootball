@@ -22,6 +22,9 @@ abstract class IMatchesRepository {
   /// Grava a lista de gols e o placar contado dela.
   Future<Either<Failure, void>> updateGoals({required String matchId, required List<MatchGoal> goals, String? season});
 
+  /// Súmula: cartões, escalação, árbitro, observações e dados do jogo de [match].
+  Future<Either<Failure, void>> updateReport(MatchDTO match, {String? season});
+
   /// Acrescenta um gol (card de gol) com o placar dado.
   Future<Either<Failure, void>> appendGoal({
     required String matchId,

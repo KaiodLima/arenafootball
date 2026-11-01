@@ -15,7 +15,9 @@ class CardMenuAction {
   const CardMenuAction({required this.icon, required this.label, required this.onSelected, this.destructive = false});
 }
 
-/// Menu ⋮ das ações de um card (ações do admin). Com [onImage], o botão fica
+/// Engrenagem das ações de gestão de um card (admin, parceiro nas notícias
+/// dele, dono do time no elenco), num círculo amarelo da paleta do app. Com
+/// [onImage], ganha uma sombra para destacar sobre fotos. Com [onImage], o botão fica
 /// num círculo escuro translúcido para aparecer sobre fotos.
 class CardMenuButton extends StatelessWidget {
   final List<CardMenuAction> actions;
@@ -26,8 +28,10 @@ class CardMenuButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final button = PopupMenuButton<int>(
-      tooltip: AppLocalizations.of(context).commonMoreActions,
-      icon: Icon(Icons.more_vert_rounded, color: onImage ? AppColors.white : AppColors.textSecondary),
+      tooltip: AppLocalizations.of(context).commonCardSettings,
+      padding: EdgeInsets.zero,
+      iconSize: AppSizes.s20,
+      icon: const Icon(Icons.settings_rounded, color: AppColors.primaryDark),
       onSelected: (index) => actions[index].onSelected(),
       itemBuilder: (_) => [
         for (var i = 0; i < actions.length; i++)
@@ -51,9 +55,16 @@ class CardMenuButton extends StatelessWidget {
       ],
     );
 
-    if (!onImage) return button;
-    return DecoratedBox(
-      decoration: BoxDecoration(color: AppColors.black.withValues(alpha: 0.45), shape: BoxShape.circle),
+    return Container(
+      width: AppSizes.s36,
+      height: AppSizes.s36,
+      decoration: BoxDecoration(
+        color: AppColors.gold,
+        shape: BoxShape.circle,
+        boxShadow: [
+          if (onImage) BoxShadow(color: AppColors.black.withValues(alpha: 0.3), blurRadius: AppSizes.s6),
+        ],
+      ),
       child: button,
     );
   }

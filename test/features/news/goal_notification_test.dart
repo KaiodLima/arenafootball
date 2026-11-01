@@ -66,6 +66,9 @@ class _FakeMatchesRepository implements IMatchesRepository {
       const Right(null);
 
   @override
+  Future<Either<Failure, void>> updateReport(MatchDTO match, {String? season}) async => const Right(null);
+
+  @override
   Future<Either<Failure, void>> appendGoal({
     required String matchId,
     required MatchGoal goal,

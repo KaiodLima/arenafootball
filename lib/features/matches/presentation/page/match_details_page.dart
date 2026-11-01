@@ -105,6 +105,22 @@ class MatchDetailsPage extends StatelessWidget {
                       onImage: true,
                       actions: [
                         CardMenuAction(
+                          icon: Icons.assignment_rounded,
+                          label: l10n.matchReportManage,
+                          onSelected: () => Navigator.pushNamed(
+                            context,
+                            AppRoutes.matchReportPage,
+                            arguments: {
+                              'match': match,
+                              'season': season,
+                              'homeCrest': homeCrest,
+                              'awayCrest': awayCrest,
+                              'homeColor': homeColor,
+                              'awayColor': awayColor,
+                            },
+                          ),
+                        ),
+                        CardMenuAction(
                           icon: Icons.edit_outlined,
                           label: l10n.matchesEditScore,
                           onSelected: () => showMatchGoalsSheet(
