@@ -1335,6 +1335,258 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @referralTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Indique amigos'**
+  String get referralTitle;
+
+  /// No description provided for @referralPaused.
+  ///
+  /// In pt, this message translates to:
+  /// **'As indicações estão pausadas no momento.'**
+  String get referralPaused;
+
+  /// No description provided for @referralSettingsSwitch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Indicações ligadas'**
+  String get referralSettingsSwitch;
+
+  /// No description provided for @referralSettingsOn.
+  ///
+  /// In pt, this message translates to:
+  /// **'O \"Indique amigos\" aparece no menu e no álbum, e as indicações valem.'**
+  String get referralSettingsOn;
+
+  /// No description provided for @referralSettingsOff.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desligado: o item some do menu e do álbum. Indicações feitas agora ficam guardadas e valem quando você religar (se a conta do amigo ainda tiver até 7 dias). Os pacotinhos extras já ganhos continuam abrindo.'**
+  String get referralSettingsOff;
+
+  /// No description provided for @referralSettingsRules.
+  ///
+  /// In pt, this message translates to:
+  /// **'Regras: o amigo cria a conta, informa o código (até 7 dias) e escolhe o time do coração; os dois ganham 1 pacotinho extra (até {max} guardados) e quem indicou soma na conquista \"Amigos indicados\".'**
+  String referralSettingsRules(int max);
+
+  /// No description provided for @referralSettingsSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Configuração salva'**
+  String get referralSettingsSaved;
+
+  /// No description provided for @referralHeadline.
+  ///
+  /// In pt, this message translates to:
+  /// **'Convide amigos e ganhem figurinhas'**
+  String get referralHeadline;
+
+  /// No description provided for @referralSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cada amigo que entrar pelo seu convite e escolher o time dá 1 pacotinho extra para você e outro para ele.'**
+  String get referralSubtitle;
+
+  /// No description provided for @referralYourCode.
+  ///
+  /// In pt, this message translates to:
+  /// **'SEU CÓDIGO'**
+  String get referralYourCode;
+
+  /// No description provided for @referralShare.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compartilhar convite'**
+  String get referralShare;
+
+  /// No description provided for @referralShareText.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bora acompanhar o futebol da nossa região no Arena Football! Entra com o meu código {code} e a gente ganha pacotinhos de figurinhas: {link}'**
+  String referralShareText(String code, String link);
+
+  /// No description provided for @referralCodeCopied.
+  ///
+  /// In pt, this message translates to:
+  /// **'Código copiado'**
+  String get referralCodeCopied;
+
+  /// No description provided for @referralStatInvited.
+  ///
+  /// In pt, this message translates to:
+  /// **'Amigos indicados'**
+  String get referralStatInvited;
+
+  /// No description provided for @referralStatExtraPacks.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pacotinhos guardados'**
+  String get referralStatExtraPacks;
+
+  /// No description provided for @referralStatEarned.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pacotinhos ganhos'**
+  String get referralStatEarned;
+
+  /// No description provided for @referralHowTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Como funciona'**
+  String get referralHowTitle;
+
+  /// No description provided for @referralHowStep1.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compartilhe o seu convite (ou o código) com os amigos.'**
+  String get referralHowStep1;
+
+  /// No description provided for @referralHowStep2.
+  ///
+  /// In pt, this message translates to:
+  /// **'O amigo cria a conta, informa o seu código e escolhe o time do coração.'**
+  String get referralHowStep2;
+
+  /// No description provided for @referralHowStep3.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vocês dois ganham 1 pacotinho extra para abrir no álbum na hora, fora da espera de 24 h (guarda até {max}).'**
+  String referralHowStep3(int max);
+
+  /// No description provided for @referralFriendsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seus indicados'**
+  String get referralFriendsTitle;
+
+  /// No description provided for @referralFriendsEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ninguém entrou pelo seu convite ainda.'**
+  String get referralFriendsEmpty;
+
+  /// No description provided for @referralFriendNoName.
+  ///
+  /// In pt, this message translates to:
+  /// **'Amigo'**
+  String get referralFriendNoName;
+
+  /// No description provided for @referralClaimTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fui indicado'**
+  String get referralClaimTitle;
+
+  /// No description provided for @referralClaimHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conta nova? Informe o código de quem te convidou (vale nos primeiros 7 dias).'**
+  String get referralClaimHint;
+
+  /// No description provided for @referralClaimField.
+  ///
+  /// In pt, this message translates to:
+  /// **'Código do amigo'**
+  String get referralClaimField;
+
+  /// No description provided for @referralClaimButton.
+  ///
+  /// In pt, this message translates to:
+  /// **'Usar código'**
+  String get referralClaimButton;
+
+  /// No description provided for @referralClaimSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Código salvo! O pacotinho chega quando você tiver o time do coração.'**
+  String get referralClaimSaved;
+
+  /// No description provided for @referralClaimInvalid.
+  ///
+  /// In pt, this message translates to:
+  /// **'Código inválido: são 8 ou 10 letras e números.'**
+  String get referralClaimInvalid;
+
+  /// No description provided for @referralClaimOwn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Esse código é o seu.'**
+  String get referralClaimOwn;
+
+  /// No description provided for @referralClaimOldAccount.
+  ///
+  /// In pt, this message translates to:
+  /// **'O código de convite vale só nos primeiros 7 dias da conta.'**
+  String get referralClaimOldAccount;
+
+  /// No description provided for @referralClaimAlready.
+  ///
+  /// In pt, this message translates to:
+  /// **'A sua conta já usou um código.'**
+  String get referralClaimAlready;
+
+  /// No description provided for @referralClaimUsed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você entrou com o código {code}'**
+  String referralClaimUsed(String code);
+
+  /// No description provided for @referralClaimValid.
+  ///
+  /// In pt, this message translates to:
+  /// **'Indicação confirmada: o pacotinho extra é seu!'**
+  String get referralClaimValid;
+
+  /// No description provided for @referralClaimPending.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha o seu time do coração para confirmar.'**
+  String get referralClaimPending;
+
+  /// No description provided for @referralRefusedCode.
+  ///
+  /// In pt, this message translates to:
+  /// **'Esse código não existe.'**
+  String get referralRefusedCode;
+
+  /// No description provided for @albumExtraPacks.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{+1 pacotinho extra guardado} other{+{count} pacotinhos extras guardados}}'**
+  String albumExtraPacks(int count);
+
+  /// No description provided for @albumOpenExtraPack.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abrir pacotinho extra'**
+  String get albumOpenExtraPack;
+
+  /// No description provided for @albumInviteForPacks.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ganhe pacotinhos indicando amigos'**
+  String get albumInviteForPacks;
+
+  /// No description provided for @pushActionReferral.
+  ///
+  /// In pt, this message translates to:
+  /// **'Indicação confirmada'**
+  String get pushActionReferral;
+
+  /// No description provided for @pushActionReferralHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para quem indicou · o amigo entrou e o pacotinho extra chegou'**
+  String get pushActionReferralHint;
+
+  /// No description provided for @achievementMetricReferrals.
+  ///
+  /// In pt, this message translates to:
+  /// **'Amigos indicados'**
+  String get achievementMetricReferrals;
+
   /// No description provided for @teamPickerOtherRegion.
   ///
   /// In pt, this message translates to:

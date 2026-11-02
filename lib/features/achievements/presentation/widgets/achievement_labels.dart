@@ -42,4 +42,5 @@ String achievementMetricLabel(AppLocalizations l10n, AchievementMetric metric) =
       AchievementMetric.albumStickers => l10n.achievementMetricAlbumStickers,
       AchievementMetric.albumPages => l10n.achievementMetricAlbumPages,
       AchievementMetric.albumComplete => l10n.achievementMetricAlbumComplete,
+      AchievementMetric.referrals => l10n.achievementMetricReferrals,
     };

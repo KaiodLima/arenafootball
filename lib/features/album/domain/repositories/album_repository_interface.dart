@@ -19,7 +19,12 @@ abstract class IAlbumRepository {
 
   Future<Either<Failure, int>> collectorsAhead(String eventId, int collected);
 
-  Future<Either<Failure, void>> requestPack({required String packId, required String userId, required String eventId});
+  Future<Either<Failure, void>> requestPack({
+    required String packId,
+    required String userId,
+    required String eventId,
+    bool extra = false,
+  });
 
   Future<Either<Failure, String>> saveEvent(AlbumEventDTO event);
 

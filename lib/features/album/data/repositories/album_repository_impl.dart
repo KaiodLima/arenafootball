@@ -38,9 +38,13 @@ class AlbumRepositoryImpl implements IAlbumRepository {
       _dataSource.collectorsAhead(eventId, collected);
 
   @override
-  Future<Either<Failure, void>> requestPack(
-          {required String packId, required String userId, required String eventId}) =>
-      _dataSource.requestPack(packId: packId, userId: userId, eventId: eventId);
+  Future<Either<Failure, void>> requestPack({
+    required String packId,
+    required String userId,
+    required String eventId,
+    bool extra = false,
+  }) =>
+      _dataSource.requestPack(packId: packId, userId: userId, eventId: eventId, extra: extra);
 
   @override
   Future<Either<Failure, String>> saveEvent(AlbumEventDTO event) => _dataSource.saveEvent(event);

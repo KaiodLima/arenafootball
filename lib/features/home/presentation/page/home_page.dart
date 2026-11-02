@@ -36,6 +36,7 @@ import 'package:arena_soccer/injection_container.dart';
 import 'package:arena_soccer/core/services/tour_service.dart';
 import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 import 'package:arena_soccer/utils/components/tour/welcome_sheet.dart';
+import 'package:arena_soccer/features/referrals/presentation/bloc/referral_config_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/section_header.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
@@ -174,6 +175,7 @@ class _HomePageState extends State<HomePage> {
       'noticias_pendentes' when user != null && user.isAdmin => AppRoutes.partnerRequestsPanelPage,
       'conquistas' when user != null => AppRoutes.achievementsPage,
       'album' when user != null => AppRoutes.albumPage,
+      'indicacao' when user != null => AppRoutes.referralPage,
       _ => null,
     };
     if (route != null) {
@@ -259,6 +261,14 @@ class _HomePageState extends State<HomePage> {
           openAthlete(context, {'playerId': id, 'season': season == SeasonCollection.currentSeason ? null : season});
         case HighlightLinkTarget(:final id):
           _openHighlight(id);
+        case InviteLinkTarget(:final code):
+          // Sem login, o convite não tem onde ficar; desligado pelo admin, só o aviso.
+          if (BlocProvider.of<SessionCubit>(context).state.user == null) break;
+          if (!BlocProvider.of<ReferralConfigCubit>(context).state.enabled) {
+            showSnackBar(context: context, message: AppLocalizations.of(context).referralPaused, isSuccess: false);
+            break;
+          }
+          Navigator.pushNamed(context, AppRoutes.referralPage, arguments: {'code': code});
         case AppLinkTarget():
           break;
       }

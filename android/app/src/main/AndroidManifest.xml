@@ -38,6 +38,7 @@
                 <data android:pathPrefix="/noticia"/>
                 <data android:pathPrefix="/atleta"/>
                 <data android:pathPrefix="/destaque"/>
+                <data android:pathPrefix="/convite"/>
             </intent-filter>
             <!-- Botão "Abrir no app" da página web (arenafootball://...). -->
             <intent-filter>

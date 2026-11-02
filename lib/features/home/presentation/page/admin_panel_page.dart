@@ -99,6 +99,11 @@ class AdminPanelPage extends StatelessWidget {
                     onTap: () => open(AppRoutes.votingRulesPage),
                   ),
                   ShortcutTile(
+                    title: l10n.referralTitle,
+                    icon: Icons.group_add_outlined,
+                    onTap: () => open(AppRoutes.referralSettingsPage),
+                  ),
+                  ShortcutTile(
                     title: l10n.albumAdminTitle,
                     icon: Icons.collections_bookmark_outlined,
                     onTap: () => open(AppRoutes.manageAlbumPage),

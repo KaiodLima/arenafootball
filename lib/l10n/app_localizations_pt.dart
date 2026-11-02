@@ -734,6 +734,160 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get referralTitle => 'Indique amigos';
+
+  @override
+  String get referralPaused => 'As indicações estão pausadas no momento.';
+
+  @override
+  String get referralSettingsSwitch => 'Indicações ligadas';
+
+  @override
+  String get referralSettingsOn =>
+      'O \"Indique amigos\" aparece no menu e no álbum, e as indicações valem.';
+
+  @override
+  String get referralSettingsOff =>
+      'Desligado: o item some do menu e do álbum. Indicações feitas agora ficam guardadas e valem quando você religar (se a conta do amigo ainda tiver até 7 dias). Os pacotinhos extras já ganhos continuam abrindo.';
+
+  @override
+  String referralSettingsRules(int max) {
+    return 'Regras: o amigo cria a conta, informa o código (até 7 dias) e escolhe o time do coração; os dois ganham 1 pacotinho extra (até $max guardados) e quem indicou soma na conquista \"Amigos indicados\".';
+  }
+
+  @override
+  String get referralSettingsSaved => 'Configuração salva';
+
+  @override
+  String get referralHeadline => 'Convide amigos e ganhem figurinhas';
+
+  @override
+  String get referralSubtitle =>
+      'Cada amigo que entrar pelo seu convite e escolher o time dá 1 pacotinho extra para você e outro para ele.';
+
+  @override
+  String get referralYourCode => 'SEU CÓDIGO';
+
+  @override
+  String get referralShare => 'Compartilhar convite';
+
+  @override
+  String referralShareText(String code, String link) {
+    return 'Bora acompanhar o futebol da nossa região no Arena Football! Entra com o meu código $code e a gente ganha pacotinhos de figurinhas: $link';
+  }
+
+  @override
+  String get referralCodeCopied => 'Código copiado';
+
+  @override
+  String get referralStatInvited => 'Amigos indicados';
+
+  @override
+  String get referralStatExtraPacks => 'Pacotinhos guardados';
+
+  @override
+  String get referralStatEarned => 'Pacotinhos ganhos';
+
+  @override
+  String get referralHowTitle => 'Como funciona';
+
+  @override
+  String get referralHowStep1 =>
+      'Compartilhe o seu convite (ou o código) com os amigos.';
+
+  @override
+  String get referralHowStep2 =>
+      'O amigo cria a conta, informa o seu código e escolhe o time do coração.';
+
+  @override
+  String referralHowStep3(int max) {
+    return 'Vocês dois ganham 1 pacotinho extra para abrir no álbum na hora, fora da espera de 24 h (guarda até $max).';
+  }
+
+  @override
+  String get referralFriendsTitle => 'Seus indicados';
+
+  @override
+  String get referralFriendsEmpty => 'Ninguém entrou pelo seu convite ainda.';
+
+  @override
+  String get referralFriendNoName => 'Amigo';
+
+  @override
+  String get referralClaimTitle => 'Fui indicado';
+
+  @override
+  String get referralClaimHint =>
+      'Conta nova? Informe o código de quem te convidou (vale nos primeiros 7 dias).';
+
+  @override
+  String get referralClaimField => 'Código do amigo';
+
+  @override
+  String get referralClaimButton => 'Usar código';
+
+  @override
+  String get referralClaimSaved =>
+      'Código salvo! O pacotinho chega quando você tiver o time do coração.';
+
+  @override
+  String get referralClaimInvalid =>
+      'Código inválido: são 8 ou 10 letras e números.';
+
+  @override
+  String get referralClaimOwn => 'Esse código é o seu.';
+
+  @override
+  String get referralClaimOldAccount =>
+      'O código de convite vale só nos primeiros 7 dias da conta.';
+
+  @override
+  String get referralClaimAlready => 'A sua conta já usou um código.';
+
+  @override
+  String referralClaimUsed(String code) {
+    return 'Você entrou com o código $code';
+  }
+
+  @override
+  String get referralClaimValid =>
+      'Indicação confirmada: o pacotinho extra é seu!';
+
+  @override
+  String get referralClaimPending =>
+      'Escolha o seu time do coração para confirmar.';
+
+  @override
+  String get referralRefusedCode => 'Esse código não existe.';
+
+  @override
+  String albumExtraPacks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '+$count pacotinhos extras guardados',
+      one: '+1 pacotinho extra guardado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get albumOpenExtraPack => 'Abrir pacotinho extra';
+
+  @override
+  String get albumInviteForPacks => 'Ganhe pacotinhos indicando amigos';
+
+  @override
+  String get pushActionReferral => 'Indicação confirmada';
+
+  @override
+  String get pushActionReferralHint =>
+      'Para quem indicou · o amigo entrou e o pacotinho extra chegou';
+
+  @override
+  String get achievementMetricReferrals => 'Amigos indicados';
+
+  @override
   String get teamPickerOtherRegion => 'Outras regiões';
 
   @override

@@ -8,6 +8,7 @@ import 'package:arena_soccer/features/album/data/dtos/album_dtos.dart';
 import 'package:arena_soccer/features/album/domain/album_layout.dart';
 import 'package:arena_soccer/features/album/domain/album_pack_id.dart';
 import 'package:arena_soccer/features/album/domain/usecases/album_usecase.dart';
+import 'package:arena_soccer/features/referrals/domain/usecases/referral_usecases.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
@@ -21,6 +22,9 @@ class AlbumState extends Equatable {
 
   /// Já passaram 24 h do último pacote (ou nunca abriu).
   final bool packReady;
+
+  /// Pacotinhos extras da indicação (abrem antes das 24 h).
+  final int extraPacks;
   final bool loading;
 
   /// Pacote pedido, esperando o sorteio do servidor.
@@ -39,6 +43,7 @@ class AlbumState extends Equatable {
     this.album = const UserAlbumDTO(),
     this.todayPack,
     this.packReady = false,
+    this.extraPacks = 0,
     this.loading = true,
     this.opening = false,
     this.teams = const {},
@@ -50,7 +55,10 @@ class AlbumState extends Equatable {
 
   int get collected => album.collected(stickers);
 
-  bool get packAvailable => packReady && !opening;
+  bool get packAvailable => (packReady || extraPacks > 0) && !opening;
+
+  /// O próximo pacote é um extra (o do dia ainda não liberou).
+  bool get nextIsExtra => !packReady && extraPacks > 0;
 
   /// Quando libera o próximo pacote (nulo = já liberado / nunca abriu).
   DateTime? get nextPackAt => AlbumPackId.nextAt(album.lastPackAt);
@@ -69,6 +77,7 @@ class AlbumState extends Equatable {
     UserAlbumDTO? album,
     AlbumPackDTO? Function()? todayPack,
     bool? packReady,
+    int? extraPacks,
     bool? loading,
     bool? opening,
     Map<String, TeamDTO>? teams,
@@ -81,6 +90,7 @@ class AlbumState extends Equatable {
       album: album ?? this.album,
       todayPack: todayPack != null ? todayPack() : this.todayPack,
       packReady: packReady ?? this.packReady,
+      extraPacks: extraPacks ?? this.extraPacks,
       loading: loading ?? this.loading,
       opening: opening ?? this.opening,
       teams: teams ?? this.teams,
@@ -91,7 +101,7 @@ class AlbumState extends Equatable {
 
   @override
   List<Object?> get props =>
-      [event, stickers, album, todayPack, packReady, loading, opening, teams, ranking, rankingLoading];
+      [event, stickers, album, todayPack, packReady, extraPacks, loading, opening, teams, ranking, rankingLoading];
 }
 
 /// O pacote acabou de abrir: a tela mostra a animação com [pack].
@@ -138,12 +148,14 @@ class ErrorAlbumState extends AlbumState {
 class AlbumCubit extends Cubit<AlbumState> {
   final AlbumUseCase albumUseCase;
   final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
+  final WatchReferralUseCase watchReferralUseCase;
   final List<StreamSubscription<Object?>> _subscriptions = [];
   StreamSubscription<Either<Failure, AlbumPackDTO?>>? _pack;
   Timer? _readyTimer;
   late String _userId;
 
-  AlbumCubit(this.albumUseCase, this.getTeamsCacheFirstUseCase) : super(const AlbumState());
+  AlbumCubit(this.albumUseCase, this.getTeamsCacheFirstUseCase, this.watchReferralUseCase)
+      : super(const AlbumState());
 
   void start({required AlbumEventDTO event, required String userId}) {
     _userId = userId;
@@ -160,6 +172,11 @@ class AlbumCubit extends Cubit<AlbumState> {
         if (isClosed || response.isLeft) return;
         emit(state.copyWith(album: response.right));
         _scheduleReady();
+      }))
+      // Saldo de pacotinhos extras da indicação (sem o doc = 0).
+      ..add(watchReferralUseCase(userId).listen((response) {
+        if (isClosed || response.isLeft) return;
+        emit(state.copyWith(extraPacks: response.right.extraPacks));
       }));
     _loadTeams();
   }
@@ -220,8 +237,14 @@ class AlbumCubit extends Cubit<AlbumState> {
   Future<void> openPack() async {
     final event = state.event;
     if (event == null || !state.packAvailable) return;
+    final extra = state.nextIsExtra;
     emit(state.copyWith(opening: true, todayPack: () => null));
-    final response = await albumUseCase.openPack(userId: _userId, eventId: event.id, opened: state.album.packs);
+    final response = await albumUseCase.openPack(
+      userId: _userId,
+      eventId: event.id,
+      opened: state.album.packs,
+      extra: extra,
+    );
     if (isClosed) return;
     response.fold(
       (failure) => emit(ErrorAlbumState(state.copyWith(opening: false), failure.toString())),

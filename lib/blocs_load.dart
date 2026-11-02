@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/referrals/presentation/bloc/referral_config_cubit.dart';
 import 'package:arena_soccer/features/album/presentation/bloc/album_event_cubit.dart';
 import 'package:arena_soccer/features/achievements/presentation/bloc/achievements_cubit.dart';
 import 'package:arena_soccer/features/achievements/presentation/widgets/achievements_sync.dart';
@@ -55,6 +56,10 @@ class BlocsLoad extends StatelessWidget {
         // Álbum de figurinhas (evento do admin) — global: o selo flutuante da
         // home e o pacotinho do dia da conta.
         BlocProvider<AlbumEventCubit>(create: (_) => AlbumEventCubit(sl())),
+
+        // "Indique amigos" ligado/desligado pelo admin — global: menu, álbum e
+        // o link de convite.
+        BlocProvider<ReferralConfigCubit>(create: (_) => ReferralConfigCubit(sl(), sl())..start()),
 
         // Conquistas da conta logada — global: drawer, carteirinha, contagem
         // das ações (compartilhar, ler notícia) e comemoração ao desbloquear.

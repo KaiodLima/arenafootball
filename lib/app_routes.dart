@@ -63,6 +63,8 @@ class AppRoutes {
   static const String adminPanelPage = '/admin_panel_page';
   static const String settingsPage = '/settings_page';
   static const String fanRankingPage = '/fan_ranking_page';
+  static const String referralPage = '/referral_page';
+  static const String referralSettingsPage = '/referral_settings_page';
   static const String predictionRankingPage = '/prediction_ranking_page';
 }
 

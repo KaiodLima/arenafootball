@@ -214,6 +214,11 @@ class _NotificationsPanelPageState extends State<NotificationsPanelPage> {
         name: l10n.pushActionAlbumPack,
         description: l10n.pushActionAlbumPackHint
       ),
+    PushAction.referral => (
+        icon: Icons.group_add_outlined,
+        name: l10n.pushActionReferral,
+        description: l10n.pushActionReferralHint
+      ),
   };
 }
 

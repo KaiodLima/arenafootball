@@ -15,6 +15,7 @@ import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart'
 import 'package:arena_soccer/core/services/tour_service.dart';
 import 'package:arena_soccer/injection_container.dart';
 import 'package:arena_soccer/utils/components/tour/tour_step.dart';
+import 'package:arena_soccer/features/referrals/presentation/bloc/referral_config_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
@@ -132,6 +133,7 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
         }
       },
       builder: (context, state) {
+        final referralsOn = BlocProvider.of<ReferralConfigCubit>(context).state.enabled;
         final event = state.event;
         if (event == null) {
           return Scaffold(
@@ -177,9 +179,11 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
                   sliver: SliverToBoxAdapter(
                     child: PackCard(
                       key: _tourPack,
-                      available: state.packAvailable,
+                      available: state.packReady && !state.opening,
                       opening: state.opening,
                       onOpen: _cubit.openPack,
+                      extraPacks: state.extraPacks,
+                      onInvite: referralsOn ? () => Navigator.pushNamed(context, AppRoutes.referralPage) : null,
                       onLongPress: isAdmin ? () => _previewPack(state) : null,
                       nextPackAt: state.nextPackAt,
                     ),

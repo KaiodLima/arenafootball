@@ -12,6 +12,7 @@ import 'package:arena_soccer/core/services/preferences_service.dart';
 import 'package:arena_soccer/core/services/tour_service.dart';
 import 'package:arena_soccer/core/services/storage_upload_service.dart';
 import 'package:arena_soccer/features/fan_ranking/di/fan_ranking_injection.dart';
+import 'package:arena_soccer/features/referrals/di/referrals_injection.dart';
 import 'package:arena_soccer/features/global_results/di/global_results_injection.dart';
 import 'package:arena_soccer/features/auth/di/auth_injection.dart';
 import 'package:arena_soccer/features/championships/di/championships_injection.dart';
@@ -54,6 +55,7 @@ Future<void> init() async {
   registerGlobalResultsDependencies();
   registerNotificationsDependencies();
   registerFanRankingDependencies();
+  registerReferralsDependencies();
   registerAchievementsDependencies();
   registerPredictionsDependencies();
 }

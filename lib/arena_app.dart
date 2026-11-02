@@ -99,6 +99,9 @@ import 'package:arena_soccer/features/home/presentation/page/admin_panel_page.da
 import 'package:arena_soccer/features/home/presentation/page/settings_page.dart';
 import 'package:arena_soccer/features/fan_ranking/presentation/bloc/fan_ranking_cubit.dart';
 import 'package:arena_soccer/features/fan_ranking/presentation/page/fan_ranking_page.dart';
+import 'package:arena_soccer/features/referrals/presentation/bloc/referral_cubit.dart';
+import 'package:arena_soccer/features/referrals/presentation/page/referral_page.dart';
+import 'package:arena_soccer/features/referrals/presentation/page/referral_settings_page.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
 import 'package:arena_soccer/features/stats/presentation/bloc/stats_ranking_cubit.dart';
 import 'package:arena_soccer/features/stats/presentation/page/stats_ranking_page.dart';
@@ -296,7 +299,7 @@ class ArenaApp extends StatelessWidget {
               child: const PartnerRequestPage(),
             ),
         AppRoutes.albumPage: (_) => BlocProvider<AlbumCubit>(
-              create: (_) => AlbumCubit(sl(), sl()),
+              create: (_) => AlbumCubit(sl(), sl(), sl()),
               child: const StickerAlbumPage(),
             ),
         // Páginas do álbum: o mesmo AlbumCubit da capa (sem leitura nova).
@@ -435,6 +438,11 @@ class ArenaApp extends StatelessWidget {
               create: (_) => FanRankingCubit(sl()),
               child: const FanRankingPage(),
             ),
+        AppRoutes.referralPage: (_) => BlocProvider<ReferralCubit>(
+              create: (_) => ReferralCubit(sl(), sl(), sl(), sl(), sl()),
+              child: const ReferralPage(),
+            ),
+        AppRoutes.referralSettingsPage: (_) => const ReferralSettingsPage(),
         AppRoutes.seasonsPanelPage: (_) => MultiBlocProvider(
               providers: [
                 BlocProvider<SeasonsPanelCubit>(create: (_) => SeasonsPanelCubit(sl(), sl())),

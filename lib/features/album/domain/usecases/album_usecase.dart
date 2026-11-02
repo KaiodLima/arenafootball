@@ -35,14 +35,16 @@ class AlbumUseCase {
   Stream<Either<Failure, AlbumPackDTO?>> watchPack(String packId) => _repository.watchPack(packId);
 
   /// Pede o próximo pacote da conta (que já abriu [opened]); devolve o id
-  /// para acompanhar o sorteio.
+  /// para acompanhar o sorteio. [extra] = pacotinho extra da indicação.
   Future<Either<Failure, String>> openPack({
     required String userId,
     required String eventId,
     required int opened,
+    bool extra = false,
   }) async {
     final packId = AlbumPackId.next(eventId: eventId, userId: userId, opened: opened);
-    final response = await _repository.requestPack(packId: packId, userId: userId, eventId: eventId);
+    final response =
+        await _repository.requestPack(packId: packId, userId: userId, eventId: eventId, extra: extra);
     return response.map((_) => packId);
   }
 }

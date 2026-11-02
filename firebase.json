@@ -29,6 +29,13 @@
         }
       },
       {
+        "source": "/convite/**",
+        "function": {
+          "functionId": "sharePage",
+          "region": "us-central1"
+        }
+      },
+      {
         "source": "/destaque/**",
         "function": {
           "functionId": "sharePage",

@@ -24,7 +24,8 @@ export type ActionKey =
   | 'noticia_parceiro'
   | 'noticia_parceiro_resposta'
   | 'conquista'
-  | 'album_pacote';
+  | 'album_pacote'
+  | 'indicacao';
 
 /** Sem configuração gravada, vale este padrão (notícia vem desligada). */
 export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
@@ -45,6 +46,7 @@ export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
   noticia_parceiro_resposta: true,
   conquista: true,
   album_pacote: true,
+  indicacao: true,
 };
 
 export type Target = { topic: string } | { condition: string };
@@ -91,7 +93,8 @@ export interface PushMessage {
     | 'parceiro'
     | 'noticias_pendentes'
     | 'conquistas'
-    | 'album';
+    | 'album'
+    | 'indicacao';
   regiao: string;
   alvo: Target;
   /** Tela específica (partida, votação, notícia); sem ela, só a aba. */

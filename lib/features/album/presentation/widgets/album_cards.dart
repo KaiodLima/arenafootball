@@ -12,11 +12,19 @@ import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
 /// Cartão do pacotinho do dia: o pacote dourado inclinado com brilho e o
-/// botão; já aberto, o pacote apagado e a contagem para o próximo.
+/// botão; já aberto, o pacote apagado e a contagem para o próximo. Com
+/// pacotinhos extras da indicação, o botão abre um deles antes das 24 h; o
+/// link "Indique amigos" fica embaixo.
 class PackCard extends StatefulWidget {
   final bool available;
   final bool opening;
   final VoidCallback onOpen;
+
+  /// Pacotinhos extras guardados (indicação).
+  final int extraPacks;
+
+  /// "Ganhe pacotinhos indicando amigos" (nulo = sem o link).
+  final VoidCallback? onInvite;
 
   /// Toque longo no cartão (a prévia da abertura, só o admin).
   final VoidCallback? onLongPress;
@@ -31,6 +39,8 @@ class PackCard extends StatefulWidget {
     required this.onOpen,
     this.onLongPress,
     this.nextPackAt,
+    this.extraPacks = 0,
+    this.onInvite,
   });
 
   @override
@@ -67,6 +77,9 @@ class _PackCardState extends State<PackCard> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final available = widget.available;
+    // O do dia já foi, mas há extra guardado: o botão abre o extra.
+    final extra = !available && widget.extraPacks > 0;
+    final canOpen = available || extra;
 
     Widget pack = Transform.rotate(
       angle: -0.12,
@@ -77,20 +90,20 @@ class _PackCardState extends State<PackCard> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: available
+            colors: canOpen
                 ? const [AppColors.googleYellow, AppColors.teamOrange]
                 : [AppColors.grey, AppColors.blueGreyLight],
           ),
           borderRadius: BorderRadius.circular(AppSizes.s10),
           border: Border.all(color: AppColors.white, width: AppSizes.s2),
           boxShadow: [
-            if (available) BoxShadow(color: AppColors.googleYellow.withValues(alpha: 0.6), blurRadius: 18),
+            if (canOpen) BoxShadow(color: AppColors.googleYellow.withValues(alpha: 0.6), blurRadius: 18),
           ],
         ),
         child: Center(child: Image.asset('lib/assets/images/ic_logo.png', width: AppSizes.s40)),
       ),
     );
-    if (available) pack = Shimmer(child: pack);
+    if (canOpen) pack = Shimmer(child: pack);
 
     final card = Container(
       padding: const EdgeInsets.all(AppSizes.s16),
@@ -118,7 +131,14 @@ class _PackCardState extends State<PackCard> {
                   available ? l10n.albumPackReadyHint : l10n.albumNextPackIn(_clock(_left)),
                   style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
                 ),
-                if (available || widget.opening) ...[
+                if (widget.extraPacks > 0) ...[
+                  const SizedBox(height: AppSizes.s4),
+                  Text(
+                    l10n.albumExtraPacks(widget.extraPacks),
+                    style: AppTypography.label(color: AppColors.teamOrange).copyWith(fontSize: AppSizes.s12),
+                  ),
+                ],
+                if (canOpen || widget.opening) ...[
                   const SizedBox(height: AppSizes.s10),
                   SizedBox(
                     height: AppSizes.s40,
@@ -135,10 +155,27 @@ class _PackCardState extends State<PackCard> {
                               child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.white),
                             )
                           : const Icon(Icons.card_giftcard_rounded, size: AppSizes.s18),
-                      label: Text(widget.opening ? l10n.albumPackOpeningShort : l10n.albumOpenPack),
+                      label: Text(
+                        widget.opening
+                            ? l10n.albumPackOpeningShort
+                            : extra
+                                ? l10n.albumOpenExtraPack
+                                : l10n.albumOpenPack,
+                      ),
                     ),
                   ),
                 ],
+                if (widget.onInvite != null)
+                  TextButton.icon(
+                    onPressed: widget.onInvite,
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      foregroundColor: AppColors.primaryDark,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    icon: const Icon(Icons.group_add_outlined, size: AppSizes.s18),
+                    label: Text(l10n.albumInviteForPacks, style: const TextStyle(fontSize: AppSizes.s12)),
+                  ),
               ],
             ),
           ),

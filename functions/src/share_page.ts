@@ -18,6 +18,7 @@ export type SharePath =
   | { kind: 'noticia'; id: string }
   | { kind: 'atleta'; season: string; id: string }
   | { kind: 'destaque'; id: string }
+  | { kind: 'convite'; code: string }
   | { kind: 'app' };
 
 const SAFE_ID = /^[A-Za-z0-9_-]{1,128}$/;
@@ -29,6 +30,9 @@ export function parseSharePath(path: string): SharePath | null {
   if (kind === 'app' && parts.length === 1) return { kind: 'app' };
   if (kind === 'noticia' && parts.length === 2 && SAFE_ID.test(a)) return { kind: 'noticia', id: a };
   if (kind === 'destaque' && parts.length === 2 && SAFE_ID.test(a)) return { kind: 'destaque', id: a };
+  if (kind === 'convite' && parts.length === 2 && /^[A-Za-z0-9]{8,10}$/.test(a)) {
+    return { kind: 'convite', code: a.toUpperCase() };
+  }
   if (kind === 'atleta' && parts.length === 3 && /^\d{4}$/.test(a) && SAFE_ID.test(b)) {
     return { kind: 'atleta', season: a, id: b };
   }
@@ -44,6 +48,8 @@ export function appPath(share: SharePath): string {
       return `destaque/${share.id}`;
     case 'atleta':
       return `atleta/${share.season}/${share.id}`;
+    case 'convite':
+      return `convite/${share.code}`;
     case 'app':
       return 'app';
   }
@@ -132,6 +138,16 @@ export function highlightPageData(highlight: Doc): PageData {
     description: 'Veja as notícias deste destaque no app Arena Football.',
     image: text(highlight.urlImagem),
     kicker: 'Destaque',
+  };
+}
+
+/** Convite de [inviterName] (primeiro nome; vazio = sem nome) com o código. */
+export function invitePageData(inviterName: string, code: string): PageData {
+  return {
+    title: inviterName ? `${inviterName} te convidou para o Arena Football` : 'Você foi convidado para o Arena Football',
+    description: `Baixe o app, entre com o código ${code} e escolha o seu time: vocês dois ganham um pacotinho de figurinhas.`,
+    image: '',
+    kicker: `Convite · código ${code}`,
   };
 }
 

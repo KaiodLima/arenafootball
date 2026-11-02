@@ -17,7 +17,7 @@ import {
   albumOf,
   albumPackMessage,
   applyPack,
-  canOpenPack,
+  packKind,
   dateOf,
   drawPack,
   nextPackAt,
@@ -26,6 +26,17 @@ import {
   rankingEntry,
   stickerOf,
 } from './album';
+import {
+  addExtraPack,
+  extraPacksOf,
+  firstName,
+  referralDecision,
+  referralEnabled,
+  referralJustEnabled,
+  referralMessage,
+  referralReady,
+  referralSettled,
+} from './referrals';
 import {
   BATCH_SIZE,
   DONE_FLAG,
@@ -117,12 +128,16 @@ import {
   PageData,
   athletePageData,
   highlightPageData,
+  invitePageData,
   newsPageData,
   parseSharePath,
   renderSharePage,
 } from './share_page';
 
 setGlobalOptions({ region: 'us-central1', maxInstances: 5 });
+
+/** Texto aparado ('' para nulo/indefinido). */
+const text = (value: unknown): string => (value === undefined || value === null ? '' : String(value).trim());
 
 interface AdminServices {
   db: Firestore;
@@ -805,7 +820,13 @@ export const sharePage = onRequest({ maxInstances: 3 }, async (req, res) => {
   }
   try {
     let data: PageData | null = APP_PAGE;
-    if (share.kind !== 'app') {
+    if (share.kind === 'convite') {
+      // Convite: o primeiro nome de quem convidou (código inexistente = sem nome).
+      const { db } = await admin();
+      const owner = text((await db.collection('codigos_indicacao').doc(share.code).get()).data()?.uid);
+      const profile = owner ? (await db.collection('usuarios').doc(owner).get()).data() : undefined;
+      data = invitePageData(firstName(profile?.nome), share.code);
+    } else if (share.kind !== 'app') {
       const { db } = await admin();
       const ref =
         share.kind === 'noticia'
@@ -898,6 +919,12 @@ export const onUserDeleted = functionsV1
     await db.recursiveDelete(db.collection('usuarios').doc(uid).collection('conquistas'));
     // Álbum de figurinhas: a coleção da conta e os pacotes pedidos.
     await db.recursiveDelete(db.collection('usuarios').doc(uid).collection('album'));
+    // Indique amigos: saldo, lista de indicados e o código da conta.
+    await db.recursiveDelete(db.collection('indicacoes').doc(uid));
+    await deleteExisting(
+      db,
+      (await db.collection('codigos_indicacao').where('uid', '==', uid).get()).docs.map((d) => d.ref),
+    );
     // E as linhas dele nos rankings dos álbuns (poucos eventos).
     const albumEvents = await db.collection('album_eventos').get();
     await deleteExisting(db, albumEvents.docs.map((e) => e.ref.collection('ranking').doc(uid)));
@@ -963,7 +990,98 @@ export const onUserProfileWritten = onDocumentWritten('usuarios/{uid}', async (e
   const ref = await progressRef(event.params.uid);
   const changes = changedFields((await ref.get()).data(), profileCounters(after));
   if (Object.keys(changes).length) await ref.set(changes, { merge: true });
+  // Indique amigos: o perfil acabou de ter o código de quem indicou + o time.
+  if (referralReady(event.data?.before.data(), after)) await settleReferral(event.params.uid, after);
 });
+
+/**
+ * Indicações religadas pelo admin: resolve as que chegaram com elas
+ * desligadas (`indicacoes/{uid}.pendente`), com o perfil atual de cada uma.
+ */
+export const onReferralConfigWritten = onDocumentWritten('config/indicacao', async (event) => {
+  if (!referralJustEnabled(event.data?.before.data(), event.data?.after.data())) return;
+  const { db } = await admin();
+  const pending = await db.collection('indicacoes').where('pendente', '==', true).limit(500).get();
+  for (const doc of pending.docs) {
+    const profile = (await db.collection('usuarios').doc(doc.id).get()).data();
+    if (profile) await settleReferral(doc.id, profile);
+  }
+});
+
+/**
+ * Confere a indicação de [uid] (lógica em referrals.ts) e, se vale, dá 1
+ * pacotinho extra para os dois, a métrica `indicacoes` de quem indicou e o
+ * push; senão grava o motivo. Uma vez só por conta (`validadaEm`/`recusa`).
+ */
+async function settleReferral(uid: string, profile: Record<string, unknown>): Promise<void> {
+  const { db, FieldValue } = await admin();
+  const mineRef = db.collection('indicacoes').doc(uid);
+  if (referralSettled((await mineRef.get()).data())) return;
+  // Desligadas pelo admin: fica pendente e é resolvida quando religar.
+  if (!referralEnabled((await db.doc('config/indicacao').get()).data())) {
+    await mineRef.set({ pendente: true }, { merge: true });
+    return;
+  }
+  const code = text(profile.indicadoPor).toUpperCase();
+  const referrerUid = text((await db.collection('codigos_indicacao').doc(code).get()).data()?.uid);
+  const { getAuth } = await import('firebase-admin/auth');
+  const created = (await getAuth().getUser(uid).catch(() => null))?.metadata.creationTime;
+  const decision = referralDecision({
+    inviteeUid: uid,
+    referrerUid,
+    createdAt: created ? new Date(created) : null,
+    now: new Date(),
+  });
+  const valid = await db.runTransaction(async (tx) => {
+    const mine = await tx.get(mineRef);
+    if (referralSettled(mine.data())) return false;
+    if (!decision.ok) {
+      tx.set(
+        mineRef,
+        { recusa: decision.motivo, recusadaEm: FieldValue.serverTimestamp(), pendente: FieldValue.delete() },
+        { merge: true },
+      );
+      return false;
+    }
+    const theirsRef = db.collection('indicacoes').doc(referrerUid);
+    const theirs = await tx.get(theirsRef);
+    const now = FieldValue.serverTimestamp();
+    const mineExtras = addExtraPack(mine.data());
+    const theirExtras = addExtraPack(theirs.data());
+    tx.set(
+      mineRef,
+      {
+        indicadoPorUid: referrerUid,
+        validadaEm: now,
+        pendente: FieldValue.delete(),
+        pacotesExtras: mineExtras,
+        pacotesExtrasGanhos: FieldValue.increment(mineExtras - extraPacksOf(mine.data())),
+      },
+      { merge: true },
+    );
+    tx.set(
+      theirsRef,
+      {
+        indicados: FieldValue.increment(1),
+        pacotesExtras: theirExtras,
+        pacotesExtrasGanhos: FieldValue.increment(theirExtras - extraPacksOf(theirs.data())),
+      },
+      { merge: true },
+    );
+    tx.set(theirsRef.collection('indicados').doc(uid), { nome: firstName(profile.nome), em: now });
+    tx.set(
+      db.collection('usuarios').doc(referrerUid).collection('progresso').doc('contadores'),
+      { indicacoes: FieldValue.increment(1) },
+      { merge: true },
+    );
+    return true;
+  });
+  if (valid) {
+    await deliver(`indicacao_${uid}`, referralMessage(referrerUid, text(profile.nome)), `usuarios/${uid}`);
+  } else if (!decision.ok) {
+    logger.info('Indicação recusada', { uid, code, motivo: decision.motivo });
+  }
+}
 
 /** Atleta ligado à conta (jogadores da temporada atual): atleta, gols e assistências do Geral. */
 export const onPlayerWritten = onDocumentWritten('{colecao}/{playerId}', async (event) => {
@@ -1160,16 +1278,23 @@ export const onAlbumPackRequested = onDocumentCreated('album_pacotes/{packId}', 
     const eventRef = db.collection('album_eventos').doc(parsed.eventId);
     const albumRef = db.collection('usuarios').doc(parsed.uid).collection('album').doc(parsed.eventId);
     const rankingRef = eventRef.collection('ranking').doc(parsed.uid);
-    const [eventSnap, catalog, albumSnap, rankingSnap, profileSnap] = await Promise.all([
+    const referralRef = db.collection('indicacoes').doc(parsed.uid);
+    const [eventSnap, catalog, albumSnap, rankingSnap, profileSnap, referralSnap] = await Promise.all([
       eventRef.get(),
       eventRef.collection('figurinhas').get(),
       albumRef.get(),
       rankingRef.get(),
       db.collection('usuarios').doc(parsed.uid).get(),
+      referralRef.get(),
     ]);
     const requestedAt = dateOf(event.data?.data()?.pedidoEm) ?? new Date();
-    // Confere de novo a sequência e as 24 h (as regras já barram).
-    if (eventSnap.data()?.ativo !== true || catalog.empty || !canOpenPack(albumSnap.data(), parsed.n, requestedAt)) {
+    // Confere de novo a sequência e as 24 h, ou o saldo de pacotinhos extras
+    // da indicação (as regras já barram). O extra não mexe no relógio do diário.
+    const kind = packKind(albumSnap.data(), parsed.n, requestedAt, {
+      requested: event.data?.data()?.extra === true,
+      extraPacks: extraPacksOf(referralSnap.data()),
+    });
+    if (eventSnap.data()?.ativo !== true || catalog.empty || kind === null) {
       await packRef.update({ status: 'recusado', abertoEm: FieldValue.serverTimestamp() });
       return;
     }
@@ -1181,9 +1306,12 @@ export const onAlbumPackRequested = onDocumentCreated('album_pacotes/{packId}', 
     batch.update(packRef, { status: 'aberto', figurinhas: drawn, novas, abertoEm: FieldValue.serverTimestamp() });
     batch.set(
       albumRef,
-      { ...album, pacotes: parsed.n, ultimoPacote: requestedAt, avisoEm: nextPackAt(requestedAt) },
+      kind === 'extra'
+        ? { ...album, pacotes: parsed.n }
+        : { ...album, pacotes: parsed.n, ultimoPacote: requestedAt, avisoEm: nextPackAt(requestedAt) },
       { merge: true },
     );
+    if (kind === 'extra') batch.update(referralRef, { pacotesExtras: FieldValue.increment(-1) });
     // Ranking de colecionadores do álbum (leitura pública).
     const profile = profileSnap.data() ?? {};
     batch.set(

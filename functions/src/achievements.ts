@@ -29,6 +29,7 @@ export const METRIC_KEYS = [
   'albumFigurinhas',
   'albumPaginas',
   'albumCompleto',
+  'indicacoes',
 ] as const;
 
 /** Ids das conquistas já desbloqueadas (gravado só pelo servidor). */

@@ -11,11 +11,13 @@ class ShareLinks {
   static const String newsPath = 'noticia';
   static const String athletePath = 'atleta';
   static const String highlightPath = 'destaque';
+  static const String invitePath = 'convite';
   static const String appPath = 'app';
 }
 
 final RegExp _idPattern = RegExp(r'^[A-Za-z0-9_-]{1,128}$');
 final RegExp _seasonPattern = RegExp(r'^\d{4}$');
+final RegExp _invitePattern = RegExp(r'^[A-Za-z0-9]{8,10}$');
 
 /// Página pública da notícia.
 String newsLink(String id) => '${ShareLinks.baseUrl}/${ShareLinks.newsPath}/$id';
@@ -25,6 +27,9 @@ String athleteLink(String season, String id) => '${ShareLinks.baseUrl}/${ShareLi
 
 /// Página pública do destaque.
 String highlightLink(String id) => '${ShareLinks.baseUrl}/${ShareLinks.highlightPath}/$id';
+
+/// Convite do "Indique amigos" com o [code] da conta.
+String inviteLink(String code) => '${ShareLinks.baseUrl}/${ShareLinks.invitePath}/$code';
 
 /// Página genérica do app (carteirinha, craque da partida).
 const String appLink = '${ShareLinks.baseUrl}/${ShareLinks.appPath}';
@@ -71,6 +76,19 @@ class HighlightLinkTarget extends DeepLinkTarget {
   int get hashCode => id.hashCode;
 }
 
+/// Convite do "Indique amigos": abre a tela com o código preenchido.
+class InviteLinkTarget extends DeepLinkTarget {
+  final String code;
+
+  const InviteLinkTarget(this.code);
+
+  @override
+  bool operator ==(Object other) => other is InviteLinkTarget && other.code == code;
+
+  @override
+  int get hashCode => code.hashCode;
+}
+
 class AppLinkTarget extends DeepLinkTarget {
   const AppLinkTarget();
 
@@ -107,6 +125,8 @@ DeepLinkTarget? parseDeepLink(Uri uri) {
       return AthleteLinkTarget(season: segments[1], id: segments[2]);
     case ShareLinks.highlightPath when segments.length == 2 && validId(segments[1]):
       return HighlightLinkTarget(segments[1]);
+    case ShareLinks.invitePath when segments.length == 2 && _invitePattern.hasMatch(segments[1]):
+      return InviteLinkTarget(segments[1].toUpperCase());
     case ShareLinks.appPath when segments.length == 1:
       return const AppLinkTarget();
     default:

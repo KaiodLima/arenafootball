@@ -49,7 +49,10 @@ enum AchievementMetric {
   albumPages('albumPaginas', countedByApp: false),
 
   /// Álbum completo (0/1).
-  albumComplete('albumCompleto', countedByApp: false);
+  albumComplete('albumCompleto', countedByApp: false),
+
+  /// Amigos que entraram pelo convite (indicação válida).
+  referrals('indicacoes', countedByApp: false);
 
   final String key;
 

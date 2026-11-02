@@ -18,7 +18,8 @@ enum PushAction {
   partnerNews('noticia_parceiro', true),
   partnerNewsAnswer('noticia_parceiro_resposta', true),
   achievement('conquista', true),
-  albumPack('album_pacote', true);
+  albumPack('album_pacote', true),
+  referral('indicacao', true);
 
   final String key;
   final bool defaultEnabled;

@@ -67,10 +67,25 @@ export function nextPackAt(last: Date): Date {
  * (`pacotes + 1`) e já passaram 24 h do último (ou é o primeiro).
  */
 export function canOpenPack(album: Doc | undefined, n: number, requestedAt: Date): boolean {
+  return packKind(album, n, requestedAt) === 'diario';
+}
+
+/**
+ * Que pacote abre: o do dia ('diario', 24 h depois do último), ou, antes
+ * disso, um pacotinho extra da indicação ('extra', pedido com `extra` e
+ * [extraPacks] > 0, que não mexe no relógio do diário); nulo = recusado.
+ */
+export function packKind(
+  album: Doc | undefined,
+  n: number,
+  requestedAt: Date,
+  extra: { requested: boolean; extraPacks: number } = { requested: false, extraPacks: 0 },
+): 'diario' | 'extra' | null {
   const opened = typeof album?.pacotes === 'number' ? album.pacotes : 0;
-  if (n !== opened + 1) return false;
+  if (n !== opened + 1) return null;
   const last = dateOf(album?.ultimoPacote);
-  return last === null || requestedAt.getTime() >= nextPackAt(last).getTime();
+  if (last === null || requestedAt.getTime() >= nextPackAt(last).getTime()) return 'diario';
+  return extra.requested && extra.extraPacks > 0 ? 'extra' : null;
 }
 
 /** Timestamp do Firestore (ou Date) → Date; nulo se não for data. */

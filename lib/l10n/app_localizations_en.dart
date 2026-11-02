@@ -731,6 +731,158 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get referralTitle => 'Invite friends';
+
+  @override
+  String get referralPaused => 'Invites are paused at the moment.';
+
+  @override
+  String get referralSettingsSwitch => 'Invites enabled';
+
+  @override
+  String get referralSettingsOn =>
+      '\"Invite friends\" shows in the menu and in the album, and invites count.';
+
+  @override
+  String get referralSettingsOff =>
+      'Disabled: the item disappears from the menu and the album. Invites made now are kept and count when you turn it back on (if the friend\'s account is still up to 7 days old). Extra packs already earned still open.';
+
+  @override
+  String referralSettingsRules(int max) {
+    return 'Rules: the friend signs up, enters the code (up to 7 days) and picks a favourite team; both get 1 extra pack (up to $max saved) and the inviter counts towards the \"Friends invited\" achievement.';
+  }
+
+  @override
+  String get referralSettingsSaved => 'Settings saved';
+
+  @override
+  String get referralHeadline => 'Invite friends and get stickers';
+
+  @override
+  String get referralSubtitle =>
+      'Every friend who joins with your invite and picks a team gives 1 extra pack to you and another to them.';
+
+  @override
+  String get referralYourCode => 'YOUR CODE';
+
+  @override
+  String get referralShare => 'Share invite';
+
+  @override
+  String referralShareText(String code, String link) {
+    return 'Follow our local football on Arena Football! Join with my code $code and we both get sticker packs: $link';
+  }
+
+  @override
+  String get referralCodeCopied => 'Code copied';
+
+  @override
+  String get referralStatInvited => 'Friends invited';
+
+  @override
+  String get referralStatExtraPacks => 'Packs saved';
+
+  @override
+  String get referralStatEarned => 'Packs earned';
+
+  @override
+  String get referralHowTitle => 'How it works';
+
+  @override
+  String get referralHowStep1 =>
+      'Share your invite (or the code) with friends.';
+
+  @override
+  String get referralHowStep2 =>
+      'Your friend signs up, enters your code and picks a favourite team.';
+
+  @override
+  String referralHowStep3(int max) {
+    return 'You both get 1 extra pack to open in the album right away, skipping the 24 h wait (up to $max saved).';
+  }
+
+  @override
+  String get referralFriendsTitle => 'Your friends';
+
+  @override
+  String get referralFriendsEmpty => 'Nobody has joined with your invite yet.';
+
+  @override
+  String get referralFriendNoName => 'Friend';
+
+  @override
+  String get referralClaimTitle => 'I was invited';
+
+  @override
+  String get referralClaimHint =>
+      'New account? Enter the code of who invited you (valid for the first 7 days).';
+
+  @override
+  String get referralClaimField => 'Friend\'s code';
+
+  @override
+  String get referralClaimButton => 'Use code';
+
+  @override
+  String get referralClaimSaved =>
+      'Code saved! The pack arrives once you pick your favourite team.';
+
+  @override
+  String get referralClaimInvalid =>
+      'Invalid code: 8 or 10 letters and numbers.';
+
+  @override
+  String get referralClaimOwn => 'That is your own code.';
+
+  @override
+  String get referralClaimOldAccount =>
+      'Invite codes only work in the account\'s first 7 days.';
+
+  @override
+  String get referralClaimAlready => 'Your account has already used a code.';
+
+  @override
+  String referralClaimUsed(String code) {
+    return 'You joined with code $code';
+  }
+
+  @override
+  String get referralClaimValid => 'Invite confirmed: the extra pack is yours!';
+
+  @override
+  String get referralClaimPending => 'Pick your favourite team to confirm.';
+
+  @override
+  String get referralRefusedCode => 'That code does not exist.';
+
+  @override
+  String albumExtraPacks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '+$count extra packs saved',
+      one: '+1 extra pack saved',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get albumOpenExtraPack => 'Open extra pack';
+
+  @override
+  String get albumInviteForPacks => 'Get packs by inviting friends';
+
+  @override
+  String get pushActionReferral => 'Invite confirmed';
+
+  @override
+  String get pushActionReferralHint =>
+      'To the inviter · their friend joined and the extra pack arrived';
+
+  @override
+  String get achievementMetricReferrals => 'Friends invited';
+
+  @override
   String get teamPickerOtherRegion => 'Other regions';
 
   @override
