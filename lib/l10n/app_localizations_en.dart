@@ -731,6 +731,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get teamPickerOtherRegion => 'Other regions';
+
+  @override
+  String get matchFormRegionFilter => 'Find competitions and teams in';
+
+  @override
+  String get matchFormRegionFilterHint =>
+      'Intercity competitions show up in every region.';
+
+  @override
+  String matchFormAppearsIn(String regions) {
+    return 'Shows up in $regions';
+  }
+
+  @override
+  String matchFormAppearsHostTeams(String championship) {
+    return '$championship host and the teams\' regions';
+  }
+
+  @override
+  String matchFormAppearsHost(String championship) {
+    return '$championship host';
+  }
+
+  @override
+  String get matchFormAppearsTeams => 'The teams\' regions';
+
+  @override
+  String get matchFormAppearsFilter => 'Region selected above';
+
+  @override
+  String get matchFormAnd => 'and';
+
+  @override
   String get matchDelay => 'Delayed';
 
   @override
@@ -3273,9 +3307,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homePublishNews => 'News';
-
-  @override
-  String get homePublishGoal => 'Goal';
 
   @override
   String get homePublishAd => 'Ad';

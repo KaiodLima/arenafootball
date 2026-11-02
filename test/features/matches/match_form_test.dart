@@ -327,6 +327,56 @@ void main() {
     expect(form.copyWith(teams: [lavaJato], homeTeam: 'Lava Jato', awayTeam: 'Lava Jato').toMatch().regionIds, isEmpty);
   });
 
+  test('região da partida: sede do campeonato e times, não a do filtro', () {
+    RegionRegistry.configure(const [RegionRef(id: 'fl', name: 'Floresta'), RegionRef(id: 'co', name: 'Colônia')]);
+    addTearDown(RegionRegistry.reset);
+    const pucas = TeamDTO(id: '1', name: 'Puças', region: 'Colônia');
+    const invasao = TeamDTO(id: '2', name: 'Invasão', region: 'Colônia');
+    const lavaJato = TeamDTO(id: '3', name: 'Lava Jato', region: 'Floresta');
+    const copaVerde = ChampionshipDTO(
+      id: 'cv',
+      championshipId: 8,
+      title: 'Copa Verde',
+      region: 'Colônia',
+      teams: ['Puças', 'Invasão', 'Lava Jato'],
+      teamIds: ['1', '2', '3'],
+      scope: ChampionshipScope.intermunicipal,
+    );
+    // Formulário em Floresta, Copa Verde (sede Colônia), dois times de Colônia.
+    const form = MatchFormData(
+      selectedRegion: 'Floresta',
+      regionTeams: [lavaJato],
+      seasonTeams: [pucas, invasao, lavaJato],
+      championships: [copaVerde],
+      championshipId: 8,
+    );
+    final local = form.copyWith(homeTeam: 'Puças', awayTeam: 'Invasão');
+    expect(local.toMatch().region, 'Colônia');
+    expect(local.toMatch().regionIds, isEmpty);
+    expect(local.appearsIn, ['Colônia']);
+
+    // Colônia × Floresta pela Copa Verde: as duas.
+    final mixed = form.copyWith(homeTeam: 'Puças', awayTeam: 'Lava Jato');
+    expect(mixed.toMatch().region, 'Colônia');
+    expect(mixed.toMatch().regionIds.toSet(), {'co', 'fl'});
+
+    // Amistoso de dois times de Colônia com o filtro em Floresta: Colônia.
+    final friendly = local.copyWith(championshipId: () => null);
+    expect(friendly.toMatch().region, 'Colônia');
+    expect(friendly.toMatch().regionIds, isEmpty);
+
+    // Municipal da região do filtro: como antes.
+    const florestaCup = ChampionshipDTO(id: 'fc', championshipId: 9, region: 'Floresta');
+    final municipal = const MatchFormData(
+      selectedRegion: 'Floresta',
+      regionTeams: [lavaJato],
+      championships: [florestaCup],
+      championshipId: 9,
+    ).copyWith(homeTeam: 'Lava Jato', awayTeam: 'Lava Jato');
+    expect(municipal.toMatch().region, 'Floresta');
+    expect(municipal.toMatch().regionIds, isEmpty);
+  });
+
   group('campeonato da partida', () {
     test('um campeonato já vem escolhido; amistoso grava 0 sem a tabela fixa e com os ids dos times', () async {
       final repository = _FakeRepository();

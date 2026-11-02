@@ -1335,6 +1335,60 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @teamPickerOtherRegion.
+  ///
+  /// In pt, this message translates to:
+  /// **'Outras regiões'**
+  String get teamPickerOtherRegion;
+
+  /// No description provided for @matchFormRegionFilter.
+  ///
+  /// In pt, this message translates to:
+  /// **'Procurar campeonatos e times em'**
+  String get matchFormRegionFilter;
+
+  /// No description provided for @matchFormRegionFilterHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeonatos intermunicipais aparecem em todas as regiões.'**
+  String get matchFormRegionFilterHint;
+
+  /// No description provided for @matchFormAppearsIn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aparece em {regions}'**
+  String matchFormAppearsIn(String regions);
+
+  /// No description provided for @matchFormAppearsHostTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sede do {championship} e região dos times'**
+  String matchFormAppearsHostTeams(String championship);
+
+  /// No description provided for @matchFormAppearsHost.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sede do {championship}'**
+  String matchFormAppearsHost(String championship);
+
+  /// No description provided for @matchFormAppearsTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Região dos times'**
+  String get matchFormAppearsTeams;
+
+  /// No description provided for @matchFormAppearsFilter.
+  ///
+  /// In pt, this message translates to:
+  /// **'Região selecionada acima'**
+  String get matchFormAppearsFilter;
+
+  /// No description provided for @matchFormAnd.
+  ///
+  /// In pt, this message translates to:
+  /// **'e'**
+  String get matchFormAnd;
+
   /// No description provided for @matchDelay.
   ///
   /// In pt, this message translates to:
@@ -5518,12 +5572,6 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Notícia'**
   String get homePublishNews;
-
-  /// No description provided for @homePublishGoal.
-  ///
-  /// In pt, this message translates to:
-  /// **'Gol'**
-  String get homePublishGoal;
 
   /// No description provided for @homePublishAd.
   ///

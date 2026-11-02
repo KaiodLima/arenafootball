@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/regions/presentation/widgets/region_select_tile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
@@ -308,19 +309,12 @@ class _NewsFormPageState extends State<NewsFormPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _FieldLabel(l10n.newsRegion),
-                      Wrap(
-                        spacing: AppSizes.s8,
-                        runSpacing: AppSizes.s8,
-                        children: [
-                          for (final region in form.regions)
-                            ArenaChoiceChip(
-                              label: region,
-                              icon: Icons.place_outlined,
-                              selected: region == form.selectedRegion,
-                              onTap: () => _cubit.selectRegion(region),
-                            ),
-                        ],
+                      RegionSelectTile(
+                        label: l10n.newsRegion,
+                        region: form.selectedRegion ?? '',
+                        regions: form.regions,
+                        recent: BlocProvider.of<RegionCubit>(context).state.recentRegions,
+                        onChanged: _cubit.selectRegion,
                       ),
                       if (!form.isAd) ...[
                         const SizedBox(height: AppSizes.s20),

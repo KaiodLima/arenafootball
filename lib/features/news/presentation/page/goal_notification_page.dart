@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/regions/presentation/widgets/region_select_tile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
@@ -195,18 +196,12 @@ class _GoalNotificationPageState extends State<GoalNotificationPage> {
           body: ListView(
             padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, AppSizes.s24),
             children: [
-              Wrap(
-                spacing: AppSizes.s8,
-                runSpacing: AppSizes.s8,
-                children: [
-                  for (final region in form.regions)
-                    ArenaChoiceChip(
-                      label: region,
-                      icon: Icons.place_outlined,
-                      selected: region == form.selectedRegion,
-                      onTap: () => _cubit.selectRegion(region),
-                    ),
-                ],
+              RegionSelectTile(
+                label: l10n.registerRegionLabel,
+                region: form.selectedRegion ?? '',
+                regions: form.regions,
+                recent: BlocProvider.of<RegionCubit>(context).state.recentRegions,
+                onChanged: _cubit.selectRegion,
               ),
               const SizedBox(height: AppSizes.s20),
               if (form.todayMatches.isNotEmpty) ...[

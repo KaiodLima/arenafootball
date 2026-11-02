@@ -8,6 +8,9 @@ import 'package:arena_soccer/features/album/presentation/bloc/manage_album_cubit
 import 'package:arena_soccer/features/album/presentation/widgets/sticker_card.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/core/utils/search_text.dart';
+import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
+import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
+import 'package:arena_soccer/utils/components/team_picker_sheet.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
@@ -254,6 +257,56 @@ class _EventEditorState extends State<_EventEditor> {
     widget.cubit.saveEvent(_event.copyWith(title: title, description: _description.text.trim()));
   }
 
+  /// Times do evento: um bloco por região (a atual primeiro), com
+  /// "marcados/total" no cabeçalho; uma região só = sem cabeçalho.
+  Widget _teamChoices(BuildContext context, ManageAlbumState state) {
+    final l10n = AppLocalizations.of(context);
+    final groups = groupTeamsByRegion(
+      state.teams,
+      firstRegion: BlocProvider.of<RegionCubit>(context).state.selectedRegion,
+    );
+    Widget chips(List<TeamDTO> teams) => Wrap(
+          spacing: AppSizes.s8,
+          runSpacing: AppSizes.s8,
+          children: [
+            for (final team in teams)
+              FilterChip(
+                label: Text(team.name),
+                selected: _event.teamIds.contains(team.id),
+                onSelected: state.busy ? null : (_) => _toggleTeam(team.id, team.name),
+              ),
+          ],
+        );
+    if (groups.length < 2) return chips(groups.firstOrNull?.teams ?? const []);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final group in groups) ...[
+          Padding(
+            padding: const EdgeInsets.only(top: AppSizes.s8, bottom: AppSizes.s6),
+            child: Row(
+              children: [
+                const Icon(Icons.location_on_rounded, color: AppColors.primaryDark, size: AppSizes.s16),
+                const SizedBox(width: AppSizes.s6),
+                Expanded(
+                  child: Text(
+                    group.region.isEmpty ? l10n.teamPickerOtherRegion : group.region,
+                    style: AppTypography.label(color: AppColors.textPrimary),
+                  ),
+                ),
+                Text(
+                  '${group.teams.where((t) => _event.teamIds.contains(t.id)).length}/${group.teams.length}',
+                  style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+                ),
+              ],
+            ),
+          ),
+          chips(group.teams),
+        ],
+      ],
+    );
+  }
+
   void _toggleTeam(String teamId, String teamName) {
     final ids = [..._event.teamIds];
     final names = [..._event.teams];
@@ -323,18 +376,7 @@ class _EventEditorState extends State<_EventEditor> {
         const SizedBox(height: AppSizes.s16),
         FormSection(
           title: l10n.albumAdminTeams,
-          child: Wrap(
-            spacing: AppSizes.s8,
-            runSpacing: AppSizes.s8,
-            children: [
-              for (final team in state.teams)
-                FilterChip(
-                  label: Text(team.name),
-                  selected: _event.teamIds.contains(team.id),
-                  onSelected: state.busy ? null : (_) => _toggleTeam(team.id, team.name),
-                ),
-            ],
-          ),
+          child: _teamChoices(context, state),
         ),
         const SizedBox(height: AppSizes.s16),
         for (final page in pages) _TeamStickers(page: page, state: state, cubit: widget.cubit, onEdit: _editSticker),

@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/regions/presentation/widgets/region_select_tile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
@@ -7,7 +8,6 @@ import 'package:arena_soccer/features/championships/presentation/bloc/manage_cha
 import 'package:arena_soccer/features/championships/presentation/bloc/manage_championships_state.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
-import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/card_menu_button.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
@@ -91,18 +91,12 @@ class _ManageChampionshipsPageState extends State<ManageChampionshipsPage> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, AppSizes.s80),
             children: [
-              Wrap(
-                spacing: AppSizes.s8,
-                runSpacing: AppSizes.s8,
-                children: [
-                  for (final region in regions)
-                    ArenaChoiceChip(
-                      label: region,
-                      icon: Icons.place_outlined,
-                      selected: region == state.region,
-                      onTap: () => _cubit.selectRegion(region),
-                    ),
-                ],
+              RegionSelectTile(
+                label: l10n.registerRegionLabel,
+                region: state.region,
+                regions: regions,
+                recent: BlocProvider.of<RegionCubit>(context).state.recentRegions,
+                onChanged: _cubit.selectRegion,
               ),
               const SizedBox(height: AppSizes.s16),
               if (state.loading)

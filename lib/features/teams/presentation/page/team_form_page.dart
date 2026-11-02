@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/regions/presentation/widgets/region_select_tile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
@@ -7,7 +8,6 @@ import 'package:arena_soccer/features/teams/presentation/bloc/team_form_state.da
 import 'package:arena_soccer/features/teams/presentation/widgets/region_teams_strip.dart';
 import 'package:arena_soccer/features/teams/presentation/widgets/team_card.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
-import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_input_decoration.dart';
 import 'package:arena_soccer/utils/components/arena_submit_bar.dart';
 import 'package:arena_soccer/utils/components/circle_photo_picker.dart';
@@ -144,19 +144,12 @@ class _TeamFormPageState extends State<TeamFormPage> {
                   onRemove: _cubit.clearCrest,
                 )),
                 const SizedBox(height: AppSizes.s20),
-                Wrap(
-                  spacing: AppSizes.s8,
-                  runSpacing: AppSizes.s8,
-                  alignment: WrapAlignment.center,
-                  children: [
-                    for (final region in form.regions)
-                      ArenaChoiceChip(
-                        label: region,
-                        icon: Icons.place_outlined,
-                        selected: region == form.selectedRegion,
-                        onTap: () => _cubit.selectRegion(region),
-                      ),
-                  ],
+                RegionSelectTile(
+                  label: l10n.registerRegionLabel,
+                  region: form.selectedRegion ?? '',
+                  regions: form.regions,
+                  recent: BlocProvider.of<RegionCubit>(context).state.recentRegions,
+                  onChanged: _cubit.selectRegion,
                 ),
                 const SizedBox(height: AppSizes.s20),
                 FormSection(

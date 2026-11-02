@@ -9,12 +9,14 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 
 /// Folha "Escolha a região": busca (com muitas regiões), as recentes em
 /// chips e a lista em ordem alfabética com a atual marcada. Devolve a
-/// escolhida (nula = fechou sem escolher).
+/// escolhida (nula = fechou sem escolher). Com [allLabel], a 1ª linha é
+/// "Todas as regiões", que devolve ''.
 Future<String?> showRegionPicker(
   BuildContext context, {
   required List<String> regions,
   required String selected,
   List<String> recent = const [],
+  String? allLabel,
 }) {
   return showModalBottomSheet<String>(
     context: context,
@@ -23,7 +25,7 @@ Future<String?> showRegionPicker(
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(AppSizes.radiusLarge)),
     ),
-    builder: (_) => _RegionPicker(regions: regions, selected: selected, recent: recent),
+    builder: (_) => _RegionPicker(regions: regions, selected: selected, recent: recent, allLabel: allLabel),
   );
 }
 
@@ -34,8 +36,9 @@ class _RegionPicker extends StatefulWidget {
   final List<String> regions;
   final String selected;
   final List<String> recent;
+  final String? allLabel;
 
-  const _RegionPicker({required this.regions, required this.selected, required this.recent});
+  const _RegionPicker({required this.regions, required this.selected, required this.recent, this.allLabel});
 
   @override
   State<_RegionPicker> createState() => _RegionPickerState();
@@ -50,6 +53,9 @@ class _RegionPickerState extends State<_RegionPicker> {
     final media = MediaQuery.of(context);
     final searching = _query.trim().isNotEmpty;
     final list = RegionChoices.search(widget.regions, _query);
+    // "Todas as regiões" ('') no topo, fora da busca.
+    final all = widget.allLabel != null && !searching;
+    final rows = [if (all) '', ...list];
     final recent = searching
         ? const <String>[]
         : RegionChoices.recentToShow(widget.recent, selected: widget.selected, regions: widget.regions);
@@ -109,7 +115,7 @@ class _RegionPickerState extends State<_RegionPicker> {
               ],
               _SectionLabel(l10n.regionPickerAll),
               Flexible(
-                child: list.isEmpty
+                child: rows.isEmpty
                     ? Padding(
                         padding: const EdgeInsets.all(AppSizes.s24),
                         child: Text(
@@ -121,18 +127,23 @@ class _RegionPickerState extends State<_RegionPicker> {
                     : ListView.builder(
                         shrinkWrap: true,
                         padding: const EdgeInsets.only(bottom: AppSizes.s8),
-                        itemCount: list.length,
+                        itemCount: rows.length,
                         itemBuilder: (context, i) {
-                          final region = list[i];
+                          final region = rows[i];
                           final selected = region == widget.selected;
+                          final isAll = all && region.isEmpty;
                           return ListTile(
                             contentPadding: const EdgeInsets.symmetric(horizontal: AppSizes.s20),
                             leading: Icon(
-                              selected ? Icons.location_on_rounded : Icons.location_on_outlined,
+                              isAll
+                                  ? Icons.public_rounded
+                                  : selected
+                                      ? Icons.location_on_rounded
+                                      : Icons.location_on_outlined,
                               color: selected ? AppColors.primary : AppColors.textSecondary,
                             ),
                             title: Text(
-                              region,
+                              isAll ? widget.allLabel! : region,
                               style: AppTypography.body(color: selected ? AppColors.primary : AppColors.textPrimary)
                                   .copyWith(fontWeight: selected ? FontWeight.w700 : FontWeight.w400),
                             ),

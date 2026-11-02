@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/regions/presentation/widgets/region_select_tile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
@@ -10,7 +11,6 @@ import 'package:arena_soccer/features/team_requests/presentation/bloc/team_reque
 import 'package:arena_soccer/features/team_requests/presentation/widgets/my_team_view.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
-import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/arena_input_decoration.dart';
 import 'package:arena_soccer/utils/components/arena_submit_bar.dart';
@@ -183,18 +183,12 @@ class _TeamRequestPageState extends State<TeamRequestPage> {
       children: [
         Text(l10n.teamRequestIntro, style: AppTypography.subtitle()),
         const SizedBox(height: AppSizes.s16),
-        Wrap(
-          spacing: AppSizes.s8,
-          runSpacing: AppSizes.s8,
-          children: [
-            for (final region in form.regions)
-              ArenaChoiceChip(
-                label: region,
-                icon: Icons.place_outlined,
-                selected: region == form.selectedRegion,
-                onTap: () => _cubit.selectRegion(region),
-              ),
-          ],
+        RegionSelectTile(
+          label: l10n.registerRegionLabel,
+          region: form.selectedRegion ?? '',
+          regions: form.regions,
+          recent: BlocProvider.of<RegionCubit>(context).state.recentRegions,
+          onChanged: _cubit.selectRegion,
         ),
         const SizedBox(height: AppSizes.s20),
         Center(

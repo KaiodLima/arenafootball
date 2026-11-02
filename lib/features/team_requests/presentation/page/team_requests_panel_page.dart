@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/regions/presentation/widgets/region_select_tile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
@@ -11,7 +12,6 @@ import 'package:arena_soccer/features/team_requests/presentation/bloc/team_reque
 import 'package:arena_soccer/features/team_requests/presentation/widgets/reason_dialog.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
-import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/arena_input_decoration.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
@@ -368,18 +368,12 @@ class _EditSheetState extends State<_EditSheet> {
                 errorText: valid ? null : l10n.teamRequestNameRequired,
               ),
             ),
-            Wrap(
-              spacing: AppSizes.s8,
-              runSpacing: AppSizes.s8,
-              children: [
-                for (final region in regions)
-                  ArenaChoiceChip(
-                    label: region,
-                    icon: Icons.place_outlined,
-                    selected: region == _region,
-                    onTap: () => setState(() => _region = region),
-                  ),
-              ],
+            RegionSelectTile(
+              label: l10n.registerRegionLabel,
+              region: _region,
+              regions: regions,
+              recent: BlocProvider.of<RegionCubit>(context).state.recentRegions,
+              onChanged: (region) => setState(() => _region = region),
             ),
             const SizedBox(height: AppSizes.s16),
             TextField(

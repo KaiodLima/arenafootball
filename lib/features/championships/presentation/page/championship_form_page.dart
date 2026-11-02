@@ -1,5 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/regions/presentation/widgets/region_select_tile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/standings_criteria_editor.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
@@ -227,12 +228,12 @@ class _ChampionshipFormPageState extends State<ChampionshipFormPage> {
                 ),
               ),
               const SizedBox(height: AppSizes.s4),
-              _Label(l10n.registerRegionLabel),
-              _Chips(
-                values: form.regions,
-                selected: base.region,
-                icon: Icons.place_outlined,
-                onSelected: _cubit.selectRegion,
+              RegionSelectTile(
+                label: l10n.registerRegionLabel,
+                region: base.region,
+                regions: form.regions,
+                recent: BlocProvider.of<RegionCubit>(context).state.recentRegions,
+                onChanged: _cubit.selectRegion,
               ),
               const SizedBox(height: AppSizes.s14),
               _Label(l10n.championshipFormSeasonLabel),
@@ -466,10 +467,9 @@ class _Label extends StatelessWidget {
 class _Chips extends StatelessWidget {
   final List<String> values;
   final String selected;
-  final IconData? icon;
   final ValueChanged<String> onSelected;
 
-  const _Chips({required this.values, required this.selected, required this.onSelected, this.icon});
+  const _Chips({required this.values, required this.selected, required this.onSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -478,7 +478,7 @@ class _Chips extends StatelessWidget {
       runSpacing: AppSizes.s8,
       children: [
         for (final value in values)
-          ArenaChoiceChip(label: value, icon: icon, selected: value == selected, onTap: () => onSelected(value)),
+          ArenaChoiceChip(label: value, selected: value == selected, onTap: () => onSelected(value)),
       ],
     );
   }

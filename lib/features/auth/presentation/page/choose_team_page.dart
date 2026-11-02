@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/regions/presentation/widgets/region_select_tile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/choose_team_cubit.dart';
@@ -12,7 +13,6 @@ import 'package:arena_soccer/utils/components/team_choice_selector.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
-import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
@@ -141,19 +141,12 @@ class _ChooseTeamPageState extends State<ChooseTeamPage> {
                 else if (state is LoadErrorChooseTeamState)
                   _LoadError(onRetry: () => _cubit.retry(initialRegion: _initialRegion))
                 else ...[
-                  _SectionLabel(icon: Icons.place_outlined, text: l10n.registerRegionLabel),
-                  const SizedBox(height: AppSizes.s10),
-                  Wrap(
-                    spacing: AppSizes.s8,
-                    runSpacing: AppSizes.s8,
-                    children: [
-                      for (final region in state.regions)
-                        ArenaChoiceChip(
-                          label: region,
-                          selected: region == state.selectedRegion,
-                          onTap: () => _cubit.selectRegion(region),
-                        ),
-                    ],
+                  RegionSelectTile(
+                    label: l10n.registerRegionLabel,
+                    region: state.selectedRegion ?? '',
+                    regions: state.regions,
+                    recent: BlocProvider.of<RegionCubit>(context).state.recentRegions,
+                    onChanged: _cubit.selectRegion,
                   ),
                   const SizedBox(height: AppSizes.s24),
                   if (!state.loadingTeams && state.teams.isEmpty)
@@ -194,24 +187,6 @@ class _ChooseTeamPageState extends State<ChooseTeamPage> {
           );
         },
       ),
-    );
-  }
-}
-
-class _SectionLabel extends StatelessWidget {
-  final IconData icon;
-  final String text;
-
-  const _SectionLabel({required this.icon, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: AppSizes.s18, color: AppColors.textSecondary),
-        const SizedBox(width: AppSizes.s6),
-        Text(text, style: AppTypography.label(color: AppColors.textPrimary)),
-      ],
     );
   }
 }

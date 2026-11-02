@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/regions/presentation/widgets/region_select_tile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
@@ -9,7 +10,6 @@ import 'package:arena_soccer/features/news/presentation/bloc/news_form_state.dar
 import 'package:arena_soccer/features/news/presentation/widgets/news_cover_picker.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
-import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_input_decoration.dart';
 import 'package:arena_soccer/utils/components/arena_submit_bar.dart';
 import 'package:arena_soccer/utils/components/form_section.dart';
@@ -225,25 +225,12 @@ class _AdFormPageState extends State<AdFormPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: AppSizes.s10),
-                        child: Text(
-                          l10n.newsRegion,
-                          style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s14),
-                        ),
-                      ),
-                      Wrap(
-                        spacing: AppSizes.s8,
-                        runSpacing: AppSizes.s8,
-                        children: [
-                          for (final region in form.regions)
-                            ArenaChoiceChip(
-                              label: region,
-                              icon: Icons.place_outlined,
-                              selected: region == form.selectedRegion,
-                              onTap: () => _cubit.selectRegion(region),
-                            ),
-                        ],
+                      RegionSelectTile(
+                        label: l10n.newsRegion,
+                        region: form.selectedRegion ?? '',
+                        regions: form.regions,
+                        recent: BlocProvider.of<RegionCubit>(context).state.recentRegions,
+                        onChanged: _cubit.selectRegion,
                       ),
                       const SizedBox(height: AppSizes.s16),
                       VisibleSwitch(

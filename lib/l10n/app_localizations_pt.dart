@@ -734,6 +734,40 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get teamPickerOtherRegion => 'Outras regiões';
+
+  @override
+  String get matchFormRegionFilter => 'Procurar campeonatos e times em';
+
+  @override
+  String get matchFormRegionFilterHint =>
+      'Campeonatos intermunicipais aparecem em todas as regiões.';
+
+  @override
+  String matchFormAppearsIn(String regions) {
+    return 'Aparece em $regions';
+  }
+
+  @override
+  String matchFormAppearsHostTeams(String championship) {
+    return 'Sede do $championship e região dos times';
+  }
+
+  @override
+  String matchFormAppearsHost(String championship) {
+    return 'Sede do $championship';
+  }
+
+  @override
+  String get matchFormAppearsTeams => 'Região dos times';
+
+  @override
+  String get matchFormAppearsFilter => 'Região selecionada acima';
+
+  @override
+  String get matchFormAnd => 'e';
+
+  @override
   String get matchDelay => 'Atrasou';
 
   @override
@@ -3292,9 +3326,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get homePublishNews => 'Notícia';
-
-  @override
-  String get homePublishGoal => 'Gol';
 
   @override
   String get homePublishAd => 'Anúncio';

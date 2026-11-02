@@ -89,17 +89,43 @@ class MatchFormData extends Equatable {
     return base.where((t) => championship.hasTeam(id: t.id, name: t.name)).toList();
   }
 
-  /// Ids das regiões dos dois times quando são diferentes (vazio = mesma
-  /// região): a partida aparece nas duas.
-  List<String> get regionIdsOfTeams {
-    String regionIdOf(String? name) {
-      for (final team in teams) {
-        if (team.name == name) return RegionRegistry.idOf(team.region);
+  /// Região do time de nome [name] ('' se não achar).
+  String regionOfTeam(String? name) {
+    if (name == null) return '';
+    for (final list in [teams, seasonTeams, regionTeams]) {
+      for (final team in list) {
+        if (team.name == name) return team.region;
       }
-      return '';
     }
+    return '';
+  }
 
-    final ids = {regionIdOf(homeTeam), regionIdOf(awayTeam), RegionRegistry.idOf(selectedRegion ?? '')}..remove('');
+  ChampionshipDTO? get selectedChampionship =>
+      championships.where((c) => c.championshipId == championshipId).firstOrNull;
+
+  /// Sede do campeonato escolhido ('' = amistoso ou campeonato sem região).
+  String get hostRegion => championshipId == null ? '' : (selectedChampionship?.region ?? '').trim();
+
+  /// Região gravada na partida: a sede do campeonato; sem ela, a do filtro
+  /// se um dos times for dela, senão a do mandante (ou do visitante). A
+  /// região do filtro do formulário sozinha não conta (o intermunicipal de
+  /// outra sede aparece em todas as regiões do filtro).
+  String get matchRegion {
+    if (hostRegion.isNotEmpty) return hostRegion;
+    final current = selectedRegion ?? '';
+    final regions = [regionOfTeam(homeTeam), regionOfTeam(awayTeam)].where((r) => r.isNotEmpty).toList();
+    if (regions.isEmpty || regions.contains(current)) return current;
+    return regions.first;
+  }
+
+  /// Regiões em que a partida aparece (nomes): a dela e as dos dois times.
+  List<String> get appearsIn =>
+      {matchRegion, regionOfTeam(homeTeam), regionOfTeam(awayTeam)}.where((r) => r.isNotEmpty).toList();
+
+  /// Ids das regiões da partida quando são mais de uma (vazio = região só):
+  /// a partida aparece em todas.
+  List<String> get regionIdsOfTeams {
+    final ids = {for (final region in appearsIn) RegionRegistry.idOf(region)}..remove('');
     return ids.length > 1 ? ids.toList() : const [];
   }
 
@@ -157,7 +183,7 @@ class MatchFormData extends Equatable {
         time: time,
         venue: venue.trim(),
         durationMinutes: durationMinutes,
-        region: selectedRegion ?? '',
+        region: matchRegion,
         championshipId: championshipId ?? 0,
         regionIds: regionIdsOfTeams,
       );

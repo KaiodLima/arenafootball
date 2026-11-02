@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/regions/presentation/widgets/region_select_tile.dart';
+import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/utils/relative_time.dart';
 import 'package:arena_soccer/features/notifications/data/dtos/push_log_dto.dart';
@@ -8,7 +10,6 @@ import 'package:arena_soccer/features/notifications/presentation/bloc/notificati
 import 'package:arena_soccer/features/notifications/presentation/bloc/notifications_panel_state.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_card.dart';
-import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/arena_input_decoration.dart';
 import 'package:arena_soccer/utils/components/arena_segmented_pill.dart';
@@ -448,24 +449,13 @@ class _SendTab extends StatelessWidget {
         ),
         FormSection(
           title: l10n.pushNoticeAudience,
-          child: Wrap(
-            spacing: AppSizes.s8,
-            runSpacing: AppSizes.s8,
-            children: [
-              ArenaChoiceChip(
-                label: l10n.pushAllRegions,
-                icon: Icons.public_rounded,
-                selected: notice.region.isEmpty,
-                onTap: () => onRegion(''),
-              ),
-              for (final region in state.regions)
-                ArenaChoiceChip(
-                  label: region,
-                  icon: Icons.place_outlined,
-                  selected: notice.region == region,
-                  onTap: () => onRegion(region),
-                ),
-            ],
+          child: RegionSelectTile(
+            label: l10n.registerRegionLabel,
+            region: notice.region,
+            regions: state.regions,
+            recent: BlocProvider.of<RegionCubit>(context).state.recentRegions,
+            allLabel: l10n.pushAllRegions,
+            onChanged: onRegion,
           ),
         ),
         FormSection(

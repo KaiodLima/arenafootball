@@ -8,6 +8,7 @@ import 'package:arena_soccer/features/matches/presentation/widgets/date_time_chi
 import 'package:arena_soccer/features/matches/presentation/widgets/match_card.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/matchup_picker.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
+import 'package:arena_soccer/features/regions/presentation/widgets/region_select_tile.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_input_decoration.dart';
@@ -72,6 +73,7 @@ class _MatchFormPageState extends State<MatchFormPage> {
       title: home ? l10n.goalHome : l10n.goalAway,
       teams: form.teams,
       selected: home ? form.homeTeam : form.awayTeam,
+      firstRegion: form.matchRegion,
     );
     if (picked == null) return;
     home ? _cubit.selectHomeTeam(picked.name) : _cubit.selectAwayTeam(picked.name);
@@ -148,19 +150,17 @@ class _MatchFormPageState extends State<MatchFormPage> {
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, AppSizes.s24),
             children: [
-              Wrap(
-                spacing: AppSizes.s8,
-                runSpacing: AppSizes.s8,
-                children: [
-                  for (final region in form.regions)
-                    ArenaChoiceChip(
-                      label: region,
-                      icon: Icons.place_outlined,
-                      selected: region == form.selectedRegion,
-                      onTap: () => _cubit.selectRegion(region),
-                    ),
-                ],
+              // Filtro: de onde vêm os campeonatos e os times oferecidos (não
+              // é a região da partida, que aparece no cartão abaixo do confronto).
+              RegionSelectTile(
+                label: l10n.matchFormRegionFilter,
+                region: form.selectedRegion ?? '',
+                regions: form.regions,
+                recent: BlocProvider.of<RegionCubit>(context).state.recentRegions,
+                onChanged: _cubit.selectRegion,
               ),
+              const SizedBox(height: AppSizes.s6),
+              Text(l10n.matchFormRegionFilterHint, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
               // Campeonato da partida (sempre à vista), ou amistoso.
               const SizedBox(height: AppSizes.s20),
               _Label(l10n.matchFormChampionship),
@@ -188,6 +188,8 @@ class _MatchFormPageState extends State<MatchFormPage> {
                 onSwap: _cubit.swapTeams,
                 errorText: _teamsError(form, l10n),
               ),
+              const SizedBox(height: AppSizes.s12),
+              _AppearsIn(form: form),
               const SizedBox(height: AppSizes.s20),
               _Label(l10n.matchFormWhen),
               MatchDateChips(selected: form.date, onSelected: _cubit.selectDate),
@@ -253,6 +255,53 @@ class _MatchFormPageState extends State<MatchFormPage> {
           ),
         );
       },
+    );
+  }
+}
+
+/// "Aparece em Colônia e Floresta": onde a partida (e os cards dela no
+/// feed) vai aparecer, com o motivo (sede do campeonato e/ou times).
+class _AppearsIn extends StatelessWidget {
+  final MatchFormData form;
+
+  const _AppearsIn({required this.form});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final regions = form.appearsIn;
+    if (regions.isEmpty) return const SizedBox.shrink();
+    final names = regions.length == 1
+        ? regions.first
+        : '${regions.sublist(0, regions.length - 1).join(', ')} ${l10n.matchFormAnd} ${regions.last}';
+    final hasTeams = form.regionOfTeam(form.homeTeam).isNotEmpty || form.regionOfTeam(form.awayTeam).isNotEmpty;
+    final championship = form.selectedChampionship?.title.trim() ?? '';
+    final reason = form.hostRegion.isNotEmpty && championship.isNotEmpty
+        ? (hasTeams ? l10n.matchFormAppearsHostTeams(championship) : l10n.matchFormAppearsHost(championship))
+        : hasTeams
+            ? l10n.matchFormAppearsTeams
+            : l10n.matchFormAppearsFilter;
+    return Container(
+      padding: const EdgeInsets.all(AppSizes.s12),
+      decoration: BoxDecoration(color: AppColors.primarySoft, borderRadius: BorderRadius.circular(AppSizes.s12)),
+      child: Row(
+        children: [
+          const Icon(Icons.place_rounded, color: AppColors.primaryDark, size: AppSizes.s20),
+          const SizedBox(width: AppSizes.s10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.matchFormAppearsIn(names),
+                  style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s14),
+                ),
+                Text(reason, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
