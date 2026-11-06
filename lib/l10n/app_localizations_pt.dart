@@ -734,6 +734,207 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get organizerSquadPermission =>
+      'Sem permissão para mudar este elenco. Peça ao admin para abrir o painel \"Organizadores de campeonato\" e tente de novo.';
+
+  @override
+  String get organizerSquadAdd => 'Do elenco geral';
+
+  @override
+  String get organizerSquadNew => 'Novo atleta';
+
+  @override
+  String get organizerSquadAddTitle => 'Adicionar à competição';
+
+  @override
+  String organizerSquadAddHint(String championship) {
+    return 'Atletas do elenco geral do time que ainda não estão em $championship.';
+  }
+
+  @override
+  String organizerSquadAddConfirm(int count) {
+    return 'Adicionar ($count)';
+  }
+
+  @override
+  String get organizerSquadNone =>
+      'Todos os atletas do elenco geral já estão na competição.';
+
+  @override
+  String organizerSquadAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count atletas adicionados',
+      one: '1 atleta adicionado',
+    );
+    return '$_temp0.';
+  }
+
+  @override
+  String organizerSquadNewHint(String championship) {
+    return 'Entra no time e já inscrito só em $championship.';
+  }
+
+  @override
+  String organizerSquadCreated(String name) {
+    return '$name inscrito na competição.';
+  }
+
+  @override
+  String get organizerSquadRemove => 'Tirar da competição';
+
+  @override
+  String organizerSquadRemoveTitle(String name) {
+    return 'Tirar $name da competição?';
+  }
+
+  @override
+  String get organizerSquadRemoveMessage =>
+      'Continua no elenco geral do time. Os números já marcados nesta competição ficam fora dela.';
+
+  @override
+  String organizerSquadRemoved(String name) {
+    return '$name saiu da competição.';
+  }
+
+  @override
+  String get organizerSquadLegacy =>
+      'Atleta antigo: o admin ou o dono do time ajustam as competições dele.';
+
+  @override
+  String organizerSquadOtherTeam(String team) {
+    return 'Joga por $team nesta competição.';
+  }
+
+  @override
+  String get organizerSquadError => 'Não foi possível salvar. Tente de novo.';
+
+  @override
+  String get organizerEnrollTeam => 'Inscrever time';
+
+  @override
+  String get organizerFormGroups => 'Formar grupos';
+
+  @override
+  String get organizerEditChampionship => 'Editar campeonato';
+
+  @override
+  String get organizerPickChampionship => 'Qual campeonato?';
+
+  @override
+  String get organizerEnrollNoCandidates =>
+      'Todos os times disponíveis já estão inscritos.';
+
+  @override
+  String organizerEnrolled(String team, String championship) {
+    return '$team inscrito em $championship.';
+  }
+
+  @override
+  String get organizerOutsideRegion =>
+      'Campeonato municipal só aceita times da própria região.';
+
+  @override
+  String get organizerRemoveTeam => 'Tirar do campeonato';
+
+  @override
+  String organizerRemoveTeamTitle(String team) {
+    return 'Tirar $team?';
+  }
+
+  @override
+  String organizerRemoveTeamMessage(String championship) {
+    return 'O time sai de $championship. As partidas já cadastradas continuam.';
+  }
+
+  @override
+  String organizerRemoved(String team) {
+    return '$team saiu do campeonato.';
+  }
+
+  @override
+  String organizerGroupsTitle(String championship) {
+    return 'Grupos · $championship';
+  }
+
+  @override
+  String get organizerGroupsEmpty =>
+      'Nenhum grupo ainda. Crie um grupo ou sorteie.';
+
+  @override
+  String get organizerGroupsLoadError => 'Não foi possível carregar os grupos.';
+
+  @override
+  String get organizerGroupNew => 'Novo grupo';
+
+  @override
+  String get organizerGroupEdit => 'Editar grupo';
+
+  @override
+  String get organizerGroupName => 'Nome do grupo';
+
+  @override
+  String get organizerGroupNameRequired => 'Informe o nome do grupo.';
+
+  @override
+  String organizerGroupLabel(String name) {
+    return 'Grupo $name';
+  }
+
+  @override
+  String get organizerGroupAddTeam => 'Adicionar time';
+
+  @override
+  String get organizerGroupFull => 'O grupo já tem 4 times.';
+
+  @override
+  String get organizerGroupNoTeamsLeft =>
+      'Todos os times inscritos já estão em grupos.';
+
+  @override
+  String get organizerGroupSaved => 'Grupo salvo.';
+
+  @override
+  String get organizerGroupDelete => 'Apagar grupo';
+
+  @override
+  String organizerGroupDeleteTitle(String name) {
+    return 'Apagar o grupo $name?';
+  }
+
+  @override
+  String get organizerGroupDeleteMessage =>
+      'Os times voltam a ficar sem grupo e a classificação do grupo é refeita.';
+
+  @override
+  String get organizerGroupsDraw => 'Sortear grupos';
+
+  @override
+  String get organizerGroupsDrawCount => 'Quantos grupos?';
+
+  @override
+  String organizerGroupsDrawOption(int count, int perGroup) {
+    return '$count grupos · até $perGroup times cada';
+  }
+
+  @override
+  String get organizerGroupsDrawNeedTeams =>
+      'Inscreva ao menos 2 times para sortear.';
+
+  @override
+  String organizerGroupsDrawConfirmTitle(int count) {
+    return 'Sortear $count grupos?';
+  }
+
+  @override
+  String get organizerGroupsDrawConfirmMessage =>
+      'Os grupos atuais são apagados e os times inscritos são distribuídos ao acaso.';
+
+  @override
+  String get organizerGroupsDrawn => 'Grupos sorteados.';
+
+  @override
   String get organizerModeFan => 'Modo torcedor';
 
   @override

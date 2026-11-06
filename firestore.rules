@@ -292,7 +292,9 @@ service cloud.firestore {
         'indicacoes', 'codigos_indicacao', 'solicitacoes_organizador']);
       allow create: if writable() && (isAdmin() || isOwnVote()
         || (isPlayers() && ownsTeam(request.resource.data))
-        || partnerCreate());
+        || partnerCreate()
+        || organizerGroupWrite()
+        || organizerSquadCreate());
       // As inscrições por competição nunca somem do atleta (o app antigo
       // regravava o documento inteiro sem elas): esvaziar pode, apagar não.
       function keepsEnrollments() {
@@ -381,6 +383,70 @@ service cloud.firestore {
             || request.resource.data.get('idsRegioes', []).hasOnly([sede]));
       }
 
+      // Organizador montando o elenco da competição dele: o índice
+      // `campeonatos_org/c<id>` (gravado na aprovação) diz de quem é a
+      // competição; o time tem de estar inscrito nela.
+      function organizerTeamIn(key, teamId) {
+        let idx = get(/databases/$(database)/documents/campeonatos_org/$(key)).data;
+        let champ = get(/databases/$(database)/documents/campeonatos/$(idx.idCampeonatoDoc)).data;
+        return signedIn() && idx.idOrganizador == request.auth.uid
+          && champ.get('ids_times', []).hasAny([teamId]);
+      }
+
+      // Põe (inscrição nova, números zerados) ou tira (apaga a chave) o atleta
+      // de uma competição do organizador; nada mais muda no atleta.
+      function organizerSquadUpdate() {
+        let before = resource.data.get('inscricoes', {});
+        let after = request.resource.data.get('inscricoes', {});
+        let keys = after.diff(before).affectedKeys();
+        let added = after.keys().removeAll(before.keys());
+        let removed = before.keys().removeAll(after.keys());
+        let key = added.size() == 1 ? added[0] : (removed.size() == 1 ? removed[0] : '-');
+        let entry = key in after ? after[key] : before.get(key, {});
+        let addedTeams = request.resource.data.get('idsTimes', []).toSet()
+          .difference(resource.data.get('idsTimes', []).toSet());
+        return isPlayers() && 'inscricoes' in resource.data
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['inscricoes', 'idsTimes'])
+          && keys.size() == 1
+          && !(key in before && key in after)
+          && (!(key in after) || (entry.get('nGols', 0) == 0 && entry.get('nAssistencias', 0) == 0))
+          && addedTeams.hasOnly([entry.get('idTime', '-'), resource.data.get('idTime', '-')])
+          && organizerTeamIn(key, entry.get('idTime', '-'));
+      }
+
+      // Atleta novo já inscrito só na competição do organizador, pelo time.
+      function organizerSquadCreate() {
+        let d = request.resource.data;
+        let ins = d.get('inscricoes', {});
+        let keys = ins.keys();
+        return isPlayers() && keys.size() == 1
+          && d.keys().hasOnly(['idJogador', 'nome', 'time', 'idTime', 'urlImagem', 'nGols', 'nAssistencias',
+            'nGolsAmistoso', 'nAssistenciasAmistoso', 'posicao', 'inscricoes', 'idsTimes'])
+          && d.get('nGols', 0) == 0 && d.get('nAssistencias', 0) == 0
+          && d.get('nGolsAmistoso', 0) == 0 && d.get('nAssistenciasAmistoso', 0) == 0
+          && d.get('idTime', '') != ''
+          && ins[keys[0]].get('idTime', '-') == d.idTime
+          && ins[keys[0]].get('nGols', 0) == 0 && ins[keys[0]].get('nAssistencias', 0) == 0
+          && d.get('idsTimes', []).hasOnly([d.idTime])
+          && organizerTeamIn(keys[0], d.idTime);
+      }
+
+      // Organizador: grupos (`grupos{ano}`) do campeonato dele. O grupo aponta
+      // o doc do campeonato (`idCampeonatoDoc`) e o `fk_campeonato` tem de ser o
+      // número desse campeonato; só os campos do grupo.
+      function organizerGroup(data) {
+        let champ = get(/databases/$(database)/documents/campeonatos/$(data.get('idCampeonatoDoc', '-')));
+        return collection.matches('grupos[0-9]*') && signedIn()
+          && champ != null && champ.data.get('idOrganizador', '') == request.auth.uid
+          && data.get('fk_campeonato', -1) == champ.data.get('id_campeonato', -2);
+      }
+      function organizerGroupWrite() {
+        return organizerGroup(request.resource.data)
+          && request.resource.data.keys().hasOnly(['descricao', 'fk_competicao', 'idRegiao', 'time1', 'time2',
+            'time3', 'time4', 'idTime1', 'idTime2', 'idTime3', 'idTime4', 'fk_campeonato', 'idCampeonatoDoc'])
+          && request.resource.data.descricao is string && request.resource.data.descricao.size() <= 30;
+      }
+
       // Atleta sem time ('') pode entrar no elenco do dono (aprovação do "Sou jogador").
       allow update: if writable() && keepsEnrollments() && (isAdmin() || isOwnVote()
         || (isPlayers()
@@ -392,9 +458,12 @@ service cloud.firestore {
           && request.resource.data.diff(resource.data).affectedKeys()
             .hasOnly(['descricao', 'urlImagem', 'corPrimaria', 'corSecundaria']))
         || partnerUpdate()
-        || organizerUpdate());
+        || organizerUpdate()
+        || (organizerGroup(resource.data) && organizerGroupWrite())
+        || organizerSquadUpdate());
       allow delete: if writable() && (isAdmin() || isOwnVote() || (isPlayers() && ownsTeam(resource.data))
-        || partnerDelete());
+        || partnerDelete()
+        || organizerGroup(resource.data));
     }
 
     // Votos de melhor jogador da partida (id do doc = uid de quem votou):
@@ -528,6 +597,20 @@ service cloud.firestore {
     // "Sou organizador de campeonato" (id = uid): o pedido atual da conta. O
     // dono envia, corrige e, respondido, manda outro (sempre pendente, campos
     // limitados); nunca se aprova. O admin lê, edita e responde.
+    // Índice do organizador (`c<id_campeonato>` → organizador e doc do
+    // campeonato), que as regras do elenco consultam. Além do admin (regra
+    // geral), o próprio organizador cria o que falta (campeonato aprovado antes
+    // do índice existir): só o do campeonato dele, com a chave certa.
+    match /campeonatos_org/{key} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['idOrganizador', 'idCampeonatoDoc'])
+        && request.resource.data.idOrganizador == request.auth.uid
+        && get(/databases/$(database)/documents/campeonatos/$(request.resource.data.idCampeonatoDoc))
+          .data.get('idOrganizador', '') == request.auth.uid
+        && key == 'c' + string(get(/databases/$(database)/documents/campeonatos/$(request.resource.data.idCampeonatoDoc))
+          .data.get('id_campeonato', -1));
+    }
+
     match /solicitacoes_organizador/{userId} {
       function isRequester() {
         return signedIn() && userId == request.auth.uid;

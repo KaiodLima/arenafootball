@@ -38,16 +38,22 @@ class OrganizerModeState extends Equatable {
 class OrganizerModeCubit extends Cubit<OrganizerModeState> {
   final WatchMyChampionshipsUseCase watchMyChampionshipsUseCase;
   final PreferencesService preferences;
+  final EnsureMyOrganizerIndexesUseCase? ensureMyIndexesUseCase;
   StreamSubscription<Either<Failure, List<ChampionshipDTO>>>? _subscription;
   String? _userId;
 
-  OrganizerModeCubit(this.watchMyChampionshipsUseCase, this.preferences) : super(const OrganizerModeState());
+  /// Campeonatos já conferidos nesta sessão (índice do organizador).
+  final _indexed = <String>{};
+
+  OrganizerModeCubit(this.watchMyChampionshipsUseCase, this.preferences, [this.ensureMyIndexesUseCase])
+      : super(const OrganizerModeState());
 
   Future<void> follow(String? userId) async {
     if (userId == _userId) return;
     _userId = userId;
     await _subscription?.cancel();
     _subscription = null;
+    _indexed.clear();
     emit(const OrganizerModeState());
     if (userId == null) return;
     final saved = await preferences.getOrganizerMode(userId);
@@ -55,8 +61,19 @@ class OrganizerModeCubit extends Cubit<OrganizerModeState> {
     emit(state.copyWith(organizerMode: saved));
     // Falha de leitura: segue como torcedor (o que muda é só a vitrine).
     _subscription = watchMyChampionshipsUseCase(userId).listen((response) {
-      if (response.isRight) emit(state.copyWith(championships: response.right));
+      if (response.isLeft) return;
+      emit(state.copyWith(championships: response.right));
+      unawaited(_ensureIndexes(userId, response.right));
     });
+  }
+
+  /// Cria o índice que falta dos campeonatos novos nesta sessão (aprovados
+  /// antes do índice existir); falha só fica no log.
+  Future<void> _ensureIndexes(String userId, List<ChampionshipDTO> championships) async {
+    final useCase = ensureMyIndexesUseCase;
+    if (useCase == null) return;
+    final pending = [for (final c in championships) if (_indexed.add(c.id)) c];
+    if (pending.isNotEmpty) await useCase(userId, pending);
   }
 
   /// Troca entre torcedor e organizador (lembrado no aparelho, por conta).

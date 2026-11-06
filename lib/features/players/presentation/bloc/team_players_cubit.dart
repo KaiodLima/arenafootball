@@ -1,7 +1,11 @@
+import 'dart:io';
 import 'dart:async';
 
 import 'package:either_dart/either.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/utils/app_logger.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
+import 'package:arena_soccer/features/players/domain/usecases/create_player_usecase.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_cache_first_usecase.dart';
@@ -25,6 +29,7 @@ class TeamPlayersCubit extends Cubit<TeamPlayersState> {
   final GetSeasonChampionshipsUseCase? getSeasonChampionshipsUseCase;
   final SetTeamChampionshipsUseCase? setTeamChampionshipsUseCase;
   final SetPlayerChampionshipsUseCase? setPlayerChampionshipsUseCase;
+  final CreatePlayerUseCase? createPlayerUseCase;
   StreamSubscription<Either<Failure, List<PlayerDTO>>>? _subscription;
   String _teamId = '';
   String? _teamName;
@@ -39,6 +44,7 @@ class TeamPlayersCubit extends Cubit<TeamPlayersState> {
     this.getSeasonChampionshipsUseCase,
     this.setTeamChampionshipsUseCase,
     this.setPlayerChampionshipsUseCase,
+    this.createPlayerUseCase,
   ]) : super(const LoadingTeamPlayersState());
 
   /// [region] (a do time) carrega as competições; [championshipId] abre já
@@ -118,6 +124,63 @@ class TeamPlayersCubit extends Cubit<TeamPlayersState> {
       season: _season,
     );
     return response.isLeft ? response.left.toString() : null;
+  }
+
+  /// Organizador: põe ([enrolled]) ou tira o atleta só da competição
+  /// [championshipId] pelo time (as outras inscrições não mudam). Nula = ok.
+  Future<Failure?> setInChampionship(PlayerDTO player, int championshipId, {required bool enrolled}) async {
+    final useCase = setPlayerChampionshipsUseCase;
+    if (useCase == null) return Failure();
+    final response = await useCase(
+      player,
+      teamId: _teamId,
+      team: _teamName ?? '',
+      selected: {if (enrolled) championshipId},
+      teamChampionships: [championshipId],
+      season: _season,
+    );
+    if (response.isLeft) {
+      AppLogger.e(
+        'setInChampionship c$championshipId time=$_teamId temporada=$_season atleta=${player.id} enrolled=$enrolled',
+        name: 'TeamPlayersCubit',
+        error: response.left,
+      );
+    }
+    return response.isLeft ? response.left : null;
+  }
+
+  /// Organizador: vários atletas do elenco geral entram na competição.
+  /// Devolve quantos entraram e a 1ª falha (nula = todos).
+  Future<({int added, Failure? error})> addToChampionship(List<PlayerDTO> players, int championshipId) async {
+    var added = 0;
+    for (final player in players) {
+      final error = await setInChampionship(player, championshipId, enrolled: true);
+      if (error != null) return (added: added, error: error);
+      added++;
+    }
+    return (added: added, error: null);
+  }
+
+  /// Organizador: atleta novo no time, inscrito só na competição.
+  Future<Failure?> createInChampionship(
+    int championshipId, {
+    required String name,
+    String position = '',
+    File? photo,
+  }) async {
+    final useCase = createPlayerUseCase;
+    if (useCase == null) return Failure();
+    final team = _teamName ?? '';
+    final player = PlayerDTO(
+      name: name.trim(),
+      team: team,
+      teamId: _teamId,
+      position: position,
+      enrollments: [PlayerEnrollment(championshipId: championshipId, teamId: _teamId, team: team)],
+      hasEnrollmentField: true,
+    );
+    final response = await useCase(player, photo: photo);
+    return response.isLeft ? response.left : null;
   }
 
   void setSort(PlayersSort sort) => emit(_withView(state.view.copyWith(sort: sort)));

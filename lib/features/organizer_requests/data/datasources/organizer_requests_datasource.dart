@@ -13,6 +13,9 @@ import 'package:arena_soccer/features/player_requests/data/dtos/player_request_d
 /// Pedidos "Sou organizador de campeonato" (`solicitacoes_organizador/{uid}`)
 /// e os campeonatos da conta (`campeonatos` com `idOrganizador`). O usuário
 /// grava o próprio pedido; o admin edita, aprova (cria o campeonato) ou rejeita.
+/// `campeonatos_org/c<id_campeonato>`: {idOrganizador, idCampeonatoDoc}.
+const String organizerIndexCollection = 'campeonatos_org';
+
 class OrganizerRequestsDataSource {
   final FirebaseFirestore _firestore;
 
@@ -95,6 +98,53 @@ class OrganizerRequestsDataSource {
 
   /// Cria o campeonato [championship] (com o próximo `id_campeonato`, como o
   /// cadastro do admin) e marca o pedido como aprovado, numa escrita só.
+  /// Organizador: cria os índices `campeonatos_org/c<id>` que faltam nos
+  /// campeonatos dele (aprovados antes do índice). 1 leitura por campeonato.
+  Future<Either<Failure, int>> ensureMyIndexes(String userId, List<ChampionshipDTO> championships) async {
+    try {
+      var created = 0;
+      for (final championship in championships) {
+        if (championship.organizerId != userId || championship.championshipId <= 0) continue;
+        final ref = _firestore.collection(organizerIndexCollection).doc('c${championship.championshipId}');
+        if ((await ref.get()).exists) continue;
+        await ref.set({'idOrganizador': userId, 'idCampeonatoDoc': championship.id});
+        created++;
+      }
+      return Right(created);
+    } catch (e) {
+      AppLogger.e('ensureMyIndexes uid=$userId', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível preparar os seus campeonatos.'));
+    }
+  }
+
+  /// Índices do organizador que faltam (campeonatos aprovados antes do
+  /// índice existir): `campeonatos_org/c<id>` de cada campeonato com
+  /// `idOrganizador`. Só grava os que não existem. Devolve quantos criou.
+  Future<Either<Failure, int>> ensureIndexes() async {
+    try {
+      final championships =
+          await _championships.where(ChampionshipDTO.organizerField, isGreaterThan: '').get();
+      var created = 0;
+      for (final doc in championships.docs) {
+        final championship = ChampionshipDTO.fromFirestore(doc);
+        if (championship.organizerId.isEmpty || championship.championshipId <= 0) continue;
+        final ref = _firestore.collection(organizerIndexCollection).doc('c${championship.championshipId}');
+        final current = await ref.get();
+        if (current.exists &&
+            current.data()?['idOrganizador'] == championship.organizerId &&
+            current.data()?['idCampeonatoDoc'] == doc.id) {
+          continue;
+        }
+        await ref.set({'idOrganizador': championship.organizerId, 'idCampeonatoDoc': doc.id});
+        created++;
+      }
+      return Right(created);
+    } catch (e) {
+      AppLogger.e('ensureIndexes', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível atualizar os organizadores.'));
+    }
+  }
+
   Future<Either<Failure, ChampionshipDTO>> approve({
     required OrganizerRequestDTO request,
     required ChampionshipDTO championship,
@@ -109,6 +159,12 @@ class OrganizerRequestsDataSource {
       );
       final batch = _firestore.batch()
         ..set(ref, created.toMap())
+        // Índice que as regras consultam (pela chave da inscrição `c<id>`):
+        // o organizador mexe nos elencos desta competição.
+        ..set(_firestore.collection(organizerIndexCollection).doc('c${created.championshipId}'), {
+          'idOrganizador': request.userId,
+          'idCampeonatoDoc': ref.id,
+        })
         ..update(_requests.doc(request.userId), {
           'status': PlayerRequestStatus.approved.key,
           'idCampeonato': ref.id,

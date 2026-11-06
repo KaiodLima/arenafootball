@@ -22,4 +22,10 @@ abstract class IOrganizerRequestsRepository {
   });
 
   Future<Either<Failure, void>> reject({required String userId, required String reason});
+
+  /// Cria os índices `campeonatos_org` que faltam (admin).
+  Future<Either<Failure, int>> ensureIndexes();
+
+  /// Organizador: cria os índices que faltam nos campeonatos dele.
+  Future<Either<Failure, int>> ensureMyIndexes(String userId, List<ChampionshipDTO> championships);
 }

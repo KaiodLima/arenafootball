@@ -3,7 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
+import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/errors/failure.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/set_team_championships_usecase.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_by_ids_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
 /// Times de cada campeonato do organizador (aba Times do modo organizador).
 class OrganizerTeamsState extends Equatable {
@@ -24,11 +28,38 @@ class OrganizerTeamsState extends Equatable {
 /// Time não encontrado aparece só com o nome.
 class OrganizerTeamsCubit extends Cubit<OrganizerTeamsState> {
   final GetTeamsByIdsUseCase getTeamsByIdsUseCase;
+  final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
+  final SetTeamChampionshipsUseCase setTeamChampionshipsUseCase;
 
-  OrganizerTeamsCubit(this.getTeamsByIdsUseCase) : super(const OrganizerTeamsState());
+  OrganizerTeamsCubit(this.getTeamsByIdsUseCase, this.getTeamsCacheFirstUseCase, this.setTeamChampionshipsUseCase)
+      : super(const OrganizerTeamsState());
+
+  /// Times que podem entrar no [championship]: os da sede (municipal) ou de
+  /// todas as regiões (intermunicipal), da temporada dele, menos os inscritos.
+  Future<Either<Failure, List<TeamDTO>>> candidates(ChampionshipDTO championship) async {
+    final municipal = championship.scope != ChampionshipScope.intermunicipal;
+    final response = await getTeamsCacheFirstUseCase(
+      region: municipal ? championship.region : null,
+      season: championship.season.isEmpty ? null : championship.season,
+    ).last;
+    return response.map((teams) => [
+          for (final team in teams)
+            if (!championship.hasTeam(id: team.id, name: team.name)) team,
+        ]);
+  }
+
+  /// Inscreve ([enrolled]) ou tira o [team] do [championship]. A lista volta
+  /// atualizada pelo campeonato ao vivo (a aba recarrega).
+  Future<Either<Failure, void>> setEnrollment(ChampionshipDTO championship, TeamDTO team, {required bool enrolled}) =>
+      setTeamChampionshipsUseCase(
+        team: team,
+        championships: [championship],
+        selected: {if (enrolled) championship.championshipId},
+      );
 
   Future<void> load(List<ChampionshipDTO> championships) async {
-    emit(const OrganizerTeamsState());
+    // Recarga (time inscrito/tirado): mantém a lista na tela até chegar a nova.
+    if (state.teamsByChampionship.isEmpty) emit(const OrganizerTeamsState());
     final bySeason = <String, List<ChampionshipDTO>>{};
     for (final c in championships) {
       bySeason.putIfAbsent(c.season, () => []).add(c);

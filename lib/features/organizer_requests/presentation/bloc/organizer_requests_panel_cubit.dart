@@ -63,17 +63,22 @@ class OrganizerRequestsPanelCubit extends Cubit<OrganizerRequestsPanelState> {
   final ApproveOrganizerRequestUseCase approveOrganizerRequestUseCase;
   final RejectOrganizerRequestUseCase rejectOrganizerRequestUseCase;
   final UpdateOrganizerRequestUseCase updateOrganizerRequestUseCase;
+  final EnsureOrganizerIndexesUseCase? ensureOrganizerIndexesUseCase;
   StreamSubscription<Either<Failure, List<OrganizerRequestDTO>>>? _subscription;
 
   OrganizerRequestsPanelCubit(
     this.watchOrganizerRequestsUseCase,
     this.approveOrganizerRequestUseCase,
     this.rejectOrganizerRequestUseCase,
-    this.updateOrganizerRequestUseCase,
-  ) : super(const OrganizerRequestsPanelState());
+    this.updateOrganizerRequestUseCase, [
+    this.ensureOrganizerIndexesUseCase,
+  ]) : super(const OrganizerRequestsPanelState());
 
   void watch() {
     _subscription?.cancel();
+    // Campeonatos aprovados antes do índice: cria os que faltam (em segundo
+    // plano; falha não atrapalha o painel).
+    unawaited(ensureOrganizerIndexesUseCase?.call());
     _subscription = watchOrganizerRequestsUseCase().listen((response) {
       if (isClosed) return;
       response.fold(

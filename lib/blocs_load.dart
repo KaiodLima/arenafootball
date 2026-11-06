@@ -56,7 +56,7 @@ class BlocsLoad extends StatelessWidget {
 
         // Organizador de campeonato aprovado — global: o toggle torcedor/organizador
         // da home e as abas só com os campeonatos dele.
-        BlocProvider<OrganizerModeCubit>(create: (_) => OrganizerModeCubit(sl(), sl())),
+        BlocProvider<OrganizerModeCubit>(create: (_) => OrganizerModeCubit(sl(), sl(), sl())),
 
         // Álbum de figurinhas (evento do admin) — global: o selo flutuante da
         // home e o pacotinho do dia da conta.

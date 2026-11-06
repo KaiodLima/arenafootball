@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_groups_cubit.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/page/organizer_groups_page.dart';
 import 'package:arena_soccer/features/album/presentation/page/album_pages_page.dart';
 import 'package:arena_soccer/features/album/presentation/page/sticker_detail_page.dart';
 import 'package:arena_soccer/features/matches/presentation/page/match_report_page.dart';
@@ -260,8 +262,13 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.teamPlayersPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<TeamPlayersCubit>(
-            create: (_) => TeamPlayersCubit(sl(), sl(), sl(), sl(), sl(), sl()),
-            child: TeamPlayersPage(team: args?['team'] as TeamDTO, championshipId: args?['championshipId'] as int?),
+            create: (_) => TeamPlayersCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl()),
+            child: TeamPlayersPage(
+              team: args?['team'] as TeamDTO,
+              championshipId: args?['championshipId'] as int?,
+              onlyChampionship: args?['onlyChampionship'] == true,
+              season: args?['season'] as String?,
+            ),
           );
         },
         // `playerId` obrigatório; `season` nulo = corrente; `player` (opcional) aparece na hora.
@@ -452,9 +459,17 @@ class ArenaApp extends StatelessWidget {
               child: const OrganizerRequestPage(),
             ),
         AppRoutes.organizerRequestsPanelPage: (_) => BlocProvider<OrganizerRequestsPanelCubit>(
-              create: (_) => OrganizerRequestsPanelCubit(sl(), sl(), sl(), sl()),
+              create: (_) => OrganizerRequestsPanelCubit(sl(), sl(), sl(), sl(), sl()),
               child: const OrganizerRequestsPanelPage(),
             ),
+        AppRoutes.organizerGroupsPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          final championship = args!['championship'] as ChampionshipDTO;
+          return BlocProvider<OrganizerGroupsCubit>(
+            create: (_) => OrganizerGroupsCubit(sl(), sl(), sl(), sl(), sl())..start(championship),
+            child: OrganizerGroupsPage(championship: championship),
+          );
+        },
         AppRoutes.seasonsPanelPage: (_) => MultiBlocProvider(
               providers: [
                 BlocProvider<SeasonsPanelCubit>(create: (_) => SeasonsPanelCubit(sl(), sl())),

@@ -45,4 +45,11 @@ class OrganizerRequestsRepositoryImpl implements IOrganizerRequestsRepository {
   @override
   Future<Either<Failure, void>> reject({required String userId, required String reason}) =>
       _dataSource.reject(userId: userId, reason: reason);
+
+  @override
+  Future<Either<Failure, int>> ensureIndexes() => _dataSource.ensureIndexes();
+
+  @override
+  Future<Either<Failure, int>> ensureMyIndexes(String userId, List<ChampionshipDTO> championships) =>
+      _dataSource.ensureMyIndexes(userId, championships);
 }

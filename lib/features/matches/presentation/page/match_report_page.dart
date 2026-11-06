@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,14 +13,10 @@ import 'package:arena_soccer/features/matches/presentation/widgets/match_report/
 import 'package:arena_soccer/features/matches/presentation/widgets/match_report/report_lineup.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_report/report_save_bar.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_report/report_timeline.dart';
-import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
-import 'package:arena_soccer/features/player_requests/presentation/widgets/player_request_labels.dart';
+import 'package:arena_soccer/features/players/presentation/widgets/quick_player_sheet.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
-import 'package:arena_soccer/utils/components/arena_button.dart';
-import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_text_field.dart';
-import 'package:arena_soccer/utils/components/circle_photo_picker.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
@@ -162,11 +157,12 @@ class MatchReportPage extends StatelessWidget {
   }
 
   Future<void> _addPlayer(BuildContext context, MatchSide side) async {
-    final result = await showModalBottomSheet<({String name, String position, File? photo})>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (_) => const _QuickPlayerSheet(),
+    final l10n = AppLocalizations.of(context);
+    final result = await showQuickPlayerSheet(
+      context,
+      title: l10n.matchReportAddPlayer,
+      hint: l10n.matchReportAddPlayerHint,
+      confirmLabel: l10n.matchReportAdd,
     );
     if (result == null || !context.mounted) return;
     await BlocProvider.of<MatchReportCubit>(context)
@@ -366,83 +362,3 @@ class _TabsHeader extends SliverPersistentHeaderDelegate {
 }
 
 /// Cadastro rápido do atleta: nome, posição e foto (opcional).
-class _QuickPlayerSheet extends StatefulWidget {
-  const _QuickPlayerSheet();
-
-  @override
-  State<_QuickPlayerSheet> createState() => _QuickPlayerSheetState();
-}
-
-class _QuickPlayerSheetState extends State<_QuickPlayerSheet> {
-  final _name = TextEditingController();
-  PlayerPosition? _position;
-  File? _photo;
-
-  @override
-  void dispose() {
-    _name.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final valid = _name.text.trim().length >= 3;
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        AppSizes.s20,
-        0,
-        AppSizes.s20,
-        AppSizes.s20 + MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(l10n.matchReportAddPlayer, style: AppTypography.title().copyWith(fontSize: AppSizes.s20)),
-            Text(l10n.matchReportAddPlayerHint, style: AppTypography.subtitle()),
-            const SizedBox(height: AppSizes.s16),
-            Center(
-              child: CirclePhotoPicker(
-                file: _photo,
-                addLabel: l10n.matchReportPhoto,
-                emptyIcon: Icons.person_rounded,
-                onPicked: (file) => setState(() => _photo = file),
-                onRemove: () => setState(() => _photo = null),
-              ),
-            ),
-            const SizedBox(height: AppSizes.s16),
-            ArenaTextField(
-              controller: _name,
-              labelText: l10n.matchReportPlayerName,
-              icon: const Icon(Icons.badge_outlined),
-              onChaged: (_) => setState(() {}),
-            ),
-            const SizedBox(height: AppSizes.s12),
-            Wrap(
-              spacing: AppSizes.s8,
-              runSpacing: AppSizes.s8,
-              children: [
-                for (final position in PlayerPosition.values)
-                  ArenaChoiceChip(
-                    label: playerPositionLabel(l10n, position),
-                    selected: _position == position,
-                    onTap: () => setState(() => _position = _position == position ? null : position),
-                  ),
-              ],
-            ),
-            const SizedBox(height: AppSizes.s20),
-            ArenaButton.primary(
-              title: l10n.matchReportAdd,
-              function: valid
-                  ? () => Navigator.pop(context, (name: _name.text.trim(), position: _position?.key ?? '', photo: _photo))
-                  : null,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-

@@ -19,6 +19,12 @@ class GroupDTO extends Equatable {
   /// `fk_campeonato` (`id_campeonato`); 0 = grupo antigo, sem campeonato.
   final int championshipId;
 
+  /// `idCampeonatoDoc`: id do doc do campeonato (grupos formados pelo app; as
+  /// regras conferem por ele o organizador). Vazio nos grupos antigos.
+  final String championshipDocId;
+
+  static const String championshipDocField = 'idCampeonatoDoc';
+
   static const int maxTeams = 4;
 
   const GroupDTO({
@@ -28,6 +34,7 @@ class GroupDTO extends Equatable {
     this.teams = const [],
     this.teamIds = const [],
     this.championshipId = 0,
+    this.championshipDocId = '',
   });
 
   /// Id do time na posição [index] ('' se não houver).
@@ -48,6 +55,7 @@ class GroupDTO extends Equatable {
       description: data['descricao']?.toString() ?? '',
       region: RegionRegistry.nameFromDoc(data),
       championshipId: (data['fk_campeonato'] as num?)?.toInt() ?? 0,
+      championshipDocId: data[championshipDocField]?.toString() ?? '',
       teams: [
         for (var i = 1; i <= maxTeams; i++) data['time$i']?.toString() ?? '',
       ],
@@ -61,6 +69,7 @@ class GroupDTO extends Equatable {
         'descricao': description,
         ...RegionRegistry.fieldsFor(region),
         if (championshipId > 0) 'fk_campeonato': championshipId,
+        if (championshipDocId.isNotEmpty) championshipDocField: championshipDocId,
         for (var i = 0; i < maxTeams; i++) 'time${i + 1}': i < teams.length ? teams[i] : '',
         for (var i = 0; i < maxTeams; i++) 'idTime${i + 1}': teamIdAt(i),
       };
@@ -73,9 +82,10 @@ class GroupDTO extends Equatable {
       teams: teams ?? this.teams,
       teamIds: teamIds ?? this.teamIds,
       championshipId: championshipId,
+      championshipDocId: championshipDocId,
     );
   }
 
   @override
-  List<Object?> get props => [id, description, region, teams, teamIds, championshipId];
+  List<Object?> get props => [id, description, region, teams, teamIds, championshipId, championshipDocId];
 }

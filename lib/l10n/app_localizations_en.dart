@@ -731,6 +731,206 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get organizerSquadPermission =>
+      'No permission to change this squad. Ask the admin to open the \"Championship organizers\" panel and try again.';
+
+  @override
+  String get organizerSquadAdd => 'From full squad';
+
+  @override
+  String get organizerSquadNew => 'New player';
+
+  @override
+  String get organizerSquadAddTitle => 'Add to the competition';
+
+  @override
+  String organizerSquadAddHint(String championship) {
+    return 'Players from the team\'s full squad not yet in $championship.';
+  }
+
+  @override
+  String organizerSquadAddConfirm(int count) {
+    return 'Add ($count)';
+  }
+
+  @override
+  String get organizerSquadNone =>
+      'Every player in the full squad is already in the competition.';
+
+  @override
+  String organizerSquadAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count players added',
+      one: '1 player added',
+    );
+    return '$_temp0.';
+  }
+
+  @override
+  String organizerSquadNewHint(String championship) {
+    return 'Joins the team, registered only in $championship.';
+  }
+
+  @override
+  String organizerSquadCreated(String name) {
+    return '$name registered in the competition.';
+  }
+
+  @override
+  String get organizerSquadRemove => 'Remove from competition';
+
+  @override
+  String organizerSquadRemoveTitle(String name) {
+    return 'Remove $name from the competition?';
+  }
+
+  @override
+  String get organizerSquadRemoveMessage =>
+      'They stay in the team\'s full squad. Numbers already recorded in this competition leave it.';
+
+  @override
+  String organizerSquadRemoved(String name) {
+    return '$name left the competition.';
+  }
+
+  @override
+  String get organizerSquadLegacy =>
+      'Older player: the admin or the team owner adjusts their competitions.';
+
+  @override
+  String organizerSquadOtherTeam(String team) {
+    return 'Plays for $team in this competition.';
+  }
+
+  @override
+  String get organizerSquadError => 'Could not save. Try again.';
+
+  @override
+  String get organizerEnrollTeam => 'Register team';
+
+  @override
+  String get organizerFormGroups => 'Form groups';
+
+  @override
+  String get organizerEditChampionship => 'Edit championship';
+
+  @override
+  String get organizerPickChampionship => 'Which championship?';
+
+  @override
+  String get organizerEnrollNoCandidates =>
+      'All available teams are already registered.';
+
+  @override
+  String organizerEnrolled(String team, String championship) {
+    return '$team registered in $championship.';
+  }
+
+  @override
+  String get organizerOutsideRegion =>
+      'A municipal championship only accepts teams from its own region.';
+
+  @override
+  String get organizerRemoveTeam => 'Remove from championship';
+
+  @override
+  String organizerRemoveTeamTitle(String team) {
+    return 'Remove $team?';
+  }
+
+  @override
+  String organizerRemoveTeamMessage(String championship) {
+    return 'The team leaves $championship. Matches already registered stay.';
+  }
+
+  @override
+  String organizerRemoved(String team) {
+    return '$team left the championship.';
+  }
+
+  @override
+  String organizerGroupsTitle(String championship) {
+    return 'Groups · $championship';
+  }
+
+  @override
+  String get organizerGroupsEmpty => 'No groups yet. Create one or draw them.';
+
+  @override
+  String get organizerGroupsLoadError => 'Could not load the groups.';
+
+  @override
+  String get organizerGroupNew => 'New group';
+
+  @override
+  String get organizerGroupEdit => 'Edit group';
+
+  @override
+  String get organizerGroupName => 'Group name';
+
+  @override
+  String get organizerGroupNameRequired => 'Enter the group name.';
+
+  @override
+  String organizerGroupLabel(String name) {
+    return 'Group $name';
+  }
+
+  @override
+  String get organizerGroupAddTeam => 'Add team';
+
+  @override
+  String get organizerGroupFull => 'The group already has 4 teams.';
+
+  @override
+  String get organizerGroupNoTeamsLeft =>
+      'All registered teams are already in groups.';
+
+  @override
+  String get organizerGroupSaved => 'Group saved.';
+
+  @override
+  String get organizerGroupDelete => 'Delete group';
+
+  @override
+  String organizerGroupDeleteTitle(String name) {
+    return 'Delete group $name?';
+  }
+
+  @override
+  String get organizerGroupDeleteMessage =>
+      'Its teams go back to no group and the group table is rebuilt.';
+
+  @override
+  String get organizerGroupsDraw => 'Draw groups';
+
+  @override
+  String get organizerGroupsDrawCount => 'How many groups?';
+
+  @override
+  String organizerGroupsDrawOption(int count, int perGroup) {
+    return '$count groups · up to $perGroup teams each';
+  }
+
+  @override
+  String get organizerGroupsDrawNeedTeams =>
+      'Register at least 2 teams to draw.';
+
+  @override
+  String organizerGroupsDrawConfirmTitle(int count) {
+    return 'Draw $count groups?';
+  }
+
+  @override
+  String get organizerGroupsDrawConfirmMessage =>
+      'Current groups are deleted and the registered teams are shuffled into new ones.';
+
+  @override
+  String get organizerGroupsDrawn => 'Groups drawn.';
+
+  @override
   String get organizerModeFan => 'Fan mode';
 
   @override

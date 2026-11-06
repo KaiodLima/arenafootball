@@ -1335,6 +1335,306 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @organizerSquadPermission.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem permissão para mudar este elenco. Peça ao admin para abrir o painel \"Organizadores de campeonato\" e tente de novo.'**
+  String get organizerSquadPermission;
+
+  /// No description provided for @organizerSquadAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Do elenco geral'**
+  String get organizerSquadAdd;
+
+  /// No description provided for @organizerSquadNew.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novo atleta'**
+  String get organizerSquadNew;
+
+  /// No description provided for @organizerSquadAddTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar à competição'**
+  String get organizerSquadAddTitle;
+
+  /// No description provided for @organizerSquadAddHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atletas do elenco geral do time que ainda não estão em {championship}.'**
+  String organizerSquadAddHint(String championship);
+
+  /// No description provided for @organizerSquadAddConfirm.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar ({count})'**
+  String organizerSquadAddConfirm(int count);
+
+  /// No description provided for @organizerSquadNone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos os atletas do elenco geral já estão na competição.'**
+  String get organizerSquadNone;
+
+  /// No description provided for @organizerSquadAdded.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 atleta adicionado} other{{count} atletas adicionados}}.'**
+  String organizerSquadAdded(int count);
+
+  /// No description provided for @organizerSquadNewHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entra no time e já inscrito só em {championship}.'**
+  String organizerSquadNewHint(String championship);
+
+  /// No description provided for @organizerSquadCreated.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} inscrito na competição.'**
+  String organizerSquadCreated(String name);
+
+  /// No description provided for @organizerSquadRemove.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tirar da competição'**
+  String get organizerSquadRemove;
+
+  /// No description provided for @organizerSquadRemoveTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tirar {name} da competição?'**
+  String organizerSquadRemoveTitle(String name);
+
+  /// No description provided for @organizerSquadRemoveMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Continua no elenco geral do time. Os números já marcados nesta competição ficam fora dela.'**
+  String get organizerSquadRemoveMessage;
+
+  /// No description provided for @organizerSquadRemoved.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} saiu da competição.'**
+  String organizerSquadRemoved(String name);
+
+  /// No description provided for @organizerSquadLegacy.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atleta antigo: o admin ou o dono do time ajustam as competições dele.'**
+  String get organizerSquadLegacy;
+
+  /// No description provided for @organizerSquadOtherTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Joga por {team} nesta competição.'**
+  String organizerSquadOtherTeam(String team);
+
+  /// No description provided for @organizerSquadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível salvar. Tente de novo.'**
+  String get organizerSquadError;
+
+  /// No description provided for @organizerEnrollTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inscrever time'**
+  String get organizerEnrollTeam;
+
+  /// No description provided for @organizerFormGroups.
+  ///
+  /// In pt, this message translates to:
+  /// **'Formar grupos'**
+  String get organizerFormGroups;
+
+  /// No description provided for @organizerEditChampionship.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar campeonato'**
+  String get organizerEditChampionship;
+
+  /// No description provided for @organizerPickChampionship.
+  ///
+  /// In pt, this message translates to:
+  /// **'Qual campeonato?'**
+  String get organizerPickChampionship;
+
+  /// No description provided for @organizerEnrollNoCandidates.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos os times disponíveis já estão inscritos.'**
+  String get organizerEnrollNoCandidates;
+
+  /// No description provided for @organizerEnrolled.
+  ///
+  /// In pt, this message translates to:
+  /// **'{team} inscrito em {championship}.'**
+  String organizerEnrolled(String team, String championship);
+
+  /// No description provided for @organizerOutsideRegion.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeonato municipal só aceita times da própria região.'**
+  String get organizerOutsideRegion;
+
+  /// No description provided for @organizerRemoveTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tirar do campeonato'**
+  String get organizerRemoveTeam;
+
+  /// No description provided for @organizerRemoveTeamTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tirar {team}?'**
+  String organizerRemoveTeamTitle(String team);
+
+  /// No description provided for @organizerRemoveTeamMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'O time sai de {championship}. As partidas já cadastradas continuam.'**
+  String organizerRemoveTeamMessage(String championship);
+
+  /// No description provided for @organizerRemoved.
+  ///
+  /// In pt, this message translates to:
+  /// **'{team} saiu do campeonato.'**
+  String organizerRemoved(String team);
+
+  /// No description provided for @organizerGroupsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grupos · {championship}'**
+  String organizerGroupsTitle(String championship);
+
+  /// No description provided for @organizerGroupsEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum grupo ainda. Crie um grupo ou sorteie.'**
+  String get organizerGroupsEmpty;
+
+  /// No description provided for @organizerGroupsLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar os grupos.'**
+  String get organizerGroupsLoadError;
+
+  /// No description provided for @organizerGroupNew.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novo grupo'**
+  String get organizerGroupNew;
+
+  /// No description provided for @organizerGroupEdit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar grupo'**
+  String get organizerGroupEdit;
+
+  /// No description provided for @organizerGroupName.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome do grupo'**
+  String get organizerGroupName;
+
+  /// No description provided for @organizerGroupNameRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Informe o nome do grupo.'**
+  String get organizerGroupNameRequired;
+
+  /// No description provided for @organizerGroupLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grupo {name}'**
+  String organizerGroupLabel(String name);
+
+  /// No description provided for @organizerGroupAddTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar time'**
+  String get organizerGroupAddTeam;
+
+  /// No description provided for @organizerGroupFull.
+  ///
+  /// In pt, this message translates to:
+  /// **'O grupo já tem 4 times.'**
+  String get organizerGroupFull;
+
+  /// No description provided for @organizerGroupNoTeamsLeft.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos os times inscritos já estão em grupos.'**
+  String get organizerGroupNoTeamsLeft;
+
+  /// No description provided for @organizerGroupSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grupo salvo.'**
+  String get organizerGroupSaved;
+
+  /// No description provided for @organizerGroupDelete.
+  ///
+  /// In pt, this message translates to:
+  /// **'Apagar grupo'**
+  String get organizerGroupDelete;
+
+  /// No description provided for @organizerGroupDeleteTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Apagar o grupo {name}?'**
+  String organizerGroupDeleteTitle(String name);
+
+  /// No description provided for @organizerGroupDeleteMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os times voltam a ficar sem grupo e a classificação do grupo é refeita.'**
+  String get organizerGroupDeleteMessage;
+
+  /// No description provided for @organizerGroupsDraw.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sortear grupos'**
+  String get organizerGroupsDraw;
+
+  /// No description provided for @organizerGroupsDrawCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quantos grupos?'**
+  String get organizerGroupsDrawCount;
+
+  /// No description provided for @organizerGroupsDrawOption.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} grupos · até {perGroup} times cada'**
+  String organizerGroupsDrawOption(int count, int perGroup);
+
+  /// No description provided for @organizerGroupsDrawNeedTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inscreva ao menos 2 times para sortear.'**
+  String get organizerGroupsDrawNeedTeams;
+
+  /// No description provided for @organizerGroupsDrawConfirmTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sortear {count} grupos?'**
+  String organizerGroupsDrawConfirmTitle(int count);
+
+  /// No description provided for @organizerGroupsDrawConfirmMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os grupos atuais são apagados e os times inscritos são distribuídos ao acaso.'**
+  String get organizerGroupsDrawConfirmMessage;
+
+  /// No description provided for @organizerGroupsDrawn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grupos sorteados.'**
+  String get organizerGroupsDrawn;
+
   /// No description provided for @organizerModeFan.
   ///
   /// In pt, this message translates to:

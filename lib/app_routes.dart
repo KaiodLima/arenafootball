@@ -67,6 +67,7 @@ class AppRoutes {
   static const String referralSettingsPage = '/referral_settings_page';
   static const String organizerRequestPage = '/organizer_request_page';
   static const String organizerRequestsPanelPage = '/organizer_requests_panel_page';
+  static const String organizerGroupsPage = '/organizer_groups_page';
   static const String predictionRankingPage = '/prediction_ranking_page';
 }
 

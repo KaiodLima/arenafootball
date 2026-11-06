@@ -22,4 +22,6 @@ void registerOrganizerRequestsDependencies() {
   _sl.registerLazySingleton(() => UpdateOrganizerRequestUseCase(_sl()));
   _sl.registerLazySingleton(() => ApproveOrganizerRequestUseCase(_sl()));
   _sl.registerLazySingleton(() => RejectOrganizerRequestUseCase(_sl()));
+  _sl.registerLazySingleton(() => EnsureOrganizerIndexesUseCase(_sl()));
+  _sl.registerLazySingleton(() => EnsureMyOrganizerIndexesUseCase(_sl()));
 }

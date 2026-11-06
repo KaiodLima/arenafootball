@@ -101,3 +101,24 @@ class RejectOrganizerRequestUseCase {
   Future<Either<Failure, void>> call({required String userId, required String reason}) =>
       _repository.reject(userId: userId, reason: reason.trim());
 }
+
+/// Admin: cria os índices `campeonatos_org` dos campeonatos aprovados antes
+/// deles existirem (o organizador só monta elencos com o índice).
+class EnsureOrganizerIndexesUseCase {
+  final IOrganizerRequestsRepository _repository;
+
+  EnsureOrganizerIndexesUseCase(this._repository);
+
+  Future<Either<Failure, int>> call() => _repository.ensureIndexes();
+}
+
+/// Organizador: cria os índices `campeonatos_org` que faltam nos campeonatos
+/// dele (o elenco da competição só grava com o índice).
+class EnsureMyOrganizerIndexesUseCase {
+  final IOrganizerRequestsRepository _repository;
+
+  EnsureMyOrganizerIndexesUseCase(this._repository);
+
+  Future<Either<Failure, int>> call(String userId, List<ChampionshipDTO> championships) =>
+      _repository.ensureMyIndexes(userId, championships);
+}
