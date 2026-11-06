@@ -102,6 +102,10 @@ import 'package:arena_soccer/features/fan_ranking/presentation/page/fan_ranking_
 import 'package:arena_soccer/features/referrals/presentation/bloc/referral_cubit.dart';
 import 'package:arena_soccer/features/referrals/presentation/page/referral_page.dart';
 import 'package:arena_soccer/features/referrals/presentation/page/referral_settings_page.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_request_cubit.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_requests_panel_cubit.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/page/organizer_request_page.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/page/organizer_requests_panel_page.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
 import 'package:arena_soccer/features/stats/presentation/bloc/stats_ranking_cubit.dart';
 import 'package:arena_soccer/features/stats/presentation/page/stats_ranking_page.dart';
@@ -443,6 +447,14 @@ class ArenaApp extends StatelessWidget {
               child: const ReferralPage(),
             ),
         AppRoutes.referralSettingsPage: (_) => const ReferralSettingsPage(),
+        AppRoutes.organizerRequestPage: (_) => BlocProvider<OrganizerRequestCubit>(
+              create: (_) => OrganizerRequestCubit(sl(), sl(), sl(), sl(), sl()),
+              child: const OrganizerRequestPage(),
+            ),
+        AppRoutes.organizerRequestsPanelPage: (_) => BlocProvider<OrganizerRequestsPanelCubit>(
+              create: (_) => OrganizerRequestsPanelCubit(sl(), sl(), sl(), sl()),
+              child: const OrganizerRequestsPanelPage(),
+            ),
         AppRoutes.seasonsPanelPage: (_) => MultiBlocProvider(
               providers: [
                 BlocProvider<SeasonsPanelCubit>(create: (_) => SeasonsPanelCubit(sl(), sl())),
@@ -455,12 +467,16 @@ class ArenaApp extends StatelessWidget {
               create: (_) => ManageChampionshipsCubit(sl(), sl(), sl()),
               child: const ManageChampionshipsPage(),
             ),
-        // `championship` opcional: campeonato a editar (sem ele, cadastra um novo).
+        // `championship` opcional: campeonato a editar (sem ele, cadastra um novo);
+        // `organizer`: edição do organizador (nome, sede, categoria e temporada travados).
         AppRoutes.championshipFormPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<ChampionshipFormCubit>(
             create: (_) => ChampionshipFormCubit(sl(), sl(), sl()),
-            child: ChampionshipFormPage(championship: args?['championship'] as ChampionshipDTO?),
+            child: ChampionshipFormPage(
+              championship: args?['championship'] as ChampionshipDTO?,
+              organizer: args?['organizer'] == true,
+            ),
           );
         },
         AppRoutes.groupsPage: (context) {

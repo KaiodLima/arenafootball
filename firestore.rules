@@ -183,7 +183,7 @@ service cloud.firestore {
       function writable() {
         return !(collection in ['config', 'notificacoes_envios', 'push_avisos', 'solicitacoes_jogador',
           'solicitacoes_time', 'solicitacoes_parceiro', 'noticias_pendentes', 'album_pacotes',
-          'indicacoes', 'codigos_indicacao']);
+          'indicacoes', 'codigos_indicacao', 'solicitacoes_organizador']);
       }
 
       // Dia de hoje em Brasília (UTC-3), igual ao `PartnerSlots.brasiliaDay`.
@@ -289,7 +289,7 @@ service cloud.firestore {
 
       allow read: if !(collection in ['usuarios', 'config', 'notificacoes_envios', 'push_avisos', 'solicitacoes_jogador',
         'solicitacoes_time', 'solicitacoes_parceiro', 'noticias_pendentes', 'manutencao', 'album_pacotes',
-        'indicacoes', 'codigos_indicacao']);
+        'indicacoes', 'codigos_indicacao', 'solicitacoes_organizador']);
       allow create: if writable() && (isAdmin() || isOwnVote()
         || (isPlayers() && ownsTeam(request.resource.data))
         || partnerCreate());
@@ -365,6 +365,22 @@ service cloud.firestore {
         return key in before || after[key].get('idTime', '') == id;
       }
 
+      // Organizador ("Sou organizador de campeonato" aprovado): edita o campeonato
+      // com o `idOrganizador` dele, só os detalhes. Nome, sede, categoria,
+      // temporada, número e organizador ficam como o admin aprovou; no
+      // municipal, as regiões continuam só a sede.
+      function organizerUpdate() {
+        let changed = request.resource.data.diff(resource.data).affectedKeys();
+        let sede = resource.data.get('idRegiao', '');
+        return collection == 'campeonatos' && signedIn()
+          && resource.data.get('idOrganizador', '') == request.auth.uid
+          && changed.hasOnly(['descricao', 'urlImagem', 'premio1', 'premio2', 'premio3', 'premioArtilheiro',
+            'premioGoleiro', 'regras', 'times', 'ids_times', 'regulamentoUrl', 'regulamentoNome', 'idsRegioes',
+            'desempate'])
+          && (resource.data.get('abrangencia', 'municipal') == 'intermunicipal'
+            || request.resource.data.get('idsRegioes', []).hasOnly([sede]));
+      }
+
       // Atleta sem time ('') pode entrar no elenco do dono (aprovação do "Sou jogador").
       allow update: if writable() && keepsEnrollments() && (isAdmin() || isOwnVote()
         || (isPlayers()
@@ -375,7 +391,8 @@ service cloud.firestore {
         || (isTeamDoc() && signedIn() && resource.data.idDono == request.auth.uid
           && request.resource.data.diff(resource.data).affectedKeys()
             .hasOnly(['descricao', 'urlImagem', 'corPrimaria', 'corSecundaria']))
-        || partnerUpdate());
+        || partnerUpdate()
+        || organizerUpdate());
       allow delete: if writable() && (isAdmin() || isOwnVote() || (isPlayers() && ownsTeam(resource.data))
         || partnerDelete());
     }
@@ -505,6 +522,32 @@ service cloud.firestore {
       allow read: if isRequester() || isAdmin();
       allow create: if isRequester() && validSubmit();
       allow update: if (isRequester() && resource.data.status != 'aprovada' && validSubmit()) || isAdmin();
+      allow delete: if (isRequester() && resource.data.status == 'pendente') || isAdmin();
+    }
+
+    // "Sou organizador de campeonato" (id = uid): o pedido atual da conta. O
+    // dono envia, corrige e, respondido, manda outro (sempre pendente, campos
+    // limitados); nunca se aprova. O admin lê, edita e responde.
+    match /solicitacoes_organizador/{userId} {
+      function isRequester() {
+        return signedIn() && userId == request.auth.uid;
+      }
+
+      function validSubmit() {
+        let data = request.resource.data;
+        return data.uid == request.auth.uid
+          && data.status == 'pendente'
+          && data.keys().hasOnly(['uid', 'nome_usuario', 'email', 'nome', 'regiao', 'idRegiao', 'abrangencia',
+            'descricao', 'urlImagem', 'contato', 'temporada', 'status', 'data', 'atualizado_em'])
+          && data.nome is string && data.nome.size() >= 3 && data.nome.size() <= 60
+          && data.regiao is string && data.regiao.size() > 0
+          && data.abrangencia in ['municipal', 'intermunicipal']
+          && data.contato is string && data.contato.size() >= 10 && data.contato.size() <= 30
+          && data.get('descricao', '') is string && data.get('descricao', '').size() <= 300;
+      }
+
+      allow read: if isRequester() || isAdmin();
+      allow create, update: if (isRequester() && validSubmit()) || isAdmin();
       allow delete: if (isRequester() && resource.data.status == 'pendente') || isAdmin();
     }
 

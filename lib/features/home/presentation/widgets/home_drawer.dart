@@ -167,6 +167,11 @@ class HomeDrawer extends StatelessWidget {
                     title: isPartner ? l10n.partnerMenuApproved : l10n.partnerMenu,
                     onTap: () => _open(context, AppRoutes.partnerRequestPage),
                   ),
+                  _DrawerItem(
+                    icon: Icons.emoji_events_outlined,
+                    title: l10n.organizerRequestMenu,
+                    onTap: () => _open(context, AppRoutes.organizerRequestPage),
+                  ),
                 ],
                 if (isAdmin) ...[
                   const SizedBox(height: AppSizes.s12),
@@ -188,6 +193,11 @@ class HomeDrawer extends StatelessWidget {
                     title: l10n.partnerPanelTitle,
                     badge: pendingPartnerRequests,
                     onTap: () => _open(context, AppRoutes.partnerRequestsPanelPage),
+                  ),
+                  _DrawerItem(
+                    icon: Icons.emoji_events_outlined,
+                    title: l10n.organizerRequestsPanelTitle,
+                    onTap: () => _open(context, AppRoutes.organizerRequestsPanelPage),
                   ),
                   _DrawerItem(
                     icon: Icons.admin_panel_settings_outlined,

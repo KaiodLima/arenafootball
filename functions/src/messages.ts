@@ -25,7 +25,9 @@ export type ActionKey =
   | 'noticia_parceiro_resposta'
   | 'conquista'
   | 'album_pacote'
-  | 'indicacao';
+  | 'indicacao'
+  | 'solicitacao_organizador'
+  | 'solicitacao_organizador_resposta';
 
 /** Sem configuração gravada, vale este padrão (notícia vem desligada). */
 export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
@@ -47,6 +49,8 @@ export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
   conquista: true,
   album_pacote: true,
   indicacao: true,
+  solicitacao_organizador: true,
+  solicitacao_organizador_resposta: true,
 };
 
 export type Target = { topic: string } | { condition: string };
@@ -94,7 +98,9 @@ export interface PushMessage {
     | 'noticias_pendentes'
     | 'conquistas'
     | 'album'
-    | 'indicacao';
+    | 'indicacao'
+    | 'solicitacoes_organizador'
+    | 'organizador';
   regiao: string;
   alvo: Target;
   /** Tela específica (partida, votação, notícia); sem ela, só a aba. */
@@ -420,6 +426,50 @@ export function teamRequestAnswerMessage(uid: string, before: Doc | undefined, a
       240,
     ),
     aba: 'meu_time',
+    regiao: text(after.regiao),
+    alvo: { topic: userTopic(uid) },
+  };
+}
+
+/** Pedido "Sou organizador de campeonato" novo ou reenviado: avisa os admins. */
+export function organizerRequestMessage(uid: string, before: Doc | undefined, after: Doc | undefined): PushMessage | null {
+  // Reenvio depois de respondido conta como novo; corrigir o pendente, não.
+  if (!after || !uid || text(after.status) !== 'pendente' || text(before?.status) === 'pendente') return null;
+  const user = text(after.nome_usuario);
+  const name = text(after.nome);
+  if (!name) return null;
+  return {
+    tipo: 'solicitacao_organizador',
+    titulo: 'Novo pedido de campeonato',
+    corpo: shorten(user ? `${user} quer organizar o campeonato ${name}` : `Pedido para organizar o campeonato ${name}`, 240),
+    aba: 'solicitacoes_organizador',
+    regiao: text(after.regiao),
+    alvo: { topic: ADMINS_TOPIC },
+  };
+}
+
+/** Admin respondeu o pedido de organizador: avisa só quem pediu. */
+export function organizerRequestAnswerMessage(
+  uid: string,
+  before: Doc | undefined,
+  after: Doc | undefined,
+): PushMessage | null {
+  if (!before || !after || !uid || text(before.status) !== 'pendente') return null;
+  const status = text(after.status);
+  if (status !== 'aprovada' && status !== 'rejeitada') return null;
+  const name = text(after.nome);
+  const reason = text(after.motivo);
+  const approved = status === 'aprovada';
+  return {
+    tipo: 'solicitacao_organizador_resposta',
+    titulo: approved ? '🏆 Seu campeonato foi aprovado!' : 'Pedido de campeonato',
+    corpo: shorten(
+      approved
+        ? `O ${name} já está no app. Complete os detalhes em Meus campeonatos.`
+        : `O pedido do campeonato ${name} não foi aprovado.${reason ? ` Motivo: ${reason}` : ''}`,
+      240,
+    ),
+    aba: 'organizador',
     regiao: text(after.regiao),
     alvo: { topic: userTopic(uid) },
   };

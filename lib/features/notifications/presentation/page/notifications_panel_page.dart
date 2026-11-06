@@ -219,6 +219,16 @@ class _NotificationsPanelPageState extends State<NotificationsPanelPage> {
         name: l10n.pushActionReferral,
         description: l10n.pushActionReferralHint
       ),
+    PushAction.organizerRequest => (
+        icon: Icons.emoji_events_outlined,
+        name: l10n.pushActionOrganizerRequest,
+        description: l10n.pushActionOrganizerRequestHint
+      ),
+    PushAction.organizerRequestAnswer => (
+        icon: Icons.fact_check_outlined,
+        name: l10n.pushActionOrganizerAnswer,
+        description: l10n.pushActionOrganizerAnswerHint
+      ),
   };
 }
 

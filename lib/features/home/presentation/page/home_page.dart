@@ -172,6 +172,8 @@ class _HomePageState extends State<HomePage> {
       'meu_time' when user != null => AppRoutes.teamRequestPage,
       'solicitacoes_parceiro' when user != null && user.isAdmin => AppRoutes.partnerRequestsPanelPage,
       'parceiro' when user != null => AppRoutes.partnerRequestPage,
+      'solicitacoes_organizador' when user != null && user.isAdmin => AppRoutes.organizerRequestsPanelPage,
+      'organizador' when user != null => AppRoutes.organizerRequestPage,
       'noticias_pendentes' when user != null && user.isAdmin => AppRoutes.partnerRequestsPanelPage,
       'conquistas' when user != null => AppRoutes.achievementsPage,
       'album' when user != null => AppRoutes.albumPage,

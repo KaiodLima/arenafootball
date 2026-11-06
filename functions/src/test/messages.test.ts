@@ -14,6 +14,8 @@ import {
   playerRequestToOwnerMessage,
   seasonCollection,
   teamRequestAnswerMessage,
+  organizerRequestAnswerMessage,
+  organizerRequestMessage,
   teamRequestMessage,
   partnerLinkRequestMessage,
   pendingNewsAnswerMessage,
@@ -276,4 +278,22 @@ test('região pelo id quando o doc tem idRegiao; senão pelo nome', () => {
     topic: 'regiaoid_kv7h',
   });
   assert.deepEqual(manualMessage({ titulo: 'Oi', corpo: 'x', regiao: 'Floresta' })?.alvo, { topic: 'regiao_floresta' });
+});
+
+test('pedido de organizador: admins no novo/reenviado, quem pediu na resposta', () => {
+  const pending = { status: 'pendente', nome: 'Copa Verde', nome_usuario: 'Ana', regiao: 'Colônia' };
+  const created = organizerRequestMessage('u1', undefined, pending);
+  assert.equal(created?.tipo, 'solicitacao_organizador');
+  assert.equal(created?.aba, 'solicitacoes_organizador');
+  assert.deepEqual(created?.alvo, { topic: 'admins' });
+  // Corrigir o pendente não avisa de novo; reenviar depois de aprovado, sim.
+  assert.equal(organizerRequestMessage('u1', pending, { ...pending, descricao: 'x' }), null);
+  assert.notEqual(organizerRequestMessage('u1', { ...pending, status: 'aprovada' }, pending), null);
+
+  const approved = organizerRequestAnswerMessage('u1', pending, { ...pending, status: 'aprovada' });
+  assert.equal(approved?.aba, 'organizador');
+  assert.deepEqual(approved?.alvo, { topic: 'usuario_u1' });
+  const rejected = organizerRequestAnswerMessage('u1', pending, { ...pending, status: 'rejeitada', motivo: 'Duplicado' });
+  assert.match(rejected?.corpo ?? '', /Motivo: Duplicado/);
+  assert.equal(organizerRequestAnswerMessage('u1', { ...pending, status: 'aprovada' }, pending), null);
 });

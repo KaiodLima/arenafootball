@@ -72,6 +72,8 @@ import {
   playerRequestAnswerMessage,
   playerRequestMessage,
   playerRequestToOwnerMessage,
+  organizerRequestAnswerMessage,
+  organizerRequestMessage,
   teamRequestAnswerMessage,
   teamRequestMessage,
   partnerLinkRequestMessage,
@@ -673,6 +675,18 @@ export const onTeamRequestWritten = onDocumentWritten('solicitacoes_time/{uid}',
   if (after?.status === 'aprovada' && before?.status !== 'aprovada') {
     await progressRef(uid).then((ref) => ref.set({ donoTime: 1 }, { merge: true }));
   }
+});
+
+/** Pedido "Sou organizador de campeonato": avisa os admins (novo) e quem pediu (resposta). */
+export const onOrganizerRequestWritten = onDocumentWritten('solicitacoes_organizador/{uid}', async (event) => {
+  const uid = event.params.uid;
+  const before = event.data?.before.data();
+  const after = event.data?.after.data();
+  const origem = `solicitacoes_organizador/${uid}`;
+  const toAdmins = organizerRequestMessage(uid, before, after);
+  if (toAdmins) await deliver(`pedido_organizador_${event.id}`, toAdmins, origem);
+  const toUser = organizerRequestAnswerMessage(uid, before, after);
+  if (toUser) await deliver(`resposta_organizador_${event.id}`, toUser, origem);
 });
 
 /** Pedido "Sou parceiro": avisa os admins (novo) e quem pediu (resposta). */

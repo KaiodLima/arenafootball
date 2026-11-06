@@ -111,7 +111,9 @@ class ChampionshipsDataSource {
   /// Regrava o campeonato mantendo o `id_campeonato` (as partidas apontam para ele).
   Future<Either<Failure, ChampionshipDTO>> updateChampionship(ChampionshipDTO championship) async {
     try {
-      await _championships.doc(championship.id).set(championship.toMap());
+      // Merge: mantém o que o formulário não conhece (`recalcularEm`) e deixa
+      // o organizador gravar só o que mudou (as regras olham a diferença).
+      await _championships.doc(championship.id).set(championship.toMap(), SetOptions(merge: true));
       return Right(championship);
     } catch (e) {
       AppLogger.e('updateChampionship id=${championship.id}', name: _logName, error: e);

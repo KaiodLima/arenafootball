@@ -731,6 +731,140 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get organizerRequestMenu => 'I organize a competition';
+
+  @override
+  String get organizerRequestTitle => 'I organize a competition';
+
+  @override
+  String get organizerRequestIntro =>
+      'Running a competition? Ask to add it to Arena. Once approved, the competition is created and you manage the details (description, rules, prizes and teams).';
+
+  @override
+  String get organizerRequestLogoAdd => 'Logo (optional)';
+
+  @override
+  String get organizerRequestSectionCompetition => 'Competition';
+
+  @override
+  String get organizerRequestNameLabel => 'Competition name';
+
+  @override
+  String get organizerRequestNameRequired =>
+      'Enter the competition name (at least 3 letters).';
+
+  @override
+  String get organizerRequestScopeLabel => 'Category';
+
+  @override
+  String get organizerRequestDescriptionLabel =>
+      'About the competition (dates, format, number of teams)';
+
+  @override
+  String get organizerRequestSubmit => 'Send request';
+
+  @override
+  String get organizerRequestSent => 'Request sent! The admin will review it.';
+
+  @override
+  String get organizerRequestCancelled => 'Request cancelled.';
+
+  @override
+  String get organizerRequestLoadError => 'Could not load your request.';
+
+  @override
+  String get organizerRequestPendingInfo =>
+      'Your request is with the admin. You will be notified when they answer.';
+
+  @override
+  String get organizerRequestRejectedInfo =>
+      'Your request was not approved. Fix the details and send it again.';
+
+  @override
+  String get organizerRequestApprovedInfo =>
+      'Your competition was created! Edit the details in \"My competitions\".';
+
+  @override
+  String get organizerRequestEdit => 'Fix request';
+
+  @override
+  String get organizerRequestCancel => 'Cancel request';
+
+  @override
+  String get organizerRequestCancelTitle => 'Cancel the request?';
+
+  @override
+  String organizerRequestCancelMessage(String name) {
+    return 'The request for $name will be deleted.';
+  }
+
+  @override
+  String get organizerRequestResubmit => 'Send again';
+
+  @override
+  String get organizerRequestNew => 'Request another competition';
+
+  @override
+  String get organizerMyChampionships => 'My competitions';
+
+  @override
+  String get organizerRequestsPanelTitle => 'Competition organizers';
+
+  @override
+  String get organizerRequestsEmptyPending => 'No organizer requests waiting.';
+
+  @override
+  String get organizerRequestsEmptyAnswered => 'No answered requests yet.';
+
+  @override
+  String get organizerRequestsLoadError =>
+      'Could not load the organizer requests.';
+
+  @override
+  String organizerRequestsApproveTitle(String name) {
+    return 'Approve $name?';
+  }
+
+  @override
+  String organizerRequestsApproveMessage(
+      String region, String scope, String user) {
+    return 'Creates the competition in $region ($scope) in the current season, organized by $user.';
+  }
+
+  @override
+  String organizerRequestsApproved(String name) {
+    return 'Competition $name created.';
+  }
+
+  @override
+  String organizerRequestsRejectTitle(String name) {
+    return 'Reject $name?';
+  }
+
+  @override
+  String organizerRequestsOrganizer(String user) {
+    return 'Organizer: $user';
+  }
+
+  @override
+  String get championshipFormOrganizerLocked =>
+      'Name, region, category and season were set on approval. Ask the admin to change them.';
+
+  @override
+  String get pushActionOrganizerRequest => 'Organizer request';
+
+  @override
+  String get pushActionOrganizerRequestHint =>
+      'To admins · someone wants to add a competition';
+
+  @override
+  String get pushActionOrganizerAnswer => 'Answer to organizer';
+
+  @override
+  String get pushActionOrganizerAnswerHint =>
+      'To the requester · competition approved or declined';
+
+  @override
   String get referralTitle => 'Invite friends';
 
   @override

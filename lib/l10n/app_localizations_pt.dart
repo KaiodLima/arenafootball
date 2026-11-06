@@ -734,6 +734,144 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get organizerRequestMenu => 'Sou organizador de campeonato';
+
+  @override
+  String get organizerRequestTitle => 'Sou organizador de campeonato';
+
+  @override
+  String get organizerRequestIntro =>
+      'Organiza uma competição? Peça para cadastrá-la no Arena. Aprovado, o campeonato é criado e você cuida dos detalhes (descrição, regulamento, prêmios e times).';
+
+  @override
+  String get organizerRequestLogoAdd => 'Logo (opcional)';
+
+  @override
+  String get organizerRequestSectionCompetition => 'Competição';
+
+  @override
+  String get organizerRequestNameLabel => 'Nome da competição';
+
+  @override
+  String get organizerRequestNameRequired =>
+      'Informe o nome da competição (mínimo 3 letras).';
+
+  @override
+  String get organizerRequestScopeLabel => 'Categoria';
+
+  @override
+  String get organizerRequestDescriptionLabel =>
+      'Sobre a competição (datas, formato, número de times)';
+
+  @override
+  String get organizerRequestSubmit => 'Enviar pedido';
+
+  @override
+  String get organizerRequestSent =>
+      'Pedido enviado! O administrador vai analisar.';
+
+  @override
+  String get organizerRequestCancelled => 'Pedido cancelado.';
+
+  @override
+  String get organizerRequestLoadError =>
+      'Não foi possível carregar o seu pedido.';
+
+  @override
+  String get organizerRequestPendingInfo =>
+      'Seu pedido está com o administrador. Você recebe um aviso quando ele responder.';
+
+  @override
+  String get organizerRequestRejectedInfo =>
+      'Seu pedido não foi aprovado. Corrija os dados e envie de novo.';
+
+  @override
+  String get organizerRequestApprovedInfo =>
+      'Seu campeonato foi criado! Edite os detalhes em \"Meus campeonatos\".';
+
+  @override
+  String get organizerRequestEdit => 'Corrigir pedido';
+
+  @override
+  String get organizerRequestCancel => 'Cancelar pedido';
+
+  @override
+  String get organizerRequestCancelTitle => 'Cancelar o pedido?';
+
+  @override
+  String organizerRequestCancelMessage(String name) {
+    return 'O pedido de $name será apagado.';
+  }
+
+  @override
+  String get organizerRequestResubmit => 'Enviar de novo';
+
+  @override
+  String get organizerRequestNew => 'Pedir outro campeonato';
+
+  @override
+  String get organizerMyChampionships => 'Meus campeonatos';
+
+  @override
+  String get organizerRequestsPanelTitle => 'Organizadores de campeonato';
+
+  @override
+  String get organizerRequestsEmptyPending =>
+      'Nenhum pedido de organizador esperando resposta.';
+
+  @override
+  String get organizerRequestsEmptyAnswered =>
+      'Nenhum pedido respondido ainda.';
+
+  @override
+  String get organizerRequestsLoadError =>
+      'Não foi possível carregar os pedidos de organizador.';
+
+  @override
+  String organizerRequestsApproveTitle(String name) {
+    return 'Aprovar $name?';
+  }
+
+  @override
+  String organizerRequestsApproveMessage(
+      String region, String scope, String user) {
+    return 'Cria o campeonato em $region ($scope) na temporada atual, organizado por $user.';
+  }
+
+  @override
+  String organizerRequestsApproved(String name) {
+    return 'Campeonato $name criado.';
+  }
+
+  @override
+  String organizerRequestsRejectTitle(String name) {
+    return 'Rejeitar $name?';
+  }
+
+  @override
+  String organizerRequestsOrganizer(String user) {
+    return 'Organizador: $user';
+  }
+
+  @override
+  String get championshipFormOrganizerLocked =>
+      'Nome, região, categoria e temporada foram definidos na aprovação. Para mudar, fale com o administrador.';
+
+  @override
+  String get pushActionOrganizerRequest => 'Pedido de organizador';
+
+  @override
+  String get pushActionOrganizerRequestHint =>
+      'Para os admins · alguém quer cadastrar um campeonato';
+
+  @override
+  String get pushActionOrganizerAnswer => 'Resposta ao organizador';
+
+  @override
+  String get pushActionOrganizerAnswerHint =>
+      'Para quem pediu · campeonato aprovado ou recusado';
+
+  @override
   String get referralTitle => 'Indique amigos';
 
   @override

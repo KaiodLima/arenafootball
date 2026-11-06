@@ -1335,6 +1335,229 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @organizerRequestMenu.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sou organizador de campeonato'**
+  String get organizerRequestMenu;
+
+  /// No description provided for @organizerRequestTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sou organizador de campeonato'**
+  String get organizerRequestTitle;
+
+  /// No description provided for @organizerRequestIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Organiza uma competição? Peça para cadastrá-la no Arena. Aprovado, o campeonato é criado e você cuida dos detalhes (descrição, regulamento, prêmios e times).'**
+  String get organizerRequestIntro;
+
+  /// No description provided for @organizerRequestLogoAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Logo (opcional)'**
+  String get organizerRequestLogoAdd;
+
+  /// No description provided for @organizerRequestSectionCompetition.
+  ///
+  /// In pt, this message translates to:
+  /// **'Competição'**
+  String get organizerRequestSectionCompetition;
+
+  /// No description provided for @organizerRequestNameLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome da competição'**
+  String get organizerRequestNameLabel;
+
+  /// No description provided for @organizerRequestNameRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Informe o nome da competição (mínimo 3 letras).'**
+  String get organizerRequestNameRequired;
+
+  /// No description provided for @organizerRequestScopeLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Categoria'**
+  String get organizerRequestScopeLabel;
+
+  /// No description provided for @organizerRequestDescriptionLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sobre a competição (datas, formato, número de times)'**
+  String get organizerRequestDescriptionLabel;
+
+  /// No description provided for @organizerRequestSubmit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar pedido'**
+  String get organizerRequestSubmit;
+
+  /// No description provided for @organizerRequestSent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedido enviado! O administrador vai analisar.'**
+  String get organizerRequestSent;
+
+  /// No description provided for @organizerRequestCancelled.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedido cancelado.'**
+  String get organizerRequestCancelled;
+
+  /// No description provided for @organizerRequestLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar o seu pedido.'**
+  String get organizerRequestLoadError;
+
+  /// No description provided for @organizerRequestPendingInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu pedido está com o administrador. Você recebe um aviso quando ele responder.'**
+  String get organizerRequestPendingInfo;
+
+  /// No description provided for @organizerRequestRejectedInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu pedido não foi aprovado. Corrija os dados e envie de novo.'**
+  String get organizerRequestRejectedInfo;
+
+  /// No description provided for @organizerRequestApprovedInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu campeonato foi criado! Edite os detalhes em \"Meus campeonatos\".'**
+  String get organizerRequestApprovedInfo;
+
+  /// No description provided for @organizerRequestEdit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Corrigir pedido'**
+  String get organizerRequestEdit;
+
+  /// No description provided for @organizerRequestCancel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cancelar pedido'**
+  String get organizerRequestCancel;
+
+  /// No description provided for @organizerRequestCancelTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cancelar o pedido?'**
+  String get organizerRequestCancelTitle;
+
+  /// No description provided for @organizerRequestCancelMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'O pedido de {name} será apagado.'**
+  String organizerRequestCancelMessage(String name);
+
+  /// No description provided for @organizerRequestResubmit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar de novo'**
+  String get organizerRequestResubmit;
+
+  /// No description provided for @organizerRequestNew.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedir outro campeonato'**
+  String get organizerRequestNew;
+
+  /// No description provided for @organizerMyChampionships.
+  ///
+  /// In pt, this message translates to:
+  /// **'Meus campeonatos'**
+  String get organizerMyChampionships;
+
+  /// No description provided for @organizerRequestsPanelTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Organizadores de campeonato'**
+  String get organizerRequestsPanelTitle;
+
+  /// No description provided for @organizerRequestsEmptyPending.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum pedido de organizador esperando resposta.'**
+  String get organizerRequestsEmptyPending;
+
+  /// No description provided for @organizerRequestsEmptyAnswered.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum pedido respondido ainda.'**
+  String get organizerRequestsEmptyAnswered;
+
+  /// No description provided for @organizerRequestsLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar os pedidos de organizador.'**
+  String get organizerRequestsLoadError;
+
+  /// No description provided for @organizerRequestsApproveTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aprovar {name}?'**
+  String organizerRequestsApproveTitle(String name);
+
+  /// No description provided for @organizerRequestsApproveMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cria o campeonato em {region} ({scope}) na temporada atual, organizado por {user}.'**
+  String organizerRequestsApproveMessage(
+      String region, String scope, String user);
+
+  /// No description provided for @organizerRequestsApproved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeonato {name} criado.'**
+  String organizerRequestsApproved(String name);
+
+  /// No description provided for @organizerRequestsRejectTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rejeitar {name}?'**
+  String organizerRequestsRejectTitle(String name);
+
+  /// No description provided for @organizerRequestsOrganizer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Organizador: {user}'**
+  String organizerRequestsOrganizer(String user);
+
+  /// No description provided for @championshipFormOrganizerLocked.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome, região, categoria e temporada foram definidos na aprovação. Para mudar, fale com o administrador.'**
+  String get championshipFormOrganizerLocked;
+
+  /// No description provided for @pushActionOrganizerRequest.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedido de organizador'**
+  String get pushActionOrganizerRequest;
+
+  /// No description provided for @pushActionOrganizerRequestHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para os admins · alguém quer cadastrar um campeonato'**
+  String get pushActionOrganizerRequestHint;
+
+  /// No description provided for @pushActionOrganizerAnswer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resposta ao organizador'**
+  String get pushActionOrganizerAnswer;
+
+  /// No description provided for @pushActionOrganizerAnswerHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para quem pediu · campeonato aprovado ou recusado'**
+  String get pushActionOrganizerAnswerHint;
+
   /// No description provided for @referralTitle.
   ///
   /// In pt, this message translates to:
