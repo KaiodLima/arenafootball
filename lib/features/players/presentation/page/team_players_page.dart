@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/players/presentation/widgets/squad_player_row.dart';
+import 'package:arena_soccer/features/players/presentation/widgets/squad_spotlight.dart';
+import 'package:arena_soccer/features/players/presentation/widgets/squad_toolbar.dart';
+import 'package:arena_soccer/utils/themes/arena_palette.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/widgets/organizer_squad_actions.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
@@ -11,16 +15,13 @@ import 'package:arena_soccer/features/players/presentation/bloc/team_players_cub
 import 'package:arena_soccer/features/players/presentation/bloc/team_players_state.dart';
 import 'package:arena_soccer/features/players/presentation/player_navigation.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/championship_checklist_sheet.dart';
-import 'package:arena_soccer/features/players/presentation/widgets/player_card.dart';
 import 'package:arena_soccer/features/team_requests/presentation/bloc/owned_team_cubit.dart';
-import 'package:arena_soccer/features/players/presentation/widgets/squad_summary.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/team_header.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
-import 'package:arena_soccer/utils/components/arena_search_field.dart';
 import 'package:arena_soccer/utils/components/card_menu_button.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
@@ -58,7 +59,7 @@ class TeamPlayersPage extends StatefulWidget {
 }
 
 class _TeamPlayersPageState extends State<TeamPlayersPage> {
-  static const double _expandedHeight = 300;
+  static const double _expandedHeight = 340;
 
   final _scroll = ScrollController();
   late final String _season;
@@ -66,6 +67,9 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
   /// Time exibido; trocado pelo que volta da edição do admin.
   late TeamDTO _team = widget.team;
   bool _collapsed = false;
+
+  /// Busca aberta na barra fixa.
+  bool _searching = false;
 
   @override
   void initState() {
@@ -276,7 +280,13 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
                     ],
                     flexibleSpace: FlexibleSpaceBar(
                       collapseMode: CollapseMode.parallax,
-                      background: TeamHeader(team: _team, season: _season),
+                      background: TeamHeader(
+                        team: _team,
+                        season: _season,
+                        stats: state.players.isEmpty
+                            ? null
+                            : (players: state.squad.length, goals: state.totalGoals, assists: state.totalAssists),
+                      ),
                     ),
                   ),
                   ..._body(context, state, visible, topScorerId, cubit, l10n),
@@ -336,57 +346,93 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
     final isAdmin = context.read<SessionCubit>().state.isAdmin;
     final ownsTeam = context.read<OwnedTeamCubit>().state.owns(id: _team.id, name: _team.name);
     final canEnroll = (isAdmin || ownsTeam) && state.championshipId == null && state.view.championships.isNotEmpty;
+    final palette = TeamPalette.fromHex(_team.primaryColor, _team.secondaryColor);
+    final accent = palette?.ring ?? ArenaPalette.of(context).primary;
+    final searching = state.query.trim().isNotEmpty;
+    final sections = state.sections;
+    final topScorer = state.topScorer;
+    final topAssister = state.topAssister;
+
+    void openPlayer(PlayerDTO player) => openAthlete(
+          context,
+          {'playerId': player.id, 'season': _season, 'name': player.name, 'player': player},
+        );
+
+    // Menu "⋮" da linha: inscrever (admin/dono, no geral) e tirar (organizador).
+    List<SquadRowAction> actionsOf(PlayerDTO player) => [
+          if (canEnroll)
+            SquadRowAction(
+              icon: Icons.emoji_events_outlined,
+              label: l10n.enrollPlayerTitle,
+              onSelected: () => _enrollPlayer(player, state, l10n),
+            ),
+          if (organizerActions != null)
+            SquadRowAction(
+              icon: Icons.person_remove_alt_1_outlined,
+              label: l10n.organizerSquadRemove,
+              destructive: true,
+              onSelected: () => organizerRemoveFromChampionship(
+                context,
+                cubit: cubit,
+                player: player,
+                championshipId: organizerChampionship!,
+              ),
+            ),
+        ];
+
+    final showTabs = state.view.championships.isNotEmpty || state.hasFriendlies;
 
     return [
+      // Abas de competição + busca + ordenação, presas ao rolar.
+      SliverPersistentHeader(
+        pinned: true,
+        delegate: SquadToolbarDelegate(
+          child: SquadToolbar(
+            tabs: showTabs
+                ? _ChampionshipChips(
+                    state: state,
+                    onSelected: cubit.selectChampionship,
+                    onlyChampionshipId: widget.onlyChampionship ? widget.championshipId : null,
+                  )
+                : const SizedBox.shrink(),
+            searching: _searching,
+            query: state.query,
+            onSearch: cubit.setQuery,
+            onOpenSearch: () => setState(() => _searching = true),
+            onCloseSearch: () {
+              cubit.setQuery('');
+              setState(() => _searching = false);
+            },
+            sort: state.sort,
+            onSort: cubit.setSort,
+            accent: accent,
+          ),
+        ),
+      ),
       SliverPadding(
         padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s8, AppSizes.s16, 0),
         sliver: SliverToBoxAdapter(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (state.view.championships.isNotEmpty || state.hasFriendlies) ...[
-                _ChampionshipChips(
-                  state: state,
-                  onSelected: cubit.selectChampionship,
-                  onlyChampionshipId: widget.onlyChampionship ? widget.championshipId : null,
-                ),
-                const SizedBox(height: AppSizes.s12),
-              ],
               if (organizerActions != null) ...[
                 organizerActions,
-                const SizedBox(height: AppSizes.s12),
+                const SizedBox(height: AppSizes.s16),
               ],
-              SquadSummary(players: state.squad.length, goals: state.totalGoals, assists: state.totalAssists),
-              const SizedBox(height: AppSizes.s16),
-              ArenaSearchField(hint: l10n.playersSearchHint, onChanged: cubit.setQuery),
-              const SizedBox(height: AppSizes.s12),
-              Row(
-                children: [
-                  _SortChip(
-                    label: l10n.playersSortGoals,
-                    selected: state.sort == PlayersSort.goals,
-                    onTap: () => cubit.setSort(PlayersSort.goals),
-                  ),
-                  const SizedBox(width: AppSizes.s8),
-                  _SortChip(
-                    label: l10n.playersSortAssists,
-                    selected: state.sort == PlayersSort.assists,
-                    onTap: () => cubit.setSort(PlayersSort.assists),
-                  ),
-                  const SizedBox(width: AppSizes.s8),
-                  _SortChip(
-                    label: l10n.playersSortName,
-                    selected: state.sort == PlayersSort.name,
-                    onTap: () => cubit.setSort(PlayersSort.name),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSizes.s16),
+              if (!searching)
+                SquadSpotlight(
+                  topScorer: topScorer,
+                  topScorerGoals: topScorer == null ? 0 : state.goalsOf(topScorer),
+                  topAssister: topAssister,
+                  topAssisterAssists: topAssister == null ? 0 : state.assistsOf(topAssister),
+                  accent: accent,
+                  onTap: openPlayer,
+                ),
             ],
           ),
         ),
       ),
-      if (visible.isEmpty)
+      if (sections.isEmpty)
         SliverToBoxAdapter(
           child: state.query.trim().isEmpty
               ? ArenaEmptyState(message: l10n.playersEmptyChampionship, icon: Icons.groups_outlined)
@@ -396,29 +442,17 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s32),
           sliver: SliverList.builder(
-            itemCount: visible.length,
-            itemBuilder: (context, index) {
-              final player = visible[index];
-              return PlayerCard(
-                // Números da lista escolhida (total ou da competição).
-                player: player.copyWith(goals: state.goalsOf(player), assists: state.assistsOf(player)),
-                // No elenco geral, admin/dono inscreve o atleta nas competições do time.
-                onEnroll: canEnroll ? () => _enrollPlayer(player, state, l10n) : null,
-                onRemove: organizerActions == null
-                    ? null
-                    : () => organizerRemoveFromChampionship(
-                          context,
-                          cubit: cubit,
-                          player: player,
-                          championshipId: organizerChampionship!,
-                        ),
-                isTopScorer: player.id == topScorerId,
-                onTap: () => openAthlete(
-                  context,
-                  {'playerId': player.id, 'season': _season, 'name': player.name, 'player': player},
-                ),
-              );
-            },
+            itemCount: sections.length,
+            itemBuilder: (context, index) => SquadSectionCard(
+              section: sections[index],
+              accent: accent,
+              // Números da lista escolhida (total ou da competição).
+              goalsOf: state.goalsOf,
+              assistsOf: state.assistsOf,
+              topScorerId: topScorerId,
+              onTap: openPlayer,
+              actionsOf: actionsOf,
+            ),
           ),
         ),
     ];
@@ -474,30 +508,6 @@ class _ChampionshipChips extends StatelessWidget {
             onTap: () => onSelected(championship.championshipId),
           );
         },
-      ),
-    );
-  }
-}
-
-class _SortChip extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _SortChip({required this.label, required this.selected, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: selected ? AppColors.primaryDark : AppColors.surface,
-      shape: StadiumBorder(side: BorderSide(color: selected ? AppColors.primaryDark : AppColors.greyLight)),
-      child: InkWell(
-        customBorder: const StadiumBorder(),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSizes.s14, vertical: AppSizes.s8),
-          child: Text(label, style: AppTypography.label(color: selected ? AppColors.white : AppColors.primaryDark)),
-        ),
       ),
     );
   }

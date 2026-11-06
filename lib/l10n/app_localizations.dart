@@ -1335,6 +1335,102 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @squadGoalkeepers.
+  ///
+  /// In pt, this message translates to:
+  /// **'Goleiros'**
+  String get squadGoalkeepers;
+
+  /// No description provided for @squadDefenders.
+  ///
+  /// In pt, this message translates to:
+  /// **'Zagueiros'**
+  String get squadDefenders;
+
+  /// No description provided for @squadFullBacks.
+  ///
+  /// In pt, this message translates to:
+  /// **'Laterais'**
+  String get squadFullBacks;
+
+  /// No description provided for @squadDefensiveMidfielders.
+  ///
+  /// In pt, this message translates to:
+  /// **'Volantes'**
+  String get squadDefensiveMidfielders;
+
+  /// No description provided for @squadMidfielders.
+  ///
+  /// In pt, this message translates to:
+  /// **'Meias'**
+  String get squadMidfielders;
+
+  /// No description provided for @squadForwards.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atacantes'**
+  String get squadForwards;
+
+  /// No description provided for @squadNoPosition.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem posição'**
+  String get squadNoPosition;
+
+  /// No description provided for @squadAllPlayers.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atletas'**
+  String get squadAllPlayers;
+
+  /// No description provided for @squadTopScorer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Artilheiro'**
+  String get squadTopScorer;
+
+  /// No description provided for @squadTopAssister.
+  ///
+  /// In pt, this message translates to:
+  /// **'Garçom'**
+  String get squadTopAssister;
+
+  /// No description provided for @squadSortBy.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ordenar por'**
+  String get squadSortBy;
+
+  /// No description provided for @squadSortPosition.
+  ///
+  /// In pt, this message translates to:
+  /// **'Posição'**
+  String get squadSortPosition;
+
+  /// No description provided for @squadGoalsShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'G'**
+  String get squadGoalsShort;
+
+  /// No description provided for @squadAssistsShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'A'**
+  String get squadAssistsShort;
+
+  /// No description provided for @squadSearch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Buscar atleta'**
+  String get squadSearch;
+
+  /// No description provided for @squadPlayerActions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ações do atleta'**
+  String get squadPlayerActions;
+
   /// No description provided for @organizerSquadPermission.
   ///
   /// In pt, this message translates to:

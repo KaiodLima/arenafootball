@@ -731,6 +731,54 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get squadGoalkeepers => 'Goalkeepers';
+
+  @override
+  String get squadDefenders => 'Defenders';
+
+  @override
+  String get squadFullBacks => 'Full-backs';
+
+  @override
+  String get squadDefensiveMidfielders => 'Defensive midfielders';
+
+  @override
+  String get squadMidfielders => 'Midfielders';
+
+  @override
+  String get squadForwards => 'Forwards';
+
+  @override
+  String get squadNoPosition => 'No position';
+
+  @override
+  String get squadAllPlayers => 'Players';
+
+  @override
+  String get squadTopScorer => 'Top scorer';
+
+  @override
+  String get squadTopAssister => 'Top assister';
+
+  @override
+  String get squadSortBy => 'Sort by';
+
+  @override
+  String get squadSortPosition => 'Position';
+
+  @override
+  String get squadGoalsShort => 'G';
+
+  @override
+  String get squadAssistsShort => 'A';
+
+  @override
+  String get squadSearch => 'Search player';
+
+  @override
+  String get squadPlayerActions => 'Player actions';
+
+  @override
   String get organizerSquadPermission =>
       'No permission to change this squad. Ask the admin to open the \"Championship organizers\" panel and try again.';
 

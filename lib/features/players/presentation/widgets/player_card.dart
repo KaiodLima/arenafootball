@@ -76,9 +76,6 @@ class PlayerCard extends StatelessWidget {
   /// Admin/dono: abre as competições do atleta pelo time (nulo = sem botão).
   final VoidCallback? onEnroll;
 
-  /// Organizador: tirar o atleta da competição.
-  final VoidCallback? onRemove;
-
   const PlayerCard({
     super.key,
     required this.player,
@@ -86,7 +83,6 @@ class PlayerCard extends StatelessWidget {
     this.onTap,
     this.photoFile,
     this.onEnroll,
-    this.onRemove,
   });
 
   @override
@@ -135,12 +131,6 @@ class PlayerCard extends StatelessWidget {
               ],
             ),
           ),
-          if (onRemove != null)
-            IconButton(
-              tooltip: l10n.organizerSquadRemove,
-              onPressed: onRemove,
-              icon: const Icon(Icons.person_remove_alt_1_outlined, color: AppColors.textSecondary),
-            ),
           if (onEnroll != null)
             IconButton(
               tooltip: l10n.enrollPlayerTitle,

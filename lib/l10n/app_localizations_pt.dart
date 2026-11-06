@@ -734,6 +734,54 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get squadGoalkeepers => 'Goleiros';
+
+  @override
+  String get squadDefenders => 'Zagueiros';
+
+  @override
+  String get squadFullBacks => 'Laterais';
+
+  @override
+  String get squadDefensiveMidfielders => 'Volantes';
+
+  @override
+  String get squadMidfielders => 'Meias';
+
+  @override
+  String get squadForwards => 'Atacantes';
+
+  @override
+  String get squadNoPosition => 'Sem posição';
+
+  @override
+  String get squadAllPlayers => 'Atletas';
+
+  @override
+  String get squadTopScorer => 'Artilheiro';
+
+  @override
+  String get squadTopAssister => 'Garçom';
+
+  @override
+  String get squadSortBy => 'Ordenar por';
+
+  @override
+  String get squadSortPosition => 'Posição';
+
+  @override
+  String get squadGoalsShort => 'G';
+
+  @override
+  String get squadAssistsShort => 'A';
+
+  @override
+  String get squadSearch => 'Buscar atleta';
+
+  @override
+  String get squadPlayerActions => 'Ações do atleta';
+
+  @override
   String get organizerSquadPermission =>
       'Sem permissão para mudar este elenco. Peça ao admin para abrir o painel \"Organizadores de campeonato\" e tente de novo.';
 
