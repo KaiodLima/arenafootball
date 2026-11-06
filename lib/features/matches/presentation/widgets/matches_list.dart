@@ -20,6 +20,7 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/delay_match_sheet.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/set_match_phase_usecase.dart';
+import 'package:arena_soccer/utils/themes/arena_palette.dart';
 
 /// Lista de partidas do [MatchesCubit] do contexto (usada pela aba de
 /// tabelas, com as partidas do dia, e pela tela "todos os jogos"). Com
@@ -106,9 +107,9 @@ class MatchesList extends StatelessWidget {
       builder: (context, state) {
         final Widget? placeholder;
         if (state is LoadingMatchesState && state.matches.isEmpty) {
-          placeholder = const Padding(
+          placeholder = Padding(
             padding: EdgeInsets.only(top: AppSizes.s48),
-            child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+            child: Center(child: CircularProgressIndicator(color: ArenaPalette.of(context).primary)),
           );
         } else if (state is ErrorMatchesState && state.matches.isEmpty) {
           placeholder = ArenaEmptyState.error(message: l10n.matchesLoadError);
@@ -237,7 +238,7 @@ class _DayHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(AppSizes.s4, AppSizes.s14, AppSizes.s4, AppSizes.s10),
       child: Row(
         children: [
-          const Icon(Icons.event_rounded, size: AppSizes.s18, color: AppColors.primaryDark),
+          Icon(Icons.event_rounded, size: AppSizes.s18, color: ArenaPalette.of(context).primaryDark),
           const SizedBox(width: AppSizes.s8),
           Text(title, style: AppTypography.title().copyWith(fontSize: AppSizes.s16)),
           const SizedBox(width: AppSizes.s8),

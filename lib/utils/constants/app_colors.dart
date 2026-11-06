@@ -62,6 +62,14 @@ class AppColors {
   /// Verde a 12%: indicador da barra inferior, cápsulas de ícone, item ativo.
   static const Color primarySoft = Color(0x1F4CAF50);
 
+  /// Paleta azul do modo organizador (home do organizador de campeonato; ver
+  /// `ArenaPalette.blue`): mesmos papéis dos verdes acima.
+  static const Color organizerPrimary = Color(0xFF1E88E5);
+  static const Color organizerDark = Color(0xFF0D2A4D);
+  static const Color organizerMedium = Color(0xFF16457A);
+  static const Color organizerStrong = Color(0xFF1565C0);
+  static const Color organizerSoft = Color(0x1F1E88E5);
+
   /// Superfície dos cards e sheets.
   static const Color surface = Colors.white;
 

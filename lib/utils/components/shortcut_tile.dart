@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/themes/arena_palette.dart';
 
 /// Bloco de atalho: ícone num círculo verde-claro e o rótulo embaixo. Ocupa
 /// uma fatia igual da linha (usar dentro de um `Row`).
@@ -29,8 +30,8 @@ class ShortcutTile extends StatelessWidget {
                 Container(
                   width: AppSizes.s48,
                   height: AppSizes.s48,
-                  decoration: const BoxDecoration(color: AppColors.primarySoft, shape: BoxShape.circle),
-                  child: Icon(icon, color: AppColors.primaryDark, size: AppSizes.s22),
+                  decoration: BoxDecoration(color: ArenaPalette.of(context).primarySoft, shape: BoxShape.circle),
+                  child: Icon(icon, color: ArenaPalette.of(context).primaryDark, size: AppSizes.s22),
                 ),
                 const SizedBox(height: AppSizes.s6),
                 Text(

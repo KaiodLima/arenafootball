@@ -8,6 +8,7 @@ import 'package:arena_soccer/utils/components/arena_search_field.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/themes/arena_palette.dart';
 
 /// "Municipal · Floresta" / "Intermunicipal · Floresta".
 String championshipScopeLine(AppLocalizations l10n, ChampionshipDTO championship) => [
@@ -29,7 +30,7 @@ class _ChampionshipThumb extends StatelessWidget {
     final url = championship?.imageUrl ?? '';
     final icon = Icon(
       championship == null ? noneIcon : Icons.emoji_events_outlined,
-      color: AppColors.primaryDark,
+      color: ArenaPalette.of(context).primaryDark,
       size: size * 0.5,
     );
     return ClipRRect(
@@ -37,7 +38,7 @@ class _ChampionshipThumb extends StatelessWidget {
       child: Container(
         width: size,
         height: size,
-        color: AppColors.primarySoft,
+        color: ArenaPalette.of(context).primarySoft,
         alignment: Alignment.center,
         child: url.isEmpty
             ? icon
@@ -182,7 +183,7 @@ class _ChampionshipPickerState extends State<_ChampionshipPicker> {
           ? null
           : Text(championshipScopeLine(l10n, championship),
               style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
-      trailing: selected ? const Icon(Icons.check_circle_rounded, color: AppColors.primary) : null,
+      trailing: selected ? Icon(Icons.check_circle_rounded, color: ArenaPalette.of(context).primary) : null,
       onTap: () => Navigator.pop(context, (id: championship?.championshipId)),
     );
   }

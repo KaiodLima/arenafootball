@@ -16,6 +16,9 @@ import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organ
 import 'package:arena_soccer/features/teams/data/datasources/teams_datasource.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/utils/constants/app_colors.dart';
+import 'package:arena_soccer/utils/themes/app_theme.dart';
+import 'package:arena_soccer/utils/themes/arena_palette.dart';
 
 class _Repo implements IOrganizerRequestsRepository {
   final controller = StreamController<Either<Failure, List<ChampionshipDTO>>>.broadcast();
@@ -111,5 +114,26 @@ void main() {
     expect(find.byIcon(Icons.emoji_events_rounded), findsOneWidget);
     await tester.tap(find.byType(OrganizerModeToggle));
     expect(taps, 1);
+  });
+
+  testWidgets('paleta: verde por padrão, azul no tema do organizador', (tester) async {
+    late ArenaPalette fan;
+    late ArenaPalette organizer;
+    await tester.pumpWidget(MaterialApp(
+      theme: AppTheme.light,
+      home: Builder(builder: (context) {
+        fan = ArenaPalette.of(context);
+        return Theme(
+          data: ArenaPalette.organizerTheme(Theme.of(context)),
+          child: Builder(builder: (context) {
+            organizer = ArenaPalette.of(context);
+            return const SizedBox();
+          }),
+        );
+      }),
+    ));
+    expect(fan.primary, AppColors.primary);
+    expect(organizer.primary, AppColors.organizerPrimary);
+    expect(organizer.primaryDark, AppColors.organizerDark);
   });
 }

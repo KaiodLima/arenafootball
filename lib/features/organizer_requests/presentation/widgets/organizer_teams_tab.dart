@@ -10,9 +10,9 @@ import 'package:arena_soccer/injection_container.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/section_header.dart';
-import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/themes/arena_palette.dart';
 
 /// Aba Times do modo organizador: uma seção por campeonato da conta, com os
 /// times inscritos (tocar abre o elenco).
@@ -45,7 +45,7 @@ class _OrganizerTeamsList extends StatelessWidget {
 
     return BlocBuilder<OrganizerTeamsCubit, OrganizerTeamsState>(
       builder: (context, state) {
-        if (state.loading) return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+        if (state.loading) return Center(child: CircularProgressIndicator(color: ArenaPalette.of(context).primary));
         if (state.error) return ArenaEmptyState.error(message: l10n.teamsLoadError);
 
         return ListView(

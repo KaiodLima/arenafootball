@@ -19,6 +19,7 @@ import 'package:arena_soccer/utils/components/section_header.dart';
 import 'package:arena_soccer/utils/components/shortcut_tile.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
+import 'package:arena_soccer/utils/themes/arena_palette.dart';
 
 /// Aba de campeonatos da home: os campeonatos da temporada num carrossel de
 /// destaque (com atalhos para grupos, artilharia e regulamento do que está na
@@ -120,7 +121,7 @@ class _ChampionshipsListState extends State<_ChampionshipsList> {
     return BlocBuilder<ChampionshipsCubit, ChampionshipsState>(
       builder: (context, state) {
         if (state is LoadingChampionshipsState && state.championships.isEmpty) {
-          return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+          return Center(child: CircularProgressIndicator(color: ArenaPalette.of(context).primary));
         }
         if (state is ErrorChampionshipsState && state.championships.isEmpty) {
           return ArenaEmptyState.error(message: l10n.championshipsLoadError);
@@ -180,7 +181,7 @@ class _ChampionshipsListState extends State<_ChampionshipsList> {
                   width: i == _page ? AppSizes.s20 : AppSizes.s8,
                   height: AppSizes.s8,
                   decoration: BoxDecoration(
-                    color: i == _page ? AppColors.primary : AppColors.greyLight,
+                    color: i == _page ? ArenaPalette.of(context).primary : AppColors.greyLight,
                     borderRadius: BorderRadius.circular(AppSizes.s4),
                   ),
                 ),

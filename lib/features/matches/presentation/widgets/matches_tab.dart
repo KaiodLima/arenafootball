@@ -21,9 +21,9 @@ import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/section_header.dart';
 import 'package:arena_soccer/utils/components/shortcut_tile.dart';
-import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/themes/arena_palette.dart';
 
 /// Aba de tabelas da home: as partidas de ontem, hoje ou amanhã da região, de
 /// todas as competições (e amistosos) ou só da escolhida no seletor (lista com
@@ -175,7 +175,7 @@ class _ChampionshipMatchesState extends State<_ChampionshipMatches> {
     return BlocBuilder<ChampionshipsCubit, ChampionshipsState>(
       builder: (context, state) {
         if (state is LoadingChampionshipsState && state.championships.isEmpty) {
-          return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+          return Center(child: CircularProgressIndicator(color: ArenaPalette.of(context).primary));
         }
         if (state is ErrorChampionshipsState && state.championships.isEmpty) {
           return ArenaEmptyState.error(message: l10n.championshipsLoadError);

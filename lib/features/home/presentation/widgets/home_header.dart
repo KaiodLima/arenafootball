@@ -9,6 +9,7 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_images.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/themes/arena_palette.dart';
 
 /// Topo escuro da home: menu, logo, escudo do time, saudação e chips de região.
 class HomeHeader extends StatelessWidget {
@@ -170,7 +171,7 @@ class OrganizerModeToggle extends StatelessWidget {
             color: selected ? AppColors.white : AppColors.transparent,
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, size: AppSizes.s20, color: selected ? AppColors.primary : AppColors.whiteSoft),
+          child: Icon(icon, size: AppSizes.s20, color: selected ? ArenaPalette.of(context).primary : AppColors.whiteSoft),
         );
 
     return Tooltip(

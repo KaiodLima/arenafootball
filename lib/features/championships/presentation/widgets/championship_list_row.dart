@@ -5,6 +5,7 @@ import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/themes/arena_palette.dart';
 
 /// Linha compacta de campeonato (temporadas anteriores): miniatura, título e
 /// temporada.
@@ -36,14 +37,14 @@ class ChampionshipListRow extends StatelessWidget {
                   child: SizedBox.square(
                     dimension: AppSizes.s56,
                     child: championship.imageUrl.isEmpty
-                        ? const ColoredBox(
-                            color: AppColors.primarySoft,
-                            child: Icon(Icons.emoji_events_rounded, color: AppColors.primaryDark),
+                        ? ColoredBox(
+                            color: ArenaPalette.of(context).primarySoft,
+                            child: Icon(Icons.emoji_events_rounded, color: ArenaPalette.of(context).primaryDark),
                           )
                         : CachedNetworkImage(
                             imageUrl: championship.imageUrl,
                             fit: BoxFit.cover,
-                            errorWidget: (_, __, ___) => const ColoredBox(color: AppColors.primarySoft),
+                            errorWidget: (_, __, ___) => ColoredBox(color: ArenaPalette.of(context).primarySoft),
                           ),
                   ),
                 ),
