@@ -79,6 +79,32 @@ class TeamsDataSource {
     }
   }
 
+  /// Times de uma lista (participantes de um campeonato, de qualquer região):
+  /// pelo id do doc, em lotes de 30 (`whereIn`); os sem id (campeonato antigo),
+  /// pelo nome. Lê só esses times, não a temporada inteira.
+  Future<Either<Failure, List<TeamDTO>>> getTeamsByIds({
+    required List<String> ids,
+    List<String> names = const [],
+    String? season,
+  }) async {
+    try {
+      final collection = _firestore.collection(SeasonCollection.name('times', season));
+      final teams = <TeamDTO>[];
+      for (final chunk in chunked(ids.where((id) => id.isNotEmpty).toSet().toList())) {
+        final result = await collection.where(FieldPath.documentId, whereIn: chunk).get();
+        teams.addAll(result.docs.map(TeamDTO.fromFirestore));
+      }
+      for (final chunk in chunked(names.where((n) => n.isNotEmpty).toSet().toList())) {
+        final result = await collection.where('nome', whereIn: chunk).get();
+        teams.addAll(result.docs.map(TeamDTO.fromFirestore));
+      }
+      return Right(teams);
+    } catch (e) {
+      AppLogger.e('getTeamsByIds season=$season', name: 'TeamsDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _fallback));
+    }
+  }
+
   Stream<Either<Failure, List<TeamDTO>>> watchTeams({String? region, String? season}) {
     return _teamsQuery(region: region, season: season).snapshots().toEither(
           (snapshot) => snapshot.docs.map(TeamDTO.fromFirestore).toList(),
@@ -261,3 +287,8 @@ class TeamsDataSource {
     };
   }
 }
+
+/// Divide [items] em lotes de até [size] (limite do `whereIn` do Firestore).
+List<List<T>> chunked<T>(List<T> items, {int size = 30}) => [
+      for (var i = 0; i < items.length; i += size) items.sublist(i, i + size > items.length ? items.length : i + size),
+    ];

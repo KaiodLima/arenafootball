@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/widgets/organizer_teams_tab.dart';
 import 'package:arena_soccer/features/album/presentation/widgets/album_floating_badge.dart';
 import 'package:arena_soccer/features/achievements/presentation/bloc/achievements_cubit.dart';
 import 'package:arena_soccer/features/achievements/presentation/widgets/unlock_celebration_dialog.dart';
@@ -310,7 +312,35 @@ class _HomePageState extends State<HomePage> {
     Navigator.pushNamedAndRemoveUntil(context, AppRoutes.loginPage, (_) => false);
   }
 
-  Widget _tabContent(HomeTab tab, RegionState region, AppLocalizations l10n) {
+  Future<void> _toggleOrganizerMode() async {
+    final cubit = BlocProvider.of<OrganizerModeCubit>(context);
+    await cubit.toggle();
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context);
+    showSnackBar(
+      context: context,
+      message: cubit.state.active ? l10n.organizerModeOrganizer : l10n.organizerModeFan,
+      durationSeconds: 2,
+    );
+  }
+
+  Widget _tabContent(HomeTab tab, RegionState region, AppLocalizations l10n, OrganizerModeState organizer) {
+    // Modo organizador: campeonatos, times e tabelas só dos campeonatos da conta
+    // (a aba Home continua a da região).
+    if (organizer.active && tab != HomeTab.news) {
+      final key = ValueKey('org-${tab.name}');
+      final championships = organizer.championships;
+      switch (tab) {
+        case HomeTab.championships:
+          return ChampionshipsTab(key: key, championships: championships);
+        case HomeTab.teams:
+          return OrganizerTeamsTab(key: key, championships: championships);
+        case HomeTab.tables:
+          return MatchesTab(key: key, organizerChampionships: championships);
+        case HomeTab.news:
+          break;
+      }
+    }
     final key = ValueKey('${tab.name}-${region.selectedRegion}-${region.selectedSeason}');
     switch (tab) {
       case HomeTab.news:
@@ -342,11 +372,14 @@ class _HomePageState extends State<HomePage> {
     final l10n = AppLocalizations.of(context);
     final session = context.watch<SessionCubit>().state;
     final region = context.watch<RegionCubit>().state;
+    final organizer = context.watch<OrganizerModeCubit>().state;
 
     return BlocBuilder<HomeCubit, HomeState>(
       builder: (context, home) {
         // Times e tabelas dependem da temporada; notícias e campeonatos, só da região.
         final showSeason = home.tab == HomeTab.teams || home.tab == HomeTab.tables;
+        // No modo organizador, só a aba Home depende da região.
+        final showRegion = !organizer.active || home.tab == HomeTab.news;
 
         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle.light,
@@ -380,6 +413,10 @@ class _HomePageState extends State<HomePage> {
                         region: region.selectedRegion,
                         favoriteTeamImage: home.favoriteTeamImage,
                         showSeason: showSeason,
+                        showRegion: showRegion,
+                        showModeToggle: organizer.isOrganizer,
+                        organizerMode: organizer.active,
+                        onToggleMode: _toggleOrganizerMode,
                         onOpenMenu: () => _scaffoldKey.currentState?.openDrawer(),
                         menuKey: _tourMenu,
                         regionKey: _tourRegion,
@@ -402,7 +439,7 @@ class _HomePageState extends State<HomePage> {
                                 clipBehavior: Clip.antiAlias,
                                 child: AnimatedSwitcher(
                                   duration: const Duration(milliseconds: 250),
-                                  child: _tabContent(home.tab, region, l10n),
+                                  child: _tabContent(home.tab, region, l10n, organizer),
                                 ),
                               ),
                             ),
@@ -417,7 +454,11 @@ class _HomePageState extends State<HomePage> {
             ),
             bottomNavigationBar: KeyedSubtree(
               key: _tourTabs,
-              child: HomeBottomBar(selected: home.tab, onSelected: _homeCubit.selectTab),
+              child: HomeBottomBar(
+                selected: home.tab,
+                onSelected: _homeCubit.selectTab,
+                organizerMode: organizer.active,
+              ),
             ),
             // Admin: todos os cadastros; parceiro: só o que ele pode publicar.
             floatingActionButton: session.isAdmin || partner.permissions.canPublish && partner.isPartner

@@ -1335,6 +1335,48 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @organizerModeFan.
+  ///
+  /// In pt, this message translates to:
+  /// **'Modo torcedor'**
+  String get organizerModeFan;
+
+  /// No description provided for @organizerModeOrganizer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Modo organizador'**
+  String get organizerModeOrganizer;
+
+  /// No description provided for @organizerModeToggle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar entre torcedor e organizador'**
+  String get organizerModeToggle;
+
+  /// No description provided for @homeTabMyChampionships.
+  ///
+  /// In pt, this message translates to:
+  /// **'Meus camp.'**
+  String get homeTabMyChampionships;
+
+  /// No description provided for @organizerModeSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Modo organizador · seus campeonatos'**
+  String get organizerModeSubtitle;
+
+  /// No description provided for @organizerNoChampionships.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum campeonato organizado por você.'**
+  String get organizerNoChampionships;
+
+  /// No description provided for @organizerTeamsEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum time inscrito neste campeonato.'**
+  String get organizerTeamsEmpty;
+
   /// No description provided for @organizerRequestMenu.
   ///
   /// In pt, this message translates to:

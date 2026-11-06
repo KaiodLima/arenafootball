@@ -72,4 +72,17 @@ class PreferencesService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_seasonKey, season);
   }
+
+  /// Modo organizador ligado na home, por conta (organizador aprovado).
+  static String _organizerModeKey(String uid) => 'modoOrganizador_$uid';
+
+  Future<bool> getOrganizerMode(String uid) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_organizerModeKey(uid)) ?? false;
+  }
+
+  Future<void> setOrganizerMode(String uid, bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_organizerModeKey(uid), value);
+  }
 }

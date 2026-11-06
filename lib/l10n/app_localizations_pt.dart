@@ -734,6 +734,28 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get organizerModeFan => 'Modo torcedor';
+
+  @override
+  String get organizerModeOrganizer => 'Modo organizador';
+
+  @override
+  String get organizerModeToggle => 'Trocar entre torcedor e organizador';
+
+  @override
+  String get homeTabMyChampionships => 'Meus camp.';
+
+  @override
+  String get organizerModeSubtitle => 'Modo organizador · seus campeonatos';
+
+  @override
+  String get organizerNoChampionships =>
+      'Nenhum campeonato organizado por você.';
+
+  @override
+  String get organizerTeamsEmpty => 'Nenhum time inscrito neste campeonato.';
+
+  @override
   String get organizerRequestMenu => 'Sou organizador de campeonato';
 
   @override

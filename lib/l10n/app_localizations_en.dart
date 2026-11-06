@@ -731,6 +731,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get organizerModeFan => 'Fan mode';
+
+  @override
+  String get organizerModeOrganizer => 'Organizer mode';
+
+  @override
+  String get organizerModeToggle => 'Switch between fan and organizer';
+
+  @override
+  String get homeTabMyChampionships => 'My leagues';
+
+  @override
+  String get organizerModeSubtitle => 'Organizer mode · your championships';
+
+  @override
+  String get organizerNoChampionships =>
+      'You don\'t organize any championship yet.';
+
+  @override
+  String get organizerTeamsEmpty => 'No teams registered in this championship.';
+
+  @override
   String get organizerRequestMenu => 'I organize a competition';
 
   @override

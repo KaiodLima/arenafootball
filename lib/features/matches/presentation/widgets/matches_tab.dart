@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
+import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/championships_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/championships_state.dart';
@@ -31,8 +32,13 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 /// região/ano mudam. [ChampionshipsCubit] e [MatchesCubit] são os da home:
 /// trocar de aba e voltar não reabre as consultas; região/ano/competição
 /// novos, sim.
+///
+/// Com [organizerChampionships] (modo organizador), o seletor mostra só esses
+/// campeonatos (sem "todas") e a região/temporada vêm do escolhido.
 class MatchesTab extends StatefulWidget {
-  const MatchesTab({super.key});
+  final List<ChampionshipDTO>? organizerChampionships;
+
+  const MatchesTab({super.key, this.organizerChampionships});
 
   @override
   State<MatchesTab> createState() => _MatchesTabState();
@@ -42,12 +48,86 @@ class _MatchesTabState extends State<MatchesTab> {
   @override
   void initState() {
     super.initState();
+    if (widget.organizerChampionships != null) return;
     final region = BlocProvider.of<RegionCubit>(context).state.selectedRegion;
     BlocProvider.of<ChampionshipsCubit>(context).watch(region: region);
   }
 
   @override
-  Widget build(BuildContext context) => const _ChampionshipMatches();
+  Widget build(BuildContext context) {
+    final organizer = widget.organizerChampionships;
+    return organizer != null ? _OrganizerMatches(championships: organizer) : const _ChampionshipMatches();
+  }
+}
+
+/// Campeonatos do organizador na ordem do seletor: os mais recentes primeiro.
+List<ChampionshipDTO> organizerTableChampionships(List<ChampionshipDTO> all) => [...all]
+  ..sort((a, b) {
+    final bySeason = b.season.compareTo(a.season);
+    return bySeason != 0 ? bySeason : a.championshipId.compareTo(b.championshipId);
+  });
+
+/// Modo organizador: uma competição por vez (as da conta), com as partidas
+/// da sede e da temporada dela.
+class _OrganizerMatches extends StatefulWidget {
+  final List<ChampionshipDTO> championships;
+
+  const _OrganizerMatches({required this.championships});
+
+  @override
+  State<_OrganizerMatches> createState() => _OrganizerMatchesState();
+}
+
+class _OrganizerMatchesState extends State<_OrganizerMatches> {
+  /// Competição escolhida, lembrada enquanto o app está aberto.
+  static int? _remembered;
+  final _filterKey = GlobalKey();
+
+  Future<void> _pick(List<ChampionshipDTO> options, int current) async {
+    final picked = await showChampionshipPickerSheet(
+      context,
+      championships: options,
+      selectedId: current,
+      showNone: false,
+    );
+    if (picked?.id != null && mounted) setState(() => _remembered = picked!.id);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final options = organizerTableChampionships(widget.championships);
+    if (options.isEmpty) {
+      return ArenaEmptyState(message: l10n.organizerNoChampionships, icon: Icons.emoji_events_outlined);
+    }
+    final championship = options.where((c) => c.championshipId == _remembered).firstOrNull ?? options.first;
+    final season = championship.season.isNotEmpty ? championship.season : SeasonCollection.currentSeason;
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s12, AppSizes.s16, 0),
+          child: ChampionshipSelectTile(
+            key: _filterKey,
+            label: l10n.matchesChampionshipFilter,
+            championship: championship,
+            onTap: () => _pick(options, championship.championshipId),
+          ),
+        ),
+        Expanded(
+          child: _DayMatches(
+            key: ValueKey('org-${championship.id}'),
+            championshipId: championship.championshipId,
+            championships: [championship],
+            championshipLabelOf: null,
+            region: championship.region,
+            season: season,
+            filterKey: _filterKey,
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 /// Competições da temporada que aparecem na região: as que a consulta da

@@ -9,7 +9,10 @@ class HomeBottomBar extends StatelessWidget {
   final HomeTab selected;
   final ValueChanged<HomeTab> onSelected;
 
-  const HomeBottomBar({super.key, required this.selected, required this.onSelected});
+  /// Modo organizador: a aba de campeonatos vira "Meus campeonatos".
+  final bool organizerMode;
+
+  const HomeBottomBar({super.key, required this.selected, required this.onSelected, this.organizerMode = false});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +34,7 @@ class HomeBottomBar extends StatelessWidget {
           NavigationDestination(
             icon: const Icon(Icons.emoji_events_outlined),
             selectedIcon: const Icon(Icons.emoji_events_rounded),
-            label: l10n.homeTabChampionships,
+            label: organizerMode ? l10n.homeTabMyChampionships : l10n.homeTabChampionships,
           ),
           NavigationDestination(
             icon: const Icon(Icons.shield_outlined),
