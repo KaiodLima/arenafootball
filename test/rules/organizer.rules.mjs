@@ -1,5 +1,5 @@
 import { assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
-import { deleteDoc, deleteField, doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import { arrayUnion, deleteDoc, deleteField, doc, getDoc, increment, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 
 /** "Sou organizador de campeonato": o pedido e a edição do campeonato pelo organizador. */
 export default async function run(env, check) {
@@ -121,9 +121,74 @@ export default async function run(env, check) {
   await check('partida com status recusada', assertFails(setDoc(doc(org, 'partidas2026/m5'), match('m5', { status: 'encerrada' }))));
   await check('partida com o mesmo time dos dois lados recusada',
     assertFails(setDoc(doc(org, 'partidas2026/m6'), match('m6', { idTimeF: 't1' }))));
-  await check('organizador não edita a partida', assertFails(updateDoc(doc(org, 'partidas2026/m1'), { horario: '17:00' })));
+  await check('organizador não edita os times da partida', assertFails(updateDoc(doc(org, 'partidas2026/m1'), { timeF: 'Outro' })));
   await check('organizador não apaga a partida', assertFails(deleteDoc(doc(org, 'partidas2026/m1'))));
   await check('usuário comum não cadastra partida', assertFails(setDoc(doc(other, 'partidas2026/m7'), match('m7'))));
+  // Súmula do organizador (partida m1 da Copa Sol, c11).
+  await check('súmula: inicia a partida', assertSucceeds(updateDoc(doc(org, 'partidas2026/m1'),
+    { status: 'andamento', statusEm: serverTimestamp(), inicioEm: serverTimestamp() })));
+  await check('súmula: salva gols, cartões, escalação e dados do jogo', assertSucceeds(updateDoc(doc(org, 'partidas2026/m1'), {
+    gols: [{ id: 'g1', lado: 'casa', idJogador: 'p7', jogador: 'Ana', idAssistencia: '', assistencia: '', minuto: 12 }],
+    golTimeCasa: 1, golTimeFora: 0, cartoes: [], escalacao: { casa: [], fora: [] }, arbitro: 'Zé', observacoes: '',
+    data: '10/12/2026', horario: '16:00', duracao: 90, local: 'Campo',
+  })));
+  await check('súmula: registra substituição', assertSucceeds(updateDoc(doc(org, 'partidas2026/m1'), {
+    substituicoes: [{ id: 's1', lado: 'casa', idSai: 'p7', sai: 'Ana', idEntra: 'p8', entra: 'Bia', minuto: 60 }],
+    escalacao: { casa: [{ idJogador: 'p8', jogador: 'Bia', titular: false }], fora: [] },
+  })));
+  await check('súmula: abre a votação', assertSucceeds(updateDoc(doc(org, 'partidas2026/m1'), { votacao: 'true' })));
+  await check('súmula: atrasou', assertSucceeds(updateDoc(doc(org, 'partidas2026/m1'),
+    { horario: '16:20', horarioOriginal: '16:00', status: deleteField(), statusEm: deleteField(), inicioEm: deleteField() })));
+  await check('súmula não troca time', assertFails(updateDoc(doc(org, 'partidas2026/m1'), { timeC: 'Outro', idTimeC: 't9' })));
+  await check('súmula não troca a competição', assertFails(updateDoc(doc(org, 'partidas2026/m1'), { id_campeonato: 12 })));
+  await check('súmula não grava o craque', assertFails(updateDoc(doc(org, 'partidas2026/m1'), { craque: { idJogador: 'p7' } })));
+  await seed('partidas2026/m9', { id_partida: 'm9', id_campeonato: 12, idTimeC: 't1', idTimeF: 't2', golTimeCasa: 0 });
+  await check('súmula de partida de outra competição recusada',
+    assertFails(updateDoc(doc(org, 'partidas2026/m9'), { golTimeCasa: 1 })));
+  await check('usuário comum não mexe na súmula', assertFails(updateDoc(doc(other, 'partidas2026/m1'), { golTimeCasa: 3 })));
+
+  // Números do atleta (como o incrementStats grava).
+  await seed('jogadores2026/p7', {
+    idJogador: 'p7', nome: 'Ana', time: 'Leões', idTime: 't1', urlImagem: '', nGols: 3, nAssistencias: 0,
+    inscricoes: { c11: { idTime: 't1', time: 'Leões', nGols: 0, nAssistencias: 0 } }, idsTimes: ['t1'],
+  });
+  const goal = (n = 1, extra = {}) => ({
+    nGols: increment(n), 'inscricoes.c11.idTime': 't1', 'inscricoes.c11.time': 'Leões',
+    'inscricoes.c11.nGols': increment(n), 'inscricoes.c11.nAssistencias': increment(0), idsTimes: arrayUnion('t1'), ...extra,
+  });
+  await check('gol soma no atleta (Geral + competição)', assertSucceeds(updateDoc(doc(org, 'jogadores2026/p7'), goal())));
+  await check('gol tirado desconta', assertSucceeds(updateDoc(doc(org, 'jogadores2026/p7'), goal(-1))));
+  await check('número inflado no Geral recusado', assertFails(updateDoc(doc(org, 'jogadores2026/p7'),
+    { ...goal(), nGols: increment(5) })));
+  await check('mais de 10 por vez recusado', assertFails(updateDoc(doc(org, 'jogadores2026/p7'), goal(11))));
+  await check('números em competição de outro recusados', assertFails(updateDoc(doc(org, 'jogadores2026/p7'), {
+    nGols: increment(1), 'inscricoes.c12.idTime': 't1', 'inscricoes.c12.time': 'Leões', 'inscricoes.c12.nGols': increment(1),
+    'inscricoes.c12.nAssistencias': increment(0),
+  })));
+  await check('números não trocam o time principal', assertFails(updateDoc(doc(org, 'jogadores2026/p7'), { ...goal(), idTime: 't2' })));
+  await seed('jogadores2026/p8', { idJogador: 'p8', nome: 'Bia', time: 'Leões', idTime: 't1', nGols: 0, nAssistencias: 0,
+    inscricoes: {}, idsTimes: ['t1'] });
+  await check('gol de atleta ainda sem a inscrição cria a dela', assertSucceeds(updateDoc(doc(org, 'jogadores2026/p8'), goal())));
+  await check('usuário comum não soma gol', assertFails(updateDoc(doc(other, 'jogadores2026/p7'), goal())));
+
+  // Card de gol do organizador.
+  const card = (extra = {}) => ({
+    id: 'k1', titulo: '', descricao: '', urlImagem: '', link: '', exibir: 'true', fk_competicao: 'Colônia', idRegiao: 'co',
+    time_casa: 'Leões', time_fora: 'Tigres', gol_time_casa: '1', gol_time_fora: '0', tag: 'gol', autor_gol_id: 'p7',
+    autor_gol: 'Ana', temporada: '2026', time_marcador: 'Leões', id_time_casa: 't1', id_time_fora: 't2',
+    id_time_marcador: 't1', id_campeonato: 11, id_partida: 'm1', id_gol: 'g1', idAutor: 'org1', data: serverTimestamp(),
+    ...extra,
+  });
+  await check('organizador publica card de gol', assertSucceeds(setDoc(doc(org, 'noticias/k1'), card())));
+  await check('organizador edita o card dele', assertSucceeds(setDoc(doc(org, 'noticias/k1'), card({ autor_gol: 'Ana B.' }))));
+  await check('card de gol de outra competição recusado',
+    assertFails(setDoc(doc(org, 'noticias/k2'), card({ id: 'k2', id_campeonato: 12 }))));
+  await check('card de gol com outro autor recusado', assertFails(setDoc(doc(org, 'noticias/k3'), card({ id: 'k3', idAutor: 'u2' }))));
+  await check('notícia comum do organizador recusada',
+    assertFails(setDoc(doc(org, 'noticias/k4'), card({ id: 'k4', tag: 'noticia' }))));
+  await seed('noticias/k5', card({ id: 'k5', idAutor: '' }));
+  await check('organizador não apaga card do admin', assertFails(deleteDoc(doc(org, 'noticias/k5'))));
+  await check('organizador apaga o card dele', assertSucceeds(deleteDoc(doc(org, 'noticias/k1'))));
   await check('usuário comum não inscreve', assertFails(updateDoc(doc(other, 'jogadores2026/p1'), { 'inscricoes.c11': entry })));
   const fresh = {
     idJogador: 'p2', nome: 'Bia', time: 'Leões', idTime: 't1', urlImagem: '', nGols: 0, nAssistencias: 0,

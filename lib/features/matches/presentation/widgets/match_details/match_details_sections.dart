@@ -80,7 +80,7 @@ class MatchGoalsTimeline extends StatelessWidget {
     final hasScorers = goals.any((g) => g.hasScorer);
 
     // Gols e cartões da súmula em ordem de minuto; os gols levam o placar.
-    final events = MatchReport.timeline(goals, match.bookings);
+    final events = MatchReport.timeline(goals, match.bookings, match.substitutions);
     var home = 0;
     var away = 0;
     final rows = <Widget>[];
@@ -130,9 +130,12 @@ class _TimelineRow extends StatelessWidget {
     final isHome = event.side == MatchSide.home;
     final score = this.score;
     final booking = event.booking;
-    Widget text(bool alignEnd) => booking == null
-        ? _GoalText(goal: event.goal!, alignEnd: alignEnd)
-        : _BookingText(booking: booking, alignEnd: alignEnd);
+    final sub = event.substitution;
+    Widget text(bool alignEnd) => sub != null
+        ? _SubstitutionText(substitution: sub, alignEnd: alignEnd)
+        : booking == null
+            ? _GoalText(goal: event.goal!, alignEnd: alignEnd)
+            : _BookingText(booking: booking, alignEnd: alignEnd);
     Widget line(bool visible) => Expanded(
           child: Container(width: AppSizes.s2, color: visible ? AppColors.greyLight : AppColors.transparent),
         );
@@ -145,7 +148,9 @@ class _TimelineRow extends StatelessWidget {
             child: Column(
               children: [
                 line(!isFirst),
-                if (score == null)
+                if (sub != null)
+                  const Icon(Icons.swap_vert_rounded, size: AppSizes.s20, color: AppColors.primaryDark)
+                else if (score == null)
                   BookingIcon(type: booking!.type, size: AppSizes.s20)
                 else
                   Container(
@@ -558,6 +563,40 @@ class _StatBadge extends StatelessWidget {
           Icon(icon, size: AppSizes.s14, color: AppColors.primaryDark),
           const SizedBox(width: AppSizes.s4),
           Text('$value', style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s12)),
+        ],
+      ),
+    );
+  }
+}
+
+/// Substituição na linha do tempo do detalhe: quem entra (com o minuto) e
+/// quem sai.
+class _SubstitutionText extends StatelessWidget {
+  final MatchSubstitution substitution;
+  final bool alignEnd;
+
+  const _SubstitutionText({required this.substitution, required this.alignEnd});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final minute = substitution.minute == null ? '' : "${substitution.minute}' ";
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSizes.s8, horizontal: AppSizes.s4),
+      child: Column(
+        crossAxisAlignment: alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            '$minute${l10n.reportEntering(substitution.inName)}',
+            textAlign: alignEnd ? TextAlign.end : TextAlign.start,
+            style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s14),
+          ),
+          Text(
+            l10n.reportLeaving(substitution.outName),
+            textAlign: alignEnd ? TextAlign.end : TextAlign.start,
+            style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+          ),
         ],
       ),
     );

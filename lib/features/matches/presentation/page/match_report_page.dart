@@ -68,6 +68,24 @@ class MatchReportPage extends StatelessWidget {
     final match = state.match!;
     final team = action.side == MatchSide.home ? match.homeTeam : match.awayTeam;
     final booking = action.booking;
+    final onField = state.onFieldOf(action.side);
+    if (action.substitution) {
+      final sub = await showPlayerGridSheet(
+        context,
+        title: '${l10n.reportSubstitution} · $team',
+        icon: const Icon(Icons.swap_vert_rounded, color: AppColors.primary, size: AppSizes.s28),
+        color: action.side == MatchSide.home ? _home : _away,
+        squad: state.squadOf(action.side),
+        lineup: match.lineup.of(action.side),
+        onField: onField,
+        substitutedOut: MatchReport.substitutedOut(match.substitutions, action.side),
+        minute: MatchReport.suggestedMinute(match, DateTime.now()),
+        substitution: true,
+      );
+      if (sub == null || sub.player == null || sub.assistant == null) return;
+      cubit.addSubstitution(action.side, playerOut: sub.player!, playerIn: sub.assistant!, minute: sub.minute);
+      return;
+    }
     final picked = await showPlayerGridSheet(
       context,
       title: booking == null
@@ -79,6 +97,7 @@ class MatchReportPage extends StatelessWidget {
       color: action.side == MatchSide.home ? _home : _away,
       squad: state.squadOf(action.side),
       lineup: match.lineup.of(action.side),
+      onField: onField,
       minute: MatchReport.suggestedMinute(match, DateTime.now()),
       goal: booking == null,
     );
@@ -118,7 +137,7 @@ class MatchReportPage extends StatelessWidget {
     );
     if (!context.mounted || choice == null) return;
     if (choice == 'delete') {
-      event.isGoal ? cubit.removeGoal(event.id) : cubit.removeBooking(event.id);
+      cubit.removeEvent(event);
       return;
     }
     final goal = event.goal!;
@@ -131,6 +150,7 @@ class MatchReportPage extends StatelessWidget {
       color: goal.side == MatchSide.home ? _home : _away,
       squad: state.squadOf(goal.side),
       lineup: match.lineup.of(goal.side),
+      onField: state.onFieldOf(goal.side),
       minute: goal.minute,
       goal: true,
     );
@@ -173,6 +193,8 @@ class MatchReportPage extends StatelessWidget {
     final minute = event.minute == null ? '' : "${event.minute}' ";
     final goal = event.goal;
     if (goal != null) return '⚽ $minute${goal.hasScorer ? goal.scorerName : l10n.reportGoalNoScorer}';
+    final sub = event.substitution;
+    if (sub != null) return '🔁 $minute${l10n.reportEntering(sub.inName)} · ${l10n.reportLeaving(sub.outName)}';
     final booking = event.booking!;
     return '${booking.type == BookingType.yellow ? '🟨' : '🟥'} $minute${booking.playerName}';
   }

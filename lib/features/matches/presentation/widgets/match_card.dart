@@ -138,7 +138,11 @@ class MatchCardStatus {
 /// A data fica no cabeçalho do dia, fora do card.
 class MatchCard extends StatefulWidget {
   final MatchDTO match;
+  /// Mostra a engrenagem (admin ou organizador da competição).
   final bool isAdmin;
+
+  /// "Apagar partida" na engrenagem (só o admin).
+  final bool canDelete;
   final String? homeCrest;
   final String? awayCrest;
 
@@ -187,6 +191,7 @@ class MatchCard extends StatefulWidget {
     super.key,
     required this.match,
     required this.isAdmin,
+    this.canDelete = true,
     required this.onVotingTap,
     required this.onToggleVoting,
     required this.onEditScore,
@@ -341,12 +346,13 @@ class _MatchCardState extends State<MatchCard> {
                             label: l10n.matchDetailsGoalCard,
                             onSelected: widget.onGoalCard!,
                           ),
-                        CardMenuAction(
-                          icon: Icons.delete_outline_rounded,
-                          label: l10n.matchesDeleteMatch,
-                          destructive: true,
-                          onSelected: widget.onDelete,
-                        ),
+                        if (widget.canDelete)
+                          CardMenuAction(
+                            icon: Icons.delete_outline_rounded,
+                            label: l10n.matchesDeleteMatch,
+                            destructive: true,
+                            onSelected: widget.onDelete,
+                          ),
                       ],
                     ),
                 ],

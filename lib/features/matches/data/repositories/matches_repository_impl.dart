@@ -40,6 +40,7 @@ class MatchesRepositoryImpl implements IMatchesRepository {
   Future<Either<Failure, void>> updateReport(MatchDTO match, {String? season}) => _dataSource.updateReport(
         matchId: match.id,
         bookings: match.bookings,
+        substitutions: match.substitutions,
         lineup: match.lineup,
         referee: match.referee,
         notes: match.notes,

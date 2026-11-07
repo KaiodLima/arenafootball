@@ -1335,6 +1335,48 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @reportSubstitution.
+  ///
+  /// In pt, this message translates to:
+  /// **'Substituição'**
+  String get reportSubstitution;
+
+  /// No description provided for @reportWhoLeaves.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem sai?'**
+  String get reportWhoLeaves;
+
+  /// No description provided for @reportWhoEnters.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem entra?'**
+  String get reportWhoEnters;
+
+  /// No description provided for @reportLeaving.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sai {name}'**
+  String reportLeaving(String name);
+
+  /// No description provided for @reportEntering.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entra {name}'**
+  String reportEntering(String name);
+
+  /// No description provided for @reportLineupNeeded.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem escalação: aparecem todos do elenco. Monte a escalação para ver só quem está em campo.'**
+  String get reportLineupNeeded;
+
+  /// No description provided for @reportNobodyToPick.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ninguém disponível neste passo.'**
+  String get reportNobodyToPick;
+
   /// No description provided for @organizerMatchTeamNotEnrolled.
   ///
   /// In pt, this message translates to:

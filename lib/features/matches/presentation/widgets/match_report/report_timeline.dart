@@ -169,13 +169,22 @@ class _EventContent extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final goal = event.goal;
     final booking = event.booking;
+    final sub = event.substitution;
     final Widget icon = goal != null
         ? const Icon(Icons.sports_soccer_rounded, size: AppSizes.s18, color: AppColors.primaryDark)
-        : BookingIcon(type: booking!.type, size: AppSizes.s16);
-    final title = goal != null ? (goal.hasScorer ? goal.scorerName : l10n.reportGoalNoScorer) : booking!.playerName;
+        : sub != null
+            ? const Icon(Icons.swap_vert_rounded, size: AppSizes.s18, color: AppColors.primaryDark)
+            : BookingIcon(type: booking!.type, size: AppSizes.s16);
+    final title = goal != null
+        ? (goal.hasScorer ? goal.scorerName : l10n.reportGoalNoScorer)
+        : sub != null
+            ? l10n.reportEntering(sub.inName)
+            : booking!.playerName;
     final subtitle = goal != null
         ? (goal.hasAssistant ? l10n.matchReportAssist(goal.assistantName) : '')
-        : (booking!.secondYellow ? l10n.matchReportSecondYellow : '');
+        : sub != null
+            ? l10n.reportLeaving(sub.outName)
+            : (booking!.secondYellow ? l10n.matchReportSecondYellow : '');
     final align = alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start;
     final titleRow = <Widget>[
       icon,

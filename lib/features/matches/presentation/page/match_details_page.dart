@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
+import 'package:arena_soccer/features/matches/domain/match_manage_access.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/match_details_cubit.dart';
@@ -60,6 +62,7 @@ class MatchDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isAdmin = context.watch<SessionCubit>().state.isAdmin;
+    final organizerIds = context.watch<OrganizerModeCubit>().state.championships.map((c) => c.championshipId).toSet();
     final cubit = BlocProvider.of<MatchDetailsCubit>(context);
 
     return BlocConsumer<MatchDetailsCubit, MatchDetailsState>(
@@ -102,7 +105,7 @@ class MatchDetailsPage extends StatelessWidget {
                   ],
                 ),
                 actions: [
-                  if (isAdmin && !state.deleted)
+                  if (canManageMatch(match, isAdmin: isAdmin, organizerChampionshipIds: organizerIds) && !state.deleted)
                     CardMenuButton(
                       onImage: true,
                       actions: [

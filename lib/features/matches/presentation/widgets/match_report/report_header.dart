@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
@@ -27,8 +29,10 @@ ReportStage reportStageOf(MatchDTO match, DateTime now) {
 
 /// Cabeçalho "match center" da súmula (estilo FotMob/SofaScore): gradiente
 /// com o brilho da cor de cada time, escudos, placar grande, pílula de status,
-/// a linha de etapas e o botão do próximo passo do jogo.
-class ReportHeader extends StatelessWidget {
+/// a linha de etapas e o botão do próximo passo do jogo. Com o jogo rolando
+/// (ou perto de começar), redesenha a cada segundo: o relógio corre e a etapa
+/// (2º tempo automático) e o próximo passo acompanham sem outra ação.
+class ReportHeader extends StatefulWidget {
   final MatchDTO match;
   final String? homeCrest;
   final String? awayCrest;
@@ -36,9 +40,10 @@ class ReportHeader extends StatelessWidget {
   final Color? awayColor;
   final bool busy;
   final ValueChanged<MatchPhase> onPhase;
-
-  /// "Atrasou" (novo horário); aparece só enquanto dá para atrasar.
   final VoidCallback? onDelay;
+
+  /// Hora fixa (testes); nula = relógio do aparelho.
+  final DateTime? now;
 
   const ReportHeader({
     super.key,
@@ -50,12 +55,94 @@ class ReportHeader extends StatelessWidget {
     required this.busy,
     required this.onPhase,
     this.onDelay,
+    this.now,
   });
+
+  @override
+  State<ReportHeader> createState() => _ReportHeaderState();
+}
+
+class _ReportHeaderState extends State<ReportHeader> {
+  Timer? _tick;
+
+  @override
+  void initState() {
+    super.initState();
+    _schedule();
+  }
+
+  @override
+  void didUpdateWidget(ReportHeader oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.match != widget.match || oldWidget.now != widget.now) _schedule();
+  }
+
+  /// Tique de 1 s só quando o relógio anda: jogo rolando ou antes do início
+  /// (vira "ao vivo" sozinho no horário). Intervalo e encerrada: parado.
+  void _schedule() {
+    _tick?.cancel();
+    _tick = null;
+    if (widget.now != null) return;
+    final stage = reportStageOf(widget.match, DateTime.now());
+    if (stage == ReportStage.halfTime || stage == ReportStage.finished) return;
+    _tick = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      setState(() {});
+      // Encerrou sozinha (fim esperado) ou foi para o intervalo: para o tique.
+      final now = reportStageOf(widget.match, DateTime.now());
+      if (now == ReportStage.halfTime || now == ReportStage.finished) _schedule();
+    });
+  }
+
+  @override
+  void dispose() {
+    _tick?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => _ReportHeaderView(
+        match: widget.match,
+        homeCrest: widget.homeCrest,
+        awayCrest: widget.awayCrest,
+        homeColor: widget.homeColor,
+        awayColor: widget.awayColor,
+        busy: widget.busy,
+        onPhase: widget.onPhase,
+        onDelay: widget.onDelay,
+        now: widget.now ?? DateTime.now(),
+      );
+}
+
+class _ReportHeaderView extends StatelessWidget {
+  final MatchDTO match;
+  final String? homeCrest;
+  final String? awayCrest;
+  final Color? homeColor;
+  final Color? awayColor;
+  final bool busy;
+  final ValueChanged<MatchPhase> onPhase;
+
+  /// "Atrasou" (novo horário); aparece só enquanto dá para atrasar.
+  final VoidCallback? onDelay;
+
+  const _ReportHeaderView({
+    required this.match,
+    required this.homeCrest,
+    required this.awayCrest,
+    required this.homeColor,
+    required this.awayColor,
+    required this.busy,
+    required this.onPhase,
+    this.onDelay,
+    required this.now,
+  });
+
+  final DateTime now;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final now = DateTime.now();
     final status = MatchCardStatus.of(match, now);
     final stage = reportStageOf(match, now);
     final actions = matchPhaseActions(l10n, match, status, now);
@@ -261,7 +348,8 @@ class _StatusPillState extends State<_StatusPill> with SingleTickerProviderState
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final live = widget.stage == ReportStage.firstHalf || widget.stage == ReportStage.secondHalf;
-    final minute = MatchClock.of(widget.match, widget.now).minuteLabel;
+    // Súmula: relógio corrido com segundos ("23:41").
+    final minute = MatchClock.runningLabel(widget.match, widget.now);
     final label = switch (widget.stage) {
       ReportStage.firstHalf || ReportStage.secondHalf => minute == null ? l10n.reportLive : '${l10n.reportLive} · $minute',
       ReportStage.halfTime => l10n.reportHalfTime,

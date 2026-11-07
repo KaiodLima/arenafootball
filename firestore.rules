@@ -295,7 +295,8 @@ service cloud.firestore {
         || partnerCreate()
         || organizerGroupWrite()
         || organizerSquadCreate()
-        || organizerMatchCreate());
+        || organizerMatchCreate()
+        || organizerGoalCard(request.resource.data));
       // As inscrições por competição nunca somem do atleta (o app antigo
       // regravava o documento inteiro sem elas): esvaziar pode, apagar não.
       function keepsEnrollments() {
@@ -415,6 +416,72 @@ service cloud.firestore {
           && organizerTeamIn(key, entry.get('idTime', '-'));
       }
 
+      // Organizador é dono da competição de chave `c<id_campeonato>`.
+      function organizerOwnsKey(key) {
+        return signedIn()
+          && get(/databases/$(database)/documents/campeonatos_org/$(key)).data.idOrganizador == request.auth.uid;
+      }
+
+      // Súmula do organizador (a mesma do admin) nas partidas da competição
+      // dele: etapas, "Atrasou", gols/placar, cartões, escalação, dados do jogo
+      // e votação. Times, competição, região e o que as functions gravam não
+      // mudam; apagar segue com o admin.
+      function organizerMatchUpdate() {
+        return collection.matches('partidas([0-9]{4})?')
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['gols', 'golTimeCasa', 'golTimeFora',
+            'cartoes', 'substituicoes', 'escalacao', 'arbitro', 'observacoes', 'data', 'horario', 'horarioOriginal',
+            'duracao', 'local',
+            'votacao', 'status', 'statusEm', 'inicioEm', 'intervaloEm', 'segundoTempoEm'])
+          && organizerOwnsKey('c' + string(resource.data.get('id_campeonato', -1)));
+      }
+
+      // Chave de `inscricoes` que mudou (até 8 inscrições; as regras não têm laço).
+      function changedEnrollmentKey(after, keys) {
+        let l = after.keys();
+        return l.size() > 0 && l[0] in keys ? l[0]
+          : l.size() > 1 && l[1] in keys ? l[1]
+          : l.size() > 2 && l[2] in keys ? l[2]
+          : l.size() > 3 && l[3] in keys ? l[3]
+          : l.size() > 4 && l[4] in keys ? l[4]
+          : l.size() > 5 && l[5] in keys ? l[5]
+          : l.size() > 6 && l[6] in keys ? l[6]
+          : l.size() > 7 && l[7] in keys ? l[7] : '-';
+      }
+
+      // Números do atleta pela súmula do organizador (gol/assistência lançado ou
+      // tirado): só o Geral e a inscrição de UMA competição dele, pelo mesmo
+      // tanto (no máximo 10 por gravação), e o time da inscrição é da competição.
+      function organizerStatsUpdate() {
+        let before = resource.data.get('inscricoes', {});
+        let after = request.resource.data.get('inscricoes', {});
+        let keys = after.diff(before).affectedKeys();
+        let key = changedEnrollmentKey(after, keys);
+        let entry = after.get(key, {});
+        let old = before.get(key, {});
+        let goals = request.resource.data.get('nGols', 0) - resource.data.get('nGols', 0);
+        let assists = request.resource.data.get('nAssistencias', 0) - resource.data.get('nAssistencias', 0);
+        let addedTeams = request.resource.data.get('idsTimes', []).toSet()
+          .difference(resource.data.get('idsTimes', []).toSet());
+        return isPlayers() && keys.size() == 1 && key != '-'
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['nGols', 'nAssistencias', 'inscricoes', 'idsTimes'])
+          && entry.get('nGols', 0) - old.get('nGols', 0) == goals
+          && entry.get('nAssistencias', 0) - old.get('nAssistencias', 0) == assists
+          && goals >= -10 && goals <= 10 && assists >= -10 && assists <= 10
+          && (!(key in before) || old.get('idTime', '') == entry.get('idTime', ''))
+          && addedTeams.hasOnly([entry.get('idTime', '-')])
+          && organizerTeamIn(key, entry.get('idTime', '-'));
+      }
+
+      // Card de gol do organizador: da partida de uma competição dele (os dois
+      // times inscritos nela) e com o `idAutor` dele. Os do admin não mexe.
+      function organizerGoalCard(d) {
+        let key = 'c' + string(d.get('id_campeonato', -1));
+        return collection == 'noticias' && signedIn()
+          && d.get('tag', '') == 'gol' && d.get('idAutor', '') == request.auth.uid
+          && organizerTeamIn(key, d.get('id_time_casa', '-')) && organizerTeamIn(key, d.get('id_time_fora', '-'));
+      }
+
       // Organizador cadastra partida da competição dele: os dois times
       // inscritos nela, partida zerada (sem placar, status, votação aberta nem
       // súmula) e só os campos do cadastro. Editar/apagar seguem com o admin.
@@ -481,10 +548,14 @@ service cloud.firestore {
         || partnerUpdate()
         || organizerUpdate()
         || (organizerGroup(resource.data) && organizerGroupWrite())
-        || organizerSquadUpdate());
+        || organizerSquadUpdate()
+        || organizerMatchUpdate()
+        || organizerStatsUpdate()
+        || (organizerGoalCard(resource.data) && organizerGoalCard(request.resource.data)));
       allow delete: if writable() && (isAdmin() || isOwnVote() || (isPlayers() && ownsTeam(resource.data))
         || partnerDelete()
-        || organizerGroup(resource.data));
+        || organizerGroup(resource.data)
+        || organizerGoalCard(resource.data));
     }
 
     // Votos de melhor jogador da partida (id do doc = uid de quem votou):

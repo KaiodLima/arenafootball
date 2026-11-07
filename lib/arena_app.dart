@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_groups_cubit.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/page/organizer_groups_page.dart';
 import 'package:arena_soccer/features/album/presentation/page/album_pages_page.dart';
@@ -329,9 +330,13 @@ class ArenaApp extends StatelessWidget {
             child: StickerDetailPage(teamId: args['teamId'] as String, stickerId: args['stickerId'] as String),
           );
         },
-        // Súmula da partida (admin): args {match, season, homeCrest, awayCrest}.
+        // Súmula da partida (admin e organizador da competição): args {match,
+        // season, homeCrest, awayCrest}.
         AppRoutes.matchReportPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+          // Organizador: garante o índice da competição antes de gravar (o admin
+          // não organiza: não faz nada).
+          BlocProvider.of<OrganizerModeCubit>(context).ensureIndexFor((args['match'] as MatchDTO).championshipId);
           return BlocProvider<MatchReportCubit>(
             create: (_) => MatchReportCubit(sl(), sl(), sl(), sl(), sl(), sl())
               ..load(match: args['match'] as MatchDTO, season: args['season'] as String?),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
+import 'package:arena_soccer/features/matches/domain/match_manage_access.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
@@ -89,6 +91,9 @@ class MatchesList extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final session = context.watch<SessionCubit>().state;
     final isAdmin = session.isAdmin;
+    // Organizador: gerencia as partidas das competições dele.
+    final organizerIds = context.watch<OrganizerModeCubit>().state.championships.map((c) => c.championshipId).toSet();
+    bool manages(MatchDTO match) => canManageMatch(match, isAdmin: isAdmin, organizerChampionshipIds: organizerIds);
     final user = session.user;
     // Chips de time (só o nome); a partida usa os ids quando tem.
     bool isFavoriteTeam(String team) => user?.isFavorite(name: team) ?? false;
@@ -124,7 +129,8 @@ class MatchesList extends StatelessWidget {
         Widget card(MatchDTO match) => MatchCard(
               match: match,
               championshipLabel: championshipLabelOf?.call(match),
-              isAdmin: isAdmin,
+              isAdmin: manages(match),
+              canDelete: isAdmin,
               homeCrest: state.crestOf(match.homeTeam),
               awayCrest: state.crestOf(match.awayTeam),
               homeColor: colorFromHex(state.colorOf(match.homeTeam) ?? ''),
@@ -168,8 +174,8 @@ class MatchesList extends StatelessWidget {
                 homeCrest: state.crestOf(match.homeTeam),
                 awayCrest: state.crestOf(match.awayTeam),
               ),
-              onSetPhase: isAdmin ? (phase) => BlocProvider.of<MatchesCubit>(context).setPhase(match, phase) : null,
-              onDelay: isAdmin
+              onSetPhase: manages(match) ? (phase) => BlocProvider.of<MatchesCubit>(context).setPhase(match, phase) : null,
+              onDelay: manages(match)
                   ? () => showDelayMatchSheet(
                         context,
                         match: match,
@@ -179,7 +185,7 @@ class MatchesList extends StatelessWidget {
                         onPause: () => BlocProvider.of<MatchesCubit>(context).setPhase(match, MatchPhase.wait),
                       )
                   : null,
-              onGoalCard: isAdmin
+              onGoalCard: manages(match)
                   ? () => Navigator.pushNamed(
                         context,
                         AppRoutes.goalNotificationPage,

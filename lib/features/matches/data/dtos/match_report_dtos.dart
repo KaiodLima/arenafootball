@@ -75,6 +75,66 @@ class MatchBooking extends Equatable {
   List<Object?> get props => [id, side, type, playerId, playerName, minute, secondYellow];
 }
 
+/// Substituição da súmula (`partidas{ano}.substituicoes[]`): lado, quem
+/// sai, quem entra e o minuto.
+class MatchSubstitution extends Equatable {
+  final String id;
+  final MatchSide side;
+  final String outId;
+  final String outName;
+  final String inId;
+  final String inName;
+  final int? minute;
+
+  const MatchSubstitution({
+    required this.id,
+    required this.side,
+    required this.outId,
+    required this.outName,
+    required this.inId,
+    required this.inName,
+    this.minute,
+  });
+
+  static final Random _random = Random();
+
+  static String newId() =>
+      's${DateTime.now().microsecondsSinceEpoch.toRadixString(36)}${_random.nextInt(1 << 20).toRadixString(36)}';
+
+  factory MatchSubstitution.fromMap(Map<String, dynamic> data) {
+    String text(String key) => data[key]?.toString() ?? '';
+    return MatchSubstitution(
+      id: text('id'),
+      side: MatchSide.fromKey(text('lado')),
+      outId: text('idSai'),
+      outName: text('sai'),
+      inId: text('idEntra'),
+      inName: text('entra'),
+      minute: (data['minuto'] as num?)?.toInt(),
+    );
+  }
+
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'lado': side.key,
+        'idSai': outId,
+        'sai': outName,
+        'idEntra': inId,
+        'entra': inName,
+        if (minute != null) 'minuto': minute,
+      };
+
+  static List<MatchSubstitution> listFrom(Object? raw) => raw is List
+      ? [
+          for (final item in raw)
+            if (item is Map) MatchSubstitution.fromMap(Map<String, dynamic>.from(item)),
+        ]
+      : const [];
+
+  @override
+  List<Object?> get props => [id, side, outId, outName, inId, inName, minute];
+}
+
 /// Atleta relacionado para a partida (`partidas{ano}.escalacao.casa|fora[]`).
 class LineupEntry extends Equatable {
   final String playerId;

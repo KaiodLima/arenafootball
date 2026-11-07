@@ -734,6 +734,32 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get reportSubstitution => 'Substituição';
+
+  @override
+  String get reportWhoLeaves => 'Quem sai?';
+
+  @override
+  String get reportWhoEnters => 'Quem entra?';
+
+  @override
+  String reportLeaving(String name) {
+    return 'Sai $name';
+  }
+
+  @override
+  String reportEntering(String name) {
+    return 'Entra $name';
+  }
+
+  @override
+  String get reportLineupNeeded =>
+      'Sem escalação: aparecem todos do elenco. Monte a escalação para ver só quem está em campo.';
+
+  @override
+  String get reportNobodyToPick => 'Ninguém disponível neste passo.';
+
+  @override
   String organizerMatchTeamNotEnrolled(String team) {
     return '$team não está inscrito nesta competição. Inscreva o time pela aba Times.';
   }

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:either_dart/either.dart';
 import 'package:arena_soccer/features/partner_requests/domain/partner_slots.dart';
 import 'package:arena_soccer/features/news/data/dtos/pending_news_dto.dart';
@@ -12,7 +13,18 @@ import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 class NewsDataSource {
   final FirebaseFirestore _firestore;
 
-  NewsDataSource(this._firestore);
+  /// Quem está logado: o card de gol grava o `idAutor` (o organizador só
+  /// mexe nos cards dele).
+  final FirebaseAuth? _auth;
+
+  NewsDataSource(this._firestore, [this._auth]);
+
+  /// Card de gol sem autor: o da conta logada.
+  NewsDTO _withGoalAuthor(NewsDTO news) {
+    if (news.tag != NewsDTO.goalTag || news.authorId.isNotEmpty) return news;
+    final uid = _auth?.currentUser?.uid ?? '';
+    return uid.isEmpty ? news : news.copyWith(authorId: uid);
+  }
 
   static const String _collection = 'noticias';
   static const String _loadFallback = 'Não foi possível carregar as notícias.';
@@ -93,6 +105,7 @@ class NewsDataSource {
   }
 
   Future<Either<Failure, void>> createNews(NewsDTO news) async {
+    news = _withGoalAuthor(news);
     try {
       if (news.id.isEmpty) {
         final ref = _news.doc();

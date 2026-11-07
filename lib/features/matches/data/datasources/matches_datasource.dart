@@ -109,6 +109,7 @@ class MatchesDataSource {
   Future<Either<Failure, void>> updateReport({
     required String matchId,
     required List<MatchBooking> bookings,
+    List<MatchSubstitution> substitutions = const [],
     required MatchLineup lineup,
     required String referee,
     required String notes,
@@ -122,6 +123,7 @@ class MatchesDataSource {
         matchId,
         {
           MatchDTO.bookingsField: [for (final b in bookings) b.toMap()],
+          MatchDTO.substitutionsField: [for (final s in substitutions) s.toMap()],
           MatchDTO.lineupField: lineup.toMap(),
           'arbitro': referee.trim(),
           'observacoes': notes.trim(),

@@ -731,6 +731,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get reportSubstitution => 'Substitution';
+
+  @override
+  String get reportWhoLeaves => 'Who comes off?';
+
+  @override
+  String get reportWhoEnters => 'Who comes on?';
+
+  @override
+  String reportLeaving(String name) {
+    return 'Off: $name';
+  }
+
+  @override
+  String reportEntering(String name) {
+    return 'On: $name';
+  }
+
+  @override
+  String get reportLineupNeeded =>
+      'No lineup: the whole squad is shown. Set the lineup to see only who is on the pitch.';
+
+  @override
+  String get reportNobodyToPick => 'Nobody available in this step.';
+
+  @override
   String organizerMatchTeamNotEnrolled(String team) {
     return '$team is not registered in this competition. Register the team in the Teams tab.';
   }
