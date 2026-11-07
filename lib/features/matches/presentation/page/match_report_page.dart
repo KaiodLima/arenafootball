@@ -333,7 +333,7 @@ class MatchReportPage extends StatelessWidget {
               bottomNavigationBar: state.dirty
                   ? ReportSaveBar(
                       changes: state.changeCount,
-                      newGoals: state.newGoals,
+                      newGoals: state.newEvents,
                       publishCards: state.publishCards,
                       saving: state.saving,
                       onPublishCards: cubit.togglePublishCards,

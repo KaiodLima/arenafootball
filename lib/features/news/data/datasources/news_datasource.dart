@@ -19,9 +19,10 @@ class NewsDataSource {
 
   NewsDataSource(this._firestore, [this._auth]);
 
-  /// Card de gol sem autor: o da conta logada.
+  /// Card de gol (ou o oculto do vermelho) sem autor: o da conta logada.
   NewsDTO _withGoalAuthor(NewsDTO news) {
-    if (news.tag != NewsDTO.goalTag || news.authorId.isNotEmpty) return news;
+    final card = news.tag == NewsDTO.goalTag || news.tag == NewsDTO.bookingTag;
+    if (!card || news.authorId.isNotEmpty) return news;
     final uid = _auth?.currentUser?.uid ?? '';
     return uid.isEmpty ? news : news.copyWith(authorId: uid);
   }
@@ -137,6 +138,29 @@ class NewsDataSource {
       return const Right(null);
     } catch (e) {
       AppLogger.e('updateNews id=${news.id}', name: 'NewsDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
+    }
+  }
+
+  /// Card ao vivo da partida (id fixo `aovivo_<idPartida>`). Com [bump]
+  /// (lance novo) regrava inteiro com a hora do servidor: sobe ao topo do
+  /// feed. Sem lance novo (apagou/editou), só atualiza o conteúdo, se o card
+  /// já existe.
+  Future<Either<Failure, void>> syncLiveCard(NewsDTO card, {required bool bump}) async {
+    try {
+      final ref = _news.doc(card.id);
+      if (bump) {
+        await ref.set({...card.toMap(), 'data': FieldValue.serverTimestamp()});
+      } else {
+        try {
+          await ref.update(card.toMap());
+        } on FirebaseException catch (e) {
+          if (e.code != 'not-found') rethrow;
+        }
+      }
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('syncLiveCard id=${card.id}', name: 'NewsDataSource', error: e);
       return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
     }
   }

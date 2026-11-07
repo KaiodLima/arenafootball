@@ -138,6 +138,11 @@ class _NotificationsPanelPageState extends State<NotificationsPanelPage> {
         name: l10n.pushActionGoal,
         description: l10n.pushActionGoalHint
       ),
+    PushAction.redCard => (
+        icon: Icons.style_rounded,
+        name: l10n.pushActionRedCard,
+        description: l10n.pushActionRedCardHint,
+      ),
     PushAction.news => (icon: Icons.article_outlined, name: l10n.pushActionNews, description: l10n.pushActionNewsHint),
     PushAction.match => (
         icon: Icons.scoreboard_outlined,

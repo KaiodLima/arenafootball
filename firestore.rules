@@ -223,7 +223,7 @@ service cloud.firestore {
             'images', 'idAutor'])
           && (tag == 'publicidade'
             ? p.get('podePublicidade', true)
-            : p.get('podeNoticias', true) && !(tag in ['gol', 'resultado', 'votacao']));
+            : p.get('podeNoticias', true) && !(tag in ['gol', 'resultado', 'votacao', 'aovivo', 'cartao']));
       }
 
       function partnerHighlight(data, p) {
@@ -296,7 +296,8 @@ service cloud.firestore {
         || organizerGroupWrite()
         || organizerSquadCreate()
         || organizerMatchCreate()
-        || organizerGoalCard(request.resource.data));
+        || organizerGoalCard(request.resource.data)
+        || organizerLiveCard(request.resource.data));
       // As inscrições por competição nunca somem do atleta (o app antigo
       // regravava o documento inteiro sem elas): esvaziar pode, apagar não.
       function keepsEnrollments() {
@@ -478,7 +479,17 @@ service cloud.firestore {
       function organizerGoalCard(d) {
         let key = 'c' + string(d.get('id_campeonato', -1));
         return collection == 'noticias' && signedIn()
-          && d.get('tag', '') == 'gol' && d.get('idAutor', '') == request.auth.uid
+          && d.get('tag', '') in ['gol', 'cartao'] && d.get('idAutor', '') == request.auth.uid
+          && organizerTeamIn(key, d.get('id_time_casa', '-')) && organizerTeamIn(key, d.get('id_time_fora', '-'));
+      }
+
+      // Card "ao vivo" da partida (`noticias/aovivo_<idPartida>`), da competição
+      // do organizador: ele cria e atualiza (mesmo o criado pelo admin; o card
+      // é da partida). Não apaga.
+      function organizerLiveCard(d) {
+        let key = 'c' + string(d.get('id_campeonato', -1));
+        return collection == 'noticias' && signedIn() && d.get('tag', '') == 'aovivo'
+          && docId == 'aovivo_' + d.get('id_partida', '-')
           && organizerTeamIn(key, d.get('id_time_casa', '-')) && organizerTeamIn(key, d.get('id_time_fora', '-'));
       }
 
@@ -551,7 +562,8 @@ service cloud.firestore {
         || organizerSquadUpdate()
         || organizerMatchUpdate()
         || organizerStatsUpdate()
-        || (organizerGoalCard(resource.data) && organizerGoalCard(request.resource.data)));
+        || (organizerGoalCard(resource.data) && organizerGoalCard(request.resource.data))
+        || (organizerLiveCard(resource.data) && organizerLiveCard(request.resource.data)));
       allow delete: if writable() && (isAdmin() || isOwnVote() || (isPlayers() && ownsTeam(resource.data))
         || partnerDelete()
         || organizerGroup(resource.data)
@@ -737,7 +749,7 @@ service cloud.firestore {
           && data.get('idAutor', '') == request.auth.uid
           && data.get('idRegiao', '') == p.get('idRegiao', '-')
           && data.get('status', '') == 'pendente'
-          && !(data.get('tag', '') in ['gol', 'resultado', 'votacao', 'publicidade'])
+          && !(data.get('tag', '') in ['gol', 'resultado', 'votacao', 'publicidade', 'aovivo', 'cartao'])
           && data.keys().hasOnly(['id', 'data', 'criadoEm', 'status', 'titulo', 'descricao', 'urlImagem', 'link',
             'exibir', 'fk_competicao', 'idRegiao', 'time_casa', 'time_fora', 'gol_time_casa', 'gol_time_fora', 'tag',
             'images', 'idAutor']);

@@ -35,6 +35,9 @@ abstract class INewsRepository {
 
   Future<Either<Failure, List<NewsDTO>>> getGoalCardsByPlayer(String playerId);
 
+  /// Card ao vivo da partida (sobe ao topo com [bump]).
+  Future<Either<Failure, void>> syncLiveCard(NewsDTO card, {required bool bump});
+
   Future<Either<Failure, List<NewsDTO>>> getGoalCardsByGoalIds(List<String> goalIds);
 
   /// Cache local dos cards de gol do jogador. Nunca falha: sem cache = `Right(null)`.

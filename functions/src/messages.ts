@@ -9,6 +9,7 @@
 /** Ações que podem emitir push (chaves de `config/notificacoes`). */
 export type ActionKey =
   | 'gol'
+  | 'cartao_vermelho'
   | 'noticia'
   | 'partida'
   | 'votacao_aberta'
@@ -32,6 +33,7 @@ export type ActionKey =
 /** Sem configuração gravada, vale este padrão (notícia vem desligada). */
 export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
   gol: true,
+  cartao_vermelho: true,
   noticia: false,
   partida: true,
   votacao_aberta: true,
@@ -231,12 +233,38 @@ export function goalMessage(news: Doc, currentSeason = ''): PushMessage | null {
   };
 }
 
+/**
+ * Card oculto do cartão vermelho (noticias com tag "cartao", gravado pela
+ * súmula): "🟥 Expulso!" para quem segue a região e os times, como o gol.
+ * Amarelo e substituição não mandam push (só o card ao vivo no feed).
+ */
+export function bookingMessage(news: Doc, currentSeason = ''): PushMessage | null {
+  const home = text(news.time_casa);
+  const away = text(news.time_fora);
+  const region = text(news.fk_competicao);
+  const alvo = gameTarget(regionTopicOf(news), home, away, text(news.id_time_casa), text(news.id_time_fora));
+  if (!home || !away || !alvo) return null;
+  const crest = text(news.escudo_marcador);
+  return {
+    tipo: 'cartao_vermelho',
+    titulo: `🟥 Expulso! ${home} ${text(news.gol_time_casa) || '0'} × ${text(news.gol_time_fora) || '0'} ${away}`,
+    corpo: text(news.descricao) || 'Confira no Arena Football',
+    aba: 'home',
+    regiao: region,
+    alvo,
+    ...openMatch('partida', { id: text(news.id_partida), season: text(news.temporada) || currentSeason }),
+    ...(crest.startsWith('https://') ? { imagem: crest } : {}),
+  };
+}
+
 /** Notícia comum publicada visível (sem gol, publicidade); [id] abre a notícia. */
 export function newsMessage(news: Doc, id = ''): PushMessage | null {
   const tag = text(news.tag);
   // Gol, resultado e votação têm card próprio (os automáticos não mandam push de notícia).
   if (
     tag === 'gol' ||
+    tag === 'cartao' ||
+    tag === 'aovivo' ||
     tag === 'resultado' ||
     tag === 'votacao' ||
     tag === 'publicidade' ||

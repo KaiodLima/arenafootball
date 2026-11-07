@@ -64,6 +64,7 @@ import {
   dailyGameMessage,
   describeTarget,
   goalMessage,
+  bookingMessage,
   isEnabled,
   manualMessage,
   matchCreatedMessage,
@@ -216,7 +217,12 @@ async function deliver(logId: string, message: PushMessage, origem: string): Pro
 export const onNewsCreated = onDocumentCreated('noticias/{newsId}', async (event) => {
   const data = event.data?.data();
   if (!data) return;
-  const message = data.tag === 'gol' ? goalMessage(data, await currentSeason()) : newsMessage(data, event.params.newsId);
+  const message =
+    data.tag === 'gol'
+      ? goalMessage(data, await currentSeason())
+      : data.tag === 'cartao'
+        ? bookingMessage(data, await currentSeason())
+        : newsMessage(data, event.params.newsId);
   if (message) await deliver(`${message.tipo}_${event.id}`, message, `noticias/${event.params.newsId}`);
 });
 

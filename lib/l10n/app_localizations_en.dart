@@ -731,6 +731,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get liveEventsTitle => 'Match events';
+
+  @override
+  String get liveSeeMatch => 'See match';
+
+  @override
+  String get liveYellowCard => 'Yellow card';
+
+  @override
+  String get liveLabel => 'Live';
+
+  @override
+  String get liveNoEvents => 'No events yet.';
+
+  @override
+  String get liveSentOff => 'Sent off';
+
+  @override
+  String get pushActionRedCard => 'Red card';
+
+  @override
+  String get pushActionRedCardHint =>
+      'Sending-off recorded in the match report (\"Sent off!\")';
+
+  @override
   String get reportSubstitution => 'Substitution';
 
   @override
@@ -1540,7 +1565,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get reportPublishCards => 'Publish goal card in the feed';
+  String get reportPublishCards => 'Publish to the feed (live match card)';
 
   @override
   String get reportSave => 'Save';

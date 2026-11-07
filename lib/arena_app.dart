@@ -209,7 +209,7 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.goalNotificationPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<GoalNotificationCubit>(
-            create: (_) => GoalNotificationCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl()),
+            create: (_) => GoalNotificationCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl()),
             child: GoalNotificationPage(
               initial: args?['news'] as NewsDTO?,
               initialMatch: args?['match'] as MatchDTO?,

@@ -734,6 +734,31 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get liveEventsTitle => 'Lances da partida';
+
+  @override
+  String get liveSeeMatch => 'Ver partida';
+
+  @override
+  String get liveYellowCard => 'Cartão amarelo';
+
+  @override
+  String get liveLabel => 'Ao vivo';
+
+  @override
+  String get liveNoEvents => 'Sem lances ainda.';
+
+  @override
+  String get liveSentOff => 'Expulso';
+
+  @override
+  String get pushActionRedCard => 'Cartão vermelho';
+
+  @override
+  String get pushActionRedCardHint =>
+      'Expulsão lançada na súmula (\"Expulso!\")';
+
+  @override
   String get reportSubstitution => 'Substituição';
 
   @override
@@ -1550,7 +1575,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get reportPublishCards => 'Publicar card de gol no feed';
+  String get reportPublishCards => 'Publicar no feed (card ao vivo da partida)';
 
   @override
   String get reportSave => 'Salvar';

@@ -1335,6 +1335,54 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @liveEventsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Lances da partida'**
+  String get liveEventsTitle;
+
+  /// No description provided for @liveSeeMatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver partida'**
+  String get liveSeeMatch;
+
+  /// No description provided for @liveYellowCard.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cartão amarelo'**
+  String get liveYellowCard;
+
+  /// No description provided for @liveLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ao vivo'**
+  String get liveLabel;
+
+  /// No description provided for @liveNoEvents.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem lances ainda.'**
+  String get liveNoEvents;
+
+  /// No description provided for @liveSentOff.
+  ///
+  /// In pt, this message translates to:
+  /// **'Expulso'**
+  String get liveSentOff;
+
+  /// No description provided for @pushActionRedCard.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cartão vermelho'**
+  String get pushActionRedCard;
+
+  /// No description provided for @pushActionRedCardHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Expulsão lançada na súmula (\"Expulso!\")'**
+  String get pushActionRedCardHint;
+
   /// No description provided for @reportSubstitution.
   ///
   /// In pt, this message translates to:
@@ -2659,7 +2707,7 @@ abstract class AppLocalizations {
   /// No description provided for @reportPublishCards.
   ///
   /// In pt, this message translates to:
-  /// **'Publicar card de gol no feed'**
+  /// **'Publicar no feed (card ao vivo da partida)'**
   String get reportPublishCards;
 
   /// No description provided for @reportSave.

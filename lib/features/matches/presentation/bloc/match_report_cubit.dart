@@ -145,6 +145,19 @@ class MatchReportState extends Equatable {
     return count;
   }
 
+  /// Lances novos desde que abriu (gols, cartões e substituições): o card ao
+  /// vivo da partida sobe no feed.
+  int get newEvents {
+    final a = original;
+    final b = match;
+    if (a == null || b == null) return newGoals;
+    final bookings = {for (final x in a.bookings) x.id};
+    final subs = {for (final x in a.substitutions) x.id};
+    return newGoals +
+        b.bookings.where((x) => !bookings.contains(x.id)).length +
+        b.substitutions.where((x) => !subs.contains(x.id)).length;
+  }
+
   /// Gols novos desde que abriu (os que viram card).
   int get newGoals {
     final ids = {for (final g in goalsBefore) g.id};

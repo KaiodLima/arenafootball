@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
+import 'package:arena_soccer/features/news/data/dtos/live_event.dart';
 
 /// Documento da coleção `noticias`. Notícias, cards de gol e anúncios
 /// usam o mesmo documento; o que muda é a [tag].
@@ -10,6 +11,16 @@ class NewsDTO extends Equatable {
 
   /// Regiões envolvidas (cards de partida entre regiões diferentes).
   static const String regionIdsField = 'idsRegioes';
+
+  /// Card "ao vivo" da partida (`noticias/aovivo_<idPartida>`): um por
+  /// partida, atualizado a cada lance da súmula e levado ao topo do feed.
+  static const String liveTag = 'aovivo';
+
+  /// Card oculto do cartão vermelho (só dispara o push "Expulso!").
+  static const String bookingTag = 'cartao';
+
+  /// Id do card ao vivo da partida [matchId].
+  static String liveIdOf(String matchId) => 'aovivo_$matchId';
 
   /// Tag dos cards de publicidade.
   static const String adTag = 'publicidade';
@@ -86,6 +97,10 @@ class NewsDTO extends Equatable {
   /// diferentes: as regiões envolvidas (`idsRegioes`); o feed de cada uma mostra.
   final List<String> regionIds;
 
+  /// Card ao vivo: o último lance (destaque) e todos, em ordem de minuto.
+  final LiveEvent? lastEvent;
+  final List<LiveEvent> liveEvents;
+
   const NewsDTO({
     this.id = '',
     this.date,
@@ -124,6 +139,8 @@ class NewsDTO extends Equatable {
     this.authorId = '',
     this.goalId = '',
     this.regionIds = const [],
+    this.lastEvent,
+    this.liveEvents = const [],
   });
 
   bool get hasScorer => scorerId.isNotEmpty && scorerName.isNotEmpty;
@@ -137,6 +154,10 @@ class NewsDTO extends Equatable {
   bool get isResult => tag == resultTag;
 
   bool get isVoteCall => tag == voteTag;
+
+  bool get isLive => tag == liveTag;
+
+  bool get isBookingCard => tag == bookingTag;
 
   factory NewsDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? const {};
@@ -182,6 +203,10 @@ class NewsDTO extends Equatable {
       authorId: data['idAutor']?.toString() ?? '',
       goalId: data['id_gol']?.toString() ?? '',
       regionIds: (data[regionIdsField] as List?)?.map((id) => id.toString()).toList() ?? const [],
+      lastEvent: data['ultimo_lance'] is Map
+          ? LiveEvent.fromMap(Map<String, dynamic>.from(data['ultimo_lance'] as Map))
+          : null,
+      liveEvents: LiveEvent.listFrom(data['lances']),
     );
   }
 
@@ -311,6 +336,8 @@ class NewsDTO extends Equatable {
         if (authorId.isNotEmpty) 'idAutor': authorId,
         if (goalId.isNotEmpty) 'id_gol': goalId,
         if (regionIds.isNotEmpty) regionIdsField: regionIds,
+        if (lastEvent != null) 'ultimo_lance': lastEvent!.toMap(),
+        if (isLive) 'lances': [for (final e in liveEvents) e.toMap()],
       };
 
   NewsDTO copyWith({
@@ -351,6 +378,8 @@ class NewsDTO extends Equatable {
     String? authorId,
     String? goalId,
     List<String>? regionIds,
+    LiveEvent? lastEvent,
+    List<LiveEvent>? liveEvents,
   }) {
     return NewsDTO(
       id: id ?? this.id,
@@ -390,6 +419,8 @@ class NewsDTO extends Equatable {
       authorId: authorId ?? this.authorId,
       goalId: goalId ?? this.goalId,
       regionIds: regionIds ?? this.regionIds,
+      lastEvent: lastEvent ?? this.lastEvent,
+      liveEvents: liveEvents ?? this.liveEvents,
     );
   }
 
@@ -430,5 +461,7 @@ class NewsDTO extends Equatable {
         championshipTitle,
         votingOpen,
         authorId,
+        lastEvent,
+        liveEvents,
       ];
 }

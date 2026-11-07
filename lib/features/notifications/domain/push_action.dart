@@ -3,6 +3,7 @@
 /// mesmo padrão das Cloud Functions).
 enum PushAction {
   goal('gol', true),
+  redCard('cartao_vermelho', true),
   news('noticia', false),
   match('partida', true),
   votingOpen('votacao_aberta', true),

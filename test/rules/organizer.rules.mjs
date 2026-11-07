@@ -189,6 +189,29 @@ export default async function run(env, check) {
   await seed('noticias/k5', card({ id: 'k5', idAutor: '' }));
   await check('organizador não apaga card do admin', assertFails(deleteDoc(doc(org, 'noticias/k5'))));
   await check('organizador apaga o card dele', assertSucceeds(deleteDoc(doc(org, 'noticias/k1'))));
+
+  // Card ao vivo da partida m1 (Copa Sol).
+  const live = (extra = {}) => ({
+    id: 'aovivo_m1', tag: 'aovivo', exibir: 'true', titulo: 'Leões 1 × 0 Tigres · ao vivo', descricao: "⚽ 12' Ana",
+    fk_competicao: 'Colônia', idRegiao: 'co', time_casa: 'Leões', time_fora: 'Tigres', gol_time_casa: '1',
+    gol_time_fora: '0', id_time_casa: 't1', id_time_fora: 't2', id_partida: 'm1', id_campeonato: 11, temporada: '2026',
+    ultimo_lance: { id: 'g1', tipo: 'gol', lado: 'casa', minuto: 12, jogador: 'Ana' },
+    lances: [{ id: 'g1', tipo: 'gol', lado: 'casa', minuto: 12, jogador: 'Ana' }], data: serverTimestamp(), ...extra,
+  });
+  await check('organizador cria o card ao vivo', assertSucceeds(setDoc(doc(org, 'noticias/aovivo_m1'), live())));
+  await seed('noticias/aovivo_m1', { ...live(), data: new Date(), idAutor: 'admin' });
+  await check('organizador atualiza o card ao vivo do admin', assertSucceeds(setDoc(doc(org, 'noticias/aovivo_m1'),
+    live({ gol_time_casa: '2', descricao: "🟥 30' Bia" }))));
+  await check('organizador só atualiza o conteúdo (lance apagado)', assertSucceeds(updateDoc(doc(org, 'noticias/aovivo_m1'),
+    { gol_time_casa: '1', lances: [] })));
+  await check('card ao vivo com id de outra partida recusado',
+    assertFails(setDoc(doc(org, 'noticias/aovivo_m2'), live())));
+  await check('card ao vivo de partida de outra competição recusado',
+    assertFails(setDoc(doc(org, 'noticias/aovivo_m9'), live({ id: 'aovivo_m9', id_partida: 'm9', id_campeonato: 12 }))));
+  await check('organizador não apaga o card ao vivo', assertFails(deleteDoc(doc(org, 'noticias/aovivo_m1'))));
+  await check('organizador cria o card oculto do vermelho', assertSucceeds(setDoc(doc(org, 'noticias/v1'),
+    (({ autor_gol_id, ...rest }) => rest)(card({ id: 'v1', tag: 'cartao', exibir: 'false', titulo: '🟥 Expulso: Bia' }))))); // eslint-disable-line no-unused-vars
+  await check('usuário comum não grava card ao vivo', assertFails(setDoc(doc(other, 'noticias/aovivo_m1'), live())));
   await check('usuário comum não inscreve', assertFails(updateDoc(doc(other, 'jogadores2026/p1'), { 'inscricoes.c11': entry })));
   const fresh = {
     idJogador: 'p2', nome: 'Bia', time: 'Leões', idTime: 't1', urlImagem: '', nGols: 0, nAssistencias: 0,

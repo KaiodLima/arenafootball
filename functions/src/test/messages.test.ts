@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import {
   dailyGameMessage,
   goalMessage,
+  bookingMessage,
   isEnabled,
   manualMessage,
   matchCreatedMessage,
@@ -296,4 +297,18 @@ test('pedido de organizador: admins no novo/reenviado, quem pediu na resposta', 
   const rejected = organizerRequestAnswerMessage('u1', pending, { ...pending, status: 'rejeitada', motivo: 'Duplicado' });
   assert.match(rejected?.corpo ?? '', /Motivo: Duplicado/);
   assert.equal(organizerRequestAnswerMessage('u1', { ...pending, status: 'aprovada' }, pending), null);
+});
+
+test('vermelho: push "Expulso!" para a região e os times; aovivo/cartao não viram push de notícia', () => {
+  const card = {
+    tag: 'cartao', exibir: 'false', time_casa: 'Leões', time_fora: 'Tigres', gol_time_casa: '1', gol_time_fora: '0',
+    fk_competicao: 'Floresta', id_time_casa: 't1', id_time_fora: 't2', descricao: "Ana (Leões) · 63'",
+    id_partida: 'm1', temporada: '2026',
+  };
+  const message = bookingMessage(card);
+  assert.equal(message?.tipo, 'cartao_vermelho');
+  assert.equal(message?.titulo, '🟥 Expulso! Leões 1 × 0 Tigres');
+  assert.equal(message?.corpo, "Ana (Leões) · 63'");
+  assert.equal(newsMessage({ ...card, exibir: 'true', titulo: 'x' }), null);
+  assert.equal(newsMessage({ tag: 'aovivo', exibir: 'true', titulo: 'Leões 1 × 0 Tigres · ao vivo', fk_competicao: 'Floresta' }), null);
 });
