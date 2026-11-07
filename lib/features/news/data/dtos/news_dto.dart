@@ -101,6 +101,14 @@ class NewsDTO extends Equatable {
   final LiveEvent? lastEvent;
   final List<LiveEvent> liveEvents;
 
+  /// Card ao vivo: fase da partida (`status_partida`: andamento, intervalo,
+  /// encerrada; vazio = andamento). As functions marcam intervalo e fim.
+  final String matchStatus;
+
+  static const String matchStatusFinished = 'encerrada';
+  static const String matchStatusHalfTime = 'intervalo';
+  static const String matchStatusLive = 'andamento';
+
   const NewsDTO({
     this.id = '',
     this.date,
@@ -141,6 +149,7 @@ class NewsDTO extends Equatable {
     this.regionIds = const [],
     this.lastEvent,
     this.liveEvents = const [],
+    this.matchStatus = '',
   });
 
   bool get hasScorer => scorerId.isNotEmpty && scorerName.isNotEmpty;
@@ -207,6 +216,7 @@ class NewsDTO extends Equatable {
           ? LiveEvent.fromMap(Map<String, dynamic>.from(data['ultimo_lance'] as Map))
           : null,
       liveEvents: LiveEvent.listFrom(data['lances']),
+      matchStatus: data['status_partida']?.toString() ?? '',
     );
   }
 
@@ -338,6 +348,7 @@ class NewsDTO extends Equatable {
         if (regionIds.isNotEmpty) regionIdsField: regionIds,
         if (lastEvent != null) 'ultimo_lance': lastEvent!.toMap(),
         if (isLive) 'lances': [for (final e in liveEvents) e.toMap()],
+        if (matchStatus.isNotEmpty) 'status_partida': matchStatus,
       };
 
   NewsDTO copyWith({
@@ -380,6 +391,7 @@ class NewsDTO extends Equatable {
     List<String>? regionIds,
     LiveEvent? lastEvent,
     List<LiveEvent>? liveEvents,
+    String? matchStatus,
   }) {
     return NewsDTO(
       id: id ?? this.id,
@@ -421,6 +433,7 @@ class NewsDTO extends Equatable {
       regionIds: regionIds ?? this.regionIds,
       lastEvent: lastEvent ?? this.lastEvent,
       liveEvents: liveEvents ?? this.liveEvents,
+      matchStatus: matchStatus ?? this.matchStatus,
     );
   }
 
@@ -463,5 +476,6 @@ class NewsDTO extends Equatable {
         authorId,
         lastEvent,
         liveEvents,
+        matchStatus,
       ];
 }

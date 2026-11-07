@@ -65,11 +65,72 @@ function findCandidate(vote: Vote, candidates: Candidate[]): Candidate | undefin
   return sameName.find((c) => c.teamId === vote.teamId || c.teamIds.includes(vote.teamId)) ?? sameName[0];
 }
 
-/** Craque eleito; nulo sem eleito (poucos votos, empate ou sem a % mínima). */
-export function electBestPlayer(votes: Vote[], candidates: Candidate[], rules: VotingRules): BestPlayer | null {
+/** Quem participou da partida, por time (nomes normalizados); nulo = sem escalação (todos valem). */
+export interface Participants {
+  homeTeamId: string;
+  awayTeamId: string;
+  home: Set<string> | null;
+  away: Set<string> | null;
+}
+
+const list = (value: unknown): Doc[] =>
+  Array.isArray(value) ? value.filter((item): item is Doc => typeof item === 'object' && item !== null) : [];
+
+/**
+ * Quem participou (súmula): titulares da escalação, quem entrou nas
+ * substituições e quem tem gol, assistência ou cartão. Reserva que não
+ * entrou fica de fora. Time sem escalação: nulo (não dá para saber; vale o
+ * elenco). Mesma regra do app (`MatchReport.participants`).
+ */
+export function participantNames(match: Doc): Participants {
+  const lineup = (match.escalacao ?? {}) as Doc;
+  const side = (lado: 'casa' | 'fora'): Set<string> | null => {
+    const entries = list(lineup[lado]);
+    if (entries.length === 0) return null;
+    const names = new Set<string>();
+    const add = (name: unknown) => {
+      const value = key(text(name));
+      if (value) names.add(value);
+    };
+    for (const e of entries) if (e.titular !== false) add(e.jogador);
+    for (const s of list(match.substituicoes)) if (text(s.lado) === lado) add(s.entra);
+    for (const g of list(match.gols)) {
+      if (text(g.lado) !== lado) continue;
+      add(g.jogador);
+      add(g.assistencia);
+    }
+    for (const c of list(match.cartoes)) if (text(c.lado) === lado) add(c.jogador);
+    return names;
+  };
+  return { homeTeamId: text(match.idTimeC), awayTeamId: text(match.idTimeF), home: side('casa'), away: side('fora') };
+}
+
+/** O voto é em quem participou? Time do voto sem escalação: vale. */
+export function isEligibleVote(vote: Vote, participants: Participants | undefined): boolean {
+  if (!participants) return true;
+  const names =
+    vote.teamId && vote.teamId === participants.homeTeamId
+      ? participants.home
+      : vote.teamId && vote.teamId === participants.awayTeamId
+        ? participants.away
+        : null;
+  return names === null || names.has(key(vote.name));
+}
+
+/**
+ * Craque eleito; nulo sem eleito (poucos votos, empate ou sem a % mínima).
+ * Com [participants], voto em quem não participou da partida não conta.
+ */
+export function electBestPlayer(
+  votes: Vote[],
+  candidates: Candidate[],
+  rules: VotingRules,
+  participants?: Participants,
+): BestPlayer | null {
   const tallies = new Map<string, { name: string; teamId: string; votes: number; candidate?: Candidate }>();
   for (const vote of votes) {
     if (!vote.name.trim()) continue;
+    if (!isEligibleVote(vote, participants)) continue;
     const candidate = findCandidate(vote, candidates);
     // Voto no próprio atleta não conta.
     if (candidate?.userId && candidate.userId === vote.voterId) continue;

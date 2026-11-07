@@ -734,6 +734,149 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get pdfTitle => 'SÚMULA DA PARTIDA';
+
+  @override
+  String get pdfDraft => 'RASCUNHO - alterações não salvas';
+
+  @override
+  String get pdfMatchInfo => 'Dados do jogo';
+
+  @override
+  String get pdfDate => 'Data';
+
+  @override
+  String get pdfTime => 'Horário';
+
+  @override
+  String get pdfVenue => 'Local';
+
+  @override
+  String get pdfRegion => 'Região';
+
+  @override
+  String get pdfDuration => 'Duração';
+
+  @override
+  String get pdfStatus => 'Situação';
+
+  @override
+  String get pdfLineups => 'Escalações';
+
+  @override
+  String get pdfStarters => 'Titulares';
+
+  @override
+  String get pdfReserves => 'Reservas';
+
+  @override
+  String get pdfGoals => 'Gols';
+
+  @override
+  String get pdfBookings => 'Cartões';
+
+  @override
+  String get pdfSubstitutions => 'Substituições';
+
+  @override
+  String get pdfMinute => 'Min.';
+
+  @override
+  String get pdfTeam => 'Time';
+
+  @override
+  String get pdfPlayer => 'Atleta';
+
+  @override
+  String get pdfScorer => 'Autor';
+
+  @override
+  String get pdfAssist => 'Assistência';
+
+  @override
+  String get pdfType => 'Tipo';
+
+  @override
+  String get pdfIn => 'Entra';
+
+  @override
+  String get pdfOut => 'Sai';
+
+  @override
+  String get pdfYellow => 'Amarelo';
+
+  @override
+  String get pdfRed => 'Vermelho';
+
+  @override
+  String get pdfBestPlayer => 'Craque da partida';
+
+  @override
+  String get pdfNotes => 'Observações';
+
+  @override
+  String get pdfSignatures => 'Assinaturas';
+
+  @override
+  String get pdfSignReferee => 'Árbitro';
+
+  @override
+  String get pdfSignOrganizer => 'Organizador';
+
+  @override
+  String pdfSignCaptain(String team) {
+    return 'Capitão - $team';
+  }
+
+  @override
+  String get pdfNone => 'Nenhum registro';
+
+  @override
+  String get pdfChampionship => 'Competição';
+
+  @override
+  String pdfGeneratedAt(String date) {
+    return 'Gerado pelo Arena Football em $date';
+  }
+
+  @override
+  String pdfPage(int page, int total) {
+    return 'página $page/$total';
+  }
+
+  @override
+  String pdfMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String pdfCameIn(String minute) {
+    return 'entrou$minute';
+  }
+
+  @override
+  String pdfWentOut(String minute) {
+    return 'saiu$minute';
+  }
+
+  @override
+  String get matchReportExportPdf => 'Exportar PDF';
+
+  @override
+  String get matchReportExport => 'Exportar súmula';
+
+  @override
+  String get matchReportExportError =>
+      'Não foi possível gerar o PDF da súmula.';
+
+  @override
+  String get votingOnlyParticipants =>
+      'Só aparecem os jogadores que participaram da partida.';
+
+  @override
+  String get liveFullTime => 'Fim de jogo';
+
+  @override
   String get liveEventsTitle => 'Lances da partida';
 
   @override

@@ -140,6 +140,43 @@ class MatchReport {
     return ids..remove('');
   }
 
+  /// Quem participou da partida pelo [side] (votação do craque): titulares,
+  /// quem entrou nas substituições e quem tem gol, assistência ou cartão.
+  /// Reserva que não entrou fica de fora. Sem escalação daquele lado, nulo
+  /// (não dá para saber: vale o elenco). Mesma regra das functions
+  /// (`participantNames`).
+  static Set<String>? participants(MatchDTO match, MatchSide side) {
+    final lineup = match.lineup.of(side);
+    if (lineup.isEmpty) return null;
+    return {
+      for (final e in lineup)
+        if (e.starter) e.playerId,
+      for (final s in match.substitutions)
+        if (s.side == side) s.inId,
+      for (final g in match.goals)
+        if (g.side == side) ...[g.scorerId, g.assistantId],
+      for (final b in match.bookings)
+        if (b.side == side) b.playerId,
+    }..remove('');
+  }
+
+  /// O mesmo pelos nomes (o voto grava o nome do atleta), em minúsculas.
+  static Set<String>? participantNames(MatchDTO match, MatchSide side) {
+    final lineup = match.lineup.of(side);
+    if (lineup.isEmpty) return null;
+    String key(String name) => name.trim().toLowerCase();
+    return {
+      for (final e in lineup)
+        if (e.starter) key(e.playerName),
+      for (final s in match.substitutions)
+        if (s.side == side) key(s.inName),
+      for (final g in match.goals)
+        if (g.side == side) ...[key(g.scorerName), key(g.assistantName)],
+      for (final b in match.bookings)
+        if (b.side == side) key(b.playerName),
+    }..remove('');
+  }
+
   /// Quem já saiu substituído do [side] (não volta a entrar).
   static Set<String> substitutedOut(List<MatchSubstitution> substitutions, MatchSide side) =>
       {for (final s in substitutions) if (s.side == side) s.outId};

@@ -1,6 +1,7 @@
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_report_dtos.dart';
+import 'package:arena_soccer/features/matches/domain/match_clock.dart';
 import 'package:arena_soccer/features/matches/domain/match_report.dart';
 import 'package:arena_soccer/features/news/data/dtos/live_event.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
@@ -107,17 +108,35 @@ class LiveMatchCard {
     };
   }
 
+  /// Fase da partida para o card: encerrada (marcada ou passado o fim
+  /// esperado), intervalo ou andamento. Lance lançado depois do fim regrava o
+  /// card já encerrado (não volta a "ao vivo").
+  static String statusOf(MatchDTO match, DateTime now) {
+    if (match.manualStatus == MatchManualStatus.finished) return NewsDTO.matchStatusFinished;
+    if (match.manualStatus == MatchManualStatus.halfTime) return NewsDTO.matchStatusHalfTime;
+    final end = MatchClock.expectedEnd(match, now);
+    if (end != null && now.isAfter(end)) return NewsDTO.matchStatusFinished;
+    return NewsDTO.matchStatusLive;
+  }
+
   /// O card ao vivo da partida. [last] = o lance em destaque (o novo; sem
-  /// lance novo, o último da linha do tempo).
+  /// lance novo, o último da linha do tempo). [now] só para teste.
   static NewsDTO build(
     MatchDTO match,
     Map<String, TeamDTO> teams, {
     String season = '',
     LiveEvent? last,
+    DateTime? now,
   }) {
     final events = eventsOf(match);
     final highlight = last ?? (events.isEmpty ? null : events.last);
     final (home, away) = scoreOf(match);
+    final status = statusOf(match, now ?? DateTime.now());
+    final suffix = switch (status) {
+      NewsDTO.matchStatusFinished => 'fim de jogo',
+      NewsDTO.matchStatusHalfTime => 'intervalo',
+      _ => 'ao vivo',
+    };
     final homeTeam = teams[match.homeTeamId];
     final awayTeam = teams[match.awayTeamId];
     return NewsDTO(
@@ -125,7 +144,7 @@ class LiveMatchCard {
       tag: NewsDTO.liveTag,
       isVisible: true,
       // Lido pelo app antigo (que não conhece a tag) como notícia comum.
-      title: '${match.homeTeam} $home × $away ${match.awayTeam} · ao vivo',
+      title: '${match.homeTeam} $home × $away ${match.awayTeam} · $suffix',
       description: highlight == null ? '' : eventText(highlight),
       region: match.region,
       homeTeam: match.homeTeam,
@@ -144,6 +163,7 @@ class LiveMatchCard {
       regionIds: match.regionIds,
       lastEvent: highlight,
       liveEvents: events,
+      matchStatus: status,
     );
   }
 

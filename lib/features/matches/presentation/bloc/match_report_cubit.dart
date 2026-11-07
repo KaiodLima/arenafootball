@@ -226,6 +226,9 @@ class MatchReportCubit extends Cubit<MatchReportState> {
   final DelayMatchUseCase delayMatchUseCase;
   String? _season;
 
+  /// Temporada da partida (exportar a súmula).
+  String? get season => _season;
+
   MatchReportCubit(
     this.watchTeamPlayersUseCase,
     this.saveMatchReportUseCase,

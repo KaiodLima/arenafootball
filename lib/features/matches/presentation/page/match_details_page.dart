@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/matches/presentation/export/match_report_export.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
 import 'package:arena_soccer/features/matches/domain/match_manage_access.dart';
 import 'package:arena_soccer/app_routes.dart';
@@ -135,6 +136,11 @@ class MatchDetailsPage extends StatelessWidget {
                             homeCrest: homeCrest,
                             awayCrest: awayCrest,
                           ),
+                        ),
+                        CardMenuAction(
+                          icon: Icons.picture_as_pdf_outlined,
+                          label: l10n.matchReportExport,
+                          onSelected: () => showMatchReportExport(context, match: match, season: season),
                         ),
                         CardMenuAction(
                           icon: Icons.sports_soccer_rounded,

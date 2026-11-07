@@ -42,6 +42,8 @@ class LiveMatchCard extends StatelessWidget {
     final homeAccent = accentOf(news.homeColor);
     final awayAccent = accentOf(news.awayColor);
     final last = news.lastEvent;
+    final finished = news.matchStatus == NewsDTO.matchStatusFinished;
+    final halfTime = news.matchStatus == NewsDTO.matchStatusHalfTime;
     final previous = [
       for (final e in news.liveEvents.reversed)
         if (e.id != last?.id) e,
@@ -81,7 +83,12 @@ class LiveMatchCard extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s10, AppSizes.s6, 0),
                   child: Row(
                     children: [
-                      const _LivePill(),
+                      if (finished)
+                        _StatusPill(label: l10n.liveFullTime, color: AppColors.textPrimary)
+                      else if (halfTime)
+                        _StatusPill(label: l10n.reportHalfTime, color: AppColors.gold, foreground: AppColors.textPrimary)
+                      else
+                        const _LivePill(),
                       const SizedBox(width: AppSizes.s8),
                       Expanded(
                         child: Text(
@@ -101,7 +108,7 @@ class LiveMatchCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(child: _Team(name: news.homeTeam, crest: news.homeCrest, accent: homeAccent)),
-                      _Score(home: news.homeGoals, away: news.awayGoals, minute: last?.minute),
+                      _Score(home: news.homeGoals, away: news.awayGoals, minute: finished ? null : last?.minute),
                       Expanded(child: _Team(name: news.awayTeam, crest: news.awayCrest, accent: awayAccent)),
                     ],
                   ),
@@ -213,6 +220,26 @@ class _LivePillState extends State<_LivePill> with SingleTickerProviderStateMixi
       ),
     );
   }
+}
+
+/// Pílula parada da fase (intervalo, fim de jogo).
+class _StatusPill extends StatelessWidget {
+  final String label;
+  final Color color;
+  final Color foreground;
+
+  const _StatusPill({required this.label, required this.color, this.foreground = AppColors.white});
+
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s4),
+        decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(AppSizes.s20)),
+        child: Text(
+          label.toUpperCase(),
+          style: AppTypography.label(color: foreground)
+              .copyWith(fontSize: AppSizes.s10, letterSpacing: 0.8, fontWeight: FontWeight.w800),
+        ),
+      );
 }
 
 /// Escudo num círculo branco com anel na cor do time, nome embaixo.

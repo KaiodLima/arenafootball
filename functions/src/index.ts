@@ -49,7 +49,7 @@ import {
   shouldRunBatch,
   worthReplacing,
 } from './recompress';
-import { candidateOf, electBestPlayer, rulesOf, voteOf, votingJustClosed } from './best_player';
+import { candidateOf, electBestPlayer, participantNames, rulesOf, voteOf, votingJustClosed } from './best_player';
 import type { DocumentReference, FieldValue as FieldValueType, Firestore } from 'firebase-admin/firestore';
 import type { Messaging } from 'firebase-admin/messaging';
 import type { Storage } from 'firebase-admin/storage';
@@ -97,6 +97,10 @@ import {
   resultNews,
   resultNewsId,
   shouldPostResult,
+  liveCardStatusOf,
+  liveCardStatusUpdate,
+  liveNewsId,
+  LiveCardStatus,
 } from './match_result';
 import { shouldPostVoteCard, voteCardNews, voteNewsId } from './vote_card';
 import { rankingDelta, rankingDocId, scorePrediction } from './predictions';
@@ -297,6 +301,9 @@ export const onMatchUpdated = onDocumentUpdated('{colecao}/{matchId}', async (ev
       .update({ votacao: String(after.votacao) === 'true' ? 'true' : 'false' })
       .catch((error) => logger.warn('Card de votação não atualizado', { matchId, error: String(error) }));
   }
+  // Card ao vivo: intervalo / 2º tempo acompanham (o fim é marcado no postResult).
+  const liveStatus = before.status !== after.status ? liveCardStatusOf(after.status) : null;
+  if (liveStatus && liveStatus !== 'encerrada') await syncLiveCardStatus(matchId, liveStatus, after);
   // Card de resultado: o admin encerrou agora → posta; placar corrigido → atualiza.
   if (justFinished && !after.resultadoNoticia) {
     await postResult(colecao, await currentSeason(), matchId, after);
@@ -313,7 +320,11 @@ async function recordBestPlayer(collection: string, season: string, matchId: str
   try {
     const { db, FieldValue } = await admin();
     const matchRef = db.collection(collection).doc(matchId);
-    const [votesSnap, config] = await Promise.all([matchRef.collection('votos').get(), db.doc('config/votacao').get()]);
+    const [votesSnap, config, matchSnap] = await Promise.all([
+      matchRef.collection('votos').get(),
+      db.doc('config/votacao').get(),
+      matchRef.get(),
+    ]);
     const votes = votesSnap.docs.map((doc) => voteOf(doc.id, doc.data()));
     // Só os atletas votados (o voto grava o nome como no cadastro): até 30 por consulta.
     const names = [...new Set(votes.map((v) => v.name).filter((n) => n.trim()))];
@@ -325,7 +336,8 @@ async function recordBestPlayer(collection: string, season: string, matchId: str
         .get();
       candidates.push(...players.docs.map((doc) => candidateOf(doc.id, doc.data())));
     }
-    const best = electBestPlayer(votes, candidates, rulesOf(config.data()));
+    // Só quem participou da partida (súmula) pode ser o craque.
+    const best = electBestPlayer(votes, candidates, rulesOf(config.data()), participantNames(matchSnap.data() ?? {}));
     await matchRef.update({ craque: best ?? FieldValue.delete() });
   } catch (error) {
     logger.error('Falha ao apurar o craque', { collection, matchId, error: String(error) });
@@ -395,8 +407,20 @@ async function postResult(collection: string, season: string, matchId: string, m
     logger.info('Card de resultado já existia', { match: `${collection}/${matchId}`, error: String(error) });
   }
   await db.collection(collection).doc(matchId).update({ resultadoNoticia: ref.id });
+  // O card ao vivo deixa de dizer "ao vivo" (fim pelo admin, pelo horário ou automático).
+  await syncLiveCardStatus(matchId, 'encerrada', match);
   await scorePredictions(collection, season, matchId, match);
   await recomputeMatchGroups(season, { ...match, resultadoNoticia: ref.id });
+}
+
+/** Marca a fase no card ao vivo da partida (sem card ao vivo, nada a fazer). */
+async function syncLiveCardStatus(matchId: string, status: LiveCardStatus, match: Record<string, unknown>) {
+  const { db } = await admin();
+  await db
+    .collection('noticias')
+    .doc(liveNewsId(matchId))
+    .update(liveCardStatusUpdate(status, match))
+    .catch((error) => logger.info('Card ao vivo não atualizado', { matchId, status, error: String(error) }));
 }
 
 /**

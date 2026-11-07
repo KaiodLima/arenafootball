@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { candidateOf, electBestPlayer, rulesOf, voteOf, votingJustClosed } from '../best_player';
+import { candidateOf, electBestPlayer, participantNames, rulesOf, voteOf, votingJustClosed } from '../best_player';
 
 const rules = { minVotes: 3, minPercent: 35 };
 const candidates = [
@@ -43,4 +43,38 @@ test('regras do config e padrões; fechamento da votação', () => {
   assert.deepEqual(rulesOf({ minVotos: 5, percentualMinimo: 50 }), { minVotes: 5, minPercent: 50 });
   assert.equal(votingJustClosed({ votacao: 'true' }, { votacao: 'false' }), true);
   assert.equal(votingJustClosed({ votacao: 'false' }, { votacao: 'false' }), false);
+});
+
+test('craque: só quem participou da partida (súmula) recebe voto que conta', () => {
+  const match = {
+    idTimeC: 't1',
+    idTimeF: 't2',
+    escalacao: {
+      casa: [
+        { idJogador: 'p1', jogador: 'Kaio', titular: true },
+        { idJogador: 'p2', jogador: 'Banco', titular: false },
+        { idJogador: 'p3', jogador: 'Rui', titular: false },
+      ],
+      fora: [],
+    },
+    substituicoes: [{ lado: 'casa', entra: 'Rui', sai: 'Kaio' }],
+    gols: [{ lado: 'casa', jogador: 'Kaio', assistencia: 'Garçom' }],
+    cartoes: [{ lado: 'fora', jogador: 'Dudu' }],
+  };
+  const participants = participantNames(match);
+  assert.deepEqual([...(participants.home ?? [])].sort(), ['garçom', 'kaio', 'rui']);
+  // Visitante sem escalação: nulo (todos valem).
+  assert.equal(participants.away, null);
+
+  const rules = { minVotes: 2, minPercent: 35 };
+  const ballots = [
+    voteOf('a', { nome: 'Banco', idTime: 't1' }),
+    voteOf('b', { nome: 'Banco', idTime: 't1' }),
+    voteOf('c', { nome: 'Banco', idTime: 't1' }),
+    voteOf('d', { nome: 'Rui', idTime: 't1' }),
+    voteOf('e', { nome: 'Rui', idTime: 't1' }),
+  ];
+  // Sem a regra, o reserva que não entrou venceria; com ela, os votos dele não contam.
+  assert.equal(electBestPlayer(ballots, [], rules)?.nome, 'Banco');
+  assert.equal(electBestPlayer(ballots, [], rules, participants)?.nome, 'Rui');
 });

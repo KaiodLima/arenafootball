@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/matches/presentation/export/match_report_export.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_report_dtos.dart';
 import 'package:arena_soccer/features/matches/domain/match_report.dart';
@@ -251,6 +252,13 @@ class MatchReportPage extends StatelessWidget {
             child: Scaffold(
               backgroundColor: AppColors.background,
               appBar: AppBar(
+                actions: [
+                  IconButton(
+                    tooltip: l10n.matchReportExportPdf,
+                    icon: const Icon(Icons.picture_as_pdf_outlined),
+                    onPressed: () => showMatchReportExport(context, match: match, season: cubit.season, draft: state.dirty),
+                  ),
+                ],
                 backgroundColor: AppColors.primaryDark,
                 foregroundColor: AppColors.white,
                 surfaceTintColor: AppColors.transparent,

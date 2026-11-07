@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/export_match_report_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/sync_live_match_card_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/update_match_goals_usecase.dart';
 import 'package:arena_soccer/features/matches/data/datasources/matches_datasource.dart';
@@ -34,6 +35,7 @@ void registerMatchesDependencies() {
   _sl.registerLazySingleton(() => UpdateMatchGoalsUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => PublishGoalCardsUseCase(_sl(), _sl(), _sl()));
   _sl.registerLazySingleton(() => SyncLiveMatchCardUseCase(_sl(), _sl(), _sl()));
+  _sl.registerLazySingleton(() => ExportMatchReportUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => SaveMatchReportUseCase(_sl(), _sl(), _sl(), _sl()));
   _sl.registerLazySingleton(() => GetTodayMatchesUseCase(_sl()));
   _sl.registerLazySingleton(() => GetRegionMatchesUseCase(_sl()));

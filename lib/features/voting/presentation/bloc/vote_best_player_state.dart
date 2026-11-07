@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/core/utils/search_text.dart';
+import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
+import 'package:arena_soccer/features/players/presentation/bloc/team_players_state.dart';
 import 'package:arena_soccer/features/voting/data/dtos/vote_dto.dart';
 
 /// Elencos dos dois times, o jogador escolhido, o voto atual do usuário e o
@@ -130,4 +132,21 @@ class ErrorVoteBestPlayerState extends VoteBestPlayerState {
 
   @override
   List<Object?> get props => [...super.props, errorMessage, errorCode];
+}
+
+/// Lista da votação agrupada por posição (goleiros → atacantes, sem posição
+/// no fim); dentro do setor, por nome. Seção vazia não aparece.
+List<({PlayerPosition? position, List<PlayerDTO> players})> votingSections(List<PlayerDTO> players) {
+  final byOrder = <int, List<PlayerDTO>>{};
+  for (final p in players) {
+    byOrder.putIfAbsent(positionOrder(p), () => []).add(p);
+  }
+  final orders = byOrder.keys.toList()..sort();
+  return [
+    for (final o in orders)
+      (
+        position: o < PlayerPosition.values.length ? PlayerPosition.values[o] : null,
+        players: byOrder[o]!..sort((a, b) => foldForSearch(a.name).compareTo(foldForSearch(b.name))),
+      ),
+  ];
 }

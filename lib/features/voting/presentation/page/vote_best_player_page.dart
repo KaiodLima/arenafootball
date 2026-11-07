@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/players/presentation/widgets/squad_player_row.dart';
+import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
+import 'package:arena_soccer/features/matches/domain/match_report.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/page_title_bar.dart';
@@ -141,13 +146,48 @@ class _VoteBestPlayerPageState extends State<VoteBestPlayerPage> {
     if (players.isEmpty) {
       return [fill(ArenaEmptyState(message: l10n.votingNoSearchResults, icon: Icons.search_off_rounded))];
     }
+    // Só quem participou (o time tem escalação na súmula): avisa.
+    final onlyParticipants =
+        MatchReport.participants(widget.match, state.showAway ? MatchSide.away : MatchSide.home) != null;
+    final rows = <Object>[
+      for (final section in votingSections(players)) ...[section.position ?? '', ...section.players],
+    ];
+    final counts = {for (final s in votingSections(players)) s.position ?? '': s.players.length};
     return [
+      if (onlyParticipants)
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s8),
+          sliver: SliverToBoxAdapter(
+            child: Row(
+              children: [
+                const Icon(Icons.info_outline_rounded, size: AppSizes.s16, color: AppColors.textSecondary),
+                const SizedBox(width: AppSizes.s6),
+                Expanded(
+                  child: Text(l10n.votingOnlyParticipants, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+                ),
+              ],
+            ),
+          ),
+        ),
       SliverPadding(
         padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s24),
         sliver: SliverList.builder(
-          itemCount: players.length,
+          itemCount: rows.length,
           itemBuilder: (context, index) {
-            final player = players[index];
+            final row = rows[index];
+            if (row is! PlayerDTO) {
+              // Título do setor ("GOLEIROS · 1").
+              final position = row is PlayerPosition ? row : null;
+              return Padding(
+                padding: EdgeInsets.fromLTRB(AppSizes.s4, index == 0 ? 0 : AppSizes.s12, AppSizes.s4, AppSizes.s6),
+                child: Text(
+                  '${squadSectionTitle(l10n, position).toUpperCase()}  ·  ${counts[row] ?? 0}',
+                  style: AppTypography.label(color: AppColors.textSecondary)
+                      .copyWith(fontSize: AppSizes.s12, letterSpacing: 0.6),
+                ),
+              );
+            }
+            final player = row;
             // O atleta da própria conta não pode ser votado por ela.
             final isSelf = !isGuest && player.userId.isNotEmpty && player.userId == _voterId;
             return VotePlayerTile(

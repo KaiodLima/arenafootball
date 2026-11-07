@@ -98,4 +98,14 @@ void main() {
     expect(find.text("12'"), findsOneWidget);
     expect(find.text('Ver partida'), findsOneWidget);
   });
+
+  testWidgets('partida encerrada: "FIM DE JOGO" e sem o minuto; intervalo: "INTERVALO"', (tester) async {
+    await _pump(tester, _card(_goal, const [_goal]).copyWith(matchStatus: NewsDTO.matchStatusFinished), 412);
+    expect(find.text('FIM DE JOGO'), findsOneWidget);
+    expect(find.text('AO VIVO'), findsNothing);
+    expect(find.text("12'"), findsNothing);
+    await _pump(tester, _card(_goal, const [_goal]).copyWith(matchStatus: NewsDTO.matchStatusHalfTime), 412);
+    expect(find.text('INTERVALO'), findsOneWidget);
+    expect(find.text('AO VIVO'), findsNothing);
+  });
 }

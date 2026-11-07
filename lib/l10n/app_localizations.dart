@@ -1335,6 +1335,264 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @pdfTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'SÚMULA DA PARTIDA'**
+  String get pdfTitle;
+
+  /// No description provided for @pdfDraft.
+  ///
+  /// In pt, this message translates to:
+  /// **'RASCUNHO - alterações não salvas'**
+  String get pdfDraft;
+
+  /// No description provided for @pdfMatchInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dados do jogo'**
+  String get pdfMatchInfo;
+
+  /// No description provided for @pdfDate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Data'**
+  String get pdfDate;
+
+  /// No description provided for @pdfTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'Horário'**
+  String get pdfTime;
+
+  /// No description provided for @pdfVenue.
+  ///
+  /// In pt, this message translates to:
+  /// **'Local'**
+  String get pdfVenue;
+
+  /// No description provided for @pdfRegion.
+  ///
+  /// In pt, this message translates to:
+  /// **'Região'**
+  String get pdfRegion;
+
+  /// No description provided for @pdfDuration.
+  ///
+  /// In pt, this message translates to:
+  /// **'Duração'**
+  String get pdfDuration;
+
+  /// No description provided for @pdfStatus.
+  ///
+  /// In pt, this message translates to:
+  /// **'Situação'**
+  String get pdfStatus;
+
+  /// No description provided for @pdfLineups.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escalações'**
+  String get pdfLineups;
+
+  /// No description provided for @pdfStarters.
+  ///
+  /// In pt, this message translates to:
+  /// **'Titulares'**
+  String get pdfStarters;
+
+  /// No description provided for @pdfReserves.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reservas'**
+  String get pdfReserves;
+
+  /// No description provided for @pdfGoals.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gols'**
+  String get pdfGoals;
+
+  /// No description provided for @pdfBookings.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cartões'**
+  String get pdfBookings;
+
+  /// No description provided for @pdfSubstitutions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Substituições'**
+  String get pdfSubstitutions;
+
+  /// No description provided for @pdfMinute.
+  ///
+  /// In pt, this message translates to:
+  /// **'Min.'**
+  String get pdfMinute;
+
+  /// No description provided for @pdfTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Time'**
+  String get pdfTeam;
+
+  /// No description provided for @pdfPlayer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atleta'**
+  String get pdfPlayer;
+
+  /// No description provided for @pdfScorer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Autor'**
+  String get pdfScorer;
+
+  /// No description provided for @pdfAssist.
+  ///
+  /// In pt, this message translates to:
+  /// **'Assistência'**
+  String get pdfAssist;
+
+  /// No description provided for @pdfType.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tipo'**
+  String get pdfType;
+
+  /// No description provided for @pdfIn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entra'**
+  String get pdfIn;
+
+  /// No description provided for @pdfOut.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sai'**
+  String get pdfOut;
+
+  /// No description provided for @pdfYellow.
+  ///
+  /// In pt, this message translates to:
+  /// **'Amarelo'**
+  String get pdfYellow;
+
+  /// No description provided for @pdfRed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vermelho'**
+  String get pdfRed;
+
+  /// No description provided for @pdfBestPlayer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Craque da partida'**
+  String get pdfBestPlayer;
+
+  /// No description provided for @pdfNotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Observações'**
+  String get pdfNotes;
+
+  /// No description provided for @pdfSignatures.
+  ///
+  /// In pt, this message translates to:
+  /// **'Assinaturas'**
+  String get pdfSignatures;
+
+  /// No description provided for @pdfSignReferee.
+  ///
+  /// In pt, this message translates to:
+  /// **'Árbitro'**
+  String get pdfSignReferee;
+
+  /// No description provided for @pdfSignOrganizer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Organizador'**
+  String get pdfSignOrganizer;
+
+  /// No description provided for @pdfSignCaptain.
+  ///
+  /// In pt, this message translates to:
+  /// **'Capitão - {team}'**
+  String pdfSignCaptain(String team);
+
+  /// No description provided for @pdfNone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum registro'**
+  String get pdfNone;
+
+  /// No description provided for @pdfChampionship.
+  ///
+  /// In pt, this message translates to:
+  /// **'Competição'**
+  String get pdfChampionship;
+
+  /// No description provided for @pdfGeneratedAt.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gerado pelo Arena Football em {date}'**
+  String pdfGeneratedAt(String date);
+
+  /// No description provided for @pdfPage.
+  ///
+  /// In pt, this message translates to:
+  /// **'página {page}/{total}'**
+  String pdfPage(int page, int total);
+
+  /// No description provided for @pdfMinutes.
+  ///
+  /// In pt, this message translates to:
+  /// **'{minutes} min'**
+  String pdfMinutes(int minutes);
+
+  /// No description provided for @pdfCameIn.
+  ///
+  /// In pt, this message translates to:
+  /// **'entrou{minute}'**
+  String pdfCameIn(String minute);
+
+  /// No description provided for @pdfWentOut.
+  ///
+  /// In pt, this message translates to:
+  /// **'saiu{minute}'**
+  String pdfWentOut(String minute);
+
+  /// No description provided for @matchReportExportPdf.
+  ///
+  /// In pt, this message translates to:
+  /// **'Exportar PDF'**
+  String get matchReportExportPdf;
+
+  /// No description provided for @matchReportExport.
+  ///
+  /// In pt, this message translates to:
+  /// **'Exportar súmula'**
+  String get matchReportExport;
+
+  /// No description provided for @matchReportExportError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível gerar o PDF da súmula.'**
+  String get matchReportExportError;
+
+  /// No description provided for @votingOnlyParticipants.
+  ///
+  /// In pt, this message translates to:
+  /// **'Só aparecem os jogadores que participaram da partida.'**
+  String get votingOnlyParticipants;
+
+  /// No description provided for @liveFullTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fim de jogo'**
+  String get liveFullTime;
+
   /// No description provided for @liveEventsTitle.
   ///
   /// In pt, this message translates to:

@@ -178,6 +178,9 @@ class MatchCard extends StatefulWidget {
   /// Admin: "Lançar card de gol" no menu (nulo = sem a ação).
   final VoidCallback? onGoalCard;
 
+  /// Admin/organizador: exporta a súmula em PDF (nulo = sem o item).
+  final VoidCallback? onExport;
+
   /// Admin: iniciar, intervalo, 2º tempo ou encerrar na mão (nulo = sem as ações).
   final ValueChanged<MatchPhase>? onSetPhase;
 
@@ -208,6 +211,7 @@ class MatchCard extends StatefulWidget {
     this.onTap,
     this.championshipLabel,
     this.onGoalCard,
+    this.onExport,
     this.onSetPhase,
     this.onPredict,
     this.now,
@@ -340,6 +344,12 @@ class _MatchCardState extends State<MatchCard> {
                               label: action.label,
                               onSelected: () => widget.onSetPhase!(action.phase),
                             ),
+                        if (widget.onExport != null)
+                          CardMenuAction(
+                            icon: Icons.picture_as_pdf_outlined,
+                            label: l10n.matchReportExport,
+                            onSelected: widget.onExport!,
+                          ),
                         if (widget.onGoalCard != null)
                           CardMenuAction(
                             icon: Icons.sports_soccer_rounded,

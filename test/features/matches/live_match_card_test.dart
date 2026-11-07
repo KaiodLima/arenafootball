@@ -85,4 +85,20 @@ void main() {
     expect(LiveEvent.fromMap(Map<String, dynamic>.from(map['ultimo_lance'] as Map)), card.lastEvent);
     expect(map['escudo_casa'], 'https://x/l.png');
   });
+
+  test('fase do card: encerrada, intervalo ou andamento (não volta a "ao vivo")', () {
+    final finished = _base.copyWith(goals: const [_goal], manualStatus: MatchManualStatus.finished);
+    final card = LiveMatchCard.build(finished, teams);
+    expect(card.matchStatus, NewsDTO.matchStatusFinished);
+    expect(card.title, 'Leões 1 × 0 Tigres · fim de jogo');
+    expect(card.toMap()['status_partida'], 'encerrada');
+
+    final halfTime = _base.copyWith(manualStatus: MatchManualStatus.halfTime);
+    expect(LiveMatchCard.statusOf(halfTime, DateTime(2026, 11, 7)), NewsDTO.matchStatusHalfTime);
+    expect(LiveMatchCard.statusOf(_base, DateTime(2026, 11, 7)), NewsDTO.matchStatusLive);
+
+    // Sem nada marcado, mas passado o fim esperado (horário + duração): encerrada.
+    final old = _base.copyWith(date: '01/11/2026', time: '15:00');
+    expect(LiveMatchCard.statusOf(old, DateTime(2026, 11, 7)), NewsDTO.matchStatusFinished);
+  });
 }

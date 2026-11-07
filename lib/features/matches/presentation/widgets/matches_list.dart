@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/matches/presentation/export/match_report_export.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
 import 'package:arena_soccer/features/matches/domain/match_manage_access.dart';
 import 'package:arena_soccer/app_routes.dart';
@@ -185,6 +186,7 @@ class MatchesList extends StatelessWidget {
                         onPause: () => BlocProvider.of<MatchesCubit>(context).setPhase(match, MatchPhase.wait),
                       )
                   : null,
+              onExport: manages(match) ? () => showMatchReportExport(context, match: match, season: season) : null,
               onGoalCard: manages(match)
                   ? () => Navigator.pushNamed(
                         context,
