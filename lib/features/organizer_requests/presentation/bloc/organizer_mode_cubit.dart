@@ -68,12 +68,29 @@ class OrganizerModeCubit extends Cubit<OrganizerModeState> {
   }
 
   /// Cria o índice que falta dos campeonatos novos nesta sessão (aprovados
-  /// antes do índice existir); falha só fica no log.
+  /// antes do índice existir). Só fica marcado quando deu certo: falhou
+  /// (regras ainda sem publicar, sem rede), tenta de novo na próxima vez.
   Future<void> _ensureIndexes(String userId, List<ChampionshipDTO> championships) async {
     final useCase = ensureMyIndexesUseCase;
     if (useCase == null) return;
-    final pending = [for (final c in championships) if (_indexed.add(c.id)) c];
-    if (pending.isNotEmpty) await useCase(userId, pending);
+    final pending = [for (final c in championships) if (!_indexed.contains(c.id)) c];
+    if (pending.isEmpty) return;
+    final response = await useCase(userId, pending);
+    if (response.isRight) _indexed.addAll(pending.map((c) => c.id));
+  }
+
+  /// Garante o índice da competição [championshipId] antes de gravar
+  /// (partida, elenco). Devolve se o índice existe ou foi criado.
+  Future<bool> ensureIndexFor(int championshipId) async {
+    final userId = _userId;
+    final useCase = ensureMyIndexesUseCase;
+    final championship = state.championships.where((c) => c.championshipId == championshipId).firstOrNull;
+    if (userId == null || useCase == null || championship == null) return false;
+    if (_indexed.contains(championship.id)) return true;
+    final response = await useCase(userId, [championship]);
+    if (response.isLeft) return false;
+    _indexed.add(championship.id);
+    return true;
   }
 
   /// Troca entre torcedor e organizador (lembrado no aparelho, por conta).

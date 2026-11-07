@@ -294,7 +294,8 @@ service cloud.firestore {
         || (isPlayers() && ownsTeam(request.resource.data))
         || partnerCreate()
         || organizerGroupWrite()
-        || organizerSquadCreate());
+        || organizerSquadCreate()
+        || organizerMatchCreate());
       // As inscrições por competição nunca somem do atleta (o app antigo
       // regravava o documento inteiro sem elas): esvaziar pode, apagar não.
       function keepsEnrollments() {
@@ -412,6 +413,26 @@ service cloud.firestore {
           && (!(key in after) || (entry.get('nGols', 0) == 0 && entry.get('nAssistencias', 0) == 0))
           && addedTeams.hasOnly([entry.get('idTime', '-'), resource.data.get('idTime', '-')])
           && organizerTeamIn(key, entry.get('idTime', '-'));
+      }
+
+      // Organizador cadastra partida da competição dele: os dois times
+      // inscritos nela, partida zerada (sem placar, status, votação aberta nem
+      // súmula) e só os campos do cadastro. Editar/apagar seguem com o admin.
+      function organizerMatchCreate() {
+        let d = request.resource.data;
+        let key = 'c' + string(d.get('id_campeonato', -1));
+        return collection.matches('partidas([0-9]{4})?') && signedIn()
+          && d.keys().hasOnly(['id_partida', 'timeC', 'timeF', 'idTimeC', 'idTimeF', 'data', 'horario', 'local',
+            'id_campeonato', 'fk_competicao', 'idRegiao', 'golTimeCasa', 'golTimeFora', 'votacao', 'tituloVotacao',
+            'melhorJogador', 'quantidadeVotos', 'dataRegistro', 'idsRegioes', 'duracao'])
+          && d.id_partida == docId
+          && d.get('golTimeCasa', 0) == 0 && d.get('golTimeFora', 0) == 0
+          // `quantidadeVotos` nasce '' no app (formato do app antigo) ou 0.
+          && d.get('votacao', 'false') == 'false' && d.get('quantidadeVotos', '') in ['', '0', 0]
+          && d.get('melhorJogador', '') == ''
+          && d.dataRegistro == request.time
+          && d.get('idTimeC', '') != '' && d.get('idTimeF', '') != '' && d.idTimeC != d.idTimeF
+          && organizerTeamIn(key, d.idTimeC) && organizerTeamIn(key, d.idTimeF);
       }
 
       // Atleta novo já inscrito só na competição do organizador, pelo time.

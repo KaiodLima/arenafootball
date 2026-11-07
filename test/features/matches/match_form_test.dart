@@ -201,6 +201,41 @@ void main() {
       await cubit.load(initialRegion: 'Floresta', now: DateTime(2026, 10, 18));
     });
 
+    test('organizador: competição fixa, só os times inscritos e sem amistoso', () async {
+      // A região tem outro campeonato; o do organizador é o único oferecido.
+      final championships = _FakeChampionships()
+        ..list = const [ChampionshipDTO(id: 'x', championshipId: 3, title: 'Outra')];
+      final organizer = MatchFormCubit(
+        CreateMatchUseCase(repository, championship),
+        _FakeRegions(),
+        _FakeTeams(),
+        GetRegionMatchesUseCase(repository),
+        championships,
+      );
+      const mine = ChampionshipDTO(
+        id: 'm',
+        championshipId: 11,
+        title: 'Copa Sol',
+        region: 'Floresta',
+        teams: ['Volta', 'Riacho'],
+        teamIds: ['2', '3'],
+      );
+      await organizer.loadForChampionship(mine, now: DateTime(2026, 10, 18));
+      final form = organizer.state.form;
+      expect(form.selectedRegion, 'Floresta');
+      expect(form.championships.map((c) => c.championshipId), [11]);
+      expect(form.championshipId, 11);
+      expect(form.isFriendly, isFalse);
+      expect(form.teams.map((t) => t.name), ['Volta', 'Riacho']);
+
+      organizer.selectTime('19:00');
+      await organizer.submit();
+      final created = repository.created.last;
+      expect(created.championshipId, 11);
+      expect({created.homeTeamId, created.awayTeamId}, {'2', '3'});
+      await organizer.close();
+    });
+
     test('vários campeonatos: times do escolhido e id gravado na partida', () async {
       final championships = _FakeChampionships()
         ..list = const [

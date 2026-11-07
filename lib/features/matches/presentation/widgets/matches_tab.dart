@@ -123,6 +123,11 @@ class _OrganizerMatchesState extends State<_OrganizerMatches> {
             region: championship.region,
             season: season,
             filterKey: _filterKey,
+            onRegister: () => Navigator.pushNamed(
+              context,
+              AppRoutes.registerMatchPage,
+              arguments: {'championship': championship},
+            ),
           ),
         ),
       ],
@@ -239,10 +244,14 @@ class _DayMatches extends StatefulWidget {
     required this.region,
     required this.season,
     this.filterKey,
+    this.onRegister,
   });
 
   /// Âncora do filtro de competição (do pai), para o tour da aba.
   final GlobalKey? filterKey;
+
+  /// Organizador: "Nova partida" na competição (nulo = sem o atalho).
+  final VoidCallback? onRegister;
 
   @override
   State<_DayMatches> createState() => _DayMatchesState();
@@ -317,6 +326,7 @@ class _DayMatchesState extends State<_DayMatches> {
             championships: widget.championships,
             region: widget.region,
             season: widget.season,
+            onRegister: widget.onRegister,
           ),
           const SizedBox(height: AppSizes.s20),
           MatchDaySwitch(key: _dayKey, selected: _day, onChanged: _selectDay),
@@ -344,6 +354,7 @@ class _Shortcuts extends StatelessWidget {
   final List<ChampionshipDTO> championships;
   final String region;
   final String season;
+  final VoidCallback? onRegister;
 
   const _Shortcuts({
     super.key,
@@ -351,6 +362,7 @@ class _Shortcuts extends StatelessWidget {
     required this.championships,
     required this.region,
     required this.season,
+    this.onRegister,
   });
 
   void _openStats(BuildContext context, StatsRankingType type) => Navigator.pushNamed(
@@ -383,6 +395,12 @@ class _Shortcuts extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (onRegister != null)
+          ShortcutTile(
+            title: l10n.organizerNewMatch,
+            icon: Icons.add_circle_outline_rounded,
+            onTap: onRegister!,
+          ),
         ShortcutTile(
           title: l10n.matchesAllGames,
           icon: Icons.calendar_month_rounded,

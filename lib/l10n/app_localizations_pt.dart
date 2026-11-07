@@ -734,6 +734,22 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String organizerMatchTeamNotEnrolled(String team) {
+    return '$team não está inscrito nesta competição. Inscreva o time pela aba Times.';
+  }
+
+  @override
+  String get organizerPermissionDenied =>
+      'Sem permissão para gravar nesta competição. Peça ao admin para abrir o painel \"Organizadores de campeonato\" e tente de novo.';
+
+  @override
+  String get organizerNewMatch => 'Nova partida';
+
+  @override
+  String get organizerMatchNeedsTeams =>
+      'Inscreva ao menos 2 times na competição (aba Times) para cadastrar partidas.';
+
+  @override
   String get squadGoalkeepers => 'Goleiros';
 
   @override

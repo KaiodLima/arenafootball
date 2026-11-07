@@ -171,6 +171,10 @@ class _GroupsView extends StatelessWidget {
         floatingActionButton: state.loading || state.error
             ? null
             : FloatingActionButton.extended(
+                backgroundColor: palette.primary,
+                foregroundColor: AppColors.white,
+                // O tema usa círculo (FAB "+" da home); com texto, pílula.
+                shape: const StadiumBorder(),
                 onPressed: state.busy ? null : () => _edit(context),
                 icon: const Icon(Icons.add_rounded),
                 label: Text(l10n.organizerGroupNew),

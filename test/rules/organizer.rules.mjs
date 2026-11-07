@@ -103,6 +103,27 @@ export default async function run(env, check) {
     assertFails(setDoc(doc(org, 'campeonatos_org/c10'), { idOrganizador: 'org1', idCampeonatoDoc: 'c3' })));
   await check('usuário comum não cria índice',
     assertFails(setDoc(doc(other, 'campeonatos_org/c15'), { idOrganizador: 'u2', idCampeonatoDoc: 'c7' })));
+  // Partidas da competição do organizador (c11 = Copa Sol, times ['t1']).
+  await seed('campeonatos/c4', { titulo: 'Copa Sol', id_campeonato: 11, ids_times: ['t1', 't2'], idOrganizador: 'org1' });
+  const match = (id, extra = {}) => ({
+    id_partida: id, timeC: 'Leões', timeF: 'Tigres', idTimeC: 't1', idTimeF: 't2', data: '10/12/2026', horario: '16:00',
+    local: 'Campo', id_campeonato: 11, fk_competicao: 'Colônia', idRegiao: 'co', golTimeCasa: 0, golTimeFora: 0,
+    votacao: 'false', tituloVotacao: '', melhorJogador: '', quantidadeVotos: '', dataRegistro: serverTimestamp(),
+    duracao: 90, ...extra,
+  });
+  await check('organizador cadastra partida da competição dele', assertSucceeds(setDoc(doc(org, 'partidas2026/m1'), match('m1'))));
+  await check('partida em competição de outro recusada',
+    assertFails(setDoc(doc(org, 'partidas2026/m2'), match('m2', { id_campeonato: 12 }))));
+  await check('partida com time fora da competição recusada',
+    assertFails(setDoc(doc(org, 'partidas2026/m3'), match('m3', { idTimeF: 't9' }))));
+  await check('partida com placar recusada', assertFails(setDoc(doc(org, 'partidas2026/m4'), match('m4', { golTimeCasa: 2 }))));
+  await check('partida com votos recusada', assertFails(setDoc(doc(org, 'partidas2026/m8'), match('m8', { quantidadeVotos: '7' }))));
+  await check('partida com status recusada', assertFails(setDoc(doc(org, 'partidas2026/m5'), match('m5', { status: 'encerrada' }))));
+  await check('partida com o mesmo time dos dois lados recusada',
+    assertFails(setDoc(doc(org, 'partidas2026/m6'), match('m6', { idTimeF: 't1' }))));
+  await check('organizador não edita a partida', assertFails(updateDoc(doc(org, 'partidas2026/m1'), { horario: '17:00' })));
+  await check('organizador não apaga a partida', assertFails(deleteDoc(doc(org, 'partidas2026/m1'))));
+  await check('usuário comum não cadastra partida', assertFails(setDoc(doc(other, 'partidas2026/m7'), match('m7'))));
   await check('usuário comum não inscreve', assertFails(updateDoc(doc(other, 'jogadores2026/p1'), { 'inscricoes.c11': entry })));
   const fresh = {
     idJogador: 'p2', nome: 'Bia', time: 'Leões', idTime: 't1', urlImagem: '', nGols: 0, nAssistencias: 0,

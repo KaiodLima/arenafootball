@@ -1335,6 +1335,30 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @organizerMatchTeamNotEnrolled.
+  ///
+  /// In pt, this message translates to:
+  /// **'{team} não está inscrito nesta competição. Inscreva o time pela aba Times.'**
+  String organizerMatchTeamNotEnrolled(String team);
+
+  /// No description provided for @organizerPermissionDenied.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem permissão para gravar nesta competição. Peça ao admin para abrir o painel \"Organizadores de campeonato\" e tente de novo.'**
+  String get organizerPermissionDenied;
+
+  /// No description provided for @organizerNewMatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nova partida'**
+  String get organizerNewMatch;
+
+  /// No description provided for @organizerMatchNeedsTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inscreva ao menos 2 times na competição (aba Times) para cadastrar partidas.'**
+  String get organizerMatchNeedsTeams;
+
   /// No description provided for @squadGoalkeepers.
   ///
   /// In pt, this message translates to:

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/team_players_cubit.dart';
@@ -83,6 +85,8 @@ class OrganizerSquadActions extends StatelessWidget {
       ),
     );
     if (picked == null || picked.isEmpty || !context.mounted) return;
+    await BlocProvider.of<OrganizerModeCubit>(context).ensureIndexFor(championshipId);
+    if (!context.mounted) return;
     final result = await cubit.addToChampionship(picked, championshipId);
     if (!context.mounted) return;
     showSnackBar(
@@ -101,6 +105,8 @@ class OrganizerSquadActions extends StatelessWidget {
       confirmLabel: l10n.matchReportAdd,
     );
     if (result == null || !context.mounted) return;
+    await BlocProvider.of<OrganizerModeCubit>(context).ensureIndexFor(championshipId);
+    if (!context.mounted) return;
     final error = await cubit.createInChampionship(
       championshipId,
       name: result.name,
@@ -161,6 +167,8 @@ Future<void> organizerRemoveFromChampionship(
     tone: ArenaAlertTone.danger,
   );
   if (!confirmed || !context.mounted) return;
+  await BlocProvider.of<OrganizerModeCubit>(context).ensureIndexFor(championshipId);
+  if (!context.mounted) return;
   final error = await cubit.setInChampionship(player, championshipId, enrolled: false);
   if (!context.mounted) return;
   showSnackBar(

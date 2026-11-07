@@ -731,6 +731,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String organizerMatchTeamNotEnrolled(String team) {
+    return '$team is not registered in this competition. Register the team in the Teams tab.';
+  }
+
+  @override
+  String get organizerPermissionDenied =>
+      'No permission to save in this competition. Ask the admin to open the \"Championship organizers\" panel and try again.';
+
+  @override
+  String get organizerNewMatch => 'New match';
+
+  @override
+  String get organizerMatchNeedsTeams =>
+      'Register at least 2 teams in the competition (Teams tab) to add matches.';
+
+  @override
   String get squadGoalkeepers => 'Goalkeepers';
 
   @override

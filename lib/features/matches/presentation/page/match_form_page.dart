@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/utils/app_logger.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
+import 'package:arena_soccer/utils/themes/arena_palette.dart';
+import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/championship_picker.dart';
 import 'package:arena_soccer/features/matches/domain/match_form_hints.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/match_form_cubit.dart';
@@ -26,7 +30,10 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 /// votação fechada. Depois de cadastrar, data/hora/local ficam para a
 /// próxima partida da rodada.
 class MatchFormPage extends StatefulWidget {
-  const MatchFormPage({super.key});
+  /// Organizador: cadastro só nesta competição (região e competição fixas).
+  final ChampionshipDTO? organizerChampionship;
+
+  const MatchFormPage({super.key, this.organizerChampionship});
 
   @override
   State<MatchFormPage> createState() => _MatchFormPageState();
@@ -44,7 +51,12 @@ class _MatchFormPageState extends State<MatchFormPage> {
   void initState() {
     super.initState();
     _cubit = BlocProvider.of<MatchFormCubit>(context);
-    _cubit.load(initialRegion: BlocProvider.of<RegionCubit>(context).state.selectedRegion);
+    final championship = widget.organizerChampionship;
+    if (championship != null) {
+      _cubit.loadForChampionship(championship);
+    } else {
+      _cubit.load(initialRegion: BlocProvider.of<RegionCubit>(context).state.selectedRegion);
+    }
   }
 
   @override
@@ -79,14 +91,31 @@ class _MatchFormPageState extends State<MatchFormPage> {
     home ? _cubit.selectHomeTeam(picked.name) : _cubit.selectAwayTeam(picked.name);
   }
 
-  void _submit(MatchFormData form) {
+  Future<void> _submit(MatchFormData form) async {
     if (!form.canSubmit) {
       FocusScope.of(context).unfocus();
       setState(() => _showErrors = true);
       return;
     }
     FocusScope.of(context).unfocus();
-    _cubit.submit();
+    final championship = widget.organizerChampionship;
+    if (championship != null) {
+      // Organizador: os dois times precisam estar inscritos com o id (a
+      // regra confere os `ids_times`) e o índice da competição tem de existir.
+      final l10n = AppLocalizations.of(context);
+      final notEnrolled = [form.homeTeam, form.awayTeam]
+          .where((name) => !championship.teamIds.contains(form.teamIdOf(name)) || form.teamIdOf(name).isEmpty)
+          .whereType<String>()
+          .toList();
+      if (notEnrolled.isNotEmpty) {
+        showSnackBar(context: context, message: l10n.organizerMatchTeamNotEnrolled(notEnrolled.first), isSuccess: false);
+        return;
+      }
+      final indexed = await BlocProvider.of<OrganizerModeCubit>(context).ensureIndexFor(championship.championshipId);
+      AppLogger.d('organizer index c${championship.championshipId}: $indexed', name: 'MatchFormPage');
+      if (!mounted) return;
+    }
+    await _cubit.submit();
   }
 
   String? _teamsError(MatchFormData form, AppLocalizations l10n) {
@@ -120,24 +149,34 @@ class _MatchFormPageState extends State<MatchFormPage> {
           showSnackBar(context: context, message: l10n.matchFormSaved);
         }
         if (state is ErrorMatchFormState) {
-          showSnackBar(context: context, message: state.errorMessage, isSuccess: false);
+          final denied = widget.organizerChampionship != null && state.errorCode == 'permission-denied';
+          showSnackBar(
+            context: context,
+            message: denied ? l10n.organizerPermissionDenied : state.errorMessage,
+            isSuccess: false,
+          );
         }
       },
       builder: (context, state) {
         final form = state.form;
         final conflicts = form.conflicts;
         final whenError = _whenError(form, l10n);
+        final organizer = widget.organizerChampionship != null;
+        final palette = ArenaPalette.of(context);
+        // Organizador sem 2 times inscritos (depois de carregar os times).
+        final needsTeams =
+            organizer && form.teams.length < 2 && (form.regionTeams.isNotEmpty || form.seasonTeams.isNotEmpty);
 
-        return Scaffold(
+        final page = Scaffold(
           backgroundColor: AppColors.background,
           appBar: AppBar(
-            backgroundColor: AppColors.primaryDark,
+            backgroundColor: organizer ? ArenaPalette.blue.primaryDark : palette.primaryDark,
             foregroundColor: AppColors.white,
             surfaceTintColor: AppColors.transparent,
             leading: IconButton(icon: const Icon(Icons.close_rounded), onPressed: () => Navigator.maybePop(context)),
             titleSpacing: 0,
             title: Text(
-              l10n.matchesFormTitle,
+              organizer ? l10n.organizerNewMatch : l10n.matchesFormTitle,
               style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s20),
             ),
           ),
@@ -152,23 +191,36 @@ class _MatchFormPageState extends State<MatchFormPage> {
             children: [
               // Filtro: de onde vêm os campeonatos e os times oferecidos (não
               // é a região da partida, que aparece no cartão abaixo do confronto).
-              RegionSelectTile(
-                label: l10n.matchFormRegionFilter,
-                region: form.selectedRegion ?? '',
-                regions: form.regions,
-                recent: BlocProvider.of<RegionCubit>(context).state.recentRegions,
-                onChanged: _cubit.selectRegion,
-              ),
-              const SizedBox(height: AppSizes.s6),
-              Text(l10n.matchFormRegionFilterHint, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+              // O organizador não troca: a competição dele já define tudo.
+              if (!organizer) ...[
+                RegionSelectTile(
+                  label: l10n.matchFormRegionFilter,
+                  region: form.selectedRegion ?? '',
+                  regions: form.regions,
+                  recent: BlocProvider.of<RegionCubit>(context).state.recentRegions,
+                  onChanged: _cubit.selectRegion,
+                ),
+                const SizedBox(height: AppSizes.s6),
+                Text(l10n.matchFormRegionFilterHint, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+                const SizedBox(height: AppSizes.s20),
+              ],
               // Campeonato da partida (sempre à vista), ou amistoso.
-              const SizedBox(height: AppSizes.s20),
               _Label(l10n.matchFormChampionship),
-              ChampionshipSelectTile(
-                label: l10n.matchFormPickChampionship,
-                championship: form.championships.where((c) => c.championshipId == form.championshipId).firstOrNull,
-                onTap: () => _pickChampionship(form),
+              IgnorePointer(
+                ignoring: organizer,
+                child: ChampionshipSelectTile(
+                  label: l10n.matchFormPickChampionship,
+                  championship: form.championships.where((c) => c.championshipId == form.championshipId).firstOrNull,
+                  onTap: () => _pickChampionship(form),
+                ),
               ),
+              if (needsTeams) ...[
+                const SizedBox(height: AppSizes.s6),
+                Text(
+                  l10n.organizerMatchNeedsTeams,
+                  style: AppTypography.label(color: AppColors.danger).copyWith(fontSize: AppSizes.s12),
+                ),
+              ],
               if (form.championships.isEmpty) ...[
                 const SizedBox(height: AppSizes.s6),
                 Text(
@@ -254,6 +306,7 @@ class _MatchFormPageState extends State<MatchFormPage> {
             ],
           ),
         );
+        return organizer ? Theme(data: ArenaPalette.organizerTheme(Theme.of(context)), child: page) : page;
       },
     );
   }
