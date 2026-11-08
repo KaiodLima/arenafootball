@@ -35,14 +35,12 @@ const _today = MatchDTO(
 );
 
 class _FakeMatchesRepository implements IMatchesRepository {
-
   @override
   Future<Either<Failure, List<MatchDTO>>> getElectedMatches({required String playerId, String? season}) async =>
       const Right([]);
 
   @override
-  Future<Either<Failure, int>> countElectedMatches({required String playerId, String? season}) async =>
-      const Right(0);
+  Future<Either<Failure, int>> countElectedMatches({required String playerId, String? season}) async => const Right(0);
   bool failUpdate = false;
   int updates = 0;
   final appended = <MatchGoal>[];
@@ -192,7 +190,6 @@ class _FakeChampionships implements GetRegionChampionshipsCacheFirstUseCase {
 }
 
 class _FakePlayersRepository implements IPlayersRepository {
-
   @override
   Future<Either<Failure, PlayerDTO?>> getPlayerByUser({required String userId, String? season}) async =>
       const Right(null);
@@ -376,8 +373,10 @@ void main() {
       expect(createNews.created!.tag, NewsDTO.goalTag);
       expect([createNews.created!.homeGoals, createNews.created!.awayGoals], ['1', '0']);
       // Sem autor: nenhum campo novo no documento.
-      expect(createNews.created!.toMap().keys,
-          isNot(anyOf(contains('autor_gol_id'), contains('assistencia_id'), contains('temporada'), contains('id_partida'))));
+      expect(
+          createNews.created!.toMap().keys,
+          isNot(anyOf(
+              contains('autor_gol_id'), contains('assistencia_id'), contains('temporada'), contains('id_partida'))));
       expect(matches.updates, 0);
       expect(cubit.state, isA<SuccessGoalNotificationState>());
     });

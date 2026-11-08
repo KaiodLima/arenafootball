@@ -734,6 +734,86 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchCardTomorrow => 'AMANHÃ';
 
   @override
+  String get shareArtTemplateVibrant => 'Cores';
+
+  @override
+  String get shareArtTemplatePoster => 'Fim de jogo';
+
+  @override
+  String get shareArtTemplateFaceOff => 'Confronto';
+
+  @override
+  String get shareArtTemplateEditorial => 'Editorial';
+
+  @override
+  String get shareArtTitle => 'Gerar arte';
+
+  @override
+  String get shareArtTemplate => 'Modelo';
+
+  @override
+  String get shareArtFormat => 'Formato';
+
+  @override
+  String get shareArtFormatFeed => 'Feed 4:5';
+
+  @override
+  String get shareArtFormatStory => 'Story 9:16';
+
+  @override
+  String get shareArtFormatSquare => 'Quadrado';
+
+  @override
+  String get shareArtFormatLandscape => 'Paisagem';
+
+  @override
+  String get shareArtQr => 'Incluir QR Code';
+
+  @override
+  String get shareArtSave => 'Salvar';
+
+  @override
+  String get shareArtInstagram => 'Instagram';
+
+  @override
+  String get shareArtSaved => 'Arte salva na galeria.';
+
+  @override
+  String get shareArtSaveError => 'Não foi possível salvar na galeria.';
+
+  @override
+  String get shareArtError => 'Não foi possível gerar a arte.';
+
+  @override
+  String get shareArtCallToAction => 'Confira mais no Arena Football';
+
+  @override
+  String shareArtHalfTime(String score) {
+    return '1º tempo $score';
+  }
+
+  @override
+  String shareArtMissing(String items) {
+    return 'Sem cadastro: $items. A arte sai sem esses dados.';
+  }
+
+  @override
+  String shareArtMissingCrest(String team) {
+    return 'escudo do $team';
+  }
+
+  @override
+  String get shareArtMissingVenue => 'local';
+
+  @override
+  String get shareArtMissingDate => 'data';
+
+  @override
+  String shareArtShareText(String home, String away, String link) {
+    return '$home x $away no Arena Football: $link';
+  }
+
+  @override
   String get pdfTitle => 'SÚMULA DA PARTIDA';
 
   @override

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/firebase/season_collection.dart';
+import 'package:arena_soccer/features/share_art/presentation/page/share_art_page.dart';
+import 'package:arena_soccer/features/share_art/presentation/bloc/share_art_cubit.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_groups_cubit.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/page/organizer_groups_page.dart';
@@ -471,6 +474,18 @@ class ArenaApp extends StatelessWidget {
               create: (_) => OrganizerRequestsPanelCubit(sl(), sl(), sl(), sl(), sl()),
               child: const OrganizerRequestsPanelPage(),
             ),
+        // "Gerar arte" do resultado: args {match, season}.
+        AppRoutes.shareArtPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+          return BlocProvider<ShareArtCubit>(
+            create: (_) => ShareArtCubit(sl())
+              ..load(
+                match: args['match'] as MatchDTO,
+                season: (args['season'] as String?) ?? SeasonCollection.currentSeason,
+              ),
+            child: const ShareArtPage(),
+          );
+        },
         AppRoutes.organizerGroupsPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           final championship = args!['championship'] as ChampionshipDTO;

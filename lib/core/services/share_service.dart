@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:gal/gal.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
 
@@ -20,6 +21,20 @@ class ShareService {
     } catch (e) {
       // Cancelar ou não ter app de destino não é erro para o usuário.
       AppLogger.e('shareText', name: 'ShareService', error: e);
+    }
+  }
+
+  /// Salva o PNG na galeria (pacote `gal`; pede a permissão só quando o
+  /// sistema exige). Devolve se salvou.
+  static Future<bool> saveImage(Uint8List png, {required String name}) async {
+    try {
+      if (!await Gal.hasAccess() && !await Gal.requestAccess()) return false;
+      await Gal.putImageBytes(png, name: name);
+      onShared?.call();
+      return true;
+    } catch (e) {
+      AppLogger.e('saveImage', name: 'ShareService', error: e);
+      return false;
     }
   }
 

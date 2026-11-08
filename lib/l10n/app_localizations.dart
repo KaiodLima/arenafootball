@@ -1335,6 +1335,150 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @shareArtTemplateVibrant.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cores'**
+  String get shareArtTemplateVibrant;
+
+  /// No description provided for @shareArtTemplatePoster.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fim de jogo'**
+  String get shareArtTemplatePoster;
+
+  /// No description provided for @shareArtTemplateFaceOff.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confronto'**
+  String get shareArtTemplateFaceOff;
+
+  /// No description provided for @shareArtTemplateEditorial.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editorial'**
+  String get shareArtTemplateEditorial;
+
+  /// No description provided for @shareArtTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gerar arte'**
+  String get shareArtTitle;
+
+  /// No description provided for @shareArtTemplate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Modelo'**
+  String get shareArtTemplate;
+
+  /// No description provided for @shareArtFormat.
+  ///
+  /// In pt, this message translates to:
+  /// **'Formato'**
+  String get shareArtFormat;
+
+  /// No description provided for @shareArtFormatFeed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Feed 4:5'**
+  String get shareArtFormatFeed;
+
+  /// No description provided for @shareArtFormatStory.
+  ///
+  /// In pt, this message translates to:
+  /// **'Story 9:16'**
+  String get shareArtFormatStory;
+
+  /// No description provided for @shareArtFormatSquare.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quadrado'**
+  String get shareArtFormatSquare;
+
+  /// No description provided for @shareArtFormatLandscape.
+  ///
+  /// In pt, this message translates to:
+  /// **'Paisagem'**
+  String get shareArtFormatLandscape;
+
+  /// No description provided for @shareArtQr.
+  ///
+  /// In pt, this message translates to:
+  /// **'Incluir QR Code'**
+  String get shareArtQr;
+
+  /// No description provided for @shareArtSave.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salvar'**
+  String get shareArtSave;
+
+  /// No description provided for @shareArtInstagram.
+  ///
+  /// In pt, this message translates to:
+  /// **'Instagram'**
+  String get shareArtInstagram;
+
+  /// No description provided for @shareArtSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arte salva na galeria.'**
+  String get shareArtSaved;
+
+  /// No description provided for @shareArtSaveError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível salvar na galeria.'**
+  String get shareArtSaveError;
+
+  /// No description provided for @shareArtError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível gerar a arte.'**
+  String get shareArtError;
+
+  /// No description provided for @shareArtCallToAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confira mais no Arena Football'**
+  String get shareArtCallToAction;
+
+  /// No description provided for @shareArtHalfTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'1º tempo {score}'**
+  String shareArtHalfTime(String score);
+
+  /// No description provided for @shareArtMissing.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem cadastro: {items}. A arte sai sem esses dados.'**
+  String shareArtMissing(String items);
+
+  /// No description provided for @shareArtMissingCrest.
+  ///
+  /// In pt, this message translates to:
+  /// **'escudo do {team}'**
+  String shareArtMissingCrest(String team);
+
+  /// No description provided for @shareArtMissingVenue.
+  ///
+  /// In pt, this message translates to:
+  /// **'local'**
+  String get shareArtMissingVenue;
+
+  /// No description provided for @shareArtMissingDate.
+  ///
+  /// In pt, this message translates to:
+  /// **'data'**
+  String get shareArtMissingDate;
+
+  /// No description provided for @shareArtShareText.
+  ///
+  /// In pt, this message translates to:
+  /// **'{home} x {away} no Arena Football: {link}'**
+  String shareArtShareText(String home, String away, String link);
+
   /// No description provided for @pdfTitle.
   ///
   /// In pt, this message translates to:

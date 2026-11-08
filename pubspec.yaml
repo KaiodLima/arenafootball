@@ -64,6 +64,8 @@ dependencies:
   flutter_image_compress: ^2.5.1
   pdf: ^3.12.0
   printing: ^5.14.3
+  gal: ^2.3.3
+  barcode: ^2.2.9
   
   
 
@@ -126,6 +128,19 @@ flutter:
     - family: PassionOne
       fonts:
         - asset: lib/assets/fonts/passion_one/PassionOne-Regular.ttf
+    # Cards compartilháveis (artes para as redes): display condensada e texto.
+    - family: Anton
+      fonts:
+        - asset: lib/assets/fonts/anton/Anton-Regular.ttf
+    - family: BarlowCondensed
+      fonts:
+        - asset: lib/assets/fonts/barlow_condensed/BarlowCondensed-SemiBold.ttf
+          weight: 600
+        - asset: lib/assets/fonts/barlow_condensed/BarlowCondensed-Bold.ttf
+          weight: 700
+        - asset: lib/assets/fonts/barlow_condensed/BarlowCondensed-ExtraBoldItalic.ttf
+          weight: 800
+          style: italic
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

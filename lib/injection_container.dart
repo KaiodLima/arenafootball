@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:arena_soccer/features/share_art/di/share_art_injection.dart';
 import 'package:arena_soccer/features/predictions/di/predictions_injection.dart';
 import 'package:arena_soccer/features/achievements/di/achievements_injection.dart';
 import 'package:arena_soccer/core/cache/cache_store.dart';
@@ -58,6 +59,7 @@ Future<void> init() async {
   registerFanRankingDependencies();
   registerReferralsDependencies();
   registerOrganizerRequestsDependencies();
+  registerShareArtDependencies();
   registerAchievementsDependencies();
   registerPredictionsDependencies();
 }

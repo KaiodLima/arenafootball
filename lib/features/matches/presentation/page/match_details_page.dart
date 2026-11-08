@@ -106,6 +106,17 @@ class MatchDetailsPage extends StatelessWidget {
                   ],
                 ),
                 actions: [
+                  // Arte do resultado para as redes (todos).
+                  if (!state.deleted)
+                    IconButton(
+                      tooltip: l10n.shareArtTitle,
+                      icon: const Icon(Icons.auto_awesome_rounded),
+                      onPressed: () => Navigator.pushNamed(
+                        context,
+                        AppRoutes.shareArtPage,
+                        arguments: {'match': match, 'season': season},
+                      ),
+                    ),
                   if (canManageMatch(match, isAdmin: isAdmin, organizerChampionshipIds: organizerIds) && !state.deleted)
                     CardMenuButton(
                       onImage: true,

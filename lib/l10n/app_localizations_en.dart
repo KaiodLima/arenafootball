@@ -731,6 +731,86 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get shareArtTemplateVibrant => 'Colors';
+
+  @override
+  String get shareArtTemplatePoster => 'Full time';
+
+  @override
+  String get shareArtTemplateFaceOff => 'Face-off';
+
+  @override
+  String get shareArtTemplateEditorial => 'Editorial';
+
+  @override
+  String get shareArtTitle => 'Create artwork';
+
+  @override
+  String get shareArtTemplate => 'Template';
+
+  @override
+  String get shareArtFormat => 'Format';
+
+  @override
+  String get shareArtFormatFeed => 'Feed 4:5';
+
+  @override
+  String get shareArtFormatStory => 'Story 9:16';
+
+  @override
+  String get shareArtFormatSquare => 'Square';
+
+  @override
+  String get shareArtFormatLandscape => 'Landscape';
+
+  @override
+  String get shareArtQr => 'Include QR code';
+
+  @override
+  String get shareArtSave => 'Save';
+
+  @override
+  String get shareArtInstagram => 'Instagram';
+
+  @override
+  String get shareArtSaved => 'Artwork saved to the gallery.';
+
+  @override
+  String get shareArtSaveError => 'Could not save to the gallery.';
+
+  @override
+  String get shareArtError => 'Could not create the artwork.';
+
+  @override
+  String get shareArtCallToAction => 'See more on Arena Football';
+
+  @override
+  String shareArtHalfTime(String score) {
+    return 'Half time $score';
+  }
+
+  @override
+  String shareArtMissing(String items) {
+    return 'Not registered: $items. The artwork goes without them.';
+  }
+
+  @override
+  String shareArtMissingCrest(String team) {
+    return '$team crest';
+  }
+
+  @override
+  String get shareArtMissingVenue => 'venue';
+
+  @override
+  String get shareArtMissingDate => 'date';
+
+  @override
+  String shareArtShareText(String home, String away, String link) {
+    return '$home x $away on Arena Football: $link';
+  }
+
+  @override
   String get pdfTitle => 'MATCH REPORT';
 
   @override
