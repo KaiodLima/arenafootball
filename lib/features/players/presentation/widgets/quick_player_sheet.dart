@@ -103,7 +103,8 @@ class QuickPlayerSheetState extends State<QuickPlayerSheet> {
             ArenaButton.primary(
               title: widget.confirmLabel,
               function: valid
-                  ? () => Navigator.pop(context, (name: _name.text.trim(), position: _position?.key ?? '', photo: _photo))
+                  ? () =>
+                      Navigator.pop(context, (name: _name.text.trim(), position: _position?.key ?? '', photo: _photo))
                   : null,
             ),
           ],

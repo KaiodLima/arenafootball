@@ -53,7 +53,8 @@ class AlbumRankingSection extends StatelessWidget {
       children: [
         Row(
           children: [
-            Expanded(child: Text(l10n.albumRankingHint, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12))),
+            Expanded(
+                child: Text(l10n.albumRankingHint, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12))),
             IconButton(
               tooltip: l10n.albumRankingRefresh,
               onPressed: loading ? null : onRefresh,

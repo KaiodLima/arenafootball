@@ -8952,6 +8952,12 @@ abstract class AppLocalizations {
   /// **'Visão geral'**
   String get championshipTabOverview;
 
+  /// No description provided for @championshipTabMatches.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogos'**
+  String get championshipTabMatches;
+
   /// No description provided for @championshipTabTeams.
   ///
   /// In pt, this message translates to:

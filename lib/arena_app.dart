@@ -279,7 +279,8 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.playerProfilePage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
           return BlocProvider<PlayerProfileCubit>(
-            create: (_) => PlayerProfileCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl()),
+            create: (_) =>
+                PlayerProfileCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl()),
             child: PlayerProfilePage(
               playerId: args['playerId'] as String,
               season: args['season'] as String?,
@@ -410,8 +411,8 @@ class ArenaApp extends StatelessWidget {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
           final season = args['season'] as String?;
           return BlocProvider<MatchDetailsCubit>(
-            create: (_) =>
-                MatchDetailsCubit(sl(), sl(), sl(), sl(), sl(), match: args['match'] as MatchDTO)..start(season: season),
+            create: (_) => MatchDetailsCubit(sl(), sl(), sl(), sl(), sl(), match: args['match'] as MatchDTO)
+              ..start(season: season),
             child: MatchDetailsPage(
               season: season,
               homeCrest: args['homeCrest'] as String?,
@@ -446,8 +447,12 @@ class ArenaApp extends StatelessWidget {
         // Campeonatos, grupos e classificação
         AppRoutes.championshipDetailsPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-          return BlocProvider<ChampionshipDetailsCubit>(
-            create: (_) => ChampionshipDetailsCubit(sl()),
+          // MatchesCubit: aba "Jogos" (só ouve as partidas quando a aba abre).
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider<ChampionshipDetailsCubit>(create: (_) => ChampionshipDetailsCubit(sl())),
+              BlocProvider<MatchesCubit>(create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl())),
+            ],
             child: ChampionshipDetailsPage(championship: args?['championship'] as ChampionshipDTO),
           );
         },

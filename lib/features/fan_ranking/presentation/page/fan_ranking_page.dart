@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/regions/presentation/widgets/region_select_tile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
@@ -8,7 +9,6 @@ import 'package:arena_soccer/features/fan_ranking/presentation/bloc/fan_ranking_
 import 'package:arena_soccer/features/fan_ranking/presentation/bloc/fan_ranking_state.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
-import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
@@ -78,19 +78,13 @@ class _FanRankingPageState extends State<FanRankingPage> {
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s12, AppSizes.s16, AppSizes.s32),
               children: [
-                SizedBox(
-                  height: AppSizes.s40,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: regions.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: AppSizes.s8),
-                    itemBuilder: (context, index) => ArenaChoiceChip(
-                      label: regions[index],
-                      icon: Icons.place_outlined,
-                      selected: regions[index] == state.region,
-                      onTap: () => _cubit.selectRegion(regions[index]),
-                    ),
-                  ),
+                // Região: campo que abre a lista com busca (cresce sem virar carrossel).
+                RegionSelectTile(
+                  label: l10n.registerRegionLabel,
+                  region: state.region,
+                  regions: regions,
+                  recent: BlocProvider.of<RegionCubit>(context).state.recentRegions,
+                  onChanged: (region) => _cubit.selectRegion(region),
                 ),
                 const SizedBox(height: AppSizes.s16),
                 if (state.loading && state.ranking == null)

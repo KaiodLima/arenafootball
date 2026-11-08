@@ -5396,6 +5396,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get championshipTabOverview => 'Visão geral';
 
   @override
+  String get championshipTabMatches => 'Jogos';
+
+  @override
   String get championshipTabTeams => 'Times';
 
   @override

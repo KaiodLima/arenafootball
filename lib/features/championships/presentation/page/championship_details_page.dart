@@ -7,6 +7,10 @@ import 'package:arena_soccer/features/championships/presentation/bloc/championsh
 import 'package:arena_soccer/features/championships/presentation/widgets/championship_hero_card.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/championship_rules_launcher.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/prize_podium.dart';
+import 'package:arena_soccer/features/matches/domain/matches_filter.dart';
+import 'package:arena_soccer/features/matches/presentation/bloc/matches_cubit.dart';
+import 'package:arena_soccer/features/matches/presentation/bloc/matches_state.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/matches_list.dart';
 import 'package:arena_soccer/features/players/presentation/player_navigation.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
@@ -45,7 +49,7 @@ class _ChampionshipDetailsPageState extends State<ChampionshipDetailsPage> {
     final championship = widget.championship;
 
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         backgroundColor: AppColors.background,
         body: NestedScrollView(
@@ -80,6 +84,7 @@ class _ChampionshipDetailsPageState extends State<ChampionshipDetailsPage> {
                 labelStyle: AppTypography.label().copyWith(fontSize: AppSizes.s14),
                 tabs: [
                   Tab(text: l10n.championshipTabOverview),
+                  Tab(text: l10n.championshipTabMatches),
                   Tab(text: l10n.championshipTabTeams),
                   Tab(text: l10n.championshipTabRules),
                 ],
@@ -89,6 +94,7 @@ class _ChampionshipDetailsPageState extends State<ChampionshipDetailsPage> {
           body: TabBarView(
             children: [
               _OverviewTab(championship: championship),
+              _MatchesTab(championship: championship),
               _TeamsTab(championship: championship),
               _RulesTab(championship: championship),
             ],
@@ -272,10 +278,71 @@ class _OverviewTab extends StatelessWidget {
           onTap: () => Navigator.pushNamed(
             context,
             AppRoutes.statsRankingPage,
-            arguments: {'type': StatsRankingType.goals, 'region': c.region, 'season': _season},
+            arguments: {
+              'type': StatsRankingType.goals,
+              'region': c.region,
+              'season': _season,
+              'championshipId': c.championshipId,
+            },
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Todos os jogos da competição, agrupados por data (a mesma lista de
+/// "Todos os jogos" da aba Tabelas). Só começa a ouvir as partidas quando a
+/// aba é aberta.
+class _MatchesTab extends StatefulWidget {
+  final ChampionshipDTO championship;
+
+  const _MatchesTab({required this.championship});
+
+  @override
+  State<_MatchesTab> createState() => _MatchesTabState();
+}
+
+class _MatchesTabState extends State<_MatchesTab> {
+  String get _season =>
+      widget.championship.season.isNotEmpty ? widget.championship.season : SeasonCollection.currentSeason;
+
+  @override
+  void initState() {
+    super.initState();
+    // Já ouvindo (voltou à aba): o cubit ignora o pedido repetido.
+    BlocProvider.of<MatchesCubit>(context).watch(
+      championshipId: widget.championship.championshipId,
+      filter: MatchesFilter.all,
+      region: widget.championship.region,
+      season: _season,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return MatchesList(
+      season: _season,
+      groupByDate: true,
+      header: BlocSelector<MatchesCubit, MatchesState, int>(
+        selector: (state) => state is LoadingMatchesState ? -1 : state.visibleMatches.length,
+        builder: (context, count) => count <= 0
+            ? const SizedBox.shrink()
+            : Padding(
+                padding: const EdgeInsets.only(bottom: AppSizes.s8),
+                child: Row(
+                  children: [
+                    const Icon(Icons.sports_soccer_rounded, size: AppSizes.s16, color: AppColors.primaryDark),
+                    const SizedBox(width: AppSizes.s6),
+                    Text(
+                      l10n.groupsGamesCount(count),
+                      style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s14),
+                    ),
+                  ],
+                ),
+              ),
+      ),
     );
   }
 }

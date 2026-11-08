@@ -106,8 +106,7 @@ class PlayerProfileState extends Equatable {
   }
 
   @override
-  List<Object?> get props =>
-      [
+  List<Object?> get props => [
         player,
         team,
         goalsRank,

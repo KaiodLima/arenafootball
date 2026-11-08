@@ -154,8 +154,7 @@ class AlbumCubit extends Cubit<AlbumState> {
   Timer? _readyTimer;
   late String _userId;
 
-  AlbumCubit(this.albumUseCase, this.getTeamsCacheFirstUseCase, this.watchReferralUseCase)
-      : super(const AlbumState());
+  AlbumCubit(this.albumUseCase, this.getTeamsCacheFirstUseCase, this.watchReferralUseCase) : super(const AlbumState());
 
   void start({required AlbumEventDTO event, required String userId}) {
     _userId = userId;

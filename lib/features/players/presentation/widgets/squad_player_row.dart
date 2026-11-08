@@ -80,12 +80,17 @@ class SquadSectionCard extends StatelessWidget {
                   decoration: BoxDecoration(color: accent, borderRadius: BorderRadius.circular(AppSizes.s2)),
                 ),
                 const SizedBox(width: AppSizes.s8),
-                Text(title.toUpperCase(), style: AppTypography.label(color: AppColors.textPrimary).copyWith(letterSpacing: 0.6)),
+                Text(title.toUpperCase(),
+                    style: AppTypography.label(color: AppColors.textPrimary).copyWith(letterSpacing: 0.6)),
                 const SizedBox(width: AppSizes.s6),
                 Text('${players.length}', style: columnLabel),
                 const Spacer(),
-                SizedBox(width: _statColumn, child: Text(l10n.squadGoalsShort, textAlign: TextAlign.center, style: columnLabel)),
-                SizedBox(width: _statColumn, child: Text(l10n.squadAssistsShort, textAlign: TextAlign.center, style: columnLabel)),
+                SizedBox(
+                    width: _statColumn,
+                    child: Text(l10n.squadGoalsShort, textAlign: TextAlign.center, style: columnLabel)),
+                SizedBox(
+                    width: _statColumn,
+                    child: Text(l10n.squadAssistsShort, textAlign: TextAlign.center, style: columnLabel)),
                 if (hasActions) const SizedBox(width: AppSizes.s36),
               ],
             ),
@@ -204,7 +209,9 @@ class SquadPlayerRow extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(width: _statColumn, child: Text('$goals', textAlign: TextAlign.center, style: goals > 0 ? number : muted)),
+            SizedBox(
+                width: _statColumn,
+                child: Text('$goals', textAlign: TextAlign.center, style: goals > 0 ? number : muted)),
             SizedBox(
               width: _statColumn,
               child: Text('$assists', textAlign: TextAlign.center, style: assists > 0 ? number : muted),

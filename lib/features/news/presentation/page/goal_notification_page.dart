@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/championship_picker.dart';
 import 'package:arena_soccer/features/regions/presentation/widgets/region_select_tile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
@@ -14,7 +15,6 @@ import 'package:arena_soccer/utils/components/team_picker_sheet.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/today_matches_strip.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
-import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_submit_bar.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
@@ -212,18 +212,21 @@ class _GoalNotificationPageState extends State<GoalNotificationPage> {
               // Competição do gol (a partida vinculada já diz qual é).
               if (!form.championshipFromMatch && form.matchChampionships.length > 1) ...[
                 _Label(l10n.goalChampionship, hint: l10n.goalChampionshipHint),
-                Wrap(
-                  spacing: AppSizes.s8,
-                  runSpacing: AppSizes.s8,
-                  children: [
-                    for (final championship in form.matchChampionships)
-                      ArenaChoiceChip(
-                        label: championship.title,
-                        icon: Icons.emoji_events_outlined,
-                        selected: championship.championshipId == form.championshipId,
-                        onTap: () => _cubit.selectChampionship(championship.championshipId),
-                      ),
-                  ],
+                ChampionshipSelectTile(
+                  label: l10n.goalChampionship,
+                  championship:
+                      form.matchChampionships.where((c) => c.championshipId == form.championshipId).firstOrNull,
+                  noneLabel: l10n.matchFormPickChampionship,
+                  noneIcon: Icons.emoji_events_outlined,
+                  onTap: () async {
+                    final picked = await showChampionshipPickerSheet(
+                      context,
+                      championships: form.matchChampionships,
+                      selectedId: form.championshipId,
+                      showNone: false,
+                    );
+                    if (picked?.id != null) _cubit.selectChampionship(picked!.id!);
+                  },
                 ),
                 const SizedBox(height: AppSizes.s20),
               ],

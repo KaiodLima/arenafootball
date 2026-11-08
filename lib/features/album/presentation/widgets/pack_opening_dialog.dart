@@ -209,7 +209,9 @@ class _PackOpeningState extends State<_PackOpening> with TickerProviderStateMixi
               builder: (context, _) {
                 final t = _tear.value;
                 final flash = _stage == _Stage.pack ? (1 - ((t - 0.35).abs() / 0.35)).clamp(0.0, 1.0) * 0.75 : 0.0;
-                return flash == 0 ? const SizedBox.shrink() : ColoredBox(color: AppColors.white.withValues(alpha: flash));
+                return flash == 0
+                    ? const SizedBox.shrink()
+                    : ColoredBox(color: AppColors.white.withValues(alpha: flash));
               },
             ),
           ),
@@ -503,10 +505,12 @@ class _FoilPack extends StatelessWidget {
                               Text(
                                 l10n.albumPackLabel.replaceAll('\n', ' ').toUpperCase(),
                                 textAlign: TextAlign.center,
-                                style: AppTypography.display(color: AppColors.white)
-                                    .copyWith(fontSize: AppSizes.s20, height: 1.1, shadows: [
-                                  Shadow(color: AppColors.black.withValues(alpha: 0.3), blurRadius: AppSizes.s6)
-                                ]),
+                                style: AppTypography.display(color: AppColors.white).copyWith(
+                                    fontSize: AppSizes.s20,
+                                    height: 1.1,
+                                    shadows: [
+                                      Shadow(color: AppColors.black.withValues(alpha: 0.3), blurRadius: AppSizes.s6)
+                                    ]),
                               ),
                               const SizedBox(height: AppSizes.s10),
                               Container(
@@ -605,7 +609,8 @@ class _RevealStage extends StatelessWidget {
                               dimension: width * 1.9,
                               child: CustomPaint(
                                 painter: RaysPainter(
-                                  color: AppColors.googleYellow.withValues(alpha: (sticker?.rare ?? false) ? 0.38 : 0.22),
+                                  color:
+                                      AppColors.googleYellow.withValues(alpha: (sticker?.rare ?? false) ? 0.38 : 0.22),
                                   rays: (sticker?.rare ?? false) ? 20 : 14,
                                 ),
                               ),
@@ -786,9 +791,7 @@ class _Badge extends StatelessWidget {
         ],
       ),
       child: Text(
-        isNew
-            ? (rare ? l10n.albumStickerRareNew : l10n.albumStickerNew)
-            : l10n.albumStickerRepeated,
+        isNew ? (rare ? l10n.albumStickerRareNew : l10n.albumStickerNew) : l10n.albumStickerRepeated,
         style: AppTypography.label(color: isNew ? AppColors.black : AppColors.white).copyWith(
           fontSize: large ? AppSizes.s16 : AppSizes.s10,
           fontWeight: FontWeight.w900,

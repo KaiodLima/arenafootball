@@ -239,11 +239,15 @@ class PlayersDataSource {
           enrollments: enrollments,
         );
         if (totals == null && enrollments == null) continue;
-        final ids = {for (final e in enrollments ?? const <PlayerEnrollment>[]) if (e.teamId.isNotEmpty) e.teamId};
+        final ids = {
+          for (final e in enrollments ?? const <PlayerEnrollment>[])
+            if (e.teamId.isNotEmpty) e.teamId
+        };
         batch.update(doc.reference, <Object, Object?>{
           ...?totals,
           if (enrollments != null)
-            for (final e in enrollments) FieldPath([PlayerEnrollment.field, PlayerEnrollment.keyOf(e.championshipId)]): e.toMap(),
+            for (final e in enrollments)
+              FieldPath([PlayerEnrollment.field, PlayerEnrollment.keyOf(e.championshipId)]): e.toMap(),
           if (ids.isNotEmpty) PlayerDTO.teamIdsField: FieldValue.arrayUnion(ids.toList()),
         });
         fixed++;
@@ -496,5 +500,4 @@ class PlayersDataSource {
       return Left(mapFirebaseError(e, fallbackMessage: _loadFallback));
     }
   }
-
 }

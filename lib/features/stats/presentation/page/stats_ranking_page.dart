@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/championship_picker.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/page_title_bar.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/stats/domain/ranking_entry.dart';
@@ -11,7 +12,6 @@ import 'package:arena_soccer/features/stats/presentation/widgets/ranking_list.da
 import 'package:arena_soccer/features/stats/presentation/widgets/ranking_podium.dart';
 import 'package:arena_soccer/features/stats/presentation/widgets/ranking_type_switch.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
-import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
@@ -145,36 +145,30 @@ class _Header extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s4, AppSizes.s16, AppSizes.s20),
             child: RankingTypeSwitch(selected: state.type, onChanged: onTypeChanged),
           ),
-          // Geral + uma chip por competição da região.
+          // Geral ou uma competição da região: campo que abre a lista com busca.
           if (state.championships.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.only(bottom: AppSizes.s16),
-              child: SizedBox(
-                height: AppSizes.s40,
-                child: ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSizes.s16),
-                  scrollDirection: Axis.horizontal,
-                  itemCount: state.championships.length + 1,
-                  separatorBuilder: (_, __) => const SizedBox(width: AppSizes.s8),
-                  itemBuilder: (context, index) {
-                    final l10n = AppLocalizations.of(context);
-                    if (index == 0) {
-                      return ArenaChoiceChip(
-                        label: l10n.statsGeneral,
-                        selected: state.championshipId == null,
-                        onTap: () => onChampionshipChanged(null),
-                      );
-                    }
-                    final championship = state.championships[index - 1];
-                    return ArenaChoiceChip(
-                      label: championship.title,
-                      icon: Icons.emoji_events_outlined,
-                      selected: state.championshipId == championship.championshipId,
-                      onTap: () => onChampionshipChanged(championship.championshipId),
+              padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s16),
+              child: Builder(builder: (context) {
+                final l10n = AppLocalizations.of(context);
+                final selected = state.championships.where((c) => c.championshipId == state.championshipId).firstOrNull;
+                return ChampionshipSelectTile(
+                  label: l10n.matchesChampionshipFilter,
+                  championship: selected,
+                  noneLabel: l10n.statsGeneral,
+                  noneIcon: Icons.leaderboard_rounded,
+                  onTap: () async {
+                    final picked = await showChampionshipPickerSheet(
+                      context,
+                      championships: state.championships,
+                      selectedId: state.championshipId,
+                      noneLabel: l10n.statsGeneral,
+                      noneIcon: Icons.leaderboard_rounded,
                     );
+                    if (picked != null) onChampionshipChanged(picked.id);
                   },
-                ),
-              ),
+                );
+              }),
             ),
           if (podium.isNotEmpty)
             Padding(

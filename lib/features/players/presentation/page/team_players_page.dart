@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/championship_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/squad_player_row.dart';
@@ -20,7 +21,6 @@ import 'package:arena_soccer/features/players/presentation/widgets/team_header.d
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
-import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/card_menu_button.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
@@ -459,8 +459,9 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
   }
 }
 
-/// "Elenco geral" + uma chip por competição que o time joga na temporada e,
-/// se houver números em amistosos, "Amistosos".
+/// Seletor compacto do elenco (cabe na barra fixa): pílula com o ícone e a
+/// escolha atual — "Elenco geral", a competição ou "Amistosos" — que abre a
+/// lista com busca. Amistosos só aparece com números em amistosos.
 class _ChampionshipChips extends StatelessWidget {
   final TeamPlayersState state;
   final ValueChanged<int?> onSelected;
@@ -470,44 +471,66 @@ class _ChampionshipChips extends StatelessWidget {
 
   const _ChampionshipChips({required this.state, required this.onSelected, this.onlyChampionshipId});
 
+  Future<void> _pick(BuildContext context, List<ChampionshipDTO> championships, bool friendlies) async {
+    final l10n = AppLocalizations.of(context);
+    final picked = await showChampionshipPickerSheet(
+      context,
+      championships: championships,
+      selectedId: state.championshipId,
+      noneLabel: l10n.playersGeneralSquad,
+      noneIcon: Icons.groups_rounded,
+      extraOption: friendlies
+          ? (id: PlayerDTO.friendlyId, label: l10n.teamPlayersFriendly, icon: Icons.handshake_outlined)
+          : null,
+    );
+    if (picked != null) onSelected(picked.id);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final palette = ArenaPalette.of(context);
     final championships = rosterChipChampionships(state.view.championships, onlyChampionshipId);
     final friendlies =
         onlyChampionshipId == null && (state.hasFriendlies || state.championshipId == PlayerDTO.friendlyId);
-    return SizedBox(
-      height: AppSizes.s40,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: championships.length + 1 + (friendlies ? 1 : 0),
-        separatorBuilder: (_, __) => const SizedBox(width: AppSizes.s8),
-        itemBuilder: (context, index) {
-          if (index == 0) {
-            return ArenaChoiceChip(
-              label: l10n.playersGeneralSquad,
-              icon: Icons.groups_rounded,
-              selected: state.championshipId == null,
-              onTap: () => onSelected(null),
-            );
-          }
-          // Amistosos: contagem à parte, depois das competições.
-          if (index > championships.length) {
-            return ArenaChoiceChip(
-              label: l10n.teamPlayersFriendly,
-              icon: Icons.handshake_outlined,
-              selected: state.championshipId == PlayerDTO.friendlyId,
-              onTap: () => onSelected(PlayerDTO.friendlyId),
-            );
-          }
-          final championship = championships[index - 1];
-          return ArenaChoiceChip(
-            label: championship.title,
-            icon: Icons.emoji_events_outlined,
-            selected: state.championshipId == championship.championshipId,
-            onTap: () => onSelected(championship.championshipId),
-          );
-        },
+    final current = state.championshipId;
+    final (IconData icon, String label) = current == null
+        ? (Icons.groups_rounded, l10n.playersGeneralSquad)
+        : current == PlayerDTO.friendlyId
+            ? (Icons.handshake_outlined, l10n.teamPlayersFriendly)
+            : (
+                Icons.emoji_events_rounded,
+                championships.where((c) => c.championshipId == current).firstOrNull?.title ?? l10n.playersGeneralSquad,
+              );
+    final shape = StadiumBorder(side: BorderSide(color: palette.primary.withValues(alpha: 0.5)));
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Material(
+        color: palette.primarySoft,
+        shape: shape,
+        child: InkWell(
+          customBorder: shape,
+          onTap: () => _pick(context, championships, friendlies),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(AppSizes.s12, AppSizes.s8, AppSizes.s8, AppSizes.s8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: AppSizes.s18, color: palette.primaryDark),
+                const SizedBox(width: AppSizes.s6),
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.label(color: palette.primaryDark).copyWith(fontSize: AppSizes.s14),
+                  ),
+                ),
+                Icon(Icons.expand_more_rounded, size: AppSizes.s20, color: palette.primaryDark),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -515,5 +538,9 @@ class _ChampionshipChips extends StatelessWidget {
 
 /// Competições das chips do elenco: todas ou, com [onlyId] (organizador), só
 /// essa.
-List<ChampionshipDTO> rosterChipChampionships(List<ChampionshipDTO> all, int? onlyId) =>
-    onlyId == null ? all : [for (final c in all) if (c.championshipId == onlyId) c];
+List<ChampionshipDTO> rosterChipChampionships(List<ChampionshipDTO> all, int? onlyId) => onlyId == null
+    ? all
+    : [
+        for (final c in all)
+          if (c.championshipId == onlyId) c
+      ];

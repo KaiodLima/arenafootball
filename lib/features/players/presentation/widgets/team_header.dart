@@ -74,7 +74,8 @@ class TeamHeader extends StatelessWidget {
                   // Região e temporada numa linha discreta.
                   Text(
                     [if (team.region.isNotEmpty) team.region, l10n.homeSeasonChip(season)].join('  ·  '),
-                    style: AppTypography.subtitle(color: foreground.withValues(alpha: 0.8)).copyWith(fontSize: AppSizes.s12),
+                    style: AppTypography.subtitle(color: foreground.withValues(alpha: 0.8))
+                        .copyWith(fontSize: AppSizes.s12),
                   ),
                   if (stats != null) ...[
                     const SizedBox(height: AppSizes.s14),
@@ -126,7 +127,8 @@ class _StatsStrip extends StatelessWidget {
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: AppTypography.subtitle(color: foreground.withValues(alpha: 0.8)).copyWith(fontSize: AppSizes.s12),
+                style:
+                    AppTypography.subtitle(color: foreground.withValues(alpha: 0.8)).copyWith(fontSize: AppSizes.s12),
               ),
             ],
           ),

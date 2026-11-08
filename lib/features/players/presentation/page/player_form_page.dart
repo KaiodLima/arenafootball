@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/championship_picker.dart';
 import 'package:arena_soccer/features/regions/presentation/widgets/region_select_tile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
@@ -10,7 +11,6 @@ import 'package:arena_soccer/features/players/presentation/widgets/squad_strip.d
 import 'package:arena_soccer/features/players/presentation/widgets/team_select_tile.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
-import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_input_decoration.dart';
 import 'package:arena_soccer/utils/components/arena_submit_bar.dart';
 import 'package:arena_soccer/utils/components/circle_photo_picker.dart';
@@ -159,18 +159,20 @@ class _PlayerFormPageState extends State<PlayerFormPage> {
                 // Competição em que o atleta entra (os times são os dela).
                 if (form.championships.isNotEmpty) ...[
                   const SizedBox(height: AppSizes.s16),
-                  Wrap(
-                    spacing: AppSizes.s8,
-                    runSpacing: AppSizes.s8,
-                    children: [
-                      for (final championship in form.championships)
-                        ArenaChoiceChip(
-                          label: championship.title,
-                          icon: Icons.emoji_events_outlined,
-                          selected: championship.championshipId == form.championshipId,
-                          onTap: () => _cubit.selectChampionship(championship.championshipId),
-                        ),
-                    ],
+                  ChampionshipSelectTile(
+                    label: l10n.matchesChampionshipFilter,
+                    championship: form.championships.where((c) => c.championshipId == form.championshipId).firstOrNull,
+                    noneLabel: l10n.matchFormPickChampionship,
+                    noneIcon: Icons.emoji_events_outlined,
+                    onTap: () async {
+                      final picked = await showChampionshipPickerSheet(
+                        context,
+                        championships: form.championships,
+                        selectedId: form.championshipId,
+                        showNone: false,
+                      );
+                      if (picked?.id != null) _cubit.selectChampionship(picked!.id!);
+                    },
                   ),
                   if (error == PlayerFormError.championship)
                     Padding(

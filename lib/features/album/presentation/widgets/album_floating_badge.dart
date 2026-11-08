@@ -132,7 +132,8 @@ class _AlbumFloatingBadgeState extends State<AlbumFloatingBadge> with TickerProv
                           animation: Listenable.merge([_idle, _shake]),
                           builder: (context, _) {
                             final idle = available && !_dragging ? _idle.value : 0.0;
-                            final shake = available ? math.sin(_shake.value * math.pi * 6) * (1 - _shake.value) * 0.18 : 0.0;
+                            final shake =
+                                available ? math.sin(_shake.value * math.pi * 6) * (1 - _shake.value) * 0.18 : 0.0;
                             return Stack(
                               clipBehavior: Clip.none,
                               alignment: Alignment.topCenter,
@@ -167,8 +168,7 @@ class _AlbumFloatingBadgeState extends State<AlbumFloatingBadge> with TickerProv
                                     ),
                                   ),
                                 ),
-                                if (available)
-                                  const Positioned(top: 0, right: AppSizes.s4, child: _Dot()),
+                                if (available) const Positioned(top: 0, right: AppSizes.s4, child: _Dot()),
                                 Positioned(
                                   bottom: 0,
                                   child: _Pill(
@@ -229,7 +229,8 @@ class _MiniPack extends StatelessWidget {
                 ),
               ),
             ),
-            CustomPaint(painter: StripesPainter(color: AppColors.white.withValues(alpha: 0.14), width: 5, diagonal: true)),
+            CustomPaint(
+                painter: StripesPainter(color: AppColors.white.withValues(alpha: 0.14), width: 5, diagonal: true)),
             Column(
               children: [
                 crimp,
@@ -278,7 +279,8 @@ class _Dot extends StatelessWidget {
       ),
       child: Text(
         '1',
-        style: AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s10, fontWeight: FontWeight.w900),
+        style:
+            AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s10, fontWeight: FontWeight.w900),
       ),
     );
   }

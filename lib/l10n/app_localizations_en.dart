@@ -5361,6 +5361,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get championshipTabOverview => 'Overview';
 
   @override
+  String get championshipTabMatches => 'Matches';
+
+  @override
   String get championshipTabTeams => 'Teams';
 
   @override
