@@ -1886,6 +1886,24 @@
   "standingsColPosition": "#",
   "standingsColTeam": "Time",
   "standingsColGames": "J",
+  "standingsColGoalDiff": "SG",
+  "standingsColPoints": "PTS",
+  "groupsTeamsCount": "{count} times",
+  "@groupsTeamsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "groupsGamesCount": "{count, plural, =1{1 jogo} other{{count} jogos}}",
+  "@groupsGamesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "standingsQualifiedLegend": "Classificados para a próxima fase",
   "standingsGoalsFor": "Gols feitos",
   "standingsGoalsAgainst": "Gols sofridos",

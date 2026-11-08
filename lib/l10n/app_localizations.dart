@@ -7470,6 +7470,30 @@ abstract class AppLocalizations {
   /// **'J'**
   String get standingsColGames;
 
+  /// No description provided for @standingsColGoalDiff.
+  ///
+  /// In pt, this message translates to:
+  /// **'SG'**
+  String get standingsColGoalDiff;
+
+  /// No description provided for @standingsColPoints.
+  ///
+  /// In pt, this message translates to:
+  /// **'PTS'**
+  String get standingsColPoints;
+
+  /// No description provided for @groupsTeamsCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} times'**
+  String groupsTeamsCount(int count);
+
+  /// No description provided for @groupsGamesCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 jogo} other{{count} jogos}}'**
+  String groupsGamesCount(int count);
+
   /// No description provided for @standingsQualifiedLegend.
   ///
   /// In pt, this message translates to:

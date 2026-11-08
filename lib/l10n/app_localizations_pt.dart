@@ -4487,6 +4487,28 @@ class AppLocalizationsPt extends AppLocalizations {
   String get standingsColGames => 'J';
 
   @override
+  String get standingsColGoalDiff => 'SG';
+
+  @override
+  String get standingsColPoints => 'PTS';
+
+  @override
+  String groupsTeamsCount(int count) {
+    return '$count times';
+  }
+
+  @override
+  String groupsGamesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count jogos',
+      one: '1 jogo',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get standingsQualifiedLegend => 'Classificados para a próxima fase';
 
   @override

@@ -8,6 +8,7 @@ class SaveRegionChampionshipsCacheUseCase {
 
   SaveRegionChampionshipsCacheUseCase(this._repository);
 
-  Future<Either<Failure, void>> call(List<ChampionshipDTO> championships, {required String region, required String season}) =>
+  Future<Either<Failure, void>> call(List<ChampionshipDTO> championships,
+          {required String region, required String season}) =>
       _repository.saveRegionChampionshipsCache(championships, region: region, season: season);
 }

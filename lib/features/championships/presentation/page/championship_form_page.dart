@@ -283,26 +283,26 @@ class _ChampionshipFormPageState extends State<ChampionshipFormPage> {
               IgnorePointer(
                 ignoring: widget.organizer,
                 child: Wrap(
-                spacing: AppSizes.s8,
-                runSpacing: AppSizes.s8,
-                children: [
-                  for (final scope in ChampionshipScope.values)
-                    ArenaChoiceChip(
-                      label: scope == ChampionshipScope.municipal
-                          ? l10n.championshipScopeMunicipal
-                          : l10n.championshipScopeIntermunicipal,
-                      icon: scope == ChampionshipScope.municipal ? Icons.location_city_rounded : Icons.public_rounded,
-                      selected: form.base.scope == scope,
-                      onTap: () {
-                        final removed = _cubit.selectScope(scope);
-                        if (removed > 0) {
-                          showSnackBar(
-                              context: context, message: l10n.championshipScopeRemoved(removed, form.base.region));
-                        }
-                      },
-                    ),
-                ],
-              ),
+                  spacing: AppSizes.s8,
+                  runSpacing: AppSizes.s8,
+                  children: [
+                    for (final scope in ChampionshipScope.values)
+                      ArenaChoiceChip(
+                        label: scope == ChampionshipScope.municipal
+                            ? l10n.championshipScopeMunicipal
+                            : l10n.championshipScopeIntermunicipal,
+                        icon: scope == ChampionshipScope.municipal ? Icons.location_city_rounded : Icons.public_rounded,
+                        selected: form.base.scope == scope,
+                        onTap: () {
+                          final removed = _cubit.selectScope(scope);
+                          if (removed > 0) {
+                            showSnackBar(
+                                context: context, message: l10n.championshipScopeRemoved(removed, form.base.region));
+                          }
+                        },
+                      ),
+                  ],
+                ),
               ),
               const SizedBox(height: AppSizes.s6),
               Text(

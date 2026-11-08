@@ -75,6 +75,7 @@ class _GroupsPageState extends State<GroupsPage> {
               final group = state.groups[index];
               return GroupCard(
                 group: group,
+                table: state.tableOf(group),
                 crestOf: state.crestOf,
                 isFavorite: (id, name) => user?.isFavorite(id: id, name: name) ?? false,
                 onTap: () => Navigator.pushNamed(
