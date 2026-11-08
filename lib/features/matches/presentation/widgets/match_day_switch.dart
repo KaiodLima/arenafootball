@@ -6,6 +6,7 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/features/matches/domain/match_time.dart';
+import 'package:arena_soccer/utils/themes/arena_palette.dart';
 
 /// Seletor "Ontem · Hoje · Amanhã" da aba de tabelas, com a data de cada dia.
 class MatchDaySwitch extends StatelessWidget {
@@ -80,8 +81,8 @@ class _DaySegment extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 180),
             padding: const EdgeInsets.symmetric(vertical: AppSizes.s8),
-            decoration:
-                BoxDecoration(color: selected ? AppColors.primary : AppColors.transparent, borderRadius: radius),
+            decoration: BoxDecoration(
+                color: selected ? ArenaPalette.of(context).primary : AppColors.transparent, borderRadius: radius),
             child: Column(
               children: [
                 Text(

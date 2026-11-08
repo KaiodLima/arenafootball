@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/firebase/season_collection.dart';
+import 'package:arena_soccer/features/share_art/presentation/page/share_art_page.dart';
+import 'package:arena_soccer/features/share_art/presentation/bloc/share_art_cubit.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_groups_cubit.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/page/organizer_groups_page.dart';
 import 'package:arena_soccer/features/album/presentation/page/album_pages_page.dart';
 import 'package:arena_soccer/features/album/presentation/page/sticker_detail_page.dart';
 import 'package:arena_soccer/features/matches/presentation/page/match_report_page.dart';
@@ -102,6 +108,10 @@ import 'package:arena_soccer/features/fan_ranking/presentation/page/fan_ranking_
 import 'package:arena_soccer/features/referrals/presentation/bloc/referral_cubit.dart';
 import 'package:arena_soccer/features/referrals/presentation/page/referral_page.dart';
 import 'package:arena_soccer/features/referrals/presentation/page/referral_settings_page.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_request_cubit.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_requests_panel_cubit.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/page/organizer_request_page.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/page/organizer_requests_panel_page.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
 import 'package:arena_soccer/features/stats/presentation/bloc/stats_ranking_cubit.dart';
 import 'package:arena_soccer/features/stats/presentation/page/stats_ranking_page.dart';
@@ -202,7 +212,7 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.goalNotificationPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<GoalNotificationCubit>(
-            create: (_) => GoalNotificationCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl()),
+            create: (_) => GoalNotificationCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl()),
             child: GoalNotificationPage(
               initial: args?['news'] as NewsDTO?,
               initialMatch: args?['match'] as MatchDTO?,
@@ -256,15 +266,21 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.teamPlayersPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<TeamPlayersCubit>(
-            create: (_) => TeamPlayersCubit(sl(), sl(), sl(), sl(), sl(), sl()),
-            child: TeamPlayersPage(team: args?['team'] as TeamDTO, championshipId: args?['championshipId'] as int?),
+            create: (_) => TeamPlayersCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl()),
+            child: TeamPlayersPage(
+              team: args?['team'] as TeamDTO,
+              championshipId: args?['championshipId'] as int?,
+              onlyChampionship: args?['onlyChampionship'] == true,
+              season: args?['season'] as String?,
+            ),
           );
         },
         // `playerId` obrigatório; `season` nulo = corrente; `player` (opcional) aparece na hora.
         AppRoutes.playerProfilePage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
           return BlocProvider<PlayerProfileCubit>(
-            create: (_) => PlayerProfileCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl()),
+            create: (_) =>
+                PlayerProfileCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl()),
             child: PlayerProfilePage(
               playerId: args['playerId'] as String,
               season: args['season'] as String?,
@@ -318,9 +334,13 @@ class ArenaApp extends StatelessWidget {
             child: StickerDetailPage(teamId: args['teamId'] as String, stickerId: args['stickerId'] as String),
           );
         },
-        // Súmula da partida (admin): args {match, season, homeCrest, awayCrest}.
+        // Súmula da partida (admin e organizador da competição): args {match,
+        // season, homeCrest, awayCrest}.
         AppRoutes.matchReportPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+          // Organizador: garante o índice da competição antes de gravar (o admin
+          // não organiza: não faz nada).
+          BlocProvider.of<OrganizerModeCubit>(context).ensureIndexFor((args['match'] as MatchDTO).championshipId);
           return BlocProvider<MatchReportCubit>(
             create: (_) => MatchReportCubit(sl(), sl(), sl(), sl(), sl(), sl())
               ..load(match: args['match'] as MatchDTO, season: args['season'] as String?),
@@ -391,8 +411,8 @@ class ArenaApp extends StatelessWidget {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
           final season = args['season'] as String?;
           return BlocProvider<MatchDetailsCubit>(
-            create: (_) =>
-                MatchDetailsCubit(sl(), sl(), sl(), sl(), sl(), match: args['match'] as MatchDTO)..start(season: season),
+            create: (_) => MatchDetailsCubit(sl(), sl(), sl(), sl(), sl(), match: args['match'] as MatchDTO)
+              ..start(season: season),
             child: MatchDetailsPage(
               season: season,
               homeCrest: args['homeCrest'] as String?,
@@ -415,16 +435,24 @@ class ArenaApp extends StatelessWidget {
             ),
           );
         },
-        AppRoutes.registerMatchPage: (_) => BlocProvider<MatchFormCubit>(
-              create: (_) => MatchFormCubit(sl(), sl(), sl(), sl(), sl()),
-              child: const MatchFormPage(),
-            ),
+        // `championship` (opcional): organizador, cadastro só nessa competição.
+        AppRoutes.registerMatchPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          return BlocProvider<MatchFormCubit>(
+            create: (_) => MatchFormCubit(sl(), sl(), sl(), sl(), sl()),
+            child: MatchFormPage(organizerChampionship: args?['championship'] as ChampionshipDTO?),
+          );
+        },
 
         // Campeonatos, grupos e classificação
         AppRoutes.championshipDetailsPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-          return BlocProvider<ChampionshipDetailsCubit>(
-            create: (_) => ChampionshipDetailsCubit(sl()),
+          // MatchesCubit: aba "Jogos" (só ouve as partidas quando a aba abre).
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider<ChampionshipDetailsCubit>(create: (_) => ChampionshipDetailsCubit(sl())),
+              BlocProvider<MatchesCubit>(create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl())),
+            ],
             child: ChampionshipDetailsPage(championship: args?['championship'] as ChampionshipDTO),
           );
         },
@@ -443,6 +471,34 @@ class ArenaApp extends StatelessWidget {
               child: const ReferralPage(),
             ),
         AppRoutes.referralSettingsPage: (_) => const ReferralSettingsPage(),
+        AppRoutes.organizerRequestPage: (_) => BlocProvider<OrganizerRequestCubit>(
+              create: (_) => OrganizerRequestCubit(sl(), sl(), sl(), sl(), sl()),
+              child: const OrganizerRequestPage(),
+            ),
+        AppRoutes.organizerRequestsPanelPage: (_) => BlocProvider<OrganizerRequestsPanelCubit>(
+              create: (_) => OrganizerRequestsPanelCubit(sl(), sl(), sl(), sl(), sl()),
+              child: const OrganizerRequestsPanelPage(),
+            ),
+        // "Gerar arte" do resultado: args {match, season}.
+        AppRoutes.shareArtPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+          return BlocProvider<ShareArtCubit>(
+            create: (_) => ShareArtCubit(sl())
+              ..load(
+                match: args['match'] as MatchDTO,
+                season: (args['season'] as String?) ?? SeasonCollection.currentSeason,
+              ),
+            child: const ShareArtPage(),
+          );
+        },
+        AppRoutes.organizerGroupsPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          final championship = args!['championship'] as ChampionshipDTO;
+          return BlocProvider<OrganizerGroupsCubit>(
+            create: (_) => OrganizerGroupsCubit(sl(), sl(), sl(), sl(), sl())..start(championship),
+            child: OrganizerGroupsPage(championship: championship),
+          );
+        },
         AppRoutes.seasonsPanelPage: (_) => MultiBlocProvider(
               providers: [
                 BlocProvider<SeasonsPanelCubit>(create: (_) => SeasonsPanelCubit(sl(), sl())),
@@ -455,18 +511,22 @@ class ArenaApp extends StatelessWidget {
               create: (_) => ManageChampionshipsCubit(sl(), sl(), sl()),
               child: const ManageChampionshipsPage(),
             ),
-        // `championship` opcional: campeonato a editar (sem ele, cadastra um novo).
+        // `championship` opcional: campeonato a editar (sem ele, cadastra um novo);
+        // `organizer`: edição do organizador (nome, sede, categoria e temporada travados).
         AppRoutes.championshipFormPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<ChampionshipFormCubit>(
             create: (_) => ChampionshipFormCubit(sl(), sl(), sl()),
-            child: ChampionshipFormPage(championship: args?['championship'] as ChampionshipDTO?),
+            child: ChampionshipFormPage(
+              championship: args?['championship'] as ChampionshipDTO?,
+              organizer: args?['organizer'] == true,
+            ),
           );
         },
         AppRoutes.groupsPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<GroupsCubit>(
-            create: (_) => GroupsCubit(sl(), sl()),
+            create: (_) => GroupsCubit(sl(), sl(), sl()),
             child: GroupsPage(
               region: args?['region'] as String?,
               season: args?['season'] as String?,

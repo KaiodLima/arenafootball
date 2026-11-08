@@ -1,7 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/matches/presentation/export/match_report_export.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_report_dtos.dart';
 import 'package:arena_soccer/features/matches/domain/match_report.dart';
@@ -14,14 +13,10 @@ import 'package:arena_soccer/features/matches/presentation/widgets/match_report/
 import 'package:arena_soccer/features/matches/presentation/widgets/match_report/report_lineup.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_report/report_save_bar.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_report/report_timeline.dart';
-import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
-import 'package:arena_soccer/features/player_requests/presentation/widgets/player_request_labels.dart';
+import 'package:arena_soccer/features/players/presentation/widgets/quick_player_sheet.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
-import 'package:arena_soccer/utils/components/arena_button.dart';
-import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_text_field.dart';
-import 'package:arena_soccer/utils/components/circle_photo_picker.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
@@ -73,6 +68,24 @@ class MatchReportPage extends StatelessWidget {
     final match = state.match!;
     final team = action.side == MatchSide.home ? match.homeTeam : match.awayTeam;
     final booking = action.booking;
+    final onField = state.onFieldOf(action.side);
+    if (action.substitution) {
+      final sub = await showPlayerGridSheet(
+        context,
+        title: '${l10n.reportSubstitution} · $team',
+        icon: const Icon(Icons.swap_vert_rounded, color: AppColors.primary, size: AppSizes.s28),
+        color: action.side == MatchSide.home ? _home : _away,
+        squad: state.squadOf(action.side),
+        lineup: match.lineup.of(action.side),
+        onField: onField,
+        substitutedOut: MatchReport.substitutedOut(match.substitutions, action.side),
+        minute: MatchReport.suggestedMinute(match, DateTime.now()),
+        substitution: true,
+      );
+      if (sub == null || sub.player == null || sub.assistant == null) return;
+      cubit.addSubstitution(action.side, playerOut: sub.player!, playerIn: sub.assistant!, minute: sub.minute);
+      return;
+    }
     final picked = await showPlayerGridSheet(
       context,
       title: booking == null
@@ -84,6 +97,7 @@ class MatchReportPage extends StatelessWidget {
       color: action.side == MatchSide.home ? _home : _away,
       squad: state.squadOf(action.side),
       lineup: match.lineup.of(action.side),
+      onField: onField,
       minute: MatchReport.suggestedMinute(match, DateTime.now()),
       goal: booking == null,
     );
@@ -123,7 +137,7 @@ class MatchReportPage extends StatelessWidget {
     );
     if (!context.mounted || choice == null) return;
     if (choice == 'delete') {
-      event.isGoal ? cubit.removeGoal(event.id) : cubit.removeBooking(event.id);
+      cubit.removeEvent(event);
       return;
     }
     final goal = event.goal!;
@@ -136,6 +150,7 @@ class MatchReportPage extends StatelessWidget {
       color: goal.side == MatchSide.home ? _home : _away,
       squad: state.squadOf(goal.side),
       lineup: match.lineup.of(goal.side),
+      onField: state.onFieldOf(goal.side),
       minute: goal.minute,
       goal: true,
     );
@@ -153,7 +168,8 @@ class MatchReportPage extends StatelessWidget {
       confirmLabel: l10n.commonSave,
       icon: Icons.tag_rounded,
       tone: ArenaAlertTone.primary,
-      content: ArenaTextField(controller: controller, keyboardType: TextInputType.number, autofocus: true, hintText: '10'),
+      content:
+          ArenaTextField(controller: controller, keyboardType: TextInputType.number, autofocus: true, hintText: '10'),
     );
     if (confirmed && context.mounted) {
       BlocProvider.of<MatchReportCubit>(context).setNumber(side, entry.playerId, int.tryParse(controller.text.trim()));
@@ -162,11 +178,12 @@ class MatchReportPage extends StatelessWidget {
   }
 
   Future<void> _addPlayer(BuildContext context, MatchSide side) async {
-    final result = await showModalBottomSheet<({String name, String position, File? photo})>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (_) => const _QuickPlayerSheet(),
+    final l10n = AppLocalizations.of(context);
+    final result = await showQuickPlayerSheet(
+      context,
+      title: l10n.matchReportAddPlayer,
+      hint: l10n.matchReportAddPlayerHint,
+      confirmLabel: l10n.matchReportAdd,
     );
     if (result == null || !context.mounted) return;
     await BlocProvider.of<MatchReportCubit>(context)
@@ -177,6 +194,8 @@ class MatchReportPage extends StatelessWidget {
     final minute = event.minute == null ? '' : "${event.minute}' ";
     final goal = event.goal;
     if (goal != null) return '⚽ $minute${goal.hasScorer ? goal.scorerName : l10n.reportGoalNoScorer}';
+    final sub = event.substitution;
+    if (sub != null) return '🔁 $minute${l10n.reportEntering(sub.inName)} · ${l10n.reportLeaving(sub.outName)}';
     final booking = event.booking!;
     return '${booking.type == BookingType.yellow ? '🟨' : '🟥'} $minute${booking.playerName}';
   }
@@ -233,6 +252,14 @@ class MatchReportPage extends StatelessWidget {
             child: Scaffold(
               backgroundColor: AppColors.background,
               appBar: AppBar(
+                actions: [
+                  IconButton(
+                    tooltip: l10n.matchReportExportPdf,
+                    icon: const Icon(Icons.picture_as_pdf_outlined),
+                    onPressed: () =>
+                        showMatchReportExport(context, match: match, season: cubit.season, draft: state.dirty),
+                  ),
+                ],
                 backgroundColor: AppColors.primaryDark,
                 foregroundColor: AppColors.white,
                 surfaceTintColor: AppColors.transparent,
@@ -315,7 +342,7 @@ class MatchReportPage extends StatelessWidget {
               bottomNavigationBar: state.dirty
                   ? ReportSaveBar(
                       changes: state.changeCount,
-                      newGoals: state.newGoals,
+                      newGoals: state.newEvents,
                       publishCards: state.publishCards,
                       saving: state.saving,
                       onPublishCards: cubit.togglePublishCards,
@@ -366,83 +393,3 @@ class _TabsHeader extends SliverPersistentHeaderDelegate {
 }
 
 /// Cadastro rápido do atleta: nome, posição e foto (opcional).
-class _QuickPlayerSheet extends StatefulWidget {
-  const _QuickPlayerSheet();
-
-  @override
-  State<_QuickPlayerSheet> createState() => _QuickPlayerSheetState();
-}
-
-class _QuickPlayerSheetState extends State<_QuickPlayerSheet> {
-  final _name = TextEditingController();
-  PlayerPosition? _position;
-  File? _photo;
-
-  @override
-  void dispose() {
-    _name.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final valid = _name.text.trim().length >= 3;
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        AppSizes.s20,
-        0,
-        AppSizes.s20,
-        AppSizes.s20 + MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(l10n.matchReportAddPlayer, style: AppTypography.title().copyWith(fontSize: AppSizes.s20)),
-            Text(l10n.matchReportAddPlayerHint, style: AppTypography.subtitle()),
-            const SizedBox(height: AppSizes.s16),
-            Center(
-              child: CirclePhotoPicker(
-                file: _photo,
-                addLabel: l10n.matchReportPhoto,
-                emptyIcon: Icons.person_rounded,
-                onPicked: (file) => setState(() => _photo = file),
-                onRemove: () => setState(() => _photo = null),
-              ),
-            ),
-            const SizedBox(height: AppSizes.s16),
-            ArenaTextField(
-              controller: _name,
-              labelText: l10n.matchReportPlayerName,
-              icon: const Icon(Icons.badge_outlined),
-              onChaged: (_) => setState(() {}),
-            ),
-            const SizedBox(height: AppSizes.s12),
-            Wrap(
-              spacing: AppSizes.s8,
-              runSpacing: AppSizes.s8,
-              children: [
-                for (final position in PlayerPosition.values)
-                  ArenaChoiceChip(
-                    label: playerPositionLabel(l10n, position),
-                    selected: _position == position,
-                    onTap: () => setState(() => _position = _position == position ? null : position),
-                  ),
-              ],
-            ),
-            const SizedBox(height: AppSizes.s20),
-            ArenaButton.primary(
-              title: l10n.matchReportAdd,
-              function: valid
-                  ? () => Navigator.pop(context, (name: _name.text.trim(), position: _position?.key ?? '', photo: _photo))
-                  : null,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-

@@ -49,7 +49,7 @@ import {
   shouldRunBatch,
   worthReplacing,
 } from './recompress';
-import { candidateOf, electBestPlayer, rulesOf, voteOf, votingJustClosed } from './best_player';
+import { candidateOf, electBestPlayer, participantNames, rulesOf, voteOf, votingJustClosed } from './best_player';
 import type { DocumentReference, FieldValue as FieldValueType, Firestore } from 'firebase-admin/firestore';
 import type { Messaging } from 'firebase-admin/messaging';
 import type { Storage } from 'firebase-admin/storage';
@@ -64,6 +64,7 @@ import {
   dailyGameMessage,
   describeTarget,
   goalMessage,
+  bookingMessage,
   isEnabled,
   manualMessage,
   matchCreatedMessage,
@@ -72,6 +73,8 @@ import {
   playerRequestAnswerMessage,
   playerRequestMessage,
   playerRequestToOwnerMessage,
+  organizerRequestAnswerMessage,
+  organizerRequestMessage,
   teamRequestAnswerMessage,
   teamRequestMessage,
   partnerLinkRequestMessage,
@@ -94,8 +97,12 @@ import {
   resultNews,
   resultNewsId,
   shouldPostResult,
+  liveCardStatusOf,
+  liveCardStatusUpdate,
+  liveNewsId,
+  LiveCardStatus,
 } from './match_result';
-import { shouldPostVoteCard, voteCardNews, voteNewsId } from './vote_card';
+import { shouldPostVoteCard, voteCardBestPlayerFields, voteCardNews, voteNewsId } from './vote_card';
 import { rankingDelta, rankingDocId, scorePrediction } from './predictions';
 import {
   GroupTeam,
@@ -214,7 +221,12 @@ async function deliver(logId: string, message: PushMessage, origem: string): Pro
 export const onNewsCreated = onDocumentCreated('noticias/{newsId}', async (event) => {
   const data = event.data?.data();
   if (!data) return;
-  const message = data.tag === 'gol' ? goalMessage(data, await currentSeason()) : newsMessage(data, event.params.newsId);
+  const message =
+    data.tag === 'gol'
+      ? goalMessage(data, await currentSeason())
+      : data.tag === 'cartao'
+        ? bookingMessage(data, await currentSeason())
+        : newsMessage(data, event.params.newsId);
   if (message) await deliver(`${message.tipo}_${event.id}`, message, `noticias/${event.params.newsId}`);
 });
 
@@ -289,6 +301,9 @@ export const onMatchUpdated = onDocumentUpdated('{colecao}/{matchId}', async (ev
       .update({ votacao: String(after.votacao) === 'true' ? 'true' : 'false' })
       .catch((error) => logger.warn('Card de votação não atualizado', { matchId, error: String(error) }));
   }
+  // Card ao vivo: intervalo / 2º tempo acompanham (o fim é marcado no postResult).
+  const liveStatus = before.status !== after.status ? liveCardStatusOf(after.status) : null;
+  if (liveStatus && liveStatus !== 'encerrada') await syncLiveCardStatus(matchId, liveStatus, after);
   // Card de resultado: o admin encerrou agora → posta; placar corrigido → atualiza.
   if (justFinished && !after.resultadoNoticia) {
     await postResult(colecao, await currentSeason(), matchId, after);
@@ -305,7 +320,11 @@ async function recordBestPlayer(collection: string, season: string, matchId: str
   try {
     const { db, FieldValue } = await admin();
     const matchRef = db.collection(collection).doc(matchId);
-    const [votesSnap, config] = await Promise.all([matchRef.collection('votos').get(), db.doc('config/votacao').get()]);
+    const [votesSnap, config, matchSnap] = await Promise.all([
+      matchRef.collection('votos').get(),
+      db.doc('config/votacao').get(),
+      matchRef.get(),
+    ]);
     const votes = votesSnap.docs.map((doc) => voteOf(doc.id, doc.data()));
     // Só os atletas votados (o voto grava o nome como no cadastro): até 30 por consulta.
     const names = [...new Set(votes.map((v) => v.name).filter((n) => n.trim()))];
@@ -317,8 +336,16 @@ async function recordBestPlayer(collection: string, season: string, matchId: str
         .get();
       candidates.push(...players.docs.map((doc) => candidateOf(doc.id, doc.data())));
     }
-    const best = electBestPlayer(votes, candidates, rulesOf(config.data()));
+    // Só quem participou da partida (súmula) pode ser o craque.
+    const best = electBestPlayer(votes, candidates, rulesOf(config.data()), participantNames(matchSnap.data() ?? {}));
     await matchRef.update({ craque: best ?? FieldValue.delete() });
+    // O card "Vote no craque" mostra o eleito (ou "sem craque eleito").
+    const fields = voteCardBestPlayerFields(best, matchSnap.data() ?? {});
+    const update = Object.fromEntries(
+      Object.entries(fields).map(([k, v]) => [k, v === null ? FieldValue.delete() : v]),
+    );
+    const cardRef = db.collection('noticias').doc(voteNewsId(matchId));
+    if ((await cardRef.get()).exists) await cardRef.update(update);
   } catch (error) {
     logger.error('Falha ao apurar o craque', { collection, matchId, error: String(error) });
   }
@@ -387,8 +414,20 @@ async function postResult(collection: string, season: string, matchId: string, m
     logger.info('Card de resultado já existia', { match: `${collection}/${matchId}`, error: String(error) });
   }
   await db.collection(collection).doc(matchId).update({ resultadoNoticia: ref.id });
+  // O card ao vivo deixa de dizer "ao vivo" (fim pelo admin, pelo horário ou automático).
+  await syncLiveCardStatus(matchId, 'encerrada', match);
   await scorePredictions(collection, season, matchId, match);
   await recomputeMatchGroups(season, { ...match, resultadoNoticia: ref.id });
+}
+
+/** Marca a fase no card ao vivo da partida (sem card ao vivo, nada a fazer). */
+async function syncLiveCardStatus(matchId: string, status: LiveCardStatus, match: Record<string, unknown>) {
+  const { db } = await admin();
+  await db
+    .collection('noticias')
+    .doc(liveNewsId(matchId))
+    .update(liveCardStatusUpdate(status, match))
+    .catch((error) => logger.info('Card ao vivo não atualizado', { matchId, status, error: String(error) }));
 }
 
 /**
@@ -673,6 +712,18 @@ export const onTeamRequestWritten = onDocumentWritten('solicitacoes_time/{uid}',
   if (after?.status === 'aprovada' && before?.status !== 'aprovada') {
     await progressRef(uid).then((ref) => ref.set({ donoTime: 1 }, { merge: true }));
   }
+});
+
+/** Pedido "Sou organizador de campeonato": avisa os admins (novo) e quem pediu (resposta). */
+export const onOrganizerRequestWritten = onDocumentWritten('solicitacoes_organizador/{uid}', async (event) => {
+  const uid = event.params.uid;
+  const before = event.data?.before.data();
+  const after = event.data?.after.data();
+  const origem = `solicitacoes_organizador/${uid}`;
+  const toAdmins = organizerRequestMessage(uid, before, after);
+  if (toAdmins) await deliver(`pedido_organizador_${event.id}`, toAdmins, origem);
+  const toUser = organizerRequestAnswerMessage(uid, before, after);
+  if (toUser) await deliver(`resposta_organizador_${event.id}`, toUser, origem);
 });
 
 /** Pedido "Sou parceiro": avisa os admins (novo) e quem pediu (resposta). */

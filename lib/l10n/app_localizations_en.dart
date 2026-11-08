@@ -731,6 +731,840 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchCardTomorrow => 'TOMORROW';
 
   @override
+  String get shareArtTemplateVibrant => 'Colors';
+
+  @override
+  String get shareArtPreviewTitle => 'Promote match';
+
+  @override
+  String get shareArtTemplateMatchday => 'Match day';
+
+  @override
+  String get shareArtTemplateVersus => 'Head to head';
+
+  @override
+  String get shareArtTemplateCalendar => 'Calendar';
+
+  @override
+  String get shareArtTemplateChampionship => 'Championship';
+
+  @override
+  String get shareArtTemplateTicket => 'Ticket';
+
+  @override
+  String get shareArtTemplateScoreboard => 'Scoreboard';
+
+  @override
+  String get shareArtToday2 => 'Today';
+
+  @override
+  String get shareArtTicketLabel => 'Official ticket';
+
+  @override
+  String get shareArtColors => 'Colors';
+
+  @override
+  String get shareArtPaletteTeams => 'Teams';
+
+  @override
+  String get shareArtPaletteArena => 'Arena';
+
+  @override
+  String get shareArtPaletteNight => 'Night';
+
+  @override
+  String get shareArtPaletteCrimson => 'Crimson';
+
+  @override
+  String get shareArtPaletteOcean => 'Ocean';
+
+  @override
+  String get shareArtPaletteGraphite => 'Graphite';
+
+  @override
+  String get shareArtDateLabel => 'Date';
+
+  @override
+  String get shareArtTimeLabel => 'Kick-off';
+
+  @override
+  String get shareArtVenueLabel => 'Venue';
+
+  @override
+  String shareArtDaysLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days to go',
+      one: '1 day to go',
+      zero: 'Today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get shareArtToday => 'It\'s today!';
+
+  @override
+  String get shareArtNextMatch => 'Next match';
+
+  @override
+  String get shareArtVenueTbd => 'Venue TBD';
+
+  @override
+  String get shareArtMissingTime => 'kick-off time';
+
+  @override
+  String shareArtWeekday(String day) {
+    String _temp0 = intl.Intl.selectLogic(
+      day,
+      {
+        '1': 'Monday',
+        '2': 'Tuesday',
+        '3': 'Wednesday',
+        '4': 'Thursday',
+        '5': 'Friday',
+        '6': 'Saturday',
+        '7': 'Sunday',
+        'other': '',
+      },
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String shareArtWeekdayShort(String day) {
+    String _temp0 = intl.Intl.selectLogic(
+      day,
+      {
+        '1': 'Mon',
+        '2': 'Tue',
+        '3': 'Wed',
+        '4': 'Thu',
+        '5': 'Fri',
+        '6': 'Sat',
+        '7': 'Sun',
+        'other': '',
+      },
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String shareArtMonth(String month) {
+    String _temp0 = intl.Intl.selectLogic(
+      month,
+      {
+        '1': 'Jan',
+        '2': 'Feb',
+        '3': 'Mar',
+        '4': 'Apr',
+        '5': 'May',
+        '6': 'Jun',
+        '7': 'Jul',
+        '8': 'Aug',
+        '9': 'Sep',
+        '10': 'Oct',
+        '11': 'Nov',
+        '12': 'Dec',
+        'other': '',
+      },
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get shareArtTemplatePoster => 'Full time';
+
+  @override
+  String get shareArtTemplateFaceOff => 'Face-off';
+
+  @override
+  String get shareArtTemplateEditorial => 'Editorial';
+
+  @override
+  String get shareArtTitle => 'Create artwork';
+
+  @override
+  String get shareArtTemplate => 'Template';
+
+  @override
+  String get shareArtFormat => 'Format';
+
+  @override
+  String get shareArtFormatFeed => 'Feed 4:5';
+
+  @override
+  String get shareArtFormatStory => 'Story 9:16';
+
+  @override
+  String get shareArtFormatSquare => 'Square';
+
+  @override
+  String get shareArtFormatLandscape => 'Landscape';
+
+  @override
+  String get shareArtQr => 'Include QR code';
+
+  @override
+  String get shareArtSave => 'Save';
+
+  @override
+  String get shareArtInstagram => 'Instagram';
+
+  @override
+  String get shareArtSaved => 'Artwork saved to the gallery.';
+
+  @override
+  String get shareArtSaveError => 'Could not save to the gallery.';
+
+  @override
+  String get shareArtError => 'Could not create the artwork.';
+
+  @override
+  String get shareArtCallToAction => 'See more on Arena Football';
+
+  @override
+  String shareArtHalfTime(String score) {
+    return 'Half time $score';
+  }
+
+  @override
+  String shareArtMissing(String items) {
+    return 'Not registered: $items. The artwork goes without them.';
+  }
+
+  @override
+  String shareArtMissingCrest(String team) {
+    return '$team crest';
+  }
+
+  @override
+  String get shareArtMissingVenue => 'venue';
+
+  @override
+  String get shareArtMissingDate => 'date';
+
+  @override
+  String shareArtShareText(String home, String away, String link) {
+    return '$home x $away on Arena Football: $link';
+  }
+
+  @override
+  String get pdfTitle => 'MATCH REPORT';
+
+  @override
+  String get pdfDraft => 'DRAFT - unsaved changes';
+
+  @override
+  String get pdfMatchInfo => 'Match details';
+
+  @override
+  String get pdfDate => 'Date';
+
+  @override
+  String get pdfTime => 'Time';
+
+  @override
+  String get pdfVenue => 'Venue';
+
+  @override
+  String get pdfRegion => 'Region';
+
+  @override
+  String get pdfDuration => 'Duration';
+
+  @override
+  String get pdfStatus => 'Status';
+
+  @override
+  String get pdfLineups => 'Lineups';
+
+  @override
+  String get pdfStarters => 'Starters';
+
+  @override
+  String get pdfReserves => 'Substitutes';
+
+  @override
+  String get pdfGoals => 'Goals';
+
+  @override
+  String get pdfBookings => 'Cards';
+
+  @override
+  String get pdfSubstitutions => 'Substitutions';
+
+  @override
+  String get pdfMinute => 'Min.';
+
+  @override
+  String get pdfTeam => 'Team';
+
+  @override
+  String get pdfPlayer => 'Player';
+
+  @override
+  String get pdfScorer => 'Scorer';
+
+  @override
+  String get pdfAssist => 'Assist';
+
+  @override
+  String get pdfType => 'Type';
+
+  @override
+  String get pdfIn => 'On';
+
+  @override
+  String get pdfOut => 'Off';
+
+  @override
+  String get pdfYellow => 'Yellow';
+
+  @override
+  String get pdfRed => 'Red';
+
+  @override
+  String get pdfBestPlayer => 'Player of the match';
+
+  @override
+  String get pdfNotes => 'Notes';
+
+  @override
+  String get pdfSignatures => 'Signatures';
+
+  @override
+  String get pdfSignReferee => 'Referee';
+
+  @override
+  String get pdfSignOrganizer => 'Organizer';
+
+  @override
+  String pdfSignCaptain(String team) {
+    return 'Captain - $team';
+  }
+
+  @override
+  String get pdfNone => 'No records';
+
+  @override
+  String get pdfChampionship => 'Competition';
+
+  @override
+  String pdfGeneratedAt(String date) {
+    return 'Generated by Arena Football on $date';
+  }
+
+  @override
+  String pdfPage(int page, int total) {
+    return 'page $page/$total';
+  }
+
+  @override
+  String pdfMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String pdfCameIn(String minute) {
+    return 'on$minute';
+  }
+
+  @override
+  String pdfWentOut(String minute) {
+    return 'off$minute';
+  }
+
+  @override
+  String get matchReportExportPdf => 'Export PDF';
+
+  @override
+  String get matchReportExport => 'Export match report';
+
+  @override
+  String get matchReportExportError =>
+      'Could not generate the match report PDF.';
+
+  @override
+  String get votingOnlyParticipants =>
+      'Only players who took part in the match are shown.';
+
+  @override
+  String get liveFullTime => 'Full time';
+
+  @override
+  String get liveEventsTitle => 'Match events';
+
+  @override
+  String get liveSeeMatch => 'See match';
+
+  @override
+  String get liveYellowCard => 'Yellow card';
+
+  @override
+  String get liveLabel => 'Live';
+
+  @override
+  String get liveNoEvents => 'No events yet.';
+
+  @override
+  String get liveSentOff => 'Sent off';
+
+  @override
+  String get pushActionRedCard => 'Red card';
+
+  @override
+  String get pushActionRedCardHint =>
+      'Sending-off recorded in the match report (\"Sent off!\")';
+
+  @override
+  String get reportSubstitution => 'Substitution';
+
+  @override
+  String get reportWhoLeaves => 'Who comes off?';
+
+  @override
+  String get reportWhoEnters => 'Who comes on?';
+
+  @override
+  String reportLeaving(String name) {
+    return 'Off: $name';
+  }
+
+  @override
+  String reportEntering(String name) {
+    return 'On: $name';
+  }
+
+  @override
+  String get reportLineupNeeded =>
+      'No lineup: the whole squad is shown. Set the lineup to see only who is on the pitch.';
+
+  @override
+  String get reportNobodyToPick => 'Nobody available in this step.';
+
+  @override
+  String organizerMatchTeamNotEnrolled(String team) {
+    return '$team is not registered in this competition. Register the team in the Teams tab.';
+  }
+
+  @override
+  String get organizerPermissionDenied =>
+      'No permission to save in this competition. Ask the admin to open the \"Championship organizers\" panel and try again.';
+
+  @override
+  String get organizerNewMatch => 'New match';
+
+  @override
+  String get organizerMatchNeedsTeams =>
+      'Register at least 2 teams in the competition (Teams tab) to add matches.';
+
+  @override
+  String get squadGoalkeepers => 'Goalkeepers';
+
+  @override
+  String get squadDefenders => 'Defenders';
+
+  @override
+  String get squadFullBacks => 'Full-backs';
+
+  @override
+  String get squadDefensiveMidfielders => 'Defensive midfielders';
+
+  @override
+  String get squadMidfielders => 'Midfielders';
+
+  @override
+  String get squadForwards => 'Forwards';
+
+  @override
+  String get squadNoPosition => 'No position';
+
+  @override
+  String get squadAllPlayers => 'Players';
+
+  @override
+  String get squadTopScorer => 'Top scorer';
+
+  @override
+  String get squadTopAssister => 'Top assister';
+
+  @override
+  String get squadSortBy => 'Sort by';
+
+  @override
+  String get squadSortPosition => 'Position';
+
+  @override
+  String get squadGoalsShort => 'G';
+
+  @override
+  String get squadAssistsShort => 'A';
+
+  @override
+  String get squadSearch => 'Search player';
+
+  @override
+  String get squadPlayerActions => 'Player actions';
+
+  @override
+  String get organizerSquadPermission =>
+      'No permission to change this squad. Ask the admin to open the \"Championship organizers\" panel and try again.';
+
+  @override
+  String get organizerSquadAdd => 'From full squad';
+
+  @override
+  String get organizerSquadNew => 'New player';
+
+  @override
+  String get organizerSquadAddTitle => 'Add to the competition';
+
+  @override
+  String organizerSquadAddHint(String championship) {
+    return 'Players from the team\'s full squad not yet in $championship.';
+  }
+
+  @override
+  String organizerSquadAddConfirm(int count) {
+    return 'Add ($count)';
+  }
+
+  @override
+  String get organizerSquadNone =>
+      'Every player in the full squad is already in the competition.';
+
+  @override
+  String organizerSquadAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count players added',
+      one: '1 player added',
+    );
+    return '$_temp0.';
+  }
+
+  @override
+  String organizerSquadNewHint(String championship) {
+    return 'Joins the team, registered only in $championship.';
+  }
+
+  @override
+  String organizerSquadCreated(String name) {
+    return '$name registered in the competition.';
+  }
+
+  @override
+  String get organizerSquadRemove => 'Remove from competition';
+
+  @override
+  String organizerSquadRemoveTitle(String name) {
+    return 'Remove $name from the competition?';
+  }
+
+  @override
+  String get organizerSquadRemoveMessage =>
+      'They stay in the team\'s full squad. Numbers already recorded in this competition leave it.';
+
+  @override
+  String organizerSquadRemoved(String name) {
+    return '$name left the competition.';
+  }
+
+  @override
+  String get organizerSquadLegacy =>
+      'Older player: the admin or the team owner adjusts their competitions.';
+
+  @override
+  String organizerSquadOtherTeam(String team) {
+    return 'Plays for $team in this competition.';
+  }
+
+  @override
+  String get organizerSquadError => 'Could not save. Try again.';
+
+  @override
+  String get organizerEnrollTeam => 'Register team';
+
+  @override
+  String get organizerFormGroups => 'Form groups';
+
+  @override
+  String get organizerEditChampionship => 'Edit championship';
+
+  @override
+  String get organizerPickChampionship => 'Which championship?';
+
+  @override
+  String get organizerEnrollNoCandidates =>
+      'All available teams are already registered.';
+
+  @override
+  String organizerEnrolled(String team, String championship) {
+    return '$team registered in $championship.';
+  }
+
+  @override
+  String get organizerOutsideRegion =>
+      'A municipal championship only accepts teams from its own region.';
+
+  @override
+  String get organizerRemoveTeam => 'Remove from championship';
+
+  @override
+  String organizerRemoveTeamTitle(String team) {
+    return 'Remove $team?';
+  }
+
+  @override
+  String organizerRemoveTeamMessage(String championship) {
+    return 'The team leaves $championship. Matches already registered stay.';
+  }
+
+  @override
+  String organizerRemoved(String team) {
+    return '$team left the championship.';
+  }
+
+  @override
+  String organizerGroupsTitle(String championship) {
+    return 'Groups · $championship';
+  }
+
+  @override
+  String get organizerGroupsEmpty => 'No groups yet. Create one or draw them.';
+
+  @override
+  String get organizerGroupsLoadError => 'Could not load the groups.';
+
+  @override
+  String get organizerGroupNew => 'New group';
+
+  @override
+  String get organizerGroupEdit => 'Edit group';
+
+  @override
+  String get organizerGroupName => 'Group name';
+
+  @override
+  String get organizerGroupNameRequired => 'Enter the group name.';
+
+  @override
+  String organizerGroupLabel(String name) {
+    return 'Group $name';
+  }
+
+  @override
+  String get organizerGroupAddTeam => 'Add team';
+
+  @override
+  String get organizerGroupFull => 'The group already has 4 teams.';
+
+  @override
+  String get organizerGroupNoTeamsLeft =>
+      'All registered teams are already in groups.';
+
+  @override
+  String get organizerGroupSaved => 'Group saved.';
+
+  @override
+  String get organizerGroupDelete => 'Delete group';
+
+  @override
+  String organizerGroupDeleteTitle(String name) {
+    return 'Delete group $name?';
+  }
+
+  @override
+  String get organizerGroupDeleteMessage =>
+      'Its teams go back to no group and the group table is rebuilt.';
+
+  @override
+  String get organizerGroupsDraw => 'Draw groups';
+
+  @override
+  String get organizerGroupsDrawCount => 'How many groups?';
+
+  @override
+  String organizerGroupsDrawOption(int count, int perGroup) {
+    return '$count groups · up to $perGroup teams each';
+  }
+
+  @override
+  String get organizerGroupsDrawNeedTeams =>
+      'Register at least 2 teams to draw.';
+
+  @override
+  String organizerGroupsDrawConfirmTitle(int count) {
+    return 'Draw $count groups?';
+  }
+
+  @override
+  String get organizerGroupsDrawConfirmMessage =>
+      'Current groups are deleted and the registered teams are shuffled into new ones.';
+
+  @override
+  String get organizerGroupsDrawn => 'Groups drawn.';
+
+  @override
+  String get organizerModeFan => 'Fan mode';
+
+  @override
+  String get organizerModeOrganizer => 'Organizer mode';
+
+  @override
+  String get organizerModeToggle => 'Switch between fan and organizer';
+
+  @override
+  String get homeTabMyChampionships => 'My leagues';
+
+  @override
+  String get organizerModeSubtitle => 'Organizer mode · your championships';
+
+  @override
+  String get organizerNoChampionships =>
+      'You don\'t organize any championship yet.';
+
+  @override
+  String get organizerTeamsEmpty => 'No teams registered in this championship.';
+
+  @override
+  String get organizerRequestMenu => 'I organize a competition';
+
+  @override
+  String get organizerRequestTitle => 'I organize a competition';
+
+  @override
+  String get organizerRequestIntro =>
+      'Running a competition? Ask to add it to Arena. Once approved, the competition is created and you manage the details (description, rules, prizes and teams).';
+
+  @override
+  String get organizerRequestLogoAdd => 'Logo (optional)';
+
+  @override
+  String get organizerRequestSectionCompetition => 'Competition';
+
+  @override
+  String get organizerRequestNameLabel => 'Competition name';
+
+  @override
+  String get organizerRequestNameRequired =>
+      'Enter the competition name (at least 3 letters).';
+
+  @override
+  String get organizerRequestScopeLabel => 'Category';
+
+  @override
+  String get organizerRequestDescriptionLabel =>
+      'About the competition (dates, format, number of teams)';
+
+  @override
+  String get organizerRequestSubmit => 'Send request';
+
+  @override
+  String get organizerRequestSent => 'Request sent! The admin will review it.';
+
+  @override
+  String get organizerRequestCancelled => 'Request cancelled.';
+
+  @override
+  String get organizerRequestLoadError => 'Could not load your request.';
+
+  @override
+  String get organizerRequestPendingInfo =>
+      'Your request is with the admin. You will be notified when they answer.';
+
+  @override
+  String get organizerRequestRejectedInfo =>
+      'Your request was not approved. Fix the details and send it again.';
+
+  @override
+  String get organizerRequestApprovedInfo =>
+      'Your competition was created! Edit the details in \"My competitions\".';
+
+  @override
+  String get organizerRequestEdit => 'Fix request';
+
+  @override
+  String get organizerRequestCancel => 'Cancel request';
+
+  @override
+  String get organizerRequestCancelTitle => 'Cancel the request?';
+
+  @override
+  String organizerRequestCancelMessage(String name) {
+    return 'The request for $name will be deleted.';
+  }
+
+  @override
+  String get organizerRequestResubmit => 'Send again';
+
+  @override
+  String get organizerRequestNew => 'Request another competition';
+
+  @override
+  String get organizerMyChampionships => 'My competitions';
+
+  @override
+  String get organizerRequestsPanelTitle => 'Competition organizers';
+
+  @override
+  String get organizerRequestsEmptyPending => 'No organizer requests waiting.';
+
+  @override
+  String get organizerRequestsEmptyAnswered => 'No answered requests yet.';
+
+  @override
+  String get organizerRequestsLoadError =>
+      'Could not load the organizer requests.';
+
+  @override
+  String organizerRequestsApproveTitle(String name) {
+    return 'Approve $name?';
+  }
+
+  @override
+  String organizerRequestsApproveMessage(
+      String region, String scope, String user) {
+    return 'Creates the competition in $region ($scope) in the current season, organized by $user.';
+  }
+
+  @override
+  String organizerRequestsApproved(String name) {
+    return 'Competition $name created.';
+  }
+
+  @override
+  String organizerRequestsRejectTitle(String name) {
+    return 'Reject $name?';
+  }
+
+  @override
+  String organizerRequestsOrganizer(String user) {
+    return 'Organizer: $user';
+  }
+
+  @override
+  String get championshipFormOrganizerLocked =>
+      'Name, region, category and season were set on approval. Ask the admin to change them.';
+
+  @override
+  String get pushActionOrganizerRequest => 'Organizer request';
+
+  @override
+  String get pushActionOrganizerRequestHint =>
+      'To admins · someone wants to add a competition';
+
+  @override
+  String get pushActionOrganizerAnswer => 'Answer to organizer';
+
+  @override
+  String get pushActionOrganizerAnswerHint =>
+      'To the requester · competition approved or declined';
+
+  @override
   String get referralTitle => 'Invite friends';
 
   @override
@@ -1094,7 +1928,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get reportPublishCards => 'Publish goal card in the feed';
+  String get reportPublishCards => 'Publish to the feed (live match card)';
 
   @override
   String get reportSave => 'Save';
@@ -2569,6 +3403,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get drawerOnFieldSection => 'On the field';
 
   @override
+  String get drawerPlayerHint => 'Ask to play for a team';
+
+  @override
+  String get drawerPlayerHintApproved => 'Your profile and stats';
+
+  @override
+  String get drawerOwnerHint => 'Register and manage your team';
+
+  @override
+  String get drawerOwnerHintApproved => 'Squad, requests and crest';
+
+  @override
+  String get drawerPartnerHint => 'Publish in your region';
+
+  @override
+  String get drawerPartnerHintApproved => 'Your posts and slots';
+
+  @override
+  String get drawerOrganizerHint => 'Run your own championship';
+
+  @override
   String get pushActionAchievement => 'Achievement unlocked';
 
   @override
@@ -2616,6 +3471,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get voteCallResult => 'See result';
+
+  @override
+  String get voteClosedTitle => 'Result is in';
+
+  @override
+  String voteClosedText(String home, String away) {
+    return 'See who was voted player of the match in $home × $away.';
+  }
+
+  @override
+  String get voteClosedBestPlayer => 'PLAYER OF THE MATCH';
+
+  @override
+  String voteClosedVotes(int votes, int percent) {
+    return '$votes votes · $percent%';
+  }
+
+  @override
+  String get voteClosedNoWinner => 'No player elected';
+
+  @override
+  String get voteClosedNoWinnerText =>
+      'The vote didn\'t reach the minimum to elect a player.';
 
   @override
   String get resultCardFullTime => 'FULL TIME';
@@ -3640,6 +4518,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get standingsColGames => 'G';
 
   @override
+  String get standingsColGoalDiff => 'GD';
+
+  @override
+  String get standingsColPoints => 'PTS';
+
+  @override
+  String groupsTeamsCount(int count) {
+    return '$count teams';
+  }
+
+  @override
+  String groupsGamesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count games',
+      one: '1 game',
+      zero: '0 games',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get standingsQualifiedLegend => 'Qualified for the next stage';
 
   @override
@@ -3653,6 +4554,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get standingsYourTeam => 'Your team';
+
+  @override
+  String get standingsLeader => 'Leader';
+
+  @override
+  String get standingsNoGamesYet => 'No games played in this group yet';
+
+  @override
+  String standingsGoalsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count goals',
+      one: '1 goal',
+      zero: '0 goals',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String standingsRecord(int wins, int draws, int losses) {
+    return '${wins}W ${draws}D ${losses}L';
+  }
 
   @override
   String get athletePlaysFor => 'Plays for';
@@ -4494,6 +5418,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get championshipTabOverview => 'Overview';
 
   @override
+  String get championshipTabMatches => 'Matches';
+
+  @override
   String get championshipTabTeams => 'Teams';
 
   @override
@@ -5265,6 +6192,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statsShortcut => 'Top scorers & assists';
+
+  @override
+  String get statsShortcutGoalsHint => 'Top scorers';
+
+  @override
+  String get statsShortcutAssistsHint => 'Top playmakers';
 
   @override
   String get alertHeaderConfirm => 'Confirm';

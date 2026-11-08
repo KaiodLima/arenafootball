@@ -8,6 +8,7 @@ import 'package:arena_soccer/utils/components/arena_search_field.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/themes/arena_palette.dart';
 
 /// "Municipal · Floresta" / "Intermunicipal · Floresta".
 String championshipScopeLine(AppLocalizations l10n, ChampionshipDTO championship) => [
@@ -29,7 +30,7 @@ class _ChampionshipThumb extends StatelessWidget {
     final url = championship?.imageUrl ?? '';
     final icon = Icon(
       championship == null ? noneIcon : Icons.emoji_events_outlined,
-      color: AppColors.primaryDark,
+      color: ArenaPalette.of(context).primaryDark,
       size: size * 0.5,
     );
     return ClipRRect(
@@ -37,7 +38,7 @@ class _ChampionshipThumb extends StatelessWidget {
       child: Container(
         width: size,
         height: size,
-        color: AppColors.primarySoft,
+        color: ArenaPalette.of(context).primarySoft,
         alignment: Alignment.center,
         child: url.isEmpty
             ? icon
@@ -120,9 +121,14 @@ class ChampionshipSelectTile extends StatelessWidget {
   }
 }
 
+/// Opção a mais no topo da lista, depois da nula (ex.: "Amistosos" no elenco,
+/// com o id próprio `PlayerDTO.friendlyId`).
+typedef ChampionshipExtraOption = ({int id, String label, IconData icon});
+
 /// Lista de campeonatos com busca e a opção "Sem campeonato (amistoso)" no
-/// topo. Devolve `(id: …)` com o `id_campeonato` escolhido (`null` =
-/// amistoso); nulo se fechar sem escolher.
+/// topo (e a [extraOption], se houver). Devolve `(id: …)` com o
+/// `id_campeonato` escolhido (`null` = a opção nula; o id da extra); nulo se
+/// fechar sem escolher.
 Future<({int? id})?> showChampionshipPickerSheet(
   BuildContext context, {
   required List<ChampionshipDTO> championships,
@@ -130,6 +136,7 @@ Future<({int? id})?> showChampionshipPickerSheet(
   String? noneLabel,
   IconData noneIcon = Icons.handshake_outlined,
   bool showNone = true,
+  ChampionshipExtraOption? extraOption,
 }) {
   return showModalBottomSheet<({int? id})>(
     context: context,
@@ -141,6 +148,7 @@ Future<({int? id})?> showChampionshipPickerSheet(
       noneLabel: noneLabel,
       noneIcon: noneIcon,
       showNone: showNone,
+      extraOption: extraOption,
     ),
   );
 }
@@ -153,6 +161,7 @@ class _ChampionshipPicker extends StatefulWidget {
 
   /// Mostra a opção nula (amistoso / todas) no topo.
   final bool showNone;
+  final ChampionshipExtraOption? extraOption;
 
   const _ChampionshipPicker({
     required this.championships,
@@ -160,6 +169,7 @@ class _ChampionshipPicker extends StatefulWidget {
     required this.noneLabel,
     required this.noneIcon,
     required this.showNone,
+    this.extraOption,
   });
 
   @override
@@ -182,7 +192,7 @@ class _ChampionshipPickerState extends State<_ChampionshipPicker> {
           ? null
           : Text(championshipScopeLine(l10n, championship),
               style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
-      trailing: selected ? const Icon(Icons.check_circle_rounded, color: AppColors.primary) : null,
+      trailing: selected ? Icon(Icons.check_circle_rounded, color: ArenaPalette.of(context).primary) : null,
       onTap: () => Navigator.pop(context, (id: championship?.championshipId)),
     );
   }
@@ -215,6 +225,23 @@ class _ChampionshipPickerState extends State<_ChampionshipPicker> {
             // Amistoso sempre no topo (fora da busca).
             if (widget.showNone) ...[
               _tile(championship: null, selected: widget.selectedId == null),
+              const Divider(height: 1),
+            ],
+            if (widget.extraOption case final extra?) ...[
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: AppSizes.s20),
+                leading: _ChampionshipThumb(championship: null, size: AppSizes.s40, noneIcon: extra.icon),
+                title: Text(
+                  extra.label,
+                  style: AppTypography.body().copyWith(
+                    fontWeight: widget.selectedId == extra.id ? FontWeight.w700 : FontWeight.w500,
+                  ),
+                ),
+                trailing: widget.selectedId == extra.id
+                    ? Icon(Icons.check_circle_rounded, color: ArenaPalette.of(context).primary)
+                    : null,
+                onTap: () => Navigator.pop(context, (id: extra.id)),
+              ),
               const Divider(height: 1),
             ],
             Expanded(

@@ -45,6 +45,62 @@ class ChampionshipsDataSource {
         );
   }
 
+  CollectionReference<Map<String, dynamic>> _groups(String? season) =>
+      _firestore.collection(SeasonCollection.name('grupos', season));
+
+  /// Grupos de um campeonato (`fk_campeonato`), de qualquer região.
+  Stream<Either<Failure, List<GroupDTO>>> watchChampionshipGroups({required int championshipId, String? season}) =>
+      _groups(season).where('fk_campeonato', isEqualTo: championshipId).snapshots().toEither(
+            (snapshot) => snapshot.docs.map(GroupDTO.fromFirestore).toList()
+              ..sort((a, b) => a.description.compareTo(b.description)),
+            fallbackMessage: 'Não foi possível carregar os grupos.',
+            logName: _logName,
+          );
+
+  /// Cria (sem id) ou regrava o grupo.
+  Future<Either<Failure, void>> saveGroup(GroupDTO group, {String? season}) async {
+    try {
+      final ref = group.id.isEmpty ? _groups(season).doc() : _groups(season).doc(group.id);
+      await ref.set(group.toMap());
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('saveGroup id=${group.id}', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
+    }
+  }
+
+  Future<Either<Failure, void>> deleteGroup(String groupId, {String? season}) async {
+    try {
+      await _groups(season).doc(groupId).delete();
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('deleteGroup id=$groupId', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
+    }
+  }
+
+  /// Troca os grupos [previous] pelos [groups] (sorteio), num lote só.
+  Future<Either<Failure, void>> replaceGroups({
+    required List<GroupDTO> previous,
+    required List<GroupDTO> groups,
+    String? season,
+  }) async {
+    try {
+      final batch = _firestore.batch();
+      for (final group in previous) {
+        batch.delete(_groups(season).doc(group.id));
+      }
+      for (final group in groups) {
+        batch.set(_groups(season).doc(), group.toMap());
+      }
+      await batch.commit();
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('replaceGroups', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
+    }
+  }
+
   /// Tabela calculada do grupo (`tabelas{ano}/{idGrupo}`); nula = ainda não
   /// calculada (grupo antigo, sem campeonato).
   Stream<Either<Failure, GroupTableDTO?>> watchGroupTable({required String groupId, String? season}) =>
@@ -111,7 +167,9 @@ class ChampionshipsDataSource {
   /// Regrava o campeonato mantendo o `id_campeonato` (as partidas apontam para ele).
   Future<Either<Failure, ChampionshipDTO>> updateChampionship(ChampionshipDTO championship) async {
     try {
-      await _championships.doc(championship.id).set(championship.toMap());
+      // Merge: mantém o que o formulário não conhece (`recalcularEm`) e deixa
+      // o organizador gravar só o que mudou (as regras olham a diferença).
+      await _championships.doc(championship.id).set(championship.toMap(), SetOptions(merge: true));
       return Right(championship);
     } catch (e) {
       AppLogger.e('updateChampionship id=${championship.id}', name: _logName, error: e);

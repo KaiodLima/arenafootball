@@ -5,6 +5,7 @@ import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 
 abstract class ITeamsRepository {
   Future<Either<Failure, List<TeamDTO>>> getTeams({String? region, String? season});
+  Future<Either<Failure, List<TeamDTO>>> getTeamsByIds({required List<String> ids, List<String> names, String? season});
 
   Future<Either<Failure, TeamDTO?>> getTeamByName(String name);
 

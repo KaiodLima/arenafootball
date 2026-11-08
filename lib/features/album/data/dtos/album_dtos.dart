@@ -346,4 +346,3 @@ class AlbumRankingEntryDTO extends Equatable {
   @override
   List<Object?> get props => [userId, name, imageUrl, collected, rares, complete, reachedAt];
 }
-

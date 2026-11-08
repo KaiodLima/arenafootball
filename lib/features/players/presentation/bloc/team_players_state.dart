@@ -1,10 +1,55 @@
 import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/core/utils/search_text.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 
-/// Ordenação do elenco na tela.
-enum PlayersSort { goals, assists, name }
+/// Ordenação do elenco na tela. Posição (padrão) agrupa por setor.
+enum PlayersSort { position, goals, assists, name }
+
+/// Bloco da lista do elenco: os atletas de uma posição (ordenação por
+/// posição; [position] nula = "Sem posição") ou a lista inteira ([grouped]
+/// falso), ranqueada por gols/assistências ([ranked]).
+class SquadSection extends Equatable {
+  final bool grouped;
+  final PlayerPosition? position;
+  final bool ranked;
+  final List<PlayerDTO> players;
+
+  const SquadSection({required this.players, this.grouped = false, this.position, this.ranked = false});
+
+  @override
+  List<Object?> get props => [grouped, position, ranked, players];
+}
+
+/// Ordem do setor na lista (sem posição no fim).
+int positionOrder(PlayerDTO player) {
+  final position = PlayerPosition.fromKey(player.position);
+  return position == null ? PlayerPosition.values.length : position.index;
+}
+
+/// Seções da lista já filtrada e ordenada ([visible]): por posição, um bloco
+/// por setor na ordem do campo (goleiros → atacantes, sem posição no fim);
+/// nas outras ordenações, um bloco só (ranqueado em gols/assistências).
+List<SquadSection> squadSections(List<PlayerDTO> visible, PlayersSort sort) {
+  if (visible.isEmpty) return const [];
+  if (sort != PlayersSort.position) {
+    return [SquadSection(players: visible, ranked: sort == PlayersSort.goals || sort == PlayersSort.assists)];
+  }
+  final byPosition = <int, List<PlayerDTO>>{};
+  for (final player in visible) {
+    byPosition.putIfAbsent(positionOrder(player), () => []).add(player);
+  }
+  final orders = byPosition.keys.toList()..sort();
+  return [
+    for (final order in orders)
+      SquadSection(
+        grouped: true,
+        position: order < PlayerPosition.values.length ? PlayerPosition.values[order] : null,
+        players: byPosition[order]!,
+      ),
+  ];
+}
 
 /// Como o elenco está sendo visto: time, competição escolhida ("Elenco geral"
 /// = nula), as competições do time na temporada, ordenação e busca.
@@ -23,7 +68,7 @@ class TeamPlayersView extends Equatable {
     this.teamName = '',
     this.championships = const [],
     this.championshipId,
-    this.sort = PlayersSort.goals,
+    this.sort = PlayersSort.position,
     this.query = '',
   });
 
@@ -89,6 +134,9 @@ class TeamPlayersState extends Equatable {
     int byName(PlayerDTO a, PlayerDTO b) => foldForSearch(a.name).compareTo(foldForSearch(b.name));
     filtered.sort((a, b) {
       switch (sort) {
+        case PlayersSort.position:
+          final diff = positionOrder(a).compareTo(positionOrder(b));
+          return diff != 0 ? diff : byName(a, b);
         case PlayersSort.goals:
           final diff = goalsOf(b).compareTo(goalsOf(a));
           return diff != 0 ? diff : byName(a, b);
@@ -102,6 +150,9 @@ class TeamPlayersState extends Equatable {
     return filtered;
   }
 
+  /// Blocos da lista na tela (ver [squadSections]).
+  List<SquadSection> get sections => squadSections(visiblePlayers, sort);
+
   int get totalGoals => squad.fold(0, (sum, p) => sum + goalsOf(p));
 
   int get totalAssists => squad.fold(0, (sum, p) => sum + assistsOf(p));
@@ -113,6 +164,19 @@ class TeamPlayersState extends Equatable {
       if (goalsOf(player) > 0 && (top == null || goalsOf(player) > goalsOf(top))) top = player;
     }
     return top?.id;
+  }
+
+  /// Artilheiro e garçom da lista escolhida (nulos sem gol/assistência).
+  PlayerDTO? get topScorer => _top(goalsOf);
+
+  PlayerDTO? get topAssister => _top(assistsOf);
+
+  PlayerDTO? _top(int Function(PlayerDTO) of) {
+    PlayerDTO? top;
+    for (final player in squad) {
+      if (of(player) > 0 && (top == null || of(player) > of(top))) top = player;
+    }
+    return top;
   }
 
   @override

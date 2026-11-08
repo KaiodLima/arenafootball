@@ -1,4 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/errors/failure.dart';
+import 'package:arena_soccer/core/utils/app_logger.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_cache_first_usecase.dart';
@@ -49,6 +51,22 @@ class MatchFormCubit extends Cubit<MatchFormState> {
       _edit(state.form.copyWith(regions: regions.contains(current) ? regions : [current, ...regions]));
     }
     await loadRegion;
+  }
+
+  /// Organizador: cadastro só na competição [championship] (sede e
+  /// competição fixas, sem amistoso; times só os inscritos nela).
+  Future<void> loadForChampionship(ChampionshipDTO championship, {DateTime? now}) async {
+    final region = championship.region;
+    _edit(state.form.copyWith(
+      regions: [region],
+      selectedRegion: region,
+      date: WatchMatchesUseCase.formatMatchDate(MatchTime.today(now ?? DateTime.now())),
+    ));
+    await _loadRegionData(region);
+    if (isClosed) return;
+    final id = championship.championshipId;
+    final form = state.form.copyWith(championships: [championship], championshipId: () => id);
+    _edit(_withTeams(form.copyWith(teams: form.teamsFor(id))));
   }
 
   Future<void> selectRegion(String region) async {
@@ -151,7 +169,18 @@ class MatchFormCubit extends Cubit<MatchFormState> {
     final response = await createMatchUseCase(match, friendly: form.isFriendly);
     if (isClosed) return;
     response.fold(
-      (failure) => emit(ErrorMatchFormState(form: form, errorMessage: failure.toString())),
+      (failure) {
+        AppLogger.e(
+          'submit c${match.championshipId} casa=${match.homeTeamId} fora=${match.awayTeamId} regiao=${match.region}',
+          name: 'MatchFormCubit',
+          error: failure,
+        );
+        emit(ErrorMatchFormState(
+          form: form,
+          errorMessage: failure.toString(),
+          errorCode: failure is ErrorWithMessage ? failure.code : null,
+        ));
+      },
       // Montar uma rodada: data, hora e local ficam; os times são escolhidos de
       // novo. A partida entra na lista para o aviso de conflito valer.
       (_) => emit(SuccessMatchFormState(

@@ -4,6 +4,9 @@ import {
   ALL_TEMPLATES,
   fillTemplate,
   isMatchOver,
+  liveCardStatusOf,
+  liveCardStatusUpdate,
+  liveNewsId,
   recentDays,
   resultChanged,
   resultGroup,
@@ -113,4 +116,18 @@ test('card de resultado aparece no feed de cada região envolvida', () => {
   assert.deepEqual(between.idsRegioes, ['r2', 'r3', 'r1']);
   assert.equal(between.idRegiao, 'r1');
   assert.equal('idsRegioes' in resultNews(base, 'm1', '2026'), false);
+});
+
+test('card ao vivo: fase da partida e o título do app antigo', () => {
+  const match = { timeC: 'Leões', timeF: 'Tigres', golTimeCasa: 2, golTimeFora: '1' };
+  assert.equal(liveNewsId('m1'), 'aovivo_m1');
+  assert.deepEqual(liveCardStatusUpdate('encerrada', match), {
+    status_partida: 'encerrada',
+    titulo: 'Leões 2 × 1 Tigres · fim de jogo',
+  });
+  assert.equal(liveCardStatusUpdate('intervalo', match).titulo, 'Leões 2 × 1 Tigres · intervalo');
+  assert.equal(liveCardStatusUpdate('andamento', match).status_partida, 'andamento');
+  assert.equal(liveCardStatusOf('intervalo'), 'intervalo');
+  assert.equal(liveCardStatusOf('aguardando'), null);
+  assert.equal(liveCardStatusOf(undefined), null);
 });

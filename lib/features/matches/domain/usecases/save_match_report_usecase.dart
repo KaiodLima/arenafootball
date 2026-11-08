@@ -1,4 +1,5 @@
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/sync_live_match_card_usecase.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
@@ -16,7 +17,10 @@ class SaveMatchReportUseCase {
   final PublishGoalCardsUseCase _cards;
   final IMatchesRepository _matches;
 
-  SaveMatchReportUseCase(this._goals, this._cards, this._matches);
+  /// Card ao vivo da partida no feed (nulo nos testes antigos).
+  final SyncLiveMatchCardUseCase? _live;
+
+  SaveMatchReportUseCase(this._goals, this._cards, this._matches, [this._live]);
 
   Future<Either<Failure, ({MatchDTO match, int publishedCards})>> call({
     required MatchDTO original,
@@ -40,6 +44,13 @@ class SaveMatchReportUseCase {
     }
     final report = await _matches.updateReport(saved, season: season);
     if (report.isLeft) return Left(report.left);
+    // Card ao vivo: o lance novo (gol, cartão ou substituição) em destaque e
+    // no topo do feed. A súmula já foi salva: a falha do card só avisa.
+    final live = _live;
+    if (publishCards && live != null) {
+      final synced = await live(match: saved, before: original.copyWith(goals: goalsBefore), season: season);
+      if (synced.isLeft) published = -1;
+    }
     return Right((match: saved, publishedCards: published));
   }
 }

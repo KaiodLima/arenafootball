@@ -10,7 +10,21 @@ class StickerName {
 
   /// Palavras que não entram na sigla ("Lava Jato FC" → LAV).
   static const _skip = {
-    'fc', 'ec', 'sc', 'ac', 'cf', 'ce', 'esporte', 'clube', 'futebol', 'de', 'da', 'do', 'das', 'dos', 'e',
+    'fc',
+    'ec',
+    'sc',
+    'ac',
+    'cf',
+    'ce',
+    'esporte',
+    'clube',
+    'futebol',
+    'de',
+    'da',
+    'do',
+    'das',
+    'dos',
+    'e',
   };
 
   /// (primeiro nome, destaque): "Carlos Eduardo Silva" → ("Carlos", "Silva");
@@ -26,10 +40,7 @@ class StickerName {
   /// senão, as 3 primeiras letras da primeira.
   static String teamCode(String team) {
     final plain = team.toLowerCase().split('').map((c) => _accents[c] ?? c).join();
-    final words = plain
-        .split(RegExp(r'[^a-z0-9]+'))
-        .where((w) => w.isNotEmpty && !_skip.contains(w))
-        .toList();
+    final words = plain.split(RegExp(r'[^a-z0-9]+')).where((w) => w.isNotEmpty && !_skip.contains(w)).toList();
     if (words.isEmpty) return '';
     final code = words.length >= 3 ? words.take(3).map((w) => w[0]).join() : words.first;
     return code.substring(0, code.length < 3 ? code.length : 3).toUpperCase();

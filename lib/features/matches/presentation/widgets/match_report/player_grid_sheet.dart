@@ -1,43 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_report_dtos.dart';
+import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/player_card.dart';
+import 'package:arena_soccer/features/players/presentation/widgets/squad_player_row.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// Lance escolhido na folha: o atleta (nulo = gol sem autor), o garçom e o minuto.
+/// Lance escolhido na folha: o atleta (nulo = gol sem autor), o garçom e o
+/// minuto. Na substituição, [player] sai e [assistant] entra.
 typedef PickedEvent = ({PlayerDTO? player, PlayerDTO? assistant, int? minute});
 
-/// Atletas na ordem da súmula: titulares (pelo número), reservas e o resto do
-/// elenco; com o número da camisa de quem está na escalação.
-List<({PlayerDTO player, int? number, bool related})> orderedForPicking(
-  List<PlayerDTO> squad,
-  List<LineupEntry> lineup,
-) {
-  final entries = {for (final e in lineup) e.playerId: e};
-  int rank(PlayerDTO p) {
-    final e = entries[p.id];
-    if (e == null) return 2;
-    return e.starter ? 0 : 1;
-  }
+/// Atleta oferecido na folha, com o número da camisa da escalação.
+typedef PickItem = ({PlayerDTO player, int? number, bool related});
 
-  final list = [...squad]..sort((a, b) {
-      final byRank = rank(a).compareTo(rank(b));
-      if (byRank != 0) return byRank;
-      final na = entries[a.id]?.number ?? 999;
-      final nb = entries[b.id]?.number ?? 999;
-      if (na != nb) return na.compareTo(nb);
-      return a.name.toLowerCase().compareTo(b.name.toLowerCase());
-    });
-  return [for (final p in list) (player: p, number: entries[p.id]?.number, related: entries.containsKey(p.id))];
+/// Bloco da folha: os atletas de uma posição (nula = "Sem posição").
+typedef PickSection = ({PlayerPosition? position, List<PickItem> items});
+
+/// Atletas agrupados por posição na ordem do campo (goleiros → atacantes,
+/// sem posição no fim); dentro do setor, pelo número da camisa e o nome.
+List<PickSection> groupedForPicking(List<PlayerDTO> players, List<LineupEntry> lineup) {
+  final entries = {for (final e in lineup) e.playerId: e};
+  int order(PlayerDTO p) => PlayerPosition.fromKey(p.position)?.index ?? PlayerPosition.values.length;
+  final byOrder = <int, List<PickItem>>{};
+  for (final p in players) {
+    byOrder.putIfAbsent(order(p), () => []).add(
+      (player: p, number: entries[p.id]?.number, related: entries.containsKey(p.id)),
+    );
+  }
+  final orders = byOrder.keys.toList()..sort();
+  return [
+    for (final o in orders)
+      (
+        position: o < PlayerPosition.values.length ? PlayerPosition.values[o] : null,
+        items: byOrder[o]!
+          ..sort((a, b) {
+            final byNumber = (a.number ?? 999).compareTo(b.number ?? 999);
+            return byNumber != 0 ? byNumber : a.player.name.toLowerCase().compareTo(b.player.name.toLowerCase());
+          }),
+      ),
+  ];
 }
 
 /// Folha de lançamento (estilo súmula de árbitro): minuto grande com − e +
-/// (já com o do relógio) e os atletas em grade com o número da camisa. No
-/// gol, o 2º passo pergunta o garçom ("Sem assistência" em destaque).
+/// (já com o do relógio) e os atletas **em campo** ([onField]; nulo = sem
+/// escalação, o elenco todo) em grade, agrupados por posição, com o número
+/// da camisa. No gol, o 2º passo pergunta o garçom ("Sem assistência" em
+/// destaque). Na [substitution], o 1º passo é quem sai (em campo) e o 2º
+/// quem entra (fora de campo, sem quem já saiu: [substitutedOut]).
 Future<PickedEvent?> showPlayerGridSheet(
   BuildContext context, {
   required String title,
@@ -45,8 +58,11 @@ Future<PickedEvent?> showPlayerGridSheet(
   required Color color,
   required List<PlayerDTO> squad,
   required List<LineupEntry> lineup,
+  Set<String>? onField,
+  Set<String> substitutedOut = const {},
   int? minute,
   bool goal = false,
+  bool substitution = false,
 }) {
   return showModalBottomSheet<PickedEvent>(
     context: context,
@@ -59,8 +75,11 @@ Future<PickedEvent?> showPlayerGridSheet(
       color: color,
       squad: squad,
       lineup: lineup,
+      onField: onField,
+      substitutedOut: substitutedOut,
       minute: minute,
       goal: goal,
+      substitution: substitution,
     ),
   );
 }
@@ -71,8 +90,11 @@ class _PlayerGridSheet extends StatefulWidget {
   final Color color;
   final List<PlayerDTO> squad;
   final List<LineupEntry> lineup;
+  final Set<String>? onField;
+  final Set<String> substitutedOut;
   final int? minute;
   final bool goal;
+  final bool substitution;
 
   const _PlayerGridSheet({
     required this.title,
@@ -80,8 +102,11 @@ class _PlayerGridSheet extends StatefulWidget {
     required this.color,
     required this.squad,
     required this.lineup,
+    required this.onField,
+    required this.substitutedOut,
     required this.minute,
     required this.goal,
+    required this.substitution,
   });
 
   @override
@@ -91,9 +116,10 @@ class _PlayerGridSheet extends StatefulWidget {
 class _PlayerGridSheetState extends State<_PlayerGridSheet> {
   late int? _minute = widget.minute;
 
-  /// Gol: autor escolhido (2º passo = o garçom).
-  PlayerDTO? _scorer;
-  bool _choosingAssist = false;
+  /// Gol: autor escolhido (2º passo = o garçom). Substituição: quem sai
+  /// (2º passo = quem entra).
+  PlayerDTO? _first;
+  bool _secondStep = false;
 
   void _bump(int delta) {
     HapticFeedback.selectionClick();
@@ -105,32 +131,56 @@ class _PlayerGridSheetState extends State<_PlayerGridSheet> {
 
   void _pick(PlayerDTO? player) {
     HapticFeedback.lightImpact();
-    if (!widget.goal) {
+    final twoSteps = widget.goal || widget.substitution;
+    if (!twoSteps) {
       Navigator.pop(context, (player: player, assistant: null, minute: _minute));
       return;
     }
-    if (!_choosingAssist) {
+    if (!_secondStep) {
       // Gol sem autor não tem garçom.
       if (player == null) {
         Navigator.pop(context, (player: null, assistant: null, minute: _minute));
         return;
       }
       setState(() {
-        _scorer = player;
-        _choosingAssist = true;
+        _first = player;
+        _secondStep = true;
       });
       return;
     }
-    Navigator.pop(context, (player: _scorer, assistant: player, minute: _minute));
+    Navigator.pop(context, (player: _first, assistant: player, minute: _minute));
+  }
+
+  /// Quem aparece no passo atual.
+  List<PlayerDTO> get _players {
+    final onField = widget.onField;
+    bool inField(PlayerDTO p) => onField == null || onField.contains(p.id);
+    if (widget.substitution && _secondStep) {
+      // Quem entra: fora de campo, sem quem já saiu nem quem acabou de sair.
+      return widget.squad
+          .where((p) =>
+              p.id != _first?.id &&
+              !widget.substitutedOut.contains(p.id) &&
+              (onField == null || !onField.contains(p.id)))
+          .toList();
+    }
+    return widget.squad.where((p) => inField(p) && !(_secondStep && p.id == _first?.id)).toList();
+  }
+
+  String _stepTitle(AppLocalizations l10n) {
+    if (widget.substitution) return _secondStep ? l10n.reportWhoEnters : l10n.reportWhoLeaves;
+    return _secondStep ? l10n.reportWhoAssisted : widget.title;
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final players = orderedForPicking(widget.squad, widget.lineup)
-        .where((p) => !_choosingAssist || p.player.id != _scorer?.id)
-        .toList();
-    final emptyLabel = _choosingAssist ? l10n.reportNoAssist : l10n.reportGoalNoScorer;
+    final sections = groupedForPicking(_players, widget.lineup);
+    final showEmpty = widget.goal;
+    final emptyLabel = _secondStep ? l10n.reportNoAssist : l10n.reportGoalNoScorer;
+    final subtitle = _secondStep && _first != null
+        ? (widget.substitution ? l10n.reportLeaving(_first!.name) : l10n.reportGoalBy(_first!.name))
+        : (widget.substitution ? widget.title : null);
 
     return SizedBox(
       height: MediaQuery.sizeOf(context).height * 0.8,
@@ -147,15 +197,9 @@ class _PlayerGridSheetState extends State<_PlayerGridSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        _choosingAssist ? l10n.reportWhoAssisted : widget.title,
-                        style: AppTypography.title().copyWith(fontSize: AppSizes.s18),
-                      ),
-                      if (_choosingAssist)
-                        Text(
-                          l10n.reportGoalBy(_scorer!.name),
-                          style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
-                        ),
+                      Text(_stepTitle(l10n), style: AppTypography.title().copyWith(fontSize: AppSizes.s18)),
+                      if (subtitle != null)
+                        Text(subtitle, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
                     ],
                   ),
                 ),
@@ -178,35 +222,95 @@ class _PlayerGridSheetState extends State<_PlayerGridSheet> {
                       ],
                     ),
                   )
-                : GridView.builder(
-                    padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s24),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      mainAxisSpacing: AppSizes.s10,
-                      crossAxisSpacing: AppSizes.s10,
-                      childAspectRatio: 0.82,
-                    ),
-                    // O 1º quadrado: "sem autor" (gol) ou "sem assistência".
-                    itemCount: players.length + (widget.goal ? 1 : 0),
-                    itemBuilder: (context, i) {
-                      if (widget.goal && i == 0) {
-                        return _EmptyTile(label: emptyLabel, highlight: _choosingAssist, onTap: () => _pick(null));
-                      }
-                      final item = players[i - (widget.goal ? 1 : 0)];
-                      return _PlayerTile(
-                        player: item.player,
-                        number: item.number,
-                        related: item.related,
-                        color: widget.color,
-                        onTap: () => _pick(item.player),
-                      );
-                    },
+                : CustomScrollView(
+                    slivers: [
+                      // Sem escalação: o elenco todo, com o lembrete.
+                      if (widget.onField == null)
+                        SliverPadding(
+                          padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s10),
+                          sliver: SliverToBoxAdapter(child: _Notice(label: l10n.reportLineupNeeded)),
+                        ),
+                      if (showEmpty)
+                        SliverPadding(
+                          padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s10),
+                          sliver: SliverToBoxAdapter(
+                            child: SizedBox(
+                              height: AppSizes.s80,
+                              child: _EmptyTile(label: emptyLabel, highlight: _secondStep, onTap: () => _pick(null)),
+                            ),
+                          ),
+                        ),
+                      if (sections.isEmpty)
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.all(AppSizes.s24),
+                            child: Text(l10n.reportNobodyToPick,
+                                textAlign: TextAlign.center, style: AppTypography.subtitle()),
+                          ),
+                        ),
+                      for (final section in sections) ...[
+                        SliverPadding(
+                          padding: const EdgeInsets.fromLTRB(AppSizes.s20, AppSizes.s4, AppSizes.s20, AppSizes.s8),
+                          sliver: SliverToBoxAdapter(
+                            child: Text(
+                              '${squadSectionTitle(l10n, section.position).toUpperCase()}  ·  ${section.items.length}',
+                              style: AppTypography.label(color: AppColors.textSecondary)
+                                  .copyWith(fontSize: AppSizes.s12, letterSpacing: 0.6),
+                            ),
+                          ),
+                        ),
+                        SliverPadding(
+                          padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s16),
+                          sliver: SliverGrid.builder(
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              mainAxisSpacing: AppSizes.s10,
+                              crossAxisSpacing: AppSizes.s10,
+                              childAspectRatio: 0.82,
+                            ),
+                            itemCount: section.items.length,
+                            itemBuilder: (context, i) {
+                              final item = section.items[i];
+                              return _PlayerTile(
+                                player: item.player,
+                                number: item.number,
+                                related: item.related,
+                                color: widget.color,
+                                onTap: () => _pick(item.player),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
           ),
         ],
       ),
     );
   }
+}
+
+class _Notice extends StatelessWidget {
+  final String label;
+
+  const _Notice({required this.label});
+
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.all(AppSizes.s10),
+        decoration: BoxDecoration(
+          color: AppColors.gold.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(AppSizes.s12),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.info_outline_rounded, size: AppSizes.s18, color: AppColors.textPrimary),
+            const SizedBox(width: AppSizes.s8),
+            Expanded(child: Text(label, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12))),
+          ],
+        ),
+      );
 }
 
 class _MinuteStepper extends StatelessWidget {

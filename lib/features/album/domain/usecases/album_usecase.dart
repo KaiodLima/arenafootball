@@ -43,8 +43,7 @@ class AlbumUseCase {
     bool extra = false,
   }) async {
     final packId = AlbumPackId.next(eventId: eventId, userId: userId, opened: opened);
-    final response =
-        await _repository.requestPack(packId: packId, userId: userId, eventId: eventId, extra: extra);
+    final response = await _repository.requestPack(packId: packId, userId: userId, eventId: eventId, extra: extra);
     return response.map((_) => packId);
   }
 }
@@ -57,4 +56,3 @@ class AlbumRankingView {
 
   const AlbumRankingView({this.top = const [], this.me, this.myPosition});
 }
-

@@ -98,8 +98,7 @@ class _Bar extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        if (value > 0)
-          Text('$value', style: AppTypography.label(color: color).copyWith(fontSize: AppSizes.s10)),
+        if (value > 0) Text('$value', style: AppTypography.label(color: color).copyWith(fontSize: AppSizes.s10)),
         TweenAnimationBuilder<double>(
           tween: Tween(begin: 0, end: height),
           duration: const Duration(milliseconds: 600),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:arena_soccer/features/news/presentation/widgets/live_match_card.dart';
 import 'package:arena_soccer/features/partner_requests/presentation/bloc/partner_cubit.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
@@ -251,6 +252,14 @@ class _NewsItem extends StatelessWidget {
             : null,
         onScorerTap: news.hasScorer ? () => _openAthlete(context, news.scorerId, news.scorerName) : null,
         onAssistantTap: news.hasAssistant ? () => _openAthlete(context, news.assistantId, news.assistantName) : null,
+      );
+    }
+    if (news.isLive) {
+      return LiveMatchCard(
+        news: news,
+        trailing: _adminMenu(context, onImage: true, canEdit: false),
+        onTap: news.matchId.isEmpty ? null : () => _openMatch(context),
+        onPlayerTap: (id, name) => _openAthlete(context, id, name),
       );
     }
     if (news.isVoteCall) {

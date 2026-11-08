@@ -183,7 +183,7 @@ service cloud.firestore {
       function writable() {
         return !(collection in ['config', 'notificacoes_envios', 'push_avisos', 'solicitacoes_jogador',
           'solicitacoes_time', 'solicitacoes_parceiro', 'noticias_pendentes', 'album_pacotes',
-          'indicacoes', 'codigos_indicacao']);
+          'indicacoes', 'codigos_indicacao', 'solicitacoes_organizador']);
       }
 
       // Dia de hoje em Brasília (UTC-3), igual ao `PartnerSlots.brasiliaDay`.
@@ -223,7 +223,7 @@ service cloud.firestore {
             'images', 'idAutor'])
           && (tag == 'publicidade'
             ? p.get('podePublicidade', true)
-            : p.get('podeNoticias', true) && !(tag in ['gol', 'resultado', 'votacao']));
+            : p.get('podeNoticias', true) && !(tag in ['gol', 'resultado', 'votacao', 'aovivo', 'cartao']));
       }
 
       function partnerHighlight(data, p) {
@@ -289,10 +289,15 @@ service cloud.firestore {
 
       allow read: if !(collection in ['usuarios', 'config', 'notificacoes_envios', 'push_avisos', 'solicitacoes_jogador',
         'solicitacoes_time', 'solicitacoes_parceiro', 'noticias_pendentes', 'manutencao', 'album_pacotes',
-        'indicacoes', 'codigos_indicacao']);
+        'indicacoes', 'codigos_indicacao', 'solicitacoes_organizador']);
       allow create: if writable() && (isAdmin() || isOwnVote()
         || (isPlayers() && ownsTeam(request.resource.data))
-        || partnerCreate());
+        || partnerCreate()
+        || organizerGroupWrite()
+        || organizerSquadCreate()
+        || organizerMatchCreate()
+        || organizerGoalCard(request.resource.data)
+        || organizerLiveCard(request.resource.data));
       // As inscrições por competição nunca somem do atleta (o app antigo
       // regravava o documento inteiro sem elas): esvaziar pode, apagar não.
       function keepsEnrollments() {
@@ -365,6 +370,182 @@ service cloud.firestore {
         return key in before || after[key].get('idTime', '') == id;
       }
 
+      // Organizador ("Sou organizador de campeonato" aprovado): edita o campeonato
+      // com o `idOrganizador` dele, só os detalhes. Nome, sede, categoria,
+      // temporada, número e organizador ficam como o admin aprovou; no
+      // municipal, as regiões continuam só a sede.
+      function organizerUpdate() {
+        let changed = request.resource.data.diff(resource.data).affectedKeys();
+        let sede = resource.data.get('idRegiao', '');
+        return collection == 'campeonatos' && signedIn()
+          && resource.data.get('idOrganizador', '') == request.auth.uid
+          && changed.hasOnly(['descricao', 'urlImagem', 'premio1', 'premio2', 'premio3', 'premioArtilheiro',
+            'premioGoleiro', 'regras', 'times', 'ids_times', 'regulamentoUrl', 'regulamentoNome', 'idsRegioes',
+            'desempate'])
+          && (resource.data.get('abrangencia', 'municipal') == 'intermunicipal'
+            || request.resource.data.get('idsRegioes', []).hasOnly([sede]));
+      }
+
+      // Organizador montando o elenco da competição dele: o índice
+      // `campeonatos_org/c<id>` (gravado na aprovação) diz de quem é a
+      // competição; o time tem de estar inscrito nela.
+      function organizerTeamIn(key, teamId) {
+        let idx = get(/databases/$(database)/documents/campeonatos_org/$(key)).data;
+        let champ = get(/databases/$(database)/documents/campeonatos/$(idx.idCampeonatoDoc)).data;
+        return signedIn() && idx.idOrganizador == request.auth.uid
+          && champ.get('ids_times', []).hasAny([teamId]);
+      }
+
+      // Põe (inscrição nova, números zerados) ou tira (apaga a chave) o atleta
+      // de uma competição do organizador; nada mais muda no atleta.
+      function organizerSquadUpdate() {
+        let before = resource.data.get('inscricoes', {});
+        let after = request.resource.data.get('inscricoes', {});
+        let keys = after.diff(before).affectedKeys();
+        let added = after.keys().removeAll(before.keys());
+        let removed = before.keys().removeAll(after.keys());
+        let key = added.size() == 1 ? added[0] : (removed.size() == 1 ? removed[0] : '-');
+        let entry = key in after ? after[key] : before.get(key, {});
+        let addedTeams = request.resource.data.get('idsTimes', []).toSet()
+          .difference(resource.data.get('idsTimes', []).toSet());
+        return isPlayers() && 'inscricoes' in resource.data
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['inscricoes', 'idsTimes'])
+          && keys.size() == 1
+          && !(key in before && key in after)
+          && (!(key in after) || (entry.get('nGols', 0) == 0 && entry.get('nAssistencias', 0) == 0))
+          && addedTeams.hasOnly([entry.get('idTime', '-'), resource.data.get('idTime', '-')])
+          && organizerTeamIn(key, entry.get('idTime', '-'));
+      }
+
+      // Organizador é dono da competição de chave `c<id_campeonato>`.
+      function organizerOwnsKey(key) {
+        return signedIn()
+          && get(/databases/$(database)/documents/campeonatos_org/$(key)).data.idOrganizador == request.auth.uid;
+      }
+
+      // Súmula do organizador (a mesma do admin) nas partidas da competição
+      // dele: etapas, "Atrasou", gols/placar, cartões, escalação, dados do jogo
+      // e votação. Times, competição, região e o que as functions gravam não
+      // mudam; apagar segue com o admin.
+      function organizerMatchUpdate() {
+        return collection.matches('partidas([0-9]{4})?')
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['gols', 'golTimeCasa', 'golTimeFora',
+            'cartoes', 'substituicoes', 'escalacao', 'arbitro', 'observacoes', 'data', 'horario', 'horarioOriginal',
+            'duracao', 'local',
+            'votacao', 'status', 'statusEm', 'inicioEm', 'intervaloEm', 'segundoTempoEm'])
+          && organizerOwnsKey('c' + string(resource.data.get('id_campeonato', -1)));
+      }
+
+      // Chave de `inscricoes` que mudou (até 8 inscrições; as regras não têm laço).
+      function changedEnrollmentKey(after, keys) {
+        let l = after.keys();
+        return l.size() > 0 && l[0] in keys ? l[0]
+          : l.size() > 1 && l[1] in keys ? l[1]
+          : l.size() > 2 && l[2] in keys ? l[2]
+          : l.size() > 3 && l[3] in keys ? l[3]
+          : l.size() > 4 && l[4] in keys ? l[4]
+          : l.size() > 5 && l[5] in keys ? l[5]
+          : l.size() > 6 && l[6] in keys ? l[6]
+          : l.size() > 7 && l[7] in keys ? l[7] : '-';
+      }
+
+      // Números do atleta pela súmula do organizador (gol/assistência lançado ou
+      // tirado): só o Geral e a inscrição de UMA competição dele, pelo mesmo
+      // tanto (no máximo 10 por gravação), e o time da inscrição é da competição.
+      function organizerStatsUpdate() {
+        let before = resource.data.get('inscricoes', {});
+        let after = request.resource.data.get('inscricoes', {});
+        let keys = after.diff(before).affectedKeys();
+        let key = changedEnrollmentKey(after, keys);
+        let entry = after.get(key, {});
+        let old = before.get(key, {});
+        let goals = request.resource.data.get('nGols', 0) - resource.data.get('nGols', 0);
+        let assists = request.resource.data.get('nAssistencias', 0) - resource.data.get('nAssistencias', 0);
+        let addedTeams = request.resource.data.get('idsTimes', []).toSet()
+          .difference(resource.data.get('idsTimes', []).toSet());
+        return isPlayers() && keys.size() == 1 && key != '-'
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['nGols', 'nAssistencias', 'inscricoes', 'idsTimes'])
+          && entry.get('nGols', 0) - old.get('nGols', 0) == goals
+          && entry.get('nAssistencias', 0) - old.get('nAssistencias', 0) == assists
+          && goals >= -10 && goals <= 10 && assists >= -10 && assists <= 10
+          && (!(key in before) || old.get('idTime', '') == entry.get('idTime', ''))
+          && addedTeams.hasOnly([entry.get('idTime', '-')])
+          && organizerTeamIn(key, entry.get('idTime', '-'));
+      }
+
+      // Card de gol do organizador: da partida de uma competição dele (os dois
+      // times inscritos nela) e com o `idAutor` dele. Os do admin não mexe.
+      function organizerGoalCard(d) {
+        let key = 'c' + string(d.get('id_campeonato', -1));
+        return collection == 'noticias' && signedIn()
+          && d.get('tag', '') in ['gol', 'cartao'] && d.get('idAutor', '') == request.auth.uid
+          && organizerTeamIn(key, d.get('id_time_casa', '-')) && organizerTeamIn(key, d.get('id_time_fora', '-'));
+      }
+
+      // Card "ao vivo" da partida (`noticias/aovivo_<idPartida>`), da competição
+      // do organizador: ele cria e atualiza (mesmo o criado pelo admin; o card
+      // é da partida). Não apaga.
+      function organizerLiveCard(d) {
+        let key = 'c' + string(d.get('id_campeonato', -1));
+        return collection == 'noticias' && signedIn() && d.get('tag', '') == 'aovivo'
+          && docId == 'aovivo_' + d.get('id_partida', '-')
+          && organizerTeamIn(key, d.get('id_time_casa', '-')) && organizerTeamIn(key, d.get('id_time_fora', '-'));
+      }
+
+      // Organizador cadastra partida da competição dele: os dois times
+      // inscritos nela, partida zerada (sem placar, status, votação aberta nem
+      // súmula) e só os campos do cadastro. Editar/apagar seguem com o admin.
+      function organizerMatchCreate() {
+        let d = request.resource.data;
+        let key = 'c' + string(d.get('id_campeonato', -1));
+        return collection.matches('partidas([0-9]{4})?') && signedIn()
+          && d.keys().hasOnly(['id_partida', 'timeC', 'timeF', 'idTimeC', 'idTimeF', 'data', 'horario', 'local',
+            'id_campeonato', 'fk_competicao', 'idRegiao', 'golTimeCasa', 'golTimeFora', 'votacao', 'tituloVotacao',
+            'melhorJogador', 'quantidadeVotos', 'dataRegistro', 'idsRegioes', 'duracao'])
+          && d.id_partida == docId
+          && d.get('golTimeCasa', 0) == 0 && d.get('golTimeFora', 0) == 0
+          // `quantidadeVotos` nasce '' no app (formato do app antigo) ou 0.
+          && d.get('votacao', 'false') == 'false' && d.get('quantidadeVotos', '') in ['', '0', 0]
+          && d.get('melhorJogador', '') == ''
+          && d.dataRegistro == request.time
+          && d.get('idTimeC', '') != '' && d.get('idTimeF', '') != '' && d.idTimeC != d.idTimeF
+          && organizerTeamIn(key, d.idTimeC) && organizerTeamIn(key, d.idTimeF);
+      }
+
+      // Atleta novo já inscrito só na competição do organizador, pelo time.
+      function organizerSquadCreate() {
+        let d = request.resource.data;
+        let ins = d.get('inscricoes', {});
+        let keys = ins.keys();
+        return isPlayers() && keys.size() == 1
+          && d.keys().hasOnly(['idJogador', 'nome', 'time', 'idTime', 'urlImagem', 'nGols', 'nAssistencias',
+            'nGolsAmistoso', 'nAssistenciasAmistoso', 'posicao', 'inscricoes', 'idsTimes'])
+          && d.get('nGols', 0) == 0 && d.get('nAssistencias', 0) == 0
+          && d.get('nGolsAmistoso', 0) == 0 && d.get('nAssistenciasAmistoso', 0) == 0
+          && d.get('idTime', '') != ''
+          && ins[keys[0]].get('idTime', '-') == d.idTime
+          && ins[keys[0]].get('nGols', 0) == 0 && ins[keys[0]].get('nAssistencias', 0) == 0
+          && d.get('idsTimes', []).hasOnly([d.idTime])
+          && organizerTeamIn(keys[0], d.idTime);
+      }
+
+      // Organizador: grupos (`grupos{ano}`) do campeonato dele. O grupo aponta
+      // o doc do campeonato (`idCampeonatoDoc`) e o `fk_campeonato` tem de ser o
+      // número desse campeonato; só os campos do grupo.
+      function organizerGroup(data) {
+        let champ = get(/databases/$(database)/documents/campeonatos/$(data.get('idCampeonatoDoc', '-')));
+        return collection.matches('grupos[0-9]*') && signedIn()
+          && champ != null && champ.data.get('idOrganizador', '') == request.auth.uid
+          && data.get('fk_campeonato', -1) == champ.data.get('id_campeonato', -2);
+      }
+      function organizerGroupWrite() {
+        return organizerGroup(request.resource.data)
+          && request.resource.data.keys().hasOnly(['descricao', 'fk_competicao', 'idRegiao', 'time1', 'time2',
+            'time3', 'time4', 'idTime1', 'idTime2', 'idTime3', 'idTime4', 'fk_campeonato', 'idCampeonatoDoc'])
+          && request.resource.data.descricao is string && request.resource.data.descricao.size() <= 30;
+      }
+
       // Atleta sem time ('') pode entrar no elenco do dono (aprovação do "Sou jogador").
       allow update: if writable() && keepsEnrollments() && (isAdmin() || isOwnVote()
         || (isPlayers()
@@ -375,9 +556,18 @@ service cloud.firestore {
         || (isTeamDoc() && signedIn() && resource.data.idDono == request.auth.uid
           && request.resource.data.diff(resource.data).affectedKeys()
             .hasOnly(['descricao', 'urlImagem', 'corPrimaria', 'corSecundaria']))
-        || partnerUpdate());
+        || partnerUpdate()
+        || organizerUpdate()
+        || (organizerGroup(resource.data) && organizerGroupWrite())
+        || organizerSquadUpdate()
+        || organizerMatchUpdate()
+        || organizerStatsUpdate()
+        || (organizerGoalCard(resource.data) && organizerGoalCard(request.resource.data))
+        || (organizerLiveCard(resource.data) && organizerLiveCard(request.resource.data)));
       allow delete: if writable() && (isAdmin() || isOwnVote() || (isPlayers() && ownsTeam(resource.data))
-        || partnerDelete());
+        || partnerDelete()
+        || organizerGroup(resource.data)
+        || organizerGoalCard(resource.data));
     }
 
     // Votos de melhor jogador da partida (id do doc = uid de quem votou):
@@ -508,6 +698,46 @@ service cloud.firestore {
       allow delete: if (isRequester() && resource.data.status == 'pendente') || isAdmin();
     }
 
+    // "Sou organizador de campeonato" (id = uid): o pedido atual da conta. O
+    // dono envia, corrige e, respondido, manda outro (sempre pendente, campos
+    // limitados); nunca se aprova. O admin lê, edita e responde.
+    // Índice do organizador (`c<id_campeonato>` → organizador e doc do
+    // campeonato), que as regras do elenco consultam. Além do admin (regra
+    // geral), o próprio organizador cria o que falta (campeonato aprovado antes
+    // do índice existir): só o do campeonato dele, com a chave certa.
+    match /campeonatos_org/{key} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['idOrganizador', 'idCampeonatoDoc'])
+        && request.resource.data.idOrganizador == request.auth.uid
+        && get(/databases/$(database)/documents/campeonatos/$(request.resource.data.idCampeonatoDoc))
+          .data.get('idOrganizador', '') == request.auth.uid
+        && key == 'c' + string(get(/databases/$(database)/documents/campeonatos/$(request.resource.data.idCampeonatoDoc))
+          .data.get('id_campeonato', -1));
+    }
+
+    match /solicitacoes_organizador/{userId} {
+      function isRequester() {
+        return signedIn() && userId == request.auth.uid;
+      }
+
+      function validSubmit() {
+        let data = request.resource.data;
+        return data.uid == request.auth.uid
+          && data.status == 'pendente'
+          && data.keys().hasOnly(['uid', 'nome_usuario', 'email', 'nome', 'regiao', 'idRegiao', 'abrangencia',
+            'descricao', 'urlImagem', 'contato', 'temporada', 'status', 'data', 'atualizado_em'])
+          && data.nome is string && data.nome.size() >= 3 && data.nome.size() <= 60
+          && data.regiao is string && data.regiao.size() > 0
+          && data.abrangencia in ['municipal', 'intermunicipal']
+          && data.contato is string && data.contato.size() >= 10 && data.contato.size() <= 30
+          && data.get('descricao', '') is string && data.get('descricao', '').size() <= 300;
+      }
+
+      allow read: if isRequester() || isAdmin();
+      allow create, update: if (isRequester() && validSubmit()) || isAdmin();
+      allow delete: if (isRequester() && resource.data.status == 'pendente') || isAdmin();
+    }
+
     // Notícia do parceiro além do limite do dia: espera o admin. O parceiro
     // cria (pendente, dele, na região dele, sem tags reservadas) e lê/apaga as
     // dele; só o admin responde (aprovar publica em `noticias`).
@@ -519,7 +749,7 @@ service cloud.firestore {
           && data.get('idAutor', '') == request.auth.uid
           && data.get('idRegiao', '') == p.get('idRegiao', '-')
           && data.get('status', '') == 'pendente'
-          && !(data.get('tag', '') in ['gol', 'resultado', 'votacao', 'publicidade'])
+          && !(data.get('tag', '') in ['gol', 'resultado', 'votacao', 'publicidade', 'aovivo', 'cartao'])
           && data.keys().hasOnly(['id', 'data', 'criadoEm', 'status', 'titulo', 'descricao', 'urlImagem', 'link',
             'exibir', 'fk_competicao', 'idRegiao', 'time_casa', 'time_fora', 'gol_time_casa', 'gol_time_fora', 'tag',
             'images', 'idAutor']);

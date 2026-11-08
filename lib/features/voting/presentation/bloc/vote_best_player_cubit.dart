@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:either_dart/either.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
+import 'package:arena_soccer/features/matches/domain/match_report.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
@@ -30,6 +32,10 @@ class VoteBestPlayerCubit extends Cubit<VoteBestPlayerState> {
   /// nela (0 = partida sem competição, elenco geral).
   int _championshipId = 0;
 
+  /// Ids de quem participou da partida por time (nulo = sem escalação).
+  Set<String>? _homeParticipants;
+  Set<String>? _awayParticipants;
+
   /// O voto atual só pré-seleciona uma vez (depois o usuário manda).
   bool _preselected = false;
 
@@ -44,6 +50,8 @@ class VoteBestPlayerCubit extends Cubit<VoteBestPlayerState> {
   void watch({required MatchDTO match, required String season, required String voterId}) {
     _ref = MatchVoteRef.of(match, season);
     _championshipId = match.championshipId;
+    _homeParticipants = MatchReport.participants(match, MatchSide.home);
+    _awayParticipants = MatchReport.participants(match, MatchSide.away);
     _preselected = false;
     _homeSubscription?.cancel();
     _awaySubscription?.cancel();
@@ -85,7 +93,7 @@ class VoteBestPlayerCubit extends Cubit<VoteBestPlayerState> {
     response.fold(
       (failure) => emit(_error(failure)),
       (all) {
-        final players = _championshipId <= 0
+        final inChampionship = _championshipId <= 0
             ? all
             : all
                 .where((p) => p.playsIn(
@@ -94,6 +102,11 @@ class VoteBestPlayerCubit extends Cubit<VoteBestPlayerState> {
                       teamName: isHome ? _ref.homeTeam : _ref.awayTeam,
                     ))
                 .toList();
+        // Só quem participou da partida (súmula); sem escalação, o elenco.
+        final participants = isHome ? _homeParticipants : _awayParticipants;
+        final players = participants == null
+            ? inChampionship
+            : inChampionship.where((p) => participants.contains(p.id)).toList();
         emit(ReadyVoteBestPlayerState(
           homePlayers: isHome ? players : state.homePlayers,
           awayPlayers: isHome ? state.awayPlayers : players,

@@ -105,7 +105,9 @@ class _DelaySheet extends StatelessWidget {
                   children: [
                     Text(l10n.matchDelayTitle, style: AppTypography.title()),
                     Text(
-                      original.isEmpty ? l10n.matchDelayCurrent(time) : '${l10n.matchDelayCurrent(time)} · ${l10n.matchCardWas(original)}',
+                      original.isEmpty
+                          ? l10n.matchDelayCurrent(time)
+                          : '${l10n.matchDelayCurrent(time)} · ${l10n.matchCardWas(original)}',
                       style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s14),
                     ),
                   ],

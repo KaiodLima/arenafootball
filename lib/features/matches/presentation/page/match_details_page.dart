@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/matches/presentation/export/match_report_export.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
+import 'package:arena_soccer/features/matches/domain/match_manage_access.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/match_details_cubit.dart';
@@ -60,6 +63,7 @@ class MatchDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isAdmin = context.watch<SessionCubit>().state.isAdmin;
+    final organizerIds = context.watch<OrganizerModeCubit>().state.championships.map((c) => c.championshipId).toSet();
     final cubit = BlocProvider.of<MatchDetailsCubit>(context);
 
     return BlocConsumer<MatchDetailsCubit, MatchDetailsState>(
@@ -102,7 +106,18 @@ class MatchDetailsPage extends StatelessWidget {
                   ],
                 ),
                 actions: [
-                  if (isAdmin && !state.deleted)
+                  // Arte do resultado para as redes (todos).
+                  if (!state.deleted)
+                    IconButton(
+                      tooltip: l10n.shareArtTitle,
+                      icon: const Icon(Icons.auto_awesome_rounded),
+                      onPressed: () => Navigator.pushNamed(
+                        context,
+                        AppRoutes.shareArtPage,
+                        arguments: {'match': match, 'season': season},
+                      ),
+                    ),
+                  if (canManageMatch(match, isAdmin: isAdmin, organizerChampionshipIds: organizerIds) && !state.deleted)
                     CardMenuButton(
                       onImage: true,
                       actions: [
@@ -132,6 +147,11 @@ class MatchDetailsPage extends StatelessWidget {
                             homeCrest: homeCrest,
                             awayCrest: awayCrest,
                           ),
+                        ),
+                        CardMenuAction(
+                          icon: Icons.picture_as_pdf_outlined,
+                          label: l10n.matchReportExport,
+                          onSelected: () => showMatchReportExport(context, match: match, season: season),
                         ),
                         CardMenuAction(
                           icon: Icons.sports_soccer_rounded,

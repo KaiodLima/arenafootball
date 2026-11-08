@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/sync_live_match_card_usecase.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/matches/domain/match_squads.dart';
@@ -99,8 +100,14 @@ class MatchGoalsCubit extends Cubit<MatchGoalsState> {
   final PublishGoalCardsUseCase? publishGoalCardsUseCase;
   String? _season;
 
-  MatchGoalsCubit(this.watchTeamPlayersUseCase, this.updateMatchGoalsUseCase, [this.publishGoalCardsUseCase])
-      : super(const MatchGoalsState());
+  final SyncLiveMatchCardUseCase? syncLiveMatchCardUseCase;
+
+  MatchGoalsCubit(
+    this.watchTeamPlayersUseCase,
+    this.updateMatchGoalsUseCase, [
+    this.publishGoalCardsUseCase,
+    this.syncLiveMatchCardUseCase,
+  ]) : super(const MatchGoalsState());
 
   void togglePublishCards(bool value) => emit(state.copyWith(publishCards: value));
 
@@ -188,6 +195,13 @@ class MatchGoalsCubit extends Cubit<MatchGoalsState> {
       if (isClosed) return;
       // O placar já foi salvo: a falha do card só avisa.
       published = cards.fold((_) => -1, (count) => count);
+      final live = syncLiveMatchCardUseCase;
+      if (live != null) {
+        final synced =
+            await live(match: response.right, before: match.copyWith(goals: state.original), season: _season);
+        if (isClosed) return;
+        if (synced.isLeft) published = -1;
+      }
     }
     emit(state.copyWith(
       match: response.right,

@@ -3,6 +3,7 @@
 /// mesmo padrão das Cloud Functions).
 enum PushAction {
   goal('gol', true),
+  redCard('cartao_vermelho', true),
   news('noticia', false),
   match('partida', true),
   votingOpen('votacao_aberta', true),
@@ -19,7 +20,9 @@ enum PushAction {
   partnerNewsAnswer('noticia_parceiro_resposta', true),
   achievement('conquista', true),
   albumPack('album_pacote', true),
-  referral('indicacao', true);
+  referral('indicacao', true),
+  organizerRequest('solicitacao_organizador', true),
+  organizerRequestAnswer('solicitacao_organizador_resposta', true);
 
   final String key;
   final bool defaultEnabled;

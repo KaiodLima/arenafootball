@@ -64,6 +64,10 @@ class NewsRepositoryImpl implements INewsRepository {
       _dataSource.getGoalCardsByPlayer(playerId);
 
   @override
+  Future<Either<Failure, void>> syncLiveCard(NewsDTO card, {required bool bump}) =>
+      _dataSource.syncLiveCard(card, bump: bump);
+
+  @override
   Future<Either<Failure, List<NewsDTO>>> getGoalCardsByGoalIds(List<String> goalIds) =>
       _dataSource.getGoalCardsByGoalIds(goalIds);
 

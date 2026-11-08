@@ -242,8 +242,7 @@ class _TiltCard extends StatefulWidget {
 class _TiltCardState extends State<_TiltCard> with TickerProviderStateMixin {
   static const double _maxAngle = 15 * math.pi / 180;
 
-  late final AnimationController _flip =
-      AnimationController(vsync: this, duration: const Duration(milliseconds: 550));
+  late final AnimationController _flip = AnimationController(vsync: this, duration: const Duration(milliseconds: 550));
   late final AnimationController _spring =
       AnimationController(vsync: this, duration: const Duration(milliseconds: 700));
   late final AnimationController _idle = AnimationController(vsync: this, duration: const Duration(seconds: 6));
@@ -590,7 +589,8 @@ class _InfoPanel extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: AppTypography.title().copyWith(fontSize: AppSizes.s20),
                         ),
-                        Text(sticker.team, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppTypography.subtitle()),
+                        Text(sticker.team,
+                            maxLines: 1, overflow: TextOverflow.ellipsis, style: AppTypography.subtitle()),
                       ],
                     ),
                   ),
@@ -602,7 +602,8 @@ class _InfoPanel extends StatelessWidget {
                 runSpacing: AppSizes.s8,
                 children: [
                   _Chip(icon: Icons.tag_rounded, label: '${sticker.number}', color: accent),
-                  if (sticker.rare) _Chip(icon: Icons.auto_awesome_rounded, label: l10n.albumRareLabel, color: AppColors.gold),
+                  if (sticker.rare)
+                    _Chip(icon: Icons.auto_awesome_rounded, label: l10n.albumRareLabel, color: AppColors.gold),
                   _Chip(
                     icon: crest ? Icons.shield_rounded : Icons.person_rounded,
                     label: crest ? l10n.albumDetailCrest : l10n.albumDetailAthlete,

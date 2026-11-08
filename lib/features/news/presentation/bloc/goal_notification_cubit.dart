@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/sync_live_match_card_usecase.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_cache_first_usecase.dart';
@@ -47,8 +48,12 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
     this.updateMatchScoreUseCase,
     this.watchTeamPlayersUseCase,
     this.addPlayerStatsUseCase,
-    this.getRegionChampionshipsCacheFirstUseCase,
-  ) : super(const EditingGoalNotificationState());
+    this.getRegionChampionshipsCacheFirstUseCase, [
+    this.syncLiveMatchCardUseCase,
+  ]) : super(const EditingGoalNotificationState());
+
+  /// Card ao vivo da partida (gol ligado a ela).
+  final SyncLiveMatchCardUseCase? syncLiveMatchCardUseCase;
 
   /// Toda edição passa por aqui: se o confronto mudou, autor e assistência
   /// deixam de valer e os elencos do novo confronto são carregados.
@@ -254,7 +259,8 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
     final response = await createNewsUseCase(
       news: NewsDTO(
         tag: NewsDTO.goalTag,
-        isVisible: true,
+        // Ligado à partida, quem aparece no feed é o card ao vivo dela.
+        isVisible: !(form.updateMatch && form.linkedMatch != null && syncLiveMatchCardUseCase != null),
         region: form.selectedRegion ?? '',
         homeTeam: form.homeTeam!,
         awayTeam: form.awayTeam!,
@@ -316,6 +322,9 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
       }
       // A lista local passa a ter o placar novo.
       final updated = update.right;
+      final live = syncLiveMatchCardUseCase;
+      if (live != null) await live(match: updated, before: match, season: _season);
+      if (isClosed) return;
       next = next.copyWith(
         todayMatches: [for (final m in next.todayMatches) m.id == updated.id ? updated : m],
         pinnedMatch: next.pinnedMatch?.id == updated.id ? updated : next.pinnedMatch,

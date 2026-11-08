@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/features/championships/data/dtos/standing_dto.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
-import 'package:arena_soccer/utils/components/arena_card.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
+const _display = 'Anton';
+const _condensed = 'BarlowCondensed';
+
 /// Tabela de classificação: Pos · escudo + time · P · J · V · E · D · SG.
-/// Os [qualifiedCount] primeiros ganham o filete verde; o time do usuário fica
-/// em destaque; tocar numa linha expande com gols feitos/sofridos e
-/// aproveitamento.
+/// A posição vai num quadradinho (1º dourado, classificados verdes); os
+/// [qualifiedCount] primeiros ganham o filete verde; a coluna P é uma faixa
+/// verde-clara; o time do usuário fica em destaque; tocar numa linha expande
+/// com gols feitos/sofridos e aproveitamento.
 class StandingsTable extends StatefulWidget {
   final List<StandingDTO> standings;
   final int qualifiedCount;
 
-  /// Time do coração do usuário logado (nome normalizado).
   /// Linha do time do coração (destacada).
   final bool Function(StandingDTO standing)? isFavorite;
 
@@ -29,38 +31,50 @@ class _StandingsTableState extends State<StandingsTable> {
   String? _expandedId;
 
   static const double _statWidth = AppSizes.s30;
-  static const double _positionWidth = AppSizes.s28;
+  static const double _positionWidth = AppSizes.s32;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final headerStyle = AppTypography.label(color: AppColors.textSecondary).copyWith(fontSize: AppSizes.s12);
+    const headerStyle = TextStyle(
+      fontFamily: _condensed,
+      fontWeight: FontWeight.w700,
+      fontSize: AppSizes.s12,
+      letterSpacing: 1.2,
+      color: AppColors.textSecondary,
+    );
+    final labels = [
+      l10n.championshipsStandingsPoints,
+      l10n.standingsColGames,
+      l10n.championshipsStandingsWins,
+      l10n.championshipsStandingsDraws,
+      l10n.championshipsStandingsLosses,
+      l10n.championshipsStandingsGoalDifference,
+    ];
 
-    return ArenaCard(
-      margin: EdgeInsets.zero,
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSizes.cardRadius),
+        boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: AppSizes.s10, offset: Offset(0, 2))],
+      ),
       child: Column(
         children: [
-          Container(
-            color: AppColors.background,
-            padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s10, AppSizes.s12, AppSizes.s10),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s12, AppSizes.s12, AppSizes.s8),
             child: Row(
               children: [
                 SizedBox(width: _positionWidth, child: Text(l10n.standingsColPosition, style: headerStyle)),
-                Expanded(child: Text(l10n.standingsColTeam, style: headerStyle)),
-                for (final label in [
-                  l10n.championshipsStandingsPoints,
-                  l10n.standingsColGames,
-                  l10n.championshipsStandingsWins,
-                  l10n.championshipsStandingsDraws,
-                  l10n.championshipsStandingsLosses,
-                  l10n.championshipsStandingsGoalDifference,
-                ])
+                const SizedBox(width: AppSizes.s8),
+                Expanded(child: Text(l10n.standingsColTeam.toUpperCase(), style: headerStyle)),
+                for (final label in labels)
                   SizedBox(width: _statWidth, child: Text(label, textAlign: TextAlign.center, style: headerStyle)),
               ],
             ),
           ),
           for (var i = 0; i < widget.standings.length; i++) ...[
-            if (i > 0) const Divider(height: 1, thickness: 1, color: AppColors.greyLight),
+            const Divider(height: 1, thickness: 1, color: AppColors.greyLight),
             _Row(
               position: i + 1,
               standing: widget.standings[i],
@@ -80,6 +94,11 @@ class _StandingsTableState extends State<StandingsTable> {
     );
   }
 }
+
+/// Cor do quadradinho da posição: 1º dourado, classificados verdes, demais cinza.
+@visibleForTesting
+Color standingsPositionColor(int position, bool qualified) =>
+    position == 1 ? AppColors.gold : (qualified ? AppColors.primary : AppColors.background);
 
 class _Row extends StatelessWidget {
   final int position;
@@ -110,14 +129,29 @@ class _Row extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final statStyle = AppTypography.body().copyWith(fontSize: AppSizes.s14);
+    final badge = standingsPositionColor(position, qualified);
+    final onBadge = position == 1
+        ? AppColors.textPrimary
+        : qualified
+            ? AppColors.white
+            : AppColors.textSecondary;
 
-    Widget stat(String value, {bool bold = false}) => SizedBox(
+    Widget stat(String value, {bool points = false}) => Container(
           width: statWidth,
+          padding: const EdgeInsets.symmetric(vertical: AppSizes.s4),
+          decoration: points
+              ? BoxDecoration(color: AppColors.primarySoft, borderRadius: BorderRadius.circular(AppSizes.s6))
+              : null,
           child: Text(
             value,
             textAlign: TextAlign.center,
-            style: bold ? statStyle.copyWith(fontWeight: FontWeight.w800) : statStyle,
+            style: TextStyle(
+              fontFamily: _condensed,
+              fontWeight: points ? FontWeight.w800 : FontWeight.w600,
+              fontSize: points ? AppSizes.s18 : AppSizes.s16,
+              color: points ? AppColors.primaryDark : AppColors.textPrimary,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
           ),
         );
 
@@ -140,13 +174,23 @@ class _Row extends StatelessWidget {
                         children: [
                           SizedBox(
                             width: positionWidth,
-                            child: Text(
-                              '$position',
-                              style: AppTypography.label(
-                                color: qualified ? AppColors.primaryDark : AppColors.textSecondary,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Container(
+                                width: AppSizes.s24,
+                                height: AppSizes.s24,
+                                alignment: Alignment.center,
+                                decoration:
+                                    BoxDecoration(color: badge, borderRadius: BorderRadius.circular(AppSizes.s6)),
+                                child: Text(
+                                  '$position',
+                                  style: TextStyle(
+                                      fontFamily: _display, fontSize: AppSizes.s14, height: 1.2, color: onBadge),
+                                ),
                               ),
                             ),
                           ),
+                          const SizedBox(width: AppSizes.s8),
                           TeamCrest(imageUrl: standing.imageUrl, size: AppSizes.s28),
                           const SizedBox(width: AppSizes.s8),
                           Expanded(
@@ -170,7 +214,7 @@ class _Row extends StatelessWidget {
                               ],
                             ),
                           ),
-                          stat('${standing.points}', bold: true),
+                          stat('${standing.points}', points: true),
                           stat('${standing.games}'),
                           stat('${standing.wins}'),
                           stat('${standing.draws}'),
@@ -186,13 +230,23 @@ class _Row extends StatelessWidget {
                                 padding: const EdgeInsets.only(top: AppSizes.s12),
                                 child: Row(
                                   children: [
-                                    _Detail(label: l10n.standingsGoalsFor, value: '${standing.goalsFor}'),
+                                    _Detail(
+                                      label: l10n.standingsGoalsFor,
+                                      value: '${standing.goalsFor}',
+                                      color: AppColors.primaryStrong,
+                                    ),
                                     const SizedBox(width: AppSizes.s8),
-                                    _Detail(label: l10n.standingsGoalsAgainst, value: '${standing.goalsAgainst}'),
+                                    _Detail(
+                                      label: l10n.standingsGoalsAgainst,
+                                      value: '${standing.goalsAgainst}',
+                                      color: AppColors.danger,
+                                    ),
                                     const SizedBox(width: AppSizes.s8),
                                     _Detail(
                                       label: l10n.standingsPerformance,
                                       value: '${(standing.performance * 100).round()}%',
+                                      color: AppColors.medalGoldDark,
+                                      progress: standing.performance,
                                     ),
                                   ],
                                 ),
@@ -214,19 +268,48 @@ class _Row extends StatelessWidget {
 class _Detail extends StatelessWidget {
   final String label;
   final String value;
+  final Color color;
 
-  const _Detail({required this.label, required this.value});
+  /// Barra fina (0–1) embaixo do número; nula = sem barra.
+  final double? progress;
+
+  const _Detail({required this.label, required this.value, required this.color, this.progress});
 
   @override
   Widget build(BuildContext context) {
+    final progress = this.progress;
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: AppSizes.s10, horizontal: AppSizes.s6),
-        decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(AppSizes.s12)),
+        padding: const EdgeInsets.symmetric(vertical: AppSizes.s10, horizontal: AppSizes.s8),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(AppSizes.s12),
+        ),
         child: Column(
           children: [
-            Text(value, style: AppTypography.title().copyWith(fontSize: AppSizes.s18)),
-            const SizedBox(height: AppSizes.s2),
+            Text(
+              value,
+              style: TextStyle(
+                fontFamily: _display,
+                fontSize: AppSizes.s22,
+                height: 1.2,
+                color: color,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+            if (progress != null) ...[
+              const SizedBox(height: AppSizes.s4),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppSizes.s2),
+                child: LinearProgressIndicator(
+                  value: progress.clamp(0.0, 1.0),
+                  minHeight: AppSizes.s4,
+                  color: color,
+                  backgroundColor: color.withValues(alpha: 0.15),
+                ),
+              ),
+            ],
+            const SizedBox(height: AppSizes.s4),
             Text(
               label,
               maxLines: 1,

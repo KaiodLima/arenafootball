@@ -7,8 +7,8 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// Lance pedido no painel: o lado e o tipo (gol ou cartão).
-typedef PadAction = ({MatchSide side, BookingType? booking});
+/// Lance pedido no painel: o lado e o tipo (gol, cartão ou substituição).
+typedef PadAction = ({MatchSide side, BookingType? booking, bool substitution});
 
 /// Painel de lançamento (o coração da súmula): uma coluna por time, com a
 /// borda na cor dele, e os botões grandes Gol, Amarelo e Vermelho.
@@ -70,7 +70,8 @@ class _Column extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
-            style: AppTypography.label(color: AppColors.textSecondary).copyWith(fontSize: AppSizes.s10, letterSpacing: 0.6),
+            style: AppTypography.label(color: AppColors.textSecondary)
+                .copyWith(fontSize: AppSizes.s10, letterSpacing: 0.6),
           ),
           const SizedBox(height: AppSizes.s6),
           _PadButton(
@@ -78,7 +79,7 @@ class _Column extends StatelessWidget {
             icon: const Icon(Icons.sports_soccer_rounded, color: AppColors.white, size: AppSizes.s20),
             background: AppColors.primary,
             foreground: AppColors.white,
-            onTap: () => onAction((side: side, booking: null)),
+            onTap: () => onAction((side: side, booking: null, substitution: false)),
           ),
           const SizedBox(height: AppSizes.s6),
           Row(
@@ -89,7 +90,7 @@ class _Column extends StatelessWidget {
                   icon: const BookingIcon(type: BookingType.yellow),
                   background: AppColors.gold.withValues(alpha: 0.2),
                   foreground: AppColors.textPrimary,
-                  onTap: () => onAction((side: side, booking: BookingType.yellow)),
+                  onTap: () => onAction((side: side, booking: BookingType.yellow, substitution: false)),
                 ),
               ),
               const SizedBox(width: AppSizes.s6),
@@ -97,10 +98,18 @@ class _Column extends StatelessWidget {
                 icon: const BookingIcon(type: BookingType.red),
                 background: AppColors.danger.withValues(alpha: 0.12),
                 foreground: AppColors.textPrimary,
-                onTap: () => onAction((side: side, booking: BookingType.red)),
+                onTap: () => onAction((side: side, booking: BookingType.red, substitution: false)),
                 tooltip: l10n.matchReportRed,
               ),
             ],
+          ),
+          const SizedBox(height: AppSizes.s6),
+          _PadButton(
+            label: l10n.reportSubstitution,
+            icon: const Icon(Icons.swap_vert_rounded, color: AppColors.primaryDark, size: AppSizes.s20),
+            background: AppColors.primary.withValues(alpha: 0.12),
+            foreground: AppColors.primaryDark,
+            onTap: () => onAction((side: side, booking: null, substitution: true)),
           ),
         ],
       ),
@@ -147,7 +156,8 @@ class _PadButton extends StatelessWidget {
                     label!,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: AppTypography.label(color: foreground).copyWith(fontSize: AppSizes.s14, fontWeight: FontWeight.w800),
+                    style: AppTypography.label(color: foreground)
+                        .copyWith(fontSize: AppSizes.s14, fontWeight: FontWeight.w800),
                   ),
                 ),
               ],

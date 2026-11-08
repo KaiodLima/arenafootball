@@ -138,7 +138,12 @@ class MatchCardStatus {
 /// A data fica no cabeçalho do dia, fora do card.
 class MatchCard extends StatefulWidget {
   final MatchDTO match;
+
+  /// Mostra a engrenagem (admin ou organizador da competição).
   final bool isAdmin;
+
+  /// "Apagar partida" na engrenagem (só o admin).
+  final bool canDelete;
   final String? homeCrest;
   final String? awayCrest;
 
@@ -174,11 +179,17 @@ class MatchCard extends StatefulWidget {
   /// Admin: "Lançar card de gol" no menu (nulo = sem a ação).
   final VoidCallback? onGoalCard;
 
+  /// Admin/organizador: exporta a súmula em PDF (nulo = sem o item).
+  final VoidCallback? onExport;
+
   /// Admin: iniciar, intervalo, 2º tempo ou encerrar na mão (nulo = sem as ações).
   final ValueChanged<MatchPhase>? onSetPhase;
 
   /// "Palpitar" antes do jogo (nulo = sem a pílula).
   final VoidCallback? onPredict;
+
+  /// "Divulgar partida" antes do jogo: abre a arte de divulgação (nulo = sem o botão).
+  final VoidCallback? onShareArt;
 
   /// Agora (só para teste).
   final DateTime? now;
@@ -187,6 +198,7 @@ class MatchCard extends StatefulWidget {
     super.key,
     required this.match,
     required this.isAdmin,
+    this.canDelete = true,
     required this.onVotingTap,
     required this.onToggleVoting,
     required this.onEditScore,
@@ -203,8 +215,10 @@ class MatchCard extends StatefulWidget {
     this.onTap,
     this.championshipLabel,
     this.onGoalCard,
+    this.onExport,
     this.onSetPhase,
     this.onPredict,
+    this.onShareArt,
     this.now,
   });
 
@@ -335,18 +349,25 @@ class _MatchCardState extends State<MatchCard> {
                               label: action.label,
                               onSelected: () => widget.onSetPhase!(action.phase),
                             ),
+                        if (widget.onExport != null)
+                          CardMenuAction(
+                            icon: Icons.picture_as_pdf_outlined,
+                            label: l10n.matchReportExport,
+                            onSelected: widget.onExport!,
+                          ),
                         if (widget.onGoalCard != null)
                           CardMenuAction(
                             icon: Icons.sports_soccer_rounded,
                             label: l10n.matchDetailsGoalCard,
                             onSelected: widget.onGoalCard!,
                           ),
-                        CardMenuAction(
-                          icon: Icons.delete_outline_rounded,
-                          label: l10n.matchesDeleteMatch,
-                          destructive: true,
-                          onSelected: widget.onDelete,
-                        ),
+                        if (widget.canDelete)
+                          CardMenuAction(
+                            icon: Icons.delete_outline_rounded,
+                            label: l10n.matchesDeleteMatch,
+                            destructive: true,
+                            onSelected: widget.onDelete,
+                          ),
                       ],
                     ),
                 ],
@@ -426,6 +447,10 @@ class _MatchCardState extends State<MatchCard> {
                 _GoalsToggle(expanded: _expanded, onTap: () => setState(() => _expanded = !_expanded)),
                 const SizedBox(width: AppSizes.s6),
               ],
+              if (status.upcoming && widget.onShareArt != null) ...[
+                _ShareArtButton(onTap: widget.onShareArt!),
+                const SizedBox(width: AppSizes.s6),
+              ],
               if (predict) ...[
                 _PredictChip(onTap: widget.onPredict!),
                 if (widget.showVoting && match.isVotingOpen) const SizedBox(width: AppSizes.s6),
@@ -483,16 +508,16 @@ class _Center extends StatelessWidget {
     final small = status.waiting
         ? l10n.matchCardWaiting
         : delayed
-        ? l10n.matchCardDelayed
-        : status.upcoming
-            ? switch (status.dayOffset) {
-                0 => l10n.matchCardToday,
-                1 => l10n.matchCardTomorrow,
-                _ => match.date.trim(),
-              }
-            : status.finished
-                ? l10n.matchCardFinished
-                : time;
+            ? l10n.matchCardDelayed
+            : status.upcoming
+                ? switch (status.dayOffset) {
+                    0 => l10n.matchCardToday,
+                    1 => l10n.matchCardTomorrow,
+                    _ => match.date.trim(),
+                  }
+                : status.finished
+                    ? l10n.matchCardFinished
+                    : time;
     // Antes do jogo (verde), atrasada/pausada (âmbar) e encerrada (cinza) vão numa pílula.
     final pill = beforeKickoff || status.finished;
     final pillColor = delayed
@@ -524,12 +549,12 @@ class _Center extends StatelessWidget {
               const SizedBox(height: AppSizes.s2),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s2),
-                decoration: pill
-                    ? BoxDecoration(color: pillColor, borderRadius: BorderRadius.circular(AppSizes.s8))
-                    : null,
+                decoration:
+                    pill ? BoxDecoration(color: pillColor, borderRadius: BorderRadius.circular(AppSizes.s8)) : null,
                 child: Text(
                   small,
-                  style: AppTypography.label(color: pillText).copyWith(fontSize: AppSizes.s12, letterSpacing: pill ? 0.8 : 0),
+                  style: AppTypography.label(color: pillText)
+                      .copyWith(fontSize: AppSizes.s12, letterSpacing: pill ? 0.8 : 0),
                 ),
               ),
               if (delayed && match.delayed)
@@ -748,6 +773,33 @@ class _VotingChip extends StatelessWidget {
 }
 
 /// Pílula "Palpitar" (antes do jogo).
+/// Botão redondo "Divulgar partida" (megafone), antes do jogo.
+class _ShareArtButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _ShareArtButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Tooltip(
+      message: l10n.shareArtPreviewTitle,
+      child: Material(
+        color: AppColors.primarySoft,
+        shape: const CircleBorder(side: BorderSide(color: AppColors.primary)),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onTap,
+          child: const Padding(
+            padding: EdgeInsets.all(AppSizes.s6),
+            child: Icon(Icons.campaign_rounded, size: AppSizes.s16, color: AppColors.primaryDark),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _PredictChip extends StatelessWidget {
   final VoidCallback onTap;
 

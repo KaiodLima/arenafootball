@@ -138,6 +138,11 @@ class _NotificationsPanelPageState extends State<NotificationsPanelPage> {
         name: l10n.pushActionGoal,
         description: l10n.pushActionGoalHint
       ),
+    PushAction.redCard => (
+        icon: Icons.style_rounded,
+        name: l10n.pushActionRedCard,
+        description: l10n.pushActionRedCardHint,
+      ),
     PushAction.news => (icon: Icons.article_outlined, name: l10n.pushActionNews, description: l10n.pushActionNewsHint),
     PushAction.match => (
         icon: Icons.scoreboard_outlined,
@@ -218,6 +223,16 @@ class _NotificationsPanelPageState extends State<NotificationsPanelPage> {
         icon: Icons.group_add_outlined,
         name: l10n.pushActionReferral,
         description: l10n.pushActionReferralHint
+      ),
+    PushAction.organizerRequest => (
+        icon: Icons.emoji_events_outlined,
+        name: l10n.pushActionOrganizerRequest,
+        description: l10n.pushActionOrganizerRequestHint
+      ),
+    PushAction.organizerRequestAnswer => (
+        icon: Icons.fact_check_outlined,
+        name: l10n.pushActionOrganizerAnswer,
+        description: l10n.pushActionOrganizerAnswerHint
       ),
   };
 }

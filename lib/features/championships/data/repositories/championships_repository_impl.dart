@@ -57,6 +57,26 @@ class ChampionshipsRepositoryImpl implements IChampionshipsRepository {
       _dataSource.getSeasonChampionships(season);
 
   @override
+  Stream<Either<Failure, List<GroupDTO>>> watchChampionshipGroups({required int championshipId, String? season}) =>
+      _dataSource.watchChampionshipGroups(championshipId: championshipId, season: season);
+
+  @override
+  Future<Either<Failure, void>> saveGroup(GroupDTO group, {String? season}) =>
+      _dataSource.saveGroup(group, season: season);
+
+  @override
+  Future<Either<Failure, void>> deleteGroup(String groupId, {String? season}) =>
+      _dataSource.deleteGroup(groupId, season: season);
+
+  @override
+  Future<Either<Failure, void>> replaceGroups({
+    required List<GroupDTO> previous,
+    required List<GroupDTO> groups,
+    String? season,
+  }) =>
+      _dataSource.replaceGroups(previous: previous, groups: groups, season: season);
+
+  @override
   Future<Either<Failure, ChampionshipDTO>> setTeamEnrollment({
     required String championshipDocId,
     required TeamDTO team,

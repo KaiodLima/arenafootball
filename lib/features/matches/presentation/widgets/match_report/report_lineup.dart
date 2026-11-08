@@ -120,7 +120,8 @@ class _SideTab extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  const _SideTab({required this.name, required this.crest, required this.color, required this.selected, required this.onTap});
+  const _SideTab(
+      {required this.name, required this.crest, required this.color, required this.selected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -220,7 +221,8 @@ class _GroupLabel extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(AppSizes.s4, AppSizes.s12, AppSizes.s4, AppSizes.s6),
         child: Text(
           text.toUpperCase(),
-          style: AppTypography.label(color: AppColors.textSecondary).copyWith(fontSize: AppSizes.s12, letterSpacing: 0.6),
+          style:
+              AppTypography.label(color: AppColors.textSecondary).copyWith(fontSize: AppSizes.s12, letterSpacing: 0.6),
         ),
       );
 }
@@ -283,9 +285,13 @@ class _PlayerRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(player.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppTypography.label(color: AppColors.textPrimary)),
+                Text(player.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.label(color: AppColors.textPrimary)),
                 if (position != null)
-                  Text(playerPositionLabel(l10n, position), style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+                  Text(playerPositionLabel(l10n, position),
+                      style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
               ],
             ),
           ),
@@ -382,8 +388,7 @@ class _DashedRect extends CustomPainter {
       ..color = color
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
-    final path = Path()
-      ..addRRect(RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(AppSizes.s14)));
+    final path = Path()..addRRect(RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(AppSizes.s14)));
     for (final metric in path.computeMetrics()) {
       for (var d = 0.0; d < metric.length; d += 10) {
         canvas.drawPath(metric.extractPath(d, d + 6), paint);

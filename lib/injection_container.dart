@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:arena_soccer/features/share_art/di/share_art_injection.dart';
 import 'package:arena_soccer/features/predictions/di/predictions_injection.dart';
 import 'package:arena_soccer/features/achievements/di/achievements_injection.dart';
 import 'package:arena_soccer/core/cache/cache_store.dart';
@@ -13,6 +14,7 @@ import 'package:arena_soccer/core/services/tour_service.dart';
 import 'package:arena_soccer/core/services/storage_upload_service.dart';
 import 'package:arena_soccer/features/fan_ranking/di/fan_ranking_injection.dart';
 import 'package:arena_soccer/features/referrals/di/referrals_injection.dart';
+import 'package:arena_soccer/features/organizer_requests/di/organizer_requests_injection.dart';
 import 'package:arena_soccer/features/global_results/di/global_results_injection.dart';
 import 'package:arena_soccer/features/auth/di/auth_injection.dart';
 import 'package:arena_soccer/features/championships/di/championships_injection.dart';
@@ -56,6 +58,8 @@ Future<void> init() async {
   registerNotificationsDependencies();
   registerFanRankingDependencies();
   registerReferralsDependencies();
+  registerOrganizerRequestsDependencies();
+  registerShareArtDependencies();
   registerAchievementsDependencies();
   registerPredictionsDependencies();
 }

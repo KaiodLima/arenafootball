@@ -31,6 +31,18 @@ abstract class IChampionshipsRepository {
   /// Competições da temporada, de todas as regiões.
   Future<Either<Failure, List<ChampionshipDTO>>> getSeasonChampionships(String season);
 
+  Stream<Either<Failure, List<GroupDTO>>> watchChampionshipGroups({required int championshipId, String? season});
+
+  Future<Either<Failure, void>> saveGroup(GroupDTO group, {String? season});
+
+  Future<Either<Failure, void>> deleteGroup(String groupId, {String? season});
+
+  Future<Either<Failure, void>> replaceGroups({
+    required List<GroupDTO> previous,
+    required List<GroupDTO> groups,
+    String? season,
+  });
+
   /// Inscreve ou tira o time do campeonato.
   Future<Either<Failure, ChampionshipDTO>> setTeamEnrollment({
     required String championshipDocId,

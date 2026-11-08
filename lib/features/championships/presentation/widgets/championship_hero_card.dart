@@ -7,6 +7,7 @@ import 'package:arena_soccer/utils/components/arena_hero_background.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/themes/arena_palette.dart';
 
 /// Fundo do hero do campeonato: o banner com degradê escuro de baixo para
 /// cima (o texto branco fica legível); sem banner, o fundo verde do app.
@@ -24,7 +25,7 @@ class ChampionshipHeroBackdrop extends StatelessWidget {
         CachedNetworkImage(
           imageUrl: imageUrl,
           fit: BoxFit.cover,
-          placeholder: (_, __) => const ColoredBox(color: AppColors.primaryDark),
+          placeholder: (_, __) => ColoredBox(color: ArenaPalette.of(context).primaryDark),
           errorWidget: (_, __, ___) => const ArenaHeroBackground(child: SizedBox.expand()),
         ),
         DecoratedBox(
@@ -34,10 +35,10 @@ class ChampionshipHeroBackdrop extends StatelessWidget {
               end: Alignment.bottomCenter,
               stops: const [0, 0.4, 0.75, 1],
               colors: [
-                AppColors.primaryDark.withValues(alpha: 0.1),
-                AppColors.primaryDark.withValues(alpha: 0.55),
-                AppColors.primaryDark.withValues(alpha: 0.9),
-                AppColors.primaryDark,
+                ArenaPalette.of(context).primaryDark.withValues(alpha: 0.1),
+                ArenaPalette.of(context).primaryDark.withValues(alpha: 0.55),
+                ArenaPalette.of(context).primaryDark.withValues(alpha: 0.9),
+                ArenaPalette.of(context).primaryDark,
               ],
             ),
           ),
@@ -103,7 +104,7 @@ class ChampionshipSeasonBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s2),
       decoration: BoxDecoration(
-        color: current ? AppColors.primary : AppColors.white.withValues(alpha: 0.2),
+        color: current ? ArenaPalette.of(context).primary : AppColors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(AppSizes.s6),
       ),
       child: Text(
@@ -128,11 +129,11 @@ class ChampionshipHeroCard extends StatelessWidget {
     final radius = BorderRadius.circular(AppSizes.cardRadius);
 
     return Material(
-      color: AppColors.primaryDark,
+      color: ArenaPalette.of(context).primaryDark,
       borderRadius: radius,
       clipBehavior: Clip.antiAlias,
       elevation: 2,
-      shadowColor: AppColors.primaryDark.withValues(alpha: 0.4),
+      shadowColor: ArenaPalette.of(context).primaryDark.withValues(alpha: 0.4),
       child: InkWell(
         onTap: onTap,
         child: AspectRatio(
@@ -168,7 +169,7 @@ class ChampionshipHeroCard extends StatelessWidget {
                           width: AppSizes.s36,
                           height: AppSizes.s36,
                           decoration: const BoxDecoration(color: AppColors.white, shape: BoxShape.circle),
-                          child: const Icon(Icons.arrow_forward_rounded, color: AppColors.primaryDark),
+                          child: Icon(Icons.arrow_forward_rounded, color: ArenaPalette.of(context).primaryDark),
                         ),
                       ],
                     ),

@@ -29,7 +29,11 @@ class ChampionshipFormPage extends StatefulWidget {
   /// Campeonato a editar; nulo = novo.
   final ChampionshipDTO? championship;
 
-  const ChampionshipFormPage({super.key, this.championship});
+  /// Edição do organizador ("Sou organizador de campeonato"): nome, sede,
+  /// categoria e temporada ficam como o admin aprovou (as regras barram).
+  final bool organizer;
+
+  const ChampionshipFormPage({super.key, this.championship, this.organizer = false});
 
   @override
   State<ChampionshipFormPage> createState() => _ChampionshipFormPageState();
@@ -215,8 +219,16 @@ class _ChampionshipFormPageState extends State<ChampionshipFormPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              if (widget.organizer) ...[
+                Text(
+                  l10n.championshipFormOrganizerLocked,
+                  style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+                ),
+                const SizedBox(height: AppSizes.s12),
+              ],
               TextField(
                 controller: _title,
+                enabled: !widget.organizer,
                 onChanged: _cubit.changeTitle,
                 maxLength: 60,
                 textCapitalization: TextCapitalization.sentences,
@@ -228,16 +240,21 @@ class _ChampionshipFormPageState extends State<ChampionshipFormPage> {
                 ),
               ),
               const SizedBox(height: AppSizes.s4),
-              RegionSelectTile(
-                label: l10n.registerRegionLabel,
-                region: base.region,
-                regions: form.regions,
-                recent: BlocProvider.of<RegionCubit>(context).state.recentRegions,
-                onChanged: _cubit.selectRegion,
+              IgnorePointer(
+                ignoring: widget.organizer,
+                child: RegionSelectTile(
+                  label: l10n.registerRegionLabel,
+                  region: base.region,
+                  regions: form.regions,
+                  recent: BlocProvider.of<RegionCubit>(context).state.recentRegions,
+                  onChanged: _cubit.selectRegion,
+                ),
               ),
-              const SizedBox(height: AppSizes.s14),
-              _Label(l10n.championshipFormSeasonLabel),
-              _Chips(values: form.seasons, selected: base.season, onSelected: _cubit.selectSeason),
+              if (!widget.organizer) ...[
+                const SizedBox(height: AppSizes.s14),
+                _Label(l10n.championshipFormSeasonLabel),
+                _Chips(values: form.seasons, selected: base.season, onSelected: _cubit.selectSeason),
+              ],
               const SizedBox(height: AppSizes.s16),
               TextField(
                 controller: _description,
@@ -263,26 +280,29 @@ class _ChampionshipFormPageState extends State<ChampionshipFormPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Abrangência: municipal (só times da sede) ou intermunicipal.
-              Wrap(
-                spacing: AppSizes.s8,
-                runSpacing: AppSizes.s8,
-                children: [
-                  for (final scope in ChampionshipScope.values)
-                    ArenaChoiceChip(
-                      label: scope == ChampionshipScope.municipal
-                          ? l10n.championshipScopeMunicipal
-                          : l10n.championshipScopeIntermunicipal,
-                      icon: scope == ChampionshipScope.municipal ? Icons.location_city_rounded : Icons.public_rounded,
-                      selected: form.base.scope == scope,
-                      onTap: () {
-                        final removed = _cubit.selectScope(scope);
-                        if (removed > 0) {
-                          showSnackBar(
-                              context: context, message: l10n.championshipScopeRemoved(removed, form.base.region));
-                        }
-                      },
-                    ),
-                ],
+              IgnorePointer(
+                ignoring: widget.organizer,
+                child: Wrap(
+                  spacing: AppSizes.s8,
+                  runSpacing: AppSizes.s8,
+                  children: [
+                    for (final scope in ChampionshipScope.values)
+                      ArenaChoiceChip(
+                        label: scope == ChampionshipScope.municipal
+                            ? l10n.championshipScopeMunicipal
+                            : l10n.championshipScopeIntermunicipal,
+                        icon: scope == ChampionshipScope.municipal ? Icons.location_city_rounded : Icons.public_rounded,
+                        selected: form.base.scope == scope,
+                        onTap: () {
+                          final removed = _cubit.selectScope(scope);
+                          if (removed > 0) {
+                            showSnackBar(
+                                context: context, message: l10n.championshipScopeRemoved(removed, form.base.region));
+                          }
+                        },
+                      ),
+                  ],
+                ),
               ),
               const SizedBox(height: AppSizes.s6),
               Text(

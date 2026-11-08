@@ -59,6 +59,13 @@ class CalculateBestPlayerUseCase {
     // Só apura votação encerrada: cache local curto, fica com a última
     // emissão (o remoto quando revalidou).
     final response = await _getVotes(ref).last;
-    return response.map((votes) => tallyVotes(VotingOutcome.withoutSelfVotes(votes, players)));
+    return response.map((votes) => tallyVotes(VotingOutcome.withoutSelfVotes(
+          // Só quem participou da partida (súmula) pode ser votado.
+          [
+            for (final v in votes)
+              if (ref.isEligible(playerName: v.playerName, teamId: v.teamId, team: v.team)) v,
+          ],
+          players,
+        )));
   }
 }

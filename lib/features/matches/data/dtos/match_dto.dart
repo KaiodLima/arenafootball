@@ -106,6 +106,9 @@ class MatchDTO extends Equatable {
   /// Súmula: cartões (`cartoes`), escalação (`escalacao`), árbitro
   /// (`arbitro`) e observações (`observacoes`); vazios em partidas sem súmula.
   final List<MatchBooking> bookings;
+
+  /// Substituições da súmula (`substituicoes`).
+  final List<MatchSubstitution> substitutions;
   final MatchLineup lineup;
   final String referee;
   final String notes;
@@ -140,6 +143,7 @@ class MatchDTO extends Equatable {
     this.secondHalfAt,
     this.statusAt,
     this.bookings = const [],
+    this.substitutions = const [],
     this.lineup = const MatchLineup(),
     this.referee = '',
     this.notes = '',
@@ -147,6 +151,7 @@ class MatchDTO extends Equatable {
 
   static const String bookingsField = 'cartoes';
   static const String lineupField = 'escalacao';
+  static const String substitutionsField = 'substituicoes';
 
   static DateTime? _time(Object? value) => value is Timestamp ? value.toDate() : null;
 
@@ -186,6 +191,7 @@ class MatchDTO extends Equatable {
       secondHalfAt: _time(data['segundoTempoEm']),
       statusAt: _time(data['statusEm']),
       bookings: MatchBooking.listFrom(data[bookingsField]),
+      substitutions: MatchSubstitution.listFrom(data[substitutionsField]),
       lineup: MatchLineup.fromMap(data[lineupField]),
       referee: data['arbitro']?.toString() ?? '',
       notes: data['observacoes']?.toString() ?? '',
@@ -218,6 +224,7 @@ class MatchDTO extends Equatable {
         'duracao': durationMinutes,
         if (manualStatus != MatchManualStatus.none) 'status': manualStatus.key,
         if (bookings.isNotEmpty) bookingsField: [for (final b in bookings) b.toMap()],
+        if (substitutions.isNotEmpty) substitutionsField: [for (final s in substitutions) s.toMap()],
         if (!lineup.isEmpty) lineupField: lineup.toMap(),
         if (referee.isNotEmpty) 'arbitro': referee,
         if (notes.isNotEmpty) 'observacoes': notes,
@@ -251,6 +258,7 @@ class MatchDTO extends Equatable {
     DateTime? secondHalfAt,
     DateTime? statusAt,
     List<MatchBooking>? bookings,
+    List<MatchSubstitution>? substitutions,
     MatchLineup? lineup,
     String? referee,
     String? notes,
@@ -285,6 +293,7 @@ class MatchDTO extends Equatable {
       secondHalfAt: secondHalfAt ?? this.secondHalfAt,
       statusAt: statusAt ?? this.statusAt,
       bookings: bookings ?? this.bookings,
+      substitutions: substitutions ?? this.substitutions,
       lineup: lineup ?? this.lineup,
       referee: referee ?? this.referee,
       notes: notes ?? this.notes,
@@ -321,6 +330,7 @@ class MatchDTO extends Equatable {
         startedAt: startedAt,
         statusAt: statusAt,
         bookings: bookings,
+        substitutions: substitutions,
         lineup: lineup,
         referee: referee,
         notes: notes,
@@ -358,6 +368,7 @@ class MatchDTO extends Equatable {
         secondHalfAt: resetClock ? null : secondHalfAt,
         statusAt: resetClock ? null : statusAt,
         bookings: bookings,
+        substitutions: substitutions,
         lineup: lineup,
         referee: referee,
         notes: notes,
@@ -397,6 +408,7 @@ class MatchDTO extends Equatable {
         secondHalfAt,
         statusAt,
         bookings,
+        substitutions,
         lineup,
         referee,
         notes,

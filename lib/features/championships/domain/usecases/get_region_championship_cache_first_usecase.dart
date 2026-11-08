@@ -16,7 +16,8 @@ class GetRegionChampionshipCacheFirstUseCase {
 
   GetRegionChampionshipCacheFirstUseCase(this._getChampionship, this._getCached, this._saveCache);
 
-  Stream<Either<Failure, ChampionshipDTO?>> call({required String region, required String season, bool force = false}) =>
+  Stream<Either<Failure, ChampionshipDTO?>> call(
+          {required String region, required String season, bool force = false}) =>
       cacheFirst<ChampionshipDTO?>(
         readCache: () => _getCached(region: region, season: season),
         fetchRemote: () => _getChampionship(region: region, season: season),

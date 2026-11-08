@@ -64,11 +64,26 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
     final l10n = AppLocalizations.of(context);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      sl<TourService>().show(context, TourIds.album, () => [
-            TourStep(target: _tourPack, icon: Icons.card_giftcard_rounded, title: l10n.tourAlbumPackTitle, body: l10n.tourAlbumPackBody),
-            TourStep(target: _tourFirstTeam, icon: Icons.menu_book_rounded, title: l10n.tourAlbumPagesTitle, body: l10n.tourAlbumPagesBody),
-            TourStep(target: _tourTabs, icon: Icons.emoji_events_rounded, title: l10n.tourAlbumTabsTitle, body: l10n.tourAlbumTabsBody),
-          ]);
+      sl<TourService>().show(
+          context,
+          TourIds.album,
+          () => [
+                TourStep(
+                    target: _tourPack,
+                    icon: Icons.card_giftcard_rounded,
+                    title: l10n.tourAlbumPackTitle,
+                    body: l10n.tourAlbumPackBody),
+                TourStep(
+                    target: _tourFirstTeam,
+                    icon: Icons.menu_book_rounded,
+                    title: l10n.tourAlbumPagesTitle,
+                    body: l10n.tourAlbumPagesBody),
+                TourStep(
+                    target: _tourTabs,
+                    icon: Icons.emoji_events_rounded,
+                    title: l10n.tourAlbumTabsTitle,
+                    body: l10n.tourAlbumTabsBody),
+              ]);
     });
   }
 
@@ -396,4 +411,3 @@ class _Stat extends StatelessWidget {
 
 /// Abas da capa: índice dos times, repetidas e o ranking de colecionadores.
 enum _CoverTab { teams, duplicates, ranking }
-

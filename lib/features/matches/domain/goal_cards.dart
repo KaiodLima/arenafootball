@@ -34,7 +34,10 @@ class GoalCardsPlan {
     }
     return GoalCardsPlan(
       added: added,
-      removed: [for (final g in before) if (!kept.contains(g.id)) g],
+      removed: [
+        for (final g in before)
+          if (!kept.contains(g.id)) g
+      ],
       changed: changed,
     );
   }

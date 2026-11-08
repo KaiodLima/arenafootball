@@ -17,7 +17,10 @@ class TeamCard extends StatelessWidget {
   final VoidCallback? onTap;
   final File? crestFile;
 
-  const TeamCard({super.key, required this.team, this.onTap, this.crestFile});
+  /// No lugar da seta (ex.: menu de ações do organizador).
+  final Widget? trailing;
+
+  const TeamCard({super.key, required this.team, this.onTap, this.crestFile, this.trailing});
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +65,7 @@ class TeamCard extends StatelessWidget {
               ],
             ),
           ),
-          const Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary),
+          trailing ?? const Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary),
         ],
       ),
     );

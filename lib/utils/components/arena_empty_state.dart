@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/themes/arena_palette.dart';
 
 /// Estado vazio/erro das listas: ícone + mensagem centralizados.
 class ArenaEmptyState extends StatelessWidget {
@@ -24,8 +24,8 @@ class ArenaEmptyState extends StatelessWidget {
             Container(
               width: AppSizes.s64,
               height: AppSizes.s64,
-              decoration: const BoxDecoration(color: AppColors.primarySoft, shape: BoxShape.circle),
-              child: Icon(icon, color: AppColors.primaryDark, size: AppSizes.s30),
+              decoration: BoxDecoration(color: ArenaPalette.of(context).primarySoft, shape: BoxShape.circle),
+              child: Icon(icon, color: ArenaPalette.of(context).primaryDark, size: AppSizes.s30),
             ),
             const SizedBox(height: AppSizes.s16),
             Text(message, textAlign: TextAlign.center, style: AppTypography.subtitle()),

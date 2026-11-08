@@ -39,8 +39,9 @@ void main() {
       home: Scaffold(body: SingleChildScrollView(child: ResultCard(news: _news, onTap: () {}))),
     ));
     expect(find.text('FIM DE JOGO'), findsOneWidget);
-    expect(find.text('3 × 1'), findsOneWidget);
-    expect(find.text('Copa Verde'), findsOneWidget);
+    expect(find.text('3'), findsOneWidget);
+    expect(find.text('1'), findsOneWidget);
+    expect(find.text('COPA VERDE'), findsOneWidget);
     expect(find.text('Deu Lava Jato!'), findsOneWidget);
     expect(find.text('Ver partida'), findsOneWidget);
   });
@@ -55,6 +56,6 @@ void main() {
       ),
     ));
     expect(find.text('FIM DE JOGO'), findsOneWidget);
-    expect(find.text('3 × 1'), findsOneWidget);
+    expect(find.text('3'), findsOneWidget);
   });
 }

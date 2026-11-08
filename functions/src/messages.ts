@@ -9,6 +9,7 @@
 /** Ações que podem emitir push (chaves de `config/notificacoes`). */
 export type ActionKey =
   | 'gol'
+  | 'cartao_vermelho'
   | 'noticia'
   | 'partida'
   | 'votacao_aberta'
@@ -25,11 +26,14 @@ export type ActionKey =
   | 'noticia_parceiro_resposta'
   | 'conquista'
   | 'album_pacote'
-  | 'indicacao';
+  | 'indicacao'
+  | 'solicitacao_organizador'
+  | 'solicitacao_organizador_resposta';
 
 /** Sem configuração gravada, vale este padrão (notícia vem desligada). */
 export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
   gol: true,
+  cartao_vermelho: true,
   noticia: false,
   partida: true,
   votacao_aberta: true,
@@ -47,6 +51,8 @@ export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
   conquista: true,
   album_pacote: true,
   indicacao: true,
+  solicitacao_organizador: true,
+  solicitacao_organizador_resposta: true,
 };
 
 export type Target = { topic: string } | { condition: string };
@@ -94,7 +100,9 @@ export interface PushMessage {
     | 'noticias_pendentes'
     | 'conquistas'
     | 'album'
-    | 'indicacao';
+    | 'indicacao'
+    | 'solicitacoes_organizador'
+    | 'organizador';
   regiao: string;
   alvo: Target;
   /** Tela específica (partida, votação, notícia); sem ela, só a aba. */
@@ -225,12 +233,38 @@ export function goalMessage(news: Doc, currentSeason = ''): PushMessage | null {
   };
 }
 
+/**
+ * Card oculto do cartão vermelho (noticias com tag "cartao", gravado pela
+ * súmula): "🟥 Expulso!" para quem segue a região e os times, como o gol.
+ * Amarelo e substituição não mandam push (só o card ao vivo no feed).
+ */
+export function bookingMessage(news: Doc, currentSeason = ''): PushMessage | null {
+  const home = text(news.time_casa);
+  const away = text(news.time_fora);
+  const region = text(news.fk_competicao);
+  const alvo = gameTarget(regionTopicOf(news), home, away, text(news.id_time_casa), text(news.id_time_fora));
+  if (!home || !away || !alvo) return null;
+  const crest = text(news.escudo_marcador);
+  return {
+    tipo: 'cartao_vermelho',
+    titulo: `🟥 Expulso! ${home} ${text(news.gol_time_casa) || '0'} × ${text(news.gol_time_fora) || '0'} ${away}`,
+    corpo: text(news.descricao) || 'Confira no Arena Football',
+    aba: 'home',
+    regiao: region,
+    alvo,
+    ...openMatch('partida', { id: text(news.id_partida), season: text(news.temporada) || currentSeason }),
+    ...(crest.startsWith('https://') ? { imagem: crest } : {}),
+  };
+}
+
 /** Notícia comum publicada visível (sem gol, publicidade); [id] abre a notícia. */
 export function newsMessage(news: Doc, id = ''): PushMessage | null {
   const tag = text(news.tag);
   // Gol, resultado e votação têm card próprio (os automáticos não mandam push de notícia).
   if (
     tag === 'gol' ||
+    tag === 'cartao' ||
+    tag === 'aovivo' ||
     tag === 'resultado' ||
     tag === 'votacao' ||
     tag === 'publicidade' ||
@@ -420,6 +454,50 @@ export function teamRequestAnswerMessage(uid: string, before: Doc | undefined, a
       240,
     ),
     aba: 'meu_time',
+    regiao: text(after.regiao),
+    alvo: { topic: userTopic(uid) },
+  };
+}
+
+/** Pedido "Sou organizador de campeonato" novo ou reenviado: avisa os admins. */
+export function organizerRequestMessage(uid: string, before: Doc | undefined, after: Doc | undefined): PushMessage | null {
+  // Reenvio depois de respondido conta como novo; corrigir o pendente, não.
+  if (!after || !uid || text(after.status) !== 'pendente' || text(before?.status) === 'pendente') return null;
+  const user = text(after.nome_usuario);
+  const name = text(after.nome);
+  if (!name) return null;
+  return {
+    tipo: 'solicitacao_organizador',
+    titulo: 'Novo pedido de campeonato',
+    corpo: shorten(user ? `${user} quer organizar o campeonato ${name}` : `Pedido para organizar o campeonato ${name}`, 240),
+    aba: 'solicitacoes_organizador',
+    regiao: text(after.regiao),
+    alvo: { topic: ADMINS_TOPIC },
+  };
+}
+
+/** Admin respondeu o pedido de organizador: avisa só quem pediu. */
+export function organizerRequestAnswerMessage(
+  uid: string,
+  before: Doc | undefined,
+  after: Doc | undefined,
+): PushMessage | null {
+  if (!before || !after || !uid || text(before.status) !== 'pendente') return null;
+  const status = text(after.status);
+  if (status !== 'aprovada' && status !== 'rejeitada') return null;
+  const name = text(after.nome);
+  const reason = text(after.motivo);
+  const approved = status === 'aprovada';
+  return {
+    tipo: 'solicitacao_organizador_resposta',
+    titulo: approved ? '🏆 Seu campeonato foi aprovado!' : 'Pedido de campeonato',
+    corpo: shorten(
+      approved
+        ? `O ${name} já está no app. Complete os detalhes em Meus campeonatos.`
+        : `O pedido do campeonato ${name} não foi aprovado.${reason ? ` Motivo: ${reason}` : ''}`,
+      240,
+    ),
+    aba: 'organizador',
     regiao: text(after.regiao),
     alvo: { topic: userTopic(uid) },
   };

@@ -97,4 +97,30 @@ class MatchClock {
     if (minute > limit) return clock(MatchClockPhase.secondHalf, minute);
     return clock(MatchClockPhase.firstHalf, minute);
   }
+
+  /// Relógio corrido com segundos para a súmula: "23:41"; com acréscimo,
+  /// "45+2:10" (1º tempo) e "90+3:05" (2º tempo). Mesma base do [of]: 2º tempo
+  /// marcado começa na metade ("45:00"); senão, conta do início (marcado ou
+  /// horário). Nulo no intervalo ou sem início conhecido.
+  static String? runningLabel(MatchDTO match, DateTime now) {
+    final clock = of(match, now);
+    if (clock.minute == null || clock.phase == MatchClockPhase.halfTime) return null;
+    final secondHalf = match.secondHalfAt;
+    final Duration elapsed;
+    if (secondHalf != null) {
+      elapsed = now.difference(secondHalf) + Duration(minutes: clock.half);
+    } else {
+      final start = manualStartOf(match) ?? kickoffOf(match, now);
+      if (start == null) return null;
+      elapsed = now.difference(start);
+    }
+    final seconds = elapsed.isNegative ? 0 : elapsed.inSeconds;
+    final limit = clock.phase == MatchClockPhase.firstHalf ? clock.half : clock.duration;
+    String two(int value) => value.toString().padLeft(2, '0');
+    if (seconds > limit * 60) {
+      final extra = seconds - limit * 60;
+      return '$limit+${extra ~/ 60}:${two(extra % 60)}';
+    }
+    return '${two(seconds ~/ 60)}:${two(seconds % 60)}';
+  }
 }

@@ -24,7 +24,7 @@ final _sl = GetIt.instance;
 
 void registerNewsDependencies() {
   // DataSource
-  _sl.registerLazySingleton<NewsDataSource>(() => NewsDataSource(_sl()));
+  _sl.registerLazySingleton<NewsDataSource>(() => NewsDataSource(_sl(), _sl()));
 
   // Repository (interface -> impl)
   _sl.registerLazySingleton<INewsRepository>(() => NewsRepositoryImpl(_sl(), _sl()));

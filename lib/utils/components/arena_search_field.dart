@@ -9,14 +9,24 @@ class ArenaSearchField extends StatefulWidget {
   final String hint;
   final ValueChanged<String> onChanged;
 
-  const ArenaSearchField({super.key, required this.hint, required this.onChanged});
+  /// Texto inicial (busca reaberta) e foco ao aparecer.
+  final String initialValue;
+  final bool autofocus;
+
+  const ArenaSearchField({
+    super.key,
+    required this.hint,
+    required this.onChanged,
+    this.initialValue = '',
+    this.autofocus = false,
+  });
 
   @override
   State<ArenaSearchField> createState() => _ArenaSearchFieldState();
 }
 
 class _ArenaSearchFieldState extends State<ArenaSearchField> {
-  final _controller = TextEditingController();
+  late final _controller = TextEditingController(text: widget.initialValue);
 
   @override
   void dispose() {
@@ -39,6 +49,7 @@ class _ArenaSearchFieldState extends State<ArenaSearchField> {
 
     return TextField(
       controller: _controller,
+      autofocus: widget.autofocus,
       onChanged: (value) {
         widget.onChanged(value);
         setState(() {});

@@ -17,6 +17,14 @@ class TeamsRepositoryImpl implements ITeamsRepository {
       _dataSource.getTeams(region: region, season: season);
 
   @override
+  Future<Either<Failure, List<TeamDTO>>> getTeamsByIds({
+    required List<String> ids,
+    List<String> names = const [],
+    String? season,
+  }) =>
+      _dataSource.getTeamsByIds(ids: ids, names: names, season: season);
+
+  @override
   Future<Either<Failure, TeamDTO?>> getTeamByName(String name) => _dataSource.getTeamByName(name);
 
   @override

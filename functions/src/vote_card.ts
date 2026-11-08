@@ -62,6 +62,37 @@ export function voteTexts(match: Doc, matchId: string): { titulo: string; descri
   };
 }
 
+/** O eleito, como o `recordBestPlayer` grava em `partidas.craque`. */
+export interface VoteCardBestPlayer {
+  nome: string;
+  idTime: string;
+  votos: number;
+  percentual: number;
+}
+
+/**
+ * Apuração no card de votação (`votacao_<id>`), gravada quando a votação
+ * fecha: `craque_apurado` + nome, time (pelo id na partida), votos e %.
+ * Sem eleito, `null` = apagar o campo (fica só `craque_apurado`).
+ */
+export function voteCardBestPlayerFields(
+  best: VoteCardBestPlayer | null | undefined,
+  match: Doc,
+): Record<string, string | number | boolean | null> {
+  if (!best || !text(best.nome).trim()) {
+    return { craque_apurado: true, craque_nome: null, craque_time: null, craque_votos: null, craque_percentual: null };
+  }
+  const id = text(best.idTime);
+  const team = id && id === text(match.idTimeC) ? text(match.timeC) : id && id === text(match.idTimeF) ? text(match.timeF) : '';
+  return {
+    craque_apurado: true,
+    craque_nome: text(best.nome).trim(),
+    craque_time: team || null,
+    craque_votos: Math.max(0, Math.round(Number(best.votos) || 0)),
+    craque_percentual: Math.max(0, Math.min(100, Math.round(Number(best.percentual) || 0))),
+  };
+}
+
 /** Campos do card de votação (sem a `data`, gravada com a hora do servidor). */
 export function voteCardNews(
   match: Doc,

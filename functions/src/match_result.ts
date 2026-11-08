@@ -19,6 +19,31 @@ export const RESULT_TAG = 'resultado';
 /** Id do card de resultado da partida (um por partida). */
 export const resultNewsId = (matchId: string): string => `resultado_${matchId}`;
 
+/** Id do card "ao vivo" da partida (gravado pelo app; as functions marcam a fase). */
+export const liveNewsId = (matchId: string): string => `aovivo_${matchId}`;
+
+/** Fase mostrada no card ao vivo (`status_partida`). */
+export type LiveCardStatus = 'andamento' | 'intervalo' | 'encerrada';
+
+/** `status` da partida → fase do card ao vivo (aguardando/sem status: nada muda). */
+export function liveCardStatusOf(status: unknown): LiveCardStatus | null {
+  const value = text(status);
+  return value === 'andamento' || value === 'intervalo' || value === 'encerrada' ? value : null;
+}
+
+/**
+ * O que gravar no card ao vivo quando a partida muda de fase: o
+ * `status_partida` (a pílula AO VIVO / INTERVALO / FIM DE JOGO no app novo) e
+ * o título lido pelo app antigo ("Leões 2 × 1 Tigres · fim de jogo").
+ */
+export function liveCardStatusUpdate(status: LiveCardStatus, match: Doc): Doc {
+  const suffix = status === 'encerrada' ? 'fim de jogo' : status === 'intervalo' ? 'intervalo' : 'ao vivo';
+  return {
+    status_partida: status,
+    titulo: `${text(match.timeC)} ${int(match.golTimeCasa)} × ${int(match.golTimeFora)} ${text(match.timeF)} · ${suffix}`,
+  };
+}
+
 export type ResultGroup = 'vitoria' | 'goleada' | 'empate' | 'zero';
 
 // Variáveis: {vencedor} {perdedor} {gv} {gp} (vitória/goleada) e {casa} {fora}

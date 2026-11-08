@@ -8,6 +8,7 @@ import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart'
 import 'package:arena_soccer/features/auth/presentation/bloc/session_state.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/notifications/presentation/widgets/push_topics_listener.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
 import 'package:arena_soccer/features/partner_requests/presentation/bloc/partner_cubit.dart';
 import 'package:arena_soccer/features/player_requests/presentation/bloc/my_player_cubit.dart';
 import 'package:arena_soccer/features/team_requests/presentation/bloc/owned_team_cubit.dart';
@@ -53,6 +54,10 @@ class BlocsLoad extends StatelessWidget {
         // destaques e publicidade na região dele, com as permissões do admin.
         BlocProvider<PartnerCubit>(create: (_) => PartnerCubit(sl())),
 
+        // Organizador de campeonato aprovado — global: o toggle torcedor/organizador
+        // da home e as abas só com os campeonatos dele.
+        BlocProvider<OrganizerModeCubit>(create: (_) => OrganizerModeCubit(sl(), sl(), sl())),
+
         // Álbum de figurinhas (evento do admin) — global: o selo flutuante da
         // home e o pacotinho do dia da conta.
         BlocProvider<AlbumEventCubit>(create: (_) => AlbumEventCubit(sl())),
@@ -71,8 +76,8 @@ class BlocsLoad extends StatelessWidget {
   }
 }
 
-/// Faz o [OwnedTeamCubit], o [MyPlayerCubit] e o [PartnerCubit] seguirem a
-/// conta logada.
+/// Faz o [OwnedTeamCubit], o [MyPlayerCubit], o [PartnerCubit] e o
+/// [OrganizerModeCubit] seguirem a conta logada.
 class OwnedTeamSync extends StatelessWidget {
   final Widget child;
 
@@ -87,6 +92,7 @@ class OwnedTeamSync extends StatelessWidget {
         BlocProvider.of<OwnedTeamCubit>(context).follow(state.user?.id);
         BlocProvider.of<MyPlayerCubit>(context).follow(state.user?.id);
         BlocProvider.of<PartnerCubit>(context).follow(state.user?.id);
+        BlocProvider.of<OrganizerModeCubit>(context).follow(state.user?.id);
         BlocProvider.of<AlbumEventCubit>(context).follow(state.user?.id, isAdmin: state.isAdmin);
       },
       child: child,

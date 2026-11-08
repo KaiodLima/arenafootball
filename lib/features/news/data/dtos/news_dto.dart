@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
+import 'package:arena_soccer/features/news/data/dtos/live_event.dart';
 
 /// Documento da coleção `noticias`. Notícias, cards de gol e anúncios
 /// usam o mesmo documento; o que muda é a [tag].
@@ -10,6 +11,16 @@ class NewsDTO extends Equatable {
 
   /// Regiões envolvidas (cards de partida entre regiões diferentes).
   static const String regionIdsField = 'idsRegioes';
+
+  /// Card "ao vivo" da partida (`noticias/aovivo_<idPartida>`): um por
+  /// partida, atualizado a cada lance da súmula e levado ao topo do feed.
+  static const String liveTag = 'aovivo';
+
+  /// Card oculto do cartão vermelho (só dispara o push "Expulso!").
+  static const String bookingTag = 'cartao';
+
+  /// Id do card ao vivo da partida [matchId].
+  static String liveIdOf(String matchId) => 'aovivo_$matchId';
 
   /// Tag dos cards de publicidade.
   static const String adTag = 'publicidade';
@@ -74,6 +85,14 @@ class NewsDTO extends Equatable {
   /// Card "Vote no craque": a votação da partida está aberta (`votacao`, string).
   final bool votingOpen;
 
+  /// Card "Vote no craque" encerrado: a apuração já foi gravada pelas
+  /// functions (`craque_apurado`); sem nome = sem craque eleito.
+  final bool bestPlayerChecked;
+  final String bestPlayerName;
+  final String bestPlayerTeam;
+  final int bestPlayerVotes;
+  final int bestPlayerPercent;
+
   /// `idAutor`: uid de quem publicou (notícias novas). O parceiro só mexe nas
   /// dele; vazio (antigas e automáticas) = só o admin.
   final String authorId;
@@ -85,6 +104,18 @@ class NewsDTO extends Equatable {
   /// Cards da partida (gol, resultado, votação) entre times de regiões
   /// diferentes: as regiões envolvidas (`idsRegioes`); o feed de cada uma mostra.
   final List<String> regionIds;
+
+  /// Card ao vivo: o último lance (destaque) e todos, em ordem de minuto.
+  final LiveEvent? lastEvent;
+  final List<LiveEvent> liveEvents;
+
+  /// Card ao vivo: fase da partida (`status_partida`: andamento, intervalo,
+  /// encerrada; vazio = andamento). As functions marcam intervalo e fim.
+  final String matchStatus;
+
+  static const String matchStatusFinished = 'encerrada';
+  static const String matchStatusHalfTime = 'intervalo';
+  static const String matchStatusLive = 'andamento';
 
   const NewsDTO({
     this.id = '',
@@ -121,9 +152,17 @@ class NewsDTO extends Equatable {
     this.awayColor = '',
     this.championshipTitle = '',
     this.votingOpen = false,
+    this.bestPlayerChecked = false,
+    this.bestPlayerName = '',
+    this.bestPlayerTeam = '',
+    this.bestPlayerVotes = 0,
+    this.bestPlayerPercent = 0,
     this.authorId = '',
     this.goalId = '',
     this.regionIds = const [],
+    this.lastEvent,
+    this.liveEvents = const [],
+    this.matchStatus = '',
   });
 
   bool get hasScorer => scorerId.isNotEmpty && scorerName.isNotEmpty;
@@ -137,6 +176,10 @@ class NewsDTO extends Equatable {
   bool get isResult => tag == resultTag;
 
   bool get isVoteCall => tag == voteTag;
+
+  bool get isLive => tag == liveTag;
+
+  bool get isBookingCard => tag == bookingTag;
 
   factory NewsDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? const {};
@@ -179,9 +222,19 @@ class NewsDTO extends Equatable {
       awayColor: data['cor_fora']?.toString() ?? '',
       championshipTitle: data['campeonato']?.toString() ?? '',
       votingOpen: data['votacao']?.toString() == 'true',
+      bestPlayerChecked: data['craque_apurado'] == true,
+      bestPlayerName: data['craque_nome']?.toString() ?? '',
+      bestPlayerTeam: data['craque_time']?.toString() ?? '',
+      bestPlayerVotes: (data['craque_votos'] as num?)?.round() ?? 0,
+      bestPlayerPercent: (data['craque_percentual'] as num?)?.round() ?? 0,
       authorId: data['idAutor']?.toString() ?? '',
       goalId: data['id_gol']?.toString() ?? '',
       regionIds: (data[regionIdsField] as List?)?.map((id) => id.toString()).toList() ?? const [],
+      lastEvent: data['ultimo_lance'] is Map
+          ? LiveEvent.fromMap(Map<String, dynamic>.from(data['ultimo_lance'] as Map))
+          : null,
+      liveEvents: LiveEvent.listFrom(data['lances']),
+      matchStatus: data['status_partida']?.toString() ?? '',
     );
   }
 
@@ -225,6 +278,11 @@ class NewsDTO extends Equatable {
       awayColor: text('awayColor'),
       championshipTitle: text('championshipTitle'),
       votingOpen: json['votingOpen'] == true,
+      bestPlayerChecked: json['bestPlayerChecked'] == true,
+      bestPlayerName: text('bestPlayerName'),
+      bestPlayerTeam: text('bestPlayerTeam'),
+      bestPlayerVotes: (json['bestPlayerVotes'] as num?)?.round() ?? 0,
+      bestPlayerPercent: (json['bestPlayerPercent'] as num?)?.round() ?? 0,
       authorId: text('authorId'),
     );
   }
@@ -265,6 +323,11 @@ class NewsDTO extends Equatable {
         'awayColor': awayColor,
         'championshipTitle': championshipTitle,
         'votingOpen': votingOpen,
+        'bestPlayerChecked': bestPlayerChecked,
+        'bestPlayerName': bestPlayerName,
+        'bestPlayerTeam': bestPlayerTeam,
+        'bestPlayerVotes': bestPlayerVotes,
+        'bestPlayerPercent': bestPlayerPercent,
         if (authorId.isNotEmpty) 'authorId': authorId,
       };
 
@@ -308,9 +371,17 @@ class NewsDTO extends Equatable {
         if (awayColor.isNotEmpty) 'cor_fora': awayColor,
         if (championshipTitle.isNotEmpty) 'campeonato': championshipTitle,
         if (isVoteCall) 'votacao': votingOpen.toString(),
+        if (bestPlayerChecked) 'craque_apurado': true,
+        if (bestPlayerName.isNotEmpty) 'craque_nome': bestPlayerName,
+        if (bestPlayerTeam.isNotEmpty) 'craque_time': bestPlayerTeam,
+        if (bestPlayerName.isNotEmpty) 'craque_votos': bestPlayerVotes,
+        if (bestPlayerName.isNotEmpty) 'craque_percentual': bestPlayerPercent,
         if (authorId.isNotEmpty) 'idAutor': authorId,
         if (goalId.isNotEmpty) 'id_gol': goalId,
         if (regionIds.isNotEmpty) regionIdsField: regionIds,
+        if (lastEvent != null) 'ultimo_lance': lastEvent!.toMap(),
+        if (isLive) 'lances': [for (final e in liveEvents) e.toMap()],
+        if (matchStatus.isNotEmpty) 'status_partida': matchStatus,
       };
 
   NewsDTO copyWith({
@@ -348,9 +419,17 @@ class NewsDTO extends Equatable {
     String? awayColor,
     String? championshipTitle,
     bool? votingOpen,
+    bool? bestPlayerChecked,
+    String? bestPlayerName,
+    String? bestPlayerTeam,
+    int? bestPlayerVotes,
+    int? bestPlayerPercent,
     String? authorId,
     String? goalId,
     List<String>? regionIds,
+    LiveEvent? lastEvent,
+    List<LiveEvent>? liveEvents,
+    String? matchStatus,
   }) {
     return NewsDTO(
       id: id ?? this.id,
@@ -387,9 +466,17 @@ class NewsDTO extends Equatable {
       awayColor: awayColor ?? this.awayColor,
       championshipTitle: championshipTitle ?? this.championshipTitle,
       votingOpen: votingOpen ?? this.votingOpen,
+      bestPlayerChecked: bestPlayerChecked ?? this.bestPlayerChecked,
+      bestPlayerName: bestPlayerName ?? this.bestPlayerName,
+      bestPlayerTeam: bestPlayerTeam ?? this.bestPlayerTeam,
+      bestPlayerVotes: bestPlayerVotes ?? this.bestPlayerVotes,
+      bestPlayerPercent: bestPlayerPercent ?? this.bestPlayerPercent,
       authorId: authorId ?? this.authorId,
       goalId: goalId ?? this.goalId,
       regionIds: regionIds ?? this.regionIds,
+      lastEvent: lastEvent ?? this.lastEvent,
+      liveEvents: liveEvents ?? this.liveEvents,
+      matchStatus: matchStatus ?? this.matchStatus,
     );
   }
 
@@ -429,6 +516,14 @@ class NewsDTO extends Equatable {
         awayColor,
         championshipTitle,
         votingOpen,
+        bestPlayerChecked,
+        bestPlayerName,
+        bestPlayerTeam,
+        bestPlayerVotes,
+        bestPlayerPercent,
         authorId,
+        lastEvent,
+        liveEvents,
+        matchStatus,
       ];
 }

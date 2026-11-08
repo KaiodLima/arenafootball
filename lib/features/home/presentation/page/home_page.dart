@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/utils/themes/arena_palette.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/widgets/organizer_teams_tab.dart';
 import 'package:arena_soccer/features/album/presentation/widgets/album_floating_badge.dart';
 import 'package:arena_soccer/features/achievements/presentation/bloc/achievements_cubit.dart';
 import 'package:arena_soccer/features/achievements/presentation/widgets/unlock_celebration_dialog.dart';
@@ -113,8 +116,17 @@ class _HomePageState extends State<HomePage> {
   }
 
   List<TourStep> _homeSteps(AppLocalizations l10n) => [
-        TourStep(target: _tourRegion, icon: Icons.location_on_rounded, title: l10n.tourHomeRegionTitle, body: l10n.tourHomeRegionBody),
-        TourStep(target: _tourTabs, icon: Icons.explore_rounded, title: l10n.tourHomeTabsTitle, body: l10n.tourHomeTabsBody, padding: 0),
+        TourStep(
+            target: _tourRegion,
+            icon: Icons.location_on_rounded,
+            title: l10n.tourHomeRegionTitle,
+            body: l10n.tourHomeRegionBody),
+        TourStep(
+            target: _tourTabs,
+            icon: Icons.explore_rounded,
+            title: l10n.tourHomeTabsTitle,
+            body: l10n.tourHomeTabsBody,
+            padding: 0),
         TourStep(
           target: _tourMenu,
           icon: Icons.menu_rounded,
@@ -138,10 +150,30 @@ class _HomePageState extends State<HomePage> {
       context,
       TourIds.drawer,
       () => [
-        TourStep(target: _drawerTour.header, icon: Icons.badge_rounded, title: l10n.tourDrawerProfileTitle, body: l10n.tourDrawerProfileBody, padding: 0),
-        TourStep(target: _drawerTour.predictions, icon: Icons.scoreboard_rounded, title: l10n.tourDrawerPredictionsTitle, body: l10n.tourDrawerPredictionsBody, padding: 2),
-        TourStep(target: _drawerTour.achievements, icon: Icons.military_tech_rounded, title: l10n.tourDrawerAchievementsTitle, body: l10n.tourDrawerAchievementsBody, padding: 2),
-        TourStep(target: _drawerTour.player, icon: Icons.sports_soccer_rounded, title: l10n.tourDrawerPlayerTitle, body: l10n.tourDrawerPlayerBody, padding: 2),
+        TourStep(
+            target: _drawerTour.header,
+            icon: Icons.badge_rounded,
+            title: l10n.tourDrawerProfileTitle,
+            body: l10n.tourDrawerProfileBody,
+            padding: 0),
+        TourStep(
+            target: _drawerTour.predictions,
+            icon: Icons.scoreboard_rounded,
+            title: l10n.tourDrawerPredictionsTitle,
+            body: l10n.tourDrawerPredictionsBody,
+            padding: 2),
+        TourStep(
+            target: _drawerTour.achievements,
+            icon: Icons.military_tech_rounded,
+            title: l10n.tourDrawerAchievementsTitle,
+            body: l10n.tourDrawerAchievementsBody,
+            padding: 2),
+        TourStep(
+            target: _drawerTour.player,
+            icon: Icons.sports_soccer_rounded,
+            title: l10n.tourDrawerPlayerTitle,
+            body: l10n.tourDrawerPlayerBody,
+            padding: 2),
       ],
       delay: const Duration(milliseconds: 400),
     );
@@ -172,6 +204,8 @@ class _HomePageState extends State<HomePage> {
       'meu_time' when user != null => AppRoutes.teamRequestPage,
       'solicitacoes_parceiro' when user != null && user.isAdmin => AppRoutes.partnerRequestsPanelPage,
       'parceiro' when user != null => AppRoutes.partnerRequestPage,
+      'solicitacoes_organizador' when user != null && user.isAdmin => AppRoutes.organizerRequestsPanelPage,
+      'organizador' when user != null => AppRoutes.organizerRequestPage,
       'noticias_pendentes' when user != null && user.isAdmin => AppRoutes.partnerRequestsPanelPage,
       'conquistas' when user != null => AppRoutes.achievementsPage,
       'album' when user != null => AppRoutes.albumPage,
@@ -308,7 +342,35 @@ class _HomePageState extends State<HomePage> {
     Navigator.pushNamedAndRemoveUntil(context, AppRoutes.loginPage, (_) => false);
   }
 
-  Widget _tabContent(HomeTab tab, RegionState region, AppLocalizations l10n) {
+  Future<void> _toggleOrganizerMode() async {
+    final cubit = BlocProvider.of<OrganizerModeCubit>(context);
+    await cubit.toggle();
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context);
+    showSnackBar(
+      context: context,
+      message: cubit.state.active ? l10n.organizerModeOrganizer : l10n.organizerModeFan,
+      durationSeconds: 2,
+    );
+  }
+
+  Widget _tabContent(HomeTab tab, RegionState region, AppLocalizations l10n, OrganizerModeState organizer) {
+    // Modo organizador: campeonatos, times e tabelas só dos campeonatos da conta
+    // (a aba Home continua a da região).
+    if (organizer.active && tab != HomeTab.news) {
+      final key = ValueKey('org-${tab.name}');
+      final championships = organizer.championships;
+      switch (tab) {
+        case HomeTab.championships:
+          return ChampionshipsTab(key: key, championships: championships);
+        case HomeTab.teams:
+          return OrganizerTeamsTab(key: key, championships: championships);
+        case HomeTab.tables:
+          return MatchesTab(key: key, organizerChampionships: championships);
+        case HomeTab.news:
+          break;
+      }
+    }
     final key = ValueKey('${tab.name}-${region.selectedRegion}-${region.selectedSeason}');
     switch (tab) {
       case HomeTab.news:
@@ -340,93 +402,109 @@ class _HomePageState extends State<HomePage> {
     final l10n = AppLocalizations.of(context);
     final session = context.watch<SessionCubit>().state;
     final region = context.watch<RegionCubit>().state;
+    final organizer = context.watch<OrganizerModeCubit>().state;
+    final baseTheme = Theme.of(context);
 
     return BlocBuilder<HomeCubit, HomeState>(
       builder: (context, home) {
         // Times e tabelas dependem da temporada; notícias e campeonatos, só da região.
         final showSeason = home.tab == HomeTab.teams || home.tab == HomeTab.tables;
+        // No modo organizador, só a aba Home depende da região.
+        final showRegion = !organizer.active || home.tab == HomeTab.news;
 
         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle.light,
-          child: Scaffold(
-            key: _scaffoldKey,
-            backgroundColor: AppColors.background,
-            onDrawerChanged: _onDrawerChanged,
-            drawer: HomeDrawer(
-              user: session.user,
-              favoriteTeamImage: home.favoriteTeamImage,
-              pendingPlayerRequests: home.pendingPlayerRequests,
-              pendingTeamRequests: home.pendingTeamRequests,
-              pendingPartnerRequests: home.pendingPartnerRequests + home.pendingPartnerNews,
-              playerTeam: myPlayer.teamName,
-              playerId: myPlayer.playerId,
-              playerSeason: myPlayer.season,
-              ownedTeam: ownedTeam.teamName,
-              isPartner: partner.isPartner,
-              onChooseTeam: _chooseTeam,
-              onLogout: _logout,
-              tourKeys: _drawerTour,
-            ),
-            // Selo flutuante do álbum de figurinhas por cima (só com o evento ativo).
-            body: Stack(
-              children: [
-                Positioned.fill(
-                  child: Column(
-                    children: [
-                      HomeHeader(
-                        user: session.user,
-                        region: region.selectedRegion,
-                        favoriteTeamImage: home.favoriteTeamImage,
-                        showSeason: showSeason,
-                        onOpenMenu: () => _scaffoldKey.currentState?.openDrawer(),
-                        menuKey: _tourMenu,
-                        regionKey: _tourRegion,
-                        seasonKey: _tourSeason,
-                      ),
-                      Expanded(
-                        // A folha clara sobe sobre o header (cantos arredondados por cima do
-                        // gradiente) e cresce o mesmo tanto, para continuar encostada na barra.
-                        child: LayoutBuilder(
-                          builder: (context, constraints) => OverflowBox(
-                            alignment: Alignment.topCenter,
-                            maxHeight: constraints.maxHeight + AppSizes.sheetOverlap,
-                            child: Transform.translate(
-                              offset: const Offset(0, -AppSizes.sheetOverlap),
-                              child: Container(
-                                decoration: const BoxDecoration(
-                                  color: AppColors.background,
-                                  borderRadius: BorderRadius.vertical(top: Radius.circular(AppSizes.radiusLarge)),
-                                ),
-                                clipBehavior: Clip.antiAlias,
-                                child: AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 250),
-                                  child: _tabContent(home.tab, region, l10n),
+          // Modo organizador: a home inteira na paleta azul (troca animada).
+          child: AnimatedTheme(
+            data: organizer.active ? ArenaPalette.organizerTheme(baseTheme) : baseTheme,
+            child: Scaffold(
+              key: _scaffoldKey,
+              backgroundColor: AppColors.background,
+              onDrawerChanged: _onDrawerChanged,
+              drawer: HomeDrawer(
+                user: session.user,
+                favoriteTeamImage: home.favoriteTeamImage,
+                pendingPlayerRequests: home.pendingPlayerRequests,
+                pendingTeamRequests: home.pendingTeamRequests,
+                pendingPartnerRequests: home.pendingPartnerRequests + home.pendingPartnerNews,
+                playerTeam: myPlayer.teamName,
+                playerId: myPlayer.playerId,
+                playerSeason: myPlayer.season,
+                ownedTeam: ownedTeam.teamName,
+                isPartner: partner.isPartner,
+                onChooseTeam: _chooseTeam,
+                onLogout: _logout,
+                tourKeys: _drawerTour,
+              ),
+              // Selo flutuante do álbum de figurinhas por cima (só com o evento ativo).
+              body: Stack(
+                children: [
+                  Positioned.fill(
+                    child: Column(
+                      children: [
+                        HomeHeader(
+                          user: session.user,
+                          region: region.selectedRegion,
+                          favoriteTeamImage: home.favoriteTeamImage,
+                          showSeason: showSeason,
+                          showRegion: showRegion,
+                          showModeToggle: organizer.isOrganizer,
+                          organizerMode: organizer.active,
+                          onToggleMode: _toggleOrganizerMode,
+                          onOpenMenu: () => _scaffoldKey.currentState?.openDrawer(),
+                          menuKey: _tourMenu,
+                          regionKey: _tourRegion,
+                          seasonKey: _tourSeason,
+                        ),
+                        Expanded(
+                          // A folha clara sobe sobre o header (cantos arredondados por cima do
+                          // gradiente) e cresce o mesmo tanto, para continuar encostada na barra.
+                          child: LayoutBuilder(
+                            builder: (context, constraints) => OverflowBox(
+                              alignment: Alignment.topCenter,
+                              maxHeight: constraints.maxHeight + AppSizes.sheetOverlap,
+                              child: Transform.translate(
+                                offset: const Offset(0, -AppSizes.sheetOverlap),
+                                child: Container(
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.background,
+                                    borderRadius: BorderRadius.vertical(top: Radius.circular(AppSizes.radiusLarge)),
+                                  ),
+                                  clipBehavior: Clip.antiAlias,
+                                  child: AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 250),
+                                    child: _tabContent(home.tab, region, l10n, organizer),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
+                  Positioned.fill(child: AlbumFloatingBadge(tourKey: _tourAlbum)),
+                ],
+              ),
+              bottomNavigationBar: KeyedSubtree(
+                key: _tourTabs,
+                child: HomeBottomBar(
+                  selected: home.tab,
+                  onSelected: _homeCubit.selectTab,
+                  organizerMode: organizer.active,
                 ),
-                Positioned.fill(child: AlbumFloatingBadge(tourKey: _tourAlbum)),
-              ],
+              ),
+              // Admin: todos os cadastros; parceiro: só o que ele pode publicar.
+              floatingActionButton: session.isAdmin || partner.permissions.canPublish && partner.isPartner
+                  ? FloatingActionButton(
+                      tooltip: l10n.homePublishTitle,
+                      onPressed: () => session.isAdmin
+                          ? AdminPublishSheet.show(context)
+                          : AdminPublishSheet.showPartner(context, partner.permissions),
+                      child: const Icon(Icons.add_rounded),
+                    )
+                  : null,
             ),
-            bottomNavigationBar: KeyedSubtree(
-              key: _tourTabs,
-              child: HomeBottomBar(selected: home.tab, onSelected: _homeCubit.selectTab),
-            ),
-            // Admin: todos os cadastros; parceiro: só o que ele pode publicar.
-            floatingActionButton: session.isAdmin || partner.permissions.canPublish && partner.isPartner
-                ? FloatingActionButton(
-                    tooltip: l10n.homePublishTitle,
-                    onPressed: () => session.isAdmin
-                        ? AdminPublishSheet.show(context)
-                        : AdminPublishSheet.showPartner(context, partner.permissions),
-                    child: const Icon(Icons.add_rounded),
-                  )
-                : null,
           ),
         );
       },

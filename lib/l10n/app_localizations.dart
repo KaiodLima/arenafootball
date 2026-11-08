@@ -1335,6 +1335,1345 @@ abstract class AppLocalizations {
   /// **'AMANHÃ'**
   String get matchCardTomorrow;
 
+  /// No description provided for @shareArtTemplateVibrant.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cores'**
+  String get shareArtTemplateVibrant;
+
+  /// No description provided for @shareArtPreviewTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Divulgar partida'**
+  String get shareArtPreviewTitle;
+
+  /// No description provided for @shareArtTemplateMatchday.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dia de jogo'**
+  String get shareArtTemplateMatchday;
+
+  /// No description provided for @shareArtTemplateVersus.
+  ///
+  /// In pt, this message translates to:
+  /// **'Duelo'**
+  String get shareArtTemplateVersus;
+
+  /// No description provided for @shareArtTemplateCalendar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Agenda'**
+  String get shareArtTemplateCalendar;
+
+  /// No description provided for @shareArtTemplateChampionship.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeonato'**
+  String get shareArtTemplateChampionship;
+
+  /// No description provided for @shareArtTemplateTicket.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ingresso'**
+  String get shareArtTemplateTicket;
+
+  /// No description provided for @shareArtTemplateScoreboard.
+  ///
+  /// In pt, this message translates to:
+  /// **'Placar'**
+  String get shareArtTemplateScoreboard;
+
+  /// No description provided for @shareArtToday2.
+  ///
+  /// In pt, this message translates to:
+  /// **'Hoje'**
+  String get shareArtToday2;
+
+  /// No description provided for @shareArtTicketLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ingresso oficial'**
+  String get shareArtTicketLabel;
+
+  /// No description provided for @shareArtColors.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cores'**
+  String get shareArtColors;
+
+  /// No description provided for @shareArtPaletteTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Times'**
+  String get shareArtPaletteTeams;
+
+  /// No description provided for @shareArtPaletteArena.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arena'**
+  String get shareArtPaletteArena;
+
+  /// No description provided for @shareArtPaletteNight.
+  ///
+  /// In pt, this message translates to:
+  /// **'Noite'**
+  String get shareArtPaletteNight;
+
+  /// No description provided for @shareArtPaletteCrimson.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rubro'**
+  String get shareArtPaletteCrimson;
+
+  /// No description provided for @shareArtPaletteOcean.
+  ///
+  /// In pt, this message translates to:
+  /// **'Oceano'**
+  String get shareArtPaletteOcean;
+
+  /// No description provided for @shareArtPaletteGraphite.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grafite'**
+  String get shareArtPaletteGraphite;
+
+  /// No description provided for @shareArtDateLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Data'**
+  String get shareArtDateLabel;
+
+  /// No description provided for @shareArtTimeLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Horário'**
+  String get shareArtTimeLabel;
+
+  /// No description provided for @shareArtVenueLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Local'**
+  String get shareArtVenueLabel;
+
+  /// No description provided for @shareArtDaysLeft.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{Hoje} =1{Falta 1 dia} other{Faltam {count} dias}}'**
+  String shareArtDaysLeft(int count);
+
+  /// No description provided for @shareArtToday.
+  ///
+  /// In pt, this message translates to:
+  /// **'É hoje!'**
+  String get shareArtToday;
+
+  /// No description provided for @shareArtNextMatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Próximo jogo'**
+  String get shareArtNextMatch;
+
+  /// No description provided for @shareArtVenueTbd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Local a definir'**
+  String get shareArtVenueTbd;
+
+  /// No description provided for @shareArtMissingTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'horário'**
+  String get shareArtMissingTime;
+
+  /// No description provided for @shareArtWeekday.
+  ///
+  /// In pt, this message translates to:
+  /// **'{day, select, 1{Segunda} 2{Terça} 3{Quarta} 4{Quinta} 5{Sexta} 6{Sábado} 7{Domingo} other{}}'**
+  String shareArtWeekday(String day);
+
+  /// No description provided for @shareArtWeekdayShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'{day, select, 1{Seg} 2{Ter} 3{Qua} 4{Qui} 5{Sex} 6{Sáb} 7{Dom} other{}}'**
+  String shareArtWeekdayShort(String day);
+
+  /// No description provided for @shareArtMonth.
+  ///
+  /// In pt, this message translates to:
+  /// **'{month, select, 1{Jan} 2{Fev} 3{Mar} 4{Abr} 5{Mai} 6{Jun} 7{Jul} 8{Ago} 9{Set} 10{Out} 11{Nov} 12{Dez} other{}}'**
+  String shareArtMonth(String month);
+
+  /// No description provided for @shareArtTemplatePoster.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fim de jogo'**
+  String get shareArtTemplatePoster;
+
+  /// No description provided for @shareArtTemplateFaceOff.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confronto'**
+  String get shareArtTemplateFaceOff;
+
+  /// No description provided for @shareArtTemplateEditorial.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editorial'**
+  String get shareArtTemplateEditorial;
+
+  /// No description provided for @shareArtTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gerar arte'**
+  String get shareArtTitle;
+
+  /// No description provided for @shareArtTemplate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Modelo'**
+  String get shareArtTemplate;
+
+  /// No description provided for @shareArtFormat.
+  ///
+  /// In pt, this message translates to:
+  /// **'Formato'**
+  String get shareArtFormat;
+
+  /// No description provided for @shareArtFormatFeed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Feed 4:5'**
+  String get shareArtFormatFeed;
+
+  /// No description provided for @shareArtFormatStory.
+  ///
+  /// In pt, this message translates to:
+  /// **'Story 9:16'**
+  String get shareArtFormatStory;
+
+  /// No description provided for @shareArtFormatSquare.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quadrado'**
+  String get shareArtFormatSquare;
+
+  /// No description provided for @shareArtFormatLandscape.
+  ///
+  /// In pt, this message translates to:
+  /// **'Paisagem'**
+  String get shareArtFormatLandscape;
+
+  /// No description provided for @shareArtQr.
+  ///
+  /// In pt, this message translates to:
+  /// **'Incluir QR Code'**
+  String get shareArtQr;
+
+  /// No description provided for @shareArtSave.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salvar'**
+  String get shareArtSave;
+
+  /// No description provided for @shareArtInstagram.
+  ///
+  /// In pt, this message translates to:
+  /// **'Instagram'**
+  String get shareArtInstagram;
+
+  /// No description provided for @shareArtSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arte salva na galeria.'**
+  String get shareArtSaved;
+
+  /// No description provided for @shareArtSaveError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível salvar na galeria.'**
+  String get shareArtSaveError;
+
+  /// No description provided for @shareArtError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível gerar a arte.'**
+  String get shareArtError;
+
+  /// No description provided for @shareArtCallToAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confira mais no Arena Football'**
+  String get shareArtCallToAction;
+
+  /// No description provided for @shareArtHalfTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'1º tempo {score}'**
+  String shareArtHalfTime(String score);
+
+  /// No description provided for @shareArtMissing.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem cadastro: {items}. A arte sai sem esses dados.'**
+  String shareArtMissing(String items);
+
+  /// No description provided for @shareArtMissingCrest.
+  ///
+  /// In pt, this message translates to:
+  /// **'escudo do {team}'**
+  String shareArtMissingCrest(String team);
+
+  /// No description provided for @shareArtMissingVenue.
+  ///
+  /// In pt, this message translates to:
+  /// **'local'**
+  String get shareArtMissingVenue;
+
+  /// No description provided for @shareArtMissingDate.
+  ///
+  /// In pt, this message translates to:
+  /// **'data'**
+  String get shareArtMissingDate;
+
+  /// No description provided for @shareArtShareText.
+  ///
+  /// In pt, this message translates to:
+  /// **'{home} x {away} no Arena Football: {link}'**
+  String shareArtShareText(String home, String away, String link);
+
+  /// No description provided for @pdfTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'SÚMULA DA PARTIDA'**
+  String get pdfTitle;
+
+  /// No description provided for @pdfDraft.
+  ///
+  /// In pt, this message translates to:
+  /// **'RASCUNHO - alterações não salvas'**
+  String get pdfDraft;
+
+  /// No description provided for @pdfMatchInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dados do jogo'**
+  String get pdfMatchInfo;
+
+  /// No description provided for @pdfDate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Data'**
+  String get pdfDate;
+
+  /// No description provided for @pdfTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'Horário'**
+  String get pdfTime;
+
+  /// No description provided for @pdfVenue.
+  ///
+  /// In pt, this message translates to:
+  /// **'Local'**
+  String get pdfVenue;
+
+  /// No description provided for @pdfRegion.
+  ///
+  /// In pt, this message translates to:
+  /// **'Região'**
+  String get pdfRegion;
+
+  /// No description provided for @pdfDuration.
+  ///
+  /// In pt, this message translates to:
+  /// **'Duração'**
+  String get pdfDuration;
+
+  /// No description provided for @pdfStatus.
+  ///
+  /// In pt, this message translates to:
+  /// **'Situação'**
+  String get pdfStatus;
+
+  /// No description provided for @pdfLineups.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escalações'**
+  String get pdfLineups;
+
+  /// No description provided for @pdfStarters.
+  ///
+  /// In pt, this message translates to:
+  /// **'Titulares'**
+  String get pdfStarters;
+
+  /// No description provided for @pdfReserves.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reservas'**
+  String get pdfReserves;
+
+  /// No description provided for @pdfGoals.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gols'**
+  String get pdfGoals;
+
+  /// No description provided for @pdfBookings.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cartões'**
+  String get pdfBookings;
+
+  /// No description provided for @pdfSubstitutions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Substituições'**
+  String get pdfSubstitutions;
+
+  /// No description provided for @pdfMinute.
+  ///
+  /// In pt, this message translates to:
+  /// **'Min.'**
+  String get pdfMinute;
+
+  /// No description provided for @pdfTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Time'**
+  String get pdfTeam;
+
+  /// No description provided for @pdfPlayer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atleta'**
+  String get pdfPlayer;
+
+  /// No description provided for @pdfScorer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Autor'**
+  String get pdfScorer;
+
+  /// No description provided for @pdfAssist.
+  ///
+  /// In pt, this message translates to:
+  /// **'Assistência'**
+  String get pdfAssist;
+
+  /// No description provided for @pdfType.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tipo'**
+  String get pdfType;
+
+  /// No description provided for @pdfIn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entra'**
+  String get pdfIn;
+
+  /// No description provided for @pdfOut.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sai'**
+  String get pdfOut;
+
+  /// No description provided for @pdfYellow.
+  ///
+  /// In pt, this message translates to:
+  /// **'Amarelo'**
+  String get pdfYellow;
+
+  /// No description provided for @pdfRed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vermelho'**
+  String get pdfRed;
+
+  /// No description provided for @pdfBestPlayer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Craque da partida'**
+  String get pdfBestPlayer;
+
+  /// No description provided for @pdfNotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Observações'**
+  String get pdfNotes;
+
+  /// No description provided for @pdfSignatures.
+  ///
+  /// In pt, this message translates to:
+  /// **'Assinaturas'**
+  String get pdfSignatures;
+
+  /// No description provided for @pdfSignReferee.
+  ///
+  /// In pt, this message translates to:
+  /// **'Árbitro'**
+  String get pdfSignReferee;
+
+  /// No description provided for @pdfSignOrganizer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Organizador'**
+  String get pdfSignOrganizer;
+
+  /// No description provided for @pdfSignCaptain.
+  ///
+  /// In pt, this message translates to:
+  /// **'Capitão - {team}'**
+  String pdfSignCaptain(String team);
+
+  /// No description provided for @pdfNone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum registro'**
+  String get pdfNone;
+
+  /// No description provided for @pdfChampionship.
+  ///
+  /// In pt, this message translates to:
+  /// **'Competição'**
+  String get pdfChampionship;
+
+  /// No description provided for @pdfGeneratedAt.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gerado pelo Arena Football em {date}'**
+  String pdfGeneratedAt(String date);
+
+  /// No description provided for @pdfPage.
+  ///
+  /// In pt, this message translates to:
+  /// **'página {page}/{total}'**
+  String pdfPage(int page, int total);
+
+  /// No description provided for @pdfMinutes.
+  ///
+  /// In pt, this message translates to:
+  /// **'{minutes} min'**
+  String pdfMinutes(int minutes);
+
+  /// No description provided for @pdfCameIn.
+  ///
+  /// In pt, this message translates to:
+  /// **'entrou{minute}'**
+  String pdfCameIn(String minute);
+
+  /// No description provided for @pdfWentOut.
+  ///
+  /// In pt, this message translates to:
+  /// **'saiu{minute}'**
+  String pdfWentOut(String minute);
+
+  /// No description provided for @matchReportExportPdf.
+  ///
+  /// In pt, this message translates to:
+  /// **'Exportar PDF'**
+  String get matchReportExportPdf;
+
+  /// No description provided for @matchReportExport.
+  ///
+  /// In pt, this message translates to:
+  /// **'Exportar súmula'**
+  String get matchReportExport;
+
+  /// No description provided for @matchReportExportError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível gerar o PDF da súmula.'**
+  String get matchReportExportError;
+
+  /// No description provided for @votingOnlyParticipants.
+  ///
+  /// In pt, this message translates to:
+  /// **'Só aparecem os jogadores que participaram da partida.'**
+  String get votingOnlyParticipants;
+
+  /// No description provided for @liveFullTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fim de jogo'**
+  String get liveFullTime;
+
+  /// No description provided for @liveEventsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Lances da partida'**
+  String get liveEventsTitle;
+
+  /// No description provided for @liveSeeMatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver partida'**
+  String get liveSeeMatch;
+
+  /// No description provided for @liveYellowCard.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cartão amarelo'**
+  String get liveYellowCard;
+
+  /// No description provided for @liveLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ao vivo'**
+  String get liveLabel;
+
+  /// No description provided for @liveNoEvents.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem lances ainda.'**
+  String get liveNoEvents;
+
+  /// No description provided for @liveSentOff.
+  ///
+  /// In pt, this message translates to:
+  /// **'Expulso'**
+  String get liveSentOff;
+
+  /// No description provided for @pushActionRedCard.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cartão vermelho'**
+  String get pushActionRedCard;
+
+  /// No description provided for @pushActionRedCardHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Expulsão lançada na súmula (\"Expulso!\")'**
+  String get pushActionRedCardHint;
+
+  /// No description provided for @reportSubstitution.
+  ///
+  /// In pt, this message translates to:
+  /// **'Substituição'**
+  String get reportSubstitution;
+
+  /// No description provided for @reportWhoLeaves.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem sai?'**
+  String get reportWhoLeaves;
+
+  /// No description provided for @reportWhoEnters.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem entra?'**
+  String get reportWhoEnters;
+
+  /// No description provided for @reportLeaving.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sai {name}'**
+  String reportLeaving(String name);
+
+  /// No description provided for @reportEntering.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entra {name}'**
+  String reportEntering(String name);
+
+  /// No description provided for @reportLineupNeeded.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem escalação: aparecem todos do elenco. Monte a escalação para ver só quem está em campo.'**
+  String get reportLineupNeeded;
+
+  /// No description provided for @reportNobodyToPick.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ninguém disponível neste passo.'**
+  String get reportNobodyToPick;
+
+  /// No description provided for @organizerMatchTeamNotEnrolled.
+  ///
+  /// In pt, this message translates to:
+  /// **'{team} não está inscrito nesta competição. Inscreva o time pela aba Times.'**
+  String organizerMatchTeamNotEnrolled(String team);
+
+  /// No description provided for @organizerPermissionDenied.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem permissão para gravar nesta competição. Peça ao admin para abrir o painel \"Organizadores de campeonato\" e tente de novo.'**
+  String get organizerPermissionDenied;
+
+  /// No description provided for @organizerNewMatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nova partida'**
+  String get organizerNewMatch;
+
+  /// No description provided for @organizerMatchNeedsTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inscreva ao menos 2 times na competição (aba Times) para cadastrar partidas.'**
+  String get organizerMatchNeedsTeams;
+
+  /// No description provided for @squadGoalkeepers.
+  ///
+  /// In pt, this message translates to:
+  /// **'Goleiros'**
+  String get squadGoalkeepers;
+
+  /// No description provided for @squadDefenders.
+  ///
+  /// In pt, this message translates to:
+  /// **'Zagueiros'**
+  String get squadDefenders;
+
+  /// No description provided for @squadFullBacks.
+  ///
+  /// In pt, this message translates to:
+  /// **'Laterais'**
+  String get squadFullBacks;
+
+  /// No description provided for @squadDefensiveMidfielders.
+  ///
+  /// In pt, this message translates to:
+  /// **'Volantes'**
+  String get squadDefensiveMidfielders;
+
+  /// No description provided for @squadMidfielders.
+  ///
+  /// In pt, this message translates to:
+  /// **'Meias'**
+  String get squadMidfielders;
+
+  /// No description provided for @squadForwards.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atacantes'**
+  String get squadForwards;
+
+  /// No description provided for @squadNoPosition.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem posição'**
+  String get squadNoPosition;
+
+  /// No description provided for @squadAllPlayers.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atletas'**
+  String get squadAllPlayers;
+
+  /// No description provided for @squadTopScorer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Artilheiro'**
+  String get squadTopScorer;
+
+  /// No description provided for @squadTopAssister.
+  ///
+  /// In pt, this message translates to:
+  /// **'Garçom'**
+  String get squadTopAssister;
+
+  /// No description provided for @squadSortBy.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ordenar por'**
+  String get squadSortBy;
+
+  /// No description provided for @squadSortPosition.
+  ///
+  /// In pt, this message translates to:
+  /// **'Posição'**
+  String get squadSortPosition;
+
+  /// No description provided for @squadGoalsShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'G'**
+  String get squadGoalsShort;
+
+  /// No description provided for @squadAssistsShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'A'**
+  String get squadAssistsShort;
+
+  /// No description provided for @squadSearch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Buscar atleta'**
+  String get squadSearch;
+
+  /// No description provided for @squadPlayerActions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ações do atleta'**
+  String get squadPlayerActions;
+
+  /// No description provided for @organizerSquadPermission.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem permissão para mudar este elenco. Peça ao admin para abrir o painel \"Organizadores de campeonato\" e tente de novo.'**
+  String get organizerSquadPermission;
+
+  /// No description provided for @organizerSquadAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Do elenco geral'**
+  String get organizerSquadAdd;
+
+  /// No description provided for @organizerSquadNew.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novo atleta'**
+  String get organizerSquadNew;
+
+  /// No description provided for @organizerSquadAddTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar à competição'**
+  String get organizerSquadAddTitle;
+
+  /// No description provided for @organizerSquadAddHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atletas do elenco geral do time que ainda não estão em {championship}.'**
+  String organizerSquadAddHint(String championship);
+
+  /// No description provided for @organizerSquadAddConfirm.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar ({count})'**
+  String organizerSquadAddConfirm(int count);
+
+  /// No description provided for @organizerSquadNone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos os atletas do elenco geral já estão na competição.'**
+  String get organizerSquadNone;
+
+  /// No description provided for @organizerSquadAdded.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 atleta adicionado} other{{count} atletas adicionados}}.'**
+  String organizerSquadAdded(int count);
+
+  /// No description provided for @organizerSquadNewHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entra no time e já inscrito só em {championship}.'**
+  String organizerSquadNewHint(String championship);
+
+  /// No description provided for @organizerSquadCreated.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} inscrito na competição.'**
+  String organizerSquadCreated(String name);
+
+  /// No description provided for @organizerSquadRemove.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tirar da competição'**
+  String get organizerSquadRemove;
+
+  /// No description provided for @organizerSquadRemoveTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tirar {name} da competição?'**
+  String organizerSquadRemoveTitle(String name);
+
+  /// No description provided for @organizerSquadRemoveMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Continua no elenco geral do time. Os números já marcados nesta competição ficam fora dela.'**
+  String get organizerSquadRemoveMessage;
+
+  /// No description provided for @organizerSquadRemoved.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} saiu da competição.'**
+  String organizerSquadRemoved(String name);
+
+  /// No description provided for @organizerSquadLegacy.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atleta antigo: o admin ou o dono do time ajustam as competições dele.'**
+  String get organizerSquadLegacy;
+
+  /// No description provided for @organizerSquadOtherTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Joga por {team} nesta competição.'**
+  String organizerSquadOtherTeam(String team);
+
+  /// No description provided for @organizerSquadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível salvar. Tente de novo.'**
+  String get organizerSquadError;
+
+  /// No description provided for @organizerEnrollTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inscrever time'**
+  String get organizerEnrollTeam;
+
+  /// No description provided for @organizerFormGroups.
+  ///
+  /// In pt, this message translates to:
+  /// **'Formar grupos'**
+  String get organizerFormGroups;
+
+  /// No description provided for @organizerEditChampionship.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar campeonato'**
+  String get organizerEditChampionship;
+
+  /// No description provided for @organizerPickChampionship.
+  ///
+  /// In pt, this message translates to:
+  /// **'Qual campeonato?'**
+  String get organizerPickChampionship;
+
+  /// No description provided for @organizerEnrollNoCandidates.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos os times disponíveis já estão inscritos.'**
+  String get organizerEnrollNoCandidates;
+
+  /// No description provided for @organizerEnrolled.
+  ///
+  /// In pt, this message translates to:
+  /// **'{team} inscrito em {championship}.'**
+  String organizerEnrolled(String team, String championship);
+
+  /// No description provided for @organizerOutsideRegion.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeonato municipal só aceita times da própria região.'**
+  String get organizerOutsideRegion;
+
+  /// No description provided for @organizerRemoveTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tirar do campeonato'**
+  String get organizerRemoveTeam;
+
+  /// No description provided for @organizerRemoveTeamTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tirar {team}?'**
+  String organizerRemoveTeamTitle(String team);
+
+  /// No description provided for @organizerRemoveTeamMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'O time sai de {championship}. As partidas já cadastradas continuam.'**
+  String organizerRemoveTeamMessage(String championship);
+
+  /// No description provided for @organizerRemoved.
+  ///
+  /// In pt, this message translates to:
+  /// **'{team} saiu do campeonato.'**
+  String organizerRemoved(String team);
+
+  /// No description provided for @organizerGroupsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grupos · {championship}'**
+  String organizerGroupsTitle(String championship);
+
+  /// No description provided for @organizerGroupsEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum grupo ainda. Crie um grupo ou sorteie.'**
+  String get organizerGroupsEmpty;
+
+  /// No description provided for @organizerGroupsLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar os grupos.'**
+  String get organizerGroupsLoadError;
+
+  /// No description provided for @organizerGroupNew.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novo grupo'**
+  String get organizerGroupNew;
+
+  /// No description provided for @organizerGroupEdit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar grupo'**
+  String get organizerGroupEdit;
+
+  /// No description provided for @organizerGroupName.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome do grupo'**
+  String get organizerGroupName;
+
+  /// No description provided for @organizerGroupNameRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Informe o nome do grupo.'**
+  String get organizerGroupNameRequired;
+
+  /// No description provided for @organizerGroupLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grupo {name}'**
+  String organizerGroupLabel(String name);
+
+  /// No description provided for @organizerGroupAddTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar time'**
+  String get organizerGroupAddTeam;
+
+  /// No description provided for @organizerGroupFull.
+  ///
+  /// In pt, this message translates to:
+  /// **'O grupo já tem 4 times.'**
+  String get organizerGroupFull;
+
+  /// No description provided for @organizerGroupNoTeamsLeft.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos os times inscritos já estão em grupos.'**
+  String get organizerGroupNoTeamsLeft;
+
+  /// No description provided for @organizerGroupSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grupo salvo.'**
+  String get organizerGroupSaved;
+
+  /// No description provided for @organizerGroupDelete.
+  ///
+  /// In pt, this message translates to:
+  /// **'Apagar grupo'**
+  String get organizerGroupDelete;
+
+  /// No description provided for @organizerGroupDeleteTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Apagar o grupo {name}?'**
+  String organizerGroupDeleteTitle(String name);
+
+  /// No description provided for @organizerGroupDeleteMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os times voltam a ficar sem grupo e a classificação do grupo é refeita.'**
+  String get organizerGroupDeleteMessage;
+
+  /// No description provided for @organizerGroupsDraw.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sortear grupos'**
+  String get organizerGroupsDraw;
+
+  /// No description provided for @organizerGroupsDrawCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quantos grupos?'**
+  String get organizerGroupsDrawCount;
+
+  /// No description provided for @organizerGroupsDrawOption.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} grupos · até {perGroup} times cada'**
+  String organizerGroupsDrawOption(int count, int perGroup);
+
+  /// No description provided for @organizerGroupsDrawNeedTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inscreva ao menos 2 times para sortear.'**
+  String get organizerGroupsDrawNeedTeams;
+
+  /// No description provided for @organizerGroupsDrawConfirmTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sortear {count} grupos?'**
+  String organizerGroupsDrawConfirmTitle(int count);
+
+  /// No description provided for @organizerGroupsDrawConfirmMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os grupos atuais são apagados e os times inscritos são distribuídos ao acaso.'**
+  String get organizerGroupsDrawConfirmMessage;
+
+  /// No description provided for @organizerGroupsDrawn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grupos sorteados.'**
+  String get organizerGroupsDrawn;
+
+  /// No description provided for @organizerModeFan.
+  ///
+  /// In pt, this message translates to:
+  /// **'Modo torcedor'**
+  String get organizerModeFan;
+
+  /// No description provided for @organizerModeOrganizer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Modo organizador'**
+  String get organizerModeOrganizer;
+
+  /// No description provided for @organizerModeToggle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar entre torcedor e organizador'**
+  String get organizerModeToggle;
+
+  /// No description provided for @homeTabMyChampionships.
+  ///
+  /// In pt, this message translates to:
+  /// **'Meus camp.'**
+  String get homeTabMyChampionships;
+
+  /// No description provided for @organizerModeSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Modo organizador · seus campeonatos'**
+  String get organizerModeSubtitle;
+
+  /// No description provided for @organizerNoChampionships.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum campeonato organizado por você.'**
+  String get organizerNoChampionships;
+
+  /// No description provided for @organizerTeamsEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum time inscrito neste campeonato.'**
+  String get organizerTeamsEmpty;
+
+  /// No description provided for @organizerRequestMenu.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sou organizador de campeonato'**
+  String get organizerRequestMenu;
+
+  /// No description provided for @organizerRequestTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sou organizador de campeonato'**
+  String get organizerRequestTitle;
+
+  /// No description provided for @organizerRequestIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Organiza uma competição? Peça para cadastrá-la no Arena. Aprovado, o campeonato é criado e você cuida dos detalhes (descrição, regulamento, prêmios e times).'**
+  String get organizerRequestIntro;
+
+  /// No description provided for @organizerRequestLogoAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Logo (opcional)'**
+  String get organizerRequestLogoAdd;
+
+  /// No description provided for @organizerRequestSectionCompetition.
+  ///
+  /// In pt, this message translates to:
+  /// **'Competição'**
+  String get organizerRequestSectionCompetition;
+
+  /// No description provided for @organizerRequestNameLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome da competição'**
+  String get organizerRequestNameLabel;
+
+  /// No description provided for @organizerRequestNameRequired.
+  ///
+  /// In pt, this message translates to:
+  /// **'Informe o nome da competição (mínimo 3 letras).'**
+  String get organizerRequestNameRequired;
+
+  /// No description provided for @organizerRequestScopeLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Categoria'**
+  String get organizerRequestScopeLabel;
+
+  /// No description provided for @organizerRequestDescriptionLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sobre a competição (datas, formato, número de times)'**
+  String get organizerRequestDescriptionLabel;
+
+  /// No description provided for @organizerRequestSubmit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar pedido'**
+  String get organizerRequestSubmit;
+
+  /// No description provided for @organizerRequestSent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedido enviado! O administrador vai analisar.'**
+  String get organizerRequestSent;
+
+  /// No description provided for @organizerRequestCancelled.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedido cancelado.'**
+  String get organizerRequestCancelled;
+
+  /// No description provided for @organizerRequestLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar o seu pedido.'**
+  String get organizerRequestLoadError;
+
+  /// No description provided for @organizerRequestPendingInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu pedido está com o administrador. Você recebe um aviso quando ele responder.'**
+  String get organizerRequestPendingInfo;
+
+  /// No description provided for @organizerRequestRejectedInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu pedido não foi aprovado. Corrija os dados e envie de novo.'**
+  String get organizerRequestRejectedInfo;
+
+  /// No description provided for @organizerRequestApprovedInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu campeonato foi criado! Edite os detalhes em \"Meus campeonatos\".'**
+  String get organizerRequestApprovedInfo;
+
+  /// No description provided for @organizerRequestEdit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Corrigir pedido'**
+  String get organizerRequestEdit;
+
+  /// No description provided for @organizerRequestCancel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cancelar pedido'**
+  String get organizerRequestCancel;
+
+  /// No description provided for @organizerRequestCancelTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cancelar o pedido?'**
+  String get organizerRequestCancelTitle;
+
+  /// No description provided for @organizerRequestCancelMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'O pedido de {name} será apagado.'**
+  String organizerRequestCancelMessage(String name);
+
+  /// No description provided for @organizerRequestResubmit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar de novo'**
+  String get organizerRequestResubmit;
+
+  /// No description provided for @organizerRequestNew.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedir outro campeonato'**
+  String get organizerRequestNew;
+
+  /// No description provided for @organizerMyChampionships.
+  ///
+  /// In pt, this message translates to:
+  /// **'Meus campeonatos'**
+  String get organizerMyChampionships;
+
+  /// No description provided for @organizerRequestsPanelTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Organizadores de campeonato'**
+  String get organizerRequestsPanelTitle;
+
+  /// No description provided for @organizerRequestsEmptyPending.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum pedido de organizador esperando resposta.'**
+  String get organizerRequestsEmptyPending;
+
+  /// No description provided for @organizerRequestsEmptyAnswered.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum pedido respondido ainda.'**
+  String get organizerRequestsEmptyAnswered;
+
+  /// No description provided for @organizerRequestsLoadError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar os pedidos de organizador.'**
+  String get organizerRequestsLoadError;
+
+  /// No description provided for @organizerRequestsApproveTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aprovar {name}?'**
+  String organizerRequestsApproveTitle(String name);
+
+  /// No description provided for @organizerRequestsApproveMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cria o campeonato em {region} ({scope}) na temporada atual, organizado por {user}.'**
+  String organizerRequestsApproveMessage(
+      String region, String scope, String user);
+
+  /// No description provided for @organizerRequestsApproved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeonato {name} criado.'**
+  String organizerRequestsApproved(String name);
+
+  /// No description provided for @organizerRequestsRejectTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rejeitar {name}?'**
+  String organizerRequestsRejectTitle(String name);
+
+  /// No description provided for @organizerRequestsOrganizer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Organizador: {user}'**
+  String organizerRequestsOrganizer(String user);
+
+  /// No description provided for @championshipFormOrganizerLocked.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome, região, categoria e temporada foram definidos na aprovação. Para mudar, fale com o administrador.'**
+  String get championshipFormOrganizerLocked;
+
+  /// No description provided for @pushActionOrganizerRequest.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedido de organizador'**
+  String get pushActionOrganizerRequest;
+
+  /// No description provided for @pushActionOrganizerRequestHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para os admins · alguém quer cadastrar um campeonato'**
+  String get pushActionOrganizerRequestHint;
+
+  /// No description provided for @pushActionOrganizerAnswer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resposta ao organizador'**
+  String get pushActionOrganizerAnswer;
+
+  /// No description provided for @pushActionOrganizerAnswerHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para quem pediu · campeonato aprovado ou recusado'**
+  String get pushActionOrganizerAnswerHint;
+
   /// No description provided for @referralTitle.
   ///
   /// In pt, this message translates to:
@@ -1932,7 +3271,7 @@ abstract class AppLocalizations {
   /// No description provided for @reportPublishCards.
   ///
   /// In pt, this message translates to:
-  /// **'Publicar card de gol no feed'**
+  /// **'Publicar no feed (card ao vivo da partida)'**
   String get reportPublishCards;
 
   /// No description provided for @reportSave.
@@ -4216,6 +5555,48 @@ abstract class AppLocalizations {
   /// **'Em campo'**
   String get drawerOnFieldSection;
 
+  /// No description provided for @drawerPlayerHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Peça para jogar num time'**
+  String get drawerPlayerHint;
+
+  /// No description provided for @drawerPlayerHintApproved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu perfil e seus números'**
+  String get drawerPlayerHintApproved;
+
+  /// No description provided for @drawerOwnerHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cadastre e gerencie seu time'**
+  String get drawerOwnerHint;
+
+  /// No description provided for @drawerOwnerHintApproved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Elenco, pedidos e escudo'**
+  String get drawerOwnerHintApproved;
+
+  /// No description provided for @drawerPartnerHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publique na sua região'**
+  String get drawerPartnerHint;
+
+  /// No description provided for @drawerPartnerHintApproved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Suas publicações e vagas'**
+  String get drawerPartnerHintApproved;
+
+  /// No description provided for @drawerOrganizerHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Monte o seu campeonato'**
+  String get drawerOrganizerHint;
+
   /// No description provided for @pushActionAchievement.
   ///
   /// In pt, this message translates to:
@@ -4311,6 +5692,42 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Ver resultado'**
   String get voteCallResult;
+
+  /// No description provided for @voteClosedTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resultado disponível'**
+  String get voteClosedTitle;
+
+  /// No description provided for @voteClosedText.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confira quem foi eleito o craque de {home} × {away}.'**
+  String voteClosedText(String home, String away);
+
+  /// No description provided for @voteClosedBestPlayer.
+  ///
+  /// In pt, this message translates to:
+  /// **'CRAQUE DA PARTIDA'**
+  String get voteClosedBestPlayer;
+
+  /// No description provided for @voteClosedVotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'{votes} votos · {percent}%'**
+  String voteClosedVotes(int votes, int percent);
+
+  /// No description provided for @voteClosedNoWinner.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem craque eleito'**
+  String get voteClosedNoWinner;
+
+  /// No description provided for @voteClosedNoWinnerText.
+  ///
+  /// In pt, this message translates to:
+  /// **'A votação não atingiu o mínimo de votos para eleger o craque.'**
+  String get voteClosedNoWinnerText;
 
   /// No description provided for @resultCardFullTime.
   ///
@@ -6149,6 +7566,30 @@ abstract class AppLocalizations {
   /// **'J'**
   String get standingsColGames;
 
+  /// No description provided for @standingsColGoalDiff.
+  ///
+  /// In pt, this message translates to:
+  /// **'SG'**
+  String get standingsColGoalDiff;
+
+  /// No description provided for @standingsColPoints.
+  ///
+  /// In pt, this message translates to:
+  /// **'PTS'**
+  String get standingsColPoints;
+
+  /// No description provided for @groupsTeamsCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} times'**
+  String groupsTeamsCount(int count);
+
+  /// No description provided for @groupsGamesCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{0 jogos} =1{1 jogo} other{{count} jogos}}'**
+  String groupsGamesCount(int count);
+
   /// No description provided for @standingsQualifiedLegend.
   ///
   /// In pt, this message translates to:
@@ -6178,6 +7619,30 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Seu time'**
   String get standingsYourTeam;
+
+  /// No description provided for @standingsLeader.
+  ///
+  /// In pt, this message translates to:
+  /// **'Líder'**
+  String get standingsLeader;
+
+  /// No description provided for @standingsNoGamesYet.
+  ///
+  /// In pt, this message translates to:
+  /// **'A bola ainda não rolou neste grupo'**
+  String get standingsNoGamesYet;
+
+  /// No description provided for @standingsGoalsCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{0 gols} =1{1 gol} other{{count} gols}}'**
+  String standingsGoalsCount(int count);
+
+  /// No description provided for @standingsRecord.
+  ///
+  /// In pt, this message translates to:
+  /// **'{wins}V {draws}E {losses}D'**
+  String standingsRecord(int wins, int draws, int losses);
 
   /// No description provided for @athletePlaysFor.
   ///
@@ -7583,6 +9048,12 @@ abstract class AppLocalizations {
   /// **'Visão geral'**
   String get championshipTabOverview;
 
+  /// No description provided for @championshipTabMatches.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogos'**
+  String get championshipTabMatches;
+
   /// No description provided for @championshipTabTeams.
   ///
   /// In pt, this message translates to:
@@ -8764,6 +10235,18 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Artilharia e assistências'**
   String get statsShortcut;
+
+  /// No description provided for @statsShortcutGoalsHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem mais marcou'**
+  String get statsShortcutGoalsHint;
+
+  /// No description provided for @statsShortcutAssistsHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem mais serviu'**
+  String get statsShortcutAssistsHint;
 
   /// No description provided for @alertHeaderConfirm.
   ///

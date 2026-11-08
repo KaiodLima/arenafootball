@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/themes/arena_palette.dart';
 
 class AppTheme {
   static ThemeData get light => ThemeData(
@@ -13,23 +14,8 @@ class AppTheme {
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.white,
         ),
-        navigationBarTheme: NavigationBarThemeData(
-          height: AppSizes.navBarHeight,
-          backgroundColor: AppColors.surface,
-          surfaceTintColor: AppColors.transparent,
-          indicatorColor: AppColors.primarySoft,
-          elevation: 0,
-          labelTextStyle: WidgetStateProperty.resolveWith(
-            (states) => AppTypography.label(
-              color: states.contains(WidgetState.selected) ? AppColors.primaryDark : AppColors.textSecondary,
-            ).copyWith(fontSize: AppSizes.s12),
-          ),
-          iconTheme: WidgetStateProperty.resolveWith(
-            (states) => IconThemeData(
-              color: states.contains(WidgetState.selected) ? AppColors.primaryDark : AppColors.textSecondary,
-            ),
-          ),
-        ),
+        navigationBarTheme: ArenaPalette.navigationBarTheme(ArenaPalette.green),
+        extensions: const [ArenaPalette.green],
         popupMenuTheme: PopupMenuThemeData(
           color: AppColors.surface,
           surfaceTintColor: AppColors.transparent,

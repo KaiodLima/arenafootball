@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/sync_live_match_card_usecase.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/publish_goal_cards_usecase.dart';
@@ -37,8 +38,8 @@ Future<bool> showMatchGoalsSheet(
         sl<WatchTeamPlayersUseCase>(),
         sl<UpdateMatchGoalsUseCase>(),
         sl<PublishGoalCardsUseCase>(),
-      )
-        ..load(match: match, season: season),
+        sl<SyncLiveMatchCardUseCase>(),
+      )..load(match: match, season: season),
       child: _MatchGoalsSheet(homeCrest: homeCrest, awayCrest: awayCrest),
     ),
   );
@@ -186,7 +187,8 @@ class _MatchGoalsSheet extends StatelessWidget {
                       l10n.matchGoalsPublishCards(state.newGoals),
                       style: AppTypography.label(color: AppColors.textPrimary),
                     ),
-                    subtitle: Text(l10n.matchGoalsPublishCardsHint, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+                    subtitle: Text(l10n.matchGoalsPublishCardsHint,
+                        style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
                   ),
                 ArenaSubmitBar(
                   title: l10n.matchGoalsSave,

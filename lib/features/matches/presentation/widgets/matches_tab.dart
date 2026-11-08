@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
+import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/championships_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/championships_state.dart';
@@ -20,9 +21,9 @@ import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/section_header.dart';
 import 'package:arena_soccer/utils/components/shortcut_tile.dart';
-import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/themes/arena_palette.dart';
 
 /// Aba de tabelas da home: as partidas de ontem, hoje ou amanhã da região, de
 /// todas as competições (e amistosos) ou só da escolhida no seletor (lista com
@@ -31,8 +32,13 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 /// região/ano mudam. [ChampionshipsCubit] e [MatchesCubit] são os da home:
 /// trocar de aba e voltar não reabre as consultas; região/ano/competição
 /// novos, sim.
+///
+/// Com [organizerChampionships] (modo organizador), o seletor mostra só esses
+/// campeonatos (sem "todas") e a região/temporada vêm do escolhido.
 class MatchesTab extends StatefulWidget {
-  const MatchesTab({super.key});
+  final List<ChampionshipDTO>? organizerChampionships;
+
+  const MatchesTab({super.key, this.organizerChampionships});
 
   @override
   State<MatchesTab> createState() => _MatchesTabState();
@@ -42,12 +48,90 @@ class _MatchesTabState extends State<MatchesTab> {
   @override
   void initState() {
     super.initState();
+    if (widget.organizerChampionships != null) return;
     final region = BlocProvider.of<RegionCubit>(context).state.selectedRegion;
     BlocProvider.of<ChampionshipsCubit>(context).watch(region: region);
   }
 
   @override
-  Widget build(BuildContext context) => const _ChampionshipMatches();
+  Widget build(BuildContext context) {
+    final organizer = widget.organizerChampionships;
+    return organizer != null ? _OrganizerMatches(championships: organizer) : const _ChampionshipMatches();
+  }
+}
+
+/// Campeonatos do organizador na ordem do seletor: os mais recentes primeiro.
+List<ChampionshipDTO> organizerTableChampionships(List<ChampionshipDTO> all) => [...all]..sort((a, b) {
+    final bySeason = b.season.compareTo(a.season);
+    return bySeason != 0 ? bySeason : a.championshipId.compareTo(b.championshipId);
+  });
+
+/// Modo organizador: uma competição por vez (as da conta), com as partidas
+/// da sede e da temporada dela.
+class _OrganizerMatches extends StatefulWidget {
+  final List<ChampionshipDTO> championships;
+
+  const _OrganizerMatches({required this.championships});
+
+  @override
+  State<_OrganizerMatches> createState() => _OrganizerMatchesState();
+}
+
+class _OrganizerMatchesState extends State<_OrganizerMatches> {
+  /// Competição escolhida, lembrada enquanto o app está aberto.
+  static int? _remembered;
+  final _filterKey = GlobalKey();
+
+  Future<void> _pick(List<ChampionshipDTO> options, int current) async {
+    final picked = await showChampionshipPickerSheet(
+      context,
+      championships: options,
+      selectedId: current,
+      showNone: false,
+    );
+    if (picked?.id != null && mounted) setState(() => _remembered = picked!.id);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final options = organizerTableChampionships(widget.championships);
+    if (options.isEmpty) {
+      return ArenaEmptyState(message: l10n.organizerNoChampionships, icon: Icons.emoji_events_outlined);
+    }
+    final championship = options.where((c) => c.championshipId == _remembered).firstOrNull ?? options.first;
+    final season = championship.season.isNotEmpty ? championship.season : SeasonCollection.currentSeason;
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s12, AppSizes.s16, 0),
+          child: ChampionshipSelectTile(
+            key: _filterKey,
+            label: l10n.matchesChampionshipFilter,
+            championship: championship,
+            onTap: () => _pick(options, championship.championshipId),
+          ),
+        ),
+        Expanded(
+          child: _DayMatches(
+            key: ValueKey('org-${championship.id}'),
+            championshipId: championship.championshipId,
+            championships: [championship],
+            championshipLabelOf: null,
+            region: championship.region,
+            season: season,
+            filterKey: _filterKey,
+            onRegister: () => Navigator.pushNamed(
+              context,
+              AppRoutes.registerMatchPage,
+              arguments: {'championship': championship},
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 /// Competições da temporada que aparecem na região: as que a consulta da
@@ -95,7 +179,7 @@ class _ChampionshipMatchesState extends State<_ChampionshipMatches> {
     return BlocBuilder<ChampionshipsCubit, ChampionshipsState>(
       builder: (context, state) {
         if (state is LoadingChampionshipsState && state.championships.isEmpty) {
-          return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+          return Center(child: CircularProgressIndicator(color: ArenaPalette.of(context).primary));
         }
         if (state is ErrorChampionshipsState && state.championships.isEmpty) {
           return ArenaEmptyState.error(message: l10n.championshipsLoadError);
@@ -159,10 +243,14 @@ class _DayMatches extends StatefulWidget {
     required this.region,
     required this.season,
     this.filterKey,
+    this.onRegister,
   });
 
   /// Âncora do filtro de competição (do pai), para o tour da aba.
   final GlobalKey? filterKey;
+
+  /// Organizador: "Nova partida" na competição (nulo = sem o atalho).
+  final VoidCallback? onRegister;
 
   @override
   State<_DayMatches> createState() => _DayMatchesState();
@@ -181,9 +269,21 @@ class _DayMatchesState extends State<_DayMatches> {
       TourIds.tables,
       () => [
         if (widget.filterKey != null)
-          TourStep(target: widget.filterKey!, icon: Icons.emoji_events_rounded, title: l10n.tourTablesFilterTitle, body: l10n.tourTablesFilterBody),
-        TourStep(target: _shortcutsKey, icon: Icons.apps_rounded, title: l10n.tourTablesShortcutsTitle, body: l10n.tourTablesShortcutsBody),
-        TourStep(target: _dayKey, icon: Icons.sports_soccer_rounded, title: l10n.tourTablesDayTitle, body: l10n.tourTablesDayBody),
+          TourStep(
+              target: widget.filterKey!,
+              icon: Icons.emoji_events_rounded,
+              title: l10n.tourTablesFilterTitle,
+              body: l10n.tourTablesFilterBody),
+        TourStep(
+            target: _shortcutsKey,
+            icon: Icons.apps_rounded,
+            title: l10n.tourTablesShortcutsTitle,
+            body: l10n.tourTablesShortcutsBody),
+        TourStep(
+            target: _dayKey,
+            icon: Icons.sports_soccer_rounded,
+            title: l10n.tourTablesDayTitle,
+            body: l10n.tourTablesDayBody),
       ],
       delay: const Duration(milliseconds: 700),
     );
@@ -237,6 +337,7 @@ class _DayMatchesState extends State<_DayMatches> {
             championships: widget.championships,
             region: widget.region,
             season: widget.season,
+            onRegister: widget.onRegister,
           ),
           const SizedBox(height: AppSizes.s20),
           MatchDaySwitch(key: _dayKey, selected: _day, onChanged: _selectDay),
@@ -264,6 +365,7 @@ class _Shortcuts extends StatelessWidget {
   final List<ChampionshipDTO> championships;
   final String region;
   final String season;
+  final VoidCallback? onRegister;
 
   const _Shortcuts({
     super.key,
@@ -271,6 +373,7 @@ class _Shortcuts extends StatelessWidget {
     required this.championships,
     required this.region,
     required this.season,
+    this.onRegister,
   });
 
   void _openStats(BuildContext context, StatsRankingType type) => Navigator.pushNamed(
@@ -303,6 +406,12 @@ class _Shortcuts extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (onRegister != null)
+          ShortcutTile(
+            title: l10n.organizerNewMatch,
+            icon: Icons.add_circle_outline_rounded,
+            onTap: onRegister!,
+          ),
         ShortcutTile(
           title: l10n.matchesAllGames,
           icon: Icons.calendar_month_rounded,

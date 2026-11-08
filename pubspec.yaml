@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 2.0.12+37
+version: 2.0.14+39
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -62,6 +62,10 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   flutter_image_compress: ^2.5.1
+  pdf: ^3.12.0
+  printing: ^5.14.3
+  gal: ^2.3.3
+  barcode: ^2.2.9
   
   
 
@@ -83,6 +87,11 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter.
+# image 4.11 usa uma função do archive 4.1+, mas o pdf prende o archive < 4.1:
+# fica no image 4.5.x (compatível) até o pdf liberar o archive novo.
+dependency_overrides:
+  image: 4.5.4
+
 flutter:
 
   # The following line ensures that the Material Icons font is
@@ -119,6 +128,19 @@ flutter:
     - family: PassionOne
       fonts:
         - asset: lib/assets/fonts/passion_one/PassionOne-Regular.ttf
+    # Cards compartilháveis (artes para as redes): display condensada e texto.
+    - family: Anton
+      fonts:
+        - asset: lib/assets/fonts/anton/Anton-Regular.ttf
+    - family: BarlowCondensed
+      fonts:
+        - asset: lib/assets/fonts/barlow_condensed/BarlowCondensed-SemiBold.ttf
+          weight: 600
+        - asset: lib/assets/fonts/barlow_condensed/BarlowCondensed-Bold.ttf
+          weight: 700
+        - asset: lib/assets/fonts/barlow_condensed/BarlowCondensed-ExtraBoldItalic.ttf
+          weight: 800
+          style: italic
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

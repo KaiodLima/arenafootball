@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/championship_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/album/data/dtos/album_dtos.dart';
 import 'package:arena_soccer/features/album/domain/album_layout.dart';
@@ -188,8 +189,7 @@ class _ManageAlbumPageState extends State<ManageAlbumPage> {
                                       ),
                                       // Desligado · Teste (só admin) · Para todos.
                                       Padding(
-                                        padding:
-                                            const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s12),
+                                        padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s12),
                                         child: Wrap(
                                           spacing: AppSizes.s8,
                                           runSpacing: AppSizes.s8,
@@ -594,7 +594,8 @@ class _TestTag extends StatelessWidget {
       decoration: BoxDecoration(color: AppColors.warning, borderRadius: BorderRadius.circular(AppSizes.s6)),
       child: Text(
         AppLocalizations.of(context).albumAdminTestTag,
-        style: AppTypography.label(color: AppColors.black).copyWith(fontSize: AppSizes.s10, fontWeight: FontWeight.w900),
+        style:
+            AppTypography.label(color: AppColors.black).copyWith(fontSize: AppSizes.s10, fontWeight: FontWeight.w900),
       ),
     );
   }
@@ -632,28 +633,26 @@ class _SquadSheetState extends State<_SquadSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l10n.albumAdminGenerateTitle(widget.team), style: AppTypography.title().copyWith(fontSize: AppSizes.s20)),
+            Text(l10n.albumAdminGenerateTitle(widget.team),
+                style: AppTypography.title().copyWith(fontSize: AppSizes.s20)),
             const SizedBox(height: AppSizes.s4),
             Text(l10n.albumAdminGenerateWhich, style: AppTypography.subtitle()),
             const SizedBox(height: AppSizes.s16),
-            Wrap(
-              spacing: AppSizes.s8,
-              runSpacing: AppSizes.s8,
-              children: [
-                ArenaChoiceChip(
-                  label: l10n.albumAdminGenerateAll,
-                  icon: Icons.groups_rounded,
-                  selected: _selected == null,
-                  onTap: () => setState(() => _selected = null),
-                ),
-                for (final c in widget.championships)
-                  ArenaChoiceChip(
-                    label: c.title,
-                    icon: Icons.emoji_events_outlined,
-                    selected: _selected == c.championshipId,
-                    onTap: () => setState(() => _selected = c.championshipId),
-                  ),
-              ],
+            ChampionshipSelectTile(
+              label: l10n.matchesChampionshipFilter,
+              championship: widget.championships.where((c) => c.championshipId == _selected).firstOrNull,
+              noneLabel: l10n.albumAdminGenerateAll,
+              noneIcon: Icons.groups_rounded,
+              onTap: () async {
+                final picked = await showChampionshipPickerSheet(
+                  context,
+                  championships: widget.championships,
+                  selectedId: _selected,
+                  noneLabel: l10n.albumAdminGenerateAll,
+                  noneIcon: Icons.groups_rounded,
+                );
+                if (picked != null) setState(() => _selected = picked.id);
+              },
             ),
             const SizedBox(height: AppSizes.s20),
             ArenaButton.primary(

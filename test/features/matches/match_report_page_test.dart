@@ -56,7 +56,8 @@ void main() {
     addTearDown(tester.view.reset);
     final cubit = MatchReportCubit(_Squads(), _Save(), _Phase(), _Voting(), _Create(), _Delay());
     await cubit.load(
-      match: const MatchDTO(id: 'm1', homeTeam: 'Alfa', awayTeam: 'Beta', homeTeamId: 'tA', awayTeamId: 'tB', venue: 'Campo'),
+      match: const MatchDTO(
+          id: 'm1', homeTeam: 'Alfa', awayTeam: 'Beta', homeTeamId: 'tA', awayTeamId: 'tB', venue: 'Campo'),
     );
     await tester.pumpWidget(MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,

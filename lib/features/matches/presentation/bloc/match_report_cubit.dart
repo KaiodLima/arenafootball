@@ -74,7 +74,20 @@ class MatchReportState extends Equatable {
     return squad.where((p) => ids.contains(p.id)).toList();
   }
 
-  List<ReportEvent> get timeline => match == null ? const [] : MatchReport.timeline(match!.goals, match!.bookings);
+  List<ReportEvent> get timeline =>
+      match == null ? const [] : MatchReport.timeline(match!.goals, match!.bookings, match!.substitutions);
+
+  /// Ids de quem está em campo do [side] (nulo = sem escalação: elenco todo).
+  Set<String>? onFieldOf(MatchSide side) {
+    final m = match;
+    if (m == null) return null;
+    return MatchReport.onField(
+      lineup: m.lineup.of(side),
+      substitutions: m.substitutions,
+      bookings: m.bookings,
+      side: side,
+    );
+  }
 
   LineupRole roleOf(MatchSide side, String playerId) {
     final entry = match?.lineup.of(side).where((e) => e.playerId == playerId).firstOrNull;
@@ -92,6 +105,8 @@ class MatchReportState extends Equatable {
     return !goalsSame ||
         a.bookings.length != b.bookings.length ||
         [for (var i = 0; i < b.bookings.length; i++) a.bookings[i] == b.bookings[i]].contains(false) ||
+        a.substitutions.length != b.substitutions.length ||
+        [for (var i = 0; i < b.substitutions.length; i++) a.substitutions[i] == b.substitutions[i]].contains(false) ||
         a.lineup != b.lineup ||
         a.referee != b.referee ||
         a.notes != b.notes ||
@@ -114,7 +129,8 @@ class MatchReportState extends Equatable {
     }
 
     var count = diff<MatchGoal>(goalsBefore, b.goals, (g) => g.id) +
-        diff<MatchBooking>(a.bookings, b.bookings, (c) => c.id);
+        diff<MatchBooking>(a.bookings, b.bookings, (c) => c.id) +
+        diff<MatchSubstitution>(a.substitutions, b.substitutions, (s) => s.id);
     for (final side in MatchSide.values) {
       count += diff<LineupEntry>(a.lineup.of(side), b.lineup.of(side), (e) => e.playerId);
     }
@@ -127,6 +143,19 @@ class MatchReportState extends Equatable {
       a.durationMinutes != b.durationMinutes,
     ].where((changed) => changed).length;
     return count;
+  }
+
+  /// Lances novos desde que abriu (gols, cartões e substituições): o card ao
+  /// vivo da partida sobe no feed.
+  int get newEvents {
+    final a = original;
+    final b = match;
+    if (a == null || b == null) return newGoals;
+    final bookings = {for (final x in a.bookings) x.id};
+    final subs = {for (final x in a.substitutions) x.id};
+    return newGoals +
+        b.bookings.where((x) => !bookings.contains(x.id)).length +
+        b.substitutions.where((x) => !subs.contains(x.id)).length;
   }
 
   /// Gols novos desde que abriu (os que viram card).
@@ -196,6 +225,9 @@ class MatchReportCubit extends Cubit<MatchReportState> {
   final CreatePlayerUseCase createPlayerUseCase;
   final DelayMatchUseCase delayMatchUseCase;
   String? _season;
+
+  /// Temporada da partida (exportar a súmula).
+  String? get season => _season;
 
   MatchReportCubit(
     this.watchTeamPlayersUseCase,
@@ -297,12 +329,63 @@ class MatchReportCubit extends Cubit<MatchReportState> {
     ));
   }
 
+  /// Substituição: [playerOut] sai e [playerIn] entra no [side]. Quem entra
+  /// e não estava na escalação vira reserva dela (ganha número e aparece).
+  void addSubstitution(
+    MatchSide side, {
+    required PlayerDTO playerOut,
+    required PlayerDTO playerIn,
+    int? minute,
+    String Function()? newId,
+  }) {
+    final match = state.match;
+    if (match == null || playerOut.id == playerIn.id) return;
+    final sub = MatchSubstitution(
+      id: (newId ?? MatchSubstitution.newId)(),
+      side: side,
+      outId: playerOut.id,
+      outName: playerOut.name,
+      inId: playerIn.id,
+      inName: playerIn.name,
+      minute: minute,
+    );
+    final lineup = match.lineup.of(side);
+    final listed = lineup.any((e) => e.playerId == playerIn.id);
+    final entries =
+        listed ? lineup : [...lineup, LineupEntry(playerId: playerIn.id, playerName: playerIn.name, starter: false)];
+    emit(state.copyWith(
+      match: match.copyWith(
+        substitutions: [...match.substitutions, sub],
+        lineup: match.lineup.withSide(side, entries),
+      ),
+      lastEvent: () => ReportEvent.substitution(sub),
+      notice: () => MatchReportNotice.eventAdded,
+    ));
+  }
+
+  void removeSubstitution(String id) {
+    final match = state.match;
+    if (match == null) return;
+    _edit(match.copyWith(substitutions: match.substitutions.where((s) => s.id != id).toList()));
+  }
+
+  /// Apaga o lance [event] (gol, cartão ou substituição).
+  void removeEvent(ReportEvent event) {
+    if (event.isGoal) {
+      removeGoal(event.id);
+    } else if (event.isSubstitution) {
+      removeSubstitution(event.id);
+    } else {
+      removeBooking(event.id);
+    }
+  }
+
   /// "Desfazer" do aviso: tira o último lance lançado (o vermelho de 2º
   /// amarelo sai junto com o amarelo).
   void undoLast() {
     final event = state.lastEvent;
     if (event == null) return;
-    event.isGoal ? removeGoal(event.id) : removeBooking(event.id);
+    removeEvent(event);
     emit(state.copyWith(lastEvent: () => null));
   }
 

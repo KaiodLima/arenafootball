@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/matches/presentation/export/match_report_export.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
+import 'package:arena_soccer/features/matches/domain/match_manage_access.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
@@ -20,6 +23,7 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/delay_match_sheet.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/set_match_phase_usecase.dart';
+import 'package:arena_soccer/utils/themes/arena_palette.dart';
 
 /// Lista de partidas do [MatchesCubit] do contexto (usada pela aba de
 /// tabelas, com as partidas do dia, e pela tela "todos os jogos"). Com
@@ -88,6 +92,9 @@ class MatchesList extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final session = context.watch<SessionCubit>().state;
     final isAdmin = session.isAdmin;
+    // Organizador: gerencia as partidas das competições dele.
+    final organizerIds = context.watch<OrganizerModeCubit>().state.championships.map((c) => c.championshipId).toSet();
+    bool manages(MatchDTO match) => canManageMatch(match, isAdmin: isAdmin, organizerChampionshipIds: organizerIds);
     final user = session.user;
     // Chips de time (só o nome); a partida usa os ids quando tem.
     bool isFavoriteTeam(String team) => user?.isFavorite(name: team) ?? false;
@@ -106,9 +113,9 @@ class MatchesList extends StatelessWidget {
       builder: (context, state) {
         final Widget? placeholder;
         if (state is LoadingMatchesState && state.matches.isEmpty) {
-          placeholder = const Padding(
+          placeholder = Padding(
             padding: EdgeInsets.only(top: AppSizes.s48),
-            child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+            child: Center(child: CircularProgressIndicator(color: ArenaPalette.of(context).primary)),
           );
         } else if (state is ErrorMatchesState && state.matches.isEmpty) {
           placeholder = ArenaEmptyState.error(message: l10n.matchesLoadError);
@@ -123,7 +130,8 @@ class MatchesList extends StatelessWidget {
         Widget card(MatchDTO match) => MatchCard(
               match: match,
               championshipLabel: championshipLabelOf?.call(match),
-              isAdmin: isAdmin,
+              isAdmin: manages(match),
+              canDelete: isAdmin,
               homeCrest: state.crestOf(match.homeTeam),
               awayCrest: state.crestOf(match.awayTeam),
               homeColor: colorFromHex(state.colorOf(match.homeTeam) ?? ''),
@@ -160,6 +168,12 @@ class MatchesList extends StatelessWidget {
                 },
               ),
               // Admin: lança um card de gol desta partida (e atualiza o placar dela).
+              // Antes do jogo: arte de divulgação (a mesma tela do "Gerar arte").
+              onShareArt: () => Navigator.pushNamed(
+                context,
+                AppRoutes.shareArtPage,
+                arguments: {'match': match, 'season': season},
+              ),
               onPredict: () => showPredictionSheet(
                 context,
                 match: match,
@@ -167,8 +181,9 @@ class MatchesList extends StatelessWidget {
                 homeCrest: state.crestOf(match.homeTeam),
                 awayCrest: state.crestOf(match.awayTeam),
               ),
-              onSetPhase: isAdmin ? (phase) => BlocProvider.of<MatchesCubit>(context).setPhase(match, phase) : null,
-              onDelay: isAdmin
+              onSetPhase:
+                  manages(match) ? (phase) => BlocProvider.of<MatchesCubit>(context).setPhase(match, phase) : null,
+              onDelay: manages(match)
                   ? () => showDelayMatchSheet(
                         context,
                         match: match,
@@ -178,7 +193,8 @@ class MatchesList extends StatelessWidget {
                         onPause: () => BlocProvider.of<MatchesCubit>(context).setPhase(match, MatchPhase.wait),
                       )
                   : null,
-              onGoalCard: isAdmin
+              onExport: manages(match) ? () => showMatchReportExport(context, match: match, season: season) : null,
+              onGoalCard: manages(match)
                   ? () => Navigator.pushNamed(
                         context,
                         AppRoutes.goalNotificationPage,
@@ -237,7 +253,7 @@ class _DayHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(AppSizes.s4, AppSizes.s14, AppSizes.s4, AppSizes.s10),
       child: Row(
         children: [
-          const Icon(Icons.event_rounded, size: AppSizes.s18, color: AppColors.primaryDark),
+          Icon(Icons.event_rounded, size: AppSizes.s18, color: ArenaPalette.of(context).primaryDark),
           const SizedBox(width: AppSizes.s8),
           Text(title, style: AppTypography.title().copyWith(fontSize: AppSizes.s16)),
           const SizedBox(width: AppSizes.s8),

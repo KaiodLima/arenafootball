@@ -22,6 +22,9 @@ class ChampionshipDTO extends Equatable {
   /// Campo com os ids das regiões dos times (e a sede): consulta por região.
   static const String regionIdsField = 'idsRegioes';
 
+  /// Campo com o uid do organizador ("Sou organizador de campeonato").
+  static const String organizerField = 'idOrganizador';
+
   /// Id do documento.
   final String id;
 
@@ -65,6 +68,9 @@ class ChampionshipDTO extends Equatable {
   /// `desempate`: critérios depois dos pontos, em ordem (vazio = o padrão).
   final List<StandingsCriterion> tiebreakers;
 
+  /// `idOrganizador`: uid de quem organiza (pedido aprovado); vazio = só o admin.
+  final String organizerId;
+
   bool get isIntermunicipal => scope == ChampionshipScope.intermunicipal;
 
   const ChampionshipDTO({
@@ -88,6 +94,7 @@ class ChampionshipDTO extends Equatable {
     this.scope = ChampionshipScope.municipal,
     this.regionIds = const [],
     this.tiebreakers = const [],
+    this.organizerId = '',
   });
 
   factory ChampionshipDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -114,6 +121,7 @@ class ChampionshipDTO extends Equatable {
       scope: ChampionshipScope.fromKey(data['abrangencia']?.toString()),
       regionIds: (data[regionIdsField] as List?)?.map((t) => t.toString()).toList() ?? const [],
       tiebreakers: StandingsCriterion.fromKeys(data['desempate']),
+      organizerId: data[organizerField]?.toString() ?? '',
     );
   }
 
@@ -145,6 +153,7 @@ class ChampionshipDTO extends Equatable {
       scope: ChampionshipScope.fromKey(json['scope']?.toString()),
       regionIds: list(json['regionIds']),
       tiebreakers: StandingsCriterion.fromKeys(json['tiebreakers']),
+      organizerId: json['organizerId']?.toString() ?? '',
     );
   }
 
@@ -170,6 +179,7 @@ class ChampionshipDTO extends Equatable {
         'scope': scope.key,
         'regionIds': regionIds,
         'tiebreakers': [for (final c in tiebreakers) c.key],
+        'organizerId': organizerId,
       };
 
   Map<String, dynamic> toMap() => {
@@ -192,6 +202,7 @@ class ChampionshipDTO extends Equatable {
         'abrangencia': scope.key,
         regionIdsField: regionIds,
         'desempate': [for (final c in tiebreakers) c.key],
+        if (organizerId.isNotEmpty) organizerField: organizerId,
       };
 
   ChampionshipDTO copyWith({
@@ -215,6 +226,7 @@ class ChampionshipDTO extends Equatable {
     ChampionshipScope? scope,
     List<String>? regionIds,
     List<StandingsCriterion>? tiebreakers,
+    String? organizerId,
   }) {
     return ChampionshipDTO(
       id: id ?? this.id,
@@ -237,6 +249,7 @@ class ChampionshipDTO extends Equatable {
       scope: scope ?? this.scope,
       regionIds: regionIds ?? this.regionIds,
       tiebreakers: tiebreakers ?? this.tiebreakers,
+      organizerId: organizerId ?? this.organizerId,
     );
   }
 
@@ -262,5 +275,6 @@ class ChampionshipDTO extends Equatable {
         scope,
         regionIds,
         tiebreakers,
+        organizerId,
       ];
 }

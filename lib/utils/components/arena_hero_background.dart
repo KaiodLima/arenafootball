@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_images.dart';
+import 'package:arena_soccer/utils/themes/arena_palette.dart';
 
 /// Fundo da marca: gradiente verde-escuro, um brilho suave no canto e a
 /// ilustração da bola na rede como marca d'água. Usado no splash, no topo das
@@ -31,11 +32,11 @@ class ArenaHeroBackground extends StatelessWidget {
           width: constraints.hasBoundedWidth ? constraints.maxWidth : null,
           child: ClipRect(
             child: DecoratedBox(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [AppColors.primaryDark, AppColors.primaryMedium],
+                  colors: [ArenaPalette.of(context).primaryDark, ArenaPalette.of(context).primaryMedium],
                 ),
               ),
               child: Stack(
@@ -50,7 +51,7 @@ class ArenaHeroBackground extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: RadialGradient(
-                          colors: [AppColors.primary.withValues(alpha: 0.35), AppColors.transparent],
+                          colors: [ArenaPalette.of(context).primary.withValues(alpha: 0.35), AppColors.transparent],
                         ),
                       ),
                     ),

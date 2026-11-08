@@ -269,8 +269,11 @@ class SuccessMatchFormState extends MatchFormState {
 class ErrorMatchFormState extends MatchFormState {
   final String errorMessage;
 
-  const ErrorMatchFormState({required super.form, required this.errorMessage});
+  /// Código do Firestore (`permission-denied`...), quando houver.
+  final String? errorCode;
+
+  const ErrorMatchFormState({required super.form, required this.errorMessage, this.errorCode});
 
   @override
-  List<Object?> get props => [form, errorMessage];
+  List<Object?> get props => [form, errorMessage, errorCode];
 }

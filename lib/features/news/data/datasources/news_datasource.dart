@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:either_dart/either.dart';
 import 'package:arena_soccer/features/partner_requests/domain/partner_slots.dart';
 import 'package:arena_soccer/features/news/data/dtos/pending_news_dto.dart';
@@ -12,7 +13,19 @@ import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 class NewsDataSource {
   final FirebaseFirestore _firestore;
 
-  NewsDataSource(this._firestore);
+  /// Quem está logado: o card de gol grava o `idAutor` (o organizador só
+  /// mexe nos cards dele).
+  final FirebaseAuth? _auth;
+
+  NewsDataSource(this._firestore, [this._auth]);
+
+  /// Card de gol (ou o oculto do vermelho) sem autor: o da conta logada.
+  NewsDTO _withGoalAuthor(NewsDTO news) {
+    final card = news.tag == NewsDTO.goalTag || news.tag == NewsDTO.bookingTag;
+    if (!card || news.authorId.isNotEmpty) return news;
+    final uid = _auth?.currentUser?.uid ?? '';
+    return uid.isEmpty ? news : news.copyWith(authorId: uid);
+  }
 
   static const String _collection = 'noticias';
   static const String _loadFallback = 'Não foi possível carregar as notícias.';
@@ -93,6 +106,7 @@ class NewsDataSource {
   }
 
   Future<Either<Failure, void>> createNews(NewsDTO news) async {
+    news = _withGoalAuthor(news);
     try {
       if (news.id.isEmpty) {
         final ref = _news.doc();
@@ -124,6 +138,29 @@ class NewsDataSource {
       return const Right(null);
     } catch (e) {
       AppLogger.e('updateNews id=${news.id}', name: 'NewsDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
+    }
+  }
+
+  /// Card ao vivo da partida (id fixo `aovivo_<idPartida>`). Com [bump]
+  /// (lance novo) regrava inteiro com a hora do servidor: sobe ao topo do
+  /// feed. Sem lance novo (apagou/editou), só atualiza o conteúdo, se o card
+  /// já existe.
+  Future<Either<Failure, void>> syncLiveCard(NewsDTO card, {required bool bump}) async {
+    try {
+      final ref = _news.doc(card.id);
+      if (bump) {
+        await ref.set({...card.toMap(), 'data': FieldValue.serverTimestamp()});
+      } else {
+        try {
+          await ref.update(card.toMap());
+        } on FirebaseException catch (e) {
+          if (e.code != 'not-found') rethrow;
+        }
+      }
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('syncLiveCard id=${card.id}', name: 'NewsDataSource', error: e);
       return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
     }
   }
@@ -216,8 +253,8 @@ class NewsDataSource {
   }
 
   /// Mais antigas primeiro (ordena no app: sem índice composto).
-  List<PendingNewsDTO> _sortPending(List<PendingNewsDTO> items) => items
-    ..sort((a, b) => (a.createdAt ?? DateTime(3000)).compareTo(b.createdAt ?? DateTime(3000)));
+  List<PendingNewsDTO> _sortPending(List<PendingNewsDTO> items) =>
+      items..sort((a, b) => (a.createdAt ?? DateTime(3000)).compareTo(b.createdAt ?? DateTime(3000)));
 
   /// Admin aprova: publica em `noticias` (hora do servidor, autor do parceiro)
   /// e marca a pendente, numa escrita só.
@@ -258,5 +295,4 @@ class NewsDataSource {
       return Left(mapFirebaseError(e, fallbackMessage: _deleteFallback));
     }
   }
-
 }

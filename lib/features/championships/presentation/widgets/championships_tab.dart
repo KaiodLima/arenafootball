@@ -19,14 +19,20 @@ import 'package:arena_soccer/utils/components/section_header.dart';
 import 'package:arena_soccer/utils/components/shortcut_tile.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
+import 'package:arena_soccer/utils/themes/arena_palette.dart';
 
 /// Aba de campeonatos da home: os campeonatos da temporada num carrossel de
 /// destaque (com atalhos para grupos, artilharia e regulamento do que está na
 /// tela) e os anteriores da região numa lista compacta. A home recria a aba (key) quando a região muda.
 /// O [ChampionshipsCubit] é o da home (compartilhado com a aba de tabelas):
 /// voltar à aba na mesma região não reabre a consulta.
+///
+/// Com [championships] (modo organizador: os campeonatos da conta), mostra
+/// essa lista e não consulta a região.
 class ChampionshipsTab extends StatefulWidget {
-  const ChampionshipsTab({super.key});
+  final List<ChampionshipDTO>? championships;
+
+  const ChampionshipsTab({super.key, this.championships});
 
   @override
   State<ChampionshipsTab> createState() => _ChampionshipsTabState();
@@ -36,16 +42,20 @@ class _ChampionshipsTabState extends State<ChampionshipsTab> {
   @override
   void initState() {
     super.initState();
+    if (widget.championships != null) return;
     final region = BlocProvider.of<RegionCubit>(context).state.selectedRegion;
     BlocProvider.of<ChampionshipsCubit>(context).watch(region: region);
   }
 
   @override
-  Widget build(BuildContext context) => const _ChampionshipsList();
+  Widget build(BuildContext context) => _ChampionshipsList(fixed: widget.championships);
 }
 
 class _ChampionshipsList extends StatefulWidget {
-  const _ChampionshipsList();
+  /// Lista dada (modo organizador); nula = a do [ChampionshipsCubit].
+  final List<ChampionshipDTO>? fixed;
+
+  const _ChampionshipsList({this.fixed});
 
   @override
   State<_ChampionshipsList> createState() => _ChampionshipsListState();
@@ -65,10 +75,21 @@ class _ChampionshipsListState extends State<_ChampionshipsList> {
     final l10n = AppLocalizations.of(context);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      sl<TourService>().show(context, TourIds.championships, () => [
-            TourStep(target: _heroKey, icon: Icons.emoji_events_rounded, title: l10n.tourChampionshipsTitle, body: l10n.tourChampionshipsBody),
-            TourStep(target: _shortcutsKey, icon: Icons.apps_rounded, title: l10n.tourChampionshipsShortcutsTitle, body: l10n.tourChampionshipsShortcutsBody),
-          ]);
+      sl<TourService>().show(
+          context,
+          TourIds.championships,
+          () => [
+                TourStep(
+                    target: _heroKey,
+                    icon: Icons.emoji_events_rounded,
+                    title: l10n.tourChampionshipsTitle,
+                    body: l10n.tourChampionshipsBody),
+                TourStep(
+                    target: _shortcutsKey,
+                    icon: Icons.apps_rounded,
+                    title: l10n.tourChampionshipsShortcutsTitle,
+                    body: l10n.tourChampionshipsShortcutsBody),
+              ]);
     });
   }
 
@@ -87,12 +108,20 @@ class _ChampionshipsListState extends State<_ChampionshipsList> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final fixed = widget.fixed;
+    if (fixed != null) {
+      // Modo organizador: em destaque, os da temporada atual.
+      if (fixed.isEmpty) {
+        return ArenaEmptyState(message: l10n.organizerNoChampionships, icon: Icons.emoji_events_outlined);
+      }
+      return _content(fixed, SeasonCollection.currentSeason, l10n);
+    }
     final selectedSeason = BlocProvider.of<RegionCubit>(context).state.selectedSeason;
 
     return BlocBuilder<ChampionshipsCubit, ChampionshipsState>(
       builder: (context, state) {
         if (state is LoadingChampionshipsState && state.championships.isEmpty) {
-          return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+          return Center(child: CircularProgressIndicator(color: ArenaPalette.of(context).primary));
         }
         if (state is ErrorChampionshipsState && state.championships.isEmpty) {
           return ArenaEmptyState.error(message: l10n.championshipsLoadError);
@@ -100,71 +129,74 @@ class _ChampionshipsListState extends State<_ChampionshipsList> {
         if (state.championships.isEmpty) {
           return ArenaEmptyState(message: l10n.championshipsEmpty, icon: Icons.emoji_events_outlined);
         }
+        return _content(state.championships, selectedSeason, l10n);
+      },
+    );
+  }
 
-        // Destaque: todos os da temporada escolhida (podem ser vários ao mesmo
-        // tempo), num carrossel; sem nenhum, o mais recente. O resto em "Anteriores".
-        final sorted = [...state.championships]..sort((a, b) => b.season.compareTo(a.season));
-        final ofSeason = sorted.where((c) => c.season == selectedSeason).toList()
-          ..sort((a, b) => a.championshipId.compareTo(b.championshipId));
-        final featured = ofSeason.isNotEmpty ? ofSeason : [sorted.first];
-        final featuredIds = featured.map((c) => c.id).toSet();
-        final previous = sorted.where((c) => !featuredIds.contains(c.id)).toList();
-        final current = featured[_page.clamp(0, featured.length - 1)];
-        _requestTour();
+  Widget _content(List<ChampionshipDTO> championships, String selectedSeason, AppLocalizations l10n) {
+    // Destaque: todos os da temporada escolhida (podem ser vários ao mesmo
+    // tempo), num carrossel; sem nenhum, o mais recente. O resto em "Anteriores".
+    final sorted = [...championships]..sort((a, b) => b.season.compareTo(a.season));
+    final ofSeason = sorted.where((c) => c.season == selectedSeason).toList()
+      ..sort((a, b) => a.championshipId.compareTo(b.championshipId));
+    final featured = ofSeason.isNotEmpty ? ofSeason : [sorted.first];
+    final featuredIds = featured.map((c) => c.id).toSet();
+    final previous = sorted.where((c) => !featuredIds.contains(c.id)).toList();
+    final current = featured[_page.clamp(0, featured.length - 1)];
+    _requestTour();
 
-        return ListView(
-          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-          padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s20, AppSizes.s16, AppSizes.s100),
-          children: [
-            LayoutBuilder(
-              key: _heroKey,
-              builder: (context, constraints) => SizedBox(
-                // Mesma proporção do card (4:3).
-                height: constraints.maxWidth * 3 / 4,
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: featured.length,
-                  onPageChanged: (page) => setState(() => _page = page),
-                  itemBuilder: (context, index) => Padding(
-                    padding: EdgeInsets.symmetric(horizontal: featured.length > 1 ? AppSizes.s4 : 0),
-                    child: ChampionshipHeroCard(
-                      championship: featured[index],
-                      onTap: () => _openDetails(featured[index]),
-                    ),
-                  ),
+    return ListView(
+      physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+      padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s20, AppSizes.s16, AppSizes.s100),
+      children: [
+        LayoutBuilder(
+          key: _heroKey,
+          builder: (context, constraints) => SizedBox(
+            // Mesma proporção do card (4:3).
+            height: constraints.maxWidth * 3 / 4,
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: featured.length,
+              onPageChanged: (page) => setState(() => _page = page),
+              itemBuilder: (context, index) => Padding(
+                padding: EdgeInsets.symmetric(horizontal: featured.length > 1 ? AppSizes.s4 : 0),
+                child: ChampionshipHeroCard(
+                  championship: featured[index],
+                  onTap: () => _openDetails(featured[index]),
                 ),
               ),
             ),
-            if (featured.length > 1) ...[
-              const SizedBox(height: AppSizes.s10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  for (var i = 0; i < featured.length; i++)
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      margin: const EdgeInsets.symmetric(horizontal: AppSizes.s4),
-                      width: i == _page ? AppSizes.s20 : AppSizes.s8,
-                      height: AppSizes.s8,
-                      decoration: BoxDecoration(
-                        color: i == _page ? AppColors.primary : AppColors.greyLight,
-                        borderRadius: BorderRadius.circular(AppSizes.s4),
-                      ),
-                    ),
-                ],
-              ),
+          ),
+        ),
+        if (featured.length > 1) ...[
+          const SizedBox(height: AppSizes.s10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (var i = 0; i < featured.length; i++)
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  margin: const EdgeInsets.symmetric(horizontal: AppSizes.s4),
+                  width: i == _page ? AppSizes.s20 : AppSizes.s8,
+                  height: AppSizes.s8,
+                  decoration: BoxDecoration(
+                    color: i == _page ? ArenaPalette.of(context).primary : AppColors.greyLight,
+                    borderRadius: BorderRadius.circular(AppSizes.s4),
+                  ),
+                ),
             ],
-            const SizedBox(height: AppSizes.s16),
-            KeyedSubtree(key: _shortcutsKey, child: _Shortcuts(championship: current)),
-            if (previous.isNotEmpty) ...[
-              const SizedBox(height: AppSizes.s20),
-              SectionHeader(title: l10n.championshipsPrevious),
-              for (final championship in previous)
-                ChampionshipListRow(championship: championship, onTap: () => _openDetails(championship)),
-            ],
-          ],
-        );
-      },
+          ),
+        ],
+        const SizedBox(height: AppSizes.s16),
+        KeyedSubtree(key: _shortcutsKey, child: _Shortcuts(championship: current)),
+        if (previous.isNotEmpty) ...[
+          const SizedBox(height: AppSizes.s20),
+          SectionHeader(title: l10n.championshipsPrevious),
+          for (final championship in previous)
+            ChampionshipListRow(championship: championship, onTap: () => _openDetails(championship)),
+        ],
+      ],
     );
   }
 }
