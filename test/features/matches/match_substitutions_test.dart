@@ -57,14 +57,17 @@ void main() {
     final events = MatchReport.timeline(
       const [MatchGoal(id: 'g', side: MatchSide.home, minute: 70)],
       const [],
-      const [MatchSubstitution(id: 's', side: MatchSide.home, outId: 'a', outName: 'a', inId: 'r', inName: 'r', minute: 60)],
+      const [
+        MatchSubstitution(id: 's', side: MatchSide.home, outId: 'a', outName: 'a', inId: 'r', inName: 'r', minute: 60)
+      ],
     );
     expect(events.map((e) => e.id), ['s', 'g']);
     expect(events.first.isSubstitution, isTrue);
   });
 
   test('substituição grava e lê no mesmo formato', () {
-    const sub = MatchSubstitution(id: 's', side: MatchSide.away, outId: 'a', outName: 'Ana', inId: 'r', inName: 'Rui', minute: 61);
+    const sub = MatchSubstitution(
+        id: 's', side: MatchSide.away, outId: 'a', outName: 'Ana', inId: 'r', inName: 'Rui', minute: 61);
     expect(MatchSubstitution.fromMap(sub.toMap()), sub);
     expect(sub.toMap()['idEntra'], 'r');
     expect(MatchReport.substitutedOut([sub], MatchSide.away), {'a'});

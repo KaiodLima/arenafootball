@@ -10,8 +10,8 @@ import 'package:arena_soccer/features/matches/domain/usecases/publish_goal_cards
 import 'package:arena_soccer/features/matches/domain/usecases/save_match_report_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/update_match_goals_usecase.dart';
 
-MatchBooking _yellow(String id, String player, {int? minute}) =>
-    MatchBooking(id: id, side: MatchSide.home, type: BookingType.yellow, playerId: player, playerName: player, minute: minute);
+MatchBooking _yellow(String id, String player, {int? minute}) => MatchBooking(
+    id: id, side: MatchSide.home, type: BookingType.yellow, playerId: player, playerName: player, minute: minute);
 
 class _Goals implements UpdateMatchGoalsUseCase {
   int calls = 0;

@@ -18,8 +18,10 @@ const _base = MatchDTO(
 );
 const _goal = MatchGoal(id: 'g1', side: MatchSide.home, scorerId: 'p1', scorerName: 'Ana', minute: 12);
 const _goal2 = MatchGoal(id: 'g2', side: MatchSide.home, scorerId: 'p2', scorerName: 'Bia', minute: 40);
-const _red = MatchBooking(id: 'c1', side: MatchSide.away, type: BookingType.red, playerId: 'p9', playerName: 'Zé', minute: 30);
-const _sub = MatchSubstitution(id: 's1', side: MatchSide.away, outId: 'p9', outName: 'Zé', inId: 'p8', inName: 'Rui', minute: 50);
+const _red =
+    MatchBooking(id: 'c1', side: MatchSide.away, type: BookingType.red, playerId: 'p9', playerName: 'Zé', minute: 30);
+const _sub = MatchSubstitution(
+    id: 's1', side: MatchSide.away, outId: 'p9', outName: 'Zé', inId: 'p8', inName: 'Rui', minute: 50);
 
 void main() {
   final teams = {

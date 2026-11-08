@@ -25,14 +25,29 @@ const _match = MatchDTO(
     LineupEntry(playerId: 'p3', playerName: 'Rui', starter: false, number: 14),
   ]),
   substitutions: [
-    MatchSubstitution(id: 's', side: MatchSide.home, outId: 'p2', outName: 'Beto', inId: 'p3', inName: 'Rui', minute: 60),
+    MatchSubstitution(
+        id: 's', side: MatchSide.home, outId: 'p2', outName: 'Beto', inId: 'p3', inName: 'Rui', minute: 60),
   ],
   goals: [
     MatchGoal(id: 'g2', side: MatchSide.away, scorerId: 'x', scorerName: 'Zé', minute: 70),
-    MatchGoal(id: 'g1', side: MatchSide.home, scorerId: 'p2', scorerName: 'Beto', assistantId: 'p1', assistantName: 'Ana', minute: 12),
+    MatchGoal(
+        id: 'g1',
+        side: MatchSide.home,
+        scorerId: 'p2',
+        scorerName: 'Beto',
+        assistantId: 'p1',
+        assistantName: 'Ana',
+        minute: 12),
   ],
   bookings: [
-    MatchBooking(id: 'c', side: MatchSide.away, type: BookingType.red, playerId: 'x', playerName: 'Zé', minute: 80, secondYellow: true),
+    MatchBooking(
+        id: 'c',
+        side: MatchSide.away,
+        type: BookingType.red,
+        playerId: 'x',
+        playerName: 'Zé',
+        minute: 80,
+        secondYellow: true),
   ],
 );
 
