@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_card.dart';
 import 'package:arena_soccer/features/share_art/domain/art_format.dart';
+import 'package:arena_soccer/features/share_art/domain/art_palette.dart';
 import 'package:arena_soccer/features/share_art/domain/result_art_data.dart';
 import 'package:arena_soccer/features/share_art/presentation/bloc/share_art_cubit.dart';
 import 'package:arena_soccer/features/share_art/presentation/templates/preview/preview_art.dart';
@@ -44,12 +45,27 @@ void main() {
     expect((texts.day, texts.month, texts.time), ('15', 'NOV', '18:00'));
   });
 
+  test('contagem regressiva: hoje, amanhã, dias, longe e sem data', () {
+    String countdown(String date) => PreviewArtTexts.of(l10n, _data(date: date), _now).countdown;
+    expect(countdown('13/11/2026'), 'HOJE');
+    expect(countdown('14/11/2026'), 'AMANHÃ');
+    expect(countdown('18/11/2026'), 'FALTAM 5 DIAS');
+    expect(countdown('31/12/2026'), '', reason: 'mais de 30 dias: sem contagem');
+    expect(countdown(''), '');
+    expect(PreviewArtTexts.of(l10n, _data(), _now).fullDate, '15/11/2026');
+  });
+
   test('sem ano na data: o ano de hoje; sem horário: aviso na divulgação', () {
     expect(ResultArtData.dayOf('15/11', _now), DateTime(2026, 11, 15));
     expect(ResultArtData.dayOf('abc', _now), isNull);
     final data = _data(time: '');
     expect(data.status, ArtMatchStatus.notStarted);
     expect(data.missing, contains(ArtMissing.time));
+  });
+
+  test('paleta: padrão Times, escolhida fica no estado', () {
+    expect(const ShareArtState().palette, ArtPalette.teams);
+    expect(const ShareArtState().copyWith(palette: ArtPalette.night).palette, ArtPalette.night);
   });
 
   test('a tela vira "Divulgar partida" só antes do jogo', () {
@@ -74,7 +90,15 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
         await tester.pumpWidget(
-          host(PreviewArt(data: _data(), template: template, format: format, showQr: true, now: _now)),
+          host(PreviewArt(
+            data: _data(),
+            template: template,
+            format: format,
+            showQr: true,
+            now: _now,
+            // Alterna as paletas entre os formatos (todas passam em algum).
+            palette: ArtPalette.values[(template.index + format.index) % ArtPalette.values.length],
+          )),
         );
         await tester.pump();
         expect(tester.takeException(), isNull);

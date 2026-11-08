@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/share_art/domain/art_format.dart';
+import 'package:arena_soccer/features/share_art/domain/art_palette.dart';
 import 'package:arena_soccer/features/share_art/domain/result_art_data.dart';
 import 'package:arena_soccer/features/share_art/domain/usecases/prepare_result_art_usecase.dart';
 import 'package:arena_soccer/features/share_art/presentation/templates/preview/preview_art.dart';
@@ -13,6 +14,9 @@ class ShareArtState extends Equatable {
 
   /// Modelo da divulgação (partida que ainda não começou).
   final PreviewArtTemplate previewTemplate;
+
+  /// Paleta da divulgação (padrão: as cores dos times).
+  final ArtPalette palette;
   final ArtFormat format;
   final bool showQr;
 
@@ -23,6 +27,7 @@ class ShareArtState extends Equatable {
     this.data,
     this.template = ResultArtTemplate.vibrant,
     this.previewTemplate = PreviewArtTemplate.matchday,
+    this.palette = ArtPalette.teams,
     this.format = ArtFormat.feed,
     this.showQr = true,
     this.busy = false,
@@ -40,6 +45,7 @@ class ShareArtState extends Equatable {
     ResultArtData? data,
     ResultArtTemplate? template,
     PreviewArtTemplate? previewTemplate,
+    ArtPalette? palette,
     ArtFormat? format,
     bool? showQr,
     bool? busy,
@@ -48,13 +54,14 @@ class ShareArtState extends Equatable {
         data: data ?? this.data,
         template: template ?? this.template,
         previewTemplate: previewTemplate ?? this.previewTemplate,
+        palette: palette ?? this.palette,
         format: format ?? this.format,
         showQr: showQr ?? this.showQr,
         busy: busy ?? this.busy,
       );
 
   @override
-  List<Object?> get props => [data, template, previewTemplate, format, showQr, busy];
+  List<Object?> get props => [data, template, previewTemplate, palette, format, showQr, busy];
 }
 
 /// "Gerar arte" da partida: os dados oficiais (pelos caches), o modelo, o
@@ -72,6 +79,8 @@ class ShareArtCubit extends Cubit<ShareArtState> {
   void selectTemplate(ResultArtTemplate template) => emit(state.copyWith(template: template));
 
   void selectPreviewTemplate(PreviewArtTemplate template) => emit(state.copyWith(previewTemplate: template));
+
+  void selectPalette(ArtPalette palette) => emit(state.copyWith(palette: palette));
 
   void selectFormat(ArtFormat format) => emit(state.copyWith(format: format));
 

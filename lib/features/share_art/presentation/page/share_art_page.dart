@@ -7,6 +7,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/services/share_service.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
 import 'package:arena_soccer/features/share_art/domain/art_format.dart';
+import 'package:arena_soccer/features/share_art/domain/art_palette.dart';
+import 'package:arena_soccer/features/share_art/domain/art_theme.dart';
 import 'package:arena_soccer/features/share_art/domain/result_art_data.dart';
 import 'package:arena_soccer/features/share_art/presentation/art_exporter.dart';
 import 'package:arena_soccer/features/share_art/presentation/bloc/share_art_cubit.dart';
@@ -107,6 +109,18 @@ class _ShareArtPageState extends State<ShareArtPage> {
         PreviewArtTemplate.matchday => l10n.shareArtTemplateMatchday,
         PreviewArtTemplate.versus => l10n.shareArtTemplateVersus,
         PreviewArtTemplate.calendar => l10n.shareArtTemplateCalendar,
+        PreviewArtTemplate.championship => l10n.shareArtTemplateChampionship,
+        PreviewArtTemplate.ticket => l10n.shareArtTemplateTicket,
+        PreviewArtTemplate.scoreboard => l10n.shareArtTemplateScoreboard,
+      };
+
+  String _paletteLabel(AppLocalizations l10n, ArtPalette palette) => switch (palette) {
+        ArtPalette.teams => l10n.shareArtPaletteTeams,
+        ArtPalette.arena => l10n.shareArtPaletteArena,
+        ArtPalette.night => l10n.shareArtPaletteNight,
+        ArtPalette.crimson => l10n.shareArtPaletteCrimson,
+        ArtPalette.ocean => l10n.shareArtPaletteOcean,
+        ArtPalette.graphite => l10n.shareArtPaletteGraphite,
       };
 
   String _missingLabel(AppLocalizations l10n, ResultArtData data) {
@@ -164,6 +178,7 @@ class _ShareArtPageState extends State<ShareArtPage> {
                                     ? PreviewArt(
                                         data: data,
                                         template: state.previewTemplate,
+                                        palette: state.palette,
                                         format: state.format,
                                         showQr: state.showQr,
                                       )
@@ -217,6 +232,22 @@ class _ShareArtPageState extends State<ShareArtPage> {
                                 ),
                           ],
                         ),
+                        if (state.preview) ...[
+                          const SizedBox(height: AppSizes.s8),
+                          _ChipRow(
+                            label: l10n.shareArtColors,
+                            children: [
+                              for (final p in ArtPalette.values)
+                                _PaletteDot(
+                                  palette: p,
+                                  theme: ArtTheme.of(data.home, data.away),
+                                  label: _paletteLabel(l10n, p),
+                                  selected: state.palette == p,
+                                  onTap: () => cubit.selectPalette(p),
+                                ),
+                            ],
+                          ),
+                        ],
                         const SizedBox(height: AppSizes.s8),
                         _ChipRow(
                           label: l10n.shareArtFormat,
@@ -362,4 +393,59 @@ class _Action extends StatelessWidget {
           ),
         ),
       );
+}
+
+/// Bolinha de paleta: metade na cor de fundo, metade no destaque (no
+/// "Times", as duas cores dos times), com o anel quando escolhida.
+class _PaletteDot extends StatelessWidget {
+  final ArtPalette palette;
+  final ArtTheme theme;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _PaletteDot({
+    required this.palette,
+    required this.theme,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = palette.resolve(theme);
+    final (a, b) = palette == ArtPalette.teams ? (theme.home, theme.away) : (colors.base, colors.accent);
+    return Tooltip(
+      message: label,
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: Container(
+          width: AppSizes.s36,
+          height: AppSizes.s36,
+          padding: const EdgeInsets.all(AppSizes.s2),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: selected ? AppColors.primaryDark : AppColors.greyLight,
+              width: selected ? AppSizes.s2 + 1 : 1,
+            ),
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [a, a, b, b],
+                stops: const [0, 0.5, 0.5, 1],
+              ),
+            ),
+            child: selected ? const Icon(Icons.check_rounded, color: AppColors.white, size: AppSizes.s18) : null,
+          ),
+        ),
+      ),
+    );
+  }
 }

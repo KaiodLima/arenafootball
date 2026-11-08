@@ -85,7 +85,7 @@ class _CalendarSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = args.texts;
-    final band = artHalfColor(args.theme.home);
+    final band = args.teamColors ? artHalfColor(args.theme.home) : args.colors.base;
     return Container(
       width: 112 * scale,
       decoration: BoxDecoration(
@@ -125,7 +125,7 @@ class _CalendarSheet extends StatelessWidget {
             child: Text(
               t.time.isEmpty ? '--:--' : t.time,
               textAlign: TextAlign.center,
-              style: ArtFonts.displayStyle(20 * scale, AppColors.gold, spacing: 1, height: 1.2),
+              style: ArtFonts.displayStyle(20 * scale, args.colors.accent, spacing: 1, height: 1.2),
             ),
           ),
         ],
@@ -141,21 +141,39 @@ class _Teams extends StatelessWidget {
 
   const _Teams({required this.args, required this.scale});
 
+  static const double _crest = 76;
+
   Widget _row(ArtSide side) {
     final team = side == ArtSide.home ? args.data.home : args.data.away;
     final color = args.theme.sideColor(side);
+    final box = _crest * scale;
     return Row(
       children: [
-        Container(width: 4 * scale, height: 44 * scale, color: color),
-        SizedBox(width: 8 * scale),
-        ArtTeamCrest(team: team, size: 44 * scale, color: color),
+        Container(width: 5 * scale, height: box, color: color),
         SizedBox(width: 10 * scale),
+        // Escudo grande num quadro branco com a borda na cor do time.
+        Container(
+          width: box,
+          height: box,
+          padding: EdgeInsets.all(7 * scale),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(16 * scale),
+            border: Border.all(color: color.withValues(alpha: 0.55), width: 2 * scale),
+            boxShadow: [
+              BoxShadow(color: _ink.withValues(alpha: 0.15), blurRadius: 8 * scale, offset: Offset(0, 3 * scale)),
+            ],
+          ),
+          child: ArtTeamCrest(team: team, size: box - 18 * scale, color: color, plain: true),
+        ),
+        SizedBox(width: 12 * scale),
+        // Mesmo tamanho nos dois nomes: o longo quebra em 2 linhas.
         Expanded(
           child: Text(
             team.name.toUpperCase(),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: ArtFonts.textStyle(17 * scale, _ink, height: 1),
+            style: ArtFonts.textStyle(20 * scale, _ink, height: 1.05),
           ),
         ),
       ],
@@ -169,11 +187,71 @@ class _Teams extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _row(ArtSide.home),
+        // "×" alinhado ao centro dos escudos.
         Padding(
-          padding: EdgeInsets.fromLTRB(18 * scale, 4 * scale, 0, 4 * scale),
-          child: Text('×', style: ArtFonts.textStyle(18 * scale, _muted)),
+          padding: EdgeInsets.only(left: (15 + _crest / 2 - 7) * scale, top: 4 * scale, bottom: 4 * scale),
+          child: Text('×', style: ArtFonts.textStyle(20 * scale, _muted, height: 1)),
         ),
         _row(ArtSide.away),
+      ],
+    );
+  }
+}
+
+/// Os dois times lado a lado (Story): escudo grande no quadro branco com a
+/// borda na cor do time, nome embaixo e o "×" no meio.
+class _TeamsSideBySide extends StatelessWidget {
+  final PreviewArtArgs args;
+  final double scale;
+
+  const _TeamsSideBySide({required this.args, required this.scale});
+
+  Widget _team(ArtSide side) {
+    final team = side == ArtSide.home ? args.data.home : args.data.away;
+    final color = args.theme.sideColor(side);
+    final box = 96 * scale;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: box,
+          height: box,
+          padding: EdgeInsets.all(9 * scale),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(20 * scale),
+            border: Border.all(color: color.withValues(alpha: 0.55), width: 2.5 * scale),
+            boxShadow: [
+              BoxShadow(color: _ink.withValues(alpha: 0.15), blurRadius: 10 * scale, offset: Offset(0, 4 * scale)),
+            ],
+          ),
+          child: ArtTeamCrest(team: team, size: box - 22 * scale, color: color, plain: true),
+        ),
+        SizedBox(height: 10 * scale),
+        Container(width: 30 * scale, height: 4 * scale, color: color),
+        SizedBox(height: 8 * scale),
+        Text(
+          team.name.toUpperCase(),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+          style: ArtFonts.textStyle(20 * scale, _ink, height: 1.05),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: _team(ArtSide.home)),
+        Padding(
+          padding: EdgeInsets.only(top: 34 * scale, left: 6 * scale, right: 6 * scale),
+          child: Text('×', style: ArtFonts.textStyle(26 * scale, _muted, height: 1)),
+        ),
+        Expanded(child: _team(ArtSide.away)),
       ],
     );
   }
@@ -242,7 +320,8 @@ class _Tall extends StatelessWidget {
           ),
           Align(
             alignment: Alignment.centerLeft,
-            child: Container(width: 54 * s, height: 4 * s, margin: EdgeInsets.only(top: 4 * s), color: AppColors.gold),
+            child:
+                Container(width: 54 * s, height: 4 * s, margin: EdgeInsets.only(top: 4 * s), color: args.colors.accent),
           ),
           Expanded(
             child: Center(
@@ -250,17 +329,29 @@ class _Tall extends StatelessWidget {
                 fit: BoxFit.scaleDown,
                 child: SizedBox(
                   width: args.size.width - 44,
-                  child: Row(
-                    children: [
-                      _CalendarSheet(args: args, scale: s),
-                      SizedBox(width: 18 * s),
-                      Expanded(child: _Teams(args: args, scale: s)),
-                    ],
-                  ),
+                  // Story (estreito e alto): folha em cima e os times lado a lado
+                  // embaixo; nos outros, a folha ao lado dos times empilhados.
+                  child: args.story
+                      ? Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _CalendarSheet(args: args, scale: s),
+                            SizedBox(height: 28 * s),
+                            _TeamsSideBySide(args: args, scale: s),
+                          ],
+                        )
+                      : Row(
+                          children: [
+                            _CalendarSheet(args: args, scale: s),
+                            SizedBox(width: 18 * s),
+                            Expanded(child: _Teams(args: args, scale: s)),
+                          ],
+                        ),
                 ),
               ),
             ),
           ),
+          SizedBox(height: 14 * s),
           _Footer(args: args, scale: s),
         ],
       ),
@@ -283,28 +374,35 @@ class _Wide extends StatelessWidget {
         children: [
           _Masthead(args: args, scale: s),
           Expanded(
-            child: Center(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: SizedBox(
-                  width: 364,
-                  child: Row(
-                    children: [
-                      _CalendarSheet(args: args, scale: 0.62),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(_headline(args), maxLines: 1, style: ArtFonts.displayStyle(28, _ink)),
-                            Container(
-                                width: 36, height: 3, margin: const EdgeInsets.only(bottom: 8), color: AppColors.gold),
-                            _Teams(args: args, scale: 0.6),
-                          ],
+            child: Padding(
+              // Respiro entre o cabeçalho, o bloco e o rodapé.
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Center(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: SizedBox(
+                    width: 364,
+                    child: Row(
+                      children: [
+                        _CalendarSheet(args: args, scale: 0.62),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(_headline(args), maxLines: 1, style: ArtFonts.displayStyle(28, _ink)),
+                              Container(
+                                  width: 36,
+                                  height: 3,
+                                  margin: const EdgeInsets.only(bottom: 8),
+                                  color: args.colors.accent),
+                              _Teams(args: args, scale: 0.7),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

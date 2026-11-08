@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:arena_soccer/core/utils/search_text.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/matches/domain/match_clock.dart';
@@ -20,6 +21,23 @@ class ArtTeam extends Equatable {
     // Ignora "de", "da", "FC"... quando há palavras maiores.
     final main = words.where((w) => w.length > 2).toList();
     return (main.isNotEmpty ? main : words).take(2).map((w) => w[0].toUpperCase()).join();
+  }
+
+  /// Sigla de placar de TV (3 letras, sem acento): as iniciais quando o nome
+  /// tem 3+ palavras de verdade ("AAF" de "Associação Atlética Floresta do
+  /// Vale"); senão, as 3 primeiras letras da 1ª ("MUL", "ACA").
+  String get abbreviation {
+    final words = foldForSearch(name.trim())
+        .replaceAll(RegExp('[^a-z0-9 ]'), '')
+        .split(RegExp(r'\s+'))
+        .where((w) => w.isNotEmpty)
+        .toList();
+    if (words.isEmpty) return '';
+    const minor = {'de', 'da', 'do', 'das', 'dos', 'e', 'no', 'na', 'nos', 'nas', 'fc', 'ec', 'sc', 'ac'};
+    final main = words.where((w) => !minor.contains(w)).toList();
+    final source = main.isNotEmpty ? main : words;
+    final code = source.length >= 3 ? source.take(3).map((w) => w[0]).join() : source.first;
+    return code.substring(0, code.length < 3 ? code.length : 3).toUpperCase();
   }
 
   @override

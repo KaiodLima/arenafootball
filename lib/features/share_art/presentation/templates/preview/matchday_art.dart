@@ -17,12 +17,13 @@ class MatchdayArt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final home = artHalfColor(args.theme.home);
-    final away = artHalfColor(args.theme.away);
+    // "Times": as metades nas cores dos times; outra paleta: as cores dela.
+    final home = args.teamColors ? artHalfColor(args.theme.home) : args.colors.base;
+    final away = args.teamColors ? artHalfColor(args.theme.away) : args.colors.deep;
     return Stack(
       fit: StackFit.expand,
       children: [
-        CustomPaint(painter: ArtSplitPainter(home: home, away: away, wide: args.wide)),
+        CustomPaint(painter: ArtSplitPainter(home: home, away: away, wide: args.wide, accent: args.colors.accent)),
         const ArtGrain(opacity: 0.05),
         if (args.wide) _Wide(args, home: home, away: away) else _Tall(args, home: home, away: away),
       ],
@@ -78,7 +79,7 @@ class _Headline extends StatelessWidget {
           ),
         ),
         SizedBox(height: 6 * scale),
-        Container(width: 64 * scale, height: 5 * scale, color: AppColors.gold),
+        Container(width: 64 * scale, height: 5 * scale, color: args.colors.accent),
       ],
     );
   }
@@ -133,9 +134,9 @@ class _VersusPlate extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: _ink,
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.gold, width: 2.5 * scale),
+                  border: Border.all(color: args.colors.accent, width: 2.5 * scale),
                 ),
-                child: Text('VS', style: ArtFonts.displayStyle(20 * scale, AppColors.gold, spacing: 0.5)),
+                child: Text('VS', style: ArtFonts.displayStyle(20 * scale, args.colors.accent, spacing: 0.5)),
               ),
             ),
             Expanded(child: _team(ArtSide.away)),
@@ -173,10 +174,10 @@ class _KickoffBoard extends StatelessWidget {
               width: 2 * scale,
               height: 34 * scale,
               margin: EdgeInsets.symmetric(horizontal: 12 * scale),
-              color: AppColors.gold,
+              color: args.colors.accent,
             ),
           if (t.shortDate.isNotEmpty)
-            Text(t.shortDate, style: ArtFonts.textStyle(15 * scale, AppColors.gold, spacing: 2)),
+            Text(t.shortDate, style: ArtFonts.textStyle(15 * scale, args.colors.accent, spacing: 2)),
         ],
       ),
     );

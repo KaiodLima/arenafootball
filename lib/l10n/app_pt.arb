@@ -393,6 +393,29 @@
   "shareArtTemplateMatchday": "Dia de jogo",
   "shareArtTemplateVersus": "Duelo",
   "shareArtTemplateCalendar": "Agenda",
+  "shareArtTemplateChampionship": "Campeonato",
+  "shareArtTemplateTicket": "Ingresso",
+  "shareArtTemplateScoreboard": "Placar",
+  "shareArtToday2": "Hoje",
+  "shareArtTicketLabel": "Ingresso oficial",
+  "shareArtColors": "Cores",
+  "shareArtPaletteTeams": "Times",
+  "shareArtPaletteArena": "Arena",
+  "shareArtPaletteNight": "Noite",
+  "shareArtPaletteCrimson": "Rubro",
+  "shareArtPaletteOcean": "Oceano",
+  "shareArtPaletteGraphite": "Grafite",
+  "shareArtDateLabel": "Data",
+  "shareArtTimeLabel": "Horário",
+  "shareArtVenueLabel": "Local",
+  "shareArtDaysLeft": "{count, plural, =0{Hoje} =1{Falta 1 dia} other{Faltam {count} dias}}",
+  "@shareArtDaysLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "shareArtToday": "É hoje!",
   "shareArtNextMatch": "Próximo jogo",
   "shareArtVenueTbd": "Local a definir",

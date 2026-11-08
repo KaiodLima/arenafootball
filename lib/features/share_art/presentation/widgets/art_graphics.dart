@@ -55,7 +55,10 @@ class ArtChampionshipLogo extends StatelessWidget {
 
   static ImageProvider _network(String url) => CachedNetworkImageProvider(url);
 
-  const ArtChampionshipLogo({super.key, required this.url, required this.height});
+  /// Sem o selo branco (logo grande ou marca d'água).
+  final bool plain;
+
+  const ArtChampionshipLogo({super.key, required this.url, required this.height, this.plain = false});
 
   @override
   Widget build(BuildContext context) {
@@ -66,17 +69,19 @@ class ArtChampionshipLogo extends StatelessWidget {
       errorBuilder: (_, __, ___) => const SizedBox.shrink(),
       frameBuilder: (_, child, frame, sync) => frame == null && !sync
           ? const SizedBox.shrink()
-          : Container(
-              height: height,
-              constraints: BoxConstraints(maxWidth: height * 3),
-              padding: EdgeInsets.all(height * 0.1),
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(height * 0.18),
-                boxShadow: [BoxShadow(color: AppColors.black.withValues(alpha: 0.25), blurRadius: height * 0.2)],
-              ),
-              child: child,
-            ),
+          : plain
+              ? SizedBox(height: height, child: child)
+              : Container(
+                  height: height,
+                  constraints: BoxConstraints(maxWidth: height * 3),
+                  padding: EdgeInsets.all(height * 0.1),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(height * 0.18),
+                    boxShadow: [BoxShadow(color: AppColors.black.withValues(alpha: 0.25), blurRadius: height * 0.2)],
+                  ),
+                  child: child,
+                ),
     );
   }
 }
@@ -504,7 +509,10 @@ class ArtSplitPainter extends CustomPainter {
   final Color away;
   final bool wide;
 
-  ArtSplitPainter({required this.home, required this.away, required this.wide});
+  /// Fio do corte (padrão: dourado).
+  final Color accent;
+
+  ArtSplitPainter({required this.home, required this.away, required this.wide, this.accent = AppColors.gold});
 
   Shader _shade(Color color, Rect rect, Alignment light) => LinearGradient(
         begin: light,
@@ -581,7 +589,7 @@ class ArtSplitPainter extends CustomPainter {
 
     final t = size.shortestSide * 0.014;
     stripe(-t, t, AppColors.white);
-    stripe(t * 2.2, t * 3.2, AppColors.gold);
+    stripe(t * 2.2, t * 3.2, accent);
   }
 
   @override

@@ -1365,6 +1365,102 @@ abstract class AppLocalizations {
   /// **'Agenda'**
   String get shareArtTemplateCalendar;
 
+  /// No description provided for @shareArtTemplateChampionship.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeonato'**
+  String get shareArtTemplateChampionship;
+
+  /// No description provided for @shareArtTemplateTicket.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ingresso'**
+  String get shareArtTemplateTicket;
+
+  /// No description provided for @shareArtTemplateScoreboard.
+  ///
+  /// In pt, this message translates to:
+  /// **'Placar'**
+  String get shareArtTemplateScoreboard;
+
+  /// No description provided for @shareArtToday2.
+  ///
+  /// In pt, this message translates to:
+  /// **'Hoje'**
+  String get shareArtToday2;
+
+  /// No description provided for @shareArtTicketLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ingresso oficial'**
+  String get shareArtTicketLabel;
+
+  /// No description provided for @shareArtColors.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cores'**
+  String get shareArtColors;
+
+  /// No description provided for @shareArtPaletteTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Times'**
+  String get shareArtPaletteTeams;
+
+  /// No description provided for @shareArtPaletteArena.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arena'**
+  String get shareArtPaletteArena;
+
+  /// No description provided for @shareArtPaletteNight.
+  ///
+  /// In pt, this message translates to:
+  /// **'Noite'**
+  String get shareArtPaletteNight;
+
+  /// No description provided for @shareArtPaletteCrimson.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rubro'**
+  String get shareArtPaletteCrimson;
+
+  /// No description provided for @shareArtPaletteOcean.
+  ///
+  /// In pt, this message translates to:
+  /// **'Oceano'**
+  String get shareArtPaletteOcean;
+
+  /// No description provided for @shareArtPaletteGraphite.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grafite'**
+  String get shareArtPaletteGraphite;
+
+  /// No description provided for @shareArtDateLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Data'**
+  String get shareArtDateLabel;
+
+  /// No description provided for @shareArtTimeLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Horário'**
+  String get shareArtTimeLabel;
+
+  /// No description provided for @shareArtVenueLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Local'**
+  String get shareArtVenueLabel;
+
+  /// No description provided for @shareArtDaysLeft.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{Hoje} =1{Falta 1 dia} other{Faltam {count} dias}}'**
+  String shareArtDaysLeft(int count);
+
   /// No description provided for @shareArtToday.
   ///
   /// In pt, this message translates to:

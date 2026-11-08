@@ -94,6 +94,14 @@ void main() {
     expect(future.missing, containsAll([ArtMissing.venue, ArtMissing.homeCrest]));
   });
 
+  test('sigla de placar (3 letras, sem acento)', () {
+    expect(const ArtTeam(name: 'Mulekada').abbreviation, 'MUL');
+    expect(const ArtTeam(name: 'Açaí No Gralle').abbreviation, 'ACA');
+    expect(const ArtTeam(name: 'Associação Atlética Floresta do Vale').abbreviation, 'AAF');
+    expect(const ArtTeam(name: 'Ás').abbreviation, 'AS');
+    expect(const ArtTeam(name: '').abbreviation, '');
+  });
+
   test('iniciais do escudo substituto', () {
     expect(const ArtTeam(name: 'Lava Jato').initials, 'LJ');
     expect(const ArtTeam(name: 'Associação de Moradores').initials, 'AM');

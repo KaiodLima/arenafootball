@@ -746,6 +746,63 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shareArtTemplateCalendar => 'Calendar';
 
   @override
+  String get shareArtTemplateChampionship => 'Championship';
+
+  @override
+  String get shareArtTemplateTicket => 'Ticket';
+
+  @override
+  String get shareArtTemplateScoreboard => 'Scoreboard';
+
+  @override
+  String get shareArtToday2 => 'Today';
+
+  @override
+  String get shareArtTicketLabel => 'Official ticket';
+
+  @override
+  String get shareArtColors => 'Colors';
+
+  @override
+  String get shareArtPaletteTeams => 'Teams';
+
+  @override
+  String get shareArtPaletteArena => 'Arena';
+
+  @override
+  String get shareArtPaletteNight => 'Night';
+
+  @override
+  String get shareArtPaletteCrimson => 'Crimson';
+
+  @override
+  String get shareArtPaletteOcean => 'Ocean';
+
+  @override
+  String get shareArtPaletteGraphite => 'Graphite';
+
+  @override
+  String get shareArtDateLabel => 'Date';
+
+  @override
+  String get shareArtTimeLabel => 'Kick-off';
+
+  @override
+  String get shareArtVenueLabel => 'Venue';
+
+  @override
+  String shareArtDaysLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days to go',
+      one: '1 day to go',
+      zero: 'Today',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get shareArtToday => 'It\'s today!';
 
   @override

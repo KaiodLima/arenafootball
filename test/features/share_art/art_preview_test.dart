@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/share_art/domain/art_format.dart';
+import 'package:arena_soccer/features/share_art/domain/art_palette.dart';
 import 'package:arena_soccer/features/share_art/domain/result_art_data.dart';
 import 'package:arena_soccer/features/share_art/presentation/art_exporter.dart';
 import 'package:arena_soccer/features/share_art/presentation/templates/preview/preview_art.dart';
@@ -149,26 +150,49 @@ void main() {
       }
     }
     // Divulgação (antes do jogo): sábado 15/11, vista na quinta 13/11.
-    final upcoming = ResultArtData.of(
-      const MatchDTO(
-        id: 'm3',
-        homeTeam: 'Mulekada',
-        awayTeam: 'Açaí No Gralle',
-        homeTeamId: 't1',
-        awayTeamId: 't2',
-        date: '15/11/2026',
-        time: '18:00',
-        venue: 'Campo do Ipê',
-        championshipId: 11,
-      ),
-      homeTeam: const TeamDTO(id: 't1', name: 'Mulekada', primaryColor: '#111111', secondaryColor: '#FFFFFF'),
-      awayTeam: const TeamDTO(id: 't2', name: 'Açaí No Gralle', primaryColor: '#6A1B9A', secondaryColor: '#FFFFFF'),
-      championship: 'Copa Açaí de Futsal',
-      championshipLogoUrl: 'memoria://logo',
-      link: 'https://arenasoccerflutter.web.app/app',
-      now: DateTime.utc(2026, 11, 13, 15),
-    );
-    for (final template in PreviewArtTemplate.values) {
+    ResultArtData upcomingWith(String logo) => ResultArtData.of(
+          const MatchDTO(
+            id: 'm3',
+            homeTeam: 'Mulekada',
+            awayTeam: 'Açaí No Gralle',
+            homeTeamId: 't1',
+            awayTeamId: 't2',
+            date: '15/11/2026',
+            time: '18:00',
+            venue: 'Campo do Ipê',
+            championshipId: 11,
+          ),
+          homeTeam: const TeamDTO(id: 't1', name: 'Mulekada', primaryColor: '#111111', secondaryColor: '#FFFFFF'),
+          awayTeam: const TeamDTO(id: 't2', name: 'Açaí No Gralle', primaryColor: '#6A1B9A', secondaryColor: '#FFFFFF'),
+          championship: 'Copa Açaí de Futsal',
+          championshipLogoUrl: logo,
+          link: 'https://arenasoccerflutter.web.app/app',
+          now: DateTime.utc(2026, 11, 13, 15),
+        );
+    final previewCases = [
+      for (final template in PreviewArtTemplate.values) (template, upcomingWith('memoria://logo'), ''),
+      // Os modelos que mais usam a logo, também sem ela.
+      for (final template in [
+        PreviewArtTemplate.championship,
+        PreviewArtTemplate.ticket,
+        PreviewArtTemplate.versus,
+        PreviewArtTemplate.scoreboard
+      ])
+        (template, upcomingWith(''), '_semlogo'),
+    ];
+    // Paletas fixas em alguns modelos.
+    final paletteCases = [
+      (PreviewArtTemplate.championship, ArtPalette.night),
+      (PreviewArtTemplate.ticket, ArtPalette.crimson),
+      (PreviewArtTemplate.scoreboard, ArtPalette.ocean),
+      (PreviewArtTemplate.matchday, ArtPalette.graphite),
+      (PreviewArtTemplate.versus, ArtPalette.night),
+    ];
+    final allCases = [
+      for (final (t, d, suffix) in previewCases) (t, d, suffix, ArtPalette.teams),
+      for (final (t, p) in paletteCases) (t, upcomingWith('memoria://logo'), '_${p.name}', p),
+    ];
+    for (final (template, upcoming, suffix, palette) in allCases) {
       for (final format in ArtFormat.values.where((f) => formats.contains(f.name))) {
         final key = GlobalKey();
         await tester.pumpWidget(MaterialApp(
@@ -185,6 +209,7 @@ void main() {
                   template: template,
                   format: format,
                   showQr: true,
+                  palette: palette,
                   now: DateTime.utc(2026, 11, 13, 15),
                 ),
               ),
@@ -196,7 +221,7 @@ void main() {
         await tester.pump();
         expect(tester.takeException(), isNull, reason: 'preview ${template.name}/${format.name}');
         final png = await tester.runAsync(() => ArtExporter.capture(key, format));
-        File('build/art_previews/preview_${template.name}_${format.name}.png').writeAsBytesSync(png!);
+        File('build/art_previews/preview_${template.name}_${format.name}$suffix.png').writeAsBytesSync(png!);
       }
     }
   }, skip: !enabled);

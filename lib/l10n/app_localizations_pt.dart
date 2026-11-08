@@ -749,6 +749,63 @@ class AppLocalizationsPt extends AppLocalizations {
   String get shareArtTemplateCalendar => 'Agenda';
 
   @override
+  String get shareArtTemplateChampionship => 'Campeonato';
+
+  @override
+  String get shareArtTemplateTicket => 'Ingresso';
+
+  @override
+  String get shareArtTemplateScoreboard => 'Placar';
+
+  @override
+  String get shareArtToday2 => 'Hoje';
+
+  @override
+  String get shareArtTicketLabel => 'Ingresso oficial';
+
+  @override
+  String get shareArtColors => 'Cores';
+
+  @override
+  String get shareArtPaletteTeams => 'Times';
+
+  @override
+  String get shareArtPaletteArena => 'Arena';
+
+  @override
+  String get shareArtPaletteNight => 'Noite';
+
+  @override
+  String get shareArtPaletteCrimson => 'Rubro';
+
+  @override
+  String get shareArtPaletteOcean => 'Oceano';
+
+  @override
+  String get shareArtPaletteGraphite => 'Grafite';
+
+  @override
+  String get shareArtDateLabel => 'Data';
+
+  @override
+  String get shareArtTimeLabel => 'Horário';
+
+  @override
+  String get shareArtVenueLabel => 'Local';
+
+  @override
+  String shareArtDaysLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Faltam $count dias',
+      one: 'Falta 1 dia',
+      zero: 'Hoje',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get shareArtToday => 'É hoje!';
 
   @override
