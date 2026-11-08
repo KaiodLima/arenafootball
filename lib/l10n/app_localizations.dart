@@ -5489,6 +5489,42 @@ abstract class AppLocalizations {
   /// **'Ver resultado'**
   String get voteCallResult;
 
+  /// No description provided for @voteClosedTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resultado disponível'**
+  String get voteClosedTitle;
+
+  /// No description provided for @voteClosedText.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confira quem foi eleito o craque de {home} × {away}.'**
+  String voteClosedText(String home, String away);
+
+  /// No description provided for @voteClosedBestPlayer.
+  ///
+  /// In pt, this message translates to:
+  /// **'CRAQUE DA PARTIDA'**
+  String get voteClosedBestPlayer;
+
+  /// No description provided for @voteClosedVotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'{votes} votos · {percent}%'**
+  String voteClosedVotes(int votes, int percent);
+
+  /// No description provided for @voteClosedNoWinner.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem craque eleito'**
+  String get voteClosedNoWinner;
+
+  /// No description provided for @voteClosedNoWinnerText.
+  ///
+  /// In pt, this message translates to:
+  /// **'A votação não atingiu o mínimo de votos para eleger o craque.'**
+  String get voteClosedNoWinnerText;
+
   /// No description provided for @resultCardFullTime.
   ///
   /// In pt, this message translates to:

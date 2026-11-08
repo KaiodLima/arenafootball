@@ -1202,6 +1202,32 @@
   "voteCallClosedBadge": "VOTAÇÃO ENCERRADA",
   "voteCallAction": "Votar agora",
   "voteCallResult": "Ver resultado",
+  "voteClosedTitle": "Resultado disponível",
+  "voteClosedText": "Confira quem foi eleito o craque de {home} × {away}.",
+  "@voteClosedText": {
+    "placeholders": {
+      "home": {
+        "type": "String"
+      },
+      "away": {
+        "type": "String"
+      }
+    }
+  },
+  "voteClosedBestPlayer": "CRAQUE DA PARTIDA",
+  "voteClosedVotes": "{votes} votos · {percent}%",
+  "@voteClosedVotes": {
+    "placeholders": {
+      "votes": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "voteClosedNoWinner": "Sem craque eleito",
+  "voteClosedNoWinnerText": "A votação não atingiu o mínimo de votos para eleger o craque.",
   "resultCardFullTime": "FIM DE JOGO",
   "resultCardFriendly": "Amistoso",
   "resultCardSeeMatch": "Ver partida",

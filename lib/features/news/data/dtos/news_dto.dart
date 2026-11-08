@@ -85,6 +85,14 @@ class NewsDTO extends Equatable {
   /// Card "Vote no craque": a votação da partida está aberta (`votacao`, string).
   final bool votingOpen;
 
+  /// Card "Vote no craque" encerrado: a apuração já foi gravada pelas
+  /// functions (`craque_apurado`); sem nome = sem craque eleito.
+  final bool bestPlayerChecked;
+  final String bestPlayerName;
+  final String bestPlayerTeam;
+  final int bestPlayerVotes;
+  final int bestPlayerPercent;
+
   /// `idAutor`: uid de quem publicou (notícias novas). O parceiro só mexe nas
   /// dele; vazio (antigas e automáticas) = só o admin.
   final String authorId;
@@ -144,6 +152,11 @@ class NewsDTO extends Equatable {
     this.awayColor = '',
     this.championshipTitle = '',
     this.votingOpen = false,
+    this.bestPlayerChecked = false,
+    this.bestPlayerName = '',
+    this.bestPlayerTeam = '',
+    this.bestPlayerVotes = 0,
+    this.bestPlayerPercent = 0,
     this.authorId = '',
     this.goalId = '',
     this.regionIds = const [],
@@ -209,6 +222,11 @@ class NewsDTO extends Equatable {
       awayColor: data['cor_fora']?.toString() ?? '',
       championshipTitle: data['campeonato']?.toString() ?? '',
       votingOpen: data['votacao']?.toString() == 'true',
+      bestPlayerChecked: data['craque_apurado'] == true,
+      bestPlayerName: data['craque_nome']?.toString() ?? '',
+      bestPlayerTeam: data['craque_time']?.toString() ?? '',
+      bestPlayerVotes: (data['craque_votos'] as num?)?.round() ?? 0,
+      bestPlayerPercent: (data['craque_percentual'] as num?)?.round() ?? 0,
       authorId: data['idAutor']?.toString() ?? '',
       goalId: data['id_gol']?.toString() ?? '',
       regionIds: (data[regionIdsField] as List?)?.map((id) => id.toString()).toList() ?? const [],
@@ -260,6 +278,11 @@ class NewsDTO extends Equatable {
       awayColor: text('awayColor'),
       championshipTitle: text('championshipTitle'),
       votingOpen: json['votingOpen'] == true,
+      bestPlayerChecked: json['bestPlayerChecked'] == true,
+      bestPlayerName: text('bestPlayerName'),
+      bestPlayerTeam: text('bestPlayerTeam'),
+      bestPlayerVotes: (json['bestPlayerVotes'] as num?)?.round() ?? 0,
+      bestPlayerPercent: (json['bestPlayerPercent'] as num?)?.round() ?? 0,
       authorId: text('authorId'),
     );
   }
@@ -300,6 +323,11 @@ class NewsDTO extends Equatable {
         'awayColor': awayColor,
         'championshipTitle': championshipTitle,
         'votingOpen': votingOpen,
+        'bestPlayerChecked': bestPlayerChecked,
+        'bestPlayerName': bestPlayerName,
+        'bestPlayerTeam': bestPlayerTeam,
+        'bestPlayerVotes': bestPlayerVotes,
+        'bestPlayerPercent': bestPlayerPercent,
         if (authorId.isNotEmpty) 'authorId': authorId,
       };
 
@@ -343,6 +371,11 @@ class NewsDTO extends Equatable {
         if (awayColor.isNotEmpty) 'cor_fora': awayColor,
         if (championshipTitle.isNotEmpty) 'campeonato': championshipTitle,
         if (isVoteCall) 'votacao': votingOpen.toString(),
+        if (bestPlayerChecked) 'craque_apurado': true,
+        if (bestPlayerName.isNotEmpty) 'craque_nome': bestPlayerName,
+        if (bestPlayerTeam.isNotEmpty) 'craque_time': bestPlayerTeam,
+        if (bestPlayerName.isNotEmpty) 'craque_votos': bestPlayerVotes,
+        if (bestPlayerName.isNotEmpty) 'craque_percentual': bestPlayerPercent,
         if (authorId.isNotEmpty) 'idAutor': authorId,
         if (goalId.isNotEmpty) 'id_gol': goalId,
         if (regionIds.isNotEmpty) regionIdsField: regionIds,
@@ -386,6 +419,11 @@ class NewsDTO extends Equatable {
     String? awayColor,
     String? championshipTitle,
     bool? votingOpen,
+    bool? bestPlayerChecked,
+    String? bestPlayerName,
+    String? bestPlayerTeam,
+    int? bestPlayerVotes,
+    int? bestPlayerPercent,
     String? authorId,
     String? goalId,
     List<String>? regionIds,
@@ -428,6 +466,11 @@ class NewsDTO extends Equatable {
       awayColor: awayColor ?? this.awayColor,
       championshipTitle: championshipTitle ?? this.championshipTitle,
       votingOpen: votingOpen ?? this.votingOpen,
+      bestPlayerChecked: bestPlayerChecked ?? this.bestPlayerChecked,
+      bestPlayerName: bestPlayerName ?? this.bestPlayerName,
+      bestPlayerTeam: bestPlayerTeam ?? this.bestPlayerTeam,
+      bestPlayerVotes: bestPlayerVotes ?? this.bestPlayerVotes,
+      bestPlayerPercent: bestPlayerPercent ?? this.bestPlayerPercent,
       authorId: authorId ?? this.authorId,
       goalId: goalId ?? this.goalId,
       regionIds: regionIds ?? this.regionIds,
@@ -473,6 +516,11 @@ class NewsDTO extends Equatable {
         awayColor,
         championshipTitle,
         votingOpen,
+        bestPlayerChecked,
+        bestPlayerName,
+        bestPlayerTeam,
+        bestPlayerVotes,
+        bestPlayerPercent,
         authorId,
         lastEvent,
         liveEvents,

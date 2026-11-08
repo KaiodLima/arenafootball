@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
-import 'package:arena_soccer/utils/components/team_crest.dart';
+import 'package:arena_soccer/features/news/presentation/widgets/feed_card_parts.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
 /// Fontes esportivas empacotadas (as mesmas das artes de compartilhar).
-const _display = 'Anton';
-const _condensed = 'BarlowCondensed';
+const _display = FeedCardFonts.display;
+const _condensed = FeedCardFonts.condensed;
 
 /// Card automático de resultado no feed (`tag: "resultado"`), sempre no verde
 /// da marca (sem as cores dos times): fundo com as linhas do campo, selo
@@ -43,11 +43,7 @@ class ResultCard extends StatelessWidget {
           boxShadow: const [
             BoxShadow(color: AppColors.shadow, blurRadius: AppSizes.s14, offset: Offset(0, AppSizes.s4)),
           ],
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [AppColors.primaryDark, AppColors.primaryStrong],
-          ),
+          gradient: feedCardGradient,
         ),
         child: Material(
           color: AppColors.transparent,
@@ -66,7 +62,7 @@ class ResultCard extends StatelessWidget {
                       padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s14, AppSizes.s8, 0),
                       child: Row(
                         children: [
-                          _FullTimeBadge(label: l10n.resultCardFullTime),
+                          FeedCutBadge(label: l10n.resultCardFullTime),
                           const SizedBox(width: AppSizes.s10),
                           Expanded(
                             child: Text(
@@ -132,7 +128,7 @@ class ResultCard extends StatelessWidget {
                           ],
                           if (onTap != null) ...[
                             const SizedBox(height: AppSizes.s14),
-                            _SeeMatchPill(label: l10n.resultCardSeeMatch),
+                            FeedActionPill(label: l10n.resultCardSeeMatch),
                           ],
                         ],
                       ),
@@ -194,52 +190,6 @@ class _PitchPainter extends CustomPainter {
   bool shouldRepaint(covariant _PitchPainter oldDelegate) => false;
 }
 
-/// "FIM DE JOGO" dourado num selo escuro com o canto cortado.
-class _FullTimeBadge extends StatelessWidget {
-  final String label;
-
-  const _FullTimeBadge({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipPath(
-      clipper: const _CutCornerClipper(),
-      child: Container(
-        color: AppColors.black.withValues(alpha: 0.32),
-        padding: const EdgeInsets.fromLTRB(AppSizes.s10, AppSizes.s4, AppSizes.s14, AppSizes.s4),
-        child: Text(
-          label,
-          style: const TextStyle(
-            fontFamily: _display,
-            fontSize: AppSizes.s14,
-            letterSpacing: 1.2,
-            height: 1.3,
-            color: AppColors.gold,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _CutCornerClipper extends CustomClipper<Path> {
-  const _CutCornerClipper();
-
-  @override
-  Path getClip(Size size) {
-    final cut = size.height * 0.5;
-    return Path()
-      ..moveTo(0, 0)
-      ..lineTo(size.width, 0)
-      ..lineTo(size.width - cut, size.height)
-      ..lineTo(0, size.height)
-      ..close();
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
-}
-
 /// Placar grande: o perdedor esmaecido (empate: os dois cheios).
 class _Score extends StatelessWidget {
   final int home;
@@ -297,23 +247,7 @@ class _Team extends StatelessWidget {
         opacity: lost ? 0.7 : 1,
         child: Column(
           children: [
-            Container(
-              width: AppSizes.s56,
-              height: AppSizes.s56,
-              padding: const EdgeInsets.all(AppSizes.s6),
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(AppSizes.s14),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.black.withValues(alpha: 0.25),
-                    blurRadius: AppSizes.s8,
-                    offset: const Offset(0, AppSizes.s2),
-                  ),
-                ],
-              ),
-              child: TeamCrest(imageUrl: crest.isEmpty ? null : crest, size: AppSizes.s44),
-            ),
+            FeedCrestBox(crest: crest),
             const SizedBox(height: AppSizes.s8),
             Text(
               name.toUpperCase(),
@@ -338,30 +272,4 @@ class _Team extends StatelessWidget {
           ],
         ),
       );
-}
-
-/// "Ver partida" numa pílula translúcida.
-class _SeeMatchPill extends StatelessWidget {
-  final String label;
-
-  const _SeeMatchPill({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(AppSizes.s14, AppSizes.s6, AppSizes.s8, AppSizes.s6),
-      decoration: BoxDecoration(
-        color: AppColors.white.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(AppSizes.s20),
-        border: Border.all(color: AppColors.white.withValues(alpha: 0.25)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(label, style: AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s14)),
-          const Icon(Icons.chevron_right_rounded, color: AppColors.white, size: AppSizes.s20),
-        ],
-      ),
-    );
-  }
 }

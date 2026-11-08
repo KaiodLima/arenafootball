@@ -253,8 +253,8 @@ class NewsDataSource {
   }
 
   /// Mais antigas primeiro (ordena no app: sem índice composto).
-  List<PendingNewsDTO> _sortPending(List<PendingNewsDTO> items) => items
-    ..sort((a, b) => (a.createdAt ?? DateTime(3000)).compareTo(b.createdAt ?? DateTime(3000)));
+  List<PendingNewsDTO> _sortPending(List<PendingNewsDTO> items) =>
+      items..sort((a, b) => (a.createdAt ?? DateTime(3000)).compareTo(b.createdAt ?? DateTime(3000)));
 
   /// Admin aprova: publica em `noticias` (hora do servidor, autor do parceiro)
   /// e marca a pendente, numa escrita só.
@@ -295,5 +295,4 @@ class NewsDataSource {
       return Left(mapFirebaseError(e, fallbackMessage: _deleteFallback));
     }
   }
-
 }

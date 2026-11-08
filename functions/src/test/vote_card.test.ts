@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { ALL_VOTE_TEMPLATES, shouldPostVoteCard, voteCardNews, voteTexts } from '../vote_card';
+import { ALL_VOTE_TEMPLATES, shouldPostVoteCard, voteCardBestPlayerFields, voteCardNews, voteTexts } from '../vote_card';
 import { fillTemplate } from '../match_result';
 
 const match = {
@@ -47,4 +47,23 @@ test('frases preenchidas e estáveis; campos do card', () => {
 test('card "Vote no craque" leva as regiões da partida', () => {
   const news = voteCardNews({ timeC: 'Alfa', timeF: 'Beta', idRegiao: 'r1', idsRegioes: ['r1', 'r2'] }, 'm1', '2026');
   assert.deepEqual(news.idsRegioes, ['r1', 'r2']);
+});
+
+test('apuração no card: eleito com o time pelo id; sem eleito apaga os campos', () => {
+  const m = { timeC: 'Lava Jato', timeF: 'Volta', idTimeC: 't1', idTimeF: 't2' };
+  assert.deepEqual(voteCardBestPlayerFields({ nome: ' Dudu ', idTime: 't2', votos: 12, percentual: 48.4 }, m), {
+    craque_apurado: true,
+    craque_nome: 'Dudu',
+    craque_time: 'Volta',
+    craque_votos: 12,
+    craque_percentual: 48,
+  });
+  assert.equal(voteCardBestPlayerFields({ nome: 'Ana', idTime: 'x', votos: 3, percentual: 60 }, m).craque_time, null);
+  assert.deepEqual(voteCardBestPlayerFields(undefined, m), {
+    craque_apurado: true,
+    craque_nome: null,
+    craque_time: null,
+    craque_votos: null,
+    craque_percentual: null,
+  });
 });

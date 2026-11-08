@@ -3312,6 +3312,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get voteCallResult => 'See result';
 
   @override
+  String get voteClosedTitle => 'Result is in';
+
+  @override
+  String voteClosedText(String home, String away) {
+    return 'See who was voted player of the match in $home × $away.';
+  }
+
+  @override
+  String get voteClosedBestPlayer => 'PLAYER OF THE MATCH';
+
+  @override
+  String voteClosedVotes(int votes, int percent) {
+    return '$votes votes · $percent%';
+  }
+
+  @override
+  String get voteClosedNoWinner => 'No player elected';
+
+  @override
+  String get voteClosedNoWinnerText =>
+      'The vote didn\'t reach the minimum to elect a player.';
+
+  @override
   String get resultCardFullTime => 'FULL TIME';
 
   @override

@@ -86,7 +86,8 @@ class LiveMatchCard extends StatelessWidget {
                       if (finished)
                         _StatusPill(label: l10n.liveFullTime, color: AppColors.textPrimary)
                       else if (halfTime)
-                        _StatusPill(label: l10n.reportHalfTime, color: AppColors.gold, foreground: AppColors.textPrimary)
+                        _StatusPill(
+                            label: l10n.reportHalfTime, color: AppColors.gold, foreground: AppColors.textPrimary)
                       else
                         const _LivePill(),
                       const SizedBox(width: AppSizes.s8),
@@ -353,7 +354,8 @@ class _Highlight extends StatelessWidget {
     final label = switch (event.type) {
       LiveEventType.goal => '${l10n.newsGoalLabel}!',
       LiveEventType.yellow => l10n.liveYellowCard,
-      LiveEventType.red => event.secondYellow ? '${l10n.liveSentOff} · ${l10n.matchReportSecondYellow}' : l10n.liveSentOff,
+      LiveEventType.red =>
+        event.secondYellow ? '${l10n.liveSentOff} · ${l10n.matchReportSecondYellow}' : l10n.liveSentOff,
       LiveEventType.substitution => l10n.reportSubstitution,
     };
     final labelColor = switch (event.type) {
@@ -361,17 +363,18 @@ class _Highlight extends StatelessWidget {
       LiveEventType.yellow => AppColors.textPrimary,
       _ => AppColors.primaryDark,
     };
-    final (playerId, playerName) = event.type == LiveEventType.substitution
-        ? (event.playerInId, event.playerIn)
-        : (event.playerId, event.player);
+    final (playerId, playerName) =
+        event.type == LiveEventType.substitution ? (event.playerInId, event.playerIn) : (event.playerId, event.player);
     final canOpen = onPlayerTap != null && playerId.isNotEmpty;
     final nameStyle = AppTypography.title(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s16, height: 1.2);
     final detailStyle = AppTypography.subtitle().copyWith(fontSize: AppSizes.s12);
 
     final List<Widget> lines = switch (event.type) {
       LiveEventType.substitution => [
-          _ArrowLine(icon: Icons.arrow_upward_rounded, color: AppColors.primary, text: event.playerIn, style: nameStyle),
-          _ArrowLine(icon: Icons.arrow_downward_rounded, color: AppColors.danger, text: event.playerOut, style: detailStyle),
+          _ArrowLine(
+              icon: Icons.arrow_upward_rounded, color: AppColors.primary, text: event.playerIn, style: nameStyle),
+          _ArrowLine(
+              icon: Icons.arrow_downward_rounded, color: AppColors.danger, text: event.playerOut, style: detailStyle),
         ],
       LiveEventType.goal => [
           Text(
@@ -381,7 +384,8 @@ class _Highlight extends StatelessWidget {
             style: nameStyle,
           ),
           if (event.assistant.isNotEmpty)
-            Text(l10n.matchReportAssist(event.assistant), maxLines: 1, overflow: TextOverflow.ellipsis, style: detailStyle),
+            Text(l10n.matchReportAssist(event.assistant),
+                maxLines: 1, overflow: TextOverflow.ellipsis, style: detailStyle),
         ],
       _ => [Text(event.player, maxLines: 1, overflow: TextOverflow.ellipsis, style: nameStyle)],
     };
@@ -472,7 +476,8 @@ class _EmptyHighlight extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.all(AppSizes.s12),
         decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(AppSizes.s12)),
-        child: Text(label, textAlign: TextAlign.center, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+        child:
+            Text(label, textAlign: TextAlign.center, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
       );
 }
 

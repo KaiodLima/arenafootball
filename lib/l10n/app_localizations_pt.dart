@@ -3328,6 +3328,29 @@ class AppLocalizationsPt extends AppLocalizations {
   String get voteCallResult => 'Ver resultado';
 
   @override
+  String get voteClosedTitle => 'Resultado disponível';
+
+  @override
+  String voteClosedText(String home, String away) {
+    return 'Confira quem foi eleito o craque de $home × $away.';
+  }
+
+  @override
+  String get voteClosedBestPlayer => 'CRAQUE DA PARTIDA';
+
+  @override
+  String voteClosedVotes(int votes, int percent) {
+    return '$votes votos · $percent%';
+  }
+
+  @override
+  String get voteClosedNoWinner => 'Sem craque eleito';
+
+  @override
+  String get voteClosedNoWinnerText =>
+      'A votação não atingiu o mínimo de votos para eleger o craque.';
+
+  @override
   String get resultCardFullTime => 'FIM DE JOGO';
 
   @override

@@ -102,7 +102,7 @@ import {
   liveNewsId,
   LiveCardStatus,
 } from './match_result';
-import { shouldPostVoteCard, voteCardNews, voteNewsId } from './vote_card';
+import { shouldPostVoteCard, voteCardBestPlayerFields, voteCardNews, voteNewsId } from './vote_card';
 import { rankingDelta, rankingDocId, scorePrediction } from './predictions';
 import {
   GroupTeam,
@@ -339,6 +339,13 @@ async function recordBestPlayer(collection: string, season: string, matchId: str
     // Só quem participou da partida (súmula) pode ser o craque.
     const best = electBestPlayer(votes, candidates, rulesOf(config.data()), participantNames(matchSnap.data() ?? {}));
     await matchRef.update({ craque: best ?? FieldValue.delete() });
+    // O card "Vote no craque" mostra o eleito (ou "sem craque eleito").
+    const fields = voteCardBestPlayerFields(best, matchSnap.data() ?? {});
+    const update = Object.fromEntries(
+      Object.entries(fields).map(([k, v]) => [k, v === null ? FieldValue.delete() : v]),
+    );
+    const cardRef = db.collection('noticias').doc(voteNewsId(matchId));
+    if ((await cardRef.get()).exists) await cardRef.update(update);
   } catch (error) {
     logger.error('Falha ao apurar o craque', { collection, matchId, error: String(error) });
   }
