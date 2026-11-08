@@ -168,6 +168,12 @@ class MatchesList extends StatelessWidget {
                 },
               ),
               // Admin: lança um card de gol desta partida (e atualiza o placar dela).
+              // Antes do jogo: arte de divulgação (a mesma tela do "Gerar arte").
+              onShareArt: () => Navigator.pushNamed(
+                context,
+                AppRoutes.shareArtPage,
+                arguments: {'match': match, 'season': season},
+              ),
               onPredict: () => showPredictionSheet(
                 context,
                 match: match,
@@ -175,7 +181,8 @@ class MatchesList extends StatelessWidget {
                 homeCrest: state.crestOf(match.homeTeam),
                 awayCrest: state.crestOf(match.awayTeam),
               ),
-              onSetPhase: manages(match) ? (phase) => BlocProvider.of<MatchesCubit>(context).setPhase(match, phase) : null,
+              onSetPhase:
+                  manages(match) ? (phase) => BlocProvider.of<MatchesCubit>(context).setPhase(match, phase) : null,
               onDelay: manages(match)
                   ? () => showDelayMatchSheet(
                         context,

@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/matches/domain/match_clock.dart';
+import 'package:arena_soccer/features/matches/domain/match_time.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 
 /// Time na arte: nome, escudo e cores (cópias dos dados oficiais).
@@ -44,7 +45,7 @@ class ArtGoal extends Equatable {
 }
 
 /// O que falta cadastrar e a arte mostra sem (aviso da prévia).
-enum ArtMissing { homeCrest, awayCrest, venue, date }
+enum ArtMissing { homeCrest, awayCrest, venue, date, time }
 
 /// Dados do card de resultado, só com informação oficial da partida: times
 /// (pelo `idTime`), placar pela lista de gols, vencedor, competição, data,
@@ -63,6 +64,9 @@ class ResultArtData extends Equatable {
   final String championshipLogoUrl;
   final String date;
   final String time;
+
+  /// Dia do jogo no calendário de Brasília (só a data; nulo sem data legível).
+  final DateTime? matchDay;
   final String venue;
   final ArtMatchStatus status;
   final List<ArtGoal> goals;
@@ -83,6 +87,7 @@ class ResultArtData extends Equatable {
     this.championshipLogoUrl = '',
     this.date = '',
     this.time = '',
+    this.matchDay,
     this.venue = '',
     this.status = ArtMatchStatus.finished,
     this.goals = const [],
@@ -97,6 +102,17 @@ class ResultArtData extends Equatable {
   }
 
   List<ArtGoal> goalsOf(ArtSide side) => goals.where((g) => g.side == side).toList();
+
+  /// "dd/MM" ou "dd/MM/aaaa" → a data (sem ano = o ano de hoje em Brasília).
+  static DateTime? dayOf(String date, DateTime now) {
+    final parts = date.trim().split('/');
+    if (parts.length < 2) return null;
+    final day = int.tryParse(parts[0].trim());
+    final month = int.tryParse(parts[1].trim());
+    final year = parts.length > 2 ? int.tryParse(parts[2].trim()) : MatchTime.today(now).year;
+    if (day == null || month == null || year == null || month < 1 || month > 12 || day < 1 || day > 31) return null;
+    return DateTime(year < 100 ? 2000 + year : year, month, day);
+  }
 
   static ArtMatchStatus statusOf(MatchDTO match, DateTime now) {
     if (match.manualStatus == MatchManualStatus.finished) return ArtMatchStatus.finished;
@@ -148,6 +164,7 @@ class ResultArtData extends Equatable {
       championshipLogoUrl: match.championshipId > 0 ? championshipLogoUrl.trim() : '',
       date: match.date.trim(),
       time: match.time.trim(),
+      matchDay: dayOf(match.date, now ?? DateTime.now()),
       venue: match.venue.trim(),
       status: statusOf(match, now ?? DateTime.now()),
       goals: goals,
@@ -163,6 +180,9 @@ class ResultArtData extends Equatable {
         if (away.crestUrl.isEmpty) ArtMissing.awayCrest,
         if (match.venue.trim().isEmpty) ArtMissing.venue,
         if (match.date.trim().isEmpty) ArtMissing.date,
+        // Divulgação: sem horário não dá para anunciar o jogo.
+        if (match.time.trim().isEmpty && statusOf(match, now ?? DateTime.now()) == ArtMatchStatus.notStarted)
+          ArtMissing.time,
       ],
     );
   }
@@ -177,6 +197,7 @@ class ResultArtData extends Equatable {
         championshipLogoUrl,
         date,
         time,
+        matchDay,
         venue,
         status,
         goals,

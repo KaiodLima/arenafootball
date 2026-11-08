@@ -12,6 +12,7 @@ import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/share_art/domain/art_format.dart';
 import 'package:arena_soccer/features/share_art/domain/result_art_data.dart';
 import 'package:arena_soccer/features/share_art/presentation/art_exporter.dart';
+import 'package:arena_soccer/features/share_art/presentation/templates/preview/preview_art.dart';
 import 'package:arena_soccer/features/share_art/presentation/templates/result/result_art.dart';
 import 'package:arena_soccer/features/share_art/presentation/widgets/art_graphics.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
@@ -145,6 +146,57 @@ void main() {
         expect(tester.takeException(), isNull, reason: '${template.name}/${format.name}');
         final png = await tester.runAsync(() => ArtExporter.capture(key, format));
         File('build/art_previews/${template.name}_${format.name}$suffix.png').writeAsBytesSync(png!);
+      }
+    }
+    // Divulgação (antes do jogo): sábado 15/11, vista na quinta 13/11.
+    final upcoming = ResultArtData.of(
+      const MatchDTO(
+        id: 'm3',
+        homeTeam: 'Mulekada',
+        awayTeam: 'Açaí No Gralle',
+        homeTeamId: 't1',
+        awayTeamId: 't2',
+        date: '15/11/2026',
+        time: '18:00',
+        venue: 'Campo do Ipê',
+        championshipId: 11,
+      ),
+      homeTeam: const TeamDTO(id: 't1', name: 'Mulekada', primaryColor: '#111111', secondaryColor: '#FFFFFF'),
+      awayTeam: const TeamDTO(id: 't2', name: 'Açaí No Gralle', primaryColor: '#6A1B9A', secondaryColor: '#FFFFFF'),
+      championship: 'Copa Açaí de Futsal',
+      championshipLogoUrl: 'memoria://logo',
+      link: 'https://arenasoccerflutter.web.app/app',
+      now: DateTime.utc(2026, 11, 13, 15),
+    );
+    for (final template in PreviewArtTemplate.values) {
+      for (final format in ArtFormat.values.where((f) => formats.contains(f.name))) {
+        final key = GlobalKey();
+        await tester.pumpWidget(MaterialApp(
+          debugShowCheckedModeBanner: false,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('pt'),
+          home: Scaffold(
+            body: Center(
+              child: RepaintBoundary(
+                key: key,
+                child: PreviewArt(
+                  data: upcoming,
+                  template: template,
+                  format: format,
+                  showQr: true,
+                  now: DateTime.utc(2026, 11, 13, 15),
+                ),
+              ),
+            ),
+          ),
+        ));
+        final element = tester.element(find.byKey(key));
+        await tester.runAsync(() => precacheImage(logo, element));
+        await tester.pump();
+        expect(tester.takeException(), isNull, reason: 'preview ${template.name}/${format.name}');
+        final png = await tester.runAsync(() => ArtExporter.capture(key, format));
+        File('build/art_previews/preview_${template.name}_${format.name}.png').writeAsBytesSync(png!);
       }
     }
   }, skip: !enabled);

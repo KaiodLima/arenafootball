@@ -351,9 +351,8 @@ class MatchReportCubit extends Cubit<MatchReportState> {
     );
     final lineup = match.lineup.of(side);
     final listed = lineup.any((e) => e.playerId == playerIn.id);
-    final entries = listed
-        ? lineup
-        : [...lineup, LineupEntry(playerId: playerIn.id, playerName: playerIn.name, starter: false)];
+    final entries =
+        listed ? lineup : [...lineup, LineupEntry(playerId: playerIn.id, playerName: playerIn.name, starter: false)];
     emit(state.copyWith(
       match: match.copyWith(
         substitutions: [...match.substitutions, sub],

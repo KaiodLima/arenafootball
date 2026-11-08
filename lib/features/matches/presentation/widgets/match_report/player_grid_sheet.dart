@@ -28,8 +28,8 @@ List<PickSection> groupedForPicking(List<PlayerDTO> players, List<LineupEntry> l
   final byOrder = <int, List<PickItem>>{};
   for (final p in players) {
     byOrder.putIfAbsent(order(p), () => []).add(
-          (player: p, number: entries[p.id]?.number, related: entries.containsKey(p.id)),
-        );
+      (player: p, number: entries[p.id]?.number, related: entries.containsKey(p.id)),
+    );
   }
   final orders = byOrder.keys.toList()..sort();
   return [
@@ -244,7 +244,8 @@ class _PlayerGridSheetState extends State<_PlayerGridSheet> {
                         SliverToBoxAdapter(
                           child: Padding(
                             padding: const EdgeInsets.all(AppSizes.s24),
-                            child: Text(l10n.reportNobodyToPick, textAlign: TextAlign.center, style: AppTypography.subtitle()),
+                            child: Text(l10n.reportNobodyToPick,
+                                textAlign: TextAlign.center, style: AppTypography.subtitle()),
                           ),
                         ),
                       for (final section in sections) ...[

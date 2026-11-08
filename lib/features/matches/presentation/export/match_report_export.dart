@@ -50,7 +50,8 @@ Future<({pw.Font regular, pw.Font bold})?> _fonts() async {
 
 /// Gera o PDF da súmula de [match] e abre a prévia (imprimir/compartilhar).
 /// [draft]: súmula com alterações ainda não salvas (faixa "RASCUNHO").
-Future<void> showMatchReportExport(BuildContext context, {required MatchDTO match, String? season, bool draft = false}) async {
+Future<void> showMatchReportExport(BuildContext context,
+    {required MatchDTO match, String? season, bool draft = false}) async {
   final l10n = AppLocalizations.of(context);
   final selectedSeason = season == null || season.isEmpty ? SeasonCollection.currentSeason : season;
   try {

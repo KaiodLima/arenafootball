@@ -70,7 +70,8 @@ class _ReportGameInfoState extends State<ReportGameInfo> {
               children: [
                 const Icon(Icons.timer_outlined, color: AppColors.textSecondary, size: AppSizes.s20),
                 const SizedBox(width: AppSizes.s8),
-                Expanded(child: Text(l10n.matchReportDuration, style: AppTypography.label(color: AppColors.textPrimary))),
+                Expanded(
+                    child: Text(l10n.matchReportDuration, style: AppTypography.label(color: AppColors.textPrimary))),
                 IconButton.filledTonal(
                   onPressed: match.durationMinutes > 10
                       ? () => widget.onChanged(durationMinutes: match.durationMinutes - 5)
@@ -127,7 +128,8 @@ class _ReportGameInfoState extends State<ReportGameInfo> {
                 match.isVotingOpen ? l10n.reportVotingOpen : l10n.reportVotingClosed,
                 style: AppTypography.label(color: AppColors.textPrimary),
               ),
-              subtitle: Text(l10n.matchReportVotingHint, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+              subtitle:
+                  Text(l10n.matchReportVotingHint, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
             ),
           ],
         ),

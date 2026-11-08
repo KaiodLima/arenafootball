@@ -10,6 +10,7 @@ import 'package:arena_soccer/features/share_art/domain/art_format.dart';
 import 'package:arena_soccer/features/share_art/domain/result_art_data.dart';
 import 'package:arena_soccer/features/share_art/presentation/art_exporter.dart';
 import 'package:arena_soccer/features/share_art/presentation/bloc/share_art_cubit.dart';
+import 'package:arena_soccer/features/share_art/presentation/templates/preview/preview_art.dart';
 import 'package:arena_soccer/features/share_art/presentation/templates/result/result_art.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
@@ -18,9 +19,10 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// "Gerar arte" do resultado da partida: modelo, formato e QR, prévia fiel
-/// (a mesma arte, só reduzida) e as ações salvar/compartilhar. A imagem sai
-/// no tamanho exato do formato ([ArtExporter]).
+/// "Gerar arte" da partida: resultado (em andamento ou terminada) ou, antes
+/// do jogo, "Divulgar partida" ([PreviewArt]). Modelo, formato e QR, prévia
+/// fiel (a mesma arte, só reduzida) e as ações salvar/compartilhar. A imagem
+/// sai no tamanho exato do formato ([ArtExporter]).
 class ShareArtPage extends StatefulWidget {
   const ShareArtPage({super.key});
 
@@ -60,7 +62,7 @@ class _ShareArtPageState extends State<ShareArtPage> {
       await WidgetsBinding.instance.endOfFrame;
       final png = await ArtExporter.capture(_artKey, state.format);
       if (png == null) throw StateError('arte sem tamanho');
-      await action(png, 'arena_${state.template.name}_${state.format.name}_${DateTime.now().millisecondsSinceEpoch}');
+      await action(png, 'arena_${state.templateName}_${state.format.name}_${DateTime.now().millisecondsSinceEpoch}');
     } catch (e) {
       AppLogger.e('share art export', name: 'ShareArtPage', error: e);
       if (mounted) showSnackBar(context: context, message: l10n.shareArtError, isSuccess: false);
@@ -101,6 +103,12 @@ class _ShareArtPageState extends State<ShareArtPage> {
         ResultArtTemplate.editorial => l10n.shareArtTemplateEditorial,
       };
 
+  String _previewLabel(AppLocalizations l10n, PreviewArtTemplate template) => switch (template) {
+        PreviewArtTemplate.matchday => l10n.shareArtTemplateMatchday,
+        PreviewArtTemplate.versus => l10n.shareArtTemplateVersus,
+        PreviewArtTemplate.calendar => l10n.shareArtTemplateCalendar,
+      };
+
   String _missingLabel(AppLocalizations l10n, ResultArtData data) {
     final names = [
       for (final m in data.missing)
@@ -109,6 +117,7 @@ class _ShareArtPageState extends State<ShareArtPage> {
           ArtMissing.awayCrest => l10n.shareArtMissingCrest(data.away.name),
           ArtMissing.venue => l10n.shareArtMissingVenue,
           ArtMissing.date => l10n.shareArtMissingDate,
+          ArtMissing.time => l10n.shareArtMissingTime,
         },
     ];
     return l10n.shareArtMissing(names.join(', '));
@@ -129,7 +138,7 @@ class _ShareArtPageState extends State<ShareArtPage> {
             backgroundColor: AppColors.primaryDark,
             foregroundColor: AppColors.white,
             surfaceTintColor: AppColors.transparent,
-            title: Text(l10n.shareArtTitle,
+            title: Text(state.preview ? l10n.shareArtPreviewTitle : l10n.shareArtTitle,
                 style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s18)),
           ),
           body: data == null
@@ -151,12 +160,19 @@ class _ShareArtPageState extends State<ShareArtPage> {
                               ),
                               child: RepaintBoundary(
                                 key: _artKey,
-                                child: ResultArt(
-                                  data: data,
-                                  template: state.template,
-                                  format: state.format,
-                                  showQr: state.showQr,
-                                ),
+                                child: state.preview
+                                    ? PreviewArt(
+                                        data: data,
+                                        template: state.previewTemplate,
+                                        format: state.format,
+                                        showQr: state.showQr,
+                                      )
+                                    : ResultArt(
+                                        data: data,
+                                        template: state.template,
+                                        format: state.format,
+                                        showQr: state.showQr,
+                                      ),
                               ),
                             ),
                           ),
@@ -185,12 +201,20 @@ class _ShareArtPageState extends State<ShareArtPage> {
                         _ChipRow(
                           label: l10n.shareArtTemplate,
                           children: [
-                            for (final t in ResultArtTemplate.values)
-                              ArenaChoiceChip(
-                                label: _templateLabel(l10n, t),
-                                selected: state.template == t,
-                                onTap: () => cubit.selectTemplate(t),
-                              ),
+                            if (state.preview)
+                              for (final t in PreviewArtTemplate.values)
+                                ArenaChoiceChip(
+                                  label: _previewLabel(l10n, t),
+                                  selected: state.previewTemplate == t,
+                                  onTap: () => cubit.selectPreviewTemplate(t),
+                                )
+                            else
+                              for (final t in ResultArtTemplate.values)
+                                ArenaChoiceChip(
+                                  label: _templateLabel(l10n, t),
+                                  selected: state.template == t,
+                                  onTap: () => cubit.selectTemplate(t),
+                                ),
                           ],
                         ),
                         const SizedBox(height: AppSizes.s8),

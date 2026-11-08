@@ -34,7 +34,10 @@ class ReportSaveBar extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.primaryDark,
           borderRadius: BorderRadius.circular(AppSizes.s20),
-          boxShadow: [BoxShadow(color: AppColors.black.withValues(alpha: 0.25), blurRadius: AppSizes.s16, offset: const Offset(0, 6))],
+          boxShadow: [
+            BoxShadow(
+                color: AppColors.black.withValues(alpha: 0.25), blurRadius: AppSizes.s16, offset: const Offset(0, 6))
+          ],
         ),
         child: Row(
           children: [
@@ -68,7 +71,8 @@ class ReportSaveBar extends StatelessWidget {
                               l10n.reportPublishCards,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: AppTypography.subtitle(color: AppColors.whiteSoft).copyWith(fontSize: AppSizes.s12),
+                              style:
+                                  AppTypography.subtitle(color: AppColors.whiteSoft).copyWith(fontSize: AppSizes.s12),
                             ),
                           ),
                         ],
@@ -91,7 +95,8 @@ class ReportSaveBar extends StatelessWidget {
                       dimension: AppSizes.s20,
                       child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primaryDark),
                     )
-                  : Text(l10n.reportSave, style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s16)),
+                  : Text(l10n.reportSave,
+                      style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s16)),
             ),
           ],
         ),

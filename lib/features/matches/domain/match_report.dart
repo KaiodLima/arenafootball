@@ -126,7 +126,10 @@ class MatchReport {
     required MatchSide side,
   }) {
     if (lineup.isEmpty) return null;
-    final ids = {for (final e in lineup) if (e.starter) e.playerId};
+    final ids = {
+      for (final e in lineup)
+        if (e.starter) e.playerId
+    };
     final ordered = [...substitutions.where((s) => s.side == side)]
       ..sort((a, b) => (a.minute ?? 999).compareTo(b.minute ?? 999));
     for (final sub in ordered) {
@@ -178,8 +181,10 @@ class MatchReport {
   }
 
   /// Quem já saiu substituído do [side] (não volta a entrar).
-  static Set<String> substitutedOut(List<MatchSubstitution> substitutions, MatchSide side) =>
-      {for (final s in substitutions) if (s.side == side) s.outId};
+  static Set<String> substitutedOut(List<MatchSubstitution> substitutions, MatchSide side) => {
+        for (final s in substitutions)
+          if (s.side == side) s.outId
+      };
 
   /// Titulares e reservas de um lado.
   static ({int starters, int subs}) lineupCount(List<LineupEntry> entries) =>

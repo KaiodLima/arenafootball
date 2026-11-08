@@ -734,6 +734,89 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shareArtTemplateVibrant => 'Colors';
 
   @override
+  String get shareArtPreviewTitle => 'Promote match';
+
+  @override
+  String get shareArtTemplateMatchday => 'Match day';
+
+  @override
+  String get shareArtTemplateVersus => 'Head to head';
+
+  @override
+  String get shareArtTemplateCalendar => 'Calendar';
+
+  @override
+  String get shareArtToday => 'It\'s today!';
+
+  @override
+  String get shareArtNextMatch => 'Next match';
+
+  @override
+  String get shareArtVenueTbd => 'Venue TBD';
+
+  @override
+  String get shareArtMissingTime => 'kick-off time';
+
+  @override
+  String shareArtWeekday(String day) {
+    String _temp0 = intl.Intl.selectLogic(
+      day,
+      {
+        '1': 'Monday',
+        '2': 'Tuesday',
+        '3': 'Wednesday',
+        '4': 'Thursday',
+        '5': 'Friday',
+        '6': 'Saturday',
+        '7': 'Sunday',
+        'other': '',
+      },
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String shareArtWeekdayShort(String day) {
+    String _temp0 = intl.Intl.selectLogic(
+      day,
+      {
+        '1': 'Mon',
+        '2': 'Tue',
+        '3': 'Wed',
+        '4': 'Thu',
+        '5': 'Fri',
+        '6': 'Sat',
+        '7': 'Sun',
+        'other': '',
+      },
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String shareArtMonth(String month) {
+    String _temp0 = intl.Intl.selectLogic(
+      month,
+      {
+        '1': 'Jan',
+        '2': 'Feb',
+        '3': 'Mar',
+        '4': 'Apr',
+        '5': 'May',
+        '6': 'Jun',
+        '7': 'Jul',
+        '8': 'Aug',
+        '9': 'Sep',
+        '10': 'Oct',
+        '11': 'Nov',
+        '12': 'Dec',
+        'other': '',
+      },
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get shareArtTemplatePoster => 'Full time';
 
   @override

@@ -22,7 +22,9 @@ ReportStage reportStageOf(MatchDTO match, DateTime now) {
   if (status.finished) return ReportStage.finished;
   if (status.halfTime) return ReportStage.halfTime;
   if (status.live) {
-    return MatchClock.of(match, now).phase == MatchClockPhase.secondHalf ? ReportStage.secondHalf : ReportStage.firstHalf;
+    return MatchClock.of(match, now).phase == MatchClockPhase.secondHalf
+        ? ReportStage.secondHalf
+        : ReportStage.firstHalf;
   }
   return ReportStage.before;
 }
@@ -175,7 +177,8 @@ class _ReportHeaderView extends StatelessWidget {
                     AnimatedSwitcher(
                       duration: const Duration(milliseconds: 350),
                       transitionBuilder: (child, animation) => ScaleTransition(
-                        scale: Tween(begin: 1.4, end: 1.0).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutBack)),
+                        scale: Tween(begin: 1.4, end: 1.0)
+                            .animate(CurvedAnimation(parent: animation, curve: Curves.easeOutBack)),
                         child: FadeTransition(opacity: animation, child: child),
                       ),
                       child: Text(
@@ -214,7 +217,9 @@ class _ReportHeaderView extends StatelessWidget {
                   onPressed: busy ? null : onDelay,
                   style: TextButton.styleFrom(foregroundColor: AppColors.gold, visualDensity: VisualDensity.compact),
                   icon: const Icon(Icons.schedule_rounded, size: AppSizes.s18),
-                  label: Text(match.delayed ? '${l10n.matchDelay} · ${l10n.matchCardWas(match.originalTime.trim())}' : l10n.matchDelay),
+                  label: Text(match.delayed
+                      ? '${l10n.matchDelay} · ${l10n.matchCardWas(match.originalTime.trim())}'
+                      : l10n.matchDelay),
                 ),
               ),
             if (actions.isNotEmpty) ...[
@@ -241,7 +246,9 @@ class _ReportHeaderView extends StatelessWidget {
                     ),
                   ),
                   // Último passo possível (encerrar durante o jogo), mais discreto.
-                  for (final action in actions.length > 1 ? [actions.last] : const <({IconData icon, String label, MatchPhase phase})>[])
+                  for (final action in actions.length > 1
+                      ? [actions.last]
+                      : const <({IconData icon, String label, MatchPhase phase})>[])
                     Padding(
                       padding: const EdgeInsets.only(left: AppSizes.s8),
                       child: OutlinedButton.icon(
@@ -351,7 +358,9 @@ class _StatusPillState extends State<_StatusPill> with SingleTickerProviderState
     // Súmula: relógio corrido com segundos ("23:41").
     final minute = MatchClock.runningLabel(widget.match, widget.now);
     final label = switch (widget.stage) {
-      ReportStage.firstHalf || ReportStage.secondHalf => minute == null ? l10n.reportLive : '${l10n.reportLive} · $minute',
+      ReportStage.firstHalf ||
+      ReportStage.secondHalf =>
+        minute == null ? l10n.reportLive : '${l10n.reportLive} · $minute',
       ReportStage.halfTime => l10n.reportHalfTime,
       ReportStage.finished => l10n.reportFinished,
       ReportStage.before => widget.match.manualStatus == MatchManualStatus.waiting

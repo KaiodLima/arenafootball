@@ -389,6 +389,38 @@
   "matchCardToday": "HOJE",
   "matchCardTomorrow": "AMANHÃ",
   "shareArtTemplateVibrant": "Cores",
+  "shareArtPreviewTitle": "Divulgar partida",
+  "shareArtTemplateMatchday": "Dia de jogo",
+  "shareArtTemplateVersus": "Duelo",
+  "shareArtTemplateCalendar": "Agenda",
+  "shareArtToday": "É hoje!",
+  "shareArtNextMatch": "Próximo jogo",
+  "shareArtVenueTbd": "Local a definir",
+  "shareArtMissingTime": "horário",
+  "shareArtWeekday": "{day, select, 1{Segunda} 2{Terça} 3{Quarta} 4{Quinta} 5{Sexta} 6{Sábado} 7{Domingo} other{}}",
+  "@shareArtWeekday": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "shareArtWeekdayShort": "{day, select, 1{Seg} 2{Ter} 3{Qua} 4{Qui} 5{Sex} 6{Sáb} 7{Dom} other{}}",
+  "@shareArtWeekdayShort": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "shareArtMonth": "{month, select, 1{Jan} 2{Fev} 3{Mar} 4{Abr} 5{Mai} 6{Jun} 7{Jul} 8{Ago} 9{Set} 10{Out} 11{Nov} 12{Dez} other{}}",
+  "@shareArtMonth": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
   "shareArtTemplatePoster": "Fim de jogo",
   "shareArtTemplateFaceOff": "Confronto",
   "shareArtTemplateEditorial": "Editorial",

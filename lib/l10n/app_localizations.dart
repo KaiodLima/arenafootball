@@ -1341,6 +1341,72 @@ abstract class AppLocalizations {
   /// **'Cores'**
   String get shareArtTemplateVibrant;
 
+  /// No description provided for @shareArtPreviewTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Divulgar partida'**
+  String get shareArtPreviewTitle;
+
+  /// No description provided for @shareArtTemplateMatchday.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dia de jogo'**
+  String get shareArtTemplateMatchday;
+
+  /// No description provided for @shareArtTemplateVersus.
+  ///
+  /// In pt, this message translates to:
+  /// **'Duelo'**
+  String get shareArtTemplateVersus;
+
+  /// No description provided for @shareArtTemplateCalendar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Agenda'**
+  String get shareArtTemplateCalendar;
+
+  /// No description provided for @shareArtToday.
+  ///
+  /// In pt, this message translates to:
+  /// **'É hoje!'**
+  String get shareArtToday;
+
+  /// No description provided for @shareArtNextMatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Próximo jogo'**
+  String get shareArtNextMatch;
+
+  /// No description provided for @shareArtVenueTbd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Local a definir'**
+  String get shareArtVenueTbd;
+
+  /// No description provided for @shareArtMissingTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'horário'**
+  String get shareArtMissingTime;
+
+  /// No description provided for @shareArtWeekday.
+  ///
+  /// In pt, this message translates to:
+  /// **'{day, select, 1{Segunda} 2{Terça} 3{Quarta} 4{Quinta} 5{Sexta} 6{Sábado} 7{Domingo} other{}}'**
+  String shareArtWeekday(String day);
+
+  /// No description provided for @shareArtWeekdayShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'{day, select, 1{Seg} 2{Ter} 3{Qua} 4{Qui} 5{Sex} 6{Sáb} 7{Dom} other{}}'**
+  String shareArtWeekdayShort(String day);
+
+  /// No description provided for @shareArtMonth.
+  ///
+  /// In pt, this message translates to:
+  /// **'{month, select, 1{Jan} 2{Fev} 3{Mar} 4{Abr} 5{Mai} 6{Jun} 7{Jul} 8{Ago} 9{Set} 10{Out} 11{Nov} 12{Dez} other{}}'**
+  String shareArtMonth(String month);
+
   /// No description provided for @shareArtTemplatePoster.
   ///
   /// In pt, this message translates to:

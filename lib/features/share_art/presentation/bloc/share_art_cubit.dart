@@ -4,11 +4,15 @@ import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/share_art/domain/art_format.dart';
 import 'package:arena_soccer/features/share_art/domain/result_art_data.dart';
 import 'package:arena_soccer/features/share_art/domain/usecases/prepare_result_art_usecase.dart';
+import 'package:arena_soccer/features/share_art/presentation/templates/preview/preview_art.dart';
 import 'package:arena_soccer/features/share_art/presentation/templates/result/result_art.dart';
 
 class ShareArtState extends Equatable {
   final ResultArtData? data;
   final ResultArtTemplate template;
+
+  /// Modelo da divulgação (partida que ainda não começou).
+  final PreviewArtTemplate previewTemplate;
   final ArtFormat format;
   final bool showQr;
 
@@ -18,6 +22,7 @@ class ShareArtState extends Equatable {
   const ShareArtState({
     this.data,
     this.template = ResultArtTemplate.vibrant,
+    this.previewTemplate = PreviewArtTemplate.matchday,
     this.format = ArtFormat.feed,
     this.showQr = true,
     this.busy = false,
@@ -25,9 +30,16 @@ class ShareArtState extends Equatable {
 
   bool get loading => data == null;
 
+  /// Partida por começar: a tela vira "Divulgar partida" (artes de divulgação).
+  bool get preview => data?.status == ArtMatchStatus.notStarted;
+
+  /// Nome do modelo em uso (nome do arquivo exportado).
+  String get templateName => preview ? previewTemplate.name : template.name;
+
   ShareArtState copyWith({
     ResultArtData? data,
     ResultArtTemplate? template,
+    PreviewArtTemplate? previewTemplate,
     ArtFormat? format,
     bool? showQr,
     bool? busy,
@@ -35,13 +47,14 @@ class ShareArtState extends Equatable {
       ShareArtState(
         data: data ?? this.data,
         template: template ?? this.template,
+        previewTemplate: previewTemplate ?? this.previewTemplate,
         format: format ?? this.format,
         showQr: showQr ?? this.showQr,
         busy: busy ?? this.busy,
       );
 
   @override
-  List<Object?> get props => [data, template, format, showQr, busy];
+  List<Object?> get props => [data, template, previewTemplate, format, showQr, busy];
 }
 
 /// "Gerar arte" da partida: os dados oficiais (pelos caches), o modelo, o
@@ -57,6 +70,8 @@ class ShareArtCubit extends Cubit<ShareArtState> {
   }
 
   void selectTemplate(ResultArtTemplate template) => emit(state.copyWith(template: template));
+
+  void selectPreviewTemplate(PreviewArtTemplate template) => emit(state.copyWith(previewTemplate: template));
 
   void selectFormat(ArtFormat format) => emit(state.copyWith(format: format));
 

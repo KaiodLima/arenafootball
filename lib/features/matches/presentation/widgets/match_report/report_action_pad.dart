@@ -70,7 +70,8 @@ class _Column extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
-            style: AppTypography.label(color: AppColors.textSecondary).copyWith(fontSize: AppSizes.s10, letterSpacing: 0.6),
+            style: AppTypography.label(color: AppColors.textSecondary)
+                .copyWith(fontSize: AppSizes.s10, letterSpacing: 0.6),
           ),
           const SizedBox(height: AppSizes.s6),
           _PadButton(
@@ -155,7 +156,8 @@ class _PadButton extends StatelessWidget {
                     label!,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: AppTypography.label(color: foreground).copyWith(fontSize: AppSizes.s14, fontWeight: FontWeight.w800),
+                    style: AppTypography.label(color: foreground)
+                        .copyWith(fontSize: AppSizes.s14, fontWeight: FontWeight.w800),
                   ),
                 ),
               ],

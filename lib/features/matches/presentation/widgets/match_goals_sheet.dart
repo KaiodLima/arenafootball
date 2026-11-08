@@ -39,8 +39,7 @@ Future<bool> showMatchGoalsSheet(
         sl<UpdateMatchGoalsUseCase>(),
         sl<PublishGoalCardsUseCase>(),
         sl<SyncLiveMatchCardUseCase>(),
-      )
-        ..load(match: match, season: season),
+      )..load(match: match, season: season),
       child: _MatchGoalsSheet(homeCrest: homeCrest, awayCrest: awayCrest),
     ),
   );
@@ -188,7 +187,8 @@ class _MatchGoalsSheet extends StatelessWidget {
                       l10n.matchGoalsPublishCards(state.newGoals),
                       style: AppTypography.label(color: AppColors.textPrimary),
                     ),
-                    subtitle: Text(l10n.matchGoalsPublishCardsHint, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+                    subtitle: Text(l10n.matchGoalsPublishCardsHint,
+                        style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
                   ),
                 ArenaSubmitBar(
                   title: l10n.matchGoalsSave,

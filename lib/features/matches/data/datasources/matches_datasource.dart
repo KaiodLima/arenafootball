@@ -224,5 +224,4 @@ class MatchesDataSource {
       return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível carregar os troféus.'));
     }
   }
-
 }

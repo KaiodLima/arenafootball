@@ -81,8 +81,8 @@ class _DaySegment extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 180),
             padding: const EdgeInsets.symmetric(vertical: AppSizes.s8),
-            decoration:
-                BoxDecoration(color: selected ? ArenaPalette.of(context).primary : AppColors.transparent, borderRadius: radius),
+            decoration: BoxDecoration(
+                color: selected ? ArenaPalette.of(context).primary : AppColors.transparent, borderRadius: radius),
             child: Column(
               children: [
                 Text(

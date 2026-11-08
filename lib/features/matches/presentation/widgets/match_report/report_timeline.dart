@@ -96,7 +96,8 @@ class _Separator extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: AppSizes.s10),
             child: Text(
               label.toUpperCase(),
-              style: AppTypography.label(color: AppColors.textSecondary).copyWith(fontSize: AppSizes.s10, letterSpacing: 1),
+              style: AppTypography.label(color: AppColors.textSecondary)
+                  .copyWith(fontSize: AppSizes.s10, letterSpacing: 1),
             ),
           ),
           line,
@@ -208,16 +209,17 @@ class _EventContent extends StatelessWidget {
             mainAxisAlignment: alignEnd ? MainAxisAlignment.end : MainAxisAlignment.start,
             children: alignEnd ? titleRow.reversed.toList() : titleRow,
           ),
-          if (subtitle.isNotEmpty)
-            Text(subtitle, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+          if (subtitle.isNotEmpty) Text(subtitle, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
           if (score != null)
             Container(
               margin: const EdgeInsets.only(top: AppSizes.s4),
               padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s2),
-              decoration: BoxDecoration(color: AppColors.primaryDark, borderRadius: BorderRadius.circular(AppSizes.s10)),
+              decoration:
+                  BoxDecoration(color: AppColors.primaryDark, borderRadius: BorderRadius.circular(AppSizes.s10)),
               child: Text(
                 score!,
-                style: AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s12, fontWeight: FontWeight.w800),
+                style: AppTypography.label(color: AppColors.white)
+                    .copyWith(fontSize: AppSizes.s12, fontWeight: FontWeight.w800),
               ),
             ),
         ],

@@ -108,7 +108,8 @@ class _MatchFormPageState extends State<MatchFormPage> {
           .whereType<String>()
           .toList();
       if (notEnrolled.isNotEmpty) {
-        showSnackBar(context: context, message: l10n.organizerMatchTeamNotEnrolled(notEnrolled.first), isSuccess: false);
+        showSnackBar(
+            context: context, message: l10n.organizerMatchTeamNotEnrolled(notEnrolled.first), isSuccess: false);
         return;
       }
       final indexed = await BlocProvider.of<OrganizerModeCubit>(context).ensureIndexFor(championship.championshipId);

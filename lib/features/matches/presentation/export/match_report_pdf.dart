@@ -183,8 +183,10 @@ Future<Uint8List> buildMatchReportPdf({
   pw.Widget sectionTitle(String text) => pw.Container(
         margin: const pw.EdgeInsets.only(top: 12, bottom: 6),
         padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: const pw.BoxDecoration(color: _greenSoft, border: pw.Border(left: pw.BorderSide(color: _green, width: 3))),
-        child: pw.Text(text.toUpperCase(), style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: _green)),
+        decoration:
+            const pw.BoxDecoration(color: _greenSoft, border: pw.Border(left: pw.BorderSide(color: _green, width: 3))),
+        child: pw.Text(text.toUpperCase(),
+            style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: _green)),
       );
 
   pw.Widget none() => pw.Padding(
@@ -226,7 +228,8 @@ Future<Uint8List> buildMatchReportPdf({
         height: 46,
         decoration: pw.BoxDecoration(shape: pw.BoxShape.circle, border: pw.Border.all(color: _line)),
         padding: const pw.EdgeInsets.all(4),
-        child: bytes == null ? pw.SizedBox() : pw.ClipOval(child: pw.Image(pw.MemoryImage(bytes), fit: pw.BoxFit.contain)),
+        child:
+            bytes == null ? pw.SizedBox() : pw.ClipOval(child: pw.Image(pw.MemoryImage(bytes), fit: pw.BoxFit.contain)),
       );
 
   pw.Widget lineupColumn(String team, List<SheetLineupRow> rows) {
@@ -251,8 +254,7 @@ Future<Uint8List> buildMatchReportPdf({
                       ),
                       pw.SizedBox(width: 6),
                       pw.Expanded(child: pw.Text(r.name, style: body)),
-                      if (r.cameIn)
-                        pw.Text(texts.cameIn(r.inMinute), style: pw.TextStyle(fontSize: 7, color: _green)),
+                      if (r.cameIn) pw.Text(texts.cameIn(r.inMinute), style: pw.TextStyle(fontSize: 7, color: _green)),
                       if (r.wentOut)
                         pw.Text(texts.wentOut(r.outMinute), style: const pw.TextStyle(fontSize: 7, color: _danger)),
                     ],
@@ -309,7 +311,8 @@ Future<Uint8List> buildMatchReportPdf({
                 child: pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Text(texts.title, style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: _green)),
+                    pw.Text(texts.title,
+                        style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: _green)),
                     pw.Text(
                       [championship, if (season.isNotEmpty) texts.season(season)].join('  ·  '),
                       style: const pw.TextStyle(fontSize: 9, color: _grey),
@@ -317,7 +320,8 @@ Future<Uint8List> buildMatchReportPdf({
                   ],
                 ),
               ),
-              pw.Text('Arena Football', style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: _green)),
+              pw.Text('Arena Football',
+                  style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: _green)),
             ],
           ),
           if (draft)
@@ -356,12 +360,14 @@ Future<Uint8List> buildMatchReportPdf({
         pw.Container(
           margin: const pw.EdgeInsets.only(top: 10),
           padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-          decoration: pw.BoxDecoration(border: pw.Border.all(color: _green, width: 1), borderRadius: pw.BorderRadius.circular(6)),
+          decoration: pw.BoxDecoration(
+              border: pw.Border.all(color: _green, width: 1), borderRadius: pw.BorderRadius.circular(6)),
           child: pw.Row(
             children: [
               crest(homeCrest),
               pw.SizedBox(width: 8),
-              pw.Expanded(child: pw.Text(match.homeTeam, style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold))),
+              pw.Expanded(
+                  child: pw.Text(match.homeTeam, style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold))),
               pw.Text('${sheet.homeGoals}  x  ${sheet.awayGoals}',
                   style: pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold, color: _green)),
               pw.Expanded(
@@ -385,8 +391,16 @@ Future<Uint8List> buildMatchReportPdf({
         sectionTitle(texts.goals),
         table(
           [texts.minute, texts.team, texts.scorer, texts.assist],
-          [for (final g in sheet.goals) [minute(g.minute), teamOf(g.home), g.scorer.isEmpty ? '-' : g.scorer, g.assistant]],
-          const {0: pw.FixedColumnWidth(36), 1: pw.FlexColumnWidth(2), 2: pw.FlexColumnWidth(3), 3: pw.FlexColumnWidth(3)},
+          [
+            for (final g in sheet.goals)
+              [minute(g.minute), teamOf(g.home), g.scorer.isEmpty ? '-' : g.scorer, g.assistant]
+          ],
+          const {
+            0: pw.FixedColumnWidth(36),
+            1: pw.FlexColumnWidth(2),
+            2: pw.FlexColumnWidth(3),
+            3: pw.FlexColumnWidth(3)
+          },
         ),
         sectionTitle(texts.bookings),
         table(
@@ -397,16 +411,30 @@ Future<Uint8List> buildMatchReportPdf({
                 minute(b.minute),
                 teamOf(b.home),
                 b.player,
-                b.type == BookingType.yellow ? texts.yellow : (b.secondYellow ? '${texts.red} (${texts.secondYellow})' : texts.red),
+                b.type == BookingType.yellow
+                    ? texts.yellow
+                    : (b.secondYellow ? '${texts.red} (${texts.secondYellow})' : texts.red),
               ],
           ],
-          const {0: pw.FixedColumnWidth(36), 1: pw.FlexColumnWidth(2), 2: pw.FlexColumnWidth(3), 3: pw.FlexColumnWidth(2)},
+          const {
+            0: pw.FixedColumnWidth(36),
+            1: pw.FlexColumnWidth(2),
+            2: pw.FlexColumnWidth(3),
+            3: pw.FlexColumnWidth(2)
+          },
         ),
         sectionTitle(texts.substitutions),
         table(
           [texts.minute, texts.team, texts.playerIn, texts.playerOut],
-          [for (final s in sheet.substitutions) [minute(s.minute), teamOf(s.home), s.playerIn, s.playerOut]],
-          const {0: pw.FixedColumnWidth(36), 1: pw.FlexColumnWidth(2), 2: pw.FlexColumnWidth(3), 3: pw.FlexColumnWidth(3)},
+          [
+            for (final s in sheet.substitutions) [minute(s.minute), teamOf(s.home), s.playerIn, s.playerOut]
+          ],
+          const {
+            0: pw.FixedColumnWidth(36),
+            1: pw.FlexColumnWidth(2),
+            2: pw.FlexColumnWidth(3),
+            3: pw.FlexColumnWidth(3)
+          },
         ),
         if (match.electedPlayerName.isNotEmpty) ...[
           sectionTitle(texts.bestPlayer),

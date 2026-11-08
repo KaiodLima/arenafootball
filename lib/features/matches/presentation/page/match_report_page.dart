@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/matches/presentation/export/match_report_export.dart';
@@ -169,7 +168,8 @@ class MatchReportPage extends StatelessWidget {
       confirmLabel: l10n.commonSave,
       icon: Icons.tag_rounded,
       tone: ArenaAlertTone.primary,
-      content: ArenaTextField(controller: controller, keyboardType: TextInputType.number, autofocus: true, hintText: '10'),
+      content:
+          ArenaTextField(controller: controller, keyboardType: TextInputType.number, autofocus: true, hintText: '10'),
     );
     if (confirmed && context.mounted) {
       BlocProvider.of<MatchReportCubit>(context).setNumber(side, entry.playerId, int.tryParse(controller.text.trim()));
@@ -256,7 +256,8 @@ class MatchReportPage extends StatelessWidget {
                   IconButton(
                     tooltip: l10n.matchReportExportPdf,
                     icon: const Icon(Icons.picture_as_pdf_outlined),
-                    onPressed: () => showMatchReportExport(context, match: match, season: cubit.season, draft: state.dirty),
+                    onPressed: () =>
+                        showMatchReportExport(context, match: match, season: cubit.season, draft: state.dirty),
                   ),
                 ],
                 backgroundColor: AppColors.primaryDark,

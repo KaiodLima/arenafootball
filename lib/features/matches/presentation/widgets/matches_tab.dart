@@ -61,8 +61,7 @@ class _MatchesTabState extends State<MatchesTab> {
 }
 
 /// Campeonatos do organizador na ordem do seletor: os mais recentes primeiro.
-List<ChampionshipDTO> organizerTableChampionships(List<ChampionshipDTO> all) => [...all]
-  ..sort((a, b) {
+List<ChampionshipDTO> organizerTableChampionships(List<ChampionshipDTO> all) => [...all]..sort((a, b) {
     final bySeason = b.season.compareTo(a.season);
     return bySeason != 0 ? bySeason : a.championshipId.compareTo(b.championshipId);
   });
@@ -270,9 +269,21 @@ class _DayMatchesState extends State<_DayMatches> {
       TourIds.tables,
       () => [
         if (widget.filterKey != null)
-          TourStep(target: widget.filterKey!, icon: Icons.emoji_events_rounded, title: l10n.tourTablesFilterTitle, body: l10n.tourTablesFilterBody),
-        TourStep(target: _shortcutsKey, icon: Icons.apps_rounded, title: l10n.tourTablesShortcutsTitle, body: l10n.tourTablesShortcutsBody),
-        TourStep(target: _dayKey, icon: Icons.sports_soccer_rounded, title: l10n.tourTablesDayTitle, body: l10n.tourTablesDayBody),
+          TourStep(
+              target: widget.filterKey!,
+              icon: Icons.emoji_events_rounded,
+              title: l10n.tourTablesFilterTitle,
+              body: l10n.tourTablesFilterBody),
+        TourStep(
+            target: _shortcutsKey,
+            icon: Icons.apps_rounded,
+            title: l10n.tourTablesShortcutsTitle,
+            body: l10n.tourTablesShortcutsBody),
+        TourStep(
+            target: _dayKey,
+            icon: Icons.sports_soccer_rounded,
+            title: l10n.tourTablesDayTitle,
+            body: l10n.tourTablesDayBody),
       ],
       delay: const Duration(milliseconds: 700),
     );

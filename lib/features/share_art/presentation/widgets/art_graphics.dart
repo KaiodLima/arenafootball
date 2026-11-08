@@ -487,3 +487,103 @@ class ArtScorerLine extends StatelessWidget {
     );
   }
 }
+
+/// Fundo da metade: a cor do time; muito clara, um pouco mais escura para o
+/// branco do corte e das placas não sumirem.
+Color artHalfColor(Color color) => isLightColor(color) ? Color.lerp(color, AppColors.black, 0.12)! : color;
+
+/// Linha do corte: em cima/à esquerda a casa, do outro lado o visitante.
+(Offset, Offset) artCut(Size size, bool wide) => wide
+    ? (Offset(size.width * 0.58, 0), Offset(size.width * 0.42, size.height))
+    : (Offset(0, size.height * 0.62), Offset(size.width, size.height * 0.44));
+
+/// Fundo em duas metades nas cores dos times, com o corte diagonal branco e
+/// dourado, retícula perto do corte e um feixe de luz ("Cores", "Dia de jogo").
+class ArtSplitPainter extends CustomPainter {
+  final Color home;
+  final Color away;
+  final bool wide;
+
+  ArtSplitPainter({required this.home, required this.away, required this.wide});
+
+  Shader _shade(Color color, Rect rect, Alignment light) => LinearGradient(
+        begin: light,
+        end: -light,
+        colors: [Color.lerp(color, AppColors.white, 0.16)!, color, Color.lerp(color, AppColors.black, 0.22)!],
+        stops: const [0, 0.55, 1],
+      ).createShader(rect);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final (a, b) = artCut(size, wide);
+    final awayPath = wide
+        ? (Path()
+          ..moveTo(a.dx, 0)
+          ..lineTo(size.width, 0)
+          ..lineTo(size.width, size.height)
+          ..lineTo(b.dx, size.height)
+          ..close())
+        : (Path()
+          ..moveTo(0, a.dy)
+          ..lineTo(size.width, b.dy)
+          ..lineTo(size.width, size.height)
+          ..lineTo(0, size.height)
+          ..close());
+    canvas.drawRect(rect, Paint()..shader = _shade(home, rect, Alignment.topLeft));
+    canvas.drawPath(awayPath, Paint()..shader = _shade(away, rect, Alignment.bottomRight));
+
+    // Feixe de luz diagonal ("luz de estádio").
+    final beam = Path()
+      ..moveTo(size.width * 0.18, 0)
+      ..lineTo(size.width * 0.42, 0)
+      ..lineTo(size.width * 0.02, size.height)
+      ..lineTo(-size.width * 0.22, size.height)
+      ..close();
+    canvas.drawPath(
+      beam,
+      Paint()
+        ..shader = LinearGradient(
+          colors: [
+            AppColors.white.withValues(alpha: 0),
+            AppColors.white.withValues(alpha: 0.09),
+            AppColors.white.withValues(alpha: 0),
+          ],
+        ).createShader(rect),
+    );
+
+    // Retícula grossa só perto do corte, dos dois lados.
+    final dir = (b - a) / (b - a).distance;
+    final normal = Offset(-dir.dy, dir.dx);
+    final band = size.shortestSide * 0.2;
+    const spacing = 7.0;
+    final dot = Paint()..color = AppColors.white.withValues(alpha: 0.16);
+    for (var y = 0.0; y <= size.height; y += spacing) {
+      final shift = (y / spacing).round().isOdd ? spacing / 2 : 0.0;
+      for (var x = shift; x <= size.width; x += spacing) {
+        final p = Offset(x, y) - a;
+        final d = (p.dx * normal.dx + p.dy * normal.dy).abs();
+        if (d < band) canvas.drawCircle(Offset(x, y), spacing * 0.36 * (1 - d / band), dot);
+      }
+    }
+
+    // O corte: faixa branca larga e um fio dourado.
+    void stripe(double from, double to, Color color) {
+      final ext = dir * 40;
+      final path = Path()
+        ..moveTo(a.dx + normal.dx * from - ext.dx, a.dy + normal.dy * from - ext.dy)
+        ..lineTo(b.dx + normal.dx * from + ext.dx, b.dy + normal.dy * from + ext.dy)
+        ..lineTo(b.dx + normal.dx * to + ext.dx, b.dy + normal.dy * to + ext.dy)
+        ..lineTo(a.dx + normal.dx * to - ext.dx, a.dy + normal.dy * to - ext.dy)
+        ..close();
+      canvas.drawPath(path, Paint()..color = color);
+    }
+
+    final t = size.shortestSide * 0.014;
+    stripe(-t, t, AppColors.white);
+    stripe(t * 2.2, t * 3.2, AppColors.gold);
+  }
+
+  @override
+  bool shouldRepaint(covariant ArtSplitPainter old) => old.home != home || old.away != away || old.wide != wide;
+}

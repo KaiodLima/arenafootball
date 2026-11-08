@@ -56,7 +56,8 @@ class SheetSubstitutionRow {
   final String playerIn;
   final String playerOut;
 
-  const SheetSubstitutionRow({required this.minute, required this.home, required this.playerIn, required this.playerOut});
+  const SheetSubstitutionRow(
+      {required this.minute, required this.home, required this.playerIn, required this.playerOut});
 }
 
 /// Conteúdo do documento da súmula (PDF), montado da partida: escalações
@@ -145,7 +146,8 @@ class MatchReportSheet {
       ],
       substitutions: [
         for (final s in subs)
-          SheetSubstitutionRow(minute: s.minute, home: s.side == MatchSide.home, playerIn: s.inName, playerOut: s.outName),
+          SheetSubstitutionRow(
+              minute: s.minute, home: s.side == MatchSide.home, playerIn: s.inName, playerOut: s.outName),
       ],
     );
   }

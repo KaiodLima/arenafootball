@@ -107,8 +107,7 @@ class MatchGoalsCubit extends Cubit<MatchGoalsState> {
     this.updateMatchGoalsUseCase, [
     this.publishGoalCardsUseCase,
     this.syncLiveMatchCardUseCase,
-  ])
-      : super(const MatchGoalsState());
+  ]) : super(const MatchGoalsState());
 
   void togglePublishCards(bool value) => emit(state.copyWith(publishCards: value));
 
@@ -198,7 +197,8 @@ class MatchGoalsCubit extends Cubit<MatchGoalsState> {
       published = cards.fold((_) => -1, (count) => count);
       final live = syncLiveMatchCardUseCase;
       if (live != null) {
-        final synced = await live(match: response.right, before: match.copyWith(goals: state.original), season: _season);
+        final synced =
+            await live(match: response.right, before: match.copyWith(goals: state.original), season: _season);
         if (isClosed) return;
         if (synced.isLeft) published = -1;
       }

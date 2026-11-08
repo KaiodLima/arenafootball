@@ -41,16 +41,16 @@ class MatchDetailsHeader extends StatelessWidget {
     final chip = status.waiting
         ? l10n.matchCardWaiting
         : status.upcoming && match.delayed
-        ? '${l10n.matchCardDelayed} · ${l10n.matchCardWas(match.originalTime.trim())}'
-        : status.upcoming
-        ? switch (status.dayOffset) {
-            0 => l10n.matchCardToday,
-            1 => l10n.matchCardTomorrow,
-            _ => match.date.trim(),
-          }
-        : status.finished
-            ? l10n.matchDetailsFinished
-            : time;
+            ? '${l10n.matchCardDelayed} · ${l10n.matchCardWas(match.originalTime.trim())}'
+            : status.upcoming
+                ? switch (status.dayOffset) {
+                    0 => l10n.matchCardToday,
+                    1 => l10n.matchCardTomorrow,
+                    _ => match.date.trim(),
+                  }
+                : status.finished
+                    ? l10n.matchDetailsFinished
+                    : time;
     final venue = match.venue.trim();
     final topInset = MediaQuery.paddingOf(context).top + kToolbarHeight;
 
