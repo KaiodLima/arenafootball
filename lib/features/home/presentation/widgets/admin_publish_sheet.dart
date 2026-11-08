@@ -34,19 +34,20 @@ class AdminPublishSheet extends StatelessWidget {
     final partner = this.partner;
     final options = partner != null
         ? [
-            if (partner.canNews) _PublishOption(Icons.article_outlined, l10n.homePublishNews, AppRoutes.registerNewsPage),
+            if (partner.canNews)
+              _PublishOption(Icons.article_outlined, l10n.homePublishNews, AppRoutes.registerNewsPage),
             if (partner.canAdsNow) _PublishOption(Icons.campaign_outlined, l10n.homePublishAd, AppRoutes.publishAdPage),
             if (partner.canHighlightsNow)
               _PublishOption(Icons.star_outline_rounded, l10n.homePublishHighlight, AppRoutes.registerHighlightPage),
           ]
         : [
-      _PublishOption(Icons.article_outlined, l10n.homePublishNews, AppRoutes.registerNewsPage),
-      _PublishOption(Icons.campaign_outlined, l10n.homePublishAd, AppRoutes.publishAdPage),
-      _PublishOption(Icons.star_outline_rounded, l10n.homePublishHighlight, AppRoutes.registerHighlightPage),
-      _PublishOption(Icons.emoji_events_outlined, l10n.homePublishChampionship, AppRoutes.championshipFormPage),
-      _PublishOption(Icons.scoreboard_outlined, l10n.homePublishMatch, AppRoutes.registerMatchPage),
-      _PublishOption(Icons.shield_outlined, l10n.homePublishTeam, AppRoutes.registerTeamPage),
-      _PublishOption(Icons.person_add_alt_outlined, l10n.homePublishPlayer, AppRoutes.registerPlayerPage),
+            _PublishOption(Icons.article_outlined, l10n.homePublishNews, AppRoutes.registerNewsPage),
+            _PublishOption(Icons.campaign_outlined, l10n.homePublishAd, AppRoutes.publishAdPage),
+            _PublishOption(Icons.star_outline_rounded, l10n.homePublishHighlight, AppRoutes.registerHighlightPage),
+            _PublishOption(Icons.emoji_events_outlined, l10n.homePublishChampionship, AppRoutes.championshipFormPage),
+            _PublishOption(Icons.scoreboard_outlined, l10n.homePublishMatch, AppRoutes.registerMatchPage),
+            _PublishOption(Icons.shield_outlined, l10n.homePublishTeam, AppRoutes.registerTeamPage),
+            _PublishOption(Icons.person_add_alt_outlined, l10n.homePublishPlayer, AppRoutes.registerPlayerPage),
           ];
 
     return Padding(

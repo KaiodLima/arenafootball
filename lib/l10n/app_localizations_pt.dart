@@ -3362,6 +3362,27 @@ class AppLocalizationsPt extends AppLocalizations {
   String get drawerOnFieldSection => 'Em campo';
 
   @override
+  String get drawerPlayerHint => 'Peça para jogar num time';
+
+  @override
+  String get drawerPlayerHintApproved => 'Seu perfil e seus números';
+
+  @override
+  String get drawerOwnerHint => 'Cadastre e gerencie seu time';
+
+  @override
+  String get drawerOwnerHintApproved => 'Elenco, pedidos e escudo';
+
+  @override
+  String get drawerPartnerHint => 'Publique na sua região';
+
+  @override
+  String get drawerPartnerHintApproved => 'Suas publicações e vagas';
+
+  @override
+  String get drawerOrganizerHint => 'Monte o seu campeonato';
+
+  @override
   String get pushActionAchievement => 'Conquista desbloqueada';
 
   @override

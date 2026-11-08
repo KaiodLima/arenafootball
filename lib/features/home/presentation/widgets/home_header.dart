@@ -83,19 +83,19 @@ class HomeHeader extends StatelessWidget {
                       OrganizerModeToggle(organizerMode: organizerMode, onTap: onToggleMode)
                     else
                       _CircleButton(
-                      tooltip: l10n.homeOpenMenu,
-                      onTap: onOpenMenu,
-                      child: favoriteTeamImage == null
-                          ? const Icon(Icons.person_outline_rounded, color: AppColors.white)
-                          : ClipOval(
-                              child: CachedNetworkImage(
-                                imageUrl: favoriteTeamImage!,
-                                width: AppSizes.s30,
-                                height: AppSizes.s30,
-                                fit: BoxFit.cover,
+                        tooltip: l10n.homeOpenMenu,
+                        onTap: onOpenMenu,
+                        child: favoriteTeamImage == null
+                            ? const Icon(Icons.person_outline_rounded, color: AppColors.white)
+                            : ClipOval(
+                                child: CachedNetworkImage(
+                                  imageUrl: favoriteTeamImage!,
+                                  width: AppSizes.s30,
+                                  height: AppSizes.s30,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
-                            ),
-                    ),
+                      ),
                   ],
                 ),
               ),
@@ -112,7 +112,8 @@ class HomeHeader extends StatelessWidget {
                       style: AppTypography.title(color: AppColors.white),
                     ),
                     const SizedBox(height: AppSizes.s2),
-                    Text(organizerMode ? l10n.organizerModeSubtitle : l10n.homeSubtitle(region), style: AppTypography.subtitle(color: AppColors.whiteSoft)),
+                    Text(organizerMode ? l10n.organizerModeSubtitle : l10n.homeSubtitle(region),
+                        style: AppTypography.subtitle(color: AppColors.whiteSoft)),
                   ],
                 ),
               ),
@@ -171,7 +172,8 @@ class OrganizerModeToggle extends StatelessWidget {
             color: selected ? AppColors.white : AppColors.transparent,
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, size: AppSizes.s20, color: selected ? ArenaPalette.of(context).primary : AppColors.whiteSoft),
+          child:
+              Icon(icon, size: AppSizes.s20, color: selected ? ArenaPalette.of(context).primary : AppColors.whiteSoft),
         );
 
     return Tooltip(

@@ -3346,6 +3346,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get drawerOnFieldSection => 'On the field';
 
   @override
+  String get drawerPlayerHint => 'Ask to play for a team';
+
+  @override
+  String get drawerPlayerHintApproved => 'Your profile and stats';
+
+  @override
+  String get drawerOwnerHint => 'Register and manage your team';
+
+  @override
+  String get drawerOwnerHintApproved => 'Squad, requests and crest';
+
+  @override
+  String get drawerPartnerHint => 'Publish in your region';
+
+  @override
+  String get drawerPartnerHintApproved => 'Your posts and slots';
+
+  @override
+  String get drawerOrganizerHint => 'Run your own championship';
+
+  @override
   String get pushActionAchievement => 'Achievement unlocked';
 
   @override

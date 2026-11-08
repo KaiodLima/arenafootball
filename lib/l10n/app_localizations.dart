@@ -5459,6 +5459,48 @@ abstract class AppLocalizations {
   /// **'Em campo'**
   String get drawerOnFieldSection;
 
+  /// No description provided for @drawerPlayerHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Peça para jogar num time'**
+  String get drawerPlayerHint;
+
+  /// No description provided for @drawerPlayerHintApproved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu perfil e seus números'**
+  String get drawerPlayerHintApproved;
+
+  /// No description provided for @drawerOwnerHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cadastre e gerencie seu time'**
+  String get drawerOwnerHint;
+
+  /// No description provided for @drawerOwnerHintApproved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Elenco, pedidos e escudo'**
+  String get drawerOwnerHintApproved;
+
+  /// No description provided for @drawerPartnerHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publique na sua região'**
+  String get drawerPartnerHint;
+
+  /// No description provided for @drawerPartnerHintApproved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Suas publicações e vagas'**
+  String get drawerPartnerHintApproved;
+
+  /// No description provided for @drawerOrganizerHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Monte o seu campeonato'**
+  String get drawerOrganizerHint;
+
   /// No description provided for @pushActionAchievement.
   ///
   /// In pt, this message translates to:

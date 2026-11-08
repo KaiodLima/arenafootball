@@ -49,5 +49,6 @@ class HomeState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [tab, favoriteTeamImage, pendingPlayerRequests, pendingTeamRequests, pendingPartnerRequests, pendingPartnerNews];
+  List<Object?> get props =>
+      [tab, favoriteTeamImage, pendingPlayerRequests, pendingTeamRequests, pendingPartnerRequests, pendingPartnerNews];
 }
