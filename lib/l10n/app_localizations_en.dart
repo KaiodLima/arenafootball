@@ -4478,6 +4478,7 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other: '$count games',
       one: '1 game',
+      zero: '0 games',
     );
     return '$_temp0';
   }
@@ -4496,6 +4497,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get standingsYourTeam => 'Your team';
+
+  @override
+  String get standingsLeader => 'Leader';
+
+  @override
+  String get standingsNoGamesYet => 'No games played in this group yet';
+
+  @override
+  String standingsGoalsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count goals',
+      one: '1 goal',
+      zero: '0 goals',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String standingsRecord(int wins, int draws, int losses) {
+    return '${wins}W ${draws}D ${losses}L';
+  }
 
   @override
   String get athletePlaysFor => 'Plays for';
@@ -6108,6 +6132,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statsShortcut => 'Top scorers & assists';
+
+  @override
+  String get statsShortcutGoalsHint => 'Top scorers';
+
+  @override
+  String get statsShortcutAssistsHint => 'Top playmakers';
 
   @override
   String get alertHeaderConfirm => 'Confirm';

@@ -7491,7 +7491,7 @@ abstract class AppLocalizations {
   /// No description provided for @groupsGamesCount.
   ///
   /// In pt, this message translates to:
-  /// **'{count, plural, =1{1 jogo} other{{count} jogos}}'**
+  /// **'{count, plural, =0{0 jogos} =1{1 jogo} other{{count} jogos}}'**
   String groupsGamesCount(int count);
 
   /// No description provided for @standingsQualifiedLegend.
@@ -7523,6 +7523,30 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Seu time'**
   String get standingsYourTeam;
+
+  /// No description provided for @standingsLeader.
+  ///
+  /// In pt, this message translates to:
+  /// **'Líder'**
+  String get standingsLeader;
+
+  /// No description provided for @standingsNoGamesYet.
+  ///
+  /// In pt, this message translates to:
+  /// **'A bola ainda não rolou neste grupo'**
+  String get standingsNoGamesYet;
+
+  /// No description provided for @standingsGoalsCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{0 gols} =1{1 gol} other{{count} gols}}'**
+  String standingsGoalsCount(int count);
+
+  /// No description provided for @standingsRecord.
+  ///
+  /// In pt, this message translates to:
+  /// **'{wins}V {draws}E {losses}D'**
+  String standingsRecord(int wins, int draws, int losses);
 
   /// No description provided for @athletePlaysFor.
   ///
@@ -10109,6 +10133,18 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Artilharia e assistências'**
   String get statsShortcut;
+
+  /// No description provided for @statsShortcutGoalsHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem mais marcou'**
+  String get statsShortcutGoalsHint;
+
+  /// No description provided for @statsShortcutAssistsHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem mais serviu'**
+  String get statsShortcutAssistsHint;
 
   /// No description provided for @alertHeaderConfirm.
   ///

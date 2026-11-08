@@ -4504,6 +4504,7 @@ class AppLocalizationsPt extends AppLocalizations {
       locale: localeName,
       other: '$count jogos',
       one: '1 jogo',
+      zero: '0 jogos',
     );
     return '$_temp0';
   }
@@ -4522,6 +4523,29 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get standingsYourTeam => 'Seu time';
+
+  @override
+  String get standingsLeader => 'Líder';
+
+  @override
+  String get standingsNoGamesYet => 'A bola ainda não rolou neste grupo';
+
+  @override
+  String standingsGoalsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count gols',
+      one: '1 gol',
+      zero: '0 gols',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String standingsRecord(int wins, int draws, int losses) {
+    return '${wins}V ${draws}E ${losses}D';
+  }
 
   @override
   String get athletePlaysFor => 'Atua por';
@@ -6147,6 +6171,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statsShortcut => 'Artilharia e assistências';
+
+  @override
+  String get statsShortcutGoalsHint => 'Quem mais marcou';
+
+  @override
+  String get statsShortcutAssistsHint => 'Quem mais serviu';
 
   @override
   String get alertHeaderConfirm => 'Confirmação';
