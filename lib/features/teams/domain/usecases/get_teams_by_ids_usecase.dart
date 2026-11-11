@@ -9,6 +9,7 @@ class GetTeamsByIdsUseCase {
 
   GetTeamsByIdsUseCase(this._repository);
 
-  Future<Either<Failure, List<TeamDTO>>> call({required List<String> ids, List<String> names = const [], String? season}) =>
+  Future<Either<Failure, List<TeamDTO>>> call(
+          {required List<String> ids, List<String> names = const [], String? season}) =>
       _repository.getTeamsByIds(ids: ids, names: names, season: season);
 }

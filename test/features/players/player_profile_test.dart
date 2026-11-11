@@ -46,7 +46,6 @@ const _all = [
 ];
 
 class _FakePlayers implements IPlayersRepository {
-
   @override
   Future<Either<Failure, PlayerDTO?>> getPlayerByUser({required String userId, String? season}) async =>
       const Right(null);
@@ -377,6 +376,7 @@ class _NoAwards implements GetPlayerAwardsUseCase {
 
 class _NoHistory implements GetPlayerSeasonHistoryUseCase {
   @override
-  Future<Either<Failure, List<PlayerSeasonSummary>>> call({required String userId, required List<String> seasons}) async =>
+  Future<Either<Failure, List<PlayerSeasonSummary>>> call(
+          {required String userId, required List<String> seasons}) async =>
       const Right([]);
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:either_dart/either.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
@@ -47,16 +49,26 @@ class MatchesDataSource {
         );
   }
 
+  /// Gravação na fila do Firestore (sem conexão): a partida sai quando a rede voltar.
+  static const String queuedCode = 'queued-offline';
+  static const Duration offlineTimeout = Duration(seconds: 8);
+
   /// Cria a partida com `id_partida` = id do documento e `dataRegistro` do
   /// servidor, numa escrita só (o app antigo fazia `add()` + `set()`).
   Future<Either<Failure, void>> createMatch(MatchDTO match, {String? season}) async {
     try {
       final ref = _matches(season).doc();
+      // Offline o `set` só termina quando o servidor confirma: depois do
+      // [offlineTimeout] a gravação segue na fila do Firestore e o formulário
+      // é liberado (`queuedCode`), em vez de girar para sempre.
       await ref.set({
         ...match.copyWith(id: ref.id).toMap(),
         'dataRegistro': FieldValue.serverTimestamp(),
-      });
+      }).timeout(offlineTimeout);
       return const Right(null);
+    } on TimeoutException {
+      AppLogger.d('createMatch na fila (sem conexão)', name: _logName);
+      return Left(ErrorWithMessage('Partida salva no aparelho', code: queuedCode));
     } catch (e) {
       AppLogger.e('createMatch', name: _logName, error: e);
       return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível cadastrar a partida.'));

@@ -28,8 +28,9 @@ class PartnerRequestsPanelState extends Equatable {
 
   List<PartnerRequestDTO> get active => requests.where((r) => r.isApproved).toList();
 
-  List<PartnerRequestDTO> get answered =>
-      requests.where((r) => r.status == PlayerRequestStatus.rejected || r.status == PlayerRequestStatus.removed).toList();
+  List<PartnerRequestDTO> get answered => requests
+      .where((r) => r.status == PlayerRequestStatus.rejected || r.status == PlayerRequestStatus.removed)
+      .toList();
 
   /// Nome do parceiro autor de [authorId] (vazio se não achar).
   String partnerName(String authorId) {
@@ -59,7 +60,16 @@ class PartnerRequestsPanelState extends Equatable {
   List<Object?> get props => [requests, busy, loading, highlightTitles, pendingNews];
 }
 
-enum PartnerRequestsNotice { approved, rejected, revoked, permissionsSaved, linked, linksCleared, newsApproved, newsRejected }
+enum PartnerRequestsNotice {
+  approved,
+  rejected,
+  revoked,
+  permissionsSaved,
+  linked,
+  linksCleared,
+  newsApproved,
+  newsRejected
+}
 
 class NoticePartnerRequestsPanelState extends PartnerRequestsPanelState {
   final PartnerRequestsNotice notice;
@@ -68,8 +78,14 @@ class NoticePartnerRequestsPanelState extends PartnerRequestsPanelState {
   /// Destaques vinculados ([PartnerRequestsNotice.linked]).
   final int count;
 
-  NoticePartnerRequestsPanelState(PartnerRequestsPanelState from, {required this.notice, this.name = '', this.count = 0})
-      : super(requests: from.requests, busy: from.busy, loading: from.loading, highlightTitles: from.highlightTitles, pendingNews: from.pendingNews);
+  NoticePartnerRequestsPanelState(PartnerRequestsPanelState from,
+      {required this.notice, this.name = '', this.count = 0})
+      : super(
+            requests: from.requests,
+            busy: from.busy,
+            loading: from.loading,
+            highlightTitles: from.highlightTitles,
+            pendingNews: from.pendingNews);
 
   @override
   List<Object?> get props => [...super.props, notice, name, count];
@@ -79,7 +95,12 @@ class ErrorPartnerRequestsPanelState extends PartnerRequestsPanelState {
   final String errorMessage;
 
   ErrorPartnerRequestsPanelState(PartnerRequestsPanelState from, {required this.errorMessage})
-      : super(requests: from.requests, busy: from.busy, loading: false, highlightTitles: from.highlightTitles, pendingNews: from.pendingNews);
+      : super(
+            requests: from.requests,
+            busy: from.busy,
+            loading: false,
+            highlightTitles: from.highlightTitles,
+            pendingNews: from.pendingNews);
 
   @override
   List<Object?> get props => [...super.props, errorMessage];

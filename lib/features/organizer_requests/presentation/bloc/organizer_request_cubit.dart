@@ -119,8 +119,7 @@ class OrganizerRequestCubit extends Cubit<OrganizerRequestState> {
     ));
   }
 
-  void _updateForm(OrganizerRequestForm form) =>
-      _emitReady(request: state.request, form: form, editing: state.editing);
+  void _updateForm(OrganizerRequestForm form) => _emitReady(request: state.request, form: form, editing: state.editing);
 
   /// Corrige o pendente ou reenvia o rejeitado (com os dados dele).
   void startEditing() {

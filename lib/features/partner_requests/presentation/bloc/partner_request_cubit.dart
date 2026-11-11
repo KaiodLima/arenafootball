@@ -250,9 +250,8 @@ class PartnerRequestCubit extends Cubit<PartnerRequestState> {
       contact: form.contact,
       message: form.message,
       // Só os que continuam sem dono.
-      claimedHighlightIds: form.claimedHighlightIds
-          .where((id) => state.unlinkedHighlights.any((h) => h.id == id))
-          .toList(),
+      claimedHighlightIds:
+          form.claimedHighlightIds.where((id) => state.unlinkedHighlights.any((h) => h.id == id)).toList(),
     ));
     if (isClosed) return;
     response.fold(

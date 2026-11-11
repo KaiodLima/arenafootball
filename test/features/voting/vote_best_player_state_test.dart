@@ -34,7 +34,8 @@ void main() {
   });
 
   test('sem voto gravado nada é "meu voto"', () {
-    const state = VoteBestPlayerState(homePlayers: _home, selected: PlayerDTO(id: '1', name: 'João Pedro', team: 'Lava Jato'));
+    const state =
+        VoteBestPlayerState(homePlayers: _home, selected: PlayerDTO(id: '1', name: 'João Pedro', team: 'Lava Jato'));
     expect(state.isMyVote(_home[0]), isFalse);
     expect(state.selectedIsMyVote, isFalse);
   });

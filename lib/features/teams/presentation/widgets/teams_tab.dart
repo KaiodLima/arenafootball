@@ -46,9 +46,16 @@ class _TeamsListState extends State<_TeamsList> {
     final l10n = AppLocalizations.of(context);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      sl<TourService>().show(context, TourIds.teams, () => [
-            TourStep(target: _firstTeam, icon: Icons.shield_rounded, title: l10n.tourTeamsTitle, body: l10n.tourTeamsBody),
-          ]);
+      sl<TourService>().show(
+          context,
+          TourIds.teams,
+          () => [
+                TourStep(
+                    target: _firstTeam,
+                    icon: Icons.shield_rounded,
+                    title: l10n.tourTeamsTitle,
+                    body: l10n.tourTeamsBody),
+              ]);
     });
   }
 

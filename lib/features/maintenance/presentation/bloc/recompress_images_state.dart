@@ -8,7 +8,8 @@ class RecompressImagesState extends Equatable {
   /// Gravando o pedido.
   final bool requesting;
 
-  const RecompressImagesState({this.status = const RecompressStatusDTO(), this.loading = true, this.requesting = false});
+  const RecompressImagesState(
+      {this.status = const RecompressStatusDTO(), this.loading = true, this.requesting = false});
 
   RecompressImagesState copyWith({RecompressStatusDTO? status, bool? loading, bool? requesting}) {
     return RecompressImagesState(

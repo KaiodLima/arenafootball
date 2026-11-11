@@ -122,8 +122,8 @@ void main() {
       expect(finished.homeTeam, 'FC Ingolstadt');
       expect(finished.awayTeam, 'Wehen Wiesbaden');
       expect([finished.homeGoals, finished.awayGoals], [2, 4]);
-      expect(finished.detailsUrl,
-          'https://www.soccerstats.com/round_details.asp?league=germany3&mrevid=m77&st1=11&st2=7');
+      expect(
+          finished.detailsUrl, 'https://www.soccerstats.com/round_details.asp?league=germany3&mrevid=m77&st1=11&st2=7');
       expect(rows[5].homeGoals, isNull);
       expect(rows[5].detailsUrl, isEmpty);
     });

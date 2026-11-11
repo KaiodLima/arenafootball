@@ -604,6 +604,60 @@
   "organizerGroupsLoadError": "Não foi possível carregar os grupos.",
   "organizerGroupNew": "Novo grupo",
   "organizerGroupEdit": "Editar grupo",
+  "groupRulesTitle": "Regras do grupo",
+  "groupRulesQualified": "Classificados",
+  "groupRulesQualifiedHint": "Os primeiros colocados que avançam",
+  "groupRulesNextPhase": "Nome da próxima fase (opcional)",
+  "groupRulesPlayoff": "Repescagem",
+  "groupRulesPlayoffHint": "Os seguintes, que disputam a repescagem",
+  "groupRulesEliminated": "Eliminados",
+  "groupRulesEliminatedHint": "Os últimos colocados",
+  "groupRulesHomeAndAway": "Ida e volta",
+  "groupRulesHomeAndAwayHint": "Cada time enfrenta o outro duas vezes",
+  "groupRulesApplyAll": "Aplicar a todos os grupos",
+  "groupRulesExceeds": "A soma das faixas passa do total de times do grupo ({total}).",
+  "@groupRulesExceeds": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "groupRulesSaved": "Regras salvas",
+  "groupRulesSummaryQualified": "{count, plural, =1{1 classifica} other{{count} classificam}}",
+  "@groupRulesSummaryQualified": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "groupRulesSummaryPlayoff": "{count} na repescagem",
+  "@groupRulesSummaryPlayoff": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "groupRulesSummaryEliminated": "{count, plural, =1{1 eliminado} other{{count} eliminados}}",
+  "@groupRulesSummaryEliminated": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "standingsQualifiedFor": "Classificados para a {phase}",
+  "@standingsQualifiedFor": {
+    "placeholders": {
+      "phase": {
+        "type": "String"
+      }
+    }
+  },
+  "standingsPlayoffLegend": "Repescagem",
+  "standingsEliminatedLegend": "Eliminados",
   "organizerGroupName": "Nome do grupo",
   "organizerGroupNameRequired": "Informe o nome do grupo.",
   "organizerGroupLabel": "Grupo {name}",
@@ -1557,6 +1611,26 @@
     }
   },
   "matchFormSaved": "Partida cadastrada! Escolha os times da próxima.",
+  "matchFormSavedOffline": "Sem conexão: a partida foi salva no aparelho e será enviada quando a internet voltar.",
+  "matchFormDuplicateTitle": "Partida repetida?",
+  "matchFormDuplicateMessage": "Já existe {home} × {away} em {date} às {time}. Cadastrar mesmo assim?",
+  "@matchFormDuplicateMessage": {
+    "placeholders": {
+      "home": {
+        "type": "String"
+      },
+      "away": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "matchFormDuplicateConfirm": "Cadastrar mesmo assim",
   "championshipsEmpty": "Nenhuma competição registrada",
   "championshipsLoadError": "Não foi possível carregar as competições.",
   "championshipsDetailsTitle": "Sobre a Competição:",

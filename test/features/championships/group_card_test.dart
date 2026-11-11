@@ -11,6 +11,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/data/dtos/group_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/group_table_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/standing_dto.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/championship_groups_usecases.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/watch_group_table_usecase.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/watch_groups_usecase.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/groups_cubit.dart';
@@ -74,11 +75,47 @@ class _FakeTable implements WatchGroupTableUseCase {
   }
 }
 
+class _FakeChampionshipGroups implements WatchChampionshipGroupsUseCase {
+  final List<GroupDTO> groups;
+  _FakeChampionshipGroups(this.groups);
+
+  @override
+  Stream<Either<Failure, List<GroupDTO>>> call({required int championshipId, String? season}) => Stream.value(Right([
+        for (final g in groups)
+          if (g.championshipId == championshipId) g
+      ]));
+}
+
 void main() {
   test('selo do grupo: a letra', () {
     expect(GroupCard.badgeOf('A'), 'A');
     expect(GroupCard.badgeOf('Grupo B'), 'B');
     expect(GroupCard.badgeOf('Ouro'), 'O');
+  });
+
+  test('grupos do campeonato: os dele ordenados; sem grupos, legado só em temporada antiga', () {
+    const b = GroupDTO(id: 'b', description: 'B', championshipId: 7);
+    const aa = GroupDTO(id: 'a', description: 'A', championshipId: 7);
+    const other = GroupDTO(id: 'o', description: 'A', championshipId: 9);
+    const legacy = GroupDTO(id: 'l', description: 'A');
+    expect(GroupsCubit.resolve(own: const [b, aa], region: const []).map((g) => g.id), ['a', 'b']);
+    expect(GroupsCubit.resolve(own: const [], region: const [other, legacy]), isEmpty,
+        reason: 'campeonato novo sem grupos não mostra os de outro');
+    expect(GroupsCubit.resolve(own: const [], region: const [legacy]).single.id, 'l');
+  });
+
+  test('cubit: busca pelo campeonato (sede em outra região também)', () async {
+    final cubit = GroupsCubit(
+      _FakeGroups(const []),
+      _FakeTeams(),
+      _FakeTable(),
+      _FakeChampionshipGroups([_group]),
+    );
+    cubit.watch(region: 'Outra', season: '2026', championshipId: 7);
+    await Future<void>.delayed(Duration.zero);
+    await Future<void>.delayed(Duration.zero);
+    expect(cubit.state.groups.single.id, 'g1');
+    await cubit.close();
   });
 
   test('cubit: escuta a tabela só dos grupos de campeonato e guarda por id', () async {

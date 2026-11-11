@@ -64,7 +64,8 @@ class HighlightsDataSource {
   /// Atualiza o destaque. Renomeado ([oldTitle] diferente), as notícias
   /// marcadas com o título antigo passam para o novo ([newsAuthorId]: só as
   /// desse autor, quando quem edita é o parceiro).
-  Future<Either<Failure, void>> updateHighlight(HighlightDTO highlight, {String? oldTitle, String? newsAuthorId}) async {
+  Future<Either<Failure, void>> updateHighlight(HighlightDTO highlight,
+      {String? oldTitle, String? newsAuthorId}) async {
     try {
       final writes = <void Function(WriteBatch)>[
         (batch) => batch.update(_highlights.doc(highlight.id), highlight.toMap()),

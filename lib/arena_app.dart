@@ -37,6 +37,7 @@ import 'package:arena_soccer/features/auth/presentation/page/choose_team_page.da
 import 'package:arena_soccer/features/auth/presentation/page/login_page.dart';
 import 'package:arena_soccer/features/auth/presentation/page/register_user_page.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/championships/data/dtos/group_rules.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/championship_details_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/championship_form_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/groups_cubit.dart';
@@ -526,7 +527,7 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.groupsPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<GroupsCubit>(
-            create: (_) => GroupsCubit(sl(), sl(), sl()),
+            create: (_) => GroupsCubit(sl(), sl(), sl(), sl()),
             child: GroupsPage(
               region: args?['region'] as String?,
               season: args?['season'] as String?,
@@ -543,6 +544,7 @@ class ArenaApp extends StatelessWidget {
               season: args?['season'] as String,
               group: args?['group'] as String,
               groupId: args?['groupId'] as String? ?? '',
+              rules: args?['rules'] as GroupRules? ?? GroupRules.standard,
             ),
           );
         },

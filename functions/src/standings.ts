@@ -45,9 +45,22 @@ export interface GroupTeam {
   name: string;
 }
 
-/** Times do grupo (`time1-4` / `idTime1-4`), sem as vagas vazias. */
+/**
+ * Times do grupo, sem as vagas vazias: as listas `idsTimes`/`times` (grupos
+ * de qualquer tamanho) ou, nos grupos antigos, `time1-4` / `idTime1-4`.
+ */
 export function groupTeams(group: Doc): GroupTeam[] {
   const teams: GroupTeam[] = [];
+  if (Array.isArray(group.times) || Array.isArray(group.idsTimes)) {
+    const names = Array.isArray(group.times) ? group.times : [];
+    const ids = Array.isArray(group.idsTimes) ? group.idsTimes : [];
+    for (let i = 0; i < Math.max(names.length, ids.length); i++) {
+      const id = text(ids[i]);
+      const name = text(names[i]);
+      if (id || name) teams.push({ id, name });
+    }
+    return teams;
+  }
   for (let i = 1; i <= 4; i++) {
     const id = text(group[`idTime${i}`]);
     const name = text(group[`time${i}`]);

@@ -1350,6 +1350,86 @@ class AppLocalizationsPt extends AppLocalizations {
   String get organizerGroupEdit => 'Editar grupo';
 
   @override
+  String get groupRulesTitle => 'Regras do grupo';
+
+  @override
+  String get groupRulesQualified => 'Classificados';
+
+  @override
+  String get groupRulesQualifiedHint => 'Os primeiros colocados que avançam';
+
+  @override
+  String get groupRulesNextPhase => 'Nome da próxima fase (opcional)';
+
+  @override
+  String get groupRulesPlayoff => 'Repescagem';
+
+  @override
+  String get groupRulesPlayoffHint => 'Os seguintes, que disputam a repescagem';
+
+  @override
+  String get groupRulesEliminated => 'Eliminados';
+
+  @override
+  String get groupRulesEliminatedHint => 'Os últimos colocados';
+
+  @override
+  String get groupRulesHomeAndAway => 'Ida e volta';
+
+  @override
+  String get groupRulesHomeAndAwayHint =>
+      'Cada time enfrenta o outro duas vezes';
+
+  @override
+  String get groupRulesApplyAll => 'Aplicar a todos os grupos';
+
+  @override
+  String groupRulesExceeds(int total) {
+    return 'A soma das faixas passa do total de times do grupo ($total).';
+  }
+
+  @override
+  String get groupRulesSaved => 'Regras salvas';
+
+  @override
+  String groupRulesSummaryQualified(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count classificam',
+      one: '1 classifica',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String groupRulesSummaryPlayoff(int count) {
+    return '$count na repescagem';
+  }
+
+  @override
+  String groupRulesSummaryEliminated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count eliminados',
+      one: '1 eliminado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String standingsQualifiedFor(String phase) {
+    return 'Classificados para a $phase';
+  }
+
+  @override
+  String get standingsPlayoffLegend => 'Repescagem';
+
+  @override
+  String get standingsEliminatedLegend => 'Eliminados';
+
+  @override
   String get organizerGroupName => 'Nome do grupo';
 
   @override
@@ -3968,6 +4048,22 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get matchFormSaved =>
       'Partida cadastrada! Escolha os times da próxima.';
+
+  @override
+  String get matchFormSavedOffline =>
+      'Sem conexão: a partida foi salva no aparelho e será enviada quando a internet voltar.';
+
+  @override
+  String get matchFormDuplicateTitle => 'Partida repetida?';
+
+  @override
+  String matchFormDuplicateMessage(
+      String home, String away, String date, String time) {
+    return 'Já existe $home × $away em $date às $time. Cadastrar mesmo assim?';
+  }
+
+  @override
+  String get matchFormDuplicateConfirm => 'Cadastrar mesmo assim';
 
   @override
   String get championshipsEmpty => 'Nenhuma competição registrada';

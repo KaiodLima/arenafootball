@@ -2307,6 +2307,120 @@ abstract class AppLocalizations {
   /// **'Editar grupo'**
   String get organizerGroupEdit;
 
+  /// No description provided for @groupRulesTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Regras do grupo'**
+  String get groupRulesTitle;
+
+  /// No description provided for @groupRulesQualified.
+  ///
+  /// In pt, this message translates to:
+  /// **'Classificados'**
+  String get groupRulesQualified;
+
+  /// No description provided for @groupRulesQualifiedHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os primeiros colocados que avançam'**
+  String get groupRulesQualifiedHint;
+
+  /// No description provided for @groupRulesNextPhase.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome da próxima fase (opcional)'**
+  String get groupRulesNextPhase;
+
+  /// No description provided for @groupRulesPlayoff.
+  ///
+  /// In pt, this message translates to:
+  /// **'Repescagem'**
+  String get groupRulesPlayoff;
+
+  /// No description provided for @groupRulesPlayoffHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os seguintes, que disputam a repescagem'**
+  String get groupRulesPlayoffHint;
+
+  /// No description provided for @groupRulesEliminated.
+  ///
+  /// In pt, this message translates to:
+  /// **'Eliminados'**
+  String get groupRulesEliminated;
+
+  /// No description provided for @groupRulesEliminatedHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os últimos colocados'**
+  String get groupRulesEliminatedHint;
+
+  /// No description provided for @groupRulesHomeAndAway.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ida e volta'**
+  String get groupRulesHomeAndAway;
+
+  /// No description provided for @groupRulesHomeAndAwayHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cada time enfrenta o outro duas vezes'**
+  String get groupRulesHomeAndAwayHint;
+
+  /// No description provided for @groupRulesApplyAll.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aplicar a todos os grupos'**
+  String get groupRulesApplyAll;
+
+  /// No description provided for @groupRulesExceeds.
+  ///
+  /// In pt, this message translates to:
+  /// **'A soma das faixas passa do total de times do grupo ({total}).'**
+  String groupRulesExceeds(int total);
+
+  /// No description provided for @groupRulesSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Regras salvas'**
+  String get groupRulesSaved;
+
+  /// No description provided for @groupRulesSummaryQualified.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 classifica} other{{count} classificam}}'**
+  String groupRulesSummaryQualified(int count);
+
+  /// No description provided for @groupRulesSummaryPlayoff.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} na repescagem'**
+  String groupRulesSummaryPlayoff(int count);
+
+  /// No description provided for @groupRulesSummaryEliminated.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 eliminado} other{{count} eliminados}}'**
+  String groupRulesSummaryEliminated(int count);
+
+  /// No description provided for @standingsQualifiedFor.
+  ///
+  /// In pt, this message translates to:
+  /// **'Classificados para a {phase}'**
+  String standingsQualifiedFor(String phase);
+
+  /// No description provided for @standingsPlayoffLegend.
+  ///
+  /// In pt, this message translates to:
+  /// **'Repescagem'**
+  String get standingsPlayoffLegend;
+
+  /// No description provided for @standingsEliminatedLegend.
+  ///
+  /// In pt, this message translates to:
+  /// **'Eliminados'**
+  String get standingsEliminatedLegend;
+
   /// No description provided for @organizerGroupName.
   ///
   /// In pt, this message translates to:
@@ -6556,6 +6670,31 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Partida cadastrada! Escolha os times da próxima.'**
   String get matchFormSaved;
+
+  /// No description provided for @matchFormSavedOffline.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem conexão: a partida foi salva no aparelho e será enviada quando a internet voltar.'**
+  String get matchFormSavedOffline;
+
+  /// No description provided for @matchFormDuplicateTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Partida repetida?'**
+  String get matchFormDuplicateTitle;
+
+  /// No description provided for @matchFormDuplicateMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Já existe {home} × {away} em {date} às {time}. Cadastrar mesmo assim?'**
+  String matchFormDuplicateMessage(
+      String home, String away, String date, String time);
+
+  /// No description provided for @matchFormDuplicateConfirm.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cadastrar mesmo assim'**
+  String get matchFormDuplicateConfirm;
 
   /// No description provided for @championshipsEmpty.
   ///

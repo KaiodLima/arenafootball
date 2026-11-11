@@ -8,6 +8,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/group_dto.dart';
+import 'package:arena_soccer/features/championships/data/dtos/group_rules.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/championship_groups_usecases.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_teams_cubit.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
@@ -62,7 +63,8 @@ class OrganizerGroupsState extends Equatable {
     return groupLetter(i);
   }
 
-  OrganizerGroupsState copyWith({bool? loading, bool? error, List<GroupDTO>? groups, List<TeamDTO>? teams, bool? busy}) =>
+  OrganizerGroupsState copyWith(
+          {bool? loading, bool? error, List<GroupDTO>? groups, List<TeamDTO>? teams, bool? busy}) =>
       OrganizerGroupsState(
         loading: loading ?? this.loading,
         error: error ?? this.error,
@@ -76,7 +78,8 @@ class OrganizerGroupsState extends Equatable {
 }
 
 /// Chave de comparação do time: o id ou, sem id, o nome normalizado.
-String teamKey({required String id, required String name}) => id.isNotEmpty ? 'id:$id' : 'nome:${normalizeTeamName(name)}';
+String teamKey({required String id, required String name}) =>
+    id.isNotEmpty ? 'id:$id' : 'nome:${normalizeTeamName(name)}';
 
 /// Grupos de um campeonato do organizador: lista ao vivo, criar/editar,
 /// apagar e sortear.
@@ -136,14 +139,27 @@ class OrganizerGroupsCubit extends Cubit<OrganizerGroupsState> {
         teamIds: group.teamIds,
         championshipId: _championship.championshipId,
         championshipDocId: _championship.id,
+        rules: group.rules,
       );
 
-  static GroupDTO groupOf(String name, List<TeamDTO> teams, {String id = ''}) => GroupDTO(
+  static GroupDTO groupOf(String name, List<TeamDTO> teams, {String id = '', GroupRules rules = GroupRules.standard}) =>
+      GroupDTO(
         id: id,
         description: name,
         teams: [for (final t in teams) t.name],
         teamIds: [for (final t in teams) t.id],
+        rules: rules,
       );
+
+  /// Grava as [rules] no grupo [group] ou, com [toAll], em todos os grupos.
+  Future<Either<Failure, void>> saveRules(GroupDTO group, GroupRules rules, {bool toAll = false}) => _busy(() async {
+        final targets = toAll ? state.groups : [group];
+        for (final g in targets) {
+          final response = await saveGroupUseCase(_complete(g.copyWith(rules: rules)), season: _season);
+          if (response.isLeft) return response;
+        }
+        return const Right(null);
+      });
 
   Future<Either<Failure, void>> save(GroupDTO group) =>
       _busy(() => saveGroupUseCase(_complete(group), season: _season));
@@ -153,7 +169,11 @@ class OrganizerGroupsCubit extends Cubit<OrganizerGroupsState> {
   /// Sorteia os inscritos em [count] grupos (A, B...) e troca os atuais.
   Future<Either<Failure, void>> draw(int count, {Random? random}) {
     final drawn = drawGroups(state.teams, count, random: random);
-    final groups = [for (var i = 0; i < drawn.length; i++) _complete(groupOf(groupLetter(i), drawn[i]))];
+    // O sorteio mantém as regras que os grupos já tinham.
+    final rules = state.groups.firstOrNull?.rules ?? GroupRules.standard;
+    final groups = [
+      for (var i = 0; i < drawn.length; i++) _complete(groupOf(groupLetter(i), drawn[i], rules: rules)),
+    ];
     return _busy(() => replaceGroupsUseCase(previous: state.groups, groups: groups, season: _season));
   }
 

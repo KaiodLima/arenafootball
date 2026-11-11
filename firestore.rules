@@ -539,10 +539,28 @@ service cloud.firestore {
           && champ != null && champ.data.get('idOrganizador', '') == request.auth.uid
           && data.get('fk_campeonato', -1) == champ.data.get('id_campeonato', -2);
       }
+      // Regras do grupo: classificados, repescagem e eliminados (0..20),
+      // nome da próxima fase (até 30) e ida e volta.
+      function validGroupRules(r) {
+        return r is map
+          && r.keys().hasOnly(['classificados', 'proximaFase', 'repescagem', 'eliminados', 'idaVolta'])
+          && r.get('classificados', 0) is int && r.get('classificados', 0) >= 0 && r.get('classificados', 0) <= 20
+          && r.get('repescagem', 0) is int && r.get('repescagem', 0) >= 0 && r.get('repescagem', 0) <= 20
+          && r.get('eliminados', 0) is int && r.get('eliminados', 0) >= 0 && r.get('eliminados', 0) <= 20
+          && r.get('proximaFase', '') is string && r.get('proximaFase', '').size() <= 30
+          && r.get('idaVolta', false) is bool;
+      }
       function organizerGroupWrite() {
         return organizerGroup(request.resource.data)
           && request.resource.data.keys().hasOnly(['descricao', 'fk_competicao', 'idRegiao', 'time1', 'time2',
-            'time3', 'time4', 'idTime1', 'idTime2', 'idTime3', 'idTime4', 'fk_campeonato', 'idCampeonatoDoc'])
+            'time3', 'time4', 'idTime1', 'idTime2', 'idTime3', 'idTime4', 'fk_campeonato', 'idCampeonatoDoc',
+            'times', 'idsTimes', 'regras'])
+          // Grupos de qualquer tamanho, até 20 times.
+          && (!('times' in request.resource.data)
+            || (request.resource.data.times is list && request.resource.data.times.size() <= 20))
+          && (!('idsTimes' in request.resource.data)
+            || (request.resource.data.idsTimes is list && request.resource.data.idsTimes.size() <= 20))
+          && (!('regras' in request.resource.data) || validGroupRules(request.resource.data.regras))
           && request.resource.data.descricao is string && request.resource.data.descricao.size() <= 30;
       }
 

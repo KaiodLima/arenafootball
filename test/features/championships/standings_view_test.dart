@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:arena_soccer/features/championships/data/dtos/group_rules.dart';
 import 'package:arena_soccer/features/championships/data/dtos/standing_dto.dart';
 import 'package:arena_soccer/features/championships/presentation/page/standings_page.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/standings_table.dart';
@@ -37,12 +38,20 @@ const _unplayed = [
 
 void main() {
   test('cor da posição: 1º dourado, classificados verdes, demais cinza', () {
-    expect(standingsPositionColor(1, true), AppColors.gold);
-    expect(standingsPositionColor(2, true), AppColors.primary);
-    expect(standingsPositionColor(3, false), AppColors.background);
+    expect(standingsPositionColor(1, GroupZone.qualified), AppColors.gold);
+    expect(standingsPositionColor(2, GroupZone.qualified), AppColors.primary);
+    expect(standingsPositionColor(3, GroupZone.playoff), AppColors.warning);
+    expect(standingsPositionColor(4, GroupZone.eliminated), AppColors.danger);
+    expect(standingsPositionColor(3, GroupZone.none), AppColors.background);
   });
 
-  Future<void> pump(WidgetTester tester, List<StandingDTO> standings, {GlobalKey? key, String? legend}) async {
+  Future<void> pump(
+    WidgetTester tester,
+    List<StandingDTO> standings, {
+    GlobalKey? key,
+    String? legend,
+    GroupRules rules = GroupRules.standard,
+  }) async {
     tester.view.physicalSize = const Size(392, 900);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -60,7 +69,7 @@ void main() {
             child: StandingsBody(
               group: 'A',
               standings: standings,
-              qualifiedCount: 2,
+              rules: rules,
               isFavorite: (s) => s.id == 't3',
               automaticLegend: legend,
             ),
@@ -84,6 +93,32 @@ void main() {
     await tester.tap(find.text('Mulekada'));
     await tester.pumpAndSettle();
     expect(find.text('Aproveitamento'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  test('regras do grupo: faixas, corte no total e padrão sem o campo', () {
+    expect(GroupRules.fromMap(null), GroupRules.standard);
+    expect(GroupRules.fromMap(null).qualified, 2);
+    const rules = GroupRules(qualified: 2, playoff: 1, eliminated: 1);
+    expect([for (var p = 1; p <= 5; p++) rules.zoneOf(p, 5)],
+        [GroupZone.qualified, GroupZone.qualified, GroupZone.playoff, GroupZone.none, GroupZone.eliminated]);
+    expect(const GroupRules(qualified: 4, eliminated: 2).zoneOf(3, 4), GroupZone.qualified, reason: 'verde vence');
+    expect(const GroupRules(qualified: 3, playoff: 2).exceeds(4), isTrue);
+    expect(const GroupRules(qualified: 0).hasAny, isFalse);
+    final map = const GroupRules(qualified: 1, nextPhase: 'Final', homeAndAway: true).toMap();
+    expect(GroupRules.fromMap(map), const GroupRules(qualified: 1, nextPhase: 'Final', homeAndAway: true));
+  });
+
+  testWidgets('regras ativas aparecem na legenda; desligadas não', (tester) async {
+    await pump(tester, _played,
+        rules: const GroupRules(qualified: 2, nextPhase: 'Semifinal', eliminated: 1, homeAndAway: true));
+    expect(find.text('Classificados para a Semifinal'), findsOneWidget);
+    expect(find.text('Eliminados'), findsOneWidget);
+    expect(find.text('Repescagem'), findsNothing);
+    expect(find.text('IDA E VOLTA'), findsOneWidget);
+    await pump(tester, _played, rules: const GroupRules(qualified: 0));
+    expect(find.textContaining('Classificados'), findsNothing);
+    expect(find.text('IDA E VOLTA'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 

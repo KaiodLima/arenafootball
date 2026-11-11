@@ -18,7 +18,7 @@ void main() {
     final all = groups.expand((g) => g).map((t) => t.id).toList();
     expect(all.toSet(), teams.map((t) => t.id).toSet());
     expect(all, hasLength(10));
-    expect(groups.map((g) => g.length), everyElement(lessThanOrEqualTo(GroupDTO.maxTeams)));
+    expect(groups.map((g) => g.length), everyElement(lessThanOrEqualTo(GroupDTO.teamLimit)));
     final sizes = groups.map((g) => g.length);
     expect(sizes.reduce(max) - sizes.reduce(min), lessThanOrEqualTo(1));
   });
@@ -26,9 +26,9 @@ void main() {
   test('quantidades de grupos possíveis', () {
     expect(groupCountOptions(1), isEmpty);
     expect(groupCountOptions(4), [1, 2]);
-    expect(groupCountOptions(10), [3, 4, 5]);
-    expect(groupCountOptions(40), [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
-    expect(groupCountOptions(20), [5, 6, 7, 8, 9, 10]);
+    expect(groupCountOptions(10), [1, 2, 3, 4, 5]);
+    expect(groupCountOptions(40), [for (var n = 2; n <= 20; n++) n]);
+    expect(groupCountOptions(20), [for (var n = 1; n <= 10; n++) n]);
   });
 
   test('nomes: A, B... e o próximo livre', () {
@@ -74,5 +74,22 @@ void main() {
     ];
     expect(rosterChipChampionships(all, null), all);
     expect(rosterChipChampionships(all, 8).map((c) => c.id), ['b']);
+  });
+
+  test('grupo sem limite de 4: 10 times em 1 grupo e o DTO grava listas + campos antigos', () {
+    expect(groupCountOptions(10).first, 1);
+    final teams = [for (var i = 0; i < 10; i++) TeamDTO(id: 't$i', name: 'Time $i')];
+    final one = drawGroups(teams, 1, random: Random(1));
+    expect(one.single.length, 10);
+    final group = GroupDTO(
+      id: 'g',
+      description: 'A',
+      teams: [for (final t in teams) t.name],
+      teamIds: [for (final t in teams) t.id],
+    );
+    final map = group.toMap();
+    expect((map['times'] as List).length, 10);
+    expect(map['time4'], 'Time 3');
+    expect(map.containsKey('time5'), isFalse);
   });
 }

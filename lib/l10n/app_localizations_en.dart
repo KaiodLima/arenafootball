@@ -1346,6 +1346,85 @@ class AppLocalizationsEn extends AppLocalizations {
   String get organizerGroupEdit => 'Edit group';
 
   @override
+  String get groupRulesTitle => 'Group rules';
+
+  @override
+  String get groupRulesQualified => 'Qualified';
+
+  @override
+  String get groupRulesQualifiedHint => 'Top teams that advance';
+
+  @override
+  String get groupRulesNextPhase => 'Next stage name (optional)';
+
+  @override
+  String get groupRulesPlayoff => 'Playoff';
+
+  @override
+  String get groupRulesPlayoffHint => 'The next ones, who go to a playoff';
+
+  @override
+  String get groupRulesEliminated => 'Eliminated';
+
+  @override
+  String get groupRulesEliminatedHint => 'The bottom teams';
+
+  @override
+  String get groupRulesHomeAndAway => 'Home and away';
+
+  @override
+  String get groupRulesHomeAndAwayHint => 'Each team plays the others twice';
+
+  @override
+  String get groupRulesApplyAll => 'Apply to all groups';
+
+  @override
+  String groupRulesExceeds(int total) {
+    return 'The zones add up to more than the group\'s teams ($total).';
+  }
+
+  @override
+  String get groupRulesSaved => 'Rules saved';
+
+  @override
+  String groupRulesSummaryQualified(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count qualify',
+      one: '1 qualifies',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String groupRulesSummaryPlayoff(int count) {
+    return '$count in the playoff';
+  }
+
+  @override
+  String groupRulesSummaryEliminated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count eliminated',
+      one: '1 eliminated',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String standingsQualifiedFor(String phase) {
+    return 'Qualified for the $phase';
+  }
+
+  @override
+  String get standingsPlayoffLegend => 'Playoff';
+
+  @override
+  String get standingsEliminatedLegend => 'Eliminated';
+
+  @override
   String get organizerGroupName => 'Group name';
 
   @override
@@ -3950,6 +4029,22 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get matchFormSaved =>
       'Match created! Choose the teams for the next one.';
+
+  @override
+  String get matchFormSavedOffline =>
+      'No connection: the match was saved on this device and will be sent when you\'re back online.';
+
+  @override
+  String get matchFormDuplicateTitle => 'Duplicate match?';
+
+  @override
+  String matchFormDuplicateMessage(
+      String home, String away, String date, String time) {
+    return '$home × $away on $date at $time already exists. Register anyway?';
+  }
+
+  @override
+  String get matchFormDuplicateConfirm => 'Register anyway';
 
   @override
   String get championshipsEmpty => 'No competitions registered';

@@ -91,7 +91,8 @@ class PartnerRequestState extends Equatable {
   bool get showForm => request == null || editing;
 
   @override
-  List<Object?> get props => [request, form, editing, slots?.takenHighlights, slots?.takenAds, highlights, unlinkedHighlights, pendingNews];
+  List<Object?> get props =>
+      [request, form, editing, slots?.takenHighlights, slots?.takenAds, highlights, unlinkedHighlights, pendingNews];
 }
 
 class LoadingPartnerRequestState extends PartnerRequestState {

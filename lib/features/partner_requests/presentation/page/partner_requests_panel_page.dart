@@ -404,7 +404,8 @@ class _RequestCard extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(AppSizes.s10),
-              decoration: BoxDecoration(color: AppColors.primarySoft, borderRadius: BorderRadius.circular(AppSizes.s12)),
+              decoration:
+                  BoxDecoration(color: AppColors.primarySoft, borderRadius: BorderRadius.circular(AppSizes.s12)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

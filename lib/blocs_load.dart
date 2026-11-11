@@ -56,7 +56,7 @@ class BlocsLoad extends StatelessWidget {
 
         // Organizador de campeonato aprovado — global: o toggle torcedor/organizador
         // da home e as abas só com os campeonatos dele.
-        BlocProvider<OrganizerModeCubit>(create: (_) => OrganizerModeCubit(sl(), sl(), sl())),
+        BlocProvider<OrganizerModeCubit>(create: (_) => OrganizerModeCubit(sl(), sl(), sl(), sl())),
 
         // Álbum de figurinhas (evento do admin) — global: o selo flutuante da
         // home e o pacotinho do dia da conta.
@@ -86,13 +86,12 @@ class OwnedTeamSync extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocListener<SessionCubit, SessionState>(
-      listenWhen: (previous, current) =>
-          previous.user?.id != current.user?.id || previous.isAdmin != current.isAdmin,
+      listenWhen: (previous, current) => previous.user?.id != current.user?.id || previous.isAdmin != current.isAdmin,
       listener: (context, state) {
         BlocProvider.of<OwnedTeamCubit>(context).follow(state.user?.id);
         BlocProvider.of<MyPlayerCubit>(context).follow(state.user?.id);
         BlocProvider.of<PartnerCubit>(context).follow(state.user?.id);
-        BlocProvider.of<OrganizerModeCubit>(context).follow(state.user?.id);
+        BlocProvider.of<OrganizerModeCubit>(context).follow(state.user?.id, isAdmin: state.isAdmin);
         BlocProvider.of<AlbumEventCubit>(context).follow(state.user?.id, isAdmin: state.isAdmin);
       },
       child: child,

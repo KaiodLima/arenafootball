@@ -82,7 +82,8 @@ class _FakeRepository implements IHighlightsRepository {
   }
 
   @override
-  Future<Either<Failure, void>> updateHighlight(HighlightDTO highlight, {String? oldTitle, String? newsAuthorId}) async {
+  Future<Either<Failure, void>> updateHighlight(HighlightDTO highlight,
+      {String? oldTitle, String? newsAuthorId}) async {
     updated.add('${highlight.id}:${highlight.title}<-$oldTitle');
     return _result;
   }

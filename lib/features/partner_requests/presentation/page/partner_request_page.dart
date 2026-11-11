@@ -506,7 +506,8 @@ class _PartnerArea extends StatelessWidget {
                       pending.isPending ? Icons.hourglass_top_rounded : Icons.block_rounded,
                       color: pending.isPending ? AppColors.primaryDark : AppColors.danger,
                     ),
-                    title: Text(pending.news.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: AppTypography.body()),
+                    title: Text(pending.news.title,
+                        maxLines: 2, overflow: TextOverflow.ellipsis, style: AppTypography.body()),
                     subtitle: Text(
                       pending.isPending
                           ? l10n.partnerPendingNewsWaiting

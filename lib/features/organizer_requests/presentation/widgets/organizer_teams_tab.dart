@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
@@ -23,9 +24,10 @@ import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/themes/arena_palette.dart';
 
-/// Aba Times do modo organizador: cabeçalho com as ações (inscrever time,
-/// formar grupos, editar campeonato) e uma seção por campeonato da conta com
-/// os times inscritos (tocar abre o elenco; o menu tira do campeonato).
+/// Aba Times do modo organizador: o seletor do campeonato (o mesmo da aba
+/// Tabelas), o cabeçalho com as ações nele (inscrever time, formar grupos,
+/// editar campeonato) e os times inscritos nele (tocar abre o elenco; o menu
+/// tira do campeonato).
 class OrganizerTeamsTab extends StatefulWidget {
   final List<ChampionshipDTO> championships;
 
@@ -40,17 +42,28 @@ class _OrganizerTeamsTabState extends State<OrganizerTeamsTab> {
 
   List<ChampionshipDTO> get _ordered => organizerTableChampionships(widget.championships);
 
+  /// O que está carregado (só o campeonato escolhido: menos leitura).
+  ChampionshipDTO? _loaded;
+
+  void _sync(ChampionshipDTO? selected, {bool force = false}) {
+    if (selected == null || (!force && selected == _loaded)) return;
+    _loaded = selected;
+    _cubit.load([selected]);
+  }
+
   @override
   void initState() {
     super.initState();
-    _cubit.load(_ordered);
+    _sync(BlocProvider.of<OrganizerModeCubit>(context).state.selectedIn(_ordered));
   }
 
   /// Campeonato ao vivo mudou (time inscrito/tirado): recarrega os times.
   @override
   void didUpdateWidget(covariant OrganizerTeamsTab oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!listEquals(oldWidget.championships, widget.championships)) _cubit.load(_ordered);
+    if (!listEquals(oldWidget.championships, widget.championships)) {
+      _sync(BlocProvider.of<OrganizerModeCubit>(context).state.selectedIn(_ordered), force: true);
+    }
   }
 
   @override
@@ -60,20 +73,41 @@ class _OrganizerTeamsTabState extends State<OrganizerTeamsTab> {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      BlocProvider<OrganizerTeamsCubit>.value(value: _cubit, child: _OrganizerTeamsList(championships: _ordered));
+  Widget build(BuildContext context) {
+    final options = _ordered;
+    final selected = context.watch<OrganizerModeCubit>().state.selectedIn(options);
+    // Trocou no seletor (aqui ou na aba Tabelas): carrega o novo.
+    if (selected != _loaded) WidgetsBinding.instance.addPostFrameCallback((_) => _sync(selected));
+    return BlocProvider<OrganizerTeamsCubit>.value(
+      value: _cubit,
+      child: _OrganizerTeamsList(championships: options, selected: selected),
+    );
+  }
 }
 
 class _OrganizerTeamsList extends StatelessWidget {
   final List<ChampionshipDTO> championships;
 
-  const _OrganizerTeamsList({required this.championships});
+  /// Campeonato escolhido no seletor (nulo = sem campeonatos).
+  final ChampionshipDTO? selected;
 
-  /// O campeonato da ação: direto com um só; com vários, pergunta.
-  Future<ChampionshipDTO?> _pickChampionship(BuildContext context) async {
-    if (championships.length == 1) return championships.first;
-    final picked = await showChampionshipPickerSheet(context, championships: championships, showNone: false);
-    return championships.where((c) => c.championshipId == picked?.id).firstOrNull;
+  const _OrganizerTeamsList({required this.championships, required this.selected});
+
+  /// O campeonato das ações: o escolhido no seletor.
+  Future<ChampionshipDTO?> _pickChampionship(BuildContext context) async => selected;
+
+  Future<void> _choose(BuildContext context) async {
+    final current = selected;
+    if (current == null || championships.length < 2) return;
+    final picked = await showChampionshipPickerSheet(
+      context,
+      championships: championships,
+      selectedId: current.championshipId,
+      showNone: false,
+    );
+    if (picked?.id != null && context.mounted) {
+      BlocProvider.of<OrganizerModeCubit>(context).selectChampionship(picked!.id!);
+    }
   }
 
   String _errorMessage(AppLocalizations l10n, Failure failure) {
@@ -145,14 +179,19 @@ class _OrganizerTeamsList extends StatelessWidget {
     await Navigator.pushNamed(
       context,
       AppRoutes.championshipFormPage,
-      arguments: {'championship': championship, 'organizer': true},
+      // Admin no modo organizador edita tudo (nada travado).
+      arguments: {
+        'championship': championship,
+        'organizer': !BlocProvider.of<OrganizerModeCubit>(context).state.isAdmin,
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    if (championships.isEmpty) {
+    final current = selected;
+    if (championships.isEmpty || current == null) {
       return ArenaEmptyState(message: l10n.organizerNoChampionships, icon: Icons.emoji_events_outlined);
     }
 
@@ -182,6 +221,12 @@ class _OrganizerTeamsList extends StatelessWidget {
         physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
         padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s20, AppSizes.s16, AppSizes.s100),
         children: [
+          ChampionshipSelectTile(
+            label: l10n.matchesChampionshipFilter,
+            championship: current,
+            onTap: () => _choose(context),
+          ),
+          const SizedBox(height: AppSizes.s16),
           header,
           const SizedBox(height: AppSizes.s20),
           if (state.loading)
@@ -191,17 +236,15 @@ class _OrganizerTeamsList extends StatelessWidget {
             )
           else if (state.error)
             ArenaEmptyState.error(message: l10n.teamsLoadError)
-          else
-            for (final championship in championships) ...[
-              SectionHeader(
-                title: championship.title,
-                trailing: championship.season.isEmpty
-                    ? null
-                    : Text(championship.season, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
-              ),
-              ..._teams(context, championship, state.teamsByChampionship[championship.id] ?? const [], l10n),
-              const SizedBox(height: AppSizes.s16),
-            ],
+          else ...[
+            SectionHeader(
+              title: current.title,
+              trailing: current.season.isEmpty
+                  ? null
+                  : Text(current.season, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+            ),
+            ..._teams(context, current, state.teamsByChampionship[current.id] ?? const [], l10n),
+          ],
         ],
       ),
     );

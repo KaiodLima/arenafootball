@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
@@ -98,6 +99,20 @@ class _MatchFormPageState extends State<MatchFormPage> {
       return;
     }
     FocusScope.of(context).unfocus();
+    // Mesmo confronto já cadastrado no dia: confirma antes (evita duplicata).
+    final duplicate = form.duplicate;
+    if (duplicate != null) {
+      final l10n = AppLocalizations.of(context);
+      final confirmed = await showArenaConfirm(
+        context,
+        title: l10n.matchFormDuplicateTitle,
+        message: l10n.matchFormDuplicateMessage(duplicate.homeTeam, duplicate.awayTeam, duplicate.date, duplicate.time),
+        confirmLabel: l10n.matchFormDuplicateConfirm,
+        icon: Icons.copy_all_rounded,
+        tone: ArenaAlertTone.warning,
+      );
+      if (!confirmed || !mounted) return;
+    }
     final championship = widget.organizerChampionship;
     if (championship != null) {
       // Organizador: os dois times precisam estar inscritos com o id (a
@@ -147,7 +162,7 @@ class _MatchFormPageState extends State<MatchFormPage> {
       listener: (context, state) {
         if (state is SuccessMatchFormState) {
           setState(() => _showErrors = false);
-          showSnackBar(context: context, message: l10n.matchFormSaved);
+          showSnackBar(context: context, message: state.offline ? l10n.matchFormSavedOffline : l10n.matchFormSaved);
         }
         if (state is ErrorMatchFormState) {
           final denied = widget.organizerChampionship != null && state.errorCode == 'permission-denied';

@@ -52,6 +52,18 @@ class MatchFormHints {
   /// Locais já usados, do mais usado ao menos usado.
   static List<String> frequentVenues(List<MatchDTO> matches) => _byFrequency(matches.map((m) => m.venue));
 
+  /// Partida já cadastrada com os mesmos dois times (em qualquer mando) em
+  /// [date]; nula se não houver.
+  static MatchDTO? duplicateOf(List<MatchDTO> matches,
+      {required String? home, required String? away, required String date}) {
+    if (home == null || away == null || date.isEmpty) return null;
+    final pair = {home.trim().toLowerCase(), away.trim().toLowerCase()};
+    return matches
+        .where((m) =>
+            m.date == date && {m.homeTeam.trim().toLowerCase(), m.awayTeam.trim().toLowerCase()}.containsAll(pair))
+        .firstOrNull;
+  }
+
   /// Conflitos de [home] x [away] em [date] ("dd/MM") às [time] em [venue].
   static List<MatchConflict> conflicts(
     List<MatchDTO> matches, {

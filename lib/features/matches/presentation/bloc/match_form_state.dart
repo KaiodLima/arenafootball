@@ -164,6 +164,9 @@ class MatchFormData extends Equatable {
 
   List<String> get frequentVenues => MatchFormHints.frequentVenues(existing);
 
+  /// Mesmo confronto já cadastrado no dia (pede confirmação antes de salvar).
+  MatchDTO? get duplicate => MatchFormHints.duplicateOf(existing, home: homeTeam, away: awayTeam, date: date);
+
   List<MatchConflict> get conflicts => MatchFormHints.conflicts(
         existing,
         home: homeTeam,
@@ -263,7 +266,13 @@ class SubmittingMatchFormState extends MatchFormState {
 }
 
 class SuccessMatchFormState extends MatchFormState {
-  const SuccessMatchFormState({required super.form});
+  /// Sem conexão: ficou salva no aparelho e sobe quando a rede voltar.
+  final bool offline;
+
+  const SuccessMatchFormState({required super.form, this.offline = false});
+
+  @override
+  List<Object?> get props => [...super.props, offline];
 }
 
 class ErrorMatchFormState extends MatchFormState {

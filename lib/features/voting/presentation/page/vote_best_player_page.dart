@@ -163,7 +163,8 @@ class _VoteBestPlayerPageState extends State<VoteBestPlayerPage> {
                 const Icon(Icons.info_outline_rounded, size: AppSizes.s16, color: AppColors.textSecondary),
                 const SizedBox(width: AppSizes.s6),
                 Expanded(
-                  child: Text(l10n.votingOnlyParticipants, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+                  child: Text(l10n.votingOnlyParticipants,
+                      style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
                 ),
               ],
             ),

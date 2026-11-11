@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/features/championships/data/dtos/group_dto.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/standings_table.dart';
+import 'package:arena_soccer/features/championships/data/dtos/group_rules.dart';
 import 'package:arena_soccer/features/championships/data/dtos/group_table_dto.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
@@ -94,6 +96,7 @@ class GroupCard extends StatelessWidget {
                         for (var i = 0; i < rows.length; i++)
                           _TeamRow(
                             position: i + 1,
+                            zone: group.rules.zoneOf(i + 1, rows.length),
                             name: rows[i].teamName,
                             crest: rows[i].imageUrl.isNotEmpty ? rows[i].imageUrl : crestOf(rows[i].teamName),
                             isFavorite: isFavorite?.call(rows[i].id, rows[i].teamName) ?? false,
@@ -278,6 +281,9 @@ class _ColumnsHeader extends StatelessWidget {
 /// J, SG (com sinal) e PTS em negrito; o time do usuário em destaque com ★.
 class _TeamRow extends StatelessWidget {
   final int? position;
+
+  /// Faixa da regra ativa na posição (sem regra = neutra).
+  final GroupZone zone;
   final String name;
   final String? crest;
   final bool isFavorite;
@@ -286,6 +292,7 @@ class _TeamRow extends StatelessWidget {
 
   const _TeamRow({
     this.position,
+    this.zone = GroupZone.none,
     required this.name,
     required this.crest,
     required this.isFavorite,
@@ -323,7 +330,7 @@ class _TeamRow extends StatelessWidget {
               height: AppSizes.s24,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: leader ? AppColors.gold : AppColors.background,
+                color: standingsPositionColor(position, zone),
                 borderRadius: BorderRadius.circular(AppSizes.s6),
               ),
               child: Text(
@@ -332,7 +339,11 @@ class _TeamRow extends StatelessWidget {
                   fontFamily: _display,
                   fontSize: AppSizes.s14,
                   height: 1.2,
-                  color: leader ? AppColors.textPrimary : AppColors.textSecondary,
+                  color: leader
+                      ? AppColors.textPrimary
+                      : zone == GroupZone.none
+                          ? AppColors.textSecondary
+                          : AppColors.white,
                 ),
               ),
             ),

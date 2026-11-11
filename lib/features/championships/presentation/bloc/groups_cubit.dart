@@ -6,6 +6,7 @@ import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/data/dtos/group_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/group_table_dto.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/championship_groups_usecases.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/watch_group_table_usecase.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/watch_groups_usecase.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/groups_state.dart';
@@ -20,12 +21,37 @@ class GroupsCubit extends Cubit<GroupsState> {
   final WatchGroupTableUseCase watchGroupTableUseCase;
   StreamSubscription<Either<Failure, List<GroupDTO>>>? _subscription;
 
+  /// Grupos pelo campeonato (qualquer região); nulo = só a busca por região.
+  final WatchChampionshipGroupsUseCase? watchChampionshipGroupsUseCase;
+  StreamSubscription<Either<Failure, List<GroupDTO>>>? _championshipSubscription;
+
+  /// Últimos resultados das duas buscas (campeonato e região).
+  List<GroupDTO>? _byChampionship;
+  List<GroupDTO>? _byRegion;
+
   /// Uma assinatura por grupo de campeonato (id do grupo → tabela).
   final Map<String, StreamSubscription<Either<Failure, GroupTableDTO?>>> _tableSubscriptions = {};
   String? _season;
 
-  GroupsCubit(this.watchGroupsUseCase, this.getTeamsCacheFirstUseCase, this.watchGroupTableUseCase)
-      : super(const LoadingGroupsState());
+  GroupsCubit(
+    this.watchGroupsUseCase,
+    this.getTeamsCacheFirstUseCase,
+    this.watchGroupTableUseCase, [
+    this.watchChampionshipGroupsUseCase,
+  ]) : super(const LoadingGroupsState());
+
+  /// Ordem A, B, C... pelo nome do grupo.
+  static List<GroupDTO> sorted(List<GroupDTO> groups) =>
+      [...groups]..sort((a, b) => a.description.compareTo(b.description));
+
+  /// Grupos do campeonato: os dele (de qualquer região); sem nenhum, os
+  /// antigos da região só se a temporada ali for só de grupos antigos (sem
+  /// nenhum ligado a campeonato) — campeonato novo sem grupo fica vazio.
+  static List<GroupDTO> resolve({required List<GroupDTO> own, required List<GroupDTO> region}) {
+    if (own.isNotEmpty) return sorted(own);
+    if (region.any((g) => g.championshipId > 0)) return const [];
+    return sorted(region.where((g) => g.championshipId == 0).toList());
+  }
 
   /// Mesmo tipo de estado, com o que mudou.
   void _emitWith({List<GroupDTO>? groups, Map<String, String>? crests, Map<String, GroupTableDTO>? tables}) {
@@ -43,30 +69,57 @@ class GroupsCubit extends Cubit<GroupsState> {
     }
   }
 
-  /// [championshipId] mostra só os grupos desse campeonato (ver
-  /// [GroupDTO.forChampionship]); nulo = todos da região.
+  void _fail(Failure failure) => emit(
+        ErrorGroupsState(
+          errorMessage: failure.toString(),
+          groups: state.groups,
+          crests: state.crests,
+          tables: state.tables,
+        ),
+      );
+
+  void _show(List<GroupDTO> shown) {
+    emit(SuccessGroupsState(groups: shown, crests: state.crests, tables: state.tables));
+    _syncTables(shown);
+  }
+
+  /// Com as duas buscas do campeonato prontas, mostra o resultado.
+  void _resolveChampionship() {
+    final own = _byChampionship;
+    final region = _byRegion;
+    if (own == null || region == null) return;
+    _show(resolve(own: own, region: region));
+  }
+
+  /// [championshipId]: os grupos desse campeonato, buscados por ele (os de
+  /// sede em outra região também), ordenados; nulo = todos da região.
   void watch({required String region, required String season, int? championshipId}) {
     _subscription?.cancel();
+    _championshipSubscription?.cancel();
+    _championshipSubscription = null;
+    _byChampionship = null;
+    _byRegion = null;
     _cancelTables();
     _season = season;
     emit(LoadingGroupsState(groups: state.groups, crests: state.crests));
     _loadCrests(region: region, season: season);
+    final byChampionship = watchChampionshipGroupsUseCase;
+    if (championshipId != null && byChampionship != null) {
+      _championshipSubscription = byChampionship(championshipId: championshipId, season: season).listen((response) {
+        response.fold(_fail, (groups) {
+          _byChampionship = groups;
+          _resolveChampionship();
+        });
+      });
+      // A da região só decide o legado (grupos antigos, sem campeonato).
+      _subscription = watchGroupsUseCase(region: region, season: season).listen((response) {
+        response.fold((_) => _byRegion = const [], (groups) => _byRegion = groups);
+        _resolveChampionship();
+      });
+      return;
+    }
     _subscription = watchGroupsUseCase(region: region, season: season).listen((response) {
-      response.fold(
-        (failure) => emit(
-          ErrorGroupsState(
-            errorMessage: failure.toString(),
-            groups: state.groups,
-            crests: state.crests,
-            tables: state.tables,
-          ),
-        ),
-        (groups) {
-          final shown = GroupDTO.forChampionship(groups, championshipId);
-          emit(SuccessGroupsState(groups: shown, crests: state.crests, tables: state.tables));
-          _syncTables(shown);
-        },
-      );
+      response.fold(_fail, (groups) => _show(sorted(GroupDTO.forChampionship(groups, championshipId))));
     });
   }
 
@@ -120,6 +173,7 @@ class GroupsCubit extends Cubit<GroupsState> {
   @override
   Future<void> close() {
     _subscription?.cancel();
+    _championshipSubscription?.cancel();
     _cancelTables();
     return super.close();
   }
