@@ -734,6 +734,77 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shareArtTemplateVibrant => 'Colors';
 
   @override
+  String get playerArtAction => 'Create player art';
+
+  @override
+  String get playerArtTitle => 'Player art';
+
+  @override
+  String get playerArtTemplateSigning => 'Signing';
+
+  @override
+  String get playerArtTemplateDeal => 'Done deal';
+
+  @override
+  String get playerArtTemplatePoster => 'Poster';
+
+  @override
+  String get playerArtHeadline => 'New signing';
+
+  @override
+  String playerArtWelcome(String team) {
+    return '$team announces';
+  }
+
+  @override
+  String playerArtDeal(String team) {
+    return 'Now with $team!';
+  }
+
+  @override
+  String get playerArtOfficial => 'Official announcement';
+
+  @override
+  String get playerArtTemplateImpact => 'Impact';
+
+  @override
+  String get playerArtTemplateCard => 'Card';
+
+  @override
+  String playerArtPresents(String team) {
+    return '$team presents';
+  }
+
+  @override
+  String get playerArtNewSigning => 'New signing';
+
+  @override
+  String get playerArtDebut => 'Debut';
+
+  @override
+  String get playerArtAbbrGoalkeeper => 'GK';
+
+  @override
+  String get playerArtAbbrDefender => 'CB';
+
+  @override
+  String get playerArtAbbrFullBack => 'FB';
+
+  @override
+  String get playerArtAbbrDefensiveMidfielder => 'DM';
+
+  @override
+  String get playerArtAbbrMidfielder => 'CM';
+
+  @override
+  String get playerArtAbbrForward => 'FW';
+
+  @override
+  String playerArtShareText(String name, String team, String link) {
+    return '$name is now with $team! $link';
+  }
+
+  @override
   String get shareArtPreviewTitle => 'Promote match';
 
   @override

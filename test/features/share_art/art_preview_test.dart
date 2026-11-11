@@ -13,6 +13,10 @@ import 'package:arena_soccer/features/share_art/domain/art_format.dart';
 import 'package:arena_soccer/features/share_art/domain/art_palette.dart';
 import 'package:arena_soccer/features/share_art/domain/result_art_data.dart';
 import 'package:arena_soccer/features/share_art/presentation/art_exporter.dart';
+import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
+import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/share_art/domain/player_art_data.dart';
+import 'package:arena_soccer/features/share_art/presentation/templates/player/player_art.dart';
 import 'package:arena_soccer/features/share_art/presentation/templates/preview/preview_art.dart';
 import 'package:arena_soccer/features/share_art/presentation/templates/result/result_art.dart';
 import 'package:arena_soccer/features/share_art/presentation/widgets/art_graphics.dart';
@@ -44,6 +48,18 @@ Future<Uint8List> _testLogo() async {
   }
   canvas.drawPath(star..close(), Paint()..color = const Color(0xFFFFD54F));
   final image = await recorder.endRecording().toImage(256, 256);
+  final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+  return bytes!.buffer.asUint8List();
+}
+
+/// Foto de teste: fundo cinza com um busto (cabeça e ombros).
+Future<Uint8List> _testPhoto() async {
+  final recorder = ui.PictureRecorder();
+  final canvas = Canvas(recorder);
+  canvas.drawRect(const Rect.fromLTWH(0, 0, 300, 400), Paint()..color = const Color(0xFF9AA4AE));
+  canvas.drawCircle(const Offset(150, 150), 70, Paint()..color = const Color(0xFFC68E6A));
+  canvas.drawOval(const Rect.fromLTWH(30, 240, 240, 260), Paint()..color = const Color(0xFFD32F2F));
+  final image = await recorder.endRecording().toImage(300, 400);
   final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
   return bytes!.buffer.asUint8List();
 }
@@ -222,6 +238,56 @@ void main() {
         expect(tester.takeException(), isNull, reason: 'preview ${template.name}/${format.name}');
         final png = await tester.runAsync(() => ArtExporter.capture(key, format));
         File('build/art_previews/preview_${template.name}_${format.name}$suffix.png').writeAsBytesSync(png!);
+      }
+    }
+    // Arte do atleta (contratação): com foto e competição, e sem foto.
+    final photo = MemoryImage((await tester.runAsync(_testPhoto))!);
+    ArtPlayerPhoto.providerFor = (_) => photo;
+    const team = TeamDTO(id: 't1', name: 'Lava Jato FC', primaryColor: '#D32F2F', secondaryColor: '#FFFFFF');
+    final withPhoto = PlayerArtData.of(
+      player: const PlayerDTO(
+          id: 'p1', name: 'Ronaldo Nazário', team: 'Lava Jato FC', imageUrl: 'memoria://foto', goals: 12, assists: 5, position: 'atacante'),
+      team: team,
+      season: '2026',
+      championship: const ChampionshipDTO(id: 'c', championshipId: 11, title: 'Copa da Floresta', imageUrl: 'memoria://logo'),
+    );
+    final noPhoto = PlayerArtData.of(
+      player: const PlayerDTO(id: 'p2', name: 'Dudu Silva', team: '', position: 'goleiro'),
+      team: const TeamDTO(id: 't2', name: 'Açaí No Gralle', primaryColor: '#6A1B9A', secondaryColor: '#FFFFFF'),
+      season: '2026',
+    );
+    final playerCases = [
+      for (final t in PlayerArtTemplate.values) (t, withPhoto, '', ArtPalette.teams),
+      for (final t in PlayerArtTemplate.values) (t, noPhoto, '_semfoto', ArtPalette.teams),
+      (PlayerArtTemplate.signing, withPhoto, '_night', ArtPalette.night),
+      (PlayerArtTemplate.deal, withPhoto, '_ocean', ArtPalette.ocean),
+    ];
+    for (final (template, pdata, suffix, palette) in playerCases) {
+      for (final format in ArtFormat.values.where((f) => formats.contains(f.name))) {
+        final key = GlobalKey();
+        await tester.pumpWidget(MaterialApp(
+          debugShowCheckedModeBanner: false,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('pt'),
+          home: Scaffold(
+            body: Center(
+              child: RepaintBoundary(
+                key: key,
+                child: PlayerArt(data: pdata, template: template, format: format, showQr: true, palette: palette),
+              ),
+            ),
+          ),
+        ));
+        final element = tester.element(find.byKey(key));
+        await tester.runAsync(() async {
+          await precacheImage(logo, element);
+          await precacheImage(photo, element);
+        });
+        await tester.pump();
+        expect(tester.takeException(), isNull, reason: 'player ${template.name}/${format.name}');
+        final png = await tester.runAsync(() => ArtExporter.capture(key, format));
+        File('build/art_previews/player_${template.name}_${format.name}$suffix.png').writeAsBytesSync(png!);
       }
     }
   }, skip: !enabled);

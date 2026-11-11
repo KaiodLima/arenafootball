@@ -358,8 +358,23 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
           {'playerId': player.id, 'season': _season, 'name': player.name, 'player': player},
         );
 
-    // Menu "⋮" da linha: inscrever (admin/dono, no geral) e tirar (organizador).
+    // Menu "⋮" da linha: arte do atleta (todos), inscrever (admin/dono, no geral) e tirar (organizador).
     List<SquadRowAction> actionsOf(PlayerDTO player) => [
+          SquadRowAction(
+            icon: Icons.auto_awesome_rounded,
+            label: l10n.playerArtAction,
+            onSelected: () => Navigator.of(context).pushNamed(
+              AppRoutes.playerArtPage,
+              arguments: {
+                'player': player,
+                'team': _team,
+                'season': _season,
+                'championship': state.view.championships
+                    .where((c) => c.championshipId == state.championshipId)
+                    .firstOrNull,
+              },
+            ),
+          ),
           if (canEnroll)
             SquadRowAction(
               icon: Icons.emoji_events_outlined,

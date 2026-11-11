@@ -20,6 +20,19 @@ abstract final class ArtFonts {
         fontFeatures: const [FontFeature.tabularFigures()],
       );
 
+  /// Anton vazado: só o contorno, na [color], com o traço [stroke].
+  static TextStyle outlineStyle(double size, Color color, {double stroke = 1.5, double spacing = 0, double height = 1}) =>
+      TextStyle(
+        fontFamily: display,
+        fontSize: size,
+        letterSpacing: spacing,
+        height: height,
+        foreground: Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = stroke
+          ..color = color,
+      );
+
   static TextStyle textStyle(
     double size,
     Color color, {
@@ -594,4 +607,64 @@ class ArtSplitPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant ArtSplitPainter old) => old.home != home || old.away != away || old.wide != wide;
+}
+
+/// Foto do atleta na arte (corta para preencher); sem foto ou se falhar, a
+/// silhueta desenhada com as iniciais na cor do time — a arte nunca quebra.
+class ArtPlayerPhoto extends StatelessWidget {
+  final String url;
+  final String initials;
+  final Color color;
+
+  /// Troca nos testes (imagem em memória).
+  static ImageProvider Function(String url) providerFor = _network;
+
+  static ImageProvider _network(String url) => CachedNetworkImageProvider(url);
+
+  const ArtPlayerPhoto({super.key, required this.url, required this.initials, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    final fallback = _Silhouette(initials: initials, color: color);
+    if (url.isEmpty) return fallback;
+    return Image(
+      image: providerFor(url),
+      fit: BoxFit.cover,
+      alignment: Alignment.topCenter,
+      errorBuilder: (_, __, ___) => fallback,
+    );
+  }
+}
+
+class _Silhouette extends StatelessWidget {
+  final String initials;
+  final Color color;
+
+  const _Silhouette({required this.initials, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, c) {
+      final size = c.biggest.shortestSide.isFinite ? c.biggest.shortestSide : 100.0;
+      return DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color.lerp(color, AppColors.white, 0.25)!, Color.lerp(color, AppColors.black, 0.35)!],
+          ),
+        ),
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            Icon(Icons.person_rounded, size: size * 0.95, color: AppColors.white.withValues(alpha: 0.22)),
+            Align(
+              alignment: const Alignment(0, -0.1),
+              child: Text(initials, style: ArtFonts.displayStyle(size * 0.26, artOn(color).withValues(alpha: 0.9))),
+            ),
+          ],
+        ),
+      );
+    });
+  }
 }

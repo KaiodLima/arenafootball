@@ -737,6 +737,77 @@ class AppLocalizationsPt extends AppLocalizations {
   String get shareArtTemplateVibrant => 'Cores';
 
   @override
+  String get playerArtAction => 'Gerar arte do atleta';
+
+  @override
+  String get playerArtTitle => 'Arte do atleta';
+
+  @override
+  String get playerArtTemplateSigning => 'Reforço';
+
+  @override
+  String get playerArtTemplateDeal => 'Fechado!';
+
+  @override
+  String get playerArtTemplatePoster => 'Pôster';
+
+  @override
+  String get playerArtHeadline => 'Reforço';
+
+  @override
+  String playerArtWelcome(String team) {
+    return '$team anuncia';
+  }
+
+  @override
+  String playerArtDeal(String team) {
+    return 'Agora é $team!';
+  }
+
+  @override
+  String get playerArtOfficial => 'Anúncio oficial';
+
+  @override
+  String get playerArtTemplateImpact => 'Impacto';
+
+  @override
+  String get playerArtTemplateCard => 'Carta';
+
+  @override
+  String playerArtPresents(String team) {
+    return '$team apresenta';
+  }
+
+  @override
+  String get playerArtNewSigning => 'Novo reforço';
+
+  @override
+  String get playerArtDebut => 'Estreia';
+
+  @override
+  String get playerArtAbbrGoalkeeper => 'GOL';
+
+  @override
+  String get playerArtAbbrDefender => 'ZAG';
+
+  @override
+  String get playerArtAbbrFullBack => 'LAT';
+
+  @override
+  String get playerArtAbbrDefensiveMidfielder => 'VOL';
+
+  @override
+  String get playerArtAbbrMidfielder => 'MEI';
+
+  @override
+  String get playerArtAbbrForward => 'ATA';
+
+  @override
+  String playerArtShareText(String name, String team, String link) {
+    return '$name agora é $team! $link';
+  }
+
+  @override
   String get shareArtPreviewTitle => 'Divulgar partida';
 
   @override

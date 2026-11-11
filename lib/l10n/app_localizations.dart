@@ -1341,6 +1341,132 @@ abstract class AppLocalizations {
   /// **'Cores'**
   String get shareArtTemplateVibrant;
 
+  /// No description provided for @playerArtAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gerar arte do atleta'**
+  String get playerArtAction;
+
+  /// No description provided for @playerArtTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arte do atleta'**
+  String get playerArtTitle;
+
+  /// No description provided for @playerArtTemplateSigning.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reforço'**
+  String get playerArtTemplateSigning;
+
+  /// No description provided for @playerArtTemplateDeal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fechado!'**
+  String get playerArtTemplateDeal;
+
+  /// No description provided for @playerArtTemplatePoster.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pôster'**
+  String get playerArtTemplatePoster;
+
+  /// No description provided for @playerArtHeadline.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reforço'**
+  String get playerArtHeadline;
+
+  /// No description provided for @playerArtWelcome.
+  ///
+  /// In pt, this message translates to:
+  /// **'{team} anuncia'**
+  String playerArtWelcome(String team);
+
+  /// No description provided for @playerArtDeal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Agora é {team}!'**
+  String playerArtDeal(String team);
+
+  /// No description provided for @playerArtOfficial.
+  ///
+  /// In pt, this message translates to:
+  /// **'Anúncio oficial'**
+  String get playerArtOfficial;
+
+  /// No description provided for @playerArtTemplateImpact.
+  ///
+  /// In pt, this message translates to:
+  /// **'Impacto'**
+  String get playerArtTemplateImpact;
+
+  /// No description provided for @playerArtTemplateCard.
+  ///
+  /// In pt, this message translates to:
+  /// **'Carta'**
+  String get playerArtTemplateCard;
+
+  /// No description provided for @playerArtPresents.
+  ///
+  /// In pt, this message translates to:
+  /// **'{team} apresenta'**
+  String playerArtPresents(String team);
+
+  /// No description provided for @playerArtNewSigning.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novo reforço'**
+  String get playerArtNewSigning;
+
+  /// No description provided for @playerArtDebut.
+  ///
+  /// In pt, this message translates to:
+  /// **'Estreia'**
+  String get playerArtDebut;
+
+  /// No description provided for @playerArtAbbrGoalkeeper.
+  ///
+  /// In pt, this message translates to:
+  /// **'GOL'**
+  String get playerArtAbbrGoalkeeper;
+
+  /// No description provided for @playerArtAbbrDefender.
+  ///
+  /// In pt, this message translates to:
+  /// **'ZAG'**
+  String get playerArtAbbrDefender;
+
+  /// No description provided for @playerArtAbbrFullBack.
+  ///
+  /// In pt, this message translates to:
+  /// **'LAT'**
+  String get playerArtAbbrFullBack;
+
+  /// No description provided for @playerArtAbbrDefensiveMidfielder.
+  ///
+  /// In pt, this message translates to:
+  /// **'VOL'**
+  String get playerArtAbbrDefensiveMidfielder;
+
+  /// No description provided for @playerArtAbbrMidfielder.
+  ///
+  /// In pt, this message translates to:
+  /// **'MEI'**
+  String get playerArtAbbrMidfielder;
+
+  /// No description provided for @playerArtAbbrForward.
+  ///
+  /// In pt, this message translates to:
+  /// **'ATA'**
+  String get playerArtAbbrForward;
+
+  /// No description provided for @playerArtShareText.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} agora é {team}! {link}'**
+  String playerArtShareText(String name, String team, String link);
+
   /// No description provided for @shareArtPreviewTitle.
   ///
   /// In pt, this message translates to:

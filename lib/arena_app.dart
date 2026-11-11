@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/features/share_art/presentation/page/share_art_page.dart';
+import 'package:arena_soccer/features/share_art/presentation/page/player_art_page.dart';
+import 'package:arena_soccer/features/share_art/presentation/bloc/player_art_cubit.dart';
+import 'package:arena_soccer/features/share_art/domain/player_art_data.dart';
 import 'package:arena_soccer/features/share_art/presentation/bloc/share_art_cubit.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_groups_cubit.dart';
@@ -490,6 +493,19 @@ class ArenaApp extends StatelessWidget {
                 season: (args['season'] as String?) ?? SeasonCollection.currentSeason,
               ),
             child: const ShareArtPage(),
+          );
+        },
+        // "Gerar arte do atleta" (elenco): args {player, team, season, championship?}.
+        AppRoutes.playerArtPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+          return BlocProvider<PlayerArtCubit>(
+            create: (_) => PlayerArtCubit(PlayerArtData.of(
+              player: args['player'] as PlayerDTO,
+              team: args['team'] as TeamDTO,
+              season: (args['season'] as String?) ?? SeasonCollection.currentSeason,
+              championship: args['championship'] as ChampionshipDTO?,
+            )),
+            child: const PlayerArtPage(),
           );
         },
         AppRoutes.organizerGroupsPage: (context) {

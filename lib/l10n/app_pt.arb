@@ -389,6 +389,61 @@
   "matchCardToday": "HOJE",
   "matchCardTomorrow": "AMANHÃ",
   "shareArtTemplateVibrant": "Cores",
+  "playerArtAction": "Gerar arte do atleta",
+  "playerArtTitle": "Arte do atleta",
+  "playerArtTemplateSigning": "Reforço",
+  "playerArtTemplateDeal": "Fechado!",
+  "playerArtTemplatePoster": "Pôster",
+  "playerArtHeadline": "Reforço",
+  "playerArtWelcome": "{team} anuncia",
+  "@playerArtWelcome": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "playerArtDeal": "Agora é {team}!",
+  "@playerArtDeal": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "playerArtOfficial": "Anúncio oficial",
+  "playerArtTemplateImpact": "Impacto",
+  "playerArtTemplateCard": "Carta",
+  "playerArtPresents": "{team} apresenta",
+  "@playerArtPresents": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "playerArtNewSigning": "Novo reforço",
+  "playerArtDebut": "Estreia",
+  "playerArtAbbrGoalkeeper": "GOL",
+  "playerArtAbbrDefender": "ZAG",
+  "playerArtAbbrFullBack": "LAT",
+  "playerArtAbbrDefensiveMidfielder": "VOL",
+  "playerArtAbbrMidfielder": "MEI",
+  "playerArtAbbrForward": "ATA",
+  "playerArtShareText": "{name} agora é {team}! {link}",
+  "@playerArtShareText": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "team": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      }
+    }
+  },
   "shareArtPreviewTitle": "Divulgar partida",
   "shareArtTemplateMatchday": "Dia de jogo",
   "shareArtTemplateVersus": "Duelo",
