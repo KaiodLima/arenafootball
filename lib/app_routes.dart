@@ -70,6 +70,7 @@ class AppRoutes {
   static const String organizerGroupsPage = '/organizer_groups_page';
   static const String shareArtPage = '/share_art_page';
   static const String playerArtPage = '/player_art_page';
+  static const String playerMatchArtPage = '/player_match_art_page';
   static const String predictionRankingPage = '/prediction_ranking_page';
 }
 

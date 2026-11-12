@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/features/share_art/presentation/page/share_art_page.dart';
 import 'package:arena_soccer/features/share_art/presentation/page/player_art_page.dart';
+import 'package:arena_soccer/features/share_art/presentation/page/player_match_art_page.dart';
+import 'package:arena_soccer/features/share_art/presentation/bloc/player_match_art_cubit.dart';
 import 'package:arena_soccer/features/share_art/presentation/bloc/player_art_cubit.dart';
 import 'package:arena_soccer/features/share_art/domain/player_art_data.dart';
 import 'package:arena_soccer/features/share_art/presentation/bloc/share_art_cubit.dart';
@@ -68,6 +70,7 @@ import 'package:arena_soccer/features/highlights/presentation/page/highlight_det
 import 'package:arena_soccer/features/highlights/presentation/page/highlight_form_page.dart';
 import 'package:arena_soccer/features/home/presentation/page/home_page.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/match_form_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/matches_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/match_details_cubit.dart';
@@ -506,6 +509,20 @@ class ArenaApp extends StatelessWidget {
               championship: args['championship'] as ChampionshipDTO?,
             )),
             child: const PlayerArtPage(),
+          );
+        },
+        // "Arte do atleta" do card de partida: args {match, season, player, side}.
+        AppRoutes.playerMatchArtPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+          return BlocProvider<PlayerMatchArtCubit>(
+            create: (_) => PlayerMatchArtCubit(sl())
+              ..load(
+                match: args['match'] as MatchDTO,
+                season: (args['season'] as String?) ?? SeasonCollection.currentSeason,
+                player: args['player'] as PlayerDTO,
+                side: args['side'] as MatchSide,
+              ),
+            child: const PlayerMatchArtPage(),
           );
         },
         AppRoutes.organizerGroupsPage: (context) {

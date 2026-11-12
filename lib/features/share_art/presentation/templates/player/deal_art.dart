@@ -47,39 +47,14 @@ class _BleedPhoto extends StatelessWidget {
   const _BleedPhoto(this.args, {this.horizontal = false});
 
   @override
-  Widget build(BuildContext context) {
-    final ground = _ground(args);
-    final tint = args.teamColors ? artHalfColor(args.teamColor) : args.colors.base;
-    final end = horizontal ? Alignment.centerRight : Alignment.bottomCenter;
-    final begin = horizontal ? Alignment.centerLeft : Alignment.topCenter;
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        ArtPlayerPhoto(url: args.data.photoUrl, initials: args.data.initials, color: args.teamColor),
-        // Duotom leve na cor do time/paleta.
-        DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: begin,
-              end: end,
-              colors: [tint.withValues(alpha: 0.28), tint.withValues(alpha: 0.05)],
-            ),
-          ),
-        ),
-        // Funde no fundo.
-        DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: begin,
-              end: end,
-              stops: const [0.45, 1],
-              colors: [ground.withValues(alpha: 0), ground],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+  Widget build(BuildContext context) => ArtBleedPhoto(
+        url: args.data.photoUrl,
+        initials: args.data.initials,
+        color: args.teamColor,
+        ground: _ground(args),
+        tint: args.teamColors ? artHalfColor(args.teamColor) : args.colors.base,
+        horizontal: horizontal,
+      );
 }
 
 /// Sobrenome gigante vazado, atravessando a arte na altura do pé da foto.

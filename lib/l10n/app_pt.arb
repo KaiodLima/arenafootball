@@ -412,6 +412,57 @@
     }
   },
   "playerArtOfficial": "Anúncio oficial",
+  "playerMatchArtAction": "Arte do atleta",
+  "playerMatchArtSheetTitle": "Gerar arte",
+  "playerMatchArtPick": "Escolher atleta",
+  "playerMatchArtSearch": "Buscar atleta",
+  "playerMatchArtEmpty": "Nenhum atleta nos elencos desta partida",
+  "playerMatchArtTitle": "Atleta na partida",
+  "playerMatchArtTemplateCover": "Capa",
+  "playerMatchArtTemplateCountdown": "Contagem",
+  "playerMatchArtTemplateAgenda": "Agenda",
+  "playerMatchArtTemplateDuel": "Duelo",
+  "playerMatchArtTemplateLineup": "Escalação",
+  "playerMatchArtTemplateSpotlight": "Holofote",
+  "playerMatchArtLineup": "Na escalação!",
+  "playerMatchArtMatchday": "Dia de jogo",
+  "playerMatchArtDaysToGo": "{count, plural, =1{dia para o jogo} other{dias para o jogo}}",
+  "@playerMatchArtDaysToGo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "playerMatchArtWaiting": "{name} te espera",
+  "@playerMatchArtWaiting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playerMatchArtComeWatch": "Vem pro jogo!",
+  "playerMatchArtShareText": "{name} em campo: {home} x {away} · {when} {link}",
+  "@playerMatchArtShareText": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "home": {
+        "type": "String"
+      },
+      "away": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      }
+    }
+  },
   "playerArtTemplateImpact": "Impacto",
   "playerArtTemplateCard": "Carta",
   "playerArtPresents": "{team} apresenta",

@@ -611,6 +611,171 @@ class ArtSplitPainter extends CustomPainter {
 
 /// Foto do atleta na arte (corta para preencher); sem foto ou se falhar, a
 /// silhueta desenhada com as iniciais na cor do time — a arte nunca quebra.
+const _diamondInk = Color(0xFF0E1114);
+
+/// "VS" forte: losango escuro inclinado com contorno e brilho no [accent].
+class ArtVsDiamond extends StatelessWidget {
+  final Color accent;
+  final double scale;
+
+  const ArtVsDiamond({super.key, required this.accent, this.scale = 1});
+
+  @override
+  Widget build(BuildContext context) {
+    final box = 64 * scale;
+    return SizedBox(
+      width: box * 1.45,
+      height: box * 1.45,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Transform.rotate(
+            angle: 0.785,
+            child: Container(
+              width: box,
+              height: box,
+              decoration: BoxDecoration(
+                color: _diamondInk,
+                border: Border.all(color: accent, width: 3 * scale),
+                boxShadow: [
+                  BoxShadow(color: accent.withValues(alpha: 0.45), blurRadius: 18 * scale),
+                  BoxShadow(color: AppColors.black.withValues(alpha: 0.5), blurRadius: 10 * scale),
+                ],
+              ),
+            ),
+          ),
+          Text(
+            'VS',
+            style: ArtFonts.displayStyle(30 * scale, AppColors.white, spacing: 1, height: 1.1).copyWith(
+              shadows: [Shadow(color: accent.withValues(alpha: 0.9), blurRadius: 10 * scale)],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Faixa de dados DATA | HORÁRIO | LOCAL (rótulo, valor), rótulos no [accent].
+class ArtInfoBar extends StatelessWidget {
+  final Color accent;
+  final double scale;
+  final (String, String) date;
+  final (String, String) time;
+  final (String, String) venue;
+
+  const ArtInfoBar({
+    super.key,
+    required this.accent,
+    required this.date,
+    required this.time,
+    required this.venue,
+    this.scale = 1,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Widget block(String label, String value, {bool big = true}) => Padding(
+          padding: EdgeInsets.symmetric(horizontal: 6 * scale),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(label, maxLines: 1, style: ArtFonts.textStyle(9 * scale, accent, spacing: 2)),
+              ),
+              SizedBox(height: 2 * scale),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  value.isEmpty ? '—' : value,
+                  maxLines: 1,
+                  style: big
+                      ? ArtFonts.displayStyle(18 * scale, AppColors.white, spacing: 0.6, height: 1.15)
+                      : ArtFonts.textStyle(14 * scale, AppColors.white, spacing: 0.8, height: 1.3),
+                ),
+              ),
+            ],
+          ),
+        );
+    Widget divider() => Container(width: 1, height: 30 * scale, color: AppColors.white.withValues(alpha: 0.2));
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12 * scale, vertical: 10 * scale),
+      decoration: BoxDecoration(
+        color: _diamondInk.withValues(alpha: 0.65),
+        borderRadius: BorderRadius.circular(10 * scale),
+        border: Border(top: BorderSide(color: accent, width: 3 * scale)),
+      ),
+      child: Row(
+        children: [
+          Expanded(flex: 3, child: block(date.$1, date.$2)),
+          divider(),
+          Expanded(flex: 2, child: block(time.$1, time.$2)),
+          divider(),
+          Expanded(flex: 4, child: block(venue.$1, venue.$2, big: false)),
+        ],
+      ),
+    );
+  }
+}
+
+/// Foto do atleta sangrada (de borda a borda) que some no fundo [ground]
+/// (para baixo ou, com [horizontal], para a direita), com um duotom leve na
+/// cor [tint]. Sem foto, a silhueta com as iniciais.
+class ArtBleedPhoto extends StatelessWidget {
+  final String url;
+  final String initials;
+  final Color color;
+  final Color ground;
+  final Color tint;
+  final bool horizontal;
+
+  /// Onde o degradê começa (0 a 1).
+  final double fadeFrom;
+
+  const ArtBleedPhoto({
+    super.key,
+    required this.url,
+    required this.initials,
+    required this.color,
+    required this.ground,
+    required this.tint,
+    this.horizontal = false,
+    this.fadeFrom = 0.45,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final end = horizontal ? Alignment.centerRight : Alignment.bottomCenter;
+    final begin = horizontal ? Alignment.centerLeft : Alignment.topCenter;
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        ArtPlayerPhoto(url: url, initials: initials, color: color),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: begin,
+              end: end,
+              colors: [tint.withValues(alpha: 0.28), tint.withValues(alpha: 0.05)],
+            ),
+          ),
+        ),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: begin,
+              end: end,
+              stops: [fadeFrom, 1],
+              colors: [ground.withValues(alpha: 0), ground],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class ArtPlayerPhoto extends StatelessWidget {
   final String url;
   final String initials;

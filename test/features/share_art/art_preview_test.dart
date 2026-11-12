@@ -16,6 +16,8 @@ import 'package:arena_soccer/features/share_art/presentation/art_exporter.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/share_art/domain/player_art_data.dart';
+import 'package:arena_soccer/features/share_art/domain/player_match_art_data.dart';
+import 'package:arena_soccer/features/share_art/presentation/templates/player_match/player_match_art.dart';
 import 'package:arena_soccer/features/share_art/presentation/templates/player/player_art.dart';
 import 'package:arena_soccer/features/share_art/presentation/templates/preview/preview_art.dart';
 import 'package:arena_soccer/features/share_art/presentation/templates/result/result_art.dart';
@@ -288,6 +290,49 @@ void main() {
         expect(tester.takeException(), isNull, reason: 'player ${template.name}/${format.name}');
         final png = await tester.runAsync(() => ArtExporter.capture(key, format));
         File('build/art_previews/player_${template.name}_${format.name}$suffix.png').writeAsBytesSync(png!);
+      }
+    }
+    // Atleta na partida (antes do jogo): com foto e logo, e sem foto.
+    PlayerMatchArtData matchArt(PlayerDTO player) => PlayerMatchArtData.of(
+          player: player,
+          match: upcomingWith('memoria://logo'),
+          side: MatchSide.away,
+          championshipId: 11,
+          season: '2026',
+        );
+    final pmCases = [
+      for (final t in PlayerMatchArtTemplate.values)
+        (t, matchArt(const PlayerDTO(id: 'p1', name: 'Ronaldo Nazário', team: 'Açaí No Gralle', teamId: 't2', imageUrl: 'memoria://foto', position: 'atacante')), ''),
+      for (final t in PlayerMatchArtTemplate.values)
+        (t, matchArt(const PlayerDTO(id: 'p2', name: 'Dudu', team: 'Açaí No Gralle', teamId: 't2', position: 'goleiro')), '_semfoto'),
+    ];
+    for (final (template, pdata, suffix) in pmCases) {
+      for (final format in ArtFormat.values.where((f) => formats.contains(f.name))) {
+        final key = GlobalKey();
+        await tester.pumpWidget(MaterialApp(
+          debugShowCheckedModeBanner: false,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('pt'),
+          home: Scaffold(
+            body: Center(
+              child: RepaintBoundary(
+                key: key,
+                child: PlayerMatchArt(
+                    data: pdata, template: template, format: format, showQr: true, now: DateTime.utc(2026, 11, 13, 15)),
+              ),
+            ),
+          ),
+        ));
+        final element = tester.element(find.byKey(key));
+        await tester.runAsync(() async {
+          await precacheImage(logo, element);
+          await precacheImage(photo, element);
+        });
+        await tester.pump();
+        expect(tester.takeException(), isNull, reason: 'player match ${template.name}/${format.name}');
+        final png = await tester.runAsync(() => ArtExporter.capture(key, format));
+        File('build/art_previews/pmatch_${template.name}_${format.name}$suffix.png').writeAsBytesSync(png!);
       }
     }
   }, skip: !enabled);

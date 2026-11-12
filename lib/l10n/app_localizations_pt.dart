@@ -768,6 +768,73 @@ class AppLocalizationsPt extends AppLocalizations {
   String get playerArtOfficial => 'Anúncio oficial';
 
   @override
+  String get playerMatchArtAction => 'Arte do atleta';
+
+  @override
+  String get playerMatchArtSheetTitle => 'Gerar arte';
+
+  @override
+  String get playerMatchArtPick => 'Escolher atleta';
+
+  @override
+  String get playerMatchArtSearch => 'Buscar atleta';
+
+  @override
+  String get playerMatchArtEmpty => 'Nenhum atleta nos elencos desta partida';
+
+  @override
+  String get playerMatchArtTitle => 'Atleta na partida';
+
+  @override
+  String get playerMatchArtTemplateCover => 'Capa';
+
+  @override
+  String get playerMatchArtTemplateCountdown => 'Contagem';
+
+  @override
+  String get playerMatchArtTemplateAgenda => 'Agenda';
+
+  @override
+  String get playerMatchArtTemplateDuel => 'Duelo';
+
+  @override
+  String get playerMatchArtTemplateLineup => 'Escalação';
+
+  @override
+  String get playerMatchArtTemplateSpotlight => 'Holofote';
+
+  @override
+  String get playerMatchArtLineup => 'Na escalação!';
+
+  @override
+  String get playerMatchArtMatchday => 'Dia de jogo';
+
+  @override
+  String playerMatchArtDaysToGo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'dias para o jogo',
+      one: 'dia para o jogo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String playerMatchArtWaiting(String name) {
+    return '$name te espera';
+  }
+
+  @override
+  String get playerMatchArtComeWatch => 'Vem pro jogo!';
+
+  @override
+  String playerMatchArtShareText(
+      String name, String home, String away, String when, String link) {
+    return '$name em campo: $home x $away · $when $link';
+  }
+
+  @override
   String get playerArtTemplateImpact => 'Impacto';
 
   @override

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/player_requests/presentation/bloc/my_player_cubit.dart';
+import 'package:arena_soccer/features/share_art/presentation/widgets/match_art_sheet.dart';
 import 'package:arena_soccer/features/matches/presentation/export/match_report_export.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
 import 'package:arena_soccer/features/matches/domain/match_manage_access.dart';
@@ -168,11 +170,14 @@ class MatchesList extends StatelessWidget {
                 },
               ),
               // Admin: lança um card de gol desta partida (e atualiza o placar dela).
-              // Antes do jogo: arte de divulgação (a mesma tela do "Gerar arte").
-              onShareArt: () => Navigator.pushNamed(
+              // Antes do jogo: arte de divulgação; admin e atleta da partida
+              // escolhem entre ela e a arte do atleta.
+              onShareArt: () => openMatchArt(
                 context,
-                AppRoutes.shareArtPage,
-                arguments: {'match': match, 'season': season},
+                match: match,
+                season: season,
+                isAdmin: isAdmin,
+                myPlayer: BlocProvider.of<MyPlayerCubit>(context).state.player,
               ),
               onPredict: () => showPredictionSheet(
                 context,

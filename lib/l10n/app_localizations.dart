@@ -1395,6 +1395,115 @@ abstract class AppLocalizations {
   /// **'Anúncio oficial'**
   String get playerArtOfficial;
 
+  /// No description provided for @playerMatchArtAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arte do atleta'**
+  String get playerMatchArtAction;
+
+  /// No description provided for @playerMatchArtSheetTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gerar arte'**
+  String get playerMatchArtSheetTitle;
+
+  /// No description provided for @playerMatchArtPick.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolher atleta'**
+  String get playerMatchArtPick;
+
+  /// No description provided for @playerMatchArtSearch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Buscar atleta'**
+  String get playerMatchArtSearch;
+
+  /// No description provided for @playerMatchArtEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum atleta nos elencos desta partida'**
+  String get playerMatchArtEmpty;
+
+  /// No description provided for @playerMatchArtTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atleta na partida'**
+  String get playerMatchArtTitle;
+
+  /// No description provided for @playerMatchArtTemplateCover.
+  ///
+  /// In pt, this message translates to:
+  /// **'Capa'**
+  String get playerMatchArtTemplateCover;
+
+  /// No description provided for @playerMatchArtTemplateCountdown.
+  ///
+  /// In pt, this message translates to:
+  /// **'Contagem'**
+  String get playerMatchArtTemplateCountdown;
+
+  /// No description provided for @playerMatchArtTemplateAgenda.
+  ///
+  /// In pt, this message translates to:
+  /// **'Agenda'**
+  String get playerMatchArtTemplateAgenda;
+
+  /// No description provided for @playerMatchArtTemplateDuel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Duelo'**
+  String get playerMatchArtTemplateDuel;
+
+  /// No description provided for @playerMatchArtTemplateLineup.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escalação'**
+  String get playerMatchArtTemplateLineup;
+
+  /// No description provided for @playerMatchArtTemplateSpotlight.
+  ///
+  /// In pt, this message translates to:
+  /// **'Holofote'**
+  String get playerMatchArtTemplateSpotlight;
+
+  /// No description provided for @playerMatchArtLineup.
+  ///
+  /// In pt, this message translates to:
+  /// **'Na escalação!'**
+  String get playerMatchArtLineup;
+
+  /// No description provided for @playerMatchArtMatchday.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dia de jogo'**
+  String get playerMatchArtMatchday;
+
+  /// No description provided for @playerMatchArtDaysToGo.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{dia para o jogo} other{dias para o jogo}}'**
+  String playerMatchArtDaysToGo(int count);
+
+  /// No description provided for @playerMatchArtWaiting.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} te espera'**
+  String playerMatchArtWaiting(String name);
+
+  /// No description provided for @playerMatchArtComeWatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vem pro jogo!'**
+  String get playerMatchArtComeWatch;
+
+  /// No description provided for @playerMatchArtShareText.
+  ///
+  /// In pt, this message translates to:
+  /// **'{name} em campo: {home} x {away} · {when} {link}'**
+  String playerMatchArtShareText(
+      String name, String home, String away, String when, String link);
+
   /// No description provided for @playerArtTemplateImpact.
   ///
   /// In pt, this message translates to:
