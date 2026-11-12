@@ -14,6 +14,7 @@ import 'package:arena_soccer/features/share_art/presentation/art_exporter.dart';
 import 'package:arena_soccer/features/share_art/presentation/bloc/player_art_cubit.dart';
 import 'package:arena_soccer/features/share_art/presentation/templates/player/player_art.dart';
 import 'package:arena_soccer/features/share_art/presentation/widgets/art_controls.dart';
+import 'package:arena_soccer/features/share_art/presentation/widgets/art_graphics.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
@@ -59,7 +60,8 @@ class _PlayerArtPageState extends State<PlayerArtPage> {
       await WidgetsBinding.instance.endOfFrame;
       final png = await ArtExporter.capture(_artKey, state.format);
       if (png == null) throw StateError('arte sem tamanho');
-      await action(png, 'arena_atleta_${state.template.name}_${state.format.name}_${DateTime.now().millisecondsSinceEpoch}');
+      await action(
+          png, 'arena_atleta_${state.template.name}_${state.format.name}_${DateTime.now().millisecondsSinceEpoch}');
     } catch (e) {
       AppLogger.e('player art export', name: 'PlayerArtPage', error: e);
       if (mounted) showSnackBar(context: context, message: l10n.shareArtError, isSuccess: false);
@@ -134,20 +136,30 @@ class _PlayerArtPageState extends State<PlayerArtPage> {
                 child: Padding(
                   padding: const EdgeInsets.all(AppSizes.s16),
                   child: Center(
-                    child: FittedBox(
-                      fit: BoxFit.contain,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          boxShadow: [BoxShadow(color: AppColors.black.withValues(alpha: 0.2), blurRadius: AppSizes.s20)],
-                        ),
-                        child: RepaintBoundary(
-                          key: _artKey,
-                          child: PlayerArt(
-                            data: data,
-                            template: state.template,
-                            palette: state.palette,
-                            format: state.format,
-                            showQr: state.showQr,
+                    child: ArtFramingGesture(
+                      enabled: data.photoUrl.isNotEmpty,
+                      onMove: cubit.moveFraming,
+                      onZoom: cubit.zoomFraming,
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(color: AppColors.black.withValues(alpha: 0.2), blurRadius: AppSizes.s20)
+                            ],
+                          ),
+                          child: RepaintBoundary(
+                            key: _artKey,
+                            child: ArtPhotoFramingScope(
+                              framing: state.framing,
+                              child: PlayerArt(
+                                data: data,
+                                template: state.template,
+                                palette: state.palette,
+                                format: state.format,
+                                showQr: state.showQr,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -155,6 +167,12 @@ class _PlayerArtPageState extends State<PlayerArtPage> {
                   ),
                 ),
               ),
+              if (data.photoUrl.isNotEmpty)
+                ArtFramingHint(
+                  hint: l10n.shareArtFramingHint,
+                  resetLabel: l10n.shareArtFramingReset,
+                  onReset: state.framing.isCentered ? null : cubit.resetFraming,
+                ),
               ArtControlsPanel(
                 children: [
                   ArtChipRow(

@@ -1395,6 +1395,18 @@ abstract class AppLocalizations {
   /// **'Anúncio oficial'**
   String get playerArtOfficial;
 
+  /// No description provided for @shareArtFramingHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arraste a foto para enquadrar · pinça para zoom'**
+  String get shareArtFramingHint;
+
+  /// No description provided for @shareArtFramingReset.
+  ///
+  /// In pt, this message translates to:
+  /// **'Centralizar'**
+  String get shareArtFramingReset;
+
   /// No description provided for @playerMatchArtAction.
   ///
   /// In pt, this message translates to:
@@ -1424,6 +1436,12 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Nenhum atleta nos elencos desta partida'**
   String get playerMatchArtEmpty;
+
+  /// No description provided for @playerMatchArtTeamEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum atleta no elenco deste time'**
+  String get playerMatchArtTeamEmpty;
 
   /// No description provided for @playerMatchArtTitle.
   ///

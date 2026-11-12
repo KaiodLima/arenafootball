@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/share_art/domain/art_photo_framing.dart';
 import 'package:arena_soccer/features/share_art/domain/result_art_data.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/team_colors.dart';
@@ -792,13 +793,38 @@ class ArtPlayerPhoto extends StatelessWidget {
   Widget build(BuildContext context) {
     final fallback = _Silhouette(initials: initials, color: color);
     if (url.isEmpty) return fallback;
-    return Image(
-      image: providerFor(url),
-      fit: BoxFit.cover,
-      alignment: Alignment.topCenter,
-      errorBuilder: (_, __, ___) => fallback,
+    // Enquadramento escolhido pelo usuário (padrão: o centro do alto).
+    final framing = ArtPhotoFramingScope.of(context);
+    final alignment = Alignment(framing.x, framing.y);
+    return ClipRect(
+      child: Transform.scale(
+        scale: framing.zoom,
+        alignment: alignment,
+        child: Image(
+          image: providerFor(url),
+          fit: BoxFit.cover,
+          alignment: alignment,
+          width: double.infinity,
+          height: double.infinity,
+          errorBuilder: (_, __, ___) => fallback,
+        ),
+      ),
     );
   }
+}
+
+/// Leva o enquadramento da foto do atleta ([ArtPhotoFraming]) até todas as
+/// fotos da arte, sem os modelos precisarem saber dele.
+class ArtPhotoFramingScope extends InheritedWidget {
+  final ArtPhotoFraming framing;
+
+  const ArtPhotoFramingScope({super.key, required this.framing, required super.child});
+
+  static ArtPhotoFraming of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<ArtPhotoFramingScope>()?.framing ?? ArtPhotoFraming.centered;
+
+  @override
+  bool updateShouldNotify(ArtPhotoFramingScope oldWidget) => oldWidget.framing != framing;
 }
 
 class _Silhouette extends StatelessWidget {

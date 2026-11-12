@@ -768,6 +768,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get playerArtOfficial => 'Anúncio oficial';
 
   @override
+  String get shareArtFramingHint =>
+      'Arraste a foto para enquadrar · pinça para zoom';
+
+  @override
+  String get shareArtFramingReset => 'Centralizar';
+
+  @override
   String get playerMatchArtAction => 'Arte do atleta';
 
   @override
@@ -781,6 +788,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get playerMatchArtEmpty => 'Nenhum atleta nos elencos desta partida';
+
+  @override
+  String get playerMatchArtTeamEmpty => 'Nenhum atleta no elenco deste time';
 
   @override
   String get playerMatchArtTitle => 'Atleta na partida';

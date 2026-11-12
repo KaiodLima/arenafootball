@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/share_art/domain/art_format.dart';
+import 'package:arena_soccer/features/share_art/domain/art_photo_framing.dart';
 import 'package:arena_soccer/features/share_art/domain/art_palette.dart';
 import 'package:arena_soccer/features/share_art/domain/result_art_data.dart';
 import 'package:arena_soccer/features/share_art/presentation/art_exporter.dart';
@@ -334,6 +335,41 @@ void main() {
         final png = await tester.runAsync(() => ArtExporter.capture(key, format));
         File('build/art_previews/pmatch_${template.name}_${format.name}$suffix.png').writeAsBytesSync(png!);
       }
+    }
+    // Enquadramento deslocado (arrastado e com zoom): a exportação segue a prévia.
+    {
+      final key = GlobalKey();
+      await tester.pumpWidget(MaterialApp(
+        debugShowCheckedModeBanner: false,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('pt'),
+        home: Scaffold(
+          body: Center(
+            child: RepaintBoundary(
+              key: key,
+              child: ArtPhotoFramingScope(
+                framing: const ArtPhotoFraming(x: 0.8, y: 0.4, zoom: 1.8),
+                child: PlayerMatchArt(
+                  data: pmCases.first.$2,
+                  template: PlayerMatchArtTemplate.duel,
+                  format: ArtFormat.feed,
+                  showQr: true,
+                  now: DateTime.utc(2026, 11, 13, 15),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ));
+      final element = tester.element(find.byKey(key));
+      await tester.runAsync(() async {
+        await precacheImage(logo, element);
+        await precacheImage(photo, element);
+      });
+      await tester.pump();
+      final png = await tester.runAsync(() => ArtExporter.capture(key, ArtFormat.feed));
+      File('build/art_previews/pmatch_duel_feed_enquadrada.png').writeAsBytesSync(png!);
     }
   }, skip: !enabled);
 }

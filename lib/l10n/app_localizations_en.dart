@@ -765,6 +765,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playerArtOfficial => 'Official announcement';
 
   @override
+  String get shareArtFramingHint =>
+      'Drag the photo to frame it · pinch to zoom';
+
+  @override
+  String get shareArtFramingReset => 'Reset';
+
+  @override
   String get playerMatchArtAction => 'Athlete art';
 
   @override
@@ -778,6 +785,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get playerMatchArtEmpty => 'No athletes in this match squads';
+
+  @override
+  String get playerMatchArtTeamEmpty => 'No athletes in this team squad';
 
   @override
   String get playerMatchArtTitle => 'Athlete in the match';

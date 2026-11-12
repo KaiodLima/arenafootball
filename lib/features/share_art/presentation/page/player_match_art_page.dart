@@ -14,6 +14,7 @@ import 'package:arena_soccer/features/share_art/presentation/art_exporter.dart';
 import 'package:arena_soccer/features/share_art/presentation/bloc/player_match_art_cubit.dart';
 import 'package:arena_soccer/features/share_art/presentation/templates/player_match/player_match_art.dart';
 import 'package:arena_soccer/features/share_art/presentation/widgets/art_controls.dart';
+import 'package:arena_soccer/features/share_art/presentation/widgets/art_graphics.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
@@ -143,22 +144,30 @@ class _PlayerMatchArtPageState extends State<PlayerMatchArtPage> {
                       child: Padding(
                         padding: const EdgeInsets.all(AppSizes.s16),
                         child: Center(
-                          child: FittedBox(
-                            fit: BoxFit.contain,
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(color: AppColors.black.withValues(alpha: 0.2), blurRadius: AppSizes.s20)
-                                ],
-                              ),
-                              child: RepaintBoundary(
-                                key: _artKey,
-                                child: PlayerMatchArt(
-                                  data: data,
-                                  template: state.template,
-                                  palette: state.palette,
-                                  format: state.format,
-                                  showQr: state.showQr,
+                          child: ArtFramingGesture(
+                            enabled: data.player.photoUrl.isNotEmpty,
+                            onMove: cubit.moveFraming,
+                            onZoom: cubit.zoomFraming,
+                            child: FittedBox(
+                              fit: BoxFit.contain,
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(color: AppColors.black.withValues(alpha: 0.2), blurRadius: AppSizes.s20)
+                                  ],
+                                ),
+                                child: RepaintBoundary(
+                                  key: _artKey,
+                                  child: ArtPhotoFramingScope(
+                                    framing: state.framing,
+                                    child: PlayerMatchArt(
+                                      data: data,
+                                      template: state.template,
+                                      palette: state.palette,
+                                      format: state.format,
+                                      showQr: state.showQr,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -166,6 +175,12 @@ class _PlayerMatchArtPageState extends State<PlayerMatchArtPage> {
                         ),
                       ),
                     ),
+                    if (data.player.photoUrl.isNotEmpty)
+                      ArtFramingHint(
+                        hint: l10n.shareArtFramingHint,
+                        resetLabel: l10n.shareArtFramingReset,
+                        onReset: state.framing.isCentered ? null : cubit.resetFraming,
+                      ),
                     ArtControlsPanel(
                       children: [
                         ArtChipRow(

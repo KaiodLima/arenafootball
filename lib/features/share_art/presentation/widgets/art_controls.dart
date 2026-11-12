@@ -148,3 +148,86 @@ class ArtPaletteDot extends StatelessWidget {
     );
   }
 }
+
+/// Prévia em que o usuário enquadra a foto do atleta: arrastar com um dedo
+/// move a foto (ela acompanha o dedo) e a pinça dá zoom. Desligado
+/// ([enabled] falso, sem foto), só mostra o [child].
+class ArtFramingGesture extends StatefulWidget {
+  final bool enabled;
+  final void Function(double dx, double dy) onMove;
+  final void Function(double factor) onZoom;
+  final Widget child;
+
+  const ArtFramingGesture({
+    super.key,
+    required this.enabled,
+    required this.onMove,
+    required this.onZoom,
+    required this.child,
+  });
+
+  @override
+  State<ArtFramingGesture> createState() => _ArtFramingGestureState();
+}
+
+class _ArtFramingGestureState extends State<ArtFramingGesture> {
+  double _lastScale = 1;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!widget.enabled) return widget.child;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onScaleStart: (_) => _lastScale = 1,
+      onScaleUpdate: (details) {
+        final box = context.findRenderObject() as RenderBox?;
+        final size = box?.size;
+        if (size == null || size.isEmpty) return;
+        // Arrastar para a direita mostra mais do lado esquerdo da foto.
+        final delta = details.focalPointDelta;
+        if (delta != Offset.zero) widget.onMove(-delta.dx / size.width * 2.4, -delta.dy / size.height * 2.4);
+        if (details.pointerCount > 1 && details.scale != _lastScale) {
+          widget.onZoom(details.scale / _lastScale);
+          _lastScale = details.scale;
+        }
+      },
+      child: widget.child,
+    );
+  }
+}
+
+/// Dica do enquadramento e o "Centralizar" (só quando a foto já saiu do padrão).
+class ArtFramingHint extends StatelessWidget {
+  final String hint;
+  final String resetLabel;
+  final VoidCallback? onReset;
+
+  const ArtFramingHint({super.key, required this.hint, required this.resetLabel, this.onReset});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s6),
+      child: Row(
+        children: [
+          const Icon(Icons.open_with_rounded, size: AppSizes.s16, color: AppColors.textSecondary),
+          const SizedBox(width: AppSizes.s6),
+          Expanded(
+            child: Text(hint, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+          ),
+          if (onReset != null)
+            TextButton.icon(
+              onPressed: onReset,
+              icon: const Icon(Icons.center_focus_strong_rounded, size: AppSizes.s16),
+              label: Text(resetLabel),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}

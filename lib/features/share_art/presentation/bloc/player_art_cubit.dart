@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/share_art/domain/art_format.dart';
+import 'package:arena_soccer/features/share_art/domain/art_photo_framing.dart';
 import 'package:arena_soccer/features/share_art/domain/art_palette.dart';
 import 'package:arena_soccer/features/share_art/domain/player_art_data.dart';
 import 'package:arena_soccer/features/share_art/presentation/templates/player/player_art.dart';
@@ -14,6 +15,9 @@ class PlayerArtState extends Equatable {
   final bool showQr;
   final bool busy;
 
+  /// Enquadramento da foto (arrastar e pinça na prévia).
+  final ArtPhotoFraming framing;
+
   const PlayerArtState({
     required this.data,
     this.template = PlayerArtTemplate.signing,
@@ -21,6 +25,7 @@ class PlayerArtState extends Equatable {
     this.format = ArtFormat.feed,
     this.showQr = true,
     this.busy = false,
+    this.framing = ArtPhotoFraming.centered,
   });
 
   PlayerArtState copyWith({
@@ -29,6 +34,7 @@ class PlayerArtState extends Equatable {
     ArtFormat? format,
     bool? showQr,
     bool? busy,
+    ArtPhotoFraming? framing,
   }) =>
       PlayerArtState(
         data: data,
@@ -37,10 +43,11 @@ class PlayerArtState extends Equatable {
         format: format ?? this.format,
         showQr: showQr ?? this.showQr,
         busy: busy ?? this.busy,
+        framing: framing ?? this.framing,
       );
 
   @override
-  List<Object?> get props => [data, template, palette, format, showQr, busy];
+  List<Object?> get props => [data, template, palette, format, showQr, busy, framing];
 }
 
 class PlayerArtCubit extends Cubit<PlayerArtState> {
@@ -51,4 +58,7 @@ class PlayerArtCubit extends Cubit<PlayerArtState> {
   void selectFormat(ArtFormat format) => emit(state.copyWith(format: format));
   void toggleQr(bool value) => emit(state.copyWith(showQr: value));
   void setBusy(bool value) => emit(state.copyWith(busy: value));
+  void moveFraming(double dx, double dy) => emit(state.copyWith(framing: state.framing.moved(dx, dy)));
+  void zoomFraming(double factor) => emit(state.copyWith(framing: state.framing.zoomed(factor)));
+  void resetFraming() => emit(state.copyWith(framing: ArtPhotoFraming.centered));
 }

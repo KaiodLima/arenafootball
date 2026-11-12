@@ -118,10 +118,12 @@ class _AthletePickerState extends State<_AthletePicker> {
         height: MediaQuery.of(context).size.height * 0.7,
         child: BlocBuilder<MatchAthletePickerCubit, MatchAthletePickerState>(
           builder: (context, state) {
+            // Os dois times sempre aparecem (elenco geral de cada um).
             final sections = [
-              (widget.match.homeTeam, MatchSide.home, filter(state.home)),
-              (widget.match.awayTeam, MatchSide.away, filter(state.away)),
-            ].where((s) => s.$3.isNotEmpty).toList();
+              (widget.match.homeTeam, MatchSide.home, filter(state.home), state.homeLoading),
+              (widget.match.awayTeam, MatchSide.away, filter(state.away), state.awayLoading),
+            ];
+            final nobody = !state.loading && sections.every((s) => s.$3.isEmpty) && term.isEmpty;
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -137,11 +139,11 @@ class _AthletePickerState extends State<_AthletePicker> {
                 Expanded(
                   child: state.loading
                       ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
-                      : sections.isEmpty
+                      : nobody
                           ? ArenaEmptyState(message: l10n.playerMatchArtEmpty, icon: Icons.groups_outlined)
                           : ListView(
                               children: [
-                                for (final (team, side, players) in sections) ...[
+                                for (final (team, side, players, teamLoading) in sections) ...[
                                   Padding(
                                     padding: const EdgeInsets.fromLTRB(
                                         AppSizes.s20, AppSizes.s12, AppSizes.s20, AppSizes.s4),
@@ -151,6 +153,17 @@ class _AthletePickerState extends State<_AthletePicker> {
                                           .copyWith(fontSize: AppSizes.s12),
                                     ),
                                   ),
+                                  if (players.isEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: AppSizes.s20, vertical: AppSizes.s8),
+                                      child: teamLoading
+                                          ? const LinearProgressIndicator(minHeight: 2, color: AppColors.primary)
+                                          : Text(
+                                              l10n.playerMatchArtTeamEmpty,
+                                              style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+                                            ),
+                                    ),
                                   for (final player in players)
                                     ListTile(
                                       leading: CircleAvatar(

@@ -4,6 +4,7 @@ import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/share_art/domain/art_format.dart';
+import 'package:arena_soccer/features/share_art/domain/art_photo_framing.dart';
 import 'package:arena_soccer/features/share_art/domain/art_palette.dart';
 import 'package:arena_soccer/features/share_art/domain/player_match_art_data.dart';
 import 'package:arena_soccer/features/share_art/domain/usecases/prepare_result_art_usecase.dart';
@@ -18,6 +19,9 @@ class PlayerMatchArtState extends Equatable {
   final bool showQr;
   final bool busy;
 
+  /// Enquadramento da foto (arrastar e pinça na prévia).
+  final ArtPhotoFraming framing;
+
   const PlayerMatchArtState({
     this.data,
     this.template = PlayerMatchArtTemplate.cover,
@@ -25,6 +29,7 @@ class PlayerMatchArtState extends Equatable {
     this.format = ArtFormat.feed,
     this.showQr = true,
     this.busy = false,
+    this.framing = ArtPhotoFraming.centered,
   });
 
   PlayerMatchArtState copyWith({
@@ -34,6 +39,7 @@ class PlayerMatchArtState extends Equatable {
     ArtFormat? format,
     bool? showQr,
     bool? busy,
+    ArtPhotoFraming? framing,
   }) =>
       PlayerMatchArtState(
         data: data ?? this.data,
@@ -42,10 +48,11 @@ class PlayerMatchArtState extends Equatable {
         format: format ?? this.format,
         showQr: showQr ?? this.showQr,
         busy: busy ?? this.busy,
+        framing: framing ?? this.framing,
       );
 
   @override
-  List<Object?> get props => [data, template, palette, format, showQr, busy];
+  List<Object?> get props => [data, template, palette, format, showQr, busy, framing];
 }
 
 /// Arte do atleta na partida: prepara a partida (a mesma leitura em cache da
@@ -79,4 +86,7 @@ class PlayerMatchArtCubit extends Cubit<PlayerMatchArtState> {
   void selectFormat(ArtFormat format) => emit(state.copyWith(format: format));
   void toggleQr(bool value) => emit(state.copyWith(showQr: value));
   void setBusy(bool value) => emit(state.copyWith(busy: value));
+  void moveFraming(double dx, double dy) => emit(state.copyWith(framing: state.framing.moved(dx, dy)));
+  void zoomFraming(double factor) => emit(state.copyWith(framing: state.framing.zoomed(factor)));
+  void resetFraming() => emit(state.copyWith(framing: ArtPhotoFraming.centered));
 }
