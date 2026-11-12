@@ -32,6 +32,7 @@ HomeDrawer _drawer({
   String? ownedTeam,
   int pending = 0,
   HomeDrawerTourKeys? keys,
+  String? playerPhoto,
 }) =>
     HomeDrawer(
       user: user,
@@ -39,6 +40,7 @@ HomeDrawer _drawer({
       referralsEnabled: referrals,
       playerTeam: playerTeam,
       playerId: playerTeam == null ? null : 'p1',
+      playerPhotoUrl: playerPhoto,
       ownedTeam: ownedTeam,
       pendingPlayerRequests: pending,
       pendingTeamRequests: pending,
@@ -66,6 +68,20 @@ void main() {
     ));
     await tester.pump();
   }
+
+  testWidgets('jogador com foto: o cabeçalho mostra a foto do atleta; sem foto, o escudo', (tester) async {
+    await pump(tester, _drawer(user: _fan, playerTeam: 'Lava Jato', playerPhoto: 'https://img/atleta.jpg'));
+    final photo = find.byKey(const ValueKey('drawer-player-photo'));
+    expect(photo, findsOneWidget);
+    final avatar = tester.widget<CircleAvatar>(find.descendant(of: photo, matching: find.byType(CircleAvatar)));
+    expect((avatar.backgroundImage as dynamic).url, 'https://img/atleta.jpg');
+    // Atleta sem foto, ou conta que não é jogador: o escudo de sempre.
+    await pump(tester, _drawer(user: _fan, playerTeam: 'Lava Jato', playerPhoto: ''));
+    expect(find.byKey(const ValueKey('drawer-player-photo')), findsNothing);
+    await pump(tester, _drawer(user: _fan, playerPhoto: 'https://img/atleta.jpg'));
+    expect(find.byKey(const ValueKey('drawer-player-photo')), findsNothing);
+    tester.takeException();
+  });
 
   testWidgets('convidado: atalhos públicos, sem "Em campo", admin nem rodapé', (tester) async {
     await pump(tester, _drawer());

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/achievements/domain/achievement_metric.dart';
 import 'package:arena_soccer/features/achievements/presentation/bloc/achievements_cubit.dart';
+import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/achievements/presentation/widgets/achievement_labels.dart';
 import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
 import 'package:arena_soccer/features/players/presentation/player_navigation.dart';
@@ -27,7 +28,7 @@ T? _maybeOf<T extends StateStreamableSource<Object?>>(BuildContext context) {
   }
 }
 
-/// Menu lateral da home: cabeçalho "carteirinha" (escudo do time do coração,
+/// Menu lateral da home: cabeçalho "carteirinha" (foto do atleta ou escudo do time do coração,
 /// nome, papéis e o nível das conquistas), atalhos em grade colorida, "Em
 /// campo" com os pedidos/áreas da conta, o bloco do admin e, no rodapé,
 /// Configurações e Sair.
@@ -48,6 +49,9 @@ class HomeDrawer extends StatelessWidget {
   final String? playerTeam;
   final String? playerId;
   final String? playerSeason;
+
+  /// Foto do atleta da conta: no cabeçalho, no lugar do escudo do time.
+  final String? playerPhotoUrl;
 
   /// Time do qual a conta é dona/treinadora ("Sou dono de time" aprovado).
   final String? ownedTeam;
@@ -77,6 +81,7 @@ class HomeDrawer extends StatelessWidget {
     this.playerTeam,
     this.playerId,
     this.playerSeason,
+    this.playerPhotoUrl,
     this.ownedTeam,
     this.isPartner = false,
     required this.onChooseTeam,
@@ -101,7 +106,8 @@ class HomeDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final isAdmin = user?.isAdmin ?? false;
+    // Admin efetivo: no modo jogador, o menu é o de um jogador.
+    final isAdmin = _maybeOf<SessionCubit>(context)?.state.isAdmin ?? (user?.isAdmin ?? false);
     final loggedIn = user != null;
     final referrals = referralsEnabled ?? _maybeOf<ReferralConfigCubit>(context)?.state.enabled ?? false;
 
@@ -163,6 +169,7 @@ class HomeDrawer extends StatelessWidget {
             child: _ProfileHeader(
               user: user,
               favoriteTeamImage: favoriteTeamImage,
+              playerPhotoUrl: playerId == null ? null : playerPhotoUrl,
               playerTeam: playerTeam,
               ownedTeam: ownedTeam,
               xp: loggedIn ? _xp(context) : null,
@@ -308,6 +315,9 @@ final _headerButtonStyle = FilledButton.styleFrom(
 class _ProfileHeader extends StatelessWidget {
   final UserDTO? user;
   final String? favoriteTeamImage;
+
+  /// Atleta da conta com foto: o avatar é a foto dele (toque abre o perfil).
+  final String? playerPhotoUrl;
   final String? playerTeam;
   final String? ownedTeam;
 
@@ -321,6 +331,7 @@ class _ProfileHeader extends StatelessWidget {
   const _ProfileHeader({
     this.user,
     this.favoriteTeamImage,
+    this.playerPhotoUrl,
     this.playerTeam,
     this.ownedTeam,
     this.xp,
@@ -354,7 +365,14 @@ class _ProfileHeader extends StatelessWidget {
                     padding: const EdgeInsets.only(right: AppSizes.s40),
                     child: Row(
                       children: [
-                        _Avatar(image: favoriteTeamImage),
+                        // Jogador com foto: a foto do atleta; senão, o escudo do time do coração.
+                        playerPhotoUrl != null && playerPhotoUrl!.trim().isNotEmpty
+                            ? GestureDetector(
+                                onTap: onOpenPlayer,
+                                child:
+                                    _Avatar(key: const ValueKey('drawer-player-photo'), image: playerPhotoUrl!.trim()),
+                              )
+                            : _Avatar(image: favoriteTeamImage),
                         const SizedBox(width: AppSizes.s14),
                         Expanded(
                           child: Column(
@@ -466,11 +484,11 @@ class _ProfileHeader extends StatelessWidget {
   }
 }
 
-/// Escudo do time do coração num anel dourado.
+/// Foto do atleta ou escudo do time do coração num anel dourado.
 class _Avatar extends StatelessWidget {
   final String? image;
 
-  const _Avatar({this.image});
+  const _Avatar({super.key, this.image});
 
   @override
   Widget build(BuildContext context) {

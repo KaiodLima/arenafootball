@@ -64,11 +64,21 @@ class ImageUploadProfile {
   /// Capa, banner e fotos de notícia/destaque/campeonato (e pasta desconhecida).
   static const ImageUploadProfile cover = ImageUploadProfile(size: 1280);
 
+  /// Logo do campeonato em PNG: mantém o fundo transparente.
+  static const ImageUploadProfile logo = ImageUploadProfile(size: 1024, png: true);
+
   static ImageUploadProfile forFolder(String folder) => switch (folder) {
         StorageFolder.users || StorageFolder.players || StorageFolder.album => photo,
         StorageFolder.teams => crest,
         _ => cover,
       };
+
+  /// Perfil pelo arquivo: a imagem do campeonato também é a logo dele (card,
+  /// detalhe, artes), então PNG continua PNG (transparência); o resto, pela pasta.
+  static ImageUploadProfile forFile(String folder, String path) {
+    if (folder == StorageFolder.championships && imageContentType(path).contentType == 'image/png') return logo;
+    return forFolder(folder);
+  }
 }
 
 /// Bytes a enviar: o comprimido quando existe e ficou menor que o original;
@@ -120,7 +130,7 @@ class StorageUploadService {
   /// CDN podem guardar por 1 ano sem baixar de novo.
   static const String cacheControl = 'public, max-age=31536000';
 
-  /// Otimiza a imagem pela pasta ([ImageUploadProfile]) e envia com o tipo
+  /// Otimiza a imagem pela pasta e pelo arquivo ([ImageUploadProfile.forFile]) e envia com o tipo
   /// (`image/*`), a extensão no nome e o cache longo. Se a compressão falhar,
   /// envia o original.
   Future<Either<Failure, String>> uploadImage({
@@ -131,16 +141,17 @@ class StorageUploadService {
     const fallback = 'Não foi possível enviar a imagem.';
     try {
       final original = await file.readAsBytes();
+      final profile = ImageUploadProfile.forFile(folder, file.path);
       Uint8List? compressed;
       try {
-        compressed = await _compressor.compress(file.path, ImageUploadProfile.forFolder(folder));
+        compressed = await _compressor.compress(file.path, profile);
       } catch (e) {
         AppLogger.e('compress folder=$folder', name: 'StorageUploadService', error: e);
       }
       final upload = chooseUploadBytes(
         original: original,
         compressed: compressed,
-        profile: ImageUploadProfile.forFolder(folder),
+        profile: profile,
         path: file.path,
       );
       final name = '${fileName ?? DateTime.now().millisecondsSinceEpoch}.${upload.extension}';

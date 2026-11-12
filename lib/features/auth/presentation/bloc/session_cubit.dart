@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
+import 'package:arena_soccer/core/services/preferences_service.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
 import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
 import 'package:arena_soccer/features/auth/domain/account_provider.dart';
@@ -21,6 +22,9 @@ class SessionCubit extends Cubit<SessionState> {
   final DeleteUserCacheUseCase deleteUserCacheUseCase;
   final ClearCacheUseCase clearCacheUseCase;
 
+  /// Onde o modo jogador do admin fica guardado (nulo nos testes antigos).
+  final PreferencesService? preferences;
+
   SessionCubit(
     this.getCurrentUserUseCase,
     this.signOutUseCase,
@@ -28,8 +32,27 @@ class SessionCubit extends Cubit<SessionState> {
     this.getCachedUserUseCase,
     this.saveUserCacheUseCase,
     this.deleteUserCacheUseCase,
-    this.clearCacheUseCase,
-  ) : super(const CheckingSessionState());
+    this.clearCacheUseCase, [
+    this.preferences,
+  ]) : super(const CheckingSessionState());
+
+  /// O modo jogador guardado para a conta (só conta admin).
+  Future<bool> _savedPlayerMode(UserDTO user) async {
+    final prefs = preferences;
+    if (!user.isAdmin || prefs == null) return false;
+    return prefs.getPlayerMode(user.id);
+  }
+
+  Future<AuthenticatedSessionState> _authenticated(UserDTO user) async =>
+      AuthenticatedSessionState(user: user, playerMode: await _savedPlayerMode(user));
+
+  /// Liga/desliga o modo jogador do admin (toggle do topo da home).
+  Future<void> setPlayerMode(bool value) async {
+    final user = state.user;
+    if (user == null || !user.isAdmin || state.playerMode == value) return;
+    emit(AuthenticatedSessionState(user: user, playerMode: value));
+    await preferences?.setPlayerMode(user.id, value);
+  }
 
   static const String _logName = 'SessionCubit';
 
@@ -40,7 +63,7 @@ class SessionCubit extends Cubit<SessionState> {
     emit(const CheckingSessionState());
     final cachedResponse = await getCachedUserUseCase();
     final cached = cachedResponse.isRight ? cachedResponse.right?.data : null;
-    if (cached != null) emit(AuthenticatedSessionState(user: cached));
+    if (cached != null) emit(await _authenticated(cached));
 
     final response = await getCurrentUserUseCase();
     if (response.isLeft) {
@@ -58,18 +81,19 @@ class SessionCubit extends Cubit<SessionState> {
       return;
     }
     await saveUserCacheUseCase(user);
-    if (user != cached) emit(AuthenticatedSessionState(user: user));
+    if (user != cached) emit(await _authenticated(user));
   }
 
   Future<void> signedIn(UserDTO user) async {
-    emit(AuthenticatedSessionState(user: user));
+    emit(await _authenticated(user));
     await saveUserCacheUseCase(user);
   }
 
   /// Atualiza os dados do usuário logado (ex.: time escolhido na etapa 2).
   Future<void> updateUser(UserDTO user) async {
     if (!state.isAuthenticated) return;
-    emit(AuthenticatedSessionState(user: user));
+    // Mantém o modo (deixou de ser admin, o modo some sozinho: `isAccountAdmin`).
+    emit(AuthenticatedSessionState(user: user, playerMode: state.playerMode && user.isAdmin));
     await saveUserCacheUseCase(user);
   }
 

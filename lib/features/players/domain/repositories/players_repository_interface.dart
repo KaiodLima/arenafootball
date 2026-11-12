@@ -35,6 +35,9 @@ abstract class IPlayersRepository {
 
   Future<Either<Failure, void>> updatePlayer(PlayerDTO player, {String? season});
 
+  /// Só a foto do jogador (o próprio atleta troca a dele).
+  Future<Either<Failure, void>> updatePlayerPhoto({required String id, required String url, String? season});
+
   Future<Either<Failure, void>> deletePlayer(PlayerDTO player, {String? season});
 
   /// Tira do elenco: com [championshipId], só da competição.

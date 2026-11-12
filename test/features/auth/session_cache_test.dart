@@ -1,5 +1,7 @@
 import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:arena_soccer/core/services/preferences_service.dart';
 import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
@@ -59,7 +61,7 @@ void main() {
   const user = UserDTO(id: 'u1', name: 'Kaio', email: 'k@x.com', favoriteTeam: 'Lava Jato');
   late _FakeAuth auth;
 
-  SessionCubit build() => SessionCubit(
+  SessionCubit build([PreferencesService? preferences]) => SessionCubit(
         GetCurrentUserUseCase(auth),
         SignOutUseCase(auth),
         DeleteAccountUseCase(auth),
@@ -67,7 +69,43 @@ void main() {
         SaveUserCacheUseCase(auth),
         DeleteUserCacheUseCase(auth),
         ClearCacheUseCase(auth),
+        preferences,
       );
+
+  test('modo jogador: no modo o admin deixa de ser admin nas telas; a conta continua admin', () {
+    const admin = UserDTO(id: 'adm', name: 'Admin', email: 'a@x.com', isAdmin: true);
+    const normal = AuthenticatedSessionState(user: admin);
+    expect((normal.isAdmin, normal.isAccountAdmin, normal.inPlayerMode), (true, true, false));
+    const player = AuthenticatedSessionState(user: admin, playerMode: true);
+    expect((player.isAdmin, player.isAccountAdmin, player.inPlayerMode), (false, true, true));
+    // Conta comum ignora o modo.
+    const fan = AuthenticatedSessionState(user: user, playerMode: true);
+    expect((fan.isAdmin, fan.inPlayerMode), (false, false));
+  });
+
+  test('modo jogador: liga, fica guardado no aparelho, volta ao entrar e zera no logout', () async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = PreferencesService();
+    const admin = UserDTO(id: 'adm', name: 'Admin', email: 'a@x.com', isAdmin: true);
+    final cubit = build(prefs);
+    await cubit.signedIn(admin);
+    expect(cubit.state.inPlayerMode, isFalse);
+    await cubit.setPlayerMode(true);
+    expect(cubit.state.inPlayerMode, isTrue);
+    expect(cubit.state.isAdmin, isFalse);
+
+    final again = build(prefs);
+    await again.signedIn(admin);
+    expect(again.state.inPlayerMode, isTrue, reason: 'lembrado no aparelho');
+    await again.signOut();
+    expect(again.state.inPlayerMode, isFalse);
+
+    // Conta comum não liga o modo.
+    final fan = build(prefs);
+    await fan.signedIn(user);
+    await fan.setPlayerMode(true);
+    expect(fan.state.playerMode, isFalse);
+  });
 
   setUp(() => auth = _FakeAuth());
 

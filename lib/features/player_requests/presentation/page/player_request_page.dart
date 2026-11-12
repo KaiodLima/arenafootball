@@ -12,7 +12,9 @@ import 'package:arena_soccer/features/player_requests/presentation/widgets/playe
 import 'package:arena_soccer/features/player_requests/presentation/widgets/player_request_labels.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/presentation/player_navigation.dart';
+import 'package:arena_soccer/features/players/presentation/widgets/player_card.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/championship_picker.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
 import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
@@ -81,13 +83,38 @@ class _PlayerRequestPageState extends State<PlayerRequestPage> {
     setState(() => _showErrors = false);
   }
 
-  void _submit(PlayerRequestForm form) {
+  /// Atletas de mesmo nome que a pessoa disse não ser (não pergunta de novo).
+  final Set<String> _notMe = {};
+
+  Future<void> _submit(PlayerRequestForm form) async {
     FocusManager.instance.primaryFocus?.unfocus();
     if (form.error != null) {
       setState(() => _showErrors = true);
       return;
     }
-    _cubit.submit();
+    // Já existe no elenco um atleta sem conta com o mesmo nome: é a pessoa?
+    final match = form.sameNameUnlinked;
+    if (match != null && !_notMe.contains(match.id)) {
+      final l10n = AppLocalizations.of(context);
+      final isMe = await showArenaChoice(
+        context,
+        header: l10n.playerRequestSameNameHeader,
+        title: l10n.playerRequestSameNameTitle(match.name, form.selectedTeam ?? ''),
+        // Já tem cadastro: o admin junta os dois na aprovação.
+        message: form.hasOwnPlayer ? l10n.playerRequestSameNameMergeMessage : l10n.playerRequestSameNameMessage,
+        icon: Icons.person_search_rounded,
+        confirmLabel: l10n.playerRequestSameNameYes,
+        cancelLabel: l10n.playerRequestSameNameNo,
+        content: _PlayerSummaryCard(player: match),
+      );
+      if (!mounted || isMe == null) return;
+      if (isMe) {
+        _cubit.claimPlayer(match);
+      } else {
+        _notMe.add(match.id);
+      }
+    }
+    await _cubit.submit();
   }
 
   Future<void> _confirmCancel(PlayerRequestDTO request, AppLocalizations l10n) async {
@@ -103,11 +130,12 @@ class _PlayerRequestPageState extends State<PlayerRequestPage> {
     if (confirmed) await _cubit.cancelRequest();
   }
 
-  void _openProfile(PlayerRequestDTO request) {
+  void _openProfile(PlayerRequestDTO request, {bool changePhoto = false}) {
     openAthlete(context, {
       'playerId': request.playerId,
       'season': request.season == SeasonCollection.currentSeason ? null : request.season,
       'name': request.name,
+      if (changePhoto) 'openPhotoPicker': true,
     });
   }
 
@@ -130,7 +158,9 @@ class _PlayerRequestPageState extends State<PlayerRequestPage> {
           current is ErrorPlayerRequestState ||
           previous.editing != current.editing ||
           // Marcar/desmarcar o "sou eu" troca o nome: o campo acompanha.
-          previous.form.claimedPlayer != current.form.claimedPlayer,
+          previous.form.claimedPlayer != current.form.claimedPlayer ||
+          // O cadastro da conta chegou (nome dele no campo).
+          previous.form.accountPlayer != current.form.accountPlayer,
       listener: (context, state) {
         if (state is SubmittedPlayerRequestState) {
           setState(() => _showErrors = false);
@@ -183,6 +213,7 @@ class _PlayerRequestPageState extends State<PlayerRequestPage> {
                   onCancel: () => _confirmCancel(state.request!, l10n),
                   onResubmit: () => _edit(state),
                   onOpenProfile: () => _openProfile(state.request!),
+                  onChangePhoto: () => _openProfile(state.request!, changePhoto: true),
                   onNewRequest: () {
                     _cubit.startNewRequest();
                     setState(() => _showErrors = false);
@@ -212,23 +243,35 @@ class _PlayerRequestPageState extends State<PlayerRequestPage> {
           recent: BlocProvider.of<RegionCubit>(context).state.recentRegions,
           onChanged: _cubit.selectRegion,
         ),
+        // Competições sem carregar: o pedido não sai (aviso com "Tentar de novo").
+        if (form.championshipsFailed) ...[
+          const SizedBox(height: AppSizes.s12),
+          Row(
+            children: [
+              Expanded(child: _ErrorText(l10n.playerRequestChampionshipsError)),
+              TextButton(onPressed: _cubit.retryChampionships, child: Text(l10n.commonTryAgain)),
+            ],
+          ),
+        ],
         // Competição em que quer jogar (os times são os dela).
         if (form.championships.isNotEmpty) ...[
           const SizedBox(height: AppSizes.s16),
-          Text(l10n.playerRequestChampionshipLabel, style: AppTypography.label(color: AppColors.textPrimary)),
-          const SizedBox(height: AppSizes.s8),
-          Wrap(
-            spacing: AppSizes.s8,
-            runSpacing: AppSizes.s8,
-            children: [
-              for (final championship in form.championships)
-                ArenaChoiceChip(
-                  label: championship.title,
-                  icon: Icons.emoji_events_outlined,
-                  selected: championship.championshipId == form.championshipId,
-                  onTap: () => _cubit.selectChampionship(championship.championshipId),
-                ),
-            ],
+          // Seletor padrão (busca; a lista de competições cresce).
+          ChampionshipSelectTile(
+            label: l10n.playerRequestChampionshipLabel,
+            championship: form.selectedChampionship,
+            noneLabel: l10n.playerRequestChampionshipChoose,
+            noneIcon: Icons.emoji_events_outlined,
+            onTap: () async {
+              final picked = await showChampionshipPickerSheet(
+                context,
+                championships: form.championships,
+                selectedId: form.championshipId,
+                showNone: false,
+              );
+              final id = picked?.id;
+              if (id != null) await _cubit.selectChampionship(id);
+            },
           ),
           if (error == PlayerRequestFormError.championship) _ErrorText(l10n.playerRequestChampionshipRequired),
           if (error == PlayerRequestFormError.alreadyInChampionship)
@@ -242,12 +285,30 @@ class _PlayerRequestPageState extends State<PlayerRequestPage> {
           key: ValueKey('${form.selectedRegion}-${form.championshipId}'),
           teams: form.selectableTeams,
           selected: form.selectedTeam,
-          loading: form.loadingTeams,
+          loading: form.loadingTeams || form.loadingChampionships,
           placeholder: l10n.playersTeam,
           onSelected: (team) => _cubit.selectTeam(team.name),
         ),
+        // Sem time para escolher (região sem times ou competição sem times dela).
+        if (!form.loadingTeams &&
+            !form.loadingChampionships &&
+            !form.championshipsFailed &&
+            form.selectableTeams.isEmpty &&
+            (form.championships.isEmpty || form.selectedChampionship != null))
+          _ErrorText(l10n.playerRequestNoTeams),
         if (error == PlayerRequestFormError.team) _ErrorText(l10n.playerRequestTeamRequired),
-        if (form.selectedTeam != null && (form.loadingPlayers || form.unlinkedPlayers.isNotEmpty)) ...[
+        // Já tem cadastro de atleta: o pedido usa ele (sem a lista "sou eu").
+        if (form.hasOwnPlayer) ...[
+          const SizedBox(height: AppSizes.s20),
+          Text(l10n.playerRequestOwnPlayerTitle, style: AppTypography.label(color: AppColors.textPrimary)),
+          const SizedBox(height: AppSizes.s8),
+          _PlayerSummaryCard(
+            player: form.accountPlayer!,
+            note: form.isClaim
+                ? l10n.playerRequestOwnPlayerClaimed(form.claimedPlayer!.name)
+                : l10n.playerRequestOwnPlayerMessage,
+          ),
+        ] else if (form.selectedTeam != null && (form.loadingPlayers || form.unlinkedPlayers.isNotEmpty)) ...[
           const SizedBox(height: AppSizes.s20),
           _ClaimSection(
             players: form.unlinkedPlayers,
@@ -285,7 +346,11 @@ class _PlayerRequestPageState extends State<PlayerRequestPage> {
                 decoration: arenaInputDecoration(
                   label: l10n.playerRequestNameLabel,
                   icon: form.isClaim ? Icons.lock_outline_rounded : Icons.person_outline_rounded,
-                  errorText: error == PlayerRequestFormError.name ? l10n.playersNameRequired : null,
+                  errorText: switch (error) {
+                    PlayerRequestFormError.name => l10n.playersNameRequired,
+                    PlayerRequestFormError.nameTooLong => l10n.playerRequestNameTooLong,
+                    _ => null,
+                  },
                 ),
               ),
               const SizedBox(height: AppSizes.s4),
@@ -395,6 +460,9 @@ class _StatusView extends StatelessWidget {
   final VoidCallback onCancel;
   final VoidCallback onResubmit;
   final VoidCallback onOpenProfile;
+
+  /// Pedido aprovado: abre o perfil já no seletor da foto.
+  final VoidCallback onChangePhoto;
   final VoidCallback onNewRequest;
 
   const _StatusView({
@@ -405,6 +473,7 @@ class _StatusView extends StatelessWidget {
     required this.onCancel,
     required this.onResubmit,
     required this.onOpenProfile,
+    required this.onChangePhoto,
     required this.onNewRequest,
   });
 
@@ -498,8 +567,11 @@ class _StatusView extends StatelessWidget {
               ArenaButton.primary(title: l10n.playerRequestResubmit, function: onResubmit),
             ],
           PlayerRequestStatus.approved => [
-              if (request.playerId.isNotEmpty)
+              if (request.playerId.isNotEmpty) ...[
                 ArenaButton.primary(title: l10n.playerRequestViewProfile, function: onOpenProfile),
+                const SizedBox(height: AppSizes.s8),
+                ArenaButton.outlined(title: l10n.playerChangeOwnPhoto, function: onChangePhoto),
+              ],
               const SizedBox(height: AppSizes.s8),
               // Joga também em outra competição (por outro time ou o mesmo).
               ArenaButton.outlined(title: l10n.playerRequestAnotherChampionship, function: onNewRequest),
@@ -559,6 +631,59 @@ class _ClaimBadge extends StatelessWidget {
               style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s12),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Cartão do atleta: foto ou iniciais, nome, posição e gols/assistências
+/// (e uma [note] embaixo, se houver).
+class _PlayerSummaryCard extends StatelessWidget {
+  final PlayerDTO player;
+  final String? note;
+
+  const _PlayerSummaryCard({required this.player, this.note});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final position = PlayerPosition.fromKey(player.position);
+    final details = [
+      if (position != null) playerPositionLabel(l10n, position),
+      if (player.team.isNotEmpty) player.team,
+      l10n.playerRequestPlayerNumbers(player.goals, player.assists),
+    ].join(' · ');
+    return Container(
+      padding: const EdgeInsets.all(AppSizes.s12),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSizes.s12),
+        border: Border.all(color: AppColors.greyLight),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              PlayerAvatar(player: player, size: AppSizes.s48),
+              const SizedBox(width: AppSizes.s12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(player.name, style: AppTypography.label(color: AppColors.textPrimary)),
+                    const SizedBox(height: AppSizes.s2),
+                    Text(details, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (note != null) ...[
+            const SizedBox(height: AppSizes.s8),
+            Text(note!, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+          ],
         ],
       ),
     );

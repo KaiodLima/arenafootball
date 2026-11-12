@@ -87,6 +87,10 @@ class _FakeRepository implements IPlayersRepository {
   Future<Either<Failure, void>> updatePlayer(PlayerDTO player, {String? season}) async => const Right(null);
 
   @override
+  Future<Either<Failure, void>> updatePlayerPhoto({required String id, required String url, String? season}) async =>
+      const Right(null);
+
+  @override
   Future<Either<Failure, void>> deletePlayer(PlayerDTO player, {String? season}) async => const Right(null);
 
   @override

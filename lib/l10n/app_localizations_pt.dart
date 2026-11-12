@@ -575,6 +575,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get playersPhotoSave => 'Salvar';
 
   @override
+  String get playersPhotoHeader => 'Foto do atleta';
+
+  @override
+  String get playersPhotoTitle => 'Trocar foto';
+
+  @override
+  String get playersPhotoMessage => 'Escolha uma foto da câmera ou da galeria';
+
+  @override
   String get statsEmptyGoals => 'Nenhum gol marcado ainda';
 
   @override
@@ -766,6 +775,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get playerArtOfficial => 'Anúncio oficial';
+
+  @override
+  String get playerChangeOwnPhoto => 'Trocar minha foto';
+
+  @override
+  String get playerPhotoUpdated => 'Foto atualizada!';
 
   @override
   String get shareArtFramingHint =>
@@ -1645,6 +1660,19 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get organizerModeOrganizer => 'Modo organizador';
+
+  @override
+  String get homeModeAdmin => 'Modo admin';
+
+  @override
+  String get homeModePlayer => 'Modo jogador';
+
+  @override
+  String get homeModePlayerBanner =>
+      'Modo jogador: você vê o app como um jogador';
+
+  @override
+  String get homeModePlayerExit => 'Sair';
 
   @override
   String get organizerModeToggle => 'Trocar entre torcedor e organizador';
@@ -5240,6 +5268,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get playerRequestChampionshipLabel => 'Competição';
 
   @override
+  String get playerRequestChampionshipChoose => 'Escolha a competição';
+
+  @override
   String get playerRequestChampionshipRequired =>
       'Escolha a competição em que você joga por esse time.';
 
@@ -5252,6 +5283,56 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get playerRequestTeamRequired => 'Escolha o time em que você joga.';
+
+  @override
+  String get playerRequestOwnPlayerTitle => 'Seu cadastro de atleta';
+
+  @override
+  String get playerRequestOwnPlayerMessage =>
+      'O pedido usa o seu cadastro: seus números continuam.';
+
+  @override
+  String get playerRequestSameNameHeader => 'Atleta encontrado';
+
+  @override
+  String playerRequestSameNameTitle(String name, String team) {
+    return 'Você é o $name do $team?';
+  }
+
+  @override
+  String get playerRequestSameNameMessage =>
+      'Já existe um atleta com o seu nome neste elenco, ainda sem conta. Se for você, o pedido liga a sua conta a ele e os números dele continuam.';
+
+  @override
+  String get playerRequestSameNameMergeMessage =>
+      'Já existe um atleta com o seu nome neste elenco, ainda sem conta. Se for você, o admin junta esse cadastro com o seu e os números somam.';
+
+  @override
+  String playerRequestOwnPlayerClaimed(String name) {
+    return 'Você disse ser o $name do elenco: o admin junta os dois cadastros na aprovação.';
+  }
+
+  @override
+  String get playerRequestSameNameYes => 'Sou eu';
+
+  @override
+  String get playerRequestSameNameNo => 'Não sou eu';
+
+  @override
+  String playerRequestPlayerNumbers(int goals, int assists) {
+    return '$goals gols · $assists assist.';
+  }
+
+  @override
+  String get playerRequestNameTooLong => 'Use até 40 letras no nome';
+
+  @override
+  String get playerRequestNoTeams =>
+      'Nenhum time disponível nesta região para a competição escolhida';
+
+  @override
+  String get playerRequestChampionshipsError =>
+      'Não foi possível carregar as competições da região';
 
   @override
   String get playerRequestNameLabel => 'Nome de jogador';
@@ -5402,6 +5483,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get playerRequestsRejectReason => 'Motivo (opcional)';
+
+  @override
+  String get rejectReasonMessage =>
+      'O motivo é opcional e aparece para quem fez o pedido.';
 
   @override
   String playerRequestsApproved(String name, String team) {

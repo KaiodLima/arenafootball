@@ -3,6 +3,17 @@ import 'dart:io';
 
 import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
+import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
+import 'package:arena_soccer/features/auth/presentation/bloc/session_state.dart';
+import 'package:arena_soccer/features/players/presentation/page/player_profile_page.dart';
+import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
+import 'package:arena_soccer/features/regions/presentation/bloc/region_state.dart';
+import 'package:arena_soccer/features/team_requests/presentation/bloc/owned_team_cubit.dart';
+import 'package:arena_soccer/features/team_requests/presentation/bloc/owned_team_state.dart';
+import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_usecase.dart';
 import 'package:arena_soccer/features/players/domain/player_season_summary.dart';
@@ -23,6 +34,7 @@ import 'package:arena_soccer/features/players/domain/repositories/players_reposi
 import 'package:arena_soccer/features/players/domain/usecases/delete_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/get_top_players_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/remove_player_from_squad_usecase.dart';
+import 'package:arena_soccer/features/players/domain/usecases/update_player_photo_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/update_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_player_usecase.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/player_profile_cubit.dart';
@@ -115,6 +127,15 @@ class _FakePlayers implements IPlayersRepository {
   @override
   Future<Either<Failure, void>> updatePlayer(PlayerDTO player, {String? season}) async {
     updated.add(player);
+    return const Right(null);
+  }
+
+  /// Fotos gravadas sozinhas (o próprio atleta): (id, url).
+  final photos = <(String, String)>[];
+
+  @override
+  Future<Either<Failure, void>> updatePlayerPhoto({required String id, required String url, String? season}) async {
+    photos.add((id, url));
     return const Right(null);
   }
 
@@ -219,6 +240,31 @@ class _FakeStorage implements StorageUploadService {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+class _Session extends Cubit<SessionState> implements SessionCubit {
+  _Session(String uid, {bool admin = false, bool playerMode = false})
+      : super(SessionState(
+          user: UserDTO(id: uid, name: 'Conta', email: 'c@x.com', isAdmin: admin),
+          playerMode: playerMode,
+        ));
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _Owned extends Cubit<OwnedTeamState> implements OwnedTeamCubit {
+  _Owned() : super(const OwnedTeamState());
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _Region extends Cubit<RegionState> implements RegionCubit {
+  _Region() : super(const RegionState(selectedSeason: '2023'));
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 void main() {
   late _FakePlayers players;
   late PlayerProfileCubit cubit;
@@ -240,12 +286,65 @@ void main() {
       _NoRegionMatches(),
       _NoAwards(),
       _NoHistory(),
+      UpdatePlayerPhotoUseCase(players, _FakeStorage()),
     );
   });
 
   tearDown(() => cubit.close());
 
   Future<void> settle() => Future<void>.delayed(const Duration(milliseconds: 10));
+
+  Future<void> pumpPage(WidgetTester tester, {required String uid, bool admin = false, bool playerMode = false}) async {
+    await tester.pumpWidget(MultiBlocProvider(
+      providers: [
+        BlocProvider<SessionCubit>(create: (_) => _Session(uid, admin: admin, playerMode: playerMode)),
+        BlocProvider<OwnedTeamCubit>(create: (_) => _Owned()),
+        BlocProvider<RegionCubit>(create: (_) => _Region()),
+        BlocProvider<PlayerProfileCubit>.value(value: cubit),
+      ],
+      child: const MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: Locale('pt'),
+        home: PlayerProfilePage(playerId: 'dudu', season: '2023'),
+      ),
+    ));
+    players.controller.add(Right(_dudu.copyWith(userId: 'u1')));
+    await tester.pump();
+    await tester.pump();
+  }
+
+  testWidgets('"Trocar minha foto" só para o próprio atleta', (tester) async {
+    await pumpPage(tester, uid: 'u1');
+    expect(find.text('Trocar minha foto'), findsOneWidget);
+    expect(find.byIcon(Icons.photo_camera_rounded), findsOneWidget);
+  });
+
+  testWidgets('outra conta não vê "Trocar minha foto"', (tester) async {
+    await pumpPage(tester, uid: 'u2');
+    expect(find.text('Trocar minha foto'), findsNothing);
+  });
+
+  testWidgets('admin no modo jogador: vê como o atleta da conta ("Trocar minha foto")', (tester) async {
+    await pumpPage(tester, uid: 'u1', admin: true, playerMode: true);
+    expect(find.text('Trocar minha foto'), findsOneWidget);
+  });
+
+  testWidgets('o admin tem o editor completo, não o botão do atleta', (tester) async {
+    await pumpPage(tester, uid: 'u1', admin: true);
+    expect(find.text('Trocar minha foto'), findsNothing);
+  });
+
+  test('o próprio atleta troca a foto: grava só a foto, não o cadastro inteiro', () async {
+    cubit.watch(playerId: 'dudu', season: '2023');
+    players.controller.add(const Right(_dudu));
+    await settle();
+    await cubit.changeOwnPhoto(File('foto.jpg'));
+    expect(players.photos, [('dudu', 'https://img/nova.png')]);
+    expect(players.updated, isEmpty);
+    expect(cubit.state.player?.imageUrl, 'https://img/nova.png');
+    expect(cubit.state.saving, isFalse);
+  });
 
   test('jogador, time, posições (empate divide) e participações', () async {
     cubit.watch(playerId: 'dudu', season: '2023');

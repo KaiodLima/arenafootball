@@ -10,6 +10,7 @@ import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/core/services/preferences_service.dart';
 import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/home/presentation/home_mode.dart';
 import 'package:arena_soccer/features/home/presentation/widgets/home_header.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/matches_tab.dart';
 import 'package:arena_soccer/features/organizer_requests/domain/repositories/organizer_requests_repository_interface.dart';
@@ -152,18 +153,35 @@ void main() {
     expect(ordered.map((c) => c.id), ['c', 'b', 'a']);
   });
 
-  testWidgets('toggle troca de modo ao tocar', (tester) async {
+  testWidgets('toggle troca de modo ao tocar; o 3º modo (jogador) só para o admin', (tester) async {
     var taps = 0;
-    await tester.pumpWidget(MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      locale: const Locale('pt'),
-      home: Scaffold(body: OrganizerModeToggle(organizerMode: false, onTap: () => taps++)),
-    ));
+    Future<void> pump({required bool showPlayer}) => tester.pumpWidget(MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('pt'),
+          home: Scaffold(
+            body: HomeModeToggle(mode: HomeMode.standard, showPlayer: showPlayer, onTap: () => taps++),
+          ),
+        ));
+    await pump(showPlayer: false);
     expect(find.byIcon(Icons.favorite_rounded), findsOneWidget);
     expect(find.byIcon(Icons.emoji_events_rounded), findsOneWidget);
-    await tester.tap(find.byType(OrganizerModeToggle));
+    expect(find.byIcon(Icons.sports_soccer_rounded), findsNothing);
+    await tester.tap(find.byType(HomeModeToggle));
     expect(taps, 1);
+    await pump(showPlayer: true);
+    expect(find.byIcon(Icons.sports_soccer_rounded), findsOneWidget);
+  });
+
+  test('ciclo do toggle: admin → organizador → jogador → admin; organizador comum ↔', () {
+    HomeMode next(HomeMode m, {bool admin = false, bool organizer = false}) =>
+        nextHomeMode(m, isAccountAdmin: admin, isOrganizer: organizer);
+    expect(next(HomeMode.standard, admin: true), HomeMode.organizer);
+    expect(next(HomeMode.organizer, admin: true), HomeMode.player);
+    expect(next(HomeMode.player, admin: true), HomeMode.standard);
+    expect(next(HomeMode.standard, organizer: true), HomeMode.organizer);
+    expect(next(HomeMode.organizer, organizer: true), HomeMode.standard);
+    expect(next(HomeMode.standard), HomeMode.standard);
   });
 
   testWidgets('paleta: verde por padrão, azul no tema do organizador', (tester) async {

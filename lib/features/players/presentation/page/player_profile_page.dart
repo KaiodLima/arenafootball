@@ -54,7 +54,18 @@ class PlayerProfilePage extends StatefulWidget {
   /// Já conhecido (ex.: vindo do elenco): aparece na hora.
   final PlayerDTO? initial;
 
-  const PlayerProfilePage({super.key, required this.playerId, this.season, this.name, this.initial});
+  /// Abre o seletor de foto assim que o próprio atleta carregar ("Trocar
+  /// foto" do pedido aprovado).
+  final bool openPhotoPicker;
+
+  const PlayerProfilePage({
+    super.key,
+    required this.playerId,
+    this.season,
+    this.name,
+    this.initial,
+    this.openPhotoPicker = false,
+  });
 
   @override
   State<PlayerProfilePage> createState() => _PlayerProfilePageState();
@@ -62,6 +73,19 @@ class PlayerProfilePage extends StatefulWidget {
 
 class _PlayerProfilePageState extends State<PlayerProfilePage> {
   late final _cubit = BlocProvider.of<PlayerProfileCubit>(context);
+
+  /// O seletor pedido pela rota já abriu (só uma vez).
+  bool _pickerOpened = false;
+
+  /// O próprio atleta troca a foto: escolhe, confirma e grava só a foto.
+  Future<void> _pickOwnPhoto(AppLocalizations l10n) async {
+    if (_cubit.state.saving) return;
+    final file = await PlayerPhotoDialog.show(context, player: _cubit.state.player);
+    if (file == null || !mounted) return;
+    await _cubit.changeOwnPhoto(file);
+    if (!mounted || _cubit.state is ErrorPlayerProfileState) return;
+    showSnackBar(context: context, message: l10n.playerPhotoUpdated);
+  }
 
   @override
   void initState() {
@@ -104,7 +128,9 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final isAdmin = context.watch<SessionCubit>().state.isAdmin;
+    final session = context.watch<SessionCubit>().state;
+    final isAdmin = session.isAdmin;
+    final uid = session.user?.id ?? '';
     final ownedTeam = context.watch<OwnedTeamCubit>().state;
 
     return BlocConsumer<PlayerProfileCubit, PlayerProfileState>(
@@ -126,6 +152,16 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
       },
       builder: (context, state) {
         final player = state.player;
+        final editor = player != null &&
+            (isAdmin ||
+                ownedTeam.owns(id: player.teamId, name: player.team) ||
+                player.enrollments.any((e) => ownedTeam.owns(id: e.teamId, name: e.team)));
+        // O atleta da conta troca a própria foto (quem já é editor tem o editor completo).
+        final self = player != null && !editor && uid.isNotEmpty && player.userId == uid;
+        if (self && widget.openPhotoPicker && !_pickerOpened) {
+          _pickerOpened = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) => _pickOwnPhoto(l10n));
+        }
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -151,9 +187,8 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
             _ => _Content(
                 state: state,
                 player: player,
-                isAdmin: isAdmin ||
-                    ownedTeam.owns(id: player.teamId, name: player.team) ||
-                    player.enrollments.any((e) => ownedTeam.owns(id: e.teamId, name: e.team)),
+                isAdmin: editor,
+                onChangeOwnPhoto: self ? () => _pickOwnPhoto(l10n) : null,
                 season: widget.season,
               ),
           },
@@ -220,7 +255,16 @@ class _Content extends StatelessWidget {
   final bool isAdmin;
   final String? season;
 
-  const _Content({required this.state, required this.player, required this.isAdmin, required this.season});
+  /// O próprio atleta: troca só a foto.
+  final VoidCallback? onChangeOwnPhoto;
+
+  const _Content({
+    required this.state,
+    required this.player,
+    required this.isAdmin,
+    required this.season,
+    this.onChangeOwnPhoto,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -229,7 +273,7 @@ class _Content extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.only(bottom: AppSizes.s32),
       children: [
-        _HeroBox(child: _Header(state: state, player: player)),
+        _HeroBox(child: _Header(state: state, player: player, onChangeOwnPhoto: onChangeOwnPhoto)),
         Padding(
           padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, 0),
           child: Row(
@@ -338,7 +382,10 @@ class _Header extends StatelessWidget {
   final PlayerProfileState state;
   final PlayerDTO player;
 
-  const _Header({required this.state, required this.player});
+  /// O próprio atleta: selo de câmera na foto e "Trocar minha foto".
+  final VoidCallback? onChangeOwnPhoto;
+
+  const _Header({required this.state, required this.player, this.onChangeOwnPhoto});
 
   @override
   Widget build(BuildContext context) {
@@ -356,6 +403,23 @@ class _Header extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 PlayerAvatar(player: player, size: AppSizes.s120),
+                if (onChangeOwnPhoto != null)
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Material(
+                      color: AppColors.primary,
+                      shape: const CircleBorder(side: BorderSide(color: AppColors.white, width: 2)),
+                      child: InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: state.saving ? null : onChangeOwnPhoto,
+                        child: const Padding(
+                          padding: EdgeInsets.all(AppSizes.s8),
+                          child: Icon(Icons.photo_camera_rounded, size: AppSizes.s18, color: AppColors.white),
+                        ),
+                      ),
+                    ),
+                  ),
                 if (state.saving)
                   const SizedBox(
                     width: AppSizes.s120,
@@ -395,6 +459,15 @@ class _Header extends StatelessWidget {
                 ),
               ),
             ),
+          ),
+        ],
+        if (onChangeOwnPhoto != null) ...[
+          const SizedBox(height: AppSizes.s10),
+          TextButton.icon(
+            onPressed: state.saving ? null : onChangeOwnPhoto,
+            icon: const Icon(Icons.photo_camera_outlined, size: AppSizes.s18),
+            label: Text(AppLocalizations.of(context).playerChangeOwnPhoto),
+            style: TextButton.styleFrom(foregroundColor: AppColors.white),
           ),
         ],
       ],
@@ -574,7 +647,7 @@ class _AdminEditorState extends State<_AdminEditor> {
   Future<void> _pickPhoto() async {
     FocusManager.instance.primaryFocus?.unfocus();
     final cubit = BlocProvider.of<PlayerProfileCubit>(context);
-    final file = await PlayerPhotoDialog.show(context);
+    final file = await PlayerPhotoDialog.show(context, player: widget.player);
     FocusManager.instance.primaryFocus?.unfocus();
     if (file != null) await cubit.changePhoto(file);
   }

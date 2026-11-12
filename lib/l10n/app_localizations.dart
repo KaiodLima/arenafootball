@@ -1101,6 +1101,24 @@ abstract class AppLocalizations {
   /// **'Salvar'**
   String get playersPhotoSave;
 
+  /// No description provided for @playersPhotoHeader.
+  ///
+  /// In pt, this message translates to:
+  /// **'Foto do atleta'**
+  String get playersPhotoHeader;
+
+  /// No description provided for @playersPhotoTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar foto'**
+  String get playersPhotoTitle;
+
+  /// No description provided for @playersPhotoMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha uma foto da câmera ou da galeria'**
+  String get playersPhotoMessage;
+
   /// No description provided for @statsEmptyGoals.
   ///
   /// In pt, this message translates to:
@@ -1394,6 +1412,18 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Anúncio oficial'**
   String get playerArtOfficial;
+
+  /// No description provided for @playerChangeOwnPhoto.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar minha foto'**
+  String get playerChangeOwnPhoto;
+
+  /// No description provided for @playerPhotoUpdated.
+  ///
+  /// In pt, this message translates to:
+  /// **'Foto atualizada!'**
+  String get playerPhotoUpdated;
 
   /// No description provided for @shareArtFramingHint.
   ///
@@ -2787,6 +2817,30 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Modo organizador'**
   String get organizerModeOrganizer;
+
+  /// No description provided for @homeModeAdmin.
+  ///
+  /// In pt, this message translates to:
+  /// **'Modo admin'**
+  String get homeModeAdmin;
+
+  /// No description provided for @homeModePlayer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Modo jogador'**
+  String get homeModePlayer;
+
+  /// No description provided for @homeModePlayerBanner.
+  ///
+  /// In pt, this message translates to:
+  /// **'Modo jogador: você vê o app como um jogador'**
+  String get homeModePlayerBanner;
+
+  /// No description provided for @homeModePlayerExit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sair'**
+  String get homeModePlayerExit;
 
   /// No description provided for @organizerModeToggle.
   ///
@@ -8696,6 +8750,12 @@ abstract class AppLocalizations {
   /// **'Competição'**
   String get playerRequestChampionshipLabel;
 
+  /// No description provided for @playerRequestChampionshipChoose.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha a competição'**
+  String get playerRequestChampionshipChoose;
+
   /// No description provided for @playerRequestChampionshipRequired.
   ///
   /// In pt, this message translates to:
@@ -8719,6 +8779,84 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Escolha o time em que você joga.'**
   String get playerRequestTeamRequired;
+
+  /// No description provided for @playerRequestOwnPlayerTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu cadastro de atleta'**
+  String get playerRequestOwnPlayerTitle;
+
+  /// No description provided for @playerRequestOwnPlayerMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'O pedido usa o seu cadastro: seus números continuam.'**
+  String get playerRequestOwnPlayerMessage;
+
+  /// No description provided for @playerRequestSameNameHeader.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atleta encontrado'**
+  String get playerRequestSameNameHeader;
+
+  /// No description provided for @playerRequestSameNameTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você é o {name} do {team}?'**
+  String playerRequestSameNameTitle(String name, String team);
+
+  /// No description provided for @playerRequestSameNameMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Já existe um atleta com o seu nome neste elenco, ainda sem conta. Se for você, o pedido liga a sua conta a ele e os números dele continuam.'**
+  String get playerRequestSameNameMessage;
+
+  /// No description provided for @playerRequestSameNameMergeMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Já existe um atleta com o seu nome neste elenco, ainda sem conta. Se for você, o admin junta esse cadastro com o seu e os números somam.'**
+  String get playerRequestSameNameMergeMessage;
+
+  /// No description provided for @playerRequestOwnPlayerClaimed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você disse ser o {name} do elenco: o admin junta os dois cadastros na aprovação.'**
+  String playerRequestOwnPlayerClaimed(String name);
+
+  /// No description provided for @playerRequestSameNameYes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sou eu'**
+  String get playerRequestSameNameYes;
+
+  /// No description provided for @playerRequestSameNameNo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não sou eu'**
+  String get playerRequestSameNameNo;
+
+  /// No description provided for @playerRequestPlayerNumbers.
+  ///
+  /// In pt, this message translates to:
+  /// **'{goals} gols · {assists} assist.'**
+  String playerRequestPlayerNumbers(int goals, int assists);
+
+  /// No description provided for @playerRequestNameTooLong.
+  ///
+  /// In pt, this message translates to:
+  /// **'Use até 40 letras no nome'**
+  String get playerRequestNameTooLong;
+
+  /// No description provided for @playerRequestNoTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum time disponível nesta região para a competição escolhida'**
+  String get playerRequestNoTeams;
+
+  /// No description provided for @playerRequestChampionshipsError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar as competições da região'**
+  String get playerRequestChampionshipsError;
 
   /// No description provided for @playerRequestNameLabel.
   ///
@@ -8977,6 +9115,12 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Motivo (opcional)'**
   String get playerRequestsRejectReason;
+
+  /// No description provided for @rejectReasonMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'O motivo é opcional e aparece para quem fez o pedido.'**
+  String get rejectReasonMessage;
 
   /// No description provided for @playerRequestsApproved.
   ///

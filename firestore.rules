@@ -564,6 +564,16 @@ service cloud.firestore {
           && request.resource.data.descricao is string && request.resource.data.descricao.size() <= 30;
       }
 
+      // O atleta vinculado à conta ("Sou jogador", `idUsuario`) troca só a
+      // própria foto: nenhum outro campo do cadastro.
+      function ownPlayerPhoto() {
+        return isPlayers() && signedIn()
+          && resource.data.get('idUsuario', '') == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['urlImagem'])
+          && request.resource.data.urlImagem is string
+          && request.resource.data.urlImagem.size() <= 2048;
+      }
+
       // Atleta sem time ('') pode entrar no elenco do dono (aprovação do "Sou jogador").
       allow update: if writable() && keepsEnrollments() && (isAdmin() || isOwnVote()
         || (isPlayers()
@@ -571,6 +581,7 @@ service cloud.firestore {
           && (ownsTeam(request.resource.data) || noTeam(request.resource.data))
           && ownEnrollmentsOnly())
         || (isPlayers() && joinsOwnedTeam())
+        || ownPlayerPhoto()
         || (isTeamDoc() && signedIn() && resource.data.idDono == request.auth.uid
           && request.resource.data.diff(resource.data).affectedKeys()
             .hasOnly(['descricao', 'urlImagem', 'corPrimaria', 'corSecundaria']))
