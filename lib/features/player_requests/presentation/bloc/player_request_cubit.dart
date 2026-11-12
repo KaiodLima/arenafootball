@@ -51,7 +51,11 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
     required String initialRegion,
   }) async {
     _userId = userId;
-    _userName = userName;
+    // Nome da conta (ex.: completo do Google) cortado no limite das regras.
+    final trimmed = userName.trim();
+    _userName = trimmed.length > PlayerRequestForm.nameMaxLength
+        ? trimmed.substring(0, PlayerRequestForm.nameMaxLength).trim()
+        : trimmed;
     _email = email;
     _initialRegion = initialRegion;
     await _load();
@@ -64,7 +68,17 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
   void setAccountPlayer(PlayerDTO? player) {
     _accountPlayer = player;
     if (state is ReadyPlayerRequestState || state.form.regions.isNotEmpty) {
-      _updateForm(state.form.copyWith(accountPlayer: () => player));
+      final form = state.form;
+      // Já tem cadastro: nome e posição vêm dele se a pessoa ainda não mexeu
+      // (o "sou eu" escolhido continua: o admin junta os dois na aprovação).
+      final untouched = form.name.trim() == _userName.trim() && !form.isClaim;
+      _updateForm(form.copyWith(
+        accountPlayer: () => player,
+        name: player != null && untouched && player.name.trim().length >= PlayerRequestForm.nameMinLength
+            ? _fit(player.name.trim(), PlayerRequestForm.nameMaxLength)
+            : null,
+        position: player != null && form.position == null ? PlayerPosition.fromKey(player.position) : null,
+      ));
     }
   }
 
@@ -79,7 +93,13 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
     final list = regions.right;
     final region = list.contains(_initialRegion) ? _initialRegion : list.first;
     emit(ReadyPlayerRequestState(
-      form: PlayerRequestForm(regions: list, selectedRegion: region, name: _userName, accountPlayer: _accountPlayer),
+      form: PlayerRequestForm(
+        regions: list,
+        selectedRegion: region,
+        name: _accountName ?? _userName,
+        position: _accountPlayer == null ? null : PlayerPosition.fromKey(_accountPlayer!.position),
+        accountPlayer: _accountPlayer,
+      ),
     ));
 
     _subscription?.cancel();
@@ -104,7 +124,11 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
       return;
     }
     final regionChanged = request != null && request.region.isNotEmpty && request.region != state.form.selectedRegion;
-    _emitReady(request: request, form: request == null ? state.form : _formFrom(request, state.form), editing: false);
+    // Pedido sumiu (cancelado): o formulário volta limpo.
+    final form = request == null
+        ? (state.request != null ? _blankForm(state.form) : state.form)
+        : _formFrom(request, state.form);
+    _emitReady(request: request, form: form, editing: false);
     // Escudo do time do pedido: precisa dos times da região dele.
     if (regionChanged) _loadTeams(request.region);
   }
@@ -125,14 +149,36 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
     );
   }
 
+  /// Formulário de pedido novo (sem time, competição, vínculo, foto e mensagem).
+  PlayerRequestForm _blankForm(PlayerRequestForm form) => form.copyWith(
+        selectedTeam: () => null,
+        championshipId: () => null,
+        claimedPlayer: () => null,
+        unlinkedPlayers: const [],
+        name: _userName,
+        message: '',
+        photo: () => null,
+        imageUrl: '',
+      );
+
+  /// Durante o envio, as atualizações (snapshot, times, competições, atleta
+  /// da conta) não derrubam o "enviando": o botão fica travado até o fim.
   void _emitReady({PlayerRequestDTO? request, required PlayerRequestForm form, required bool editing}) {
-    emit(ReadyPlayerRequestState(request: request, form: form, editing: editing));
+    final ready = ReadyPlayerRequestState(request: request, form: form, editing: editing);
+    emit(state is SubmittingPlayerRequestState ? SubmittingPlayerRequestState(ready) : ready);
   }
 
   void _updateForm(PlayerRequestForm form) => _emitReady(request: state.request, form: form, editing: state.editing);
 
   Future<void> _loadTeams(String region) async {
-    _updateForm(state.form.copyWith(selectedRegion: region, loadingTeams: true));
+    _updateForm(state.form.copyWith(
+      selectedRegion: region,
+      loadingTeams: true,
+      // As da região anterior não valem aqui.
+      championships: region == state.form.selectedRegion ? null : const [],
+      loadingChampionships: true,
+      championshipsFailed: false,
+    ));
     unawaited(_loadChampionships(region));
     await for (final response in getTeamsCacheFirstUseCase(region: region)) {
       // Só aplica se a região não mudou enquanto carregava.
@@ -159,12 +205,18 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
     await for (final response
         in getRegionChampionshipsCacheFirstUseCase(region: region, season: SeasonCollection.currentSeason)) {
       if (isClosed || state.form.selectedRegion != region) return;
-      if (response.isLeft) continue;
+      if (response.isLeft) {
+        // Sem cache e sem rede: o pedido não sai sem saber das competições.
+        _updateForm(state.form.copyWith(loadingChampionships: false, championshipsFailed: true));
+        continue;
+      }
       final championships = [...response.right]..sort((a, b) => a.championshipId.compareTo(b.championshipId));
       final current = state.form.championshipId;
       final keep = championships.any((c) => c.championshipId == current);
       _updateForm(state.form.copyWith(
         championships: championships,
+        loadingChampionships: false,
+        championshipsFailed: false,
         // Uma competição só: já vem escolhida.
         championshipId: keep ? null : () => championships.length == 1 ? championships.first.championshipId : null,
       ));
@@ -181,6 +233,8 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
       selectedTeam: teamStays ? null : () => null,
       claimedPlayer: () => null,
       unlinkedPlayers: teamStays ? null : const [],
+      // Desfez o "sou eu": o nome volta ao da conta.
+      name: form.isClaim ? _userName : null,
     ));
     if (teamStays) await _loadUnlinkedPlayers(team);
   }
@@ -219,8 +273,22 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
 
   Future<void> selectRegion(String region) async {
     if (region == state.form.selectedRegion) return;
-    _updateForm(state.form.copyWith(selectedTeam: () => null));
+    _updateForm(state.form.copyWith(
+      selectedTeam: () => null,
+      championshipId: () => null,
+      claimedPlayer: () => null,
+      unlinkedPlayers: const [],
+      name: state.form.isClaim ? _userName : null,
+    ));
     await _loadTeams(region);
+  }
+
+  /// "Tentar de novo" das competições da região.
+  Future<void> retryChampionships() async {
+    final region = state.form.selectedRegion;
+    if (region == null) return;
+    _updateForm(state.form.copyWith(loadingChampionships: true, championshipsFailed: false));
+    await _loadChampionships(region);
   }
 
   /// Escolher o time limpa o "sou eu" e carrega os atletas dele sem conta.
@@ -230,6 +298,7 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
       selectedTeam: () => team,
       claimedPlayer: () => null,
       unlinkedPlayers: const [],
+      name: state.form.isClaim ? _userName : null,
     ));
     await _loadUnlinkedPlayers(team);
   }
@@ -292,7 +361,8 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
       userId: _userId,
       userName: _userName,
       email: _email,
-      name: form.name,
+      // Vínculo com atleta de nome curto demais para as regras: o da conta.
+      name: form.submitName.length >= PlayerRequestForm.nameMinLength ? form.submitName : _userName,
       team: form.selectedTeam!,
       teamId: form.selectedTeamId,
       region: form.selectedRegion ?? '',
@@ -302,13 +372,16 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
       imageUrl: form.imageUrl.isEmpty && form.photo == null ? form.claimedPlayer?.imageUrl ?? '' : form.imageUrl,
       claimedPlayerId: form.claimedPlayer?.id ?? '',
       championshipId: form.selectedChampionship?.championshipId,
-      championship: form.selectedChampionship?.title ?? '',
+      championship: _fit(form.selectedChampionship?.title ?? '', 80),
+      // Corrigindo um pendente: o "enviado em" continua o do pedido.
+      createdAt: current.request?.status == PlayerRequestStatus.pending ? current.request?.createdAt : null,
     );
     final response = await submitPlayerRequestUseCase(request, photo: form.photo);
     if (isClosed) return;
+    // O estado de agora (o snapshot do próprio envio pode já ter chegado).
     response.fold(
-      (failure) => emit(ErrorPlayerRequestState(current, errorMessage: failure.toString())),
-      (_) => emit(SubmittedPlayerRequestState(current)),
+      (failure) => emit(ErrorPlayerRequestState(_ready(state), errorMessage: failure.toString())),
+      (_) => emit(SubmittedPlayerRequestState(_ready(state))),
     );
   }
 
@@ -319,10 +392,23 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
     final response = await cancelPlayerRequestUseCase(_userId);
     if (isClosed) return;
     response.fold(
-      (failure) => emit(ErrorPlayerRequestState(current, errorMessage: failure.toString())),
-      (_) => emit(CancelledPlayerRequestState(current)),
+      (failure) => emit(ErrorPlayerRequestState(_ready(state), errorMessage: failure.toString())),
+      // Cancelado: o formulário volta limpo.
+      (_) => emit(CancelledPlayerRequestState(ReadyPlayerRequestState(form: _blankForm(state.form)))),
     );
   }
+
+  /// Nome do cadastro de atleta da conta (no limite das regras), se servir.
+  String? get _accountName {
+    final name = _accountPlayer?.name.trim() ?? '';
+    return name.length >= PlayerRequestForm.nameMinLength ? _fit(name, PlayerRequestForm.nameMaxLength) : null;
+  }
+
+  /// O estado atual sem o "enviando" (para o resultado do envio).
+  PlayerRequestState _ready(PlayerRequestState from) =>
+      ReadyPlayerRequestState(request: from.request, form: from.form, editing: from.editing);
+
+  static String _fit(String text, int max) => text.length > max ? text.substring(0, max).trim() : text;
 
   @override
   Future<void> close() {

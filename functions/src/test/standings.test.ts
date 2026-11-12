@@ -111,3 +111,11 @@ test('espelho na linha antiga e grupos da partida', () => {
   assert.equal(groupHasAny(teams, [{ id: 'x', name: '' }, { id: 'c', name: 'Vila' }]), true);
   assert.equal(groupHasAny(teams, [{ id: 'x', name: 'Outro' }]), false);
 });
+
+test('grupo de qualquer tamanho: lê as listas idsTimes/times', () => {
+  const big = { times: ['A', 'B', 'C', 'D', 'E', 'F'], idsTimes: ['a', 'b', 'c', 'd', 'e', 'f'], time1: 'A', idTime1: 'a' };
+  assert.deepEqual(
+    groupTeams(big).map((t) => t.id),
+    ['a', 'b', 'c', 'd', 'e', 'f'],
+  );
+});

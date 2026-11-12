@@ -62,8 +62,8 @@ class PartnerRequestsPanelCubit extends Cubit<PartnerRequestsPanelState> {
   }
 
   /// Publica a notícia pendente no feed.
-  Future<void> approveNews(PendingNewsDTO pending) => _runNews(
-      pending, PartnerRequestsNotice.newsApproved, () => pendingNewsUseCase.approve(pending));
+  Future<void> approveNews(PendingNewsDTO pending) =>
+      _runNews(pending, PartnerRequestsNotice.newsApproved, () => pendingNewsUseCase.approve(pending));
 
   Future<void> rejectNews(PendingNewsDTO pending, {String reason = ''}) => _runNews(
       pending, PartnerRequestsNotice.newsRejected, () => pendingNewsUseCase.reject(pending.id, reason: reason));
@@ -98,15 +98,16 @@ class PartnerRequestsPanelCubit extends Cubit<PartnerRequestsPanelState> {
     _setBusy(request.userId, false);
     response.fold(
       (failure) => emit(ErrorPartnerRequestsPanelState(state, errorMessage: failure.toString())),
-      (count) => emit(NoticePartnerRequestsPanelState(state, notice: PartnerRequestsNotice.linked, name: request.name, count: count)),
+      (count) => emit(NoticePartnerRequestsPanelState(state,
+          notice: PartnerRequestsNotice.linked, name: request.name, count: count)),
     );
   }
 
-  Future<void> clearHighlightLinks(PartnerRequestDTO request) => _run(
-      request, PartnerRequestsNotice.linksCleared, () => partnerHighlightLinksUseCase.clear(request.userId));
+  Future<void> clearHighlightLinks(PartnerRequestDTO request) =>
+      _run(request, PartnerRequestsNotice.linksCleared, () => partnerHighlightLinksUseCase.clear(request.userId));
 
-  Future<void> reject(PartnerRequestDTO request, {String reason = ''}) => _run(
-      request, PartnerRequestsNotice.rejected, () => answerPartnerRequestUseCase.reject(request.userId, reason: reason));
+  Future<void> reject(PartnerRequestDTO request, {String reason = ''}) => _run(request, PartnerRequestsNotice.rejected,
+      () => answerPartnerRequestUseCase.reject(request.userId, reason: reason));
 
   Future<void> revoke(PartnerRequestDTO request, {String reason = ''}) => _run(
       request, PartnerRequestsNotice.revoked, () => answerPartnerRequestUseCase.revoke(request.userId, reason: reason));

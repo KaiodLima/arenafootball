@@ -57,6 +57,10 @@ class PlayersRepositoryImpl implements IPlayersRepository {
       _invalidate(await _dataSource.updatePlayer(player, season: season));
 
   @override
+  Future<Either<Failure, void>> updatePlayerPhoto({required String id, required String url, String? season}) async =>
+      _invalidate(await _dataSource.updatePlayerPhoto(id: id, url: url, season: season));
+
+  @override
   Future<Either<Failure, void>> deletePlayer(PlayerDTO player, {String? season}) async =>
       _invalidate(await _dataSource.deletePlayer(player, season: season));
 

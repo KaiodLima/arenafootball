@@ -141,7 +141,10 @@ class PartnerRequestsDataSource {
         userId: request.userId,
         currentLimit: request.permissions.highlightLimit,
         claimed: free.map((h) => h.id).toList(),
-        taken: {for (final doc in slotDocs) if (doc.exists) doc.id},
+        taken: {
+          for (final doc in slotDocs)
+            if (doc.exists) doc.id
+        },
         maxSlots: PartnerPermissions.maxLimit,
       );
       final batch = _firestore.batch();
@@ -180,7 +183,10 @@ class PartnerRequestsDataSource {
   Future<Either<Failure, Set<String>>> existingIds({required String collection, required List<String> ids}) async {
     try {
       final docs = await Future.wait(ids.map((id) => _firestore.collection(collection).doc(id).get()));
-      return Right({for (final doc in docs) if (doc.exists) doc.id});
+      return Right({
+        for (final doc in docs)
+          if (doc.exists) doc.id
+      });
     } catch (e) {
       AppLogger.e('existingIds $collection', name: _logName, error: e);
       return Left(mapFirebaseError(e, fallbackMessage: _loadFallback));

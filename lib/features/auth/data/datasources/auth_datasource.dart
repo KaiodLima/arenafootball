@@ -212,7 +212,8 @@ class AuthDataSource {
       AppLogger.e('deleteAccount google', name: 'AuthDataSource', error: e);
       return Left(ErrorWithMessage(fallback));
     } on FirebaseAuthException catch (e) {
-      if (_appleCanceledCodes.contains(e.code)) return Left(ErrorWithMessage(fallback, code: deleteAccountCanceledCode));
+      if (_appleCanceledCodes.contains(e.code))
+        return Left(ErrorWithMessage(fallback, code: deleteAccountCanceledCode));
       AppLogger.e('deleteAccount', name: 'AuthDataSource', error: e);
       return Left(mapFirebaseError(e, fallbackMessage: fallback));
     } catch (e) {

@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:arena_soccer/features/matches/data/datasources/matches_datasource.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
@@ -31,6 +33,9 @@ class MatchFormCubit extends Cubit<MatchFormState> {
     this.getRegionChampionshipsCacheFirstUseCase,
   ) : super(const EditingMatchFormState());
 
+  /// Temporada da partida (organizador: a do campeonato; nula = a atual).
+  String? _season;
+
   void _edit(MatchFormData form) {
     if (!isClosed) emit(EditingMatchFormState(form: form));
   }
@@ -57,6 +62,7 @@ class MatchFormCubit extends Cubit<MatchFormState> {
   /// competição fixas, sem amistoso; times só os inscritos nela).
   Future<void> loadForChampionship(ChampionshipDTO championship, {DateTime? now}) async {
     final region = championship.region;
+    _season = championship.season.isEmpty ? null : championship.season;
     _edit(state.form.copyWith(
       regions: [region],
       selectedRegion: region,
@@ -166,8 +172,15 @@ class MatchFormCubit extends Cubit<MatchFormState> {
 
     final match = form.toMatch();
     // Região com campeonatos e nenhum escolhido = amistoso.
-    final response = await createMatchUseCase(match, friendly: form.isFriendly);
+    final response = await createMatchUseCase(match, friendly: form.isFriendly, season: _season);
     if (isClosed) return;
+    final queued = response.isLeft &&
+        response.left is ErrorWithMessage &&
+        (response.left as ErrorWithMessage).code == MatchesDataSource.queuedCode;
+    if (queued) {
+      _succeeded(form, match, offline: true);
+      return;
+    }
     response.fold(
       (failure) {
         AppLogger.e(
@@ -181,15 +194,31 @@ class MatchFormCubit extends Cubit<MatchFormState> {
           errorCode: failure is ErrorWithMessage ? failure.code : null,
         ));
       },
-      // Montar uma rodada: data, hora e local ficam; os times são escolhidos de
-      // novo. A partida entra na lista para o aviso de conflito valer.
-      (_) => emit(SuccessMatchFormState(
-        form: form.copyWith(
-          clearTeams: true,
-          customVenue: false,
-          existing: [...form.existing, match],
-        ),
-      )),
+      (_) => _succeeded(form, match),
     );
+  }
+
+  /// Montar uma rodada: data, hora e local ficam; os times são escolhidos de
+  /// novo. A partida entra na lista para o aviso de conflito valer, e a lista
+  /// é recarregada (o que outros cadastraram enquanto isso também conta).
+  void _succeeded(MatchFormData form, MatchDTO match, {bool offline = false}) {
+    final added = [...form.existing, match];
+    emit(SuccessMatchFormState(
+      offline: offline,
+      form: form.copyWith(clearTeams: true, customVenue: false, existing: added),
+    ));
+    unawaited(_refreshExisting(form.selectedRegion, pending: match));
+  }
+
+  Future<void> _refreshExisting(String? region, {required MatchDTO pending}) async {
+    if (region == null) return;
+    final response = await getRegionMatchesUseCase(region: region);
+    if (isClosed || state.form.selectedRegion != region || response.isLeft) return;
+    bool same(MatchDTO a, MatchDTO b) =>
+        a.homeTeam == b.homeTeam && a.awayTeam == b.awayTeam && a.date == b.date && a.time == b.time;
+    final remote = response.right;
+    // A recém-salva ainda pode não estar no servidor (offline): fica a local.
+    final merged = [...remote, if (!remote.any((m) => same(m, pending))) pending];
+    _edit(state.form.copyWith(existing: merged));
   }
 }

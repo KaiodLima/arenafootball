@@ -52,7 +52,8 @@ class ReferralSettingsPage extends StatelessWidget {
                   value: state.enabled,
                   onChanged: state.saving ? null : BlocProvider.of<ReferralConfigCubit>(context).setEnabled,
                   activeThumbColor: AppColors.primary,
-                  title: Text(l10n.referralSettingsSwitch, style: AppTypography.title().copyWith(fontSize: AppSizes.s16)),
+                  title:
+                      Text(l10n.referralSettingsSwitch, style: AppTypography.title().copyWith(fontSize: AppSizes.s16)),
                   subtitle: Padding(
                     padding: const EdgeInsets.only(top: AppSizes.s4),
                     child: Text(

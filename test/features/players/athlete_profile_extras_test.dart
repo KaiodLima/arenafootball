@@ -65,7 +65,8 @@ void main() {
     });
 
     test('fora: partida futura, de outro time e antiga sem lista de gols (exceto 0 × 0)', () {
-      final other = _match('o', '10/10/2026').copyWith(homeTeamId: 't8', homeTeam: 'X', awayTeamId: 't9', awayTeam: 'Y');
+      final other =
+          _match('o', '10/10/2026').copyWith(homeTeamId: 't8', homeTeam: 'X', awayTeamId: 't9', awayTeam: 'Y');
       final stats = PlayerMatchStats.lastMatches([
         _match('future', '30/10/2026'),
         other,
@@ -89,7 +90,9 @@ void main() {
       userId: 'u1',
       seasons: const ['2024', '2025', '2026'],
     );
-    expect(history.right.map((h) => (h.season, h.player.team, h.awards)), [('2026', 'Lava Jato', 0), ('2025', 'Riacho', 2)]);
-    expect((await GetPlayerSeasonHistoryUseCase(_Players(), _Matches())(userId: '', seasons: const ['2026'])).right, isEmpty);
+    expect(history.right.map((h) => (h.season, h.player.team, h.awards)),
+        [('2026', 'Lava Jato', 0), ('2025', 'Riacho', 2)]);
+    expect((await GetPlayerSeasonHistoryUseCase(_Players(), _Matches())(userId: '', seasons: const ['2026'])).right,
+        isEmpty);
   });
 }

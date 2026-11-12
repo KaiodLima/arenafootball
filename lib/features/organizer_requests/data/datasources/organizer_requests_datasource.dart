@@ -122,8 +122,7 @@ class OrganizerRequestsDataSource {
   /// `idOrganizador`. Só grava os que não existem. Devolve quantos criou.
   Future<Either<Failure, int>> ensureIndexes() async {
     try {
-      final championships =
-          await _championships.where(ChampionshipDTO.organizerField, isGreaterThan: '').get();
+      final championships = await _championships.where(ChampionshipDTO.organizerField, isGreaterThan: '').get();
       var created = 0;
       for (final doc in championships.docs) {
         final championship = ChampionshipDTO.fromFirestore(doc);

@@ -85,4 +85,17 @@ class PreferencesService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_organizerModeKey(uid), value);
   }
+
+  /// Modo jogador do admin (toggle do topo da home), por conta.
+  static String _playerModeKey(String uid) => 'modoJogador_$uid';
+
+  Future<bool> getPlayerMode(String uid) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_playerModeKey(uid)) ?? false;
+  }
+
+  Future<void> setPlayerMode(String uid, bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_playerModeKey(uid), value);
+  }
 }

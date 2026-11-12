@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
@@ -78,8 +79,6 @@ class _OrganizerMatches extends StatefulWidget {
 }
 
 class _OrganizerMatchesState extends State<_OrganizerMatches> {
-  /// Competição escolhida, lembrada enquanto o app está aberto.
-  static int? _remembered;
   final _filterKey = GlobalKey();
 
   Future<void> _pick(List<ChampionshipDTO> options, int current) async {
@@ -89,7 +88,8 @@ class _OrganizerMatchesState extends State<_OrganizerMatches> {
       selectedId: current,
       showNone: false,
     );
-    if (picked?.id != null && mounted) setState(() => _remembered = picked!.id);
+    // Escolha compartilhada com a aba Times do modo (vale enquanto o app está aberto).
+    if (picked?.id != null && mounted) BlocProvider.of<OrganizerModeCubit>(context).selectChampionship(picked!.id!);
   }
 
   @override
@@ -99,7 +99,7 @@ class _OrganizerMatchesState extends State<_OrganizerMatches> {
     if (options.isEmpty) {
       return ArenaEmptyState(message: l10n.organizerNoChampionships, icon: Icons.emoji_events_outlined);
     }
-    final championship = options.where((c) => c.championshipId == _remembered).firstOrNull ?? options.first;
+    final championship = context.watch<OrganizerModeCubit>().state.selectedIn(options)!;
     final season = championship.season.isNotEmpty ? championship.season : SeasonCollection.currentSeason;
 
     return Column(

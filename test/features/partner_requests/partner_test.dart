@@ -246,7 +246,6 @@ void main() {
     });
   });
 
-
   group('limite de notícias por dia', () {
     NewsFormCubit cubitOf(_NewsRepository repository, _Slots slots) => NewsFormCubit(
           CreateNewsUseCase(repository, _Storage()),
@@ -292,5 +291,4 @@ void main() {
       await cubit.close();
     });
   });
-
 }

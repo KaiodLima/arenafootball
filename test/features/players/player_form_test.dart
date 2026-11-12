@@ -24,7 +24,6 @@ const _squads = {
 };
 
 class _FakeRepository implements IPlayersRepository {
-
   @override
   Future<Either<Failure, PlayerDTO?>> getPlayerByUser({required String userId, String? season}) async =>
       const Right(null);
@@ -86,6 +85,10 @@ class _FakeRepository implements IPlayersRepository {
 
   @override
   Future<Either<Failure, void>> updatePlayer(PlayerDTO player, {String? season}) async => const Right(null);
+
+  @override
+  Future<Either<Failure, void>> updatePlayerPhoto({required String id, required String url, String? season}) async =>
+      const Right(null);
 
   @override
   Future<Either<Failure, void>> deletePlayer(PlayerDTO player, {String? season}) async => const Right(null);

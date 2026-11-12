@@ -18,7 +18,7 @@ class AdminPanelPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final isAdmin = context.watch<SessionCubit>().state.user?.isAdmin ?? false;
+    final isAdmin = context.watch<SessionCubit>().state.isAdmin;
     void open(String route) => Navigator.pushNamed(context, route);
 
     return Scaffold(

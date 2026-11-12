@@ -53,6 +53,16 @@ export default async function run(env, check) {
   await check('organizador edita o grupo', assertSucceeds(setDoc(doc(org, 'grupos2026/g1'), group({ time2: 'Tigres', idTime2: 't2' }))));
   await check('grupo em campeonato de outro recusado', assertFails(setDoc(doc(org, 'grupos2026/g2'), group({ fk_campeonato: 10, idCampeonatoDoc: 'c3' }))));
   await check('fk_campeonato forjado recusado', assertFails(setDoc(doc(org, 'grupos2026/g3'), group({ fk_campeonato: 10 }))));
+  const six = ['a', 'b', 'c', 'd', 'e', 'f'];
+  await check('grupo de 6 times (listas)', assertSucceeds(setDoc(doc(org, 'grupos2026/g7'), group({ times: six, idsTimes: six }))));
+  const many = Array.from({ length: 21 }, (_, i) => `t${i}`);
+  await check('grupo com mais de 20 recusado', assertFails(setDoc(doc(org, 'grupos2026/g8'), group({ times: many, idsTimes: many }))));
+  const regras = { classificados: 2, proximaFase: 'Semifinal', repescagem: 1, eliminados: 1, idaVolta: true };
+  await check('grupo com regras', assertSucceeds(setDoc(doc(org, 'grupos2026/g10'), group({ regras }))));
+  await check('regras com chave estranha recusadas',
+    assertFails(setDoc(doc(org, 'grupos2026/g11'), group({ regras: { ...regras, pontos: 3 } }))));
+  await check('regras com número fora do limite recusadas',
+    assertFails(setDoc(doc(org, 'grupos2026/g12'), group({ regras: { ...regras, classificados: 30 } }))));
   await check('campo fora do grupo recusado', assertFails(setDoc(doc(org, 'grupos2026/g4'), group({ pontos: 9 }))));
   await check('usuário comum não grava grupo', assertFails(setDoc(doc(other, 'grupos2026/g5'), group())));
   await check('usuário comum não apaga grupo', assertFails(deleteDoc(doc(other, 'grupos2026/g1'))));

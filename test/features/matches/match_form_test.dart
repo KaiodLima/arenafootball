@@ -1,5 +1,6 @@
 import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:arena_soccer/features/matches/data/datasources/matches_datasource.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
@@ -43,6 +44,10 @@ const _existing = [
 
 class _FakeRepository implements IMatchesRepository {
   final created = <MatchDTO>[];
+  final seasons = <String?>[];
+
+  /// Simula a gravação na fila (sem conexão).
+  bool offline = false;
 
   @override
   Stream<Either<Failure, List<MatchDTO>>> watchMatches({String? season, String? region}) =>
@@ -51,6 +56,8 @@ class _FakeRepository implements IMatchesRepository {
   @override
   Future<Either<Failure, void>> createMatch(MatchDTO match, {String? season}) async {
     created.add(match);
+    seasons.add(season);
+    if (offline) return Left(ErrorWithMessage('fila', code: MatchesDataSource.queuedCode));
     return const Right(null);
   }
 
@@ -219,6 +226,7 @@ void main() {
         region: 'Floresta',
         teams: ['Volta', 'Riacho'],
         teamIds: ['2', '3'],
+        season: '2025',
       );
       await organizer.loadForChampionship(mine, now: DateTime(2026, 10, 18));
       final form = organizer.state.form;
@@ -233,7 +241,26 @@ void main() {
       final created = repository.created.last;
       expect(created.championshipId, 11);
       expect({created.homeTeamId, created.awayTeamId}, {'2', '3'});
+      expect(repository.seasons.last, '2025', reason: 'a temporada do campeonato, não a atual');
       await organizer.close();
+    });
+
+    test('sem conexão: libera o formulário para o próximo registro', () async {
+      repository.offline = true;
+      cubit.selectTime('20:00');
+      await cubit.submit();
+      final state = cubit.state;
+      expect(state, isA<SuccessMatchFormState>());
+      expect((state as SuccessMatchFormState).offline, isTrue);
+      expect(state.form.homeTeam, isNull, reason: 'times limpos para a próxima');
+      expect(state.form.time, '20:00', reason: 'data/hora/local ficam');
+    });
+
+    test('duplicata: mesmo confronto no dia, em qualquer mando', () {
+      const list = [MatchDTO(homeTeam: 'Lava Jato', awayTeam: 'Volta', date: '18/10', time: '15:00')];
+      expect(MatchFormHints.duplicateOf(list, home: 'Volta', away: 'Lava Jato', date: '18/10'), isNotNull);
+      expect(MatchFormHints.duplicateOf(list, home: 'Volta', away: 'Lava Jato', date: '19/10'), isNull);
+      expect(MatchFormHints.duplicateOf(list, home: 'Volta', away: 'Riacho', date: '18/10'), isNull);
     });
 
     test('vários campeonatos: times do escolhido e id gravado na partida', () async {

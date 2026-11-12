@@ -23,7 +23,8 @@ const _match = MatchDTO(
     MatchSubstitution(id: 's', side: MatchSide.home, outId: 'p1', outName: 'Kaio', inId: 'p3', inName: 'Rui'),
   ],
   goals: [
-    MatchGoal(id: 'g', side: MatchSide.home, scorerId: 'p1', scorerName: 'Kaio', assistantId: 'p4', assistantName: 'Garçom'),
+    MatchGoal(
+        id: 'g', side: MatchSide.home, scorerId: 'p1', scorerName: 'Kaio', assistantId: 'p4', assistantName: 'Garçom'),
   ],
 );
 

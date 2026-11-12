@@ -65,7 +65,8 @@ OrganizerRequestCubit _cubit(_Repo repo) => OrganizerRequestCubit(
     );
 
 void main() {
-  setUp(() => RegionRegistry.configure(const [RegionRef(id: 'co', name: 'Colônia'), RegionRef(id: 'fl', name: 'Floresta')]));
+  setUp(() =>
+      RegionRegistry.configure(const [RegionRef(id: 'co', name: 'Colônia'), RegionRef(id: 'fl', name: 'Floresta')]));
   tearDown(RegionRegistry.reset);
 
   const request = OrganizerRequestDTO(

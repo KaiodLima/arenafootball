@@ -187,50 +187,6 @@ class _Side extends StatelessWidget {
   }
 }
 
-/// "VS" forte: losango escuro inclinado com contorno e brilho no destaque.
-class _VsBadge extends StatelessWidget {
-  final PreviewArtArgs args;
-  final double scale;
-
-  const _VsBadge({required this.args, required this.scale});
-
-  @override
-  Widget build(BuildContext context) {
-    final accent = args.colors.accent;
-    final box = 64 * scale;
-    return SizedBox(
-      width: box * 1.45,
-      height: box * 1.45,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Transform.rotate(
-            angle: 0.785,
-            child: Container(
-              width: box,
-              height: box,
-              decoration: BoxDecoration(
-                color: _ink,
-                border: Border.all(color: accent, width: 3 * scale),
-                boxShadow: [
-                  BoxShadow(color: accent.withValues(alpha: 0.45), blurRadius: 18 * scale),
-                  BoxShadow(color: AppColors.black.withValues(alpha: 0.5), blurRadius: 10 * scale),
-                ],
-              ),
-            ),
-          ),
-          Text(
-            'VS',
-            style: ArtFonts.displayStyle(30 * scale, AppColors.white, spacing: 1, height: 1.1).copyWith(
-              shadows: [Shadow(color: accent.withValues(alpha: 0.9), blurRadius: 10 * scale)],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 /// Confronto: os dois lados e o "VS" no meio, sobre o corte.
 class _Matchup extends StatelessWidget {
   final PreviewArtArgs args;
@@ -246,7 +202,7 @@ class _Matchup extends StatelessWidget {
         Expanded(child: _Side(args: args, side: ArtSide.home, scale: scale)),
         Padding(
           padding: EdgeInsets.only(top: 20 * scale),
-          child: _VsBadge(args: args, scale: scale),
+          child: ArtVsDiamond(accent: args.colors.accent, scale: scale),
         ),
         Expanded(child: _Side(args: args, side: ArtSide.away, scale: scale)),
       ],
@@ -264,47 +220,12 @@ class _InfoBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = args.texts;
-    final accent = args.colors.accent;
-    Widget block(String label, String value, {bool big = true}) => Padding(
-          padding: EdgeInsets.symmetric(horizontal: 6 * scale),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(label, maxLines: 1, style: ArtFonts.textStyle(9 * scale, accent, spacing: 2)),
-              ),
-              SizedBox(height: 2 * scale),
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  value.isEmpty ? '—' : value,
-                  maxLines: 1,
-                  style: big
-                      ? ArtFonts.displayStyle(18 * scale, AppColors.white, spacing: 0.6, height: 1.15)
-                      : ArtFonts.textStyle(14 * scale, AppColors.white, spacing: 0.8, height: 1.3),
-                ),
-              ),
-            ],
-          ),
-        );
-    Widget divider() => Container(width: 1, height: 30 * scale, color: AppColors.white.withValues(alpha: 0.2));
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12 * scale, vertical: 10 * scale),
-      decoration: BoxDecoration(
-        color: _ink.withValues(alpha: 0.65),
-        borderRadius: BorderRadius.circular(10 * scale),
-        border: Border(top: BorderSide(color: accent, width: 3 * scale)),
-      ),
-      child: Row(
-        children: [
-          Expanded(flex: 3, child: block(t.dateLabel, t.shortDate)),
-          divider(),
-          Expanded(flex: 2, child: block(t.timeLabel, t.time)),
-          divider(),
-          Expanded(flex: 4, child: block(t.venueLabel, t.venue, big: false)),
-        ],
-      ),
+    return ArtInfoBar(
+      accent: args.colors.accent,
+      scale: scale,
+      date: (t.dateLabel, t.shortDate),
+      time: (t.timeLabel, t.time),
+      venue: (t.venueLabel, t.venue),
     );
   }
 }

@@ -17,6 +17,7 @@ import 'package:arena_soccer/core/services/deep_link_service.dart';
 import 'package:arena_soccer/core/services/push_service.dart';
 import 'package:arena_soccer/core/utils/share_links.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
+import 'package:arena_soccer/features/auth/presentation/bloc/session_state.dart';
 import 'package:arena_soccer/features/auth/presentation/page/choose_team_page.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/championships_tab.dart';
 import 'package:arena_soccer/features/highlights/presentation/widgets/highlights_carousel.dart';
@@ -25,6 +26,7 @@ import 'package:arena_soccer/features/home/presentation/bloc/home_state.dart';
 import 'package:arena_soccer/features/home/presentation/widgets/admin_publish_sheet.dart';
 import 'package:arena_soccer/features/home/presentation/widgets/home_bottom_bar.dart';
 import 'package:arena_soccer/features/home/presentation/widgets/home_drawer.dart';
+import 'package:arena_soccer/features/home/presentation/home_mode.dart';
 import 'package:arena_soccer/features/home/presentation/widgets/home_header.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/matches_tab.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/news_tab.dart';
@@ -75,6 +77,7 @@ class _HomePageState extends State<HomePage> {
     _homeCubit = BlocProvider.of<HomeCubit>(context);
     final user = BlocProvider.of<SessionCubit>(context).state.user;
     if (user != null) _homeCubit.loadFavoriteTeam(user.favoriteTeam, teamId: user.favoriteTeamId);
+    // Conta admin (também no modo jogador: ao voltar, as contagens já estão lá).
     if (user != null && user.isAdmin) _homeCubit.watchPendingPlayerRequests();
 
     // Push: pede a permissão (Android 13+) e abre a aba da notificação tocada.
@@ -196,17 +199,20 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     final tab = target.tab;
-    final user = BlocProvider.of<SessionCubit>(context).state.user;
+    final session = BlocProvider.of<SessionCubit>(context).state;
+    final user = session.user;
+    // Painéis só fora do modo jogador (no modo, abre como para um jogador).
+    final admin = session.isAdmin;
     final route = switch (tab) {
-      'solicitacoes' when user != null && user.isAdmin => AppRoutes.playerRequestsPanelPage,
+      'solicitacoes' when user != null && admin => AppRoutes.playerRequestsPanelPage,
       'sou_jogador' when user != null => AppRoutes.playerRequestPage,
-      'solicitacoes_time' when user != null && user.isAdmin => AppRoutes.teamRequestsPanelPage,
+      'solicitacoes_time' when user != null && admin => AppRoutes.teamRequestsPanelPage,
       'meu_time' when user != null => AppRoutes.teamRequestPage,
-      'solicitacoes_parceiro' when user != null && user.isAdmin => AppRoutes.partnerRequestsPanelPage,
+      'solicitacoes_parceiro' when user != null && admin => AppRoutes.partnerRequestsPanelPage,
       'parceiro' when user != null => AppRoutes.partnerRequestPage,
-      'solicitacoes_organizador' when user != null && user.isAdmin => AppRoutes.organizerRequestsPanelPage,
+      'solicitacoes_organizador' when user != null && admin => AppRoutes.organizerRequestsPanelPage,
       'organizador' when user != null => AppRoutes.organizerRequestPage,
-      'noticias_pendentes' when user != null && user.isAdmin => AppRoutes.partnerRequestsPanelPage,
+      'noticias_pendentes' when user != null && admin => AppRoutes.partnerRequestsPanelPage,
       'conquistas' when user != null => AppRoutes.achievementsPage,
       'album' when user != null => AppRoutes.albumPage,
       'indicacao' when user != null => AppRoutes.referralPage,
@@ -342,16 +348,44 @@ class _HomePageState extends State<HomePage> {
     Navigator.pushNamedAndRemoveUntil(context, AppRoutes.loginPage, (_) => false);
   }
 
-  Future<void> _toggleOrganizerMode() async {
-    final cubit = BlocProvider.of<OrganizerModeCubit>(context);
-    await cubit.toggle();
+  /// Modo atual da home (toggle do topo).
+  HomeMode _modeOf(SessionState session, OrganizerModeState organizer) =>
+      session.inPlayerMode ? HomeMode.player : (organizer.active ? HomeMode.organizer : HomeMode.standard);
+
+  /// Toque no toggle: admin → organizador → jogador → admin; organizador
+  /// comum: torcedor ↔ organizador.
+  Future<void> _cycleMode() async {
+    final sessionCubit = BlocProvider.of<SessionCubit>(context);
+    final organizerCubit = BlocProvider.of<OrganizerModeCubit>(context);
+    final session = sessionCubit.state;
+    final current = _modeOf(session, organizerCubit.state);
+    final next = nextHomeMode(
+      current,
+      isAccountAdmin: session.isAccountAdmin,
+      isOrganizer: organizerCubit.state.isOrganizer,
+    );
+    if (next == current) return;
+    if (current == HomeMode.organizer) await organizerCubit.toggle();
+    if (next == HomeMode.organizer && !organizerCubit.state.active) await organizerCubit.toggle();
+    await sessionCubit.setPlayerMode(next == HomeMode.player);
     if (!mounted) return;
     final l10n = AppLocalizations.of(context);
     showSnackBar(
       context: context,
-      message: cubit.state.active ? l10n.organizerModeOrganizer : l10n.organizerModeFan,
+      message: switch (next) {
+        HomeMode.organizer => l10n.organizerModeOrganizer,
+        HomeMode.player => l10n.homeModePlayer,
+        HomeMode.standard => session.isAccountAdmin ? l10n.homeModeAdmin : l10n.organizerModeFan,
+      },
       durationSeconds: 2,
     );
+  }
+
+  /// "Sair" da faixa do modo jogador: volta ao modo admin.
+  Future<void> _exitPlayerMode() async {
+    await BlocProvider.of<SessionCubit>(context).setPlayerMode(false);
+    if (!mounted) return;
+    showSnackBar(context: context, message: AppLocalizations.of(context).homeModeAdmin, durationSeconds: 2);
   }
 
   Widget _tabContent(HomeTab tab, RegionState region, AppLocalizations l10n, OrganizerModeState organizer) {
@@ -430,6 +464,7 @@ class _HomePageState extends State<HomePage> {
                 playerTeam: myPlayer.teamName,
                 playerId: myPlayer.playerId,
                 playerSeason: myPlayer.season,
+                playerPhotoUrl: myPlayer.player?.imageUrl,
                 ownedTeam: ownedTeam.teamName,
                 isPartner: partner.isPartner,
                 onChooseTeam: _chooseTeam,
@@ -448,9 +483,12 @@ class _HomePageState extends State<HomePage> {
                           favoriteTeamImage: home.favoriteTeamImage,
                           showSeason: showSeason,
                           showRegion: showRegion,
-                          showModeToggle: organizer.isOrganizer,
+                          showModeToggle: organizer.isOrganizer || session.isAccountAdmin,
                           organizerMode: organizer.active,
-                          onToggleMode: _toggleOrganizerMode,
+                          mode: _modeOf(session, organizer),
+                          showPlayerMode: session.isAccountAdmin,
+                          onToggleMode: _cycleMode,
+                          onExitPlayerMode: _exitPlayerMode,
                           onOpenMenu: () => _scaffoldKey.currentState?.openDrawer(),
                           menuKey: _tourMenu,
                           regionKey: _tourRegion,

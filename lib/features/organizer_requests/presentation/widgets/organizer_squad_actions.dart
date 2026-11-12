@@ -224,7 +224,8 @@ class _SquadPickerState extends State<_SquadPicker> {
                       title: Text(player.name, style: AppTypography.body()),
                       subtitle: player.position.isEmpty
                           ? null
-                          : Text(player.position, style: AppTypography.subtitle().copyWith(color: AppColors.textSecondary)),
+                          : Text(player.position,
+                              style: AppTypography.subtitle().copyWith(color: AppColors.textSecondary)),
                     ),
                 ],
               ),
@@ -234,7 +235,10 @@ class _SquadPickerState extends State<_SquadPicker> {
               title: l10n.organizerSquadAddConfirm(_selected.length),
               function: _selected.isEmpty
                   ? null
-                  : () => Navigator.pop(context, [for (final p in widget.players) if (_selected.contains(p.id)) p]),
+                  : () => Navigator.pop(context, [
+                        for (final p in widget.players)
+                          if (_selected.contains(p.id)) p
+                      ]),
             ),
           ],
         ),

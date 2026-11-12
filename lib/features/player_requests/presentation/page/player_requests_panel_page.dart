@@ -8,9 +8,9 @@ import 'package:arena_soccer/features/player_requests/presentation/widgets/edit_
 import 'package:arena_soccer/features/player_requests/presentation/widgets/player_request_claim_info.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/player_requests/presentation/widgets/player_request_labels.dart';
+import 'package:arena_soccer/features/team_requests/presentation/widgets/reason_dialog.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
-import 'package:arena_soccer/utils/components/arena_input_decoration.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
@@ -73,9 +73,10 @@ class _PlayerRequestsPanelPageState extends State<PlayerRequestsPanelPage> {
   }
 
   Future<void> _confirmReject(PlayerRequestDTO request, AppLocalizations l10n) async {
-    final reason = await showDialog<String>(
-      context: context,
-      builder: (_) => _RejectDialog(name: request.name),
+    final reason = await showReasonDialog(
+      context,
+      title: l10n.playerRequestsRejectTitle(request.name),
+      confirmLabel: l10n.playerRequestsReject,
     );
     if (reason != null) await _cubit.reject(request, reason: reason);
   }
@@ -383,50 +384,6 @@ class _Warning extends StatelessWidget {
           Expanded(child: Text(text, style: AppTypography.body().copyWith(fontSize: AppSizes.s14))),
         ],
       ),
-    );
-  }
-}
-
-/// Confirmação da rejeição, com motivo opcional. Devolve o motivo (pode ser
-/// vazio) ou `null` se cancelar.
-class _RejectDialog extends StatefulWidget {
-  final String name;
-
-  const _RejectDialog({required this.name});
-
-  @override
-  State<_RejectDialog> createState() => _RejectDialogState();
-}
-
-class _RejectDialogState extends State<_RejectDialog> {
-  final _controller = TextEditingController();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return AlertDialog(
-      title: Text(l10n.playerRequestsRejectTitle(widget.name)),
-      content: TextField(
-        controller: _controller,
-        maxLength: 200,
-        minLines: 1,
-        maxLines: 3,
-        textCapitalization: TextCapitalization.sentences,
-        decoration: arenaInputDecoration(label: l10n.playerRequestsRejectReason),
-      ),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.commonCancel)),
-        TextButton(
-          onPressed: () => Navigator.pop(context, _controller.text.trim()),
-          child: Text(l10n.playerRequestsReject, style: const TextStyle(color: AppColors.danger)),
-        ),
-      ],
     );
   }
 }

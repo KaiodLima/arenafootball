@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/features/share_art/presentation/page/share_art_page.dart';
+import 'package:arena_soccer/features/share_art/presentation/page/player_art_page.dart';
+import 'package:arena_soccer/features/share_art/presentation/page/player_match_art_page.dart';
+import 'package:arena_soccer/features/share_art/presentation/bloc/player_match_art_cubit.dart';
+import 'package:arena_soccer/features/share_art/presentation/bloc/player_art_cubit.dart';
+import 'package:arena_soccer/features/share_art/domain/player_art_data.dart';
 import 'package:arena_soccer/features/share_art/presentation/bloc/share_art_cubit.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_groups_cubit.dart';
@@ -37,6 +42,7 @@ import 'package:arena_soccer/features/auth/presentation/page/choose_team_page.da
 import 'package:arena_soccer/features/auth/presentation/page/login_page.dart';
 import 'package:arena_soccer/features/auth/presentation/page/register_user_page.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/championships/data/dtos/group_rules.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/championship_details_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/championship_form_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/groups_cubit.dart';
@@ -64,6 +70,7 @@ import 'package:arena_soccer/features/highlights/presentation/page/highlight_det
 import 'package:arena_soccer/features/highlights/presentation/page/highlight_form_page.dart';
 import 'package:arena_soccer/features/home/presentation/page/home_page.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/match_form_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/matches_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/match_details_cubit.dart';
@@ -280,12 +287,13 @@ class ArenaApp extends StatelessWidget {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
           return BlocProvider<PlayerProfileCubit>(
             create: (_) =>
-                PlayerProfileCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl()),
+                PlayerProfileCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl()),
             child: PlayerProfilePage(
               playerId: args['playerId'] as String,
               season: args['season'] as String?,
               name: args['name'] as String?,
               initial: args['player'] as PlayerDTO?,
+              openPhotoPicker: args['openPhotoPicker'] == true,
             ),
           );
         },
@@ -491,6 +499,33 @@ class ArenaApp extends StatelessWidget {
             child: const ShareArtPage(),
           );
         },
+        // "Gerar arte do atleta" (elenco): args {player, team, season, championship?}.
+        AppRoutes.playerArtPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+          return BlocProvider<PlayerArtCubit>(
+            create: (_) => PlayerArtCubit(PlayerArtData.of(
+              player: args['player'] as PlayerDTO,
+              team: args['team'] as TeamDTO,
+              season: (args['season'] as String?) ?? SeasonCollection.currentSeason,
+              championship: args['championship'] as ChampionshipDTO?,
+            )),
+            child: const PlayerArtPage(),
+          );
+        },
+        // "Arte do atleta" do card de partida: args {match, season, player, side}.
+        AppRoutes.playerMatchArtPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+          return BlocProvider<PlayerMatchArtCubit>(
+            create: (_) => PlayerMatchArtCubit(sl())
+              ..load(
+                match: args['match'] as MatchDTO,
+                season: (args['season'] as String?) ?? SeasonCollection.currentSeason,
+                player: args['player'] as PlayerDTO,
+                side: args['side'] as MatchSide,
+              ),
+            child: const PlayerMatchArtPage(),
+          );
+        },
         AppRoutes.organizerGroupsPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           final championship = args!['championship'] as ChampionshipDTO;
@@ -526,7 +561,7 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.groupsPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<GroupsCubit>(
-            create: (_) => GroupsCubit(sl(), sl(), sl()),
+            create: (_) => GroupsCubit(sl(), sl(), sl(), sl()),
             child: GroupsPage(
               region: args?['region'] as String?,
               season: args?['season'] as String?,
@@ -543,6 +578,7 @@ class ArenaApp extends StatelessWidget {
               season: args?['season'] as String,
               group: args?['group'] as String,
               groupId: args?['groupId'] as String? ?? '',
+              rules: args?['rules'] as GroupRules? ?? GroupRules.standard,
             ),
           );
         },

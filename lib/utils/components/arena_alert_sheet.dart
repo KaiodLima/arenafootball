@@ -46,6 +46,36 @@ Future<bool> showArenaConfirm(
   return confirmed ?? false;
 }
 
+/// Escolha entre duas respostas no mesmo padrão: devolve true (confirmar),
+/// false (o outro botão) ou nulo (fechou no ✕ ou arrastando: não decidiu).
+Future<bool?> showArenaChoice(
+  BuildContext context, {
+  required String title,
+  String? message,
+  Widget? content,
+  required String confirmLabel,
+  required String cancelLabel,
+  IconData icon = Icons.help_outline_rounded,
+  ArenaAlertTone tone = ArenaAlertTone.primary,
+  String? header,
+}) {
+  final l10n = AppLocalizations.of(context);
+  return _show<bool>(
+    context,
+    _ArenaAlertSheet(
+      header: header ?? l10n.alertHeaderConfirm,
+      title: title,
+      message: message,
+      content: content,
+      icon: icon,
+      tone: tone,
+      confirmLabel: confirmLabel,
+      cancelLabel: cancelLabel,
+      closeUndecided: true,
+    ),
+  );
+}
+
 /// Aviso com um botão só ("Ok"), no mesmo padrão.
 Future<void> showArenaNotice(
   BuildContext context, {
@@ -101,6 +131,9 @@ class _ArenaAlertSheet extends StatelessWidget {
   /// Nulo = aviso (só o botão de confirmar).
   final String? cancelLabel;
 
+  /// O ✕ devolve nulo (não decidiu) em vez de false ([showArenaChoice]).
+  final bool closeUndecided;
+
   const _ArenaAlertSheet({
     required this.header,
     required this.title,
@@ -110,12 +143,14 @@ class _ArenaAlertSheet extends StatelessWidget {
     required this.tone,
     required this.confirmLabel,
     this.cancelLabel,
+    this.closeUndecided = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final color = tone.color;
-    final divider = Divider(height: AppSizes.s1, thickness: AppSizes.s1, color: AppColors.greyLight.withValues(alpha: 0.6));
+    final divider =
+        Divider(height: AppSizes.s1, thickness: AppSizes.s1, color: AppColors.greyLight.withValues(alpha: 0.6));
 
     final cancel = cancelLabel == null
         ? null
@@ -158,7 +193,7 @@ class _ArenaAlertSheet extends StatelessWidget {
                   ),
                   IconButton(
                     visualDensity: VisualDensity.compact,
-                    onPressed: () => Navigator.pop(context, false),
+                    onPressed: () => Navigator.pop(context, closeUndecided ? null : false),
                     icon: const Icon(Icons.close_rounded, color: AppColors.textSecondary),
                   ),
                 ],

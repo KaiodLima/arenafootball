@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/championships/data/dtos/group_rules.dart';
 import 'package:arena_soccer/features/championships/data/dtos/standing_dto.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
@@ -11,17 +12,19 @@ const _condensed = 'BarlowCondensed';
 
 /// Tabela de classificação: Pos · escudo + time · P · J · V · E · D · SG.
 /// A posição vai num quadradinho (1º dourado, classificados verdes); os
-/// [qualifiedCount] primeiros ganham o filete verde; a coluna P é uma faixa
+/// faixas das [rules] do grupo (só as ativas) ganham o filete; a coluna P é uma faixa
 /// verde-clara; o time do usuário fica em destaque; tocar numa linha expande
 /// com gols feitos/sofridos e aproveitamento.
 class StandingsTable extends StatefulWidget {
   final List<StandingDTO> standings;
-  final int qualifiedCount;
+
+  /// Regras do grupo: classificados, repescagem e eliminados.
+  final GroupRules rules;
 
   /// Linha do time do coração (destacada).
   final bool Function(StandingDTO standing)? isFavorite;
 
-  const StandingsTable({super.key, required this.standings, required this.qualifiedCount, this.isFavorite});
+  const StandingsTable({super.key, required this.standings, this.rules = GroupRules.standard, this.isFavorite});
 
   @override
   State<StandingsTable> createState() => _StandingsTableState();
@@ -78,7 +81,7 @@ class _StandingsTableState extends State<StandingsTable> {
             _Row(
               position: i + 1,
               standing: widget.standings[i],
-              qualified: i < widget.qualifiedCount,
+              zone: widget.rules.zoneOf(i + 1, widget.standings.length),
               isFavorite: widget.isFavorite?.call(widget.standings[i]) ?? false,
               expanded: _expandedId == widget.standings[i].id,
               statWidth: _statWidth,
@@ -95,15 +98,22 @@ class _StandingsTableState extends State<StandingsTable> {
   }
 }
 
-/// Cor do quadradinho da posição: 1º dourado, classificados verdes, demais cinza.
-@visibleForTesting
-Color standingsPositionColor(int position, bool qualified) =>
-    position == 1 ? AppColors.gold : (qualified ? AppColors.primary : AppColors.background);
+/// Cor de cada faixa de regra (classificados, repescagem, eliminados).
+Color groupZoneColor(GroupZone zone) => switch (zone) {
+      GroupZone.qualified => AppColors.primary,
+      GroupZone.playoff => AppColors.warning,
+      GroupZone.eliminated => AppColors.danger,
+      GroupZone.none => AppColors.background,
+    };
+
+/// Cor do quadradinho da posição: 1º dourado; depois, a cor da faixa ativa
+/// (classificados, repescagem, eliminados) ou cinza.
+Color standingsPositionColor(int position, GroupZone zone) => position == 1 ? AppColors.gold : groupZoneColor(zone);
 
 class _Row extends StatelessWidget {
   final int position;
   final StandingDTO standing;
-  final bool qualified;
+  final GroupZone zone;
   final bool isFavorite;
   final bool expanded;
   final double statWidth;
@@ -113,7 +123,7 @@ class _Row extends StatelessWidget {
   const _Row({
     required this.position,
     required this.standing,
-    required this.qualified,
+    required this.zone,
     required this.isFavorite,
     required this.expanded,
     required this.statWidth,
@@ -129,10 +139,10 @@ class _Row extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final badge = standingsPositionColor(position, qualified);
+    final badge = standingsPositionColor(position, zone);
     final onBadge = position == 1
         ? AppColors.textPrimary
-        : qualified
+        : zone != GroupZone.none
             ? AppColors.white
             : AppColors.textSecondary;
 
@@ -164,7 +174,10 @@ class _Row extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Filete da zona de classificação.
-              Container(width: AppSizes.s4, color: qualified ? AppColors.primary : AppColors.transparent),
+              Container(
+                width: AppSizes.s4,
+                color: zone == GroupZone.none ? AppColors.transparent : groupZoneColor(zone),
+              ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(AppSizes.s12, AppSizes.s10, AppSizes.s12, AppSizes.s10),

@@ -24,6 +24,18 @@ void main() {
     expect(ImageUploadProfile.forFolder('outra'), ImageUploadProfile.cover);
   });
 
+  test('campeonato: logo PNG continua PNG (transparência); JPG vira capa; outras pastas pela pasta', () {
+    final logo = ImageUploadProfile.forFile(StorageFolder.championships, '/x/logo.PNG');
+    expect(logo, ImageUploadProfile.logo);
+    expect((logo.png, logo.size, logo.contentType), (true, 1024, 'image/png'));
+    expect(ImageUploadProfile.forFile(StorageFolder.championships, '/x/banner.jpg'), ImageUploadProfile.cover);
+    expect(ImageUploadProfile.forFile(StorageFolder.championships, '/x/sem_extensao'), ImageUploadProfile.cover);
+    // PNG em outras pastas segue o perfil delas (foto de atleta vira JPEG).
+    expect(ImageUploadProfile.forFile(StorageFolder.players, '/x/foto.png'), ImageUploadProfile.photo);
+    expect(ImageUploadProfile.forFile(StorageFolder.news, '/x/capa.png'), ImageUploadProfile.cover);
+    expect(ImageUploadProfile.forFile(StorageFolder.teams, '/x/escudo.jpg'), ImageUploadProfile.crest);
+  });
+
   test('envia o comprimido quando ficou menor; senão, o original', () {
     final original = Uint8List(1000);
     final smaller = Uint8List(100);

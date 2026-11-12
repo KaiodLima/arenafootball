@@ -24,8 +24,8 @@ class CreateHighlightUseCase {
 
     // Do parceiro (já com o id da vaga): depois dos do admin, prioridade fixa.
     if (highlight.id.isNotEmpty) {
-      return _repository.createHighlight(
-          highlight.copyWith(imageUrl: imageUrl, priority: PartnerSlots.highlightPriority));
+      return _repository
+          .createHighlight(highlight.copyWith(imageUrl: imageUrl, priority: PartnerSlots.highlightPriority));
     }
 
     // O novo destaque entra no fim do carrossel.

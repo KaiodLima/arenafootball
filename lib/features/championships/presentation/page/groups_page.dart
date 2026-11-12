@@ -81,7 +81,13 @@ class _GroupsPageState extends State<GroupsPage> {
                 onTap: () => Navigator.pushNamed(
                   context,
                   AppRoutes.standingsPage,
-                  arguments: {'region': _region, 'season': _season, 'group': group.description, 'groupId': group.id},
+                  arguments: {
+                    'region': _region,
+                    'season': _season,
+                    'group': group.description,
+                    'groupId': group.id,
+                    'rules': group.rules,
+                  },
                 ),
               );
             },

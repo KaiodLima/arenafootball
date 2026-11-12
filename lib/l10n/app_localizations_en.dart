@@ -572,6 +572,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playersPhotoSave => 'Save';
 
   @override
+  String get playersPhotoHeader => 'Athlete photo';
+
+  @override
+  String get playersPhotoTitle => 'Change photo';
+
+  @override
+  String get playersPhotoMessage => 'Pick a photo from the camera or gallery';
+
+  @override
   String get statsEmptyGoals => 'No goals scored yet';
 
   @override
@@ -732,6 +741,160 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shareArtTemplateVibrant => 'Colors';
+
+  @override
+  String get playerArtAction => 'Create player art';
+
+  @override
+  String get playerArtTitle => 'Player art';
+
+  @override
+  String get playerArtTemplateSigning => 'Signing';
+
+  @override
+  String get playerArtTemplateDeal => 'Done deal';
+
+  @override
+  String get playerArtTemplatePoster => 'Poster';
+
+  @override
+  String get playerArtHeadline => 'New signing';
+
+  @override
+  String playerArtWelcome(String team) {
+    return '$team announces';
+  }
+
+  @override
+  String playerArtDeal(String team) {
+    return 'Now with $team!';
+  }
+
+  @override
+  String get playerArtOfficial => 'Official announcement';
+
+  @override
+  String get playerChangeOwnPhoto => 'Change my photo';
+
+  @override
+  String get playerPhotoUpdated => 'Photo updated!';
+
+  @override
+  String get shareArtFramingHint =>
+      'Drag the photo to frame it · pinch to zoom';
+
+  @override
+  String get shareArtFramingReset => 'Reset';
+
+  @override
+  String get playerMatchArtAction => 'Athlete art';
+
+  @override
+  String get playerMatchArtSheetTitle => 'Create art';
+
+  @override
+  String get playerMatchArtPick => 'Choose athlete';
+
+  @override
+  String get playerMatchArtSearch => 'Search athlete';
+
+  @override
+  String get playerMatchArtEmpty => 'No athletes in this match squads';
+
+  @override
+  String get playerMatchArtTeamEmpty => 'No athletes in this team squad';
+
+  @override
+  String get playerMatchArtTitle => 'Athlete in the match';
+
+  @override
+  String get playerMatchArtTemplateCover => 'Cover';
+
+  @override
+  String get playerMatchArtTemplateCountdown => 'Countdown';
+
+  @override
+  String get playerMatchArtTemplateAgenda => 'Schedule';
+
+  @override
+  String get playerMatchArtTemplateDuel => 'Duel';
+
+  @override
+  String get playerMatchArtTemplateLineup => 'Line-up';
+
+  @override
+  String get playerMatchArtTemplateSpotlight => 'Spotlight';
+
+  @override
+  String get playerMatchArtLineup => 'In the line-up!';
+
+  @override
+  String get playerMatchArtMatchday => 'Match day';
+
+  @override
+  String playerMatchArtDaysToGo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'days to go',
+      one: 'day to go',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String playerMatchArtWaiting(String name) {
+    return '$name is waiting for you';
+  }
+
+  @override
+  String get playerMatchArtComeWatch => 'Come to the game!';
+
+  @override
+  String playerMatchArtShareText(
+      String name, String home, String away, String when, String link) {
+    return '$name on the pitch: $home x $away · $when $link';
+  }
+
+  @override
+  String get playerArtTemplateImpact => 'Impact';
+
+  @override
+  String get playerArtTemplateCard => 'Card';
+
+  @override
+  String playerArtPresents(String team) {
+    return '$team presents';
+  }
+
+  @override
+  String get playerArtNewSigning => 'New signing';
+
+  @override
+  String get playerArtDebut => 'Debut';
+
+  @override
+  String get playerArtAbbrGoalkeeper => 'GK';
+
+  @override
+  String get playerArtAbbrDefender => 'CB';
+
+  @override
+  String get playerArtAbbrFullBack => 'FB';
+
+  @override
+  String get playerArtAbbrDefensiveMidfielder => 'DM';
+
+  @override
+  String get playerArtAbbrMidfielder => 'CM';
+
+  @override
+  String get playerArtAbbrForward => 'FW';
+
+  @override
+  String playerArtShareText(String name, String team, String link) {
+    return '$name is now with $team! $link';
+  }
 
   @override
   String get shareArtPreviewTitle => 'Promote match';
@@ -1346,6 +1509,85 @@ class AppLocalizationsEn extends AppLocalizations {
   String get organizerGroupEdit => 'Edit group';
 
   @override
+  String get groupRulesTitle => 'Group rules';
+
+  @override
+  String get groupRulesQualified => 'Qualified';
+
+  @override
+  String get groupRulesQualifiedHint => 'Top teams that advance';
+
+  @override
+  String get groupRulesNextPhase => 'Next stage name (optional)';
+
+  @override
+  String get groupRulesPlayoff => 'Playoff';
+
+  @override
+  String get groupRulesPlayoffHint => 'The next ones, who go to a playoff';
+
+  @override
+  String get groupRulesEliminated => 'Eliminated';
+
+  @override
+  String get groupRulesEliminatedHint => 'The bottom teams';
+
+  @override
+  String get groupRulesHomeAndAway => 'Home and away';
+
+  @override
+  String get groupRulesHomeAndAwayHint => 'Each team plays the others twice';
+
+  @override
+  String get groupRulesApplyAll => 'Apply to all groups';
+
+  @override
+  String groupRulesExceeds(int total) {
+    return 'The zones add up to more than the group\'s teams ($total).';
+  }
+
+  @override
+  String get groupRulesSaved => 'Rules saved';
+
+  @override
+  String groupRulesSummaryQualified(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count qualify',
+      one: '1 qualifies',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String groupRulesSummaryPlayoff(int count) {
+    return '$count in the playoff';
+  }
+
+  @override
+  String groupRulesSummaryEliminated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count eliminated',
+      one: '1 eliminated',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String standingsQualifiedFor(String phase) {
+    return 'Qualified for the $phase';
+  }
+
+  @override
+  String get standingsPlayoffLegend => 'Playoff';
+
+  @override
+  String get standingsEliminatedLegend => 'Eliminated';
+
+  @override
   String get organizerGroupName => 'Group name';
 
   @override
@@ -1413,6 +1655,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get organizerModeOrganizer => 'Organizer mode';
+
+  @override
+  String get homeModeAdmin => 'Admin mode';
+
+  @override
+  String get homeModePlayer => 'Player mode';
+
+  @override
+  String get homeModePlayerBanner => 'Player mode: you see the app as a player';
+
+  @override
+  String get homeModePlayerExit => 'Exit';
 
   @override
   String get organizerModeToggle => 'Switch between fan and organizer';
@@ -3952,6 +4206,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'Match created! Choose the teams for the next one.';
 
   @override
+  String get matchFormSavedOffline =>
+      'No connection: the match was saved on this device and will be sent when you\'re back online.';
+
+  @override
+  String get matchFormDuplicateTitle => 'Duplicate match?';
+
+  @override
+  String matchFormDuplicateMessage(
+      String home, String away, String date, String time) {
+    return '$home × $away on $date at $time already exists. Register anyway?';
+  }
+
+  @override
+  String get matchFormDuplicateConfirm => 'Register anyway';
+
+  @override
   String get championshipsEmpty => 'No competitions registered';
 
   @override
@@ -4968,6 +5238,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playerRequestChampionshipLabel => 'Competition';
 
   @override
+  String get playerRequestChampionshipChoose => 'Choose the competition';
+
+  @override
   String get playerRequestChampionshipRequired =>
       'Choose the competition you play in for this team.';
 
@@ -4980,6 +5253,56 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get playerRequestTeamRequired => 'Choose the team you play for.';
+
+  @override
+  String get playerRequestOwnPlayerTitle => 'Your athlete profile';
+
+  @override
+  String get playerRequestOwnPlayerMessage =>
+      'The request uses your profile: your numbers stay.';
+
+  @override
+  String get playerRequestSameNameHeader => 'Athlete found';
+
+  @override
+  String playerRequestSameNameTitle(String name, String team) {
+    return 'Are you $name from $team?';
+  }
+
+  @override
+  String get playerRequestSameNameMessage =>
+      'There is already an athlete with your name in this squad, without an account. If it is you, the request links your account to them and their numbers stay.';
+
+  @override
+  String get playerRequestSameNameMergeMessage =>
+      'There is already an athlete with your name in this squad, without an account. If it is you, the admin merges that profile with yours and the numbers add up.';
+
+  @override
+  String playerRequestOwnPlayerClaimed(String name) {
+    return 'You said you are $name from the squad: the admin merges both profiles on approval.';
+  }
+
+  @override
+  String get playerRequestSameNameYes => 'It\'s me';
+
+  @override
+  String get playerRequestSameNameNo => 'It\'s not me';
+
+  @override
+  String playerRequestPlayerNumbers(int goals, int assists) {
+    return '$goals goals · $assists assists';
+  }
+
+  @override
+  String get playerRequestNameTooLong => 'Use up to 40 letters in the name';
+
+  @override
+  String get playerRequestNoTeams =>
+      'No team available in this region for the chosen competition';
+
+  @override
+  String get playerRequestChampionshipsError =>
+      'Couldn\'t load the region\'s competitions';
 
   @override
   String get playerRequestNameLabel => 'Player name';
@@ -5127,6 +5450,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get playerRequestsRejectReason => 'Reason (optional)';
+
+  @override
+  String get rejectReasonMessage =>
+      'The reason is optional and is shown to whoever made the request.';
 
   @override
   String playerRequestsApproved(String name, String team) {

@@ -11,6 +11,7 @@ import 'package:arena_soccer/features/share_art/domain/art_palette.dart';
 import 'package:arena_soccer/features/share_art/domain/art_theme.dart';
 import 'package:arena_soccer/features/share_art/domain/result_art_data.dart';
 import 'package:arena_soccer/features/share_art/presentation/art_exporter.dart';
+import 'package:arena_soccer/features/share_art/presentation/widgets/art_controls.dart';
 import 'package:arena_soccer/features/share_art/presentation/bloc/share_art_cubit.dart';
 import 'package:arena_soccer/features/share_art/presentation/templates/preview/preview_art.dart';
 import 'package:arena_soccer/features/share_art/presentation/templates/result/result_art.dart';
@@ -194,7 +195,7 @@ class _ShareArtPageState extends State<ShareArtPage> {
                         ),
                       ),
                     ),
-                    _Controls(
+                    ArtControlsPanel(
                       children: [
                         if (data.missing.isNotEmpty)
                           Padding(
@@ -213,7 +214,7 @@ class _ShareArtPageState extends State<ShareArtPage> {
                               ],
                             ),
                           ),
-                        _ChipRow(
+                        ArtChipRow(
                           label: l10n.shareArtTemplate,
                           children: [
                             if (state.preview)
@@ -234,11 +235,11 @@ class _ShareArtPageState extends State<ShareArtPage> {
                         ),
                         if (state.preview) ...[
                           const SizedBox(height: AppSizes.s8),
-                          _ChipRow(
+                          ArtChipRow(
                             label: l10n.shareArtColors,
                             children: [
                               for (final p in ArtPalette.values)
-                                _PaletteDot(
+                                ArtPaletteDot(
                                   palette: p,
                                   theme: ArtTheme.of(data.home, data.away),
                                   label: _paletteLabel(l10n, p),
@@ -249,7 +250,7 @@ class _ShareArtPageState extends State<ShareArtPage> {
                           ),
                         ],
                         const SizedBox(height: AppSizes.s8),
-                        _ChipRow(
+                        ArtChipRow(
                           label: l10n.shareArtFormat,
                           children: [
                             for (final f in ArtFormat.values)
@@ -269,25 +270,25 @@ class _ShareArtPageState extends State<ShareArtPage> {
                         ),
                         Row(
                           children: [
-                            _Action(
+                            ArtShareAction(
                               icon: Icons.download_rounded,
                               label: l10n.shareArtSave,
                               color: AppColors.primaryDark,
                               onTap: ready ? _save : null,
                             ),
-                            _Action(
+                            ArtShareAction(
                               icon: Icons.camera_alt_rounded,
                               label: l10n.shareArtInstagram,
                               color: AppColors.instagramStart,
                               onTap: ready ? _share : null,
                             ),
-                            _Action(
+                            ArtShareAction(
                               icon: Icons.chat_rounded,
                               label: l10n.shareWhatsApp,
                               color: AppColors.whatsapp,
                               onTap: ready ? _share : null,
                             ),
-                            _Action(
+                            ArtShareAction(
                               icon: Icons.share_rounded,
                               label: l10n.shareMoreOptions,
                               color: AppColors.textSecondary,
@@ -306,146 +307,6 @@ class _ShareArtPageState extends State<ShareArtPage> {
                 ),
         );
       },
-    );
-  }
-}
-
-class _Controls extends StatelessWidget {
-  final List<Widget> children;
-
-  const _Controls({required this.children});
-
-  @override
-  Widget build(BuildContext context) => Container(
-        width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s12, AppSizes.s16, AppSizes.s16),
-        decoration: const BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppSizes.radiusLarge)),
-          boxShadow: [BoxShadow(color: AppColors.shadow, blurRadius: AppSizes.s14)],
-        ),
-        child: SafeArea(top: false, child: Column(mainAxisSize: MainAxisSize.min, children: children)),
-      );
-}
-
-class _ChipRow extends StatelessWidget {
-  final String label;
-  final List<Widget> children;
-
-  const _ChipRow({required this.label, required this.children});
-
-  @override
-  Widget build(BuildContext context) => Row(
-        children: [
-          SizedBox(
-            width: AppSizes.s72,
-            child: Text(label, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  for (final child in children)
-                    Padding(padding: const EdgeInsets.only(right: AppSizes.s6), child: child),
-                ],
-              ),
-            ),
-          ),
-        ],
-      );
-}
-
-class _Action extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback? onTap;
-
-  const _Action({required this.icon, required this.label, required this.color, this.onTap});
-
-  @override
-  Widget build(BuildContext context) => Expanded(
-        child: InkWell(
-          borderRadius: BorderRadius.circular(AppSizes.s12),
-          onTap: onTap,
-          child: Opacity(
-            opacity: onTap == null ? 0.4 : 1,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: AppSizes.s6),
-              child: Column(
-                children: [
-                  CircleAvatar(
-                    radius: AppSizes.s20,
-                    backgroundColor: color,
-                    child: Icon(icon, color: AppColors.white, size: AppSizes.s20),
-                  ),
-                  const SizedBox(height: AppSizes.s4),
-                  Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s12),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-}
-
-/// Bolinha de paleta: metade na cor de fundo, metade no destaque (no
-/// "Times", as duas cores dos times), com o anel quando escolhida.
-class _PaletteDot extends StatelessWidget {
-  final ArtPalette palette;
-  final ArtTheme theme;
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _PaletteDot({
-    required this.palette,
-    required this.theme,
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = palette.resolve(theme);
-    final (a, b) = palette == ArtPalette.teams ? (theme.home, theme.away) : (colors.base, colors.accent);
-    return Tooltip(
-      message: label,
-      child: InkWell(
-        customBorder: const CircleBorder(),
-        onTap: onTap,
-        child: Container(
-          width: AppSizes.s36,
-          height: AppSizes.s36,
-          padding: const EdgeInsets.all(AppSizes.s2),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: selected ? AppColors.primaryDark : AppColors.greyLight,
-              width: selected ? AppSizes.s2 + 1 : 1,
-            ),
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [a, a, b, b],
-                stops: const [0, 0.5, 0.5, 1],
-              ),
-            ),
-            child: selected ? const Icon(Icons.check_rounded, color: AppColors.white, size: AppSizes.s18) : null,
-          ),
-        ),
-      ),
     );
   }
 }

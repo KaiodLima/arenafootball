@@ -50,18 +50,18 @@ class ReplaceGroupsUseCase {
 /// Nome do grupo de posição [index]: A, B, C...
 String groupLetter(int index) => String.fromCharCode('A'.codeUnitAt(0) + index);
 
-/// Quantidades de grupos possíveis para [teamCount] times: todos cabem (até
-/// [GroupDTO.maxTeams] por grupo) e cada grupo tem ao menos 2.
+/// Quantidades de grupos possíveis para [teamCount] times: de 1 (todos juntos,
+/// até [GroupDTO.teamLimit] por grupo) até cada grupo com ao menos 2.
 List<int> groupCountOptions(int teamCount) {
   if (teamCount < 2) return const [];
-  final min = (teamCount / GroupDTO.maxTeams).ceil();
+  final min = (teamCount / GroupDTO.teamLimit).ceil();
   return [for (var n = min; n <= teamCount ~/ 2; n++) n];
 }
 
 /// Distribui [teams] ao acaso em [count] grupos, em rodízio: os tamanhos
 /// diferem em no máximo 1. [count] tem de caber todos.
 List<List<TeamDTO>> drawGroups(List<TeamDTO> teams, int count, {Random? random}) {
-  assert(count > 0 && teams.length <= count * GroupDTO.maxTeams);
+  assert(count > 0 && teams.length <= count * GroupDTO.teamLimit);
   final shuffled = [...teams]..shuffle(random ?? Random());
   final groups = List.generate(count, (_) => <TeamDTO>[]);
   for (var i = 0; i < shuffled.length; i++) {

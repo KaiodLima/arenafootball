@@ -19,7 +19,16 @@ class StandingsHero extends StatelessWidget {
   /// O líder é o time do coração? (★)
   final bool leaderIsFavorite;
 
-  const StandingsHero({super.key, required this.group, required this.standings, this.leaderIsFavorite = false});
+  /// Regra "ida e volta" ligada (a pílula só aparece nesse caso).
+  final bool homeAndAway;
+
+  const StandingsHero({
+    super.key,
+    required this.group,
+    required this.standings,
+    this.leaderIsFavorite = false,
+    this.homeAndAway = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -105,6 +114,7 @@ class StandingsHero extends StatelessWidget {
                     _Pill(icon: Icons.shield_rounded, label: l10n.groupsTeamsCount(standings.length)),
                     _Pill(icon: Icons.sports_rounded, label: l10n.groupsGamesCount(games)),
                     _Pill(icon: Icons.sports_soccer_rounded, label: l10n.standingsGoalsCount(goals)),
+                    if (homeAndAway) _Pill(icon: Icons.sync_alt_rounded, label: l10n.groupRulesHomeAndAway),
                   ],
                 ),
                 const SizedBox(height: AppSizes.s14),

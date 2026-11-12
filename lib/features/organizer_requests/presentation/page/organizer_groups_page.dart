@@ -4,9 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/group_dto.dart';
+import 'package:arena_soccer/features/championships/data/dtos/group_rules.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/championship_groups_usecases.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_groups_cubit.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
+import 'package:arena_soccer/features/organizer_requests/presentation/widgets/group_rules_sheet.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
@@ -21,7 +23,7 @@ import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/themes/arena_palette.dart';
 
-/// "Formar grupos" do organizador: os grupos do campeonato (até 4 times),
+/// "Formar grupos" do organizador: os grupos do campeonato (qualquer tamanho),
 /// criar/editar/apagar e sortear. Na paleta azul do modo organizador.
 class OrganizerGroupsPage extends StatelessWidget {
   final ChampionshipDTO championship;
@@ -44,7 +46,8 @@ class OrganizerGroupsPage extends StatelessWidget {
     );
   }
 
-  ChampionshipDTO? _find(OrganizerModeState state) => state.championships.where((c) => c.id == championship.id).firstOrNull;
+  ChampionshipDTO? _find(OrganizerModeState state) =>
+      state.championships.where((c) => c.id == championship.id).firstOrNull;
 }
 
 class _GroupsView extends StatelessWidget {
@@ -86,6 +89,19 @@ class _GroupsView extends StatelessWidget {
     );
     if (result == null || !context.mounted) return;
     await _report(context, cubit.save(result), l10n.organizerGroupSaved);
+  }
+
+  Future<void> _rules(BuildContext context, GroupDTO group) async {
+    final l10n = AppLocalizations.of(context);
+    final cubit = BlocProvider.of<OrganizerGroupsCubit>(context);
+    final choice = await showGroupRulesSheet(
+      context,
+      rules: group.rules,
+      teamCount: group.teams.where((t) => t.trim().isNotEmpty).length,
+      canApplyToAll: cubit.state.groups.length > 1,
+    );
+    if (choice == null || !context.mounted) return;
+    await _report(context, cubit.saveRules(group, choice.rules, toAll: choice.toAll), l10n.groupRulesSaved);
   }
 
   Future<void> _delete(BuildContext context, GroupDTO group) async {
@@ -193,6 +209,7 @@ class _GroupsView extends StatelessWidget {
                   group: group,
                   teams: state.teams,
                   onEdit: state.busy ? null : () => _edit(context, group: group),
+                  onRules: state.busy ? null : () => _rules(context, group),
                   onDelete: state.busy ? null : () => _delete(context, group),
                 ),
             ],
@@ -208,15 +225,19 @@ class _GroupCard extends StatelessWidget {
   final GroupDTO group;
   final List<TeamDTO> teams;
   final VoidCallback? onEdit;
+  final VoidCallback? onRules;
   final VoidCallback? onDelete;
 
-  const _GroupCard({required this.group, required this.teams, this.onEdit, this.onDelete});
+  const _GroupCard({required this.group, required this.teams, this.onEdit, this.onRules, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final palette = ArenaPalette.of(context);
-    final names = [for (final name in group.teams) if (name.isNotEmpty) name];
+    final names = [
+      for (final name in group.teams)
+        if (name.isNotEmpty) name
+    ];
 
     return Card(
       margin: const EdgeInsets.only(bottom: AppSizes.s12),
@@ -242,16 +263,43 @@ class _GroupCard extends StatelessWidget {
                   ),
                   const SizedBox(width: AppSizes.s10),
                   Expanded(child: Text(l10n.organizerGroupLabel(group.description), style: AppTypography.title())),
-                  PopupMenuButton<bool>(
+                  IconButton(
+                    tooltip: l10n.groupRulesTitle,
+                    onPressed: onRules,
+                    icon: Icon(Icons.settings_rounded, color: palette.primaryDark),
+                  ),
+                  PopupMenuButton<int>(
                     enabled: onEdit != null,
-                    onSelected: (edit) => edit ? onEdit?.call() : onDelete?.call(),
+                    onSelected: (action) => switch (action) {
+                      0 => onEdit?.call(),
+                      1 => onRules?.call(),
+                      _ => onDelete?.call(),
+                    },
                     itemBuilder: (_) => [
-                      PopupMenuItem(value: true, child: Text(l10n.organizerGroupEdit)),
-                      PopupMenuItem(value: false, child: Text(l10n.organizerGroupDelete)),
+                      PopupMenuItem(value: 0, child: Text(l10n.organizerGroupEdit)),
+                      PopupMenuItem(value: 1, child: Text(l10n.groupRulesTitle)),
+                      PopupMenuItem(value: 2, child: Text(l10n.organizerGroupDelete)),
                     ],
                   ),
                 ],
               ),
+              // Resumo só das regras ativas.
+              if (group.rules.hasAny)
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSizes.s4),
+                  child: Row(
+                    children: [
+                      Icon(Icons.rule_rounded, size: AppSizes.s14, color: palette.primary),
+                      const SizedBox(width: AppSizes.s4),
+                      Expanded(
+                        child: Text(
+                          groupRulesSummary(l10n, group.rules),
+                          style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               const SizedBox(height: AppSizes.s8),
               for (var i = 0; i < group.teams.length; i++)
                 if (group.teams[i].isNotEmpty)
@@ -279,14 +327,15 @@ class _GroupCard extends StatelessWidget {
   }
 }
 
-/// Folha de criar/editar grupo: nome e até 4 times (dos inscritos livres).
+/// Folha de criar/editar grupo: nome e os times (dos inscritos livres).
 class _GroupEditor extends StatefulWidget {
   final GroupDTO? group;
   final String suggestedName;
   final List<TeamDTO> allTeams;
   final List<TeamDTO> freeTeams;
 
-  const _GroupEditor({required this.group, required this.suggestedName, required this.allTeams, required this.freeTeams});
+  const _GroupEditor(
+      {required this.group, required this.suggestedName, required this.allTeams, required this.freeTeams});
 
   @override
   State<_GroupEditor> createState() => _GroupEditorState();
@@ -307,7 +356,8 @@ class _GroupEditorState extends State<_GroupEditor> {
         for (var i = 0; i < group.teams.length; i++)
           if (group.teams[i].isNotEmpty)
             widget.allTeams
-                    .where((t) => teamKey(id: t.id, name: t.name) == teamKey(id: group.teamIdAt(i), name: group.teams[i]))
+                    .where(
+                        (t) => teamKey(id: t.id, name: t.name) == teamKey(id: group.teamIdAt(i), name: group.teams[i]))
                     .firstOrNull ??
                 TeamDTO(id: group.teamIdAt(i), name: group.teams[i]),
     ];
@@ -321,12 +371,15 @@ class _GroupEditorState extends State<_GroupEditor> {
 
   Future<void> _addTeam() async {
     final l10n = AppLocalizations.of(context);
-    if (_teams.length >= GroupDTO.maxTeams) {
+    if (_teams.length >= GroupDTO.teamLimit) {
       showSnackBar(context: context, message: l10n.organizerGroupFull, isSuccess: false);
       return;
     }
     final chosen = {for (final t in _teams) teamKey(id: t.id, name: t.name)};
-    final options = [for (final t in widget.freeTeams) if (!chosen.contains(teamKey(id: t.id, name: t.name))) t];
+    final options = [
+      for (final t in widget.freeTeams)
+        if (!chosen.contains(teamKey(id: t.id, name: t.name))) t
+    ];
     if (options.isEmpty) {
       showSnackBar(context: context, message: l10n.organizerGroupNoTeamsLeft, isSuccess: false);
       return;
@@ -341,7 +394,15 @@ class _GroupEditorState extends State<_GroupEditor> {
       setState(() => _nameError = true);
       return;
     }
-    Navigator.pop(context, OrganizerGroupsCubit.groupOf(name, _teams, id: widget.group?.id ?? ''));
+    Navigator.pop(
+      context,
+      OrganizerGroupsCubit.groupOf(
+        name,
+        _teams,
+        id: widget.group?.id ?? '',
+        rules: widget.group?.rules ?? GroupRules.standard,
+      ),
+    );
   }
 
   @override
@@ -350,8 +411,8 @@ class _GroupEditorState extends State<_GroupEditor> {
     final palette = ArenaPalette.of(context);
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(
-          AppSizes.s20, 0, AppSizes.s20, AppSizes.s20 + MediaQuery.of(context).viewInsets.bottom),
+      padding:
+          EdgeInsets.fromLTRB(AppSizes.s20, 0, AppSizes.s20, AppSizes.s20 + MediaQuery.of(context).viewInsets.bottom),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -377,7 +438,7 @@ class _GroupEditorState extends State<_GroupEditor> {
                 onPressed: () => setState(() => _teams.remove(team)),
               ),
             ),
-          if (_teams.length < GroupDTO.maxTeams)
+          if (_teams.length < GroupDTO.teamLimit)
             TextButton.icon(
               onPressed: _addTeam,
               icon: Icon(Icons.add_circle_outline_rounded, color: palette.primary),

@@ -52,11 +52,14 @@ class PlayerRequestsDataSource {
   }
 
   /// Envia (ou reenvia) o pedido: sobrescreve o anterior e volta a "pendente".
+  /// Com [PlayerRequestDTO.createdAt] (corrigindo um pendente), o "enviado
+  /// em" continua o do pedido; senão, a hora do servidor.
   Future<Either<Failure, void>> submit(PlayerRequestDTO request) async {
     try {
+      final createdAt = request.createdAt;
       await _requests.doc(request.userId).set({
         ...request.toSubmitMap(),
-        'data': FieldValue.serverTimestamp(),
+        'data': createdAt == null ? FieldValue.serverTimestamp() : Timestamp.fromDate(createdAt),
         'atualizado_em': FieldValue.serverTimestamp(),
       });
       return const Right(null);

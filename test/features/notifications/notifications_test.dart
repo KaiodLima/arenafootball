@@ -46,7 +46,8 @@ class _FakeRepository implements INotificationsRepository {
       ]));
 
   @override
-  Future<Either<Failure, void>> sendManual({required String title, required String body, required String region}) async {
+  Future<Either<Failure, void>> sendManual(
+      {required String title, required String body, required String region}) async {
     if (fail) return Left(ErrorWithMessage('erro'));
     notices.add('$title|$body|$region');
     return const Right(null);
@@ -67,8 +68,8 @@ void main() {
     });
 
     test('desejados: todos + região + time (se houver)', () {
-      expect(desiredTopics(region: 'Floresta', favoriteTeam: 'Lava Jato'),
-          {'todos', 'regiao_floresta', 'time_lava_jato'});
+      expect(
+          desiredTopics(region: 'Floresta', favoriteTeam: 'Lava Jato'), {'todos', 'regiao_floresta', 'time_lava_jato'});
       expect(desiredTopics(region: 'Floresta', favoriteTeam: ''), {'todos', 'regiao_floresta'});
     });
 

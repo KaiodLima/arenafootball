@@ -16,6 +16,7 @@ import 'package:arena_soccer/features/players/domain/usecases/get_players_usecas
 import 'package:arena_soccer/features/players/domain/usecases/get_top_players_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/remove_player_from_squad_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/set_player_championships_usecase.dart';
+import 'package:arena_soccer/features/players/domain/usecases/update_player_photo_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/update_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
@@ -37,6 +38,7 @@ void registerPlayersDependencies() {
   _sl.registerLazySingleton(() => CreatePlayerUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => AddPlayerStatsUseCase(_sl()));
   _sl.registerLazySingleton(() => UpdatePlayerUseCase(_sl(), _sl()));
+  _sl.registerLazySingleton(() => UpdatePlayerPhotoUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => WatchPlayerUseCase(_sl()));
   _sl.registerLazySingleton(() => DeletePlayerUseCase(_sl()));
   _sl.registerLazySingleton(() => RemovePlayerFromSquadUseCase(_sl()));

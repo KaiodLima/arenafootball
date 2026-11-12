@@ -172,6 +172,18 @@ class PlayersDataSource {
     }
   }
 
+  /// Grava só a foto (`urlImagem`) do jogador [id]: o atleta vinculado à
+  /// conta troca a própria foto (as regras só deixam esse campo).
+  Future<Either<Failure, void>> updatePlayerPhoto({required String id, required String url, String? season}) async {
+    try {
+      await _players(season).doc(id).update({'urlImagem': url});
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('updatePlayerPhoto id=$id', name: 'PlayersDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
+    }
+  }
+
   /// Soma [goals] gols e [assists] assistências ao jogador, de forma atômica
   /// (`FieldValue.increment`): não lê nem regrava o documento, então duas
   /// somas ao mesmo tempo não se perdem. Com [enrollment], soma também na

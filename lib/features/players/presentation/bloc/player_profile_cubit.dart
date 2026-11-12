@@ -16,6 +16,7 @@ import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/domain/usecases/adjust_player_stats_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/delete_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/remove_player_from_squad_usecase.dart';
+import 'package:arena_soccer/features/players/domain/usecases/update_player_photo_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/update_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_player_usecase.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/player_profile_state.dart';
@@ -44,6 +45,9 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
   final GetRegionMatchesUseCase getRegionMatchesUseCase;
   final GetPlayerAwardsUseCase getPlayerAwardsUseCase;
   final GetPlayerSeasonHistoryUseCase getPlayerSeasonHistoryUseCase;
+
+  /// O próprio atleta troca a foto (grava só ela).
+  final UpdatePlayerPhotoUseCase? updatePlayerPhotoUseCase;
   StreamSubscription<Either<Failure, PlayerDTO?>>? _subscription;
   String? _season;
 
@@ -63,8 +67,9 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
     this.getRegionChampionshipsCacheFirstUseCase,
     this.getRegionMatchesUseCase,
     this.getPlayerAwardsUseCase,
-    this.getPlayerSeasonHistoryUseCase,
-  ) : super(const PlayerProfileState());
+    this.getPlayerSeasonHistoryUseCase, [
+    this.updatePlayerPhotoUseCase,
+  ]) : super(const PlayerProfileState());
 
   /// Temporadas do seletor (histórico) e a conta cujo histórico já carregou.
   List<String> _seasons = const [];
@@ -305,6 +310,21 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
     final player = state.player;
     if (player == null) return Future.value();
     return _save(player, image: image);
+  }
+
+  /// O atleta da conta troca a própria foto: só o campo da foto é gravado
+  /// (as regras não deixam o atleta mexer no resto do cadastro).
+  Future<void> changeOwnPhoto(File image) async {
+    final player = state.player;
+    final useCase = updatePlayerPhotoUseCase;
+    if (player == null || useCase == null || state.saving) return;
+    emit(state.copyWith(saving: true));
+    final response = await useCase(player: player, image: image, season: _season);
+    if (isClosed) return;
+    response.fold(
+      (failure) => emit(ErrorPlayerProfileState(state.copyWith(saving: false), failure.toString())),
+      (saved) => emit(state.copyWith(player: saved, saving: false)),
+    );
   }
 
   /// Sem foto, mostra na hora (o stream confirma); com foto, espera o envio.

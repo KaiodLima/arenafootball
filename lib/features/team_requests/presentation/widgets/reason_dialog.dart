@@ -1,28 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 import 'package:arena_soccer/utils/components/arena_input_decoration.dart';
-import 'package:arena_soccer/utils/constants/app_colors.dart';
 
-/// Confirmação de rejeição com motivo opcional. Devolve o motivo (pode ser
-/// vazio) ou `null` se cancelar.
-Future<String?> showReasonDialog(BuildContext context, {required String title, required String confirmLabel}) {
-  return showDialog<String>(
-    context: context,
-    builder: (_) => _ReasonDialog(title: title, confirmLabel: confirmLabel),
+/// Confirmação de rejeição com motivo opcional, no modal padrão do app
+/// ([showArenaConfirm]). Devolve o motivo (pode ser vazio) ou `null` se
+/// cancelar ou fechar.
+Future<String?> showReasonDialog(BuildContext context, {required String title, required String confirmLabel}) async {
+  final l10n = AppLocalizations.of(context);
+  var reason = '';
+  final confirmed = await showArenaConfirm(
+    context,
+    title: title,
+    message: l10n.rejectReasonMessage,
+    icon: Icons.block_rounded,
+    tone: ArenaAlertTone.danger,
+    confirmLabel: confirmLabel,
+    content: _ReasonField(onChanged: (value) => reason = value),
   );
+  return confirmed ? reason.trim() : null;
 }
 
-class _ReasonDialog extends StatefulWidget {
-  final String title;
-  final String confirmLabel;
+/// Campo do motivo (dono do próprio controller: o modal fecha animando).
+class _ReasonField extends StatefulWidget {
+  final ValueChanged<String> onChanged;
 
-  const _ReasonDialog({required this.title, required this.confirmLabel});
+  const _ReasonField({required this.onChanged});
 
   @override
-  State<_ReasonDialog> createState() => _ReasonDialogState();
+  State<_ReasonField> createState() => _ReasonFieldState();
 }
 
-class _ReasonDialogState extends State<_ReasonDialog> {
+class _ReasonFieldState extends State<_ReasonField> {
   final _controller = TextEditingController();
 
   @override
@@ -34,23 +43,14 @@ class _ReasonDialogState extends State<_ReasonDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return AlertDialog(
-      title: Text(widget.title),
-      content: TextField(
-        controller: _controller,
-        maxLength: 200,
-        minLines: 1,
-        maxLines: 3,
-        textCapitalization: TextCapitalization.sentences,
-        decoration: arenaInputDecoration(label: l10n.playerRequestsRejectReason),
-      ),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.commonCancel)),
-        TextButton(
-          onPressed: () => Navigator.pop(context, _controller.text.trim()),
-          child: Text(widget.confirmLabel, style: const TextStyle(color: AppColors.danger)),
-        ),
-      ],
+    return TextField(
+      controller: _controller,
+      onChanged: widget.onChanged,
+      maxLength: 200,
+      minLines: 1,
+      maxLines: 3,
+      textCapitalization: TextCapitalization.sentences,
+      decoration: arenaInputDecoration(label: l10n.playerRequestsRejectReason),
     );
   }
 }

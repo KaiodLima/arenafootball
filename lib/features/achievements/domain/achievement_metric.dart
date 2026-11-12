@@ -69,7 +69,8 @@ enum AchievementMetric {
   }
 
   /// Métricas de sim/não: a meta é sempre 1.
-  bool get isBoolean => this == favoriteTeam || this == cardPhoto || this == athlete || this == teamOwner || this == albumComplete;
+  bool get isBoolean =>
+      this == favoriteTeam || this == cardPhoto || this == athlete || this == teamOwner || this == albumComplete;
 }
 
 /// Nível da medalha (cor e brilho).

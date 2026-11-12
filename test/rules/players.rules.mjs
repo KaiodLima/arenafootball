@@ -51,4 +51,26 @@ export default async function run(env, check) {
     'dono não troca o time de inscrição de outro time',
     assertFails(updateDoc(doc(dono, 'jogadores2026/p2'), { 'inscricoes.c5': mulekada, idsTimes: ['tA', 'tB'] })),
   );
+
+  // O atleta vinculado (idUsuario) troca só a própria foto.
+  await seed('jogadores2026/p3', { nome: 'Sem conta', time: 'Açaí', idTime: 'tA', urlImagem: '' });
+  const u1 = env.authenticatedContext('u1').firestore();
+  const foto = 'https://example.com/nova.jpg';
+  await check('atleta troca a própria foto', assertSucceeds(updateDoc(doc(u1, 'jogadores2026/p1'), { urlImagem: foto })));
+  await check('atleta não troca a foto de outro atleta', assertFails(updateDoc(doc(u1, 'jogadores2026/p2'), { urlImagem: foto })));
+  await check('atleta não troca a foto de atleta sem conta', assertFails(updateDoc(doc(u1, 'jogadores2026/p3'), { urlImagem: foto })));
+  await check(
+    'atleta não muda outro campo junto com a foto',
+    assertFails(updateDoc(doc(u1, 'jogadores2026/p1'), { urlImagem: 'https://example.com/2.jpg', nome: 'Paulão' })),
+  );
+  await check('atleta não muda os próprios gols', assertFails(updateDoc(doc(u1, 'jogadores2026/p1'), { nGols: 99 })));
+  await check(
+    'atleta não mexe nas próprias inscrições',
+    assertFails(updateDoc(doc(u1, 'jogadores2026/p1'), { 'inscricoes.c3.nGols': 50 })),
+  );
+  await check('atleta não se desvincula', assertFails(updateDoc(doc(u1, 'jogadores2026/p1'), { idUsuario: 'outro' })));
+  await check(
+    'foto precisa ser texto',
+    assertFails(updateDoc(doc(u1, 'jogadores2026/p1'), { urlImagem: 123 })),
+  );
 }

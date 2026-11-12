@@ -104,9 +104,8 @@ class VoteBestPlayerCubit extends Cubit<VoteBestPlayerState> {
                 .toList();
         // Só quem participou da partida (súmula); sem escalação, o elenco.
         final participants = isHome ? _homeParticipants : _awayParticipants;
-        final players = participants == null
-            ? inChampionship
-            : inChampionship.where((p) => participants.contains(p.id)).toList();
+        final players =
+            participants == null ? inChampionship : inChampionship.where((p) => participants.contains(p.id)).toList();
         emit(ReadyVoteBestPlayerState(
           homePlayers: isHome ? players : state.homePlayers,
           awayPlayers: isHome ? state.awayPlayers : players,

@@ -24,8 +24,7 @@ class _AlbumUseCase implements AlbumUseCase {
   Stream<Either<Failure, AlbumEventDTO?>> watchActiveEvent() => event.stream;
 
   @override
-  Stream<Either<Failure, UserAlbumDTO>> watchMyAlbum({required String userId, required String eventId}) =>
-      album.stream;
+  Stream<Either<Failure, UserAlbumDTO>> watchMyAlbum({required String userId, required String eventId}) => album.stream;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -64,12 +63,15 @@ void main() {
       ],
       existing: const [StickerDTO(id: 'x', teamId: 'tA', playerId: 'p2', order: 5)],
     );
-    expect(added.map((s) => (s.kind, s.name, s.order)), [(StickerKind.crest, 'Alfa', 0), (StickerKind.athlete, 'Bia', 6)]);
+    expect(
+        added.map((s) => (s.kind, s.name, s.order)), [(StickerKind.crest, 'Alfa', 0), (StickerKind.athlete, 'Bia', 6)]);
     expect(added.last.imageUrl, 'https://bia');
   });
 
   test('álbum da conta: coladas, repetidas e página completa', () {
-    final album = UserAlbumDTO.fromMap(const {'figurinhas': {'a0': 2, 'a1': 1, 'a2': 1, 'velha': 3}});
+    final album = UserAlbumDTO.fromMap(const {
+      'figurinhas': {'a0': 2, 'a1': 1, 'a2': 1, 'velha': 3}
+    });
     expect(album.collected(_stickers), 3);
     expect(album.duplicates(_stickers), 1);
     final pages = AlbumLayout.pages(_event, _stickers);
@@ -121,7 +123,9 @@ void main() {
   });
 
   test('detalhe: folheia só as coladas da página, na ordem', () {
-    final album = UserAlbumDTO.fromMap(const {'figurinhas': {'a0': 1, 'a2': 2}});
+    final album = UserAlbumDTO.fromMap(const {
+      'figurinhas': {'a0': 1, 'a2': 2}
+    });
     final page = AlbumLayout.pages(_event, _stickers)[1];
     final collected = page.collectedStickers(album);
     expect(collected.map((s) => s.id), ['a0', 'a2']);
@@ -201,7 +205,9 @@ void main() {
       PlayerDTO(id: 'p3', name: 'Caio', team: 'Alfa', teamId: 'tA'),
     ];
     List<String> ids(int? championship) =>
-        AlbumLayout.squadIn(players, championshipId: championship, teamId: 'tA', team: 'Alfa').map((p) => p.id).toList();
+        AlbumLayout.squadIn(players, championshipId: championship, teamId: 'tA', team: 'Alfa')
+            .map((p) => p.id)
+            .toList();
     expect(ids(3), ['p1', 'p3']);
     expect(ids(5), ['p2', 'p3']);
     expect(ids(null), ['p1', 'p2', 'p3']);

@@ -53,3 +53,16 @@ class MatchPlayerLine {
     return lines;
   }
 }
+
+/// Lado em que o atleta [player] joga nesta partida (arte do atleta na
+/// partida), pela mesma regra do [matchSquad]: na competição da partida, a
+/// inscrição pelo time; em amistoso, o elenco geral. Nulo = não joga nela.
+MatchSide? playerArtSideOf(MatchDTO match, PlayerDTO? player) {
+  if (player == null) return null;
+  bool plays(String teamId, String teamName) => match.championshipId > 0
+      ? player.playsIn(match.championshipId, teamId: teamId, teamName: teamName)
+      : player.playsFor(teamId: teamId, teamName: teamName);
+  if (plays(match.homeTeamId, match.homeTeam)) return MatchSide.home;
+  if (plays(match.awayTeamId, match.awayTeam)) return MatchSide.away;
+  return null;
+}

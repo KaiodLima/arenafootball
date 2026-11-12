@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
+import 'package:arena_soccer/features/championships/data/dtos/group_rules.dart';
 import 'package:arena_soccer/features/championships/data/dtos/standing_dto.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/standings_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/standings_state.dart';
@@ -26,12 +27,16 @@ class StandingsPage extends StatefulWidget {
   /// Id do grupo (`grupos{ano}`): a tabela calculada fica em `tabelas{ano}/{id}`.
   final String groupId;
 
+  /// Regras do grupo (faixas e ida e volta); sem elas, os padrões.
+  final GroupRules rules;
+
   const StandingsPage({
     super.key,
     required this.region,
     required this.season,
     required this.group,
     this.groupId = '',
+    this.rules = GroupRules.standard,
   });
 
   @override
@@ -39,9 +44,6 @@ class StandingsPage extends StatefulWidget {
 }
 
 class _StandingsPageState extends State<StandingsPage> {
-  /// Quantos times por grupo se classificam.
-  static const int _qualifiedCount = 2;
-
   @override
   void initState() {
     super.initState();
@@ -76,7 +78,7 @@ class _StandingsPageState extends State<StandingsPage> {
           return StandingsBody(
             group: widget.group,
             standings: state.standings,
-            qualifiedCount: _qualifiedCount,
+            rules: widget.rules,
             isFavorite: (s) => user?.isFavorite(id: s.teamId, name: s.teamName) ?? false,
             automaticLegend: state.automatic
                 ? l10n.standingsAutomaticLegend(StandingsCriterion.effective(state.criteria)
@@ -95,7 +97,7 @@ class _StandingsPageState extends State<StandingsPage> {
 class StandingsBody extends StatelessWidget {
   final String group;
   final List<StandingDTO> standings;
-  final int qualifiedCount;
+  final GroupRules rules;
   final bool Function(StandingDTO standing) isFavorite;
 
   /// Texto da tabela automática (atualização e desempate); nulo = manual.
@@ -105,7 +107,7 @@ class StandingsBody extends StatelessWidget {
     super.key,
     required this.group,
     required this.standings,
-    required this.qualifiedCount,
+    this.rules = GroupRules.standard,
     required this.isFavorite,
     this.automaticLegend,
   });
@@ -114,6 +116,7 @@ class StandingsBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final legend = automaticLegend;
+    final zones = rules.zonesIn(standings.length);
     return ListView(
       physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
       padding: const EdgeInsets.fromLTRB(AppSizes.s12, AppSizes.s16, AppSizes.s12, AppSizes.s24),
@@ -122,55 +125,68 @@ class StandingsBody extends StatelessWidget {
           group: group,
           standings: standings,
           leaderIsFavorite: standings.isNotEmpty && isFavorite(standings.first),
+          homeAndAway: rules.homeAndAway,
         ),
         const SizedBox(height: AppSizes.s14),
-        StandingsTable(standings: standings, qualifiedCount: qualifiedCount, isFavorite: isFavorite),
-        const SizedBox(height: AppSizes.s14),
-        Container(
-          padding: const EdgeInsets.all(AppSizes.s12),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(AppSizes.s14),
-            border: Border.all(color: AppColors.greyLight),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: AppSizes.s14,
-                    height: AppSizes.s14,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(AppSizes.s4),
+        StandingsTable(standings: standings, rules: rules, isFavorite: isFavorite),
+        if (zones.isNotEmpty || legend != null) ...[
+          const SizedBox(height: AppSizes.s14),
+          Container(
+            padding: const EdgeInsets.all(AppSizes.s12),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(AppSizes.s14),
+              border: Border.all(color: AppColors.greyLight),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Só as faixas das regras ativas neste grupo.
+                for (final zone in [GroupZone.qualified, GroupZone.playoff, GroupZone.eliminated])
+                  if (zones.contains(zone))
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: AppSizes.s8),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: AppSizes.s14,
+                            height: AppSizes.s14,
+                            decoration: BoxDecoration(
+                              color: groupZoneColor(zone),
+                              borderRadius: BorderRadius.circular(AppSizes.s4),
+                            ),
+                          ),
+                          const SizedBox(width: AppSizes.s8),
+                          Expanded(
+                            child: Text(
+                              switch (zone) {
+                                GroupZone.qualified => rules.nextPhase.isEmpty
+                                    ? l10n.standingsQualifiedLegend
+                                    : l10n.standingsQualifiedFor(rules.nextPhase),
+                                GroupZone.playoff => l10n.standingsPlayoffLegend,
+                                _ => l10n.standingsEliminatedLegend,
+                              },
+                              style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s12),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
+                if (legend != null)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.autorenew_rounded, size: AppSizes.s14, color: AppColors.primaryStrong),
+                      const SizedBox(width: AppSizes.s8),
+                      Expanded(
+                        child: Text(legend, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: AppSizes.s8),
-                  Expanded(
-                    child: Text(
-                      l10n.standingsQualifiedLegend,
-                      style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s12),
-                    ),
-                  ),
-                ],
-              ),
-              if (legend != null) ...[
-                const SizedBox(height: AppSizes.s8),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(Icons.autorenew_rounded, size: AppSizes.s14, color: AppColors.primaryStrong),
-                    const SizedBox(width: AppSizes.s8),
-                    Expanded(
-                      child: Text(legend, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
-                    ),
-                  ],
-                ),
               ],
-            ],
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
