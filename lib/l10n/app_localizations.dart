@@ -3671,6 +3671,30 @@ abstract class AppLocalizations {
   /// **'Onde'**
   String get reportWhere;
 
+  /// No description provided for @matchEditInfo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar partida'**
+  String get matchEditInfo;
+
+  /// No description provided for @matchEditInfoTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar partida'**
+  String get matchEditInfoTitle;
+
+  /// No description provided for @matchEditInfoSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Data, horário, duração e local'**
+  String get matchEditInfoSubtitle;
+
+  /// No description provided for @matchEditInfoSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Partida atualizada'**
+  String get matchEditInfoSaved;
+
   /// No description provided for @reportRefereeing.
   ///
   /// In pt, this message translates to:
@@ -6233,6 +6257,24 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'ENCERRADA'**
   String get matchCardFinished;
+
+  /// No description provided for @matchCardLiveShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'AO VIVO'**
+  String get matchCardLiveShort;
+
+  /// No description provided for @matchCardHalfTimeShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'INT'**
+  String get matchCardHalfTimeShort;
+
+  /// No description provided for @matchCardFinishedShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'FIM'**
+  String get matchCardFinishedShort;
 
   /// No description provided for @achievementsAlmostThere.
   ///

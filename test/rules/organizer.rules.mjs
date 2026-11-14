@@ -156,6 +156,12 @@ export default async function run(env, check) {
   await check('súmula de partida de outra competição recusada',
     assertFails(updateDoc(doc(org, 'partidas2026/m9'), { golTimeCasa: 1 })));
   await check('usuário comum não mexe na súmula', assertFails(updateDoc(doc(other, 'partidas2026/m1'), { golTimeCasa: 3 })));
+  // "Editar partida" (engrenagem do card): só data, horário, duração e local.
+  await check('editar partida: organizador muda data, horário, duração e local', assertSucceeds(updateDoc(doc(org, 'partidas2026/m1'),
+    { data: '11/12/2026', horario: '19:30', duracao: 80, local: 'Arena Orlandão' })));
+  await check('editar partida: não muda a de outra competição', assertFails(updateDoc(doc(org, 'partidas2026/m9'),
+    { data: '11/12/2026', horario: '19:30', duracao: 80, local: 'Arena Orlandão' })));
+  await check('editar partida: usuário comum não muda', assertFails(updateDoc(doc(other, 'partidas2026/m1'), { horario: '20:00' })));
 
   // Números do atleta (como o incrementStats grava).
   await seed('jogadores2026/p7', {

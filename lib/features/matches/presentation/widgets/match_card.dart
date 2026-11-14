@@ -191,8 +191,15 @@ class MatchCard extends StatefulWidget {
   /// "Divulgar partida" antes do jogo: abre a arte de divulgação (nulo = sem o botão).
   final VoidCallback? onShareArt;
 
+  /// "Editar partida" (data, horário, duração e local; nulo = sem o item).
+  final VoidCallback? onEditInfo;
+
   /// Agora (só para teste).
   final DateTime? now;
+
+  /// Card compacto em linha (lista "Todos os jogos"): status à esquerda, os
+  /// dois times com o placar, os atalhos e o menu à direita.
+  final bool compact;
 
   const MatchCard({
     super.key,
@@ -219,7 +226,9 @@ class MatchCard extends StatefulWidget {
     this.onSetPhase,
     this.onPredict,
     this.onShareArt,
+    this.onEditInfo,
     this.now,
+    this.compact = false,
   });
 
   static bool _none(String _) => false;
@@ -269,6 +278,7 @@ class _MatchCardState extends State<MatchCard> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.compact) return _buildCompact(context);
     final l10n = AppLocalizations.of(context);
     final match = widget.match;
     final isAdmin = widget.isAdmin;
@@ -317,59 +327,7 @@ class _MatchCardState extends State<MatchCard> {
                     ),
                   ] else
                     const Spacer(),
-                  if (isAdmin)
-                    CardMenuButton(
-                      actions: [
-                        if (widget.onManage != null)
-                          CardMenuAction(
-                            icon: Icons.assignment_rounded,
-                            label: l10n.matchReportManage,
-                            onSelected: widget.onManage!,
-                          ),
-                        CardMenuAction(
-                          icon: match.isVotingOpen ? Icons.lock_outline_rounded : Icons.how_to_vote_outlined,
-                          label: match.isVotingOpen ? l10n.matchesCloseVoting : l10n.matchesOpenVoting,
-                          onSelected: widget.onToggleVoting,
-                        ),
-                        CardMenuAction(
-                          icon: Icons.edit_outlined,
-                          label: l10n.matchesEditScore,
-                          onSelected: widget.onEditScore,
-                        ),
-                        if (widget.onDelay != null && canDelayMatch(match, status))
-                          CardMenuAction(
-                            icon: Icons.schedule_rounded,
-                            label: l10n.matchDelay,
-                            onSelected: widget.onDelay!,
-                          ),
-                        if (widget.onSetPhase != null)
-                          for (final action in matchPhaseActions(l10n, match, status, now))
-                            CardMenuAction(
-                              icon: action.icon,
-                              label: action.label,
-                              onSelected: () => widget.onSetPhase!(action.phase),
-                            ),
-                        if (widget.onExport != null)
-                          CardMenuAction(
-                            icon: Icons.picture_as_pdf_outlined,
-                            label: l10n.matchReportExport,
-                            onSelected: widget.onExport!,
-                          ),
-                        if (widget.onGoalCard != null)
-                          CardMenuAction(
-                            icon: Icons.sports_soccer_rounded,
-                            label: l10n.matchDetailsGoalCard,
-                            onSelected: widget.onGoalCard!,
-                          ),
-                        if (widget.canDelete)
-                          CardMenuAction(
-                            icon: Icons.delete_outline_rounded,
-                            label: l10n.matchesDeleteMatch,
-                            destructive: true,
-                            onSelected: widget.onDelete,
-                          ),
-                      ],
-                    ),
+                  if (isAdmin) CardMenuButton(actions: _menuActions(l10n, match, status, now)),
                 ],
               ),
             ),
@@ -479,6 +437,155 @@ class _MatchCardState extends State<MatchCard> {
             content,
             Positioned(left: AppSizes.s6, top: AppSizes.s16, bottom: AppSizes.s16, child: stripe(homeColor)),
             Positioned(right: AppSizes.s6, top: AppSizes.s16, bottom: AppSizes.s16, child: stripe(awayColor)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Ações do menu do admin/organizador (as mesmas nos dois layouts).
+  List<CardMenuAction> _menuActions(AppLocalizations l10n, MatchDTO match, MatchCardStatus status, DateTime now) => [
+        if (widget.onManage != null)
+          CardMenuAction(
+            icon: Icons.assignment_rounded,
+            label: l10n.matchReportManage,
+            onSelected: widget.onManage!,
+          ),
+        if (widget.onEditInfo != null)
+          CardMenuAction(
+            icon: Icons.edit_calendar_rounded,
+            label: l10n.matchEditInfo,
+            onSelected: widget.onEditInfo!,
+          ),
+        CardMenuAction(
+          icon: match.isVotingOpen ? Icons.lock_outline_rounded : Icons.how_to_vote_outlined,
+          label: match.isVotingOpen ? l10n.matchesCloseVoting : l10n.matchesOpenVoting,
+          onSelected: widget.onToggleVoting,
+        ),
+        CardMenuAction(
+          icon: Icons.edit_outlined,
+          label: l10n.matchesEditScore,
+          onSelected: widget.onEditScore,
+        ),
+        if (widget.onDelay != null && canDelayMatch(match, status))
+          CardMenuAction(
+            icon: Icons.schedule_rounded,
+            label: l10n.matchDelay,
+            onSelected: widget.onDelay!,
+          ),
+        if (widget.onSetPhase != null)
+          for (final action in matchPhaseActions(l10n, match, status, now))
+            CardMenuAction(
+              icon: action.icon,
+              label: action.label,
+              onSelected: () => widget.onSetPhase!(action.phase),
+            ),
+        if (widget.onExport != null)
+          CardMenuAction(
+            icon: Icons.picture_as_pdf_outlined,
+            label: l10n.matchReportExport,
+            onSelected: widget.onExport!,
+          ),
+        if (widget.onGoalCard != null)
+          CardMenuAction(
+            icon: Icons.sports_soccer_rounded,
+            label: l10n.matchDetailsGoalCard,
+            onSelected: widget.onGoalCard!,
+          ),
+        if (widget.canDelete)
+          CardMenuAction(
+            icon: Icons.delete_outline_rounded,
+            label: l10n.matchesDeleteMatch,
+            destructive: true,
+            onSelected: widget.onDelete,
+          ),
+      ];
+
+  /// Layout compacto (~64 px): coluna do status, as duas linhas dos times com
+  /// o placar e, à direita, palpite/divulgar/votação e o menu.
+  Widget _buildCompact(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final match = widget.match;
+    final now = widget.now ?? DateTime.now();
+    final status = MatchCardStatus.of(match, now);
+    final started = !status.upcoming && !status.waiting;
+    final homeWon = started && match.homeGoals > match.awayGoals;
+    final awayWon = started && match.awayGoals > match.homeGoals;
+    Color accent(Color? color) => color == null
+        ? AppColors.primary
+        : isLightColor(color)
+            ? AppColors.greyLight
+            : color;
+    final predict = status.upcoming && widget.onPredict != null;
+    final shareArt = status.upcoming && widget.onShareArt != null;
+    final voting = widget.showVoting && match.isVotingOpen;
+
+    Widget action(IconData icon, String tooltip, VoidCallback onTap, {bool strong = false}) => Tooltip(
+          message: tooltip,
+          child: InkResponse(
+            onTap: onTap,
+            radius: AppSizes.s20,
+            child: Padding(
+              padding: const EdgeInsets.all(AppSizes.s6),
+              child: Icon(icon, size: AppSizes.s18, color: strong ? AppColors.primary : AppColors.primaryDark),
+            ),
+          ),
+        );
+
+    return ArenaCard(
+      onTap: widget.onTap,
+      margin: const EdgeInsets.only(bottom: AppSizes.s6),
+      child: Container(
+        foregroundDecoration: widget.isFavorite
+            ? BoxDecoration(
+                borderRadius: BorderRadius.circular(AppSizes.cardRadius),
+                border: Border.all(color: AppColors.primary, width: AppSizes.s2),
+              )
+            : null,
+        padding: const EdgeInsets.fromLTRB(AppSizes.s10, AppSizes.s8, AppSizes.s4, AppSizes.s8),
+        child: Row(
+          children: [
+            SizedBox(width: AppSizes.s52, child: _CompactStatus(match: match, status: status, now: now)),
+            Container(
+              width: 1,
+              height: AppSizes.s36,
+              margin: const EdgeInsets.symmetric(horizontal: AppSizes.s8),
+              color: AppColors.greyLight,
+            ),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _CompactTeam(
+                    name: match.homeTeam,
+                    crest: widget.homeCrest,
+                    color: accent(widget.homeColor),
+                    goals: started ? match.homeGoals : null,
+                    won: homeWon,
+                    lost: awayWon,
+                    isFavorite: widget.isFavoriteTeam(match.homeTeam),
+                  ),
+                  const SizedBox(height: AppSizes.s6),
+                  _CompactTeam(
+                    name: match.awayTeam,
+                    crest: widget.awayCrest,
+                    color: accent(widget.awayColor),
+                    goals: started ? match.awayGoals : null,
+                    won: awayWon,
+                    lost: homeWon,
+                    isFavorite: widget.isFavoriteTeam(match.awayTeam),
+                  ),
+                ],
+              ),
+            ),
+            if (predict) action(Icons.scoreboard_outlined, l10n.predictionAction, widget.onPredict!),
+            if (shareArt) action(Icons.campaign_rounded, l10n.shareArtPreviewTitle, widget.onShareArt!),
+            if (voting) action(Icons.how_to_vote_rounded, l10n.matchesVoteAction, widget.onVotingTap, strong: true),
+            if (widget.isAdmin) ...[
+              const SizedBox(width: AppSizes.s6),
+              CardMenuButton(actions: _menuActions(l10n, match, status, now)),
+            ] else if (!predict && !shareArt && !voting)
+              const SizedBox(width: AppSizes.s8),
           ],
         ),
       ),
@@ -994,6 +1101,139 @@ class _MatchClockBadgeState extends State<MatchClockBadge> {
       onDark: widget.onDark,
       label: matchClockLabel(AppLocalizations.of(context), clock),
       paused: clock.phase == MatchClockPhase.halfTime,
+    );
+  }
+}
+
+/// Coluna do status no card compacto: horário (+ HOJE/AMANHÃ/data),
+/// ATRASADA/AGUARDANDO em âmbar, AO VIVO com o minuto, ou FIM.
+class _CompactStatus extends StatelessWidget {
+  final MatchDTO match;
+  final MatchCardStatus status;
+  final DateTime now;
+
+  const _CompactStatus({required this.match, required this.status, required this.now});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final small =
+        AppTypography.label(color: AppColors.textSecondary).copyWith(fontSize: AppSizes.s10, letterSpacing: 0.4);
+    if (status.live) {
+      final clock = MatchClock.of(match, now);
+      final minute = clock.phase == MatchClockPhase.halfTime ? l10n.matchCardHalfTimeShort : (clock.minuteLabel ?? '');
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(l10n.matchCardLiveShort, style: small.copyWith(color: AppColors.danger, fontWeight: FontWeight.w800)),
+          if (minute.isNotEmpty)
+            Text(minute, style: AppTypography.label(color: AppColors.danger).copyWith(fontSize: AppSizes.s14)),
+        ],
+      );
+    }
+    if (status.finished || (!status.upcoming && !status.waiting)) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(l10n.matchCardFinishedShort, style: small),
+          if (match.time.trim().isNotEmpty) Text(match.time.trim(), style: small),
+        ],
+      );
+    }
+    final delayed = (status.upcoming && match.delayed) || status.waiting;
+    final time = match.time.trim();
+    final sub = status.waiting
+        ? l10n.matchCardWaiting
+        : delayed
+            ? l10n.matchCardDelayed
+            : switch (status.dayOffset) {
+                0 => l10n.matchCardToday,
+                1 => l10n.matchCardTomorrow,
+                _ => '',
+              };
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            time.isEmpty ? '--:--' : time,
+            style: AppTypography.label(color: AppColors.primaryDark)
+                .copyWith(fontSize: AppSizes.s16, fontFeatures: const [FontFeature.tabularFigures()]),
+          ),
+        ),
+        if (sub.isNotEmpty)
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(sub, style: small.copyWith(color: delayed ? AppColors.teamOrange : AppColors.primaryDark)),
+          ),
+      ],
+    );
+  }
+}
+
+/// Linha de um time no card compacto: faixa na cor do time, escudo, nome
+/// (vencedor em negrito, perdedor esmaecido, ★ do time do coração) e o placar.
+class _CompactTeam extends StatelessWidget {
+  final String name;
+  final String? crest;
+  final Color color;
+  final int? goals;
+  final bool won;
+  final bool lost;
+  final bool isFavorite;
+
+  const _CompactTeam({
+    required this.name,
+    required this.crest,
+    required this.color,
+    required this.goals,
+    required this.won,
+    required this.lost,
+    required this.isFavorite,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final ink = lost ? AppColors.textSecondary : AppColors.textPrimary;
+    final weight = won ? FontWeight.w800 : FontWeight.w600;
+    return Row(
+      children: [
+        Container(
+          width: 3,
+          height: AppSizes.s18,
+          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(AppSizes.s2)),
+        ),
+        const SizedBox(width: AppSizes.s6),
+        TeamCrest(imageUrl: crest, size: AppSizes.s20),
+        const SizedBox(width: AppSizes.s8),
+        Expanded(
+          child: Text(
+            name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTypography.label(color: ink).copyWith(fontSize: AppSizes.s14, fontWeight: weight),
+          ),
+        ),
+        if (isFavorite)
+          const Padding(
+            padding: EdgeInsets.only(left: AppSizes.s2),
+            child: Icon(Icons.star_rounded, color: AppColors.gold, size: AppSizes.s14),
+          ),
+        if (goals != null)
+          SizedBox(
+            width: AppSizes.s28,
+            child: Text(
+              '$goals',
+              textAlign: TextAlign.right,
+              style: AppTypography.label(color: ink).copyWith(
+                fontSize: AppSizes.s16,
+                fontWeight: weight,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

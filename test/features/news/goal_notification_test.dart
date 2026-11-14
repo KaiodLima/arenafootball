@@ -67,6 +67,17 @@ class _FakeMatchesRepository implements IMatchesRepository {
   Future<Either<Failure, void>> updateReport(MatchDTO match, {String? season}) async => const Right(null);
 
   @override
+  Future<Either<Failure, void>> updateMatchInfo({
+    required String matchId,
+    required String date,
+    required String time,
+    required int durationMinutes,
+    required String venue,
+    String? season,
+  }) async =>
+      const Right(null);
+
+  @override
   Future<Either<Failure, void>> delayMatch({
     required String matchId,
     required String newTime,

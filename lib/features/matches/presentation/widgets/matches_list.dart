@@ -11,6 +11,7 @@ import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/matches_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/matches_state.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_goals_sheet.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/edit_match_info_sheet.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_card.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/matches_summary_card.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/team_filter_chips.dart';
@@ -46,7 +47,11 @@ class MatchesList extends StatelessWidget {
   /// Etiqueta da competição em cada card (nulo = sem etiqueta).
   final String? Function(MatchDTO match)? championshipLabelOf;
 
+  /// Cards compactos em linha (lista longa, "Todos os jogos").
+  final bool compact;
+
   const MatchesList({
+    this.compact = false,
     super.key,
     required this.season,
     this.header,
@@ -74,6 +79,21 @@ class MatchesList extends StatelessWidget {
       homeCrest: state.crestOf(match.homeTeam),
       awayCrest: state.crestOf(match.awayTeam),
     );
+  }
+
+  /// "Editar partida": data, horário, duração e local.
+  Future<void> _editInfo(BuildContext context, MatchDTO match) async {
+    final cubit = BlocProvider.of<MatchesCubit>(context);
+    final l10n = AppLocalizations.of(context);
+    final info = await showEditMatchInfoSheet(
+      context,
+      match: match,
+      homeCrest: cubit.state.crestOf(match.homeTeam),
+      awayCrest: cubit.state.crestOf(match.awayTeam),
+    );
+    if (info == null) return;
+    final saved = await cubit.updateInfo(match, info);
+    if (saved && context.mounted) showSnackBar(context: context, message: l10n.matchEditInfoSaved);
   }
 
   Future<void> _confirmDelete(BuildContext context, MatchDTO match) async {
@@ -131,6 +151,7 @@ class MatchesList extends StatelessWidget {
 
         Widget card(MatchDTO match) => MatchCard(
               match: match,
+              compact: compact,
               championshipLabel: championshipLabelOf?.call(match),
               isAdmin: manages(match),
               canDelete: isAdmin,
@@ -156,6 +177,7 @@ class MatchesList extends StatelessWidget {
                 },
               ),
               onDelete: () => _confirmDelete(context, match),
+              onEditInfo: manages(match) ? () => _editInfo(context, match) : null,
               onTap: () => Navigator.pushNamed(
                 context,
                 AppRoutes.matchDetailsPage,

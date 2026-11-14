@@ -2166,6 +2166,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportWhere => 'Where';
 
   @override
+  String get matchEditInfo => 'Edit match';
+
+  @override
+  String get matchEditInfoTitle => 'Edit match';
+
+  @override
+  String get matchEditInfoSubtitle => 'Date, time, duration and venue';
+
+  @override
+  String get matchEditInfoSaved => 'Match updated';
+
+  @override
   String get reportRefereeing => 'Refereeing';
 
   @override
@@ -3803,6 +3815,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get matchCardFinished => 'FULL TIME';
+
+  @override
+  String get matchCardLiveShort => 'LIVE';
+
+  @override
+  String get matchCardHalfTimeShort => 'HT';
+
+  @override
+  String get matchCardFinishedShort => 'FT';
 
   @override
   String get achievementsAlmostThere => 'ALMOST THERE';

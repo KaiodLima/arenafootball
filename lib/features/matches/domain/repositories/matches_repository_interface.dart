@@ -45,6 +45,16 @@ abstract class IMatchesRepository {
   });
 
   /// "Atrasou": novo horário, guardando o original.
+  /// "Editar partida": data, horário, duração e local.
+  Future<Either<Failure, void>> updateMatchInfo({
+    required String matchId,
+    required String date,
+    required String time,
+    required int durationMinutes,
+    required String venue,
+    String? season,
+  });
+
   Future<Either<Failure, void>> delayMatch({
     required String matchId,
     required String newTime,

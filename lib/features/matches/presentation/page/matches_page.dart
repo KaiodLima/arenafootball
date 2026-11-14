@@ -51,7 +51,8 @@ class _MatchesPageState extends State<MatchesPage> {
         title: l10n.matchesAllGamesTitle,
         subtitle: l10n.groupsSubtitle(_region, _season),
       ),
-      body: MatchesList(season: _season, groupByDate: true),
+      // Lista longa: cards compactos em linha.
+      body: MatchesList(season: _season, groupByDate: true, compact: true),
     );
   }
 }

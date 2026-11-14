@@ -147,6 +147,21 @@ class MatchesDataSource {
         season: season,
       );
 
+  /// "Editar partida": só data, horário, duração e local.
+  Future<Either<Failure, void>> updateMatchInfo({
+    required String matchId,
+    required String date,
+    required String time,
+    required int durationMinutes,
+    required String venue,
+    String? season,
+  }) =>
+      _update(
+        matchId,
+        {'data': date, 'horario': time, 'duracao': durationMinutes, 'local': venue},
+        season: season,
+      );
+
   /// `votacao` continua gravado como string.
   Future<Either<Failure, void>> setVotingOpen({required String matchId, required bool isOpen, String? season}) =>
       _update(matchId, {'votacao': isOpen.toString()}, season: season);

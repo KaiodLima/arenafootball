@@ -17,6 +17,7 @@ import 'package:arena_soccer/features/matches/domain/usecases/update_match_score
 import 'package:arena_soccer/features/matches/domain/usecases/watch_match_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/watch_matches_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/delay_match_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/update_match_info_usecase.dart';
 
 final _sl = GetIt.instance;
 
@@ -43,4 +44,5 @@ void registerMatchesDependencies() {
   _sl.registerLazySingleton(() => DeleteMatchUseCase(_sl()));
   _sl.registerLazySingleton(() => SetMatchPhaseUseCase(_sl()));
   _sl.registerLazySingleton(() => DelayMatchUseCase(_sl()));
+  _sl.registerLazySingleton(() => UpdateMatchInfoUseCase(_sl()));
 }

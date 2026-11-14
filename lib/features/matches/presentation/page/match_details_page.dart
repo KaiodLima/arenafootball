@@ -8,6 +8,7 @@ import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart'
 import 'package:arena_soccer/features/matches/presentation/bloc/match_details_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_details/match_details_header.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_details/match_details_sections.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/edit_match_info_sheet.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_card.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_goals_sheet.dart';
 import 'package:arena_soccer/features/predictions/presentation/widgets/match_prediction_card.dart';
@@ -136,6 +137,23 @@ class MatchDetailsPage extends StatelessWidget {
                               'awayColor': awayColor,
                             },
                           ),
+                        ),
+                        CardMenuAction(
+                          icon: Icons.edit_calendar_rounded,
+                          label: l10n.matchEditInfo,
+                          onSelected: () async {
+                            final info = await showEditMatchInfoSheet(
+                              context,
+                              match: match,
+                              homeCrest: homeCrest,
+                              awayCrest: awayCrest,
+                            );
+                            if (info == null) return;
+                            final saved = await cubit.updateInfo(info);
+                            if (saved && context.mounted) {
+                              showSnackBar(context: context, message: l10n.matchEditInfoSaved);
+                            }
+                          },
                         ),
                         CardMenuAction(
                           icon: Icons.edit_outlined,

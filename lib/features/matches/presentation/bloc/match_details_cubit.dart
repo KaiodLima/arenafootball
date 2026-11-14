@@ -11,6 +11,7 @@ import 'package:arena_soccer/features/matches/domain/usecases/watch_match_usecas
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/delay_match_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/update_match_info_usecase.dart';
 
 /// Detalhes da partida: a partida ao vivo, os elencos dos dois lados (na
 /// competição da partida) e o lado escolhido na seção "Elencos".
@@ -80,6 +81,9 @@ class MatchDetailsCubit extends Cubit<MatchDetailsState> {
   final ToggleMatchVotingUseCase toggleMatchVotingUseCase;
   final SetMatchPhaseUseCase setMatchPhaseUseCase;
   final DelayMatchUseCase delayMatchUseCase;
+
+  /// "Editar partida" (data, horário, duração e local).
+  final UpdateMatchInfoUseCase? updateMatchInfoUseCase;
   StreamSubscription? _subscription;
   String? _season;
 
@@ -90,6 +94,7 @@ class MatchDetailsCubit extends Cubit<MatchDetailsState> {
     this.setMatchPhaseUseCase,
     this.delayMatchUseCase, {
     required MatchDTO match,
+    this.updateMatchInfoUseCase,
   }) : super(MatchDetailsState(match: match));
 
   /// Começa com a partida recebida da lista; o stream traz as mudanças.
@@ -143,6 +148,19 @@ class MatchDetailsCubit extends Cubit<MatchDetailsState> {
   }
 
   /// Admin: a partida atrasou e começa às [newTime].
+  /// "Editar partida": devolve se gravou.
+  Future<bool> updateInfo(MatchInfoEdit info) async {
+    final useCase = updateMatchInfoUseCase;
+    if (useCase == null) return false;
+    final response = await useCase(match: state.match, info: info, season: _season);
+    if (isClosed) return false;
+    response.fold(
+      (failure) => emit(state.copyWith(errorMessage: () => failure.toString())),
+      (updated) => emit(state.copyWith(match: updated, errorMessage: () => null)),
+    );
+    return response.isRight;
+  }
+
   Future<void> delay(String newTime) async {
     final response = await delayMatchUseCase(match: state.match, newTime: newTime, season: _season);
     if (isClosed) return;

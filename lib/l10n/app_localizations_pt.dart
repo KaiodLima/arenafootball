@@ -2178,6 +2178,18 @@ class AppLocalizationsPt extends AppLocalizations {
   String get reportWhere => 'Onde';
 
   @override
+  String get matchEditInfo => 'Editar partida';
+
+  @override
+  String get matchEditInfoTitle => 'Editar partida';
+
+  @override
+  String get matchEditInfoSubtitle => 'Data, horário, duração e local';
+
+  @override
+  String get matchEditInfoSaved => 'Partida atualizada';
+
+  @override
   String get reportRefereeing => 'Arbitragem';
 
   @override
@@ -3821,6 +3833,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get matchCardFinished => 'ENCERRADA';
+
+  @override
+  String get matchCardLiveShort => 'AO VIVO';
+
+  @override
+  String get matchCardHalfTimeShort => 'INT';
+
+  @override
+  String get matchCardFinishedShort => 'FIM';
 
   @override
   String get achievementsAlmostThere => 'QUASE LÁ';

@@ -14,6 +14,7 @@ import 'package:arena_soccer/features/matches/domain/usecases/watch_matches_usec
 import 'package:arena_soccer/features/matches/presentation/bloc/matches_state.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/delay_match_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/update_match_info_usecase.dart';
 
 /// Partidas de um campeonato em tempo real + ações do admin (placar,
 /// abrir/fechar votação, excluir). As ações gravam na mesma temporada da
@@ -27,6 +28,9 @@ class MatchesCubit extends Cubit<MatchesState> {
   final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
   final SetMatchPhaseUseCase setMatchPhaseUseCase;
   final DelayMatchUseCase delayMatchUseCase;
+
+  /// "Editar partida" (data, horário, duração e local).
+  final UpdateMatchInfoUseCase? updateMatchInfoUseCase;
   StreamSubscription<Either<Failure, List<MatchDTO>>>? _subscription;
   String? _region;
   String? _season;
@@ -46,8 +50,9 @@ class MatchesCubit extends Cubit<MatchesState> {
     this.deleteMatchUseCase,
     this.getTeamsCacheFirstUseCase,
     this.setMatchPhaseUseCase,
-    this.delayMatchUseCase,
-  ) : super(const LoadingMatchesState());
+    this.delayMatchUseCase, [
+    this.updateMatchInfoUseCase,
+  ]) : super(const LoadingMatchesState());
 
   /// Recorte (dia) que está sendo ouvido; nulo antes do primeiro [watch].
   MatchesFilter? get filter => _filter;
@@ -182,6 +187,15 @@ class MatchesCubit extends Cubit<MatchesState> {
   /// Admin: a partida atrasou e começa às [newTime].
   Future<void> delay(MatchDTO match, String newTime) async {
     _emitIfFailed(await delayMatchUseCase(match: match, newTime: newTime, season: _season));
+  }
+
+  /// "Editar partida": devolve se gravou (o stream traz a partida nova).
+  Future<bool> updateInfo(MatchDTO match, MatchInfoEdit info) async {
+    final useCase = updateMatchInfoUseCase;
+    if (useCase == null) return false;
+    final response = await useCase(match: match, info: info, season: _season);
+    _emitIfFailed(response);
+    return response.isRight;
   }
 
   Future<void> delete(MatchDTO match) async {
