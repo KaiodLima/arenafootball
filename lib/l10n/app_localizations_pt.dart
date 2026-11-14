@@ -184,6 +184,28 @@ class AppLocalizationsPt extends AppLocalizations {
   String get newsDeleteConfirm => 'DESEJA REALMENTE EXCLUIR ESSA NOTÍCIA ?';
 
   @override
+  String get newsMoveRegion => 'Mudar região';
+
+  @override
+  String newsMoveRegionTitle(String region) {
+    return 'Mover para $region?';
+  }
+
+  @override
+  String newsMoveRegionMessage(String region) {
+    return 'O card passa a aparecer só no feed de $region. O push já enviado não é desfeito.';
+  }
+
+  @override
+  String get newsMoveRegionLiveNote =>
+      'Card ao vivo da partida: corrija também a região/competição da partida, senão o próximo lance o traz de volta.';
+
+  @override
+  String newsMovedRegion(String region) {
+    return 'Notícia movida para $region';
+  }
+
+  @override
   String get newsAdPlaceholder => 'PUBLICIDADE';
 
   @override

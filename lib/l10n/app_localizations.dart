@@ -410,6 +410,36 @@ abstract class AppLocalizations {
   /// **'DESEJA REALMENTE EXCLUIR ESSA NOTÍCIA ?'**
   String get newsDeleteConfirm;
 
+  /// No description provided for @newsMoveRegion.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mudar região'**
+  String get newsMoveRegion;
+
+  /// No description provided for @newsMoveRegionTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mover para {region}?'**
+  String newsMoveRegionTitle(String region);
+
+  /// No description provided for @newsMoveRegionMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'O card passa a aparecer só no feed de {region}. O push já enviado não é desfeito.'**
+  String newsMoveRegionMessage(String region);
+
+  /// No description provided for @newsMoveRegionLiveNote.
+  ///
+  /// In pt, this message translates to:
+  /// **'Card ao vivo da partida: corrija também a região/competição da partida, senão o próximo lance o traz de volta.'**
+  String get newsMoveRegionLiveNote;
+
+  /// No description provided for @newsMovedRegion.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notícia movida para {region}'**
+  String newsMovedRegion(String region);
+
   /// No description provided for @newsAdPlaceholder.
   ///
   /// In pt, this message translates to:

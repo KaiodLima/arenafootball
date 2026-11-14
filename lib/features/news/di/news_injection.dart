@@ -7,6 +7,7 @@ import 'package:arena_soccer/features/news/domain/usecases/create_news_usecase.d
 import 'package:arena_soccer/features/news/domain/usecases/delete_goal_cards_cache_usecase.dart';
 import 'package:arena_soccer/features/news/domain/usecases/delete_news_cache_usecase.dart';
 import 'package:arena_soccer/features/news/domain/usecases/delete_news_usecase.dart';
+import 'package:arena_soccer/features/news/domain/usecases/update_news_region_usecase.dart';
 import 'package:arena_soccer/features/news/domain/usecases/get_cached_goal_cards_usecase.dart';
 import 'package:arena_soccer/features/news/domain/usecases/get_cached_news_usecase.dart';
 import 'package:arena_soccer/features/news/domain/usecases/get_news_by_id_cache_first_usecase.dart';
@@ -36,6 +37,7 @@ void registerNewsDependencies() {
   _sl.registerLazySingleton(() => CreateNewsUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => UpdateNewsUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => DeleteNewsUseCase(_sl()));
+  _sl.registerLazySingleton(() => UpdateNewsRegionUseCase(_sl()));
   _sl.registerLazySingleton(() => GetPlayerGoalCardsUseCase(_sl()));
   _sl.registerLazySingleton(() => GetNewsByIdUseCase(_sl()));
   _sl.registerLazySingleton(() => PendingNewsUseCase(_sl()));

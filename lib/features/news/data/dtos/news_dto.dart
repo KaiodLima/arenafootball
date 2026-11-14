@@ -335,6 +335,15 @@ class NewsDTO extends Equatable {
   /// servidor; na edição, o original.
   /// `images` só é gravado quando há fotos (cards de gol/anúncio nunca
   /// tiveram esse campo).
+  /// Gravação da edição (o doc inteiro): as regiões envolvidas só ficam se
+  /// a região continua uma delas. Mudou de região, só a nova: senão o card
+  /// seguiria no feed da região antiga (`whereRegionOrIn`).
+  Map<String, dynamic> toEditMap() {
+    final regionId = RegionRegistry.idOf(region);
+    final keepRegionIds = regionIds.isNotEmpty && regionId.isNotEmpty && regionIds.contains(regionId);
+    return {...toMap()}..removeWhere((key, _) => key == regionIdsField && !keepRegionIds);
+  }
+
   Map<String, dynamic> toMap() => {
         'id': id,
         'titulo': title,

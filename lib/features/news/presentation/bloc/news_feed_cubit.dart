@@ -6,6 +6,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/features/news/domain/news_feed_page.dart';
 import 'package:arena_soccer/features/news/domain/usecases/delete_news_usecase.dart';
+import 'package:arena_soccer/features/news/domain/usecases/update_news_region_usecase.dart';
 import 'package:arena_soccer/features/news/domain/usecases/get_news_page_usecase.dart';
 import 'package:arena_soccer/features/news/domain/usecases/watch_news_feed_usecase.dart';
 import 'package:arena_soccer/features/news/presentation/bloc/news_feed_state.dart';
@@ -17,6 +18,9 @@ class NewsFeedCubit extends Cubit<NewsFeedState> {
   final WatchNewsFeedUseCase watchNewsFeedUseCase;
   final GetNewsPageUseCase getNewsPageUseCase;
   final DeleteNewsUseCase deleteNewsUseCase;
+
+  /// "Mudar região" (admin).
+  final UpdateNewsRegionUseCase? updateNewsRegionUseCase;
   StreamSubscription<Either<Failure, NewsFeedPage>>? _subscription;
   String? _region;
 
@@ -35,7 +39,8 @@ class NewsFeedCubit extends Cubit<NewsFeedState> {
   /// descartada.
   int _generation = 0;
 
-  NewsFeedCubit(this.watchNewsFeedUseCase, this.getNewsPageUseCase, this.deleteNewsUseCase)
+  NewsFeedCubit(this.watchNewsFeedUseCase, this.getNewsPageUseCase, this.deleteNewsUseCase,
+      [this.updateNewsRegionUseCase])
       : super(const LoadingNewsFeedState());
 
   /// Já ouve o feed desta região.
@@ -121,6 +126,24 @@ class NewsFeedCubit extends Cubit<NewsFeedState> {
 
   /// O stream atualiza a primeira página sozinho após a exclusão; nas
   /// páginas antigas (leitura única) a notícia sai da lista aqui.
+  /// Move o card para outra região: some deste feed (o stream tira o da
+  /// janela ao vivo; o das páginas antigas sai daqui). Devolve se gravou.
+  Future<bool> moveRegion(String id, String region) async {
+    final useCase = updateNewsRegionUseCase;
+    if (useCase == null) return false;
+    final response = await useCase(id: id, region: region);
+    if (isClosed) return false;
+    if (response.isLeft) {
+      emit(ErrorNewsFeedState(errorMessage: response.left.toString(), news: state.news, hasMore: state.hasMore));
+      return false;
+    }
+    if (_older.any((n) => n.id == id)) {
+      _older = _older.where((n) => n.id != id).toList();
+      _emitList();
+    }
+    return true;
+  }
+
   Future<void> delete(String id) async {
     final response = await deleteNewsUseCase(id);
     if (isClosed) return;

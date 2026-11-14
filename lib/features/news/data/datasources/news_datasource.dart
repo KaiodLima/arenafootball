@@ -132,12 +132,27 @@ class NewsDataSource {
   Future<Either<Failure, void>> updateNews(NewsDTO news) async {
     try {
       await _news.doc(news.id).set({
-        ...news.toMap(),
+        ...news.toEditMap(),
         'data': news.date != null ? Timestamp.fromDate(news.date!) : FieldValue.serverTimestamp(),
       });
       return const Right(null);
     } catch (e) {
       AppLogger.e('updateNews id=${news.id}', name: 'NewsDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
+    }
+  }
+
+  /// "Mudar região" (admin): só a região do card; apaga `idsRegioes` para
+  /// ele deixar de aparecer nas outras regiões.
+  Future<Either<Failure, void>> updateNewsRegion({required String id, required String region}) async {
+    try {
+      await _news.doc(id).update({
+        ...RegionRegistry.fieldsFor(region),
+        NewsDTO.regionIdsField: FieldValue.delete(),
+      });
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('updateNewsRegion id=$id', name: 'NewsDataSource', error: e);
       return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
     }
   }

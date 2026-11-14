@@ -60,6 +60,10 @@ class NewsRepositoryImpl implements INewsRepository {
       _invalidate(await _dataSource.deleteNews(id), newsId: id);
 
   @override
+  Future<Either<Failure, void>> updateNewsRegion({required String id, required String region}) async =>
+      _invalidate(await _dataSource.updateNewsRegion(id: id, region: region), newsId: id);
+
+  @override
   Future<Either<Failure, List<NewsDTO>>> getGoalCardsByPlayer(String playerId) =>
       _dataSource.getGoalCardsByPlayer(playerId);
 

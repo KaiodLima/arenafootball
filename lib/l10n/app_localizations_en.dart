@@ -183,6 +183,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newsDeleteConfirm => 'DO YOU REALLY WANT TO DELETE THIS NEWS?';
 
   @override
+  String get newsMoveRegion => 'Change region';
+
+  @override
+  String newsMoveRegionTitle(String region) {
+    return 'Move to $region?';
+  }
+
+  @override
+  String newsMoveRegionMessage(String region) {
+    return 'The card will only show in the $region feed. The push already sent is not undone.';
+  }
+
+  @override
+  String get newsMoveRegionLiveNote =>
+      'Live match card: also fix the match\'s region/competition, or the next event brings it back.';
+
+  @override
+  String newsMovedRegion(String region) {
+    return 'News moved to $region';
+  }
+
+  @override
   String get newsAdPlaceholder => 'ADVERTISEMENT';
 
   @override

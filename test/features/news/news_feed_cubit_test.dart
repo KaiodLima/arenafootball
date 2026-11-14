@@ -8,6 +8,8 @@ import 'package:arena_soccer/features/news/domain/news_feed_page.dart';
 import 'package:arena_soccer/features/news/domain/repositories/news_repository_interface.dart';
 import 'package:arena_soccer/features/news/domain/usecases/delete_news_usecase.dart';
 import 'package:arena_soccer/features/news/domain/usecases/get_news_page_usecase.dart';
+import 'package:arena_soccer/features/news/domain/usecases/update_news_region_usecase.dart';
+import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/features/news/domain/usecases/watch_news_feed_usecase.dart';
 import 'package:arena_soccer/features/news/presentation/bloc/news_feed_cubit.dart';
 import 'package:arena_soccer/features/news/presentation/bloc/news_feed_state.dart';
@@ -50,6 +52,14 @@ class _FakeRepository implements INewsRepository {
   @override
   Future<Either<Failure, void>> deleteNews(String id) async => const Right(null);
 
+  final moved = <(String, String)>[];
+
+  @override
+  Future<Either<Failure, void>> updateNewsRegion({required String id, required String region}) async {
+    moved.add((id, region));
+    return const Right(null);
+  }
+
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -66,6 +76,7 @@ void main() {
       WatchNewsFeedUseCase(repository),
       GetNewsPageUseCase(repository),
       DeleteNewsUseCase(repository),
+      UpdateNewsRegionUseCase(repository),
     );
   });
 
@@ -179,5 +190,45 @@ void main() {
     await cubit.delete('n25');
     expect(_ids(cubit.state).contains('n25'), isFalse);
     expect(cubit.state.news.length, 39);
+  });
+
+  test('mudar região: grava a região nova e o card sai das páginas antigas deste feed', () async {
+    cubit.watch(region: 'Floresta');
+    await emitFirstPage('Floresta', _range(0, 20));
+    await cubit.loadMore();
+    expect(_ids(cubit.state), contains('n25'));
+    final moved = await cubit.moveRegion('n25', 'Riacho');
+    expect(moved, isTrue);
+    expect(repository.moved, [('n25', 'Riacho')]);
+    expect(_ids(cubit.state), isNot(contains('n25')));
+  });
+
+  group('edição da notícia (toEditMap)', () {
+    setUp(() => RegionRegistry.configure(const [
+          RegionRef(id: 'fl', name: 'Floresta'),
+          RegionRef(id: 'ri', name: 'Riacho'),
+        ]));
+    tearDown(RegionRegistry.reset);
+
+    test('mantém o autor (parceiro) e as regiões envolvidas na mesma região', () {
+      const news = NewsDTO(id: 'x', region: 'Floresta', authorId: 'p1', regionIds: ['fl', 'ri']);
+      final map = news.toEditMap();
+      expect(map['idAutor'], 'p1');
+      expect(map[NewsDTO.regionIdsField], ['fl', 'ri']);
+      expect(map['idRegiao'], 'fl');
+    });
+
+    test('mudou para uma região fora das envolvidas: só a nova', () {
+      RegionRegistry.configure(const [
+        RegionRef(id: 'fl', name: 'Floresta'),
+        RegionRef(id: 'ri', name: 'Riacho'),
+        RegionRef(id: 'sa', name: 'Santo Inácio'),
+      ]);
+      const news = NewsDTO(id: 'x', region: 'Santo Inácio', regionIds: ['fl', 'ri']);
+      final map = news.toEditMap();
+      expect(map.containsKey(NewsDTO.regionIdsField), isFalse);
+      expect(map['idRegiao'], 'sa');
+      expect(map.containsKey('idAutor'), isFalse);
+    });
   });
 }

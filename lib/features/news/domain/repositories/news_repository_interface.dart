@@ -21,6 +21,9 @@ abstract class INewsRepository {
 
   Future<Either<Failure, void>> deleteNews(String id);
 
+  /// "Mudar região" do card (admin).
+  Future<Either<Failure, void>> updateNewsRegion({required String id, required String region});
+
   Future<Either<Failure, void>> createPendingNews(NewsDTO news);
 
   Stream<Either<Failure, List<PendingNewsDTO>>> watchMyPendingNews(String authorId);

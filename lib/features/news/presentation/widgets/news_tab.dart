@@ -19,6 +19,7 @@ import 'package:arena_soccer/utils/constants/team_colors.dart';
 import 'package:arena_soccer/features/players/presentation/player_navigation.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/features/regions/presentation/widgets/region_picker_sheet.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/card_menu_button.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
@@ -165,6 +166,13 @@ class _NewsItem extends StatelessWidget {
               arguments: {'news': news},
             ),
           ),
+        // Card na região errada: o admin move (qualquer tipo de card).
+        if (isAdmin)
+          CardMenuAction(
+            icon: Icons.swap_horiz_rounded,
+            label: l10n.newsMoveRegion,
+            onSelected: () => _moveRegion(context),
+          ),
         CardMenuAction(
           icon: Icons.delete_outline_rounded,
           label: l10n.commonDelete,
@@ -216,6 +224,32 @@ class _NewsItem extends StatelessWidget {
         'championshipLabel': news.championshipTitle.isEmpty ? null : news.championshipTitle,
       },
     );
+  }
+
+  /// "Mudar região": escolhe a região (busca) e confirma; o push já enviado
+  /// não volta. O card ao vivo segue a partida: avisa para corrigi-la também.
+  Future<void> _moveRegion(BuildContext context) async {
+    final cubit = BlocProvider.of<NewsFeedCubit>(context);
+    final regions = BlocProvider.of<RegionCubit>(context).state;
+    final l10n = AppLocalizations.of(context);
+    final picked = await showRegionPicker(
+      context,
+      regions: regions.regions,
+      selected: news.region,
+      recent: regions.recentRegions,
+    );
+    if (picked == null || picked == news.region || !context.mounted) return;
+    final message = l10n.newsMoveRegionMessage(picked);
+    final confirmed = await showArenaConfirm(
+      context,
+      title: l10n.newsMoveRegionTitle(picked),
+      message: news.isLive ? '$message\n\n${l10n.newsMoveRegionLiveNote}' : message,
+      confirmLabel: l10n.newsMoveRegion,
+      icon: Icons.swap_horiz_rounded,
+    );
+    if (!confirmed) return;
+    final moved = await cubit.moveRegion(news.id, picked);
+    if (moved && context.mounted) showSnackBar(context: context, message: l10n.newsMovedRegion(picked));
   }
 
   Future<void> _confirmDelete(BuildContext context) async {

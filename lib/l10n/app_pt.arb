@@ -73,6 +73,32 @@
   "newsEmpty": "Nenhuma notícia registrada",
   "newsLoadError": "Não foi possível carregar as notícias.",
   "newsDeleteConfirm": "DESEJA REALMENTE EXCLUIR ESSA NOTÍCIA ?",
+  "newsMoveRegion": "Mudar região",
+  "newsMoveRegionTitle": "Mover para {region}?",
+  "@newsMoveRegionTitle": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "newsMoveRegionMessage": "O card passa a aparecer só no feed de {region}. O push já enviado não é desfeito.",
+  "@newsMoveRegionMessage": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "newsMoveRegionLiveNote": "Card ao vivo da partida: corrija também a região/competição da partida, senão o próximo lance o traz de volta.",
+  "newsMovedRegion": "Notícia movida para {region}",
+  "@newsMovedRegion": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      }
+    }
+  },
   "newsAdPlaceholder": "PUBLICIDADE",
   "newsCreateTitle": "Nova notícia",
   "newsEditTitle": "Editar notícia",
