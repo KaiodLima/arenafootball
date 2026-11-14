@@ -35,4 +35,7 @@ abstract class IAlbumRepository {
   Future<Either<Failure, void>> saveStickers({required String eventId, required List<StickerDTO> stickers});
 
   Future<Either<Failure, void>> deleteSticker({required String eventId, required String stickerId});
+
+  /// Várias de uma vez (em lotes).
+  Future<Either<Failure, void>> deleteStickers({required String eventId, required List<String> stickerIds});
 }

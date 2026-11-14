@@ -9,6 +9,7 @@ import 'package:arena_soccer/utils/components/shortcut_tile.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Painel do admin: os cadastros e as configurações em grupos de atalhos (no
 /// drawer ficam só as solicitações e este painel).
@@ -36,7 +37,7 @@ class AdminPanelPage extends StatelessWidget {
       body: !isAdmin
           ? const SizedBox.shrink()
           : ListView(
-              padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, AppSizes.s32),
+              padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s32)),
               children: [
                 _Group(title: l10n.adminPanelContent, tiles: [
                   ShortcutTile(

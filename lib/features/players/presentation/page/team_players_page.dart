@@ -29,6 +29,7 @@ import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/constants/team_colors.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Elenco de um time na temporada selecionada: topo com o escudo, as chips
 /// "Elenco geral" + uma por competição que o time joga, resumo, busca,
@@ -455,7 +456,7 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
         )
       else
         SliverPadding(
-          padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s32),
+          padding: EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, safeBottom(context, AppSizes.s32)),
           sliver: SliverList.builder(
             itemCount: sections.length,
             itemBuilder: (context, index) => SquadSectionCard(

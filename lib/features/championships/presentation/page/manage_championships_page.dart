@@ -15,6 +15,7 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Painel do admin: campeonatos por região, com criar, editar e excluir.
 class ManageChampionshipsPage extends StatefulWidget {
@@ -89,7 +90,7 @@ class _ManageChampionshipsPageState extends State<ManageChampionshipsPage> {
         builder: (context, state) {
           final championships = state.visible;
           return ListView(
-            padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, AppSizes.s80),
+            padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s80)),
             children: [
               RegionSelectTile(
                 label: l10n.registerRegionLabel,

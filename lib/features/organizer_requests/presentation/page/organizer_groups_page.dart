@@ -22,6 +22,7 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/themes/arena_palette.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// "Formar grupos" do organizador: os grupos do campeonato (qualquer tamanho),
 /// criar/editar/apagar e sortear. Na paleta azul do modo organizador.
@@ -77,7 +78,7 @@ class _GroupsView extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (_) => Theme(
+      builder: (_) => _safeSheet(Theme(
         data: ArenaPalette.organizerTheme(Theme.of(context)),
         child: _GroupEditor(
           group: group,
@@ -85,7 +86,7 @@ class _GroupsView extends StatelessWidget {
           allTeams: state.teams,
           freeTeams: state.freeTeams(editing: group),
         ),
-      ),
+      )),
     );
     if (result == null || !context.mounted) return;
     await _report(context, cubit.save(result), l10n.organizerGroupSaved);
@@ -202,7 +203,7 @@ class _GroupsView extends StatelessWidget {
             return ArenaEmptyState(message: l10n.organizerGroupsEmpty, icon: Icons.grid_view_rounded);
           }
           return ListView(
-            padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, AppSizes.s100),
+            padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s100)),
             children: [
               for (final group in state.groups)
                 _GroupCard(
@@ -451,3 +452,6 @@ class _GroupEditorState extends State<_GroupEditor> {
     );
   }
 }
+
+/// Folha acima da barra de navegação do sistema (Android de ponta a ponta).
+Widget _safeSheet(Widget child) => SafeArea(top: false, child: child);

@@ -63,4 +63,8 @@ class AlbumRepositoryImpl implements IAlbumRepository {
   @override
   Future<Either<Failure, void>> deleteSticker({required String eventId, required String stickerId}) =>
       _dataSource.deleteSticker(eventId: eventId, stickerId: stickerId);
+
+  @override
+  Future<Either<Failure, void>> deleteStickers({required String eventId, required List<String> stickerIds}) =>
+      _dataSource.deleteStickers(eventId: eventId, stickerIds: stickerIds);
 }

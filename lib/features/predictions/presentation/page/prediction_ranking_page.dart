@@ -268,13 +268,14 @@ class _MyPositionBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final entry = this.entry;
-    return SafeArea(
-      top: false,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: AppSizes.s16, vertical: AppSizes.s12),
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(colors: [AppColors.primary, AppColors.primaryDark]),
-        ),
+    // Fundo desce atrás da barra do sistema; o conteúdo fica acima dela.
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(colors: [AppColors.primary, AppColors.primaryDark]),
+      ),
+      child: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.symmetric(horizontal: AppSizes.s16, vertical: AppSizes.s12),
         child: Row(
           children: [
             const Icon(Icons.person_pin_rounded, color: AppColors.white, size: AppSizes.s28),

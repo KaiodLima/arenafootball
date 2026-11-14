@@ -16,6 +16,7 @@ import 'package:arena_soccer/utils/components/arena_hero_background.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Tier do emblema de cada nível do torcedor.
 AchievementTier _levelTier(FanLevel level) => switch (level) {
@@ -516,7 +517,7 @@ class _CategoryGridPage extends StatelessWidget {
         title: Text(title, style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s20)),
       ),
       body: GridView.builder(
-        padding: const EdgeInsets.all(AppSizes.s16),
+        padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s16)),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
           mainAxisSpacing: AppSizes.s8,

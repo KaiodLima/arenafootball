@@ -13,6 +13,7 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Painel do admin: temporada atual, as disponíveis, "Iniciar temporada" e a
 /// manutenção "Vincular times por id".
@@ -76,7 +77,7 @@ class _SeasonsPanelPageState extends State<SeasonsPanelPage> {
           final seasons = state.seasons.reversed.toList();
 
           return ListView(
-            padding: const EdgeInsets.all(AppSizes.s16),
+            padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s16)),
             children: [
               // Atual
               ClipRRect(

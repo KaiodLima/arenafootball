@@ -38,6 +38,7 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Tela do atleta: foto, nome e time no topo; gols e assistências com a
 /// posição nos rankings da região; os cards de gol em que participou. O
@@ -271,7 +272,7 @@ class _Content extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     return ListView(
-      padding: const EdgeInsets.only(bottom: AppSizes.s32),
+      padding: EdgeInsets.only(bottom: safeBottom(context, AppSizes.s32)),
       children: [
         _HeroBox(child: _Header(state: state, player: player, onChangeOwnPhoto: onChangeOwnPhoto)),
         Padding(

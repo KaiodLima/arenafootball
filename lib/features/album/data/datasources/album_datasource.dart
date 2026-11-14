@@ -208,6 +208,25 @@ class AlbumDataSource {
     }
   }
 
+  /// Apaga várias figurinhas em lotes (até 450 por lote) e acerta o `total`
+  /// uma vez no fim.
+  Future<Either<Failure, void>> deleteStickers({required String eventId, required List<String> stickerIds}) async {
+    try {
+      for (var start = 0; start < stickerIds.length; start += 450) {
+        final batch = _firestore.batch();
+        for (final id in stickerIds.skip(start).take(450)) {
+          batch.delete(_stickers(eventId).doc(id));
+        }
+        await batch.commit();
+      }
+      await _syncTotal(eventId);
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('deleteStickers $eventId (${stickerIds.length})', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
+    }
+  }
+
   /// `total` do evento = figurinhas do catálogo (`count()`, uma leitura).
   Future<void> _syncTotal(String eventId) async {
     final count = await _stickers(eventId).count().get();

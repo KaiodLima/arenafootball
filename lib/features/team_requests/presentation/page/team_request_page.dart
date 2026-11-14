@@ -23,6 +23,7 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// "Sou dono de time": sem pedido (ou editando), o formulário; pendente ou
 /// rejeitado, a situação; aprovado, a área "Meu time" do dono.
@@ -311,7 +312,7 @@ class _StatusView extends StatelessWidget {
     final sentOn = playerRequestDate(context, request.createdAt);
 
     return ListView(
-      padding: const EdgeInsets.all(AppSizes.s16),
+      padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s16)),
       children: [
         Container(
           padding: const EdgeInsets.all(AppSizes.s20),

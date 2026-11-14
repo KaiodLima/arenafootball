@@ -17,6 +17,7 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Painel do admin com os pedidos "Sou jogador": pendentes (aprovar, rejeitar,
 /// editar) e respondidos.
@@ -195,7 +196,7 @@ class _RequestList extends StatelessWidget {
   Widget build(BuildContext context) {
     if (requests.isEmpty) return ArenaEmptyState(message: emptyMessage, icon: Icons.how_to_reg_outlined);
     return ListView.separated(
-      padding: const EdgeInsets.all(AppSizes.s16),
+      padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s16)),
       itemCount: requests.length,
       separatorBuilder: (_, __) => const SizedBox(height: AppSizes.s12),
       itemBuilder: (context, index) {

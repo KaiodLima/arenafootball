@@ -36,14 +36,14 @@ Future<void> showPredictionSheet(
     isScrollControlled: true,
     useSafeArea: true,
     showDragHandle: true,
-    builder: (_) => user == null
+    builder: (_) => _safeSheet(user == null
         ? sheet
         : cubit != null
             ? BlocProvider<PredictionCubit>.value(value: cubit, child: sheet)
             : BlocProvider<PredictionCubit>(
                 create: (_) => createPredictionCubit(matchId: match.id, uid: user.id, season: season),
                 child: sheet,
-              ),
+              )),
   );
 }
 
@@ -221,3 +221,6 @@ class _SideStepper extends StatelessWidget {
     );
   }
 }
+
+/// Folha acima da barra de navegação do sistema (Android de ponta a ponta).
+Widget _safeSheet(Widget child) => SafeArea(top: false, child: child);

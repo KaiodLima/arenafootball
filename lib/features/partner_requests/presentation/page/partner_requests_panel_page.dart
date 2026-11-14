@@ -17,6 +17,7 @@ import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Painel do admin "Parceiros": pedidos pendentes (aprovar/rejeitar),
 /// parceiros ativos (permissões, remover) e os respondidos.
@@ -182,7 +183,7 @@ class _PartnerRequestsPanelPageState extends State<PartnerRequestsPanelPage> {
             Widget list(List<PartnerRequestDTO> requests, String empty, _CardMode mode) {
               if (requests.isEmpty) return ArenaEmptyState(message: empty, icon: Icons.handshake_outlined);
               return ListView.separated(
-                padding: const EdgeInsets.all(AppSizes.s16),
+                padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s16)),
                 itemCount: requests.length,
                 separatorBuilder: (_, __) => const SizedBox(height: AppSizes.s12),
                 itemBuilder: (context, index) {
@@ -212,7 +213,7 @@ class _PartnerRequestsPanelPageState extends State<PartnerRequestsPanelPage> {
                 state.pendingNews.isEmpty
                     ? ArenaEmptyState(message: l10n.partnerPanelEmptyNews, icon: Icons.article_outlined)
                     : ListView.separated(
-                        padding: const EdgeInsets.all(AppSizes.s16),
+                        padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s16)),
                         itemCount: state.pendingNews.length,
                         separatorBuilder: (_, __) => const SizedBox(height: AppSizes.s12),
                         itemBuilder: (context, index) {

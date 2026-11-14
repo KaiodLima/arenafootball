@@ -23,6 +23,7 @@ import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Nome da abrangência ("Municipal"/"Intermunicipal").
 String championshipScopeName(AppLocalizations l10n, ChampionshipScope scope) =>
@@ -171,7 +172,8 @@ class _OrganizerRequestPageState extends State<OrganizerRequestPage> {
                 ),
               _ => ListView(
                   keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                  padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, AppSizes.s24),
+                  padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16,
+                      showForm ? AppSizes.s24 : safeBottom(context, AppSizes.s24)),
                   children: [
                     if (state.championships.isNotEmpty && !state.editing) ...[
                       _MyChampionships(championships: state.championships, onOpen: _openChampionship),

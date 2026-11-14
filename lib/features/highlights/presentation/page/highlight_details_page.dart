@@ -19,6 +19,7 @@ import 'package:arena_soccer/utils/components/arena_hero_background.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Um destaque e as notícias marcadas com ele (tag = título do destaque):
 /// topo verde que recolhe com a foto (Hero do carrossel), contagem e link;
@@ -155,7 +156,7 @@ class _HighlightDetailsPageState extends State<HighlightDetailsPage> {
                   )
                 else
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(AppSizes.s8, 0, AppSizes.s8, AppSizes.s80),
+                    padding: EdgeInsets.fromLTRB(AppSizes.s8, 0, AppSizes.s8, safeBottom(context, AppSizes.s80)),
                     sliver: SliverList.builder(
                       itemCount: state.news.length,
                       itemBuilder: (context, index) {

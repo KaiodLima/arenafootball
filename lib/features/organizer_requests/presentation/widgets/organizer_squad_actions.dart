@@ -75,14 +75,14 @@ class OrganizerSquadActions extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (_) => Theme(
+      builder: (_) => _safeSheet(Theme(
         data: Theme.of(context),
         child: _SquadPicker(
           players: candidates,
           title: l10n.organizerSquadAddTitle,
           hint: l10n.organizerSquadAddHint(championshipTitle),
         ),
-      ),
+      )),
     );
     if (picked == null || picked.isEmpty || !context.mounted) return;
     await BlocProvider.of<OrganizerModeCubit>(context).ensureIndexFor(championshipId);
@@ -246,3 +246,6 @@ class _SquadPickerState extends State<_SquadPicker> {
     );
   }
 }
+
+/// Folha acima da barra de navegação do sistema (Android de ponta a ponta).
+Widget _safeSheet(Widget child) => SafeArea(top: false, child: child);

@@ -25,13 +25,13 @@ Future<TeamDTO?> showTeamPickerSheet(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
-    builder: (_) => _TeamPicker(
+    builder: (_) => _safeSheet(_TeamPicker(
       title: title,
       teams: teams,
       selected: selected,
       selectedId: selectedId,
       firstRegion: firstRegion,
-    ),
+    )),
   );
 }
 
@@ -190,3 +190,6 @@ class _RegionHeader extends StatelessWidget {
     );
   }
 }
+
+/// Folha acima da barra de navegação do sistema (Android de ponta a ponta).
+Widget _safeSheet(Widget child) => SafeArea(top: false, child: child);

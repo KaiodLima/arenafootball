@@ -1243,6 +1243,33 @@
   "@albumAdminGenerated": {"placeholders": {"count": {"type": "int"}}},
   "albumAdminStickerSaved": "Figurinha salva.",
   "albumAdminStickerDeleted": "Figurinha apagada.",
+  "albumAdminSelectAll": "Selecionar todas",
+  "albumAdminUnselectAll": "Desmarcar todas",
+  "albumAdminSelected": "{count, plural, =1{1 selecionada} other{{count} selecionadas}}",
+  "@albumAdminSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "albumAdminDeleteStickersTitle": "{count, plural, =1{Excluir 1 figurinha?} other{Excluir {count} figurinhas?}}",
+  "@albumAdminDeleteStickersTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "albumAdminDeleteStickersMessage": "Quem já colou essas figurinhas deixa de vê-las no álbum. Os números são refeitos em sequência.",
+  "albumAdminStickersDeleted": "{count, plural, =1{1 figurinha excluída.} other{{count} figurinhas excluídas.}}",
+  "@albumAdminStickersDeleted": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "albumAdminDeleteTitle": "Apagar o evento {title}?",
   "@albumAdminDeleteTitle": {"placeholders": {"title": {"type": "String"}}},
   "albumAdminDeleteMessage": "O evento e as figurinhas somem do app. As coleções dos torcedores ficam guardadas, mas sem o álbum.",

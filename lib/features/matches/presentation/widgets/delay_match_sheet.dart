@@ -26,11 +26,11 @@ Future<void> showDelayMatchSheet(
     isScrollControlled: true,
     useSafeArea: true,
     showDragHandle: true,
-    builder: (_) => _DelaySheet(
+    builder: (_) => _safeSheet(_DelaySheet(
       match: match,
       canStartNow: canStartNow,
       canPause: match.manualStatus != MatchManualStatus.waiting,
-    ),
+    )),
   );
   if (choice == null || !context.mounted) return;
   HapticFeedback.mediumImpact();
@@ -170,3 +170,6 @@ class _DelaySheet extends StatelessWidget {
     );
   }
 }
+
+/// Folha acima da barra de navegação do sistema (Android de ponta a ponta).
+Widget _safeSheet(Widget child) => SafeArea(top: false, child: child);

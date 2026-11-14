@@ -16,6 +16,7 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Painel de regiões (admin): as regiões cadastradas, com os times de cada
 /// uma na temporada atual; criar, renomear, excluir (só vazia) e a
@@ -170,7 +171,7 @@ class _ManageRegionsPageState extends State<ManageRegionsPage> {
               if (state.working) const LinearProgressIndicator(color: AppColors.primary, minHeight: 2),
               Expanded(
                 child: ListView(
-                  padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, AppSizes.s80),
+                  padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s80)),
                   children: [
                     for (final region in state.regions)
                       _RegionTile(

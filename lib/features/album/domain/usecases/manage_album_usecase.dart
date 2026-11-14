@@ -60,6 +60,18 @@ class ManageAlbumUseCase {
     return _renumber(event);
   }
 
+  /// Várias figurinhas de uma vez: apaga em lote e renumera uma vez só.
+  Future<Either<Failure, void>> deleteStickers(AlbumEventDTO event, List<StickerDTO> stickers) async {
+    final ids = [
+      for (final s in stickers)
+        if (s.id.isNotEmpty) s.id
+    ];
+    if (ids.isEmpty) return const Right(null);
+    final deleted = await _repository.deleteStickers(eventId: event.id, stickerIds: ids);
+    if (deleted.isLeft) return deleted;
+    return _renumber(event);
+  }
+
   /// Números em sequência, página por página (só grava o que mudou).
   Future<Either<Failure, void>> _renumber(AlbumEventDTO event) async {
     final current = await _repository.watchStickers(event.id).first;

@@ -25,10 +25,10 @@ Future<GroupRulesChoice?> showGroupRulesSheet(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
-    builder: (_) => Theme(
+    builder: (_) => _safeSheet(Theme(
       data: Theme.of(context),
       child: _GroupRulesSheet(rules: rules, teamCount: teamCount, canApplyToAll: canApplyToAll),
-    ),
+    )),
   );
 }
 
@@ -256,3 +256,6 @@ String groupRulesSummary(AppLocalizations l10n, GroupRules rules) => [
       if (rules.eliminated > 0) l10n.groupRulesSummaryEliminated(rules.eliminated),
       if (rules.homeAndAway) l10n.groupRulesHomeAndAway,
     ].join('  ·  ');
+
+/// Folha acima da barra de navegação do sistema (Android de ponta a ponta).
+Widget _safeSheet(Widget child) => SafeArea(top: false, child: child);

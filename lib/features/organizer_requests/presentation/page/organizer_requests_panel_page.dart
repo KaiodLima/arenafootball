@@ -21,6 +21,7 @@ import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Painel do admin com os pedidos "Sou organizador de campeonato":
 /// pendentes (aprovar, rejeitar, editar, chamar no WhatsApp) e respondidos.
@@ -70,7 +71,8 @@ class _OrganizerRequestsPanelPageState extends State<OrganizerRequestsPanelPage>
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (_) => _EditSheet(request: request, regions: BlocProvider.of<RegionCubit>(context).state.regions),
+      builder: (_) =>
+          _safeSheet(_EditSheet(request: request, regions: BlocProvider.of<RegionCubit>(context).state.regions)),
     );
     if (edited != null && edited != request) await _cubit.update(edited);
   }
@@ -145,7 +147,7 @@ class _OrganizerRequestsPanelPageState extends State<OrganizerRequestsPanelPage>
             Widget list(List<OrganizerRequestDTO> requests, String empty, {required bool actions}) {
               if (requests.isEmpty) return ArenaEmptyState(message: empty, icon: Icons.emoji_events_outlined);
               return ListView.separated(
-                padding: const EdgeInsets.all(AppSizes.s16),
+                padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s16)),
                 itemCount: requests.length,
                 separatorBuilder: (_, __) => const SizedBox(height: AppSizes.s12),
                 itemBuilder: (context, index) {
@@ -390,3 +392,6 @@ class _EditSheetState extends State<_EditSheet> {
     );
   }
 }
+
+/// Folha acima da barra de navegação do sistema (Android de ponta a ponta).
+Widget _safeSheet(Widget child) => SafeArea(top: false, child: child);

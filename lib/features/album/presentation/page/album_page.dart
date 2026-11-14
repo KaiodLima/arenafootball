@@ -24,6 +24,7 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/constants/team_colors.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Cor do time da figurinha (selo e faixa); sem cor, o verde do app.
 Color albumAccentOf(AlbumState state, String teamId) =>
@@ -241,7 +242,7 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
                   SliverToBoxAdapter(child: ArenaEmptyState(message: l10n.albumEmpty, icon: Icons.style_outlined))
                 else if (_tab == _CoverTab.teams)
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s32),
+                    padding: EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, safeBottom(context, AppSizes.s32)),
                     sliver: SliverGrid.builder(
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 3,
@@ -279,7 +280,7 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
                   )
                 else
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s6, AppSizes.s16, AppSizes.s32),
+                    padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s6, AppSizes.s16, safeBottom(context, AppSizes.s32)),
                     sliver: SliverGrid.builder(
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 3,

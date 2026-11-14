@@ -142,14 +142,14 @@ Future<({int? id})?> showChampionshipPickerSheet(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
-    builder: (_) => _ChampionshipPicker(
+    builder: (_) => _safeSheet(_ChampionshipPicker(
       championships: championships,
       selectedId: selectedId,
       noneLabel: noneLabel,
       noneIcon: noneIcon,
       showNone: showNone,
       extraOption: extraOption,
-    ),
+    )),
   );
 }
 
@@ -260,3 +260,6 @@ class _ChampionshipPickerState extends State<_ChampionshipPicker> {
     );
   }
 }
+
+/// Folha acima da barra de navegação do sistema (Android de ponta a ponta).
+Widget _safeSheet(Widget child) => SafeArea(top: false, child: child);

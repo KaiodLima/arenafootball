@@ -21,6 +21,7 @@ import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Detalhe do campeonato: hero escuro (banner, temporada, título e chips) que
 /// recolhe ao rolar, e abas Visão geral · Times · Regulamento. O campeonato já
@@ -197,7 +198,7 @@ class _OverviewTab extends StatelessWidget {
     ].where((p) => p.$3.trim().isNotEmpty).toList();
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s32),
+      padding: EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, safeBottom(context, AppSizes.s32)),
       children: [
         if (hasPodium || individual.isNotEmpty) ...[
           _SectionTitle(l10n.championshipFormSectionPrizes),
@@ -400,7 +401,7 @@ class _TeamsTab extends StatelessWidget {
     }
     return BlocBuilder<ChampionshipDetailsCubit, List<TeamDTO>>(
       builder: (context, teams) => GridView.builder(
-        padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, AppSizes.s32),
+        padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s32)),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
           mainAxisSpacing: AppSizes.s10,
@@ -470,7 +471,7 @@ class _RulesTab extends StatelessWidget {
     }
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, AppSizes.s32),
+      padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s32)),
       children: [
         if (hasPdf)
           _Card(

@@ -3037,6 +3037,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String get albumAdminStickerDeleted => 'Sticker deleted.';
 
   @override
+  String get albumAdminSelectAll => 'Select all';
+
+  @override
+  String get albumAdminUnselectAll => 'Unselect all';
+
+  @override
+  String albumAdminSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count selected',
+      one: '1 selected',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String albumAdminDeleteStickersTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Delete $count stickers?',
+      one: 'Delete 1 sticker?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get albumAdminDeleteStickersMessage =>
+      'People who already stuck these stickers won\'t see them in the album anymore. Numbers are redone in sequence.';
+
+  @override
+  String albumAdminStickersDeleted(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stickers deleted.',
+      one: '1 sticker deleted.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String albumAdminDeleteTitle(String title) {
     return 'Delete the event $title?';
   }

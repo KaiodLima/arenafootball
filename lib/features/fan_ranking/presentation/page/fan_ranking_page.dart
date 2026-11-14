@@ -15,6 +15,7 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/constants/team_colors.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Ranking de torcidas: times da região com mais torcedores entre os usuários
 /// do app (time do coração). Pódio dos 3 primeiros, lista com barras na cor do
@@ -76,7 +77,7 @@ class _FanRankingPageState extends State<FanRankingPage> {
             onRefresh: () => _load(force: true),
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s12, AppSizes.s16, AppSizes.s32),
+              padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s12, AppSizes.s16, safeBottom(context, AppSizes.s32)),
               children: [
                 // Região: campo que abre a lista com busca (cresce sem virar carrossel).
                 RegionSelectTile(

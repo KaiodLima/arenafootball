@@ -7,6 +7,7 @@ import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Painel do admin → "Indique amigos": liga/desliga as indicações
 /// (`config/indicacao`) com o resumo das regras.
@@ -40,7 +41,7 @@ class ReferralSettingsPage extends StatelessWidget {
         },
         builder: (context, state) {
           return ListView(
-            padding: const EdgeInsets.all(AppSizes.s16),
+            padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s16)),
             children: [
               Container(
                 decoration: BoxDecoration(

@@ -16,7 +16,17 @@ import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
 /// Aviso de ação concluída no painel do álbum.
-enum ManageAlbumNotice { saved, activated, testing, deactivated, deleted, generated, stickerSaved, stickerDeleted }
+enum ManageAlbumNotice {
+  saved,
+  activated,
+  testing,
+  deactivated,
+  deleted,
+  generated,
+  stickerSaved,
+  stickerDeleted,
+  stickersDeleted,
+}
 
 class ManageAlbumState extends Equatable {
   final List<AlbumEventDTO> events;
@@ -252,6 +262,20 @@ class ManageAlbumCubit extends Cubit<ManageAlbumState> {
     final event = state.editing;
     if (event == null) return;
     await _run(() => manageAlbumUseCase.deleteSticker(event, sticker), ManageAlbumNotice.stickerDeleted);
+  }
+
+  /// Exclui as figurinhas marcadas de uma vez (aviso com a contagem).
+  Future<void> deleteStickers(List<StickerDTO> stickers) async {
+    final event = state.editing;
+    if (event == null || stickers.isEmpty) return;
+    emit(state.copyWith(busy: true));
+    final response = await manageAlbumUseCase.deleteStickers(event, stickers);
+    if (isClosed) return;
+    response.fold(
+      (failure) => emit(ErrorManageAlbumState(state.copyWith(busy: false), failure.toString())),
+      (_) => emit(NoticeManageAlbumState(state.copyWith(busy: false), ManageAlbumNotice.stickersDeleted,
+          count: stickers.length)),
+    );
   }
 
   @override

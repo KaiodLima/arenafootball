@@ -69,7 +69,7 @@ Future<PickedEvent?> showPlayerGridSheet(
     isScrollControlled: true,
     showDragHandle: true,
     backgroundColor: AppColors.surface,
-    builder: (_) => _PlayerGridSheet(
+    builder: (_) => _safeSheet(_PlayerGridSheet(
       title: title,
       icon: icon,
       color: color,
@@ -80,7 +80,7 @@ Future<PickedEvent?> showPlayerGridSheet(
       minute: minute,
       goal: goal,
       substitution: substitution,
-    ),
+    )),
   );
 }
 
@@ -474,3 +474,6 @@ class _WideTile extends StatelessWidget {
         label: Text(label),
       );
 }
+
+/// Folha acima da barra de navegação do sistema (Android de ponta a ponta).
+Widget _safeSheet(Widget child) => SafeArea(top: false, child: child);

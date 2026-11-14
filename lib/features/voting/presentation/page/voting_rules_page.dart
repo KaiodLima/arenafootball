@@ -8,6 +8,7 @@ import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Admin: regras da votação de melhor jogador (mínimo de votos e porcentagem
 /// do mais votado), com a frase de como fica a regra.
@@ -47,7 +48,7 @@ class VotingRulesPage extends StatelessWidget {
             children: [
               Expanded(
                 child: ListView(
-                  padding: const EdgeInsets.all(AppSizes.s16),
+                  padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s16)),
                   children: [
                     _Stepper(
                       label: l10n.votingRulesMinVotes,

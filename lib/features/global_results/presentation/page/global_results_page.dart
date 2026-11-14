@@ -13,6 +13,7 @@ import 'package:arena_soccer/utils/components/arena_segmented_pill.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Resultados de jogos pelo mundo (web scraping do soccerstats.com): seletor
 /// de dia no topo escuro, busca + filtro "ao vivo" e os jogos em cards por
@@ -101,7 +102,7 @@ class _GlobalResultsPageState extends State<GlobalResultsPage> {
                   )
                 else
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s32),
+                    padding: EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, safeBottom(context, AppSizes.s32)),
                     sliver: SliverList.builder(
                       itemCount: groups.length,
                       itemBuilder: (context, index) =>

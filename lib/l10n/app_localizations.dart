@@ -5052,6 +5052,42 @@ abstract class AppLocalizations {
   /// **'Figurinha apagada.'**
   String get albumAdminStickerDeleted;
 
+  /// No description provided for @albumAdminSelectAll.
+  ///
+  /// In pt, this message translates to:
+  /// **'Selecionar todas'**
+  String get albumAdminSelectAll;
+
+  /// No description provided for @albumAdminUnselectAll.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desmarcar todas'**
+  String get albumAdminUnselectAll;
+
+  /// No description provided for @albumAdminSelected.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 selecionada} other{{count} selecionadas}}'**
+  String albumAdminSelected(int count);
+
+  /// No description provided for @albumAdminDeleteStickersTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{Excluir 1 figurinha?} other{Excluir {count} figurinhas?}}'**
+  String albumAdminDeleteStickersTitle(int count);
+
+  /// No description provided for @albumAdminDeleteStickersMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem já colou essas figurinhas deixa de vê-las no álbum. Os números são refeitos em sequência.'**
+  String get albumAdminDeleteStickersMessage;
+
+  /// No description provided for @albumAdminStickersDeleted.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 figurinha excluída.} other{{count} figurinhas excluídas.}}'**
+  String albumAdminStickersDeleted(int count);
+
   /// No description provided for @albumAdminDeleteTitle.
   ///
   /// In pt, this message translates to:

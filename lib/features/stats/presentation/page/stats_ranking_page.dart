@@ -15,6 +15,7 @@ import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Ranking de artilharia ou de assistências: pódio dos 3 primeiros no topo
 /// escuro e os demais num card. [type] é o quesito inicial; o seletor troca
@@ -109,7 +110,7 @@ class _StatsRankingPageState extends State<StatsRankingPage> {
     if (rest.isEmpty) return const [SliverToBoxAdapter(child: SizedBox(height: AppSizes.s24))];
     return [
       SliverPadding(
-        padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s4, AppSizes.s16, AppSizes.s24),
+        padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s4, AppSizes.s16, safeBottom(context, AppSizes.s24)),
         sliver: SliverToBoxAdapter(
           child: RankingList(entries: rest, type: state.type, crestOf: state.crestOf, isFavorite: isFavorite),
         ),

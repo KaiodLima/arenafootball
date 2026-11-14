@@ -26,7 +26,7 @@ Future<QuickPlayer?> showQuickPlayerSheet(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (_) => QuickPlayerSheet(title: title, hint: hint, confirmLabel: confirmLabel),
+      builder: (_) => _safeSheet(QuickPlayerSheet(title: title, hint: hint, confirmLabel: confirmLabel)),
     );
 
 class QuickPlayerSheet extends StatefulWidget {
@@ -113,3 +113,6 @@ class QuickPlayerSheetState extends State<QuickPlayerSheet> {
     );
   }
 }
+
+/// Folha acima da barra de navegação do sistema (Android de ponta a ponta).
+Widget _safeSheet(Widget child) => SafeArea(top: false, child: child);

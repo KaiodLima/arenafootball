@@ -24,7 +24,7 @@ Future<MatchInfoEdit?> showEditMatchInfoSheet(
       isScrollControlled: true,
       useSafeArea: true,
       showDragHandle: true,
-      builder: (_) => _EditMatchInfoSheet(match: match, homeCrest: homeCrest, awayCrest: awayCrest),
+      builder: (_) => _safeSheet(_EditMatchInfoSheet(match: match, homeCrest: homeCrest, awayCrest: awayCrest)),
     );
 
 class _EditMatchInfoSheet extends StatefulWidget {
@@ -149,3 +149,6 @@ class _EditMatchInfoSheetState extends State<_EditMatchInfoSheet> {
     );
   }
 }
+
+/// Folha acima da barra de navegação do sistema (Android de ponta a ponta).
+Widget _safeSheet(Widget child) => SafeArea(top: false, child: child);

@@ -3052,6 +3052,49 @@ class AppLocalizationsPt extends AppLocalizations {
   String get albumAdminStickerDeleted => 'Figurinha apagada.';
 
   @override
+  String get albumAdminSelectAll => 'Selecionar todas';
+
+  @override
+  String get albumAdminUnselectAll => 'Desmarcar todas';
+
+  @override
+  String albumAdminSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count selecionadas',
+      one: '1 selecionada',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String albumAdminDeleteStickersTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Excluir $count figurinhas?',
+      one: 'Excluir 1 figurinha?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get albumAdminDeleteStickersMessage =>
+      'Quem já colou essas figurinhas deixa de vê-las no álbum. Os números são refeitos em sequência.';
+
+  @override
+  String albumAdminStickersDeleted(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count figurinhas excluídas.',
+      one: '1 figurinha excluída.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String albumAdminDeleteTitle(String title) {
     return 'Apagar o evento $title?';
   }

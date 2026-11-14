@@ -27,6 +27,7 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/team_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Painel do admin "Álbum de figurinhas": a lista de eventos (ligar/desligar,
 /// apagar, criar) e o editor do evento aberto (times e figurinhas).
@@ -95,6 +96,7 @@ class _ManageAlbumPageState extends State<ManageAlbumPage> {
         ManageAlbumNotice.generated => l10n.albumAdminGenerated(state.count),
         ManageAlbumNotice.stickerSaved => l10n.albumAdminStickerSaved,
         ManageAlbumNotice.stickerDeleted => l10n.albumAdminStickerDeleted,
+        ManageAlbumNotice.stickersDeleted => l10n.albumAdminStickersDeleted(state.count),
       };
 
   @override
@@ -150,7 +152,7 @@ class _ManageAlbumPageState extends State<ManageAlbumPage> {
                     : state.events.isEmpty
                         ? ArenaEmptyState(message: l10n.albumAdminEmpty, icon: Icons.collections_bookmark_outlined)
                         : ListView(
-                            padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, AppSizes.s100),
+                            padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s100)),
                             children: [
                               Text(l10n.albumAdminIntro, style: AppTypography.subtitle()),
                               const SizedBox(height: AppSizes.s12),
@@ -242,6 +244,49 @@ class _EventEditorState extends State<_EventEditor> {
   late final _title = TextEditingController(text: widget.state.editing!.title);
   late final _description = TextEditingController(text: widget.state.editing!.description);
 
+  /// Modo de seleção (segurar uma figurinha): ids marcadas para excluir.
+  final Set<String> _selected = {};
+  bool get _selecting => _selected.isNotEmpty;
+
+  void _toggle(StickerDTO sticker) => setState(() {
+        if (!_selected.remove(sticker.id)) _selected.add(sticker.id);
+      });
+
+  void _selectTeamStickers(AlbumTeamPage page, bool select) => setState(() {
+        final ids = page.stickers.map((s) => s.id).where((id) => id.isNotEmpty);
+        select ? _selected.addAll(ids) : _selected.removeAll(ids);
+      });
+
+  void _clearSelection() => setState(_selected.clear);
+
+  /// Exclui as marcadas (confirmando no modal padrão).
+  Future<void> _deleteSelected(AppLocalizations l10n) async {
+    final stickers = [
+      for (final page in widget.state.pages)
+        for (final s in page.stickers)
+          if (_selected.contains(s.id)) s,
+    ];
+    if (stickers.isEmpty) return;
+    final confirmed = await showArenaConfirm(
+      context,
+      title: l10n.albumAdminDeleteStickersTitle(stickers.length),
+      message: l10n.albumAdminDeleteStickersMessage,
+      confirmLabel: l10n.commonDelete,
+      icon: Icons.delete_outline_rounded,
+      tone: ArenaAlertTone.danger,
+    );
+    if (!confirmed || !mounted) return;
+    _clearSelection();
+    await widget.cubit.deleteStickers(stickers);
+  }
+
+  @override
+  void didUpdateWidget(covariant _EventEditor oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Trocou de evento: a seleção não vale mais.
+    if (oldWidget.state.editing?.id != widget.state.editing?.id) _selected.clear();
+  }
+
   @override
   void dispose() {
     _title.dispose();
@@ -326,7 +371,7 @@ class _EventEditorState extends State<_EventEditor> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (_) => _StickerSheet(sticker: sticker),
+      builder: (_) => _safeSheet(_StickerSheet(sticker: sticker)),
     );
     if (result == null) return;
     if (result.delete) {
@@ -342,8 +387,8 @@ class _EventEditorState extends State<_EventEditor> {
     final state = widget.state;
     final pages = state.pages;
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, AppSizes.s32),
+    final list = ListView(
+      padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, _selecting ? AppSizes.s100 : AppSizes.s32),
       children: [
         FormSection(
           title: l10n.albumAdminEventData,
@@ -379,7 +424,61 @@ class _EventEditorState extends State<_EventEditor> {
           child: _teamChoices(context, state),
         ),
         const SizedBox(height: AppSizes.s16),
-        for (final page in pages) _TeamStickers(page: page, state: state, cubit: widget.cubit, onEdit: _editSticker),
+        for (final page in pages)
+          _TeamStickers(
+            page: page,
+            state: state,
+            cubit: widget.cubit,
+            onEdit: _editSticker,
+            selected: _selected,
+            selecting: _selecting,
+            onToggle: _toggle,
+            onToggleTeam: (select) => _selectTeamStickers(page, select),
+          ),
+      ],
+    );
+    return Stack(
+      children: [
+        list,
+        // Barra da seleção: quantas, cancelar e excluir.
+        if (_selecting)
+          Positioned(
+            left: AppSizes.s12,
+            right: AppSizes.s12,
+            bottom: AppSizes.s12,
+            child: SafeArea(
+              child: Material(
+                color: AppColors.primaryDark,
+                elevation: 6,
+                borderRadius: BorderRadius.circular(AppSizes.s16),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s6, AppSizes.s6, AppSizes.s6),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          l10n.albumAdminSelected(_selected.length),
+                          style: AppTypography.label(color: AppColors.white),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: _clearSelection,
+                        style: TextButton.styleFrom(foregroundColor: AppColors.white),
+                        child: Text(l10n.commonCancel),
+                      ),
+                      const SizedBox(width: AppSizes.s4),
+                      FilledButton.icon(
+                        onPressed: state.busy ? null : () => _deleteSelected(l10n),
+                        style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
+                        icon: const Icon(Icons.delete_outline_rounded, size: AppSizes.s18),
+                        label: Text(l10n.commonDelete),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }
@@ -392,7 +491,22 @@ class _TeamStickers extends StatelessWidget {
   final ManageAlbumCubit cubit;
   final ValueChanged<StickerDTO> onEdit;
 
-  const _TeamStickers({required this.page, required this.state, required this.cubit, required this.onEdit});
+  /// Seleção para excluir várias: segurar entra no modo; nele, o toque marca.
+  final Set<String> selected;
+  final bool selecting;
+  final ValueChanged<StickerDTO> onToggle;
+  final ValueChanged<bool> onToggleTeam;
+
+  const _TeamStickers({
+    required this.page,
+    required this.state,
+    required this.cubit,
+    required this.onEdit,
+    required this.selected,
+    required this.selecting,
+    required this.onToggle,
+    required this.onToggleTeam,
+  });
 
   /// Cores e escudo do time (os times que o painel já carregou).
   StickerStyle get _style {
@@ -445,6 +559,21 @@ class _TeamStickers extends StatelessWidget {
                 icon: const Icon(Icons.add_rounded, size: AppSizes.s18),
                 label: Text(l10n.albumAdminAddSticker),
               ),
+              // No modo de seleção: marcar/desmarcar todas do time.
+              if (selecting && page.stickers.isNotEmpty)
+                TextButton.icon(
+                  onPressed: () =>
+                      onToggleTeam(!(page.stickers.isNotEmpty && page.stickers.every((s) => selected.contains(s.id)))),
+                  icon: Icon(
+                    page.stickers.isNotEmpty && page.stickers.every((s) => selected.contains(s.id))
+                        ? Icons.deselect_rounded
+                        : Icons.select_all_rounded,
+                    size: AppSizes.s18,
+                  ),
+                  label: Text(page.stickers.isNotEmpty && page.stickers.every((s) => selected.contains(s.id))
+                      ? l10n.albumAdminUnselectAll
+                      : l10n.albumAdminSelectAll),
+                ),
             ],
           ),
           if (page.stickers.isNotEmpty) ...[
@@ -458,7 +587,14 @@ class _TeamStickers extends StatelessWidget {
               childAspectRatio: 3 / 4,
               children: [
                 for (final sticker in page.stickers)
-                  StickerCard(sticker: sticker, style: _style, onTap: () => onEdit(sticker)),
+                  _SelectableSticker(
+                    key: ValueKey('album-sticker-${sticker.id}'),
+                    selected: selected.contains(sticker.id),
+                    // Fora do modo: toque edita, segurar entra no modo; no modo, o toque marca.
+                    onTap: () => selecting ? onToggle(sticker) : onEdit(sticker),
+                    onLongPress: sticker.id.isEmpty ? null : () => onToggle(sticker),
+                    child: StickerCard(sticker: sticker, style: _style),
+                  ),
               ],
             ),
           ],
@@ -665,3 +801,56 @@ class _SquadSheetState extends State<_SquadSheet> {
     );
   }
 }
+
+/// Figurinha do editor com a seleção: véu na cor da marca e selo ✓ quando
+/// marcada (por cima do card, sem mexer nele).
+class _SelectableSticker extends StatelessWidget {
+  final bool selected;
+  final VoidCallback onTap;
+  final VoidCallback? onLongPress;
+  final Widget child;
+
+  const _SelectableSticker({
+    super.key,
+    required this.selected,
+    required this.onTap,
+    required this.onLongPress,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      onLongPress: onLongPress,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          IgnorePointer(child: child),
+          if (selected) ...[
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.28),
+                borderRadius: BorderRadius.circular(AppSizes.s8),
+                border: Border.all(color: AppColors.primary, width: AppSizes.s2),
+              ),
+            ),
+            const Positioned(
+              top: AppSizes.s4,
+              right: AppSizes.s4,
+              child: CircleAvatar(
+                radius: AppSizes.s12,
+                backgroundColor: AppColors.primary,
+                child: Icon(Icons.check_rounded, size: AppSizes.s16, color: AppColors.white),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Folha acima da barra de navegação do sistema (Android de ponta a ponta).
+Widget _safeSheet(Widget child) => SafeArea(top: false, child: child);

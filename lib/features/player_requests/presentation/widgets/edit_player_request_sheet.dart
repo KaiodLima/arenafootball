@@ -23,7 +23,7 @@ Future<PlayerRequestDTO?> showEditPlayerRequestSheet(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
-    builder: (_) => _EditSheet(request: request, teams: teams),
+    builder: (_) => _safeSheet(_EditSheet(request: request, teams: teams)),
   );
 }
 
@@ -147,3 +147,6 @@ class _EditSheetState extends State<_EditSheet> {
     );
   }
 }
+
+/// Folha acima da barra de navegação do sistema (Android de ponta a ponta).
+Widget _safeSheet(Widget child) => SafeArea(top: false, child: child);

@@ -11,6 +11,7 @@ import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Admin: recomprime as imagens antigas do Storage (a function faz em lotes;
 /// a tela mostra o progresso ao vivo). Pode rodar de novo: só pega o que falta.
@@ -79,7 +80,7 @@ class _RecompressImagesPageState extends State<RecompressImagesPage> {
           };
 
           return ListView(
-            padding: const EdgeInsets.all(AppSizes.s16),
+            padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s16)),
             children: [
               Text(l10n.recompressIntro, style: AppTypography.subtitle()),
               const SizedBox(height: AppSizes.s16),

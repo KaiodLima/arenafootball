@@ -17,6 +17,7 @@ import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// "Indique amigos": o código e o link de convite da conta, o saldo de
 /// pacotinhos extras, os indicados e o "Fui indicado" (conta nova). O código
@@ -117,7 +118,7 @@ class _ReferralPageState extends State<ReferralPage> {
             return const Center(child: CircularProgressIndicator(color: AppColors.primary));
           }
           return ListView(
-            padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, AppSizes.s32),
+            padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s32)),
             children: [
               _InviteCard(
                 code: state.code,

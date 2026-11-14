@@ -25,6 +25,7 @@ import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// "Meu time": área do dono aprovado, com abas Elenco · Pedidos · Editar.
 class MyTeamView extends StatefulWidget {
@@ -171,7 +172,7 @@ class _MyTeamViewState extends State<MyTeamView> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (_) => _AddPlayerSheet(championships: state.championships),
+      builder: (_) => _safeSheet(_AddPlayerSheet(championships: state.championships)),
     );
     if (result != null) {
       await _cubit.addPlayer(name: result.$1, position: result.$2, photo: result.$3, championshipId: result.$4);
@@ -189,7 +190,7 @@ class _SquadTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return ListView(
-      padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, AppSizes.s32),
+      padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s32)),
       children: [
         ArenaButton.primary(
             title: l10n.myTeamAddPlayer, isLoading: state.saving, function: state.saving ? null : onAdd),
@@ -229,7 +230,7 @@ class _RequestsTab extends StatelessWidget {
     if (pending.isEmpty) return ArenaEmptyState(message: l10n.myTeamRequestsEmpty, icon: Icons.how_to_reg_outlined);
 
     return ListView.separated(
-      padding: const EdgeInsets.all(AppSizes.s16),
+      padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s16)),
       itemCount: pending.length,
       separatorBuilder: (_, __) => const SizedBox(height: AppSizes.s10),
       itemBuilder: (context, index) {
@@ -401,3 +402,6 @@ class _AddPlayerSheetState extends State<_AddPlayerSheet> {
     );
   }
 }
+
+/// Folha acima da barra de navegação do sistema (Android de ponta a ponta).
+Widget _safeSheet(Widget child) => SafeArea(top: false, child: child);

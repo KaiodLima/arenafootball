@@ -87,10 +87,10 @@ Future<(PlayerDTO, MatchSide)?> showMatchAthletePicker(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
-    builder: (_) => BlocProvider<MatchAthletePickerCubit>(
+    builder: (_) => _safeSheet(BlocProvider<MatchAthletePickerCubit>(
       create: (_) => MatchAthletePickerCubit(sl())..load(match, season),
       child: _AthletePicker(match: match),
-    ),
+    )),
   );
 }
 
@@ -193,3 +193,6 @@ class _AthletePickerState extends State<_AthletePicker> {
     );
   }
 }
+
+/// Folha acima da barra de navegação do sistema (Android de ponta a ponta).
+Widget _safeSheet(Widget child) => SafeArea(top: false, child: child);

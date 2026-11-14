@@ -28,6 +28,7 @@ import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Carteirinha de torcedor do usuário logado, com troca de foto e, sem time
 /// do coração, o atalho para escolher um.
@@ -159,7 +160,7 @@ class _FanCardPageState extends State<FanCardPage> {
               },
               builder: (context, state) {
                 return ListView(
-                  padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s24, AppSizes.s16, AppSizes.s32),
+                  padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s24, AppSizes.s16, safeBottom(context, AppSizes.s32)),
                   children: [
                     // Enquanto o time carrega, esqueleto neutro: o card só aparece
                     // já com as cores do time (sem passar pelo verde padrão).

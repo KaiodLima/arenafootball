@@ -15,6 +15,7 @@ import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Admin: conquistas cadastradas (ativas e inativas), com ativar/desativar,
 /// editar, excluir e criar as sugeridas quando o catálogo está vazio.
@@ -92,7 +93,7 @@ class ManageAchievementsPage extends StatelessWidget {
             );
           }
           return ListView.builder(
-            padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, AppSizes.s100),
+            padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s100)),
             itemCount: state.achievements.length,
             itemBuilder: (context, index) {
               final achievement = state.achievements[index];

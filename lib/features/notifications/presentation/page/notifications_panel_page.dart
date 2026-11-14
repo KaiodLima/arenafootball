@@ -19,6 +19,7 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Painel de notificações push (admin): quais ações enviam, o histórico de
 /// envios e o aviso manual.
@@ -249,7 +250,7 @@ class _ActionsTab extends StatelessWidget {
     if (!state.configLoaded) return const Center(child: CircularProgressIndicator(color: AppColors.primary));
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s8, AppSizes.s16, AppSizes.s24),
+      padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s8, AppSizes.s16, safeBottom(context, AppSizes.s24)),
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: AppSizes.s12),
@@ -315,7 +316,7 @@ class _HistoryTab extends StatelessWidget {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s8, AppSizes.s16, AppSizes.s24),
+      padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s8, AppSizes.s16, safeBottom(context, AppSizes.s24)),
       itemCount: state.history.length,
       itemBuilder: (context, index) => _LogCard(log: state.history[index]),
     );
@@ -438,7 +439,7 @@ class _SendTab extends StatelessWidget {
 
     return ListView(
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s8, AppSizes.s16, AppSizes.s24),
+      padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s8, AppSizes.s16, safeBottom(context, AppSizes.s24)),
       children: [
         FormSection(
           title: l10n.pushNoticeSection,

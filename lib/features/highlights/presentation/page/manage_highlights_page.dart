@@ -13,6 +13,7 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Painel de destaques (admin): ordem do carrossel arrastando, mostrar/
 /// ocultar, editar, ver e excluir.
@@ -94,7 +95,7 @@ class _ManageHighlightsPageState extends State<ManageHighlightsPage> {
           }
 
           return ReorderableListView.builder(
-            padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s80),
+            padding: EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, safeBottom(context, AppSizes.s80)),
             buildDefaultDragHandles: false,
             header: Padding(
               padding: const EdgeInsets.fromLTRB(AppSizes.s4, AppSizes.s16, AppSizes.s4, AppSizes.s10),

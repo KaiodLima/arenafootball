@@ -18,6 +18,7 @@ import 'package:arena_soccer/utils/components/share_image_sheet.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 
 /// Craque da partida (votação encerrada): o placar no topo escuro, o cartão
 /// do eleito sobreposto a ele e o ranking de todos os votados. Sem votos, o
@@ -154,7 +155,7 @@ class _ElectedPlayerPageState extends State<ElectedPlayerPage> {
         ),
       ),
       SliverPadding(
-        padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s24, AppSizes.s16, AppSizes.s32),
+        padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s24, AppSizes.s16, safeBottom(context, AppSizes.s32)),
         sliver: SliverList.list(
           children: [
             Padding(
