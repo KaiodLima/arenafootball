@@ -6301,6 +6301,46 @@ class AppLocalizationsPt extends AppLocalizations {
   String get fanCardTitle => 'Carteirinha de torcedor';
 
   @override
+  String get fanCardMember => 'SÓCIO TORCEDOR';
+
+  @override
+  String get fanCardFlipHint => 'Toque no cartão para virar';
+
+  @override
+  String fanCardValidSeason(String season) {
+    return 'Válida na temporada $season';
+  }
+
+  @override
+  String get fanCardBackCta => 'Baixe o Arena e torça junto';
+
+  @override
+  String get fanCardSignature => 'Assinatura do torcedor';
+
+  @override
+  String get fanCardLevelSection => 'Seu nível de torcedor';
+
+  @override
+  String get fanCardSeeAchievements => 'Ver conquistas';
+
+  @override
+  String get fanCardActionShare => 'Compartilhar';
+
+  @override
+  String get fanCardActionPhoto => 'Foto';
+
+  @override
+  String get fanCardActionTeam => 'Time';
+
+  @override
+  String fanCardBackStats(String level, int xp, int count) {
+    return '$level · $xp XP · $count conquistas';
+  }
+
+  @override
+  String get fanCardMaxLevel => 'Nível máximo alcançado!';
+
+  @override
   String get fanCardLabel => 'CARTEIRINHA DE TORCEDOR';
 
   @override

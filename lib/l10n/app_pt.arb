@@ -3077,6 +3077,38 @@
   "colorPink": "Rosa",
   "fanCardMenu": "Minha carteirinha",
   "fanCardTitle": "Carteirinha de torcedor",
+  "fanCardMember": "SÓCIO TORCEDOR",
+  "fanCardFlipHint": "Toque no cartão para virar",
+  "fanCardValidSeason": "Válida na temporada {season}",
+  "@fanCardValidSeason": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "fanCardBackCta": "Baixe o Arena e torça junto",
+  "fanCardSignature": "Assinatura do torcedor",
+  "fanCardLevelSection": "Seu nível de torcedor",
+  "fanCardSeeAchievements": "Ver conquistas",
+  "fanCardActionShare": "Compartilhar",
+  "fanCardActionPhoto": "Foto",
+  "fanCardActionTeam": "Time",
+  "fanCardBackStats": "{level} · {xp} XP · {count} conquistas",
+  "@fanCardBackStats": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      },
+      "xp": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fanCardMaxLevel": "Nível máximo alcançado!",
   "fanCardLabel": "CARTEIRINHA DE TORCEDOR",
   "fanCardFanOf": "Torcedor do {team}",
   "@fanCardFanOf": {

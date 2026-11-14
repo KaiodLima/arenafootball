@@ -10436,6 +10436,78 @@ abstract class AppLocalizations {
   /// **'Carteirinha de torcedor'**
   String get fanCardTitle;
 
+  /// No description provided for @fanCardMember.
+  ///
+  /// In pt, this message translates to:
+  /// **'SÓCIO TORCEDOR'**
+  String get fanCardMember;
+
+  /// No description provided for @fanCardFlipHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Toque no cartão para virar'**
+  String get fanCardFlipHint;
+
+  /// No description provided for @fanCardValidSeason.
+  ///
+  /// In pt, this message translates to:
+  /// **'Válida na temporada {season}'**
+  String fanCardValidSeason(String season);
+
+  /// No description provided for @fanCardBackCta.
+  ///
+  /// In pt, this message translates to:
+  /// **'Baixe o Arena e torça junto'**
+  String get fanCardBackCta;
+
+  /// No description provided for @fanCardSignature.
+  ///
+  /// In pt, this message translates to:
+  /// **'Assinatura do torcedor'**
+  String get fanCardSignature;
+
+  /// No description provided for @fanCardLevelSection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu nível de torcedor'**
+  String get fanCardLevelSection;
+
+  /// No description provided for @fanCardSeeAchievements.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver conquistas'**
+  String get fanCardSeeAchievements;
+
+  /// No description provided for @fanCardActionShare.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compartilhar'**
+  String get fanCardActionShare;
+
+  /// No description provided for @fanCardActionPhoto.
+  ///
+  /// In pt, this message translates to:
+  /// **'Foto'**
+  String get fanCardActionPhoto;
+
+  /// No description provided for @fanCardActionTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Time'**
+  String get fanCardActionTeam;
+
+  /// No description provided for @fanCardBackStats.
+  ///
+  /// In pt, this message translates to:
+  /// **'{level} · {xp} XP · {count} conquistas'**
+  String fanCardBackStats(String level, int xp, int count);
+
+  /// No description provided for @fanCardMaxLevel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nível máximo alcançado!'**
+  String get fanCardMaxLevel;
+
   /// No description provided for @fanCardLabel.
   ///
   /// In pt, this message translates to:

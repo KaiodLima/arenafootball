@@ -6261,6 +6261,46 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fanCardTitle => 'Fan card';
 
   @override
+  String get fanCardMember => 'FAN MEMBER';
+
+  @override
+  String get fanCardFlipHint => 'Tap the card to flip it';
+
+  @override
+  String fanCardValidSeason(String season) {
+    return 'Valid for the $season season';
+  }
+
+  @override
+  String get fanCardBackCta => 'Get Arena and cheer together';
+
+  @override
+  String get fanCardSignature => 'Fan signature';
+
+  @override
+  String get fanCardLevelSection => 'Your fan level';
+
+  @override
+  String get fanCardSeeAchievements => 'See achievements';
+
+  @override
+  String get fanCardActionShare => 'Share';
+
+  @override
+  String get fanCardActionPhoto => 'Photo';
+
+  @override
+  String get fanCardActionTeam => 'Team';
+
+  @override
+  String fanCardBackStats(String level, int xp, int count) {
+    return '$level · $xp XP · $count achievements';
+  }
+
+  @override
+  String get fanCardMaxLevel => 'Top level reached!';
+
+  @override
   String get fanCardLabel => 'FAN CARD';
 
   @override
