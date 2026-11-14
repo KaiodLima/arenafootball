@@ -125,8 +125,7 @@ class _Details extends StatelessWidget {
           margin: EdgeInsets.symmetric(vertical: 8 * scale),
           color: args.colors.accent,
         ),
-        if (t.position.isNotEmpty)
-          Text(t.position, style: ArtFonts.textStyle(12 * scale, _muted, spacing: 2.4)),
+        if (t.position.isNotEmpty) Text(t.position, style: ArtFonts.textStyle(12 * scale, _muted, spacing: 2.4)),
         SizedBox(height: 12 * scale),
         Row(
           children: [

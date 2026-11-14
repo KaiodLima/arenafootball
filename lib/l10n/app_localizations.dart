@@ -1437,6 +1437,24 @@ abstract class AppLocalizations {
   /// **'Centralizar'**
   String get shareArtFramingReset;
 
+  /// No description provided for @shareArtUseGalleryPhoto.
+  ///
+  /// In pt, this message translates to:
+  /// **'Usar foto da galeria'**
+  String get shareArtUseGalleryPhoto;
+
+  /// No description provided for @shareArtUseAthletePhoto.
+  ///
+  /// In pt, this message translates to:
+  /// **'Voltar à foto do atleta'**
+  String get shareArtUseAthletePhoto;
+
+  /// No description provided for @shareArtNoPhotoHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atleta sem foto: use uma da galeria só nesta arte'**
+  String get shareArtNoPhotoHint;
+
   /// No description provided for @playerMatchArtAction.
   ///
   /// In pt, this message translates to:

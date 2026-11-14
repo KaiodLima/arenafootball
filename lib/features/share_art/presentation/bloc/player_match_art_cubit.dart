@@ -22,6 +22,10 @@ class PlayerMatchArtState extends Equatable {
   /// Enquadramento da foto (arrastar e pinça na prévia).
   final ArtPhotoFraming framing;
 
+  /// Foto do aparelho (galeria/câmera) usada só nesta arte, no lugar da do
+  /// atleta: nada é enviado nem muda o cadastro. Nulo = a foto do atleta.
+  final String? localPhoto;
+
   const PlayerMatchArtState({
     this.data,
     this.template = PlayerMatchArtTemplate.cover,
@@ -30,6 +34,7 @@ class PlayerMatchArtState extends Equatable {
     this.showQr = true,
     this.busy = false,
     this.framing = ArtPhotoFraming.centered,
+    this.localPhoto,
   });
 
   PlayerMatchArtState copyWith({
@@ -40,6 +45,7 @@ class PlayerMatchArtState extends Equatable {
     bool? showQr,
     bool? busy,
     ArtPhotoFraming? framing,
+    String? Function()? localPhoto,
   }) =>
       PlayerMatchArtState(
         data: data ?? this.data,
@@ -49,10 +55,11 @@ class PlayerMatchArtState extends Equatable {
         showQr: showQr ?? this.showQr,
         busy: busy ?? this.busy,
         framing: framing ?? this.framing,
+        localPhoto: localPhoto != null ? localPhoto() : this.localPhoto,
       );
 
   @override
-  List<Object?> get props => [data, template, palette, format, showQr, busy, framing];
+  List<Object?> get props => [data, template, palette, format, showQr, busy, framing, localPhoto];
 }
 
 /// Arte do atleta na partida: prepara a partida (a mesma leitura em cache da
@@ -89,4 +96,10 @@ class PlayerMatchArtCubit extends Cubit<PlayerMatchArtState> {
   void moveFraming(double dx, double dy) => emit(state.copyWith(framing: state.framing.moved(dx, dy)));
   void zoomFraming(double factor) => emit(state.copyWith(framing: state.framing.zoomed(factor)));
   void resetFraming() => emit(state.copyWith(framing: ArtPhotoFraming.centered));
+
+  /// Usa a foto do aparelho só nesta arte (o enquadramento recomeça).
+  void useLocalPhoto(String path) => emit(state.copyWith(localPhoto: () => path, framing: ArtPhotoFraming.centered));
+
+  /// Volta à foto do atleta.
+  void clearLocalPhoto() => emit(state.copyWith(localPhoto: () => null, framing: ArtPhotoFraming.centered));
 }

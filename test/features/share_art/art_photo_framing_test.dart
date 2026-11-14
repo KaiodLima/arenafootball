@@ -3,6 +3,9 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:arena_soccer/features/share_art/domain/art_photo_framing.dart';
+import 'package:arena_soccer/features/share_art/domain/player_art_data.dart';
+import 'package:arena_soccer/features/share_art/domain/result_art_data.dart';
+import 'package:arena_soccer/features/share_art/presentation/bloc/player_art_cubit.dart';
 import 'package:arena_soccer/features/share_art/presentation/widgets/art_controls.dart';
 import 'package:arena_soccer/features/share_art/presentation/widgets/art_graphics.dart';
 
@@ -86,5 +89,56 @@ void main() {
       find.descendant(of: find.byType(ArtPlayerPhoto), matching: find.byType(Transform)).first,
     );
     expect(scale.transform.getMaxScaleOnAxis(), closeTo(2, 0.001));
+  });
+
+  testWidgets('foto do aparelho no escopo: a arte usa ela no lugar da do atleta', (tester) async {
+    final previousLocal = ArtPlayerPhoto.localProviderFor;
+    final previousUrl = ArtPlayerPhoto.providerFor;
+    final usedLocal = <String>[];
+    ArtPlayerPhoto.localProviderFor = (path) {
+      usedLocal.add(path);
+      return MemoryImage(_png);
+    };
+    ArtPlayerPhoto.providerFor = (_) => MemoryImage(_png);
+    addTearDown(() {
+      ArtPlayerPhoto.localProviderFor = previousLocal;
+      ArtPlayerPhoto.providerFor = previousUrl;
+    });
+    Future<void> pump(String? local, {String url = 'memoria://atleta'}) => tester.pumpWidget(MaterialApp(
+          home: Center(
+            child: SizedBox(
+              width: 100,
+              height: 140,
+              child: ArtPhotoFramingScope(
+                framing: ArtPhotoFraming.centered,
+                localPhoto: local,
+                child: ArtPlayerPhoto(url: url, initials: 'RN', color: Colors.blue),
+              ),
+            ),
+          ),
+        ));
+    await pump('/fotos/alta.jpg');
+    expect(usedLocal, ['/fotos/alta.jpg']);
+    // Sem foto do atleta, a do aparelho também vale (em vez da silhueta).
+    await pump('/fotos/outra.jpg', url: '');
+    expect(usedLocal.last, '/fotos/outra.jpg');
+    expect(find.byType(Image), findsOneWidget);
+    // Sem foto local: a do atleta.
+    usedLocal.clear();
+    await pump(null);
+    expect(usedLocal, isEmpty);
+  });
+
+  test('cubit: usar a foto do aparelho zera o enquadramento; voltar usa a do atleta', () {
+    final cubit = PlayerArtCubit(const PlayerArtData(name: 'Ronaldo', team: ArtTeam(name: 'Lava Jato')));
+    cubit.moveFraming(0.5, 0.5);
+    cubit.useLocalPhoto('/fotos/alta.jpg');
+    expect(cubit.state.localPhoto, '/fotos/alta.jpg');
+    expect(cubit.state.framing, ArtPhotoFraming.centered);
+    cubit.zoomFraming(2);
+    cubit.clearLocalPhoto();
+    expect(cubit.state.localPhoto, isNull);
+    expect(cubit.state.framing, ArtPhotoFraming.centered);
+    cubit.close();
   });
 }

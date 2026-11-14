@@ -133,7 +133,8 @@ class _AthletePickerState extends State<_AthletePicker> {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: AppSizes.s16),
-                  child: ArenaSearchField(hint: l10n.playerMatchArtSearch, onChanged: (v) => setState(() => _query = v)),
+                  child:
+                      ArenaSearchField(hint: l10n.playerMatchArtSearch, onChanged: (v) => setState(() => _query = v)),
                 ),
                 const SizedBox(height: AppSizes.s8),
                 Expanded(
@@ -155,8 +156,8 @@ class _AthletePickerState extends State<_AthletePicker> {
                                   ),
                                   if (players.isEmpty)
                                     Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: AppSizes.s20, vertical: AppSizes.s8),
+                                      padding:
+                                          const EdgeInsets.symmetric(horizontal: AppSizes.s20, vertical: AppSizes.s8),
                                       child: teamLoading
                                           ? const LinearProgressIndicator(minHeight: 2, color: AppColors.primary)
                                           : Text(
@@ -175,7 +176,8 @@ class _AthletePickerState extends State<_AthletePicker> {
                                             ? const Icon(Icons.person_rounded, color: AppColors.textSecondary)
                                             : null,
                                       ),
-                                      title: Text(player.name, style: AppTypography.label(color: AppColors.textPrimary)),
+                                      title:
+                                          Text(player.name, style: AppTypography.label(color: AppColors.textPrimary)),
                                       onTap: () => Navigator.of(context).pop((player, side)),
                                     ),
                                 ],

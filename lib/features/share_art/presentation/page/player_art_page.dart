@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:arena_soccer/core/services/share_service.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
 import 'package:arena_soccer/features/share_art/domain/art_format.dart';
@@ -17,6 +18,7 @@ import 'package:arena_soccer/features/share_art/presentation/widgets/art_control
 import 'package:arena_soccer/features/share_art/presentation/widgets/art_graphics.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
+import 'package:arena_soccer/utils/components/image_source_sheet.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
@@ -48,6 +50,22 @@ class _PlayerArtPageState extends State<PlayerArtPage> {
             .timeout(const Duration(seconds: 6), onTimeout: () {}),
     ]);
     if (mounted) setState(() => _imagesReady = true);
+  }
+
+  /// Foto do aparelho só para esta arte (em alta; nada é enviado). Carrega
+  /// antes de liberar o salvar/compartilhar.
+  Future<void> _pickLocalPhoto() async {
+    final cubit = BlocProvider.of<PlayerArtCubit>(context);
+    final source = await showImageSourceSheet(context);
+    if (source == null || !mounted) return;
+    final picked = await ImagePicker().pickImage(source: source, imageQuality: 95, maxWidth: 2400);
+    if (picked == null || !mounted) return;
+    setState(() => _imagesReady = false);
+    await precacheImage(ArtPlayerPhoto.localProviderFor(picked.path), context, onError: (_, __) {})
+        .timeout(const Duration(seconds: 6), onTimeout: () {});
+    if (!mounted) return;
+    cubit.useLocalPhoto(picked.path);
+    setState(() => _imagesReady = true);
   }
 
   Future<void> _export(Future<void> Function(Uint8List png, String name) action) async {
@@ -137,7 +155,7 @@ class _PlayerArtPageState extends State<PlayerArtPage> {
                   padding: const EdgeInsets.all(AppSizes.s16),
                   child: Center(
                     child: ArtFramingGesture(
-                      enabled: data.photoUrl.isNotEmpty,
+                      enabled: data.photoUrl.isNotEmpty || state.localPhoto != null,
                       onMove: cubit.moveFraming,
                       onZoom: cubit.zoomFraming,
                       child: FittedBox(
@@ -152,6 +170,7 @@ class _PlayerArtPageState extends State<PlayerArtPage> {
                             key: _artKey,
                             child: ArtPhotoFramingScope(
                               framing: state.framing,
+                              localPhoto: state.localPhoto,
                               child: PlayerArt(
                                 data: data,
                                 template: state.template,
@@ -167,12 +186,16 @@ class _PlayerArtPageState extends State<PlayerArtPage> {
                   ),
                 ),
               ),
-              if (data.photoUrl.isNotEmpty)
-                ArtFramingHint(
-                  hint: l10n.shareArtFramingHint,
-                  resetLabel: l10n.shareArtFramingReset,
-                  onReset: state.framing.isCentered ? null : cubit.resetFraming,
-                ),
+              ArtFramingHint(
+                hint: data.photoUrl.isNotEmpty || state.localPhoto != null
+                    ? l10n.shareArtFramingHint
+                    : l10n.shareArtNoPhotoHint,
+                resetLabel: l10n.shareArtFramingReset,
+                onReset: state.framing.isCentered ? null : cubit.resetFraming,
+                usingLocalPhoto: state.localPhoto != null,
+                photoLabel: state.localPhoto != null ? l10n.shareArtUseAthletePhoto : l10n.shareArtUseGalleryPhoto,
+                onPhoto: state.localPhoto != null ? cubit.clearLocalPhoto : _pickLocalPhoto,
+              ),
               ArtControlsPanel(
                 children: [
                   ArtChipRow(

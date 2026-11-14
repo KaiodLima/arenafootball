@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'dart:math' as math;
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -22,7 +24,8 @@ abstract final class ArtFonts {
       );
 
   /// Anton vazado: só o contorno, na [color], com o traço [stroke].
-  static TextStyle outlineStyle(double size, Color color, {double stroke = 1.5, double spacing = 0, double height = 1}) =>
+  static TextStyle outlineStyle(double size, Color color,
+          {double stroke = 1.5, double spacing = 0, double height = 1}) =>
       TextStyle(
         fontFamily: display,
         fontSize: size,
@@ -787,12 +790,19 @@ class ArtPlayerPhoto extends StatelessWidget {
 
   static ImageProvider _network(String url) => CachedNetworkImageProvider(url);
 
+  /// Foto do aparelho (arquivo local); troca nos testes.
+  static ImageProvider Function(String path) localProviderFor = _file;
+
+  static ImageProvider _file(String path) => FileImage(File(path));
+
   const ArtPlayerPhoto({super.key, required this.url, required this.initials, required this.color});
 
   @override
   Widget build(BuildContext context) {
     final fallback = _Silhouette(initials: initials, color: color);
-    if (url.isEmpty) return fallback;
+    // Foto do aparelho escolhida só para esta arte (em alta), senão a do atleta.
+    final local = ArtPhotoFramingScope.localPhotoOf(context);
+    if (url.isEmpty && local == null) return fallback;
     // Enquadramento escolhido pelo usuário (padrão: o centro do alto).
     final framing = ArtPhotoFramingScope.of(context);
     final alignment = Alignment(framing.x, framing.y);
@@ -801,7 +811,7 @@ class ArtPlayerPhoto extends StatelessWidget {
         scale: framing.zoom,
         alignment: alignment,
         child: Image(
-          image: providerFor(url),
+          image: local != null ? localProviderFor(local) : providerFor(url),
           fit: BoxFit.cover,
           alignment: alignment,
           width: double.infinity,
@@ -818,13 +828,20 @@ class ArtPlayerPhoto extends StatelessWidget {
 class ArtPhotoFramingScope extends InheritedWidget {
   final ArtPhotoFraming framing;
 
-  const ArtPhotoFramingScope({super.key, required this.framing, required super.child});
+  /// Foto do aparelho usada só nesta arte (caminho do arquivo; nulo = a do atleta).
+  final String? localPhoto;
+
+  const ArtPhotoFramingScope({super.key, required this.framing, this.localPhoto, required super.child});
 
   static ArtPhotoFraming of(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<ArtPhotoFramingScope>()?.framing ?? ArtPhotoFraming.centered;
 
+  static String? localPhotoOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<ArtPhotoFramingScope>()?.localPhoto;
+
   @override
-  bool updateShouldNotify(ArtPhotoFramingScope oldWidget) => oldWidget.framing != framing;
+  bool updateShouldNotify(ArtPhotoFramingScope oldWidget) =>
+      oldWidget.framing != framing || oldWidget.localPhoto != localPhoto;
 }
 
 class _Silhouette extends StatelessWidget {

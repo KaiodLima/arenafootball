@@ -18,6 +18,10 @@ class PlayerArtState extends Equatable {
   /// Enquadramento da foto (arrastar e pinça na prévia).
   final ArtPhotoFraming framing;
 
+  /// Foto do aparelho (galeria/câmera) usada só nesta arte, no lugar da do
+  /// atleta: nada é enviado nem muda o cadastro. Nulo = a foto do atleta.
+  final String? localPhoto;
+
   const PlayerArtState({
     required this.data,
     this.template = PlayerArtTemplate.signing,
@@ -26,6 +30,7 @@ class PlayerArtState extends Equatable {
     this.showQr = true,
     this.busy = false,
     this.framing = ArtPhotoFraming.centered,
+    this.localPhoto,
   });
 
   PlayerArtState copyWith({
@@ -35,6 +40,7 @@ class PlayerArtState extends Equatable {
     bool? showQr,
     bool? busy,
     ArtPhotoFraming? framing,
+    String? Function()? localPhoto,
   }) =>
       PlayerArtState(
         data: data,
@@ -44,10 +50,11 @@ class PlayerArtState extends Equatable {
         showQr: showQr ?? this.showQr,
         busy: busy ?? this.busy,
         framing: framing ?? this.framing,
+        localPhoto: localPhoto != null ? localPhoto() : this.localPhoto,
       );
 
   @override
-  List<Object?> get props => [data, template, palette, format, showQr, busy, framing];
+  List<Object?> get props => [data, template, palette, format, showQr, busy, framing, localPhoto];
 }
 
 class PlayerArtCubit extends Cubit<PlayerArtState> {
@@ -61,4 +68,10 @@ class PlayerArtCubit extends Cubit<PlayerArtState> {
   void moveFraming(double dx, double dy) => emit(state.copyWith(framing: state.framing.moved(dx, dy)));
   void zoomFraming(double factor) => emit(state.copyWith(framing: state.framing.zoomed(factor)));
   void resetFraming() => emit(state.copyWith(framing: ArtPhotoFraming.centered));
+
+  /// Usa a foto do aparelho só nesta arte (o enquadramento recomeça).
+  void useLocalPhoto(String path) => emit(state.copyWith(localPhoto: () => path, framing: ArtPhotoFraming.centered));
+
+  /// Volta à foto do atleta.
+  void clearLocalPhoto() => emit(state.copyWith(localPhoto: () => null, framing: ArtPhotoFraming.centered));
 }

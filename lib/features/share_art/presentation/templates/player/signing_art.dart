@@ -119,7 +119,10 @@ class _Titles extends StatelessWidget {
         ),
         SizedBox(height: 7 * scale),
         if (first.isNotEmpty)
-          Text(first, maxLines: 1, overflow: TextOverflow.ellipsis, style: ArtFonts.textStyle(22 * scale, AppColors.white, italic: true, height: 1)),
+          Text(first,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: ArtFonts.textStyle(22 * scale, AppColors.white, italic: true, height: 1)),
         FittedBox(
           fit: BoxFit.scaleDown,
           alignment: Alignment.centerLeft,

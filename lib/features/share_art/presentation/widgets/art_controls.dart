@@ -196,36 +196,74 @@ class _ArtFramingGestureState extends State<ArtFramingGesture> {
   }
 }
 
-/// Dica do enquadramento e o "Centralizar" (só quando a foto já saiu do padrão).
+/// Dica do enquadramento, o "Centralizar" (só quando a foto já saiu do
+/// padrão) e "Usar foto da galeria" / "Voltar à foto do atleta" (a foto do
+/// aparelho vale só para a arte).
 class ArtFramingHint extends StatelessWidget {
   final String hint;
   final String resetLabel;
   final VoidCallback? onReset;
 
-  const ArtFramingHint({super.key, required this.hint, required this.resetLabel, this.onReset});
+  /// Botão da foto do aparelho: [photoLabel] + [onPhoto] (nulo = sem botão).
+  final String? photoLabel;
+  final VoidCallback? onPhoto;
+  final bool usingLocalPhoto;
+
+  const ArtFramingHint({
+    super.key,
+    required this.hint,
+    required this.resetLabel,
+    this.onReset,
+    this.photoLabel,
+    this.onPhoto,
+    this.usingLocalPhoto = false,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final style = TextButton.styleFrom(
+      foregroundColor: AppColors.primary,
+      visualDensity: VisualDensity.compact,
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8),
+    );
     return Padding(
       padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s6),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.open_with_rounded, size: AppSizes.s16, color: AppColors.textSecondary),
-          const SizedBox(width: AppSizes.s6),
-          Expanded(
-            child: Text(hint, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
-          ),
-          if (onReset != null)
-            TextButton.icon(
-              onPressed: onReset,
-              icon: const Icon(Icons.center_focus_strong_rounded, size: AppSizes.s16),
-              label: Text(resetLabel),
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.primary,
-                visualDensity: VisualDensity.compact,
-                padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8),
+          Row(
+            children: [
+              const Icon(Icons.open_with_rounded, size: AppSizes.s16, color: AppColors.textSecondary),
+              const SizedBox(width: AppSizes.s6),
+              Expanded(
+                child: Text(hint, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
               ),
-            ),
+            ],
+          ),
+          Wrap(
+            alignment: WrapAlignment.end,
+            spacing: AppSizes.s4,
+            children: [
+              if (photoLabel != null && onPhoto != null)
+                TextButton.icon(
+                  onPressed: onPhoto,
+                  icon: Icon(
+                    usingLocalPhoto ? Icons.undo_rounded : Icons.add_photo_alternate_outlined,
+                    size: AppSizes.s16,
+                  ),
+                  label: Text(photoLabel!),
+                  style: style,
+                ),
+              if (onReset != null)
+                TextButton.icon(
+                  onPressed: onReset,
+                  icon: const Icon(Icons.center_focus_strong_rounded, size: AppSizes.s16),
+                  label: Text(resetLabel),
+                  style: style,
+                ),
+            ],
+          ),
         ],
       ),
     );

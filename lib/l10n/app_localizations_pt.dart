@@ -790,6 +790,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get shareArtFramingReset => 'Centralizar';
 
   @override
+  String get shareArtUseGalleryPhoto => 'Usar foto da galeria';
+
+  @override
+  String get shareArtUseAthletePhoto => 'Voltar à foto do atleta';
+
+  @override
+  String get shareArtNoPhotoHint =>
+      'Atleta sem foto: use uma da galeria só nesta arte';
+
+  @override
   String get playerMatchArtAction => 'Arte do atleta';
 
   @override

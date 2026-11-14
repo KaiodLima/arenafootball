@@ -25,8 +25,7 @@ class ArtPhotoFraming extends Equatable {
       ArtPhotoFraming(x: _clamp(x + dx, -1, 1), y: _clamp(y + dy, -1, 1), zoom: zoom);
 
   /// Multiplica o zoom por [factor], entre [minZoom] e [maxZoom].
-  ArtPhotoFraming zoomed(double factor) =>
-      ArtPhotoFraming(x: x, y: y, zoom: _clamp(zoom * factor, minZoom, maxZoom));
+  ArtPhotoFraming zoomed(double factor) => ArtPhotoFraming(x: x, y: y, zoom: _clamp(zoom * factor, minZoom, maxZoom));
 
   @override
   List<Object?> get props => [x, y, zoom];

@@ -156,7 +156,8 @@ class _Tag extends StatelessWidget {
           color: accent,
           boxShadow: [BoxShadow(color: AppColors.black.withValues(alpha: 0.35), offset: Offset(3 * scale, 3 * scale))],
         ),
-        child: Text(args.texts.newSigning, style: ArtFonts.displayStyle(22 * scale, artOn(accent), spacing: 1.5, height: 1.2)),
+        child: Text(args.texts.newSigning,
+            style: ArtFonts.displayStyle(22 * scale, artOn(accent), spacing: 1.5, height: 1.2)),
       ),
     );
   }
@@ -216,7 +217,8 @@ class _Plate extends StatelessWidget {
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
-            child: Text(d.name.toUpperCase(), maxLines: 1, style: ArtFonts.displayStyle(38 * scale, AppColors.white, height: 1.1)),
+            child: Text(d.name.toUpperCase(),
+                maxLines: 1, style: ArtFonts.displayStyle(38 * scale, AppColors.white, height: 1.1)),
           ),
           if (meta.isNotEmpty) ...[
             SizedBox(height: 4 * scale),
