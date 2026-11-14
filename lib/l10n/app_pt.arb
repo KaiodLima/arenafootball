@@ -2001,6 +2001,25 @@
   "drawerClose": "Fechar menu",
   "settingsTitle": "Configurações",
   "settingsAccountSection": "Conta",
+  "profileTitle": "Meu perfil",
+  "profileMenu": "Editar perfil",
+  "profileNameLabel": "Nome",
+  "profileNameTooLong": "O nome pode ter no máximo {max} caracteres",
+  "@profileNameTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "profileNameSaved": "Nome atualizado!",
+  "profileEmailLabel": "E-mail",
+  "profileFavoriteTeam": "Time do coração",
+  "profileNoTeam": "Nenhum time escolhido",
+  "profilePhotoHint": "Sua foto aparece no menu e na carteirinha de torcedor.",
+  "profileAccountSection": "Dados da conta",
+  "profileEmailLocked": "Não é possível alterar o e-mail",
+  "profileChangeTeam": "Trocar",
   "drawerAdmin": "Administração",
   "drawerLogout": "Sair da conta",
   "drawerDeleteAccount": "Excluir conta",

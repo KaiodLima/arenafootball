@@ -4653,6 +4653,45 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settingsAccountSection => 'Conta';
 
   @override
+  String get profileTitle => 'Meu perfil';
+
+  @override
+  String get profileMenu => 'Editar perfil';
+
+  @override
+  String get profileNameLabel => 'Nome';
+
+  @override
+  String profileNameTooLong(int max) {
+    return 'O nome pode ter no máximo $max caracteres';
+  }
+
+  @override
+  String get profileNameSaved => 'Nome atualizado!';
+
+  @override
+  String get profileEmailLabel => 'E-mail';
+
+  @override
+  String get profileFavoriteTeam => 'Time do coração';
+
+  @override
+  String get profileNoTeam => 'Nenhum time escolhido';
+
+  @override
+  String get profilePhotoHint =>
+      'Sua foto aparece no menu e na carteirinha de torcedor.';
+
+  @override
+  String get profileAccountSection => 'Dados da conta';
+
+  @override
+  String get profileEmailLocked => 'Não é possível alterar o e-mail';
+
+  @override
+  String get profileChangeTeam => 'Trocar';
+
+  @override
   String get drawerAdmin => 'Administração';
 
   @override

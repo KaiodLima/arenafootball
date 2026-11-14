@@ -282,6 +282,20 @@ class AuthDataSource {
     }
   }
 
+  /// Grava o nome da conta (`nome`) no documento do próprio usuário.
+  Future<Either<Failure, void>> updateName({required String userId, required String name}) async {
+    const fallback = 'Não foi possível salvar o nome.';
+    try {
+      final doc = await _findUserDoc(userId);
+      if (doc == null) return Left(ErrorWithMessage(fallback, code: _userDataNotFound));
+      await doc.reference.update({'nome': name});
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('updateName id=$userId', name: 'AuthDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: fallback));
+    }
+  }
+
   /// Grava a foto da conta (`urlImagem`) no documento do próprio usuário.
   Future<Either<Failure, void>> updatePhoto({required String userId, required String photoUrl}) async {
     const fallback = 'Não foi possível salvar a foto.';

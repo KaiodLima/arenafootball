@@ -83,6 +83,36 @@ void main() {
     tester.takeException();
   });
 
+  testWidgets('conta com foto: o cabeçalho mostra a foto da conta; o toque abre "Meu perfil"', (tester) async {
+    const withPhoto = UserDTO(id: 'u1', name: 'Kaio Lima', email: 'k@x.com', photoUrl: 'https://img/conta.jpg');
+    final pushed = <String?>[];
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('pt'),
+      navigatorObservers: [_Observer(pushed)],
+      onGenerateRoute: (settings) => MaterialPageRoute(settings: settings, builder: (_) => const Scaffold()),
+      home: Builder(
+        builder: (context) => TextButton(
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => Scaffold(body: _drawer(user: withPhoto))),
+          ),
+          child: const Text('abrir'),
+        ),
+      ),
+    ));
+    await tester.tap(find.text('abrir'));
+    await tester.pumpAndSettle();
+    final photo = find.byKey(const ValueKey('drawer-account-photo'));
+    final avatar = tester.widget<CircleAvatar>(find.descendant(of: photo, matching: find.byType(CircleAvatar)));
+    expect((avatar.backgroundImage as dynamic).url, 'https://img/conta.jpg');
+    await tester.tap(photo);
+    await tester.pumpAndSettle();
+    expect(pushed.last, '/profile_page');
+    tester.takeException();
+  });
+
   testWidgets('convidado: atalhos públicos, sem "Em campo", admin nem rodapé', (tester) async {
     await pump(tester, _drawer());
     expect(find.text('BOLÃO'), findsOneWidget);
@@ -147,4 +177,13 @@ void main() {
       File('build/drawer_previews/${entry.key}.png').writeAsBytesSync(png!);
     }
   }, skip: !preview);
+}
+
+class _Observer extends NavigatorObserver {
+  final List<String?> pushed;
+
+  _Observer(this.pushed);
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) => pushed.add(route.settings.name);
 }

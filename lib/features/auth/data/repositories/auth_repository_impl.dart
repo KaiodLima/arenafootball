@@ -61,6 +61,10 @@ class AuthRepositoryImpl implements IAuthRepository {
   }
 
   @override
+  Future<Either<Failure, void>> updateName({required String userId, required String name}) =>
+      _dataSource.updateName(userId: userId, name: name);
+
+  @override
   Future<Either<Failure, void>> updatePhoto({required String userId, required String photoUrl}) =>
       _dataSource.updatePhoto(userId: userId, photoUrl: photoUrl);
 

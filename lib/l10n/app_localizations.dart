@@ -7676,6 +7676,78 @@ abstract class AppLocalizations {
   /// **'Conta'**
   String get settingsAccountSection;
 
+  /// No description provided for @profileTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Meu perfil'**
+  String get profileTitle;
+
+  /// No description provided for @profileMenu.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar perfil'**
+  String get profileMenu;
+
+  /// No description provided for @profileNameLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome'**
+  String get profileNameLabel;
+
+  /// No description provided for @profileNameTooLong.
+  ///
+  /// In pt, this message translates to:
+  /// **'O nome pode ter no máximo {max} caracteres'**
+  String profileNameTooLong(int max);
+
+  /// No description provided for @profileNameSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome atualizado!'**
+  String get profileNameSaved;
+
+  /// No description provided for @profileEmailLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'E-mail'**
+  String get profileEmailLabel;
+
+  /// No description provided for @profileFavoriteTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Time do coração'**
+  String get profileFavoriteTeam;
+
+  /// No description provided for @profileNoTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum time escolhido'**
+  String get profileNoTeam;
+
+  /// No description provided for @profilePhotoHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua foto aparece no menu e na carteirinha de torcedor.'**
+  String get profilePhotoHint;
+
+  /// No description provided for @profileAccountSection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dados da conta'**
+  String get profileAccountSection;
+
+  /// No description provided for @profileEmailLocked.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não é possível alterar o e-mail'**
+  String get profileEmailLocked;
+
+  /// No description provided for @profileChangeTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar'**
+  String get profileChangeTeam;
+
   /// No description provided for @drawerAdmin.
   ///
   /// In pt, this message translates to:

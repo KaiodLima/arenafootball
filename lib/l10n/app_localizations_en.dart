@@ -4626,6 +4626,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAccountSection => 'Account';
 
   @override
+  String get profileTitle => 'My profile';
+
+  @override
+  String get profileMenu => 'Edit profile';
+
+  @override
+  String get profileNameLabel => 'Name';
+
+  @override
+  String profileNameTooLong(int max) {
+    return 'The name can have at most $max characters';
+  }
+
+  @override
+  String get profileNameSaved => 'Name updated!';
+
+  @override
+  String get profileEmailLabel => 'Email';
+
+  @override
+  String get profileFavoriteTeam => 'Favorite team';
+
+  @override
+  String get profileNoTeam => 'No team chosen';
+
+  @override
+  String get profilePhotoHint =>
+      'Your photo shows in the menu and on your fan card.';
+
+  @override
+  String get profileAccountSection => 'Account details';
+
+  @override
+  String get profileEmailLocked => 'The email cannot be changed';
+
+  @override
+  String get profileChangeTeam => 'Change';
+
+  @override
   String get drawerAdmin => 'Administration';
 
   @override

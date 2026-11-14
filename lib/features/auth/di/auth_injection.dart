@@ -8,6 +8,7 @@ import 'package:arena_soccer/features/auth/domain/usecases/delete_account_usecas
 import 'package:arena_soccer/features/auth/domain/usecases/get_account_created_at_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/get_cached_user_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/save_user_cache_usecase.dart';
+import 'package:arena_soccer/features/auth/domain/usecases/update_user_name_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/update_user_photo_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/get_current_user_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/send_password_reset_usecase.dart';
@@ -38,6 +39,7 @@ void registerAuthDependencies() {
   _sl.registerLazySingleton(() => SendPasswordResetUseCase(_sl()));
   _sl.registerLazySingleton(() => UpdateFavoriteTeamUseCase(_sl()));
   _sl.registerLazySingleton(() => UpdateUserPhotoUseCase(_sl(), _sl()));
+  _sl.registerLazySingleton(() => UpdateUserNameUseCase(_sl()));
   _sl.registerLazySingleton(() => GetAccountCreatedAtUseCase(_sl()));
 
   // Cache local

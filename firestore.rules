@@ -97,8 +97,16 @@ service cloud.firestore {
         && request.resource.data.admin == false
         && !('trocaTimeEm' in request.resource.data)
         && referralOk();
+      // Nome da conta ("Meu perfil"): de 3 a 40 caracteres (`ProfileName` no app).
+      function nameOk() {
+        return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['nome'])
+          || (request.resource.data.nome is string
+            && request.resource.data.nome.size() >= 3 && request.resource.data.nome.size() <= 40);
+      }
+
       allow update: if isOwner()
         && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin', 'idUsuario'])
+        && nameOk()
         && honestStamp()
         && teamSwitchAllowed()
         && referralOk();

@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
@@ -14,6 +13,7 @@ import 'package:arena_soccer/utils/components/arena_hero_background.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/utils/components/arena_gold_avatar.dart';
 
 /// Fontes esportivas empacotadas (as mesmas dos cards do feed e das artes).
 const _display = 'Anton';
@@ -181,6 +181,7 @@ class HomeDrawer extends StatelessWidget {
                       openAthlete(context, {'playerId': playerId, 'season': playerSeason});
                     },
               onOpenOwnedTeam: () => _open(context, AppRoutes.teamRequestPage),
+              onOpenProfile: () => _open(context, AppRoutes.profilePage),
               onChooseTeam: () {
                 Navigator.pop(context);
                 onChooseTeam();
@@ -316,6 +317,9 @@ class _ProfileHeader extends StatelessWidget {
   final UserDTO? user;
   final String? favoriteTeamImage;
 
+  /// "Meu perfil" (foto e nome da conta): toque no avatar sem foto de atleta e no nome.
+  final VoidCallback onOpenProfile;
+
   /// Atleta da conta com foto: o avatar é a foto dele (toque abre o perfil).
   final String? playerPhotoUrl;
   final String? playerTeam;
@@ -339,6 +343,7 @@ class _ProfileHeader extends StatelessWidget {
     required this.onChooseTeam,
     this.onOpenPlayer,
     required this.onOpenOwnedTeam,
+    required this.onOpenProfile,
   });
 
   @override
@@ -365,32 +370,56 @@ class _ProfileHeader extends StatelessWidget {
                     padding: const EdgeInsets.only(right: AppSizes.s40),
                     child: Row(
                       children: [
-                        // Jogador com foto: a foto do atleta; senão, o escudo do time do coração.
-                        playerPhotoUrl != null && playerPhotoUrl!.trim().isNotEmpty
-                            ? GestureDetector(
-                                onTap: onOpenPlayer,
-                                child:
-                                    _Avatar(key: const ValueKey('drawer-player-photo'), image: playerPhotoUrl!.trim()),
-                              )
-                            : _Avatar(image: favoriteTeamImage),
+                        // Jogador com foto: a foto do atleta; senão, a foto da conta;
+                        // sem nenhuma, o escudo do time do coração.
+                        if (playerPhotoUrl != null && playerPhotoUrl!.trim().isNotEmpty)
+                          GestureDetector(
+                            onTap: onOpenPlayer,
+                            child: _Avatar(key: const ValueKey('drawer-player-photo'), image: playerPhotoUrl!.trim()),
+                          )
+                        else if (isGuest)
+                          _Avatar(image: favoriteTeamImage)
+                        else
+                          Semantics(
+                            button: true,
+                            label: l10n.profileMenu,
+                            child: GestureDetector(
+                              onTap: onOpenProfile,
+                              child: Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  user!.photoUrl.trim().isNotEmpty
+                                      ? _Avatar(
+                                          key: const ValueKey('drawer-account-photo'),
+                                          image: user!.photoUrl.trim(),
+                                        )
+                                      : _Avatar(image: favoriteTeamImage),
+                                  const Positioned(right: 0, bottom: 0, child: _EditBadge()),
+                                ],
+                              ),
+                            ),
+                          ),
                         const SizedBox(width: AppSizes.s14),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                (isGuest ? l10n.drawerGuest : user!.name).toUpperCase(),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontFamily: _display,
-                                  fontSize: AppSizes.s24,
-                                  height: 1.1,
-                                  letterSpacing: 0.5,
-                                  color: AppColors.white,
-                                  shadows: [
-                                    Shadow(color: AppColors.black.withValues(alpha: 0.3), offset: const Offset(0, 2))
-                                  ],
+                              GestureDetector(
+                                onTap: isGuest ? null : onOpenProfile,
+                                child: Text(
+                                  (isGuest ? l10n.drawerGuest : user!.name).toUpperCase(),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontFamily: _display,
+                                    fontSize: AppSizes.s24,
+                                    height: 1.1,
+                                    letterSpacing: 0.5,
+                                    color: AppColors.white,
+                                    shadows: [
+                                      Shadow(color: AppColors.black.withValues(alpha: 0.3), offset: const Offset(0, 2))
+                                    ],
+                                  ),
                                 ),
                               ),
                               if (isGuest) ...[
@@ -484,6 +513,24 @@ class _ProfileHeader extends StatelessWidget {
   }
 }
 
+/// Selo de lápis do avatar: abre "Meu perfil".
+class _EditBadge extends StatelessWidget {
+  const _EditBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSizes.s4),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        shape: BoxShape.circle,
+        boxShadow: [BoxShadow(color: AppColors.black.withValues(alpha: 0.25), blurRadius: AppSizes.s4)],
+      ),
+      child: const Icon(Icons.edit_rounded, color: AppColors.primaryDark, size: AppSizes.s14),
+    );
+  }
+}
+
 /// Foto do atleta ou escudo do time do coração num anel dourado.
 class _Avatar extends StatelessWidget {
   final String? image;
@@ -491,32 +538,7 @@ class _Avatar extends StatelessWidget {
   const _Avatar({super.key, this.image});
 
   @override
-  Widget build(BuildContext context) {
-    final url = image;
-    return Container(
-      padding: const EdgeInsets.all(3),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppColors.medalGoldLight, AppColors.gold, AppColors.medalGoldDark],
-        ),
-        boxShadow: [BoxShadow(color: AppColors.black.withValues(alpha: 0.3), blurRadius: AppSizes.s10)],
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(AppSizes.s2),
-        decoration: const BoxDecoration(color: AppColors.white, shape: BoxShape.circle),
-        child: CircleAvatar(
-          radius: AppSizes.s30,
-          backgroundColor: AppColors.background,
-          backgroundImage: url == null ? null : CachedNetworkImageProvider(url),
-          child:
-              url == null ? const Icon(Icons.person_rounded, color: AppColors.textSecondary, size: AppSizes.s30) : null,
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => ArenaGoldAvatar(image: image);
 }
 
 /// Nível das conquistas: "LEAL · 240 XP", barra dourada até o próximo nível

@@ -82,6 +82,32 @@ class SettingsPage extends StatelessWidget {
           SectionHeader(title: l10n.settingsAccountSection),
           ArenaCard(
             padding: const EdgeInsets.symmetric(horizontal: AppSizes.s16, vertical: AppSizes.s14),
+            onTap: () => Navigator.pushNamed(context, AppRoutes.profilePage),
+            child: Row(
+              children: [
+                Container(
+                  width: AppSizes.s36,
+                  height: AppSizes.s36,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(AppSizes.s10),
+                  ),
+                  child: const Icon(Icons.person_outline_rounded, color: AppColors.primary, size: AppSizes.s20),
+                ),
+                const SizedBox(width: AppSizes.s14),
+                Expanded(
+                  child: Text(
+                    l10n.profileTitle,
+                    style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s16),
+                  ),
+                ),
+                const Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary, size: AppSizes.s20),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSizes.s10),
+          ArenaCard(
+            padding: const EdgeInsets.symmetric(horizontal: AppSizes.s16, vertical: AppSizes.s14),
             onTap: () => _deleteAccount(context),
             child: Row(
               children: [

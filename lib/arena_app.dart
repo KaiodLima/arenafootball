@@ -139,6 +139,8 @@ import 'package:arena_soccer/features/voting/presentation/page/vote_best_player_
 import 'package:arena_soccer/injection_container.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/themes/app_theme.dart';
+import 'package:arena_soccer/features/auth/presentation/bloc/profile_cubit.dart';
+import 'package:arena_soccer/features/auth/presentation/page/profile_page.dart';
 
 class ArenaApp extends StatelessWidget {
   const ArenaApp({super.key});
@@ -169,6 +171,10 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.chooseTeamPage: (_) => BlocProvider<ChooseTeamCubit>(
               create: (_) => ChooseTeamCubit(sl(), sl(), sl()),
               child: const ChooseTeamPage(),
+            ),
+        AppRoutes.profilePage: (_) => BlocProvider<ProfileCubit>(
+              create: (_) => ProfileCubit(sl(), sl(), sl()),
+              child: const ProfilePage(),
             ),
         AppRoutes.fanCardPage: (_) => BlocProvider<FanCardCubit>(
               create: (_) => FanCardCubit(sl(), sl(), sl()),
