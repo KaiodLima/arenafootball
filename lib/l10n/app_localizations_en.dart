@@ -6491,6 +6491,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventPollFinal => 'Final result';
 
   @override
+  String get eventPollShareResult => 'Share result';
+
+  @override
+  String get eventArtTitle => 'Result art';
+
+  @override
+  String get eventArtResultSeal => 'RESULT';
+
+  @override
+  String eventArtClosedOn(String date) {
+    return 'Closed on $date';
+  }
+
+  @override
+  String get eventArtTemplateChampion => 'Champion';
+
+  @override
+  String get eventArtTemplatePodium => 'Podium';
+
+  @override
+  String get eventArtTemplateRanking => 'Ranking';
+
+  @override
+  String eventArtShareText(
+      String event, String winner, int percent, String link) {
+    return '🏆 Result: $event — $winner won with $percent%!\n$link';
+  }
+
+  @override
+  String eventArtShareTie(String event, String names, String link) {
+    return '🏆 Result: $event — a tie between $names!\n$link';
+  }
+
+  @override
   String get fanCardMember => 'FAN MEMBER';
 
   @override

@@ -3206,6 +3206,51 @@
   "eventPollNotFound": "Este evento não está mais disponível.",
   "eventPollPartial": "Parcial",
   "eventPollFinal": "Resultado final",
+  "eventPollShareResult": "Compartilhar resultado",
+  "eventArtTitle": "Arte do resultado",
+  "eventArtResultSeal": "RESULTADO",
+  "eventArtClosedOn": "Encerrado em {date}",
+  "@eventArtClosedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "eventArtTemplateChampion": "Campeão",
+  "eventArtTemplatePodium": "Pódio",
+  "eventArtTemplateRanking": "Ranking",
+  "eventArtShareText": "🏆 Resultado: {event} — {winner} venceu com {percent}%!\n{link}",
+  "@eventArtShareText": {
+    "placeholders": {
+      "event": {
+        "type": "String"
+      },
+      "winner": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "int"
+      },
+      "link": {
+        "type": "String"
+      }
+    }
+  },
+  "eventArtShareTie": "🏆 Resultado: {event} — empate entre {names}!\n{link}",
+  "@eventArtShareTie": {
+    "placeholders": {
+      "event": {
+        "type": "String"
+      },
+      "names": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      }
+    }
+  },
   "fanCardMember": "SÓCIO TORCEDOR",
   "fanCardFlipHint": "Toque no cartão para virar",
   "fanCardValidSeason": "Válida na temporada {season}",

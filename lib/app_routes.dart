@@ -9,6 +9,7 @@ class AppRoutes {
   static const String profilePage = '/profile_page';
   static const String eventPollPage = '/event_poll_page';
   static const String eventPollFormPage = '/event_poll_form_page';
+  static const String eventResultArtPage = '/event_result_art_page';
   static const String home = '/home';
 
   // Resultados globais (web scraping)

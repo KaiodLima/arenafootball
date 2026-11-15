@@ -10,6 +10,7 @@ import 'package:arena_soccer/features/event_polls/presentation/bloc/event_poll_c
 import 'package:arena_soccer/features/event_polls/presentation/bloc/event_poll_state.dart';
 import 'package:arena_soccer/features/event_polls/presentation/widgets/event_poll_parts.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
+import 'package:arena_soccer/features/share_art/domain/event_result_art_data.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
@@ -94,6 +95,22 @@ class _EventPollPageState extends State<EventPollPage> {
     if (confirmed) await _cubit.closeEvent();
   }
 
+  /// Arte do resultado (encerrado e com votos): sem leitura nova.
+  void _openResultArt(EventPollState state) {
+    final news = state.news;
+    final tally = state.tally;
+    if (news == null || tally == null) return;
+    Navigator.pushNamed(
+      context,
+      AppRoutes.eventResultArtPage,
+      arguments: {'data': EventResultArtData.of(news, tally)},
+    );
+  }
+
+  /// Pode gerar a arte: encerrado, com a apuração lida e com votos.
+  bool _canShareResult(EventPollState state, DateTime now) =>
+      !state.event.isOpenAt(now) && (state.tally?.total ?? 0) > 0;
+
   void _onNotice(BuildContext context, EventPollState state) {
     final l10n = AppLocalizations.of(context);
     switch (state.notice) {
@@ -137,6 +154,13 @@ class _EventPollPageState extends State<EventPollPage> {
               style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s20),
             ),
             actions: [
+              if (_canShareResult(state, now))
+                IconButton(
+                  key: const ValueKey('event-share-result'),
+                  tooltip: l10n.eventPollShareResult,
+                  icon: const Icon(Icons.ios_share_rounded),
+                  onPressed: () => _openResultArt(state),
+                ),
               if (isAdmin && news != null) ...[
                 IconButton(
                   tooltip: l10n.eventPollFormTitleEdit,
@@ -249,6 +273,21 @@ class _EventPollPageState extends State<EventPollPage> {
                   tie: winners.length > 1,
                   onTap: canVote ? () => setState(() => _selected = event.options[i].id) : null,
                 ),
+              if (_canShareResult(state, now)) ...[
+                const SizedBox(height: AppSizes.s6),
+                FilledButton.icon(
+                  key: const ValueKey('event-share-result-button'),
+                  onPressed: () => _openResultArt(state),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.primaryDark,
+                    foregroundColor: AppColors.white,
+                    padding: const EdgeInsets.symmetric(vertical: AppSizes.s14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSizes.s14)),
+                  ),
+                  icon: const Icon(Icons.auto_awesome_rounded, color: AppColors.gold),
+                  label: Text(l10n.eventPollShareResult),
+                ),
+              ],
             ],
           ),
         ),

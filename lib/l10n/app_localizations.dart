@@ -10832,6 +10832,61 @@ abstract class AppLocalizations {
   /// **'Resultado final'**
   String get eventPollFinal;
 
+  /// No description provided for @eventPollShareResult.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compartilhar resultado'**
+  String get eventPollShareResult;
+
+  /// No description provided for @eventArtTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arte do resultado'**
+  String get eventArtTitle;
+
+  /// No description provided for @eventArtResultSeal.
+  ///
+  /// In pt, this message translates to:
+  /// **'RESULTADO'**
+  String get eventArtResultSeal;
+
+  /// No description provided for @eventArtClosedOn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Encerrado em {date}'**
+  String eventArtClosedOn(String date);
+
+  /// No description provided for @eventArtTemplateChampion.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeão'**
+  String get eventArtTemplateChampion;
+
+  /// No description provided for @eventArtTemplatePodium.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pódio'**
+  String get eventArtTemplatePodium;
+
+  /// No description provided for @eventArtTemplateRanking.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ranking'**
+  String get eventArtTemplateRanking;
+
+  /// No description provided for @eventArtShareText.
+  ///
+  /// In pt, this message translates to:
+  /// **'🏆 Resultado: {event} — {winner} venceu com {percent}%!\n{link}'**
+  String eventArtShareText(
+      String event, String winner, int percent, String link);
+
+  /// No description provided for @eventArtShareTie.
+  ///
+  /// In pt, this message translates to:
+  /// **'🏆 Resultado: {event} — empate entre {names}!\n{link}'**
+  String eventArtShareTie(String event, String names, String link);
+
   /// No description provided for @fanCardMember.
   ///
   /// In pt, this message translates to:

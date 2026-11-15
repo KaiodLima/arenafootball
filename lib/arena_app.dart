@@ -145,6 +145,9 @@ import 'package:arena_soccer/features/event_polls/presentation/bloc/event_poll_c
 import 'package:arena_soccer/features/event_polls/presentation/bloc/event_poll_form_cubit.dart';
 import 'package:arena_soccer/features/event_polls/presentation/page/event_poll_form_page.dart';
 import 'package:arena_soccer/features/event_polls/presentation/page/event_poll_page.dart';
+import 'package:arena_soccer/features/share_art/domain/event_result_art_data.dart';
+import 'package:arena_soccer/features/share_art/presentation/bloc/event_result_art_cubit.dart';
+import 'package:arena_soccer/features/share_art/presentation/page/event_result_art_page.dart';
 
 class ArenaApp extends StatelessWidget {
   const ArenaApp({super.key});
@@ -187,6 +190,13 @@ class ArenaApp extends StatelessWidget {
           return BlocProvider<EventPollCubit>(
             create: (_) => EventPollCubit(sl()),
             child: EventPollPage(eventId: news?.id ?? args?['id'] as String? ?? '', initial: news),
+          );
+        },
+        AppRoutes.eventResultArtPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+          return BlocProvider<EventResultArtCubit>(
+            create: (_) => EventResultArtCubit(args['data'] as EventResultArtData),
+            child: const EventResultArtPage(),
           );
         },
         AppRoutes.eventPollFormPage: (context) {

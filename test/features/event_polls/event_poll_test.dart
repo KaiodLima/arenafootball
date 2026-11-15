@@ -233,6 +233,8 @@ void main() {
     testWidgets('escolhe, confirma e vota; com o parcial, as barras aparecem', (tester) async {
       await pumpPage(tester, _card());
       expect(find.text('Escolha uma opção e confirme o seu voto.'), findsOneWidget);
+      // Aberto: ainda sem a arte do resultado.
+      expect(find.byKey(const ValueKey('event-share-result')), findsNothing);
       await tester.tap(find.text('Gol do Rafa'));
       await tester.pump();
       await tester.tap(find.text('VOTAR EM GOL DO RAFA'));
@@ -264,6 +266,9 @@ void main() {
       await tester.pump();
       await tester.pump();
       expect(find.text('VENCEDOR'), findsOneWidget);
+      // Encerrado e com votos: compartilhar a arte do resultado.
+      expect(find.byKey(const ValueKey('event-share-result')), findsOneWidget);
+      expect(find.byKey(const ValueKey('event-share-result-button')), findsOneWidget);
       expect(find.text('70%'), findsOneWidget);
       expect(find.byIcon(Icons.radio_button_off_rounded), findsNothing);
     });
