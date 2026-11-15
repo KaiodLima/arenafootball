@@ -47,6 +47,7 @@ import 'package:arena_soccer/utils/components/section_header.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
+import 'package:arena_soccer/features/album/presentation/bloc/album_event_cubit.dart';
 
 /// Casca da home: header escuro (saudação + região), folha clara com a aba
 /// selecionada, barra de navegação inferior e, para o admin, o botão "Publicar".
@@ -309,10 +310,50 @@ class _HomePageState extends State<HomePage> {
             break;
           }
           Navigator.pushNamed(context, AppRoutes.referralPage, arguments: {'code': code});
+        case VoteLinkTarget(:final season, :final matchId):
+          _openMatchLink(season, matchId, voting: true);
+        case MatchLinkTarget(:final season, :final matchId):
+          _openMatchLink(season, matchId, voting: false);
+        case PoolLinkTarget():
+          Navigator.pushNamed(context, AppRoutes.predictionRankingPage);
+        case NowLinkTarget(:final regionId):
+          // QR fixo da região: o que está acontecendo agora nela.
+          Navigator.pushNamed(context, AppRoutes.nowPage, arguments: {'regionId': regionId});
+        case AlbumLinkTarget():
+          // Álbum desligado (ou sem conta): só o aviso.
+          if (BlocProvider.of<AlbumEventCubit>(context).state.visible) {
+            Navigator.pushNamed(context, AppRoutes.albumPage);
+          } else {
+            showSnackBar(context: context, message: AppLocalizations.of(context).deepLinkAlbumClosed, isSuccess: false);
+          }
         case AppLinkTarget():
           break;
       }
     });
+  }
+
+  /// QR/link da votação ou da partida: votar no craque (aberta) ou o eleito
+  /// (fechada); a partida, nos detalhes. Partida apagada: o aviso.
+  Future<void> _openMatchLink(String season, String matchId, {required bool voting}) async {
+    final match = await _homeCubit.findMatch(matchId, season: season);
+    if (!mounted) return;
+    if (match == null) {
+      showSnackBar(context: context, message: AppLocalizations.of(context).deepLinkMatchNotFound, isSuccess: false);
+      return;
+    }
+    if (voting) {
+      Navigator.pushNamed(
+        context,
+        match.isVotingOpen ? AppRoutes.voteBestPlayerPage : AppRoutes.electedPlayerPage,
+        arguments: {'match': match, 'season': season},
+      );
+      return;
+    }
+    Navigator.pushNamed(
+      context,
+      AppRoutes.matchDetailsPage,
+      arguments: {'match': match, 'season': season == SeasonCollection.currentSeason ? null : season},
+    );
   }
 
   Future<void> _openHighlight(String id) async {

@@ -296,6 +296,258 @@ abstract class AppLocalizations {
   /// **'Ranking de torcidas'**
   String get fanRankingTitle;
 
+  /// No description provided for @qrCodesTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'QR codes'**
+  String get qrCodesTitle;
+
+  /// No description provided for @qrKindNow.
+  ///
+  /// In pt, this message translates to:
+  /// **'Acontecendo agora'**
+  String get qrKindNow;
+
+  /// No description provided for @qrNowTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'QR fixo de {region}'**
+  String qrNowTitle(String region);
+
+  /// No description provided for @qrNowSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sempre leva ao que está acontecendo agora: votação, jogo ao vivo, eventos e palpites'**
+  String get qrNowSubtitle;
+
+  /// No description provided for @qrNowPosterTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Acontecendo agora em {region}'**
+  String qrNowPosterTitle(String region);
+
+  /// No description provided for @nowTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Acontecendo agora'**
+  String get nowTitle;
+
+  /// No description provided for @nowIn.
+  ///
+  /// In pt, this message translates to:
+  /// **'em {region}'**
+  String nowIn(String region);
+
+  /// No description provided for @nowRegionGone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Esta região não existe mais no app.'**
+  String get nowRegionGone;
+
+  /// No description provided for @nowQuiet.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nada acontecendo agora em {region}. Que tal palpitar no próximo jogo?'**
+  String nowQuiet(String region);
+
+  /// No description provided for @nowSectionVotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votações do craque abertas'**
+  String get nowSectionVotes;
+
+  /// No description provided for @nowSectionLive.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ao vivo'**
+  String get nowSectionLive;
+
+  /// No description provided for @nowSectionEvents.
+  ///
+  /// In pt, this message translates to:
+  /// **'Eventos de votação'**
+  String get nowSectionEvents;
+
+  /// No description provided for @nowSectionUpcoming.
+  ///
+  /// In pt, this message translates to:
+  /// **'Próximos jogos'**
+  String get nowSectionUpcoming;
+
+  /// No description provided for @nowSectionMore.
+  ///
+  /// In pt, this message translates to:
+  /// **'Participe também'**
+  String get nowSectionMore;
+
+  /// No description provided for @nowVote.
+  ///
+  /// In pt, this message translates to:
+  /// **'VOTAR NO CRAQUE'**
+  String get nowVote;
+
+  /// No description provided for @nowWatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'VER A PARTIDA'**
+  String get nowWatch;
+
+  /// No description provided for @nowEventVote.
+  ///
+  /// In pt, this message translates to:
+  /// **'VOTAR NO EVENTO'**
+  String get nowEventVote;
+
+  /// No description provided for @nowPredict.
+  ///
+  /// In pt, this message translates to:
+  /// **'DAR PALPITE'**
+  String get nowPredict;
+
+  /// No description provided for @nowPool.
+  ///
+  /// In pt, this message translates to:
+  /// **'ABRIR O BOLÃO'**
+  String get nowPool;
+
+  /// No description provided for @nowLiveBadge.
+  ///
+  /// In pt, this message translates to:
+  /// **'AO VIVO'**
+  String get nowLiveBadge;
+
+  /// No description provided for @qrCodesIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gere o QR code do que está acontecendo agora: imprima, mostre no telão ou poste nas redes.'**
+  String get qrCodesIntro;
+
+  /// No description provided for @qrSectionAlways.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sempre ativos'**
+  String get qrSectionAlways;
+
+  /// No description provided for @qrSectionEvents.
+  ///
+  /// In pt, this message translates to:
+  /// **'Eventos de votação abertos'**
+  String get qrSectionEvents;
+
+  /// No description provided for @qrSectionVotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votações do craque abertas'**
+  String get qrSectionVotes;
+
+  /// No description provided for @qrSectionMatches.
+  ///
+  /// In pt, this message translates to:
+  /// **'Próximas partidas (palpite)'**
+  String get qrSectionMatches;
+
+  /// No description provided for @qrSectionEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nada aberto agora.'**
+  String get qrSectionEmpty;
+
+  /// No description provided for @qrKindVote.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vote no craque'**
+  String get qrKindVote;
+
+  /// No description provided for @qrKindMatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dê o seu palpite'**
+  String get qrKindMatch;
+
+  /// No description provided for @qrKindPool.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bolão'**
+  String get qrKindPool;
+
+  /// No description provided for @qrKindAlbum.
+  ///
+  /// In pt, this message translates to:
+  /// **'Álbum de figurinhas'**
+  String get qrKindAlbum;
+
+  /// No description provided for @qrKindEvent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Evento de votação'**
+  String get qrKindEvent;
+
+  /// No description provided for @qrPoolTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bolão do Arena Football'**
+  String get qrPoolTitle;
+
+  /// No description provided for @qrPoolSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Palpite nos jogos e dispute o ranking da sua região'**
+  String get qrPoolSubtitle;
+
+  /// No description provided for @qrAlbumSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abra pacotinhos e complete o álbum'**
+  String get qrAlbumSubtitle;
+
+  /// No description provided for @qrScanCta.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aponte a câmera e participe!'**
+  String get qrScanCta;
+
+  /// No description provided for @qrPosterTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cartaz do QR code'**
+  String get qrPosterTitle;
+
+  /// No description provided for @qrCopyLink.
+  ///
+  /// In pt, this message translates to:
+  /// **'Copiar link'**
+  String get qrCopyLink;
+
+  /// No description provided for @qrLinkCopied.
+  ///
+  /// In pt, this message translates to:
+  /// **'Link copiado!'**
+  String get qrLinkCopied;
+
+  /// No description provided for @qrShareText.
+  ///
+  /// In pt, this message translates to:
+  /// **'{title} — aponte a câmera ou toque no link e participe! ⚽\n{link}'**
+  String qrShareText(String title, String link);
+
+  /// No description provided for @qrMatchVote.
+  ///
+  /// In pt, this message translates to:
+  /// **'QR code da votação'**
+  String get qrMatchVote;
+
+  /// No description provided for @qrMatchMatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'QR code da partida'**
+  String get qrMatchMatch;
+
+  /// No description provided for @qrMenu.
+  ///
+  /// In pt, this message translates to:
+  /// **'QR code'**
+  String get qrMenu;
+
   /// No description provided for @fanRankingScopeRegion.
   ///
   /// In pt, this message translates to:
@@ -11828,6 +12080,18 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Esta notícia não está mais disponível.'**
   String get newsNotFound;
+
+  /// No description provided for @deepLinkAlbumClosed.
+  ///
+  /// In pt, this message translates to:
+  /// **'O álbum de figurinhas não está aberto agora.'**
+  String get deepLinkAlbumClosed;
+
+  /// No description provided for @deepLinkMatchNotFound.
+  ///
+  /// In pt, this message translates to:
+  /// **'Esta partida não está mais disponível.'**
+  String get deepLinkMatchNotFound;
 
   /// No description provided for @deepLinkHighlightNotFound.
   ///

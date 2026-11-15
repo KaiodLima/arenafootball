@@ -27,6 +27,7 @@ import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/delay_match_sheet.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/set_match_phase_usecase.dart';
 import 'package:arena_soccer/utils/themes/arena_palette.dart';
+import 'package:arena_soccer/features/qr_codes/presentation/page/qr_poster_page.dart';
 
 /// Lista de partidas do [MatchesCubit] do contexto (usada pela aba de
 /// tabelas, com as partidas do dia, e pela tela "todos os jogos"). Com
@@ -221,6 +222,15 @@ class MatchesList extends StatelessWidget {
                       )
                   : null,
               onExport: manages(match) ? () => showMatchReportExport(context, match: match, season: season) : null,
+              onQrCode: manages(match)
+                  ? () => openMatchQr(
+                        context,
+                        match: match,
+                        season: season,
+                        homeCrest: state.crestOf(match.homeTeam),
+                        awayCrest: state.crestOf(match.awayTeam),
+                      )
+                  : null,
               onGoalCard: manages(match)
                   ? () => Navigator.pushNamed(
                         context,

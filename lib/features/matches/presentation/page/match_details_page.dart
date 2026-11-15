@@ -23,6 +23,7 @@ import 'package:arena_soccer/utils/constants/team_colors.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/delay_match_sheet.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/set_match_phase_usecase.dart';
 import 'package:arena_soccer/utils/components/safe_bottom.dart';
+import 'package:arena_soccer/features/qr_codes/presentation/page/qr_poster_page.dart';
 
 /// Detalhes da partida: cabeçalho com as cores dos dois times, escudos e
 /// placar (antes do jogo, o horário), depois os gols em linha do tempo, o
@@ -171,6 +172,17 @@ class MatchDetailsPage extends StatelessWidget {
                           icon: Icons.picture_as_pdf_outlined,
                           label: l10n.matchReportExport,
                           onSelected: () => showMatchReportExport(context, match: match, season: season),
+                        ),
+                        CardMenuAction(
+                          icon: Icons.qr_code_2_rounded,
+                          label: match.isVotingOpen ? l10n.qrMatchVote : l10n.qrMatchMatch,
+                          onSelected: () => openMatchQr(
+                            context,
+                            match: match,
+                            season: season,
+                            homeCrest: homeCrest,
+                            awayCrest: awayCrest,
+                          ),
                         ),
                         CardMenuAction(
                           icon: Icons.sports_soccer_rounded,

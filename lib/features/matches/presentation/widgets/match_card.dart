@@ -182,6 +182,9 @@ class MatchCard extends StatefulWidget {
   /// Admin/organizador: exporta a súmula em PDF (nulo = sem o item).
   final VoidCallback? onExport;
 
+  /// QR code da votação (aberta) ou da partida (quem gerencia a partida).
+  final VoidCallback? onQrCode;
+
   /// Admin: iniciar, intervalo, 2º tempo ou encerrar na mão (nulo = sem as ações).
   final ValueChanged<MatchPhase>? onSetPhase;
 
@@ -223,6 +226,7 @@ class MatchCard extends StatefulWidget {
     this.championshipLabel,
     this.onGoalCard,
     this.onExport,
+    this.onQrCode,
     this.onSetPhase,
     this.onPredict,
     this.onShareArt,
@@ -491,6 +495,12 @@ class _MatchCardState extends State<MatchCard> {
             icon: Icons.sports_soccer_rounded,
             label: l10n.matchDetailsGoalCard,
             onSelected: widget.onGoalCard!,
+          ),
+        if (widget.onQrCode != null)
+          CardMenuAction(
+            icon: Icons.qr_code_2_rounded,
+            label: match.isVotingOpen ? l10n.qrMatchVote : l10n.qrMatchMatch,
+            onSelected: widget.onQrCode!,
           ),
         if (widget.canDelete)
           CardMenuAction(

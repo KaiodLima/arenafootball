@@ -43,6 +43,41 @@
         }
       },
       {
+        "source": "/votacao/**",
+        "function": {
+          "functionId": "sharePage",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/partida/**",
+        "function": {
+          "functionId": "sharePage",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/bolao",
+        "function": {
+          "functionId": "sharePage",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/album",
+        "function": {
+          "functionId": "sharePage",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/agora/**",
+        "function": {
+          "functionId": "sharePage",
+          "region": "us-central1"
+        }
+      },
+      {
         "source": "/app",
         "function": {
           "functionId": "sharePage",

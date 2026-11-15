@@ -33,6 +33,86 @@
   "homeTabTeams": "Times",
   "homeTabTables": "Tabelas",
   "fanRankingTitle": "Ranking de torcidas",
+  "qrCodesTitle": "QR codes",
+  "qrKindNow": "Acontecendo agora",
+  "qrNowTitle": "QR fixo de {region}",
+  "@qrNowTitle": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "qrNowSubtitle": "Sempre leva ao que está acontecendo agora: votação, jogo ao vivo, eventos e palpites",
+  "qrNowPosterTitle": "Acontecendo agora em {region}",
+  "@qrNowPosterTitle": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "nowTitle": "Acontecendo agora",
+  "nowIn": "em {region}",
+  "@nowIn": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "nowRegionGone": "Esta região não existe mais no app.",
+  "nowQuiet": "Nada acontecendo agora em {region}. Que tal palpitar no próximo jogo?",
+  "@nowQuiet": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "nowSectionVotes": "Votações do craque abertas",
+  "nowSectionLive": "Ao vivo",
+  "nowSectionEvents": "Eventos de votação",
+  "nowSectionUpcoming": "Próximos jogos",
+  "nowSectionMore": "Participe também",
+  "nowVote": "VOTAR NO CRAQUE",
+  "nowWatch": "VER A PARTIDA",
+  "nowEventVote": "VOTAR NO EVENTO",
+  "nowPredict": "DAR PALPITE",
+  "nowPool": "ABRIR O BOLÃO",
+  "nowLiveBadge": "AO VIVO",
+  "qrCodesIntro": "Gere o QR code do que está acontecendo agora: imprima, mostre no telão ou poste nas redes.",
+  "qrSectionAlways": "Sempre ativos",
+  "qrSectionEvents": "Eventos de votação abertos",
+  "qrSectionVotes": "Votações do craque abertas",
+  "qrSectionMatches": "Próximas partidas (palpite)",
+  "qrSectionEmpty": "Nada aberto agora.",
+  "qrKindVote": "Vote no craque",
+  "qrKindMatch": "Dê o seu palpite",
+  "qrKindPool": "Bolão",
+  "qrKindAlbum": "Álbum de figurinhas",
+  "qrKindEvent": "Evento de votação",
+  "qrPoolTitle": "Bolão do Arena Football",
+  "qrPoolSubtitle": "Palpite nos jogos e dispute o ranking da sua região",
+  "qrAlbumSubtitle": "Abra pacotinhos e complete o álbum",
+  "qrScanCta": "Aponte a câmera e participe!",
+  "qrPosterTitle": "Cartaz do QR code",
+  "qrCopyLink": "Copiar link",
+  "qrLinkCopied": "Link copiado!",
+  "qrShareText": "{title} — aponte a câmera ou toque no link e participe! ⚽\n{link}",
+  "@qrShareText": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      }
+    }
+  },
+  "qrMatchVote": "QR code da votação",
+  "qrMatchMatch": "QR code da partida",
+  "qrMenu": "QR code",
   "fanRankingScopeRegion": "Região",
   "fanRankingScopeOverall": "Geral",
   "fanRankingBiggestIn": "Maior torcida de {region}",
@@ -3727,5 +3807,7 @@
   "newsShareTitle": "Compartilhar notícia",
   "newsShareCardFooter": "Leia no app · arenasoccerflutter.web.app",
   "newsNotFound": "Esta notícia não está mais disponível.",
+  "deepLinkAlbumClosed": "O álbum de figurinhas não está aberto agora.",
+  "deepLinkMatchNotFound": "Esta partida não está mais disponível.",
   "deepLinkHighlightNotFound": "Este destaque não está mais disponível."
 }

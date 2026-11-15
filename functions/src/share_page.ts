@@ -19,6 +19,11 @@ export type SharePath =
   | { kind: 'atleta'; season: string; id: string }
   | { kind: 'destaque'; id: string }
   | { kind: 'convite'; code: string }
+  | { kind: 'votacao'; season: string; id: string }
+  | { kind: 'partida'; season: string; id: string }
+  | { kind: 'bolao' }
+  | { kind: 'album' }
+  | { kind: 'agora'; regionId: string }
   | { kind: 'app' };
 
 const SAFE_ID = /^[A-Za-z0-9_-]{1,128}$/;
@@ -28,6 +33,12 @@ export function parseSharePath(path: string): SharePath | null {
   const parts = path.split('?')[0].split('/').filter(Boolean).map((p) => decodeURIComponent(p));
   const [kind, a, b] = parts;
   if (kind === 'app' && parts.length === 1) return { kind: 'app' };
+  if (kind === 'bolao' && parts.length === 1) return { kind: 'bolao' };
+  if (kind === 'album' && parts.length === 1) return { kind: 'album' };
+  if (kind === 'agora' && parts.length === 2 && SAFE_ID.test(a)) return { kind: 'agora', regionId: a };
+  if ((kind === 'votacao' || kind === 'partida') && parts.length === 3 && /^\d{4}$/.test(a) && SAFE_ID.test(b)) {
+    return { kind, season: a, id: b };
+  }
   if (kind === 'noticia' && parts.length === 2 && SAFE_ID.test(a)) return { kind: 'noticia', id: a };
   if (kind === 'destaque' && parts.length === 2 && SAFE_ID.test(a)) return { kind: 'destaque', id: a };
   if (kind === 'convite' && parts.length === 2 && /^[A-Za-z0-9]{8,10}$/.test(a)) {
@@ -50,6 +61,16 @@ export function appPath(share: SharePath): string {
       return `atleta/${share.season}/${share.id}`;
     case 'convite':
       return `convite/${share.code}`;
+    case 'votacao':
+      return `votacao/${share.season}/${share.id}`;
+    case 'partida':
+      return `partida/${share.season}/${share.id}`;
+    case 'bolao':
+      return 'bolao';
+    case 'album':
+      return 'album';
+    case 'agora':
+      return `agora/${share.regionId}`;
     case 'app':
       return 'app';
   }
@@ -150,6 +171,63 @@ export function invitePageData(inviterName: string, code: string): PageData {
     kicker: `Convite · código ${code}`,
   };
 }
+
+/** "Lava Jato x Volta" da partida (nomes gravados nela). */
+function matchTitle(match: Doc): string {
+  const home = text(match.timeC);
+  const away = text(match.timeF);
+  return home && away ? `${home} x ${away}` : 'Partida';
+}
+
+/** QR/link da votação do craque: votar (aberta) ou ver o eleito. */
+export function votePageData(match: Doc): PageData {
+  const open = text(match.votacao) === 'true';
+  return {
+    title: `Vote no craque: ${matchTitle(match)}`,
+    description: open
+      ? 'Escolha o melhor da partida no app Arena Football. A votação está aberta!'
+      : 'Veja quem foi eleito o craque da partida no app Arena Football.',
+    image: '',
+    kicker: open ? 'Votação aberta' : 'Votação encerrada',
+  };
+}
+
+/** QR/link da partida: placar, palpite e lances no app. */
+export function matchPageData(match: Doc): PageData {
+  const when = [text(match.data), text(match.horario)].filter(Boolean).join(' · ');
+  const region = text(match.fk_competicao);
+  return {
+    title: matchTitle(match),
+    description: `${when ? `${when}. ` : ''}Dê o seu palpite e acompanhe a partida no app Arena Football.`,
+    image: '',
+    kicker: ['Partida', region].filter(Boolean).join(' · '),
+  };
+}
+
+/** QR fixo da região: o que está acontecendo agora nela. */
+export function nowPageData(regionName: string): PageData {
+  const region = text(regionName);
+  return {
+    title: region ? `Acontecendo agora em ${region}` : 'Acontecendo agora',
+    description: 'Vote no craque, dê o seu palpite e participe dos eventos da sua região no app Arena Football.',
+    image: '',
+    kicker: ['Ao vivo', region].filter(Boolean).join(' · '),
+  };
+}
+
+export const POOL_PAGE: PageData = {
+  title: 'Bolão do Arena Football',
+  description: 'Palpite nos jogos da sua região, ganhe pontos e dispute o ranking. É grátis!',
+  image: '',
+  kicker: 'Bolão',
+};
+
+export const ALBUM_PAGE: PageData = {
+  title: 'Álbum de figurinhas do Arena Football',
+  description: 'Abra pacotinhos, cole as figurinhas dos atletas da sua região e complete o álbum.',
+  image: '',
+  kicker: 'Álbum de figurinhas',
+};
 
 export const APP_PAGE: PageData = {
   title: 'Arena Football',

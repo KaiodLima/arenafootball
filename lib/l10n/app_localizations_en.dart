@@ -112,6 +112,145 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fanRankingTitle => 'Fan ranking';
 
   @override
+  String get qrCodesTitle => 'QR codes';
+
+  @override
+  String get qrKindNow => 'Happening now';
+
+  @override
+  String qrNowTitle(String region) {
+    return 'Fixed QR for $region';
+  }
+
+  @override
+  String get qrNowSubtitle =>
+      'Always opens what is happening now: votes, live games, events and predictions';
+
+  @override
+  String qrNowPosterTitle(String region) {
+    return 'Happening now in $region';
+  }
+
+  @override
+  String get nowTitle => 'Happening now';
+
+  @override
+  String nowIn(String region) {
+    return 'in $region';
+  }
+
+  @override
+  String get nowRegionGone => 'This region no longer exists in the app.';
+
+  @override
+  String nowQuiet(String region) {
+    return 'Nothing happening in $region right now. How about predicting the next game?';
+  }
+
+  @override
+  String get nowSectionVotes => 'Open best-player votes';
+
+  @override
+  String get nowSectionLive => 'Live';
+
+  @override
+  String get nowSectionEvents => 'Voting events';
+
+  @override
+  String get nowSectionUpcoming => 'Upcoming games';
+
+  @override
+  String get nowSectionMore => 'Also join';
+
+  @override
+  String get nowVote => 'VOTE NOW';
+
+  @override
+  String get nowWatch => 'SEE THE MATCH';
+
+  @override
+  String get nowEventVote => 'VOTE IN THE EVENT';
+
+  @override
+  String get nowPredict => 'MAKE A PREDICTION';
+
+  @override
+  String get nowPool => 'OPEN THE POOL';
+
+  @override
+  String get nowLiveBadge => 'LIVE';
+
+  @override
+  String get qrCodesIntro =>
+      'Create a QR code for what is happening now: print it, show it on screen or post it.';
+
+  @override
+  String get qrSectionAlways => 'Always on';
+
+  @override
+  String get qrSectionEvents => 'Open voting events';
+
+  @override
+  String get qrSectionVotes => 'Open best-player votes';
+
+  @override
+  String get qrSectionMatches => 'Upcoming games (predictions)';
+
+  @override
+  String get qrSectionEmpty => 'Nothing open right now.';
+
+  @override
+  String get qrKindVote => 'Vote for the best player';
+
+  @override
+  String get qrKindMatch => 'Make your prediction';
+
+  @override
+  String get qrKindPool => 'Prediction pool';
+
+  @override
+  String get qrKindAlbum => 'Sticker album';
+
+  @override
+  String get qrKindEvent => 'Voting event';
+
+  @override
+  String get qrPoolTitle => 'Arena Football pool';
+
+  @override
+  String get qrPoolSubtitle =>
+      'Predict the games and climb your region\'s ranking';
+
+  @override
+  String get qrAlbumSubtitle => 'Open packs and complete the album';
+
+  @override
+  String get qrScanCta => 'Point your camera and join in!';
+
+  @override
+  String get qrPosterTitle => 'QR code poster';
+
+  @override
+  String get qrCopyLink => 'Copy link';
+
+  @override
+  String get qrLinkCopied => 'Link copied!';
+
+  @override
+  String qrShareText(String title, String link) {
+    return '$title — scan or tap the link and join in! ⚽\n$link';
+  }
+
+  @override
+  String get qrMatchVote => 'Voting QR code';
+
+  @override
+  String get qrMatchMatch => 'Match QR code';
+
+  @override
+  String get qrMenu => 'QR code';
+
+  @override
   String get fanRankingScopeRegion => 'Region';
 
   @override
@@ -7168,6 +7307,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get newsNotFound => 'This news item is no longer available.';
+
+  @override
+  String get deepLinkAlbumClosed => 'The sticker album is not open right now.';
+
+  @override
+  String get deepLinkMatchNotFound => 'This match is no longer available.';
 
   @override
   String get deepLinkHighlightNotFound =>

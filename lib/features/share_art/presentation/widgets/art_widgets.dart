@@ -151,11 +151,15 @@ class _QrPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = AppColors.black;
+    // Sem anti-aliasing e com um fio de sobra: os módulos ficam sólidos, sem
+    // as frestas claras entre eles (melhor leitura, inclusive impresso).
+    final paint = Paint()
+      ..color = AppColors.black
+      ..isAntiAlias = false;
     try {
       for (final element in Barcode.qrCode().make(data, width: size.width, height: size.height, drawText: false)) {
         if (element is BarcodeBar && element.black) {
-          canvas.drawRect(Rect.fromLTWH(element.left, element.top, element.width, element.height), paint);
+          canvas.drawRect(Rect.fromLTWH(element.left, element.top, element.width, element.height).inflate(0.35), paint);
         }
       }
     } catch (_) {

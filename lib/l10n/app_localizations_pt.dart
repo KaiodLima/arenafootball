@@ -112,6 +112,145 @@ class AppLocalizationsPt extends AppLocalizations {
   String get fanRankingTitle => 'Ranking de torcidas';
 
   @override
+  String get qrCodesTitle => 'QR codes';
+
+  @override
+  String get qrKindNow => 'Acontecendo agora';
+
+  @override
+  String qrNowTitle(String region) {
+    return 'QR fixo de $region';
+  }
+
+  @override
+  String get qrNowSubtitle =>
+      'Sempre leva ao que está acontecendo agora: votação, jogo ao vivo, eventos e palpites';
+
+  @override
+  String qrNowPosterTitle(String region) {
+    return 'Acontecendo agora em $region';
+  }
+
+  @override
+  String get nowTitle => 'Acontecendo agora';
+
+  @override
+  String nowIn(String region) {
+    return 'em $region';
+  }
+
+  @override
+  String get nowRegionGone => 'Esta região não existe mais no app.';
+
+  @override
+  String nowQuiet(String region) {
+    return 'Nada acontecendo agora em $region. Que tal palpitar no próximo jogo?';
+  }
+
+  @override
+  String get nowSectionVotes => 'Votações do craque abertas';
+
+  @override
+  String get nowSectionLive => 'Ao vivo';
+
+  @override
+  String get nowSectionEvents => 'Eventos de votação';
+
+  @override
+  String get nowSectionUpcoming => 'Próximos jogos';
+
+  @override
+  String get nowSectionMore => 'Participe também';
+
+  @override
+  String get nowVote => 'VOTAR NO CRAQUE';
+
+  @override
+  String get nowWatch => 'VER A PARTIDA';
+
+  @override
+  String get nowEventVote => 'VOTAR NO EVENTO';
+
+  @override
+  String get nowPredict => 'DAR PALPITE';
+
+  @override
+  String get nowPool => 'ABRIR O BOLÃO';
+
+  @override
+  String get nowLiveBadge => 'AO VIVO';
+
+  @override
+  String get qrCodesIntro =>
+      'Gere o QR code do que está acontecendo agora: imprima, mostre no telão ou poste nas redes.';
+
+  @override
+  String get qrSectionAlways => 'Sempre ativos';
+
+  @override
+  String get qrSectionEvents => 'Eventos de votação abertos';
+
+  @override
+  String get qrSectionVotes => 'Votações do craque abertas';
+
+  @override
+  String get qrSectionMatches => 'Próximas partidas (palpite)';
+
+  @override
+  String get qrSectionEmpty => 'Nada aberto agora.';
+
+  @override
+  String get qrKindVote => 'Vote no craque';
+
+  @override
+  String get qrKindMatch => 'Dê o seu palpite';
+
+  @override
+  String get qrKindPool => 'Bolão';
+
+  @override
+  String get qrKindAlbum => 'Álbum de figurinhas';
+
+  @override
+  String get qrKindEvent => 'Evento de votação';
+
+  @override
+  String get qrPoolTitle => 'Bolão do Arena Football';
+
+  @override
+  String get qrPoolSubtitle =>
+      'Palpite nos jogos e dispute o ranking da sua região';
+
+  @override
+  String get qrAlbumSubtitle => 'Abra pacotinhos e complete o álbum';
+
+  @override
+  String get qrScanCta => 'Aponte a câmera e participe!';
+
+  @override
+  String get qrPosterTitle => 'Cartaz do QR code';
+
+  @override
+  String get qrCopyLink => 'Copiar link';
+
+  @override
+  String get qrLinkCopied => 'Link copiado!';
+
+  @override
+  String qrShareText(String title, String link) {
+    return '$title — aponte a câmera ou toque no link e participe! ⚽\n$link';
+  }
+
+  @override
+  String get qrMatchVote => 'QR code da votação';
+
+  @override
+  String get qrMatchMatch => 'QR code da partida';
+
+  @override
+  String get qrMenu => 'QR code';
+
+  @override
   String get fanRankingScopeRegion => 'Região';
 
   @override
@@ -7208,6 +7347,13 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get newsNotFound => 'Esta notícia não está mais disponível.';
+
+  @override
+  String get deepLinkAlbumClosed =>
+      'O álbum de figurinhas não está aberto agora.';
+
+  @override
+  String get deepLinkMatchNotFound => 'Esta partida não está mais disponível.';
 
   @override
   String get deepLinkHighlightNotFound =>

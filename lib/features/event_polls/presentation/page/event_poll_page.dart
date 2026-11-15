@@ -21,6 +21,8 @@ import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/features/qr_codes/domain/qr_target.dart';
+import 'package:arena_soccer/features/qr_codes/presentation/page/qr_poster_page.dart';
 
 /// Página do evento de votação: cabeçalho com capa, título e prazo; as
 /// opções com foto e o botão do vídeo; votar (escolhe e confirma, voto
@@ -162,6 +164,12 @@ class _EventPollPageState extends State<EventPollPage> {
                   onPressed: () => _openResultArt(state),
                 ),
               if (isAdmin && news != null) ...[
+                IconButton(
+                  key: const ValueKey('event-qr'),
+                  tooltip: l10n.qrMenu,
+                  icon: const Icon(Icons.qr_code_2_rounded),
+                  onPressed: () => openQrPoster(context, QrTarget.event(news)),
+                ),
                 IconButton(
                   tooltip: l10n.eventPollFormTitleEdit,
                   icon: const Icon(Icons.edit_outlined),

@@ -140,6 +140,11 @@ import {
   newsPageData,
   parseSharePath,
   renderSharePage,
+  ALBUM_PAGE,
+  POOL_PAGE,
+  matchPageData,
+  votePageData,
+  nowPageData,
 } from './share_page';
 
 setGlobalOptions({ region: 'us-central1', maxInstances: 5 });
@@ -872,7 +877,21 @@ export const sharePage = onRequest({ maxInstances: 3 }, async (req, res) => {
   }
   try {
     let data: PageData | null = APP_PAGE;
-    if (share.kind === 'convite') {
+    if (share.kind === 'bolao') {
+      data = POOL_PAGE;
+    } else if (share.kind === 'album') {
+      data = ALBUM_PAGE;
+    } else if (share.kind === 'agora') {
+      // QR fixo da região: o nome atual pelo id (região apagada = 404).
+      const { db } = await admin();
+      const region = (await db.collection('competicao').doc(share.regionId).get()).data();
+      data = region ? nowPageData(text(region.nome)) : null;
+    } else if (share.kind === 'votacao' || share.kind === 'partida') {
+      // A partida da temporada do link (coleção conferida pelo padrão da temporada).
+      const { db } = await admin();
+      const match = (await db.collection(seasonCollection('partidas', share.season)).doc(share.id).get()).data();
+      data = !match ? null : share.kind === 'votacao' ? votePageData(match) : matchPageData(match);
+    } else if (share.kind === 'convite') {
       // Convite: o primeiro nome de quem convidou (código inexistente = sem nome).
       const { db } = await admin();
       const owner = text((await db.collection('codigos_indicacao').doc(share.code).get()).data()?.uid);

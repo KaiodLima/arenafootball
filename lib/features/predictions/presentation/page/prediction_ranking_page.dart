@@ -21,6 +21,8 @@ import 'package:arena_soccer/utils/components/safe_bottom.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/features/qr_codes/domain/qr_target.dart';
+import 'package:arena_soccer/features/qr_codes/presentation/page/qr_poster_page.dart';
 
 /// Compartilhar texto (trocável no teste).
 Future<void> Function(String text) predictionHubShare = ShareService.shareText;
@@ -137,6 +139,16 @@ class _PredictionHubPageState extends State<PredictionHubPage> with SingleTicker
               style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s20),
             ),
             actions: [
+              if (context.watch<SessionCubit>().state.isAdmin)
+                IconButton(
+                  key: const ValueKey('hub-qr'),
+                  tooltip: l10n.qrMenu,
+                  icon: const Icon(Icons.qr_code_2_rounded),
+                  onPressed: () => openQrPoster(
+                    context,
+                    QrTarget.pool(title: l10n.qrPoolTitle, subtitle: l10n.qrPoolSubtitle),
+                  ),
+                ),
               Padding(
                 padding: const EdgeInsets.only(right: AppSizes.s12),
                 child: _RegionPill(region: state.region, onTap: () => _pickRegion(state.region)),

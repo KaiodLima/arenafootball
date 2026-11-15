@@ -148,6 +148,10 @@ import 'package:arena_soccer/features/event_polls/presentation/page/event_poll_p
 import 'package:arena_soccer/features/share_art/domain/event_result_art_data.dart';
 import 'package:arena_soccer/features/share_art/presentation/bloc/event_result_art_cubit.dart';
 import 'package:arena_soccer/features/share_art/presentation/page/event_result_art_page.dart';
+import 'package:arena_soccer/features/qr_codes/presentation/bloc/qr_codes_cubit.dart';
+import 'package:arena_soccer/features/qr_codes/presentation/page/qr_codes_page.dart';
+import 'package:arena_soccer/features/qr_codes/presentation/bloc/now_cubit.dart';
+import 'package:arena_soccer/features/qr_codes/presentation/page/now_page.dart';
 
 class ArenaApp extends StatelessWidget {
   const ArenaApp({super.key});
@@ -190,6 +194,19 @@ class ArenaApp extends StatelessWidget {
           return BlocProvider<EventPollCubit>(
             create: (_) => EventPollCubit(sl()),
             child: EventPollPage(eventId: news?.id ?? args?['id'] as String? ?? '', initial: news),
+          );
+        },
+        // Central de QR codes do admin (o que está ativo na região).
+        AppRoutes.qrCodesPage: (_) => BlocProvider<QrCodesCubit>(
+              create: (_) => QrCodesCubit(sl(), sl(), sl()),
+              child: const QrCodesPage(),
+            ),
+        // "Acontecendo agora" da região do QR fixo (`/agora/<idRegiao>`).
+        AppRoutes.nowPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          return BlocProvider<NowCubit>(
+            create: (_) => NowCubit(sl(), sl(), sl()),
+            child: NowPage(regionId: args?['regionId'] as String? ?? ''),
           );
         },
         AppRoutes.eventResultArtPage: (context) {

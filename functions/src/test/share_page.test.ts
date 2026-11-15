@@ -7,6 +7,10 @@ import {
   parseSharePath,
   renderSharePage,
   schemeHref,
+  votePageData,
+  matchPageData,
+  appPath,
+  nowPageData,
 } from '../share_page';
 
 test('caminhos válidos e inválidos', () => {
@@ -58,4 +62,31 @@ test('as duas lojas na página e o esquema do app para o iPhone', () => {
   assert.ok(html.includes('"arenafootball://noticia/n1"'));
   // Capa inteira, sem corte.
   assert.ok(html.includes('object-fit:contain'));
+});
+
+test('QR codes: votação, partida, bolão e álbum', () => {
+  assert.deepEqual(parseSharePath('/votacao/2026/m1'), { kind: 'votacao', season: '2026', id: 'm1' });
+  assert.deepEqual(parseSharePath('/partida/2026/m1'), { kind: 'partida', season: '2026', id: 'm1' });
+  assert.deepEqual(parseSharePath('/bolao'), { kind: 'bolao' });
+  assert.deepEqual(parseSharePath('/album'), { kind: 'album' });
+  assert.equal(parseSharePath('/votacao/26/m1'), null);
+  assert.equal(parseSharePath('/votacao/2026'), null);
+  assert.equal(parseSharePath('/bolao/x'), null);
+  assert.equal(appPath({ kind: 'votacao', season: '2026', id: 'm1' }), 'votacao/2026/m1');
+  assert.equal(appPath({ kind: 'bolao' }), 'bolao');
+  const match = { timeC: 'Lava Jato', timeF: 'Volta', votacao: 'true', data: '15/11', horario: '15:30' };
+  assert.equal(votePageData(match).title, 'Vote no craque: Lava Jato x Volta');
+  assert.equal(votePageData(match).kicker, 'Votação aberta');
+  assert.equal(votePageData({ ...match, votacao: 'false' }).kicker, 'Votação encerrada');
+  assert.equal(matchPageData(match).title, 'Lava Jato x Volta');
+  assert.match(matchPageData(match).description, /^15\/11 · 15:30\./);
+});
+
+test('QR fixo da região: /agora/<idRegiao>', () => {
+  assert.deepEqual(parseSharePath('/agora/fl'), { kind: 'agora', regionId: 'fl' });
+  assert.equal(parseSharePath('/agora'), null);
+  assert.equal(parseSharePath('/agora/fl/x'), null);
+  assert.equal(appPath({ kind: 'agora', regionId: 'fl' }), 'agora/fl');
+  assert.equal(nowPageData('Floresta').title, 'Acontecendo agora em Floresta');
+  assert.equal(nowPageData('').title, 'Acontecendo agora');
 });
