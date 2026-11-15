@@ -40,4 +40,12 @@ class PredictionsRepositoryImpl implements IPredictionsRepository {
   @override
   Future<Either<Failure, int>> aheadOf({required String regionId, required int points, String? season}) =>
       _dataSource.aheadOf(regionId: regionId, points: points, season: season);
+
+  @override
+  Future<Either<Failure, Map<String, PredictionDTO>>> getMine({
+    required List<String> matchIds,
+    required String uid,
+    String? season,
+  }) =>
+      _dataSource.getMine(matchIds: matchIds, uid: uid, season: season);
 }

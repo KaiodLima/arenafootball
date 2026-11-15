@@ -16,6 +16,14 @@ import 'package:arena_soccer/features/predictions/presentation/bloc/prediction_c
 import 'package:arena_soccer/l10n/app_localizations.dart';
 
 class _FakeRepository implements IPredictionsRepository {
+  @override
+  Future<Either<Failure, Map<String, PredictionDTO>>> getMine({
+    required List<String> matchIds,
+    required String uid,
+    String? season,
+  }) async =>
+      const Right({});
+
   final mineController = StreamController<Either<Failure, PredictionDTO?>>();
   List<PredictionRankingEntry> top = const [];
   PredictionRankingEntry? mineEntry;

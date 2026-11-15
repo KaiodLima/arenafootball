@@ -6036,6 +6036,198 @@ abstract class AppLocalizations {
   /// **'Bolão'**
   String get predictionRankingTitle;
 
+  /// No description provided for @predictionHubHeroTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'SEU BOLÃO'**
+  String get predictionHubHeroTitle;
+
+  /// No description provided for @predictionHubStatPoints.
+  ///
+  /// In pt, this message translates to:
+  /// **'pts'**
+  String get predictionHubStatPoints;
+
+  /// No description provided for @predictionHubStatExact.
+  ///
+  /// In pt, this message translates to:
+  /// **'exatos'**
+  String get predictionHubStatExact;
+
+  /// No description provided for @predictionHubStatPicks.
+  ///
+  /// In pt, this message translates to:
+  /// **'palpites'**
+  String get predictionHubStatPicks;
+
+  /// No description provided for @predictionHubPlace.
+  ///
+  /// In pt, this message translates to:
+  /// **'lugar em {region}'**
+  String predictionHubPlace(String region);
+
+  /// No description provided for @predictionHubChase.
+  ///
+  /// In pt, this message translates to:
+  /// **'Faltam {points} pts para passar {name}'**
+  String predictionHubChase(int points, String name);
+
+  /// No description provided for @predictionHubLeader.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você lidera o bolão!'**
+  String get predictionHubLeader;
+
+  /// No description provided for @predictionHubNoPoints.
+  ///
+  /// In pt, this message translates to:
+  /// **'Palpite nos jogos e dispute com a sua região!'**
+  String get predictionHubNoPoints;
+
+  /// No description provided for @predictionHubGuest.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entre para palpitar e disputar o ranking da sua região.'**
+  String get predictionHubGuest;
+
+  /// No description provided for @predictionHubSignIn.
+  ///
+  /// In pt, this message translates to:
+  /// **'ENTRAR'**
+  String get predictionHubSignIn;
+
+  /// No description provided for @predictionHubHowTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Como pontua'**
+  String get predictionHubHowTitle;
+
+  /// No description provided for @predictionHubExact.
+  ///
+  /// In pt, this message translates to:
+  /// **'Placar exato'**
+  String get predictionHubExact;
+
+  /// No description provided for @predictionHubWinnerDiff.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vencedor + saldo'**
+  String get predictionHubWinnerDiff;
+
+  /// No description provided for @predictionHubWinner.
+  ///
+  /// In pt, this message translates to:
+  /// **'Só o vencedor'**
+  String get predictionHubWinner;
+
+  /// No description provided for @predictionHubTabPlay.
+  ///
+  /// In pt, this message translates to:
+  /// **'Palpitar'**
+  String get predictionHubTabPlay;
+
+  /// No description provided for @predictionHubTabRanking.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ranking'**
+  String get predictionHubTabRanking;
+
+  /// No description provided for @predictionHubUpcoming.
+  ///
+  /// In pt, this message translates to:
+  /// **'Próximos jogos'**
+  String get predictionHubUpcoming;
+
+  /// No description provided for @predictionHubNoUpcoming.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum jogo aberto para palpite na região agora.'**
+  String get predictionHubNoUpcoming;
+
+  /// No description provided for @predictionHubClosesIn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fecha em {time}'**
+  String predictionHubClosesIn(String time);
+
+  /// No description provided for @predictionHubPredict.
+  ///
+  /// In pt, this message translates to:
+  /// **'PALPITAR'**
+  String get predictionHubPredict;
+
+  /// No description provided for @predictionHubYourPick.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu palpite'**
+  String get predictionHubYourPick;
+
+  /// No description provided for @predictionHubChange.
+  ///
+  /// In pt, this message translates to:
+  /// **'Alterar'**
+  String get predictionHubChange;
+
+  /// No description provided for @predictionHubRecent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seus últimos palpites'**
+  String get predictionHubRecent;
+
+  /// No description provided for @predictionHubRecentEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os seus palpites dos jogos encerrados aparecem aqui.'**
+  String get predictionHubRecentEmpty;
+
+  /// No description provided for @predictionHubPending.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aguardando apuração'**
+  String get predictionHubPending;
+
+  /// No description provided for @predictionHubExactChip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Exato'**
+  String get predictionHubExactChip;
+
+  /// No description provided for @predictionHubYouSaid.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você: {home} × {away}'**
+  String predictionHubYouSaid(int home, int away);
+
+  /// No description provided for @predictionHubHitRate.
+  ///
+  /// In pt, this message translates to:
+  /// **'{percent}% de aproveitamento'**
+  String predictionHubHitRate(int percent);
+
+  /// No description provided for @predictionHubChallenge.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desafiar amigos'**
+  String get predictionHubChallenge;
+
+  /// No description provided for @predictionHubChallengeText.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tô em {position}º no bolão do Arena Football em {region}! Vem palpitar e tenta me passar ⚽\n{link}'**
+  String predictionHubChallengeText(int position, String region, String link);
+
+  /// No description provided for @predictionHubChallengeTextNoRank.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vem palpitar comigo no bolão do Arena Football em {region}! ⚽\n{link}'**
+  String predictionHubChallengeTextNoRank(String region, String link);
+
+  /// No description provided for @predictionHubPredictors.
+  ///
+  /// In pt, this message translates to:
+  /// **'Palpiteiros'**
+  String get predictionHubPredictors;
+
   /// No description provided for @predictionRankingEmpty.
   ///
   /// In pt, this message translates to:

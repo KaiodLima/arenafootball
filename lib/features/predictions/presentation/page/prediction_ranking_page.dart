@@ -1,34 +1,65 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:arena_soccer/features/regions/presentation/widgets/region_select_tile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
+import 'package:arena_soccer/core/services/share_service.dart';
+import 'package:arena_soccer/core/utils/share_links.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/predictions/data/dtos/prediction_dto.dart';
-import 'package:arena_soccer/features/predictions/presentation/bloc/prediction_ranking_cubit.dart';
+import 'package:arena_soccer/features/predictions/domain/prediction_hub.dart';
+import 'package:arena_soccer/features/predictions/presentation/bloc/prediction_hub_cubit.dart';
+import 'package:arena_soccer/features/predictions/presentation/widgets/hub_widgets.dart';
+import 'package:arena_soccer/features/predictions/presentation/widgets/prediction_sheet.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
+import 'package:arena_soccer/features/regions/presentation/widgets/region_picker_sheet.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
+import 'package:arena_soccer/utils/components/safe_bottom.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// Bolão: ranking de palpiteiros da região na temporada atual. Pódio dos 3
-/// primeiros, a lista até o 50º e "Sua posição" fixa embaixo.
-class PredictionRankingPage extends StatefulWidget {
-  const PredictionRankingPage({super.key});
+/// Compartilhar texto (trocável no teste).
+Future<void> Function(String text) predictionHubShare = ShareService.shareText;
+
+/// Central do bolão da região: cabeçalho "Seu bolão" (posição, quem a conta
+/// persegue, como pontua) e as abas Palpitar (próximos jogos abertos com o
+/// palpite e os últimos palpites já jogados) e Ranking (pódio, lista até o
+/// 50º, "Desafiar amigos" e "Sua posição" fixa embaixo).
+class PredictionHubPage extends StatefulWidget {
+  const PredictionHubPage({super.key});
 
   @override
-  State<PredictionRankingPage> createState() => _PredictionRankingPageState();
+  State<PredictionHubPage> createState() => _PredictionHubPageState();
 }
 
-class _PredictionRankingPageState extends State<PredictionRankingPage> {
-  late final PredictionRankingCubit _cubit;
+class _PredictionHubPageState extends State<PredictionHubPage> with SingleTickerProviderStateMixin {
+  late final PredictionHubCubit _cubit;
+  late final TabController _tabs = TabController(length: 2, vsync: this)
+    ..addListener(() {
+      if (!_tabs.indexIsChanging && mounted) setState(() {});
+    });
+  Timer? _clock;
 
   @override
   void initState() {
     super.initState();
-    _cubit = BlocProvider.of<PredictionRankingCubit>(context);
+    _cubit = BlocProvider.of<PredictionHubCubit>(context);
     _load(BlocProvider.of<RegionCubit>(context).state.selectedRegion);
+    // A contagem "Fecha em" anda com a tela aberta.
+    _clock = Timer.periodic(const Duration(minutes: 1), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _clock?.cancel();
+    _tabs.dispose();
+    super.dispose();
   }
 
   Future<void> _load(String region) => _cubit.load(
@@ -37,17 +68,62 @@ class _PredictionRankingPageState extends State<PredictionRankingPage> {
         season: SeasonCollection.currentSeason,
       );
 
+  Future<void> _pickRegion(String current) async {
+    final regions = BlocProvider.of<RegionCubit>(context).state;
+    final picked = await showRegionPicker(
+      context,
+      regions: regions.regions,
+      selected: current,
+      recent: regions.recentRegions,
+    );
+    if (picked != null && picked != current) await _load(picked);
+  }
+
+  Future<void> _predict(MatchDTO match, PredictionHubState state) async {
+    final home = state.teams.resolve(id: match.homeTeamId, name: match.homeTeam);
+    final away = state.teams.resolve(id: match.awayTeamId, name: match.awayTeam);
+    await showPredictionSheet(
+      context,
+      match: match,
+      season: SeasonCollection.currentSeason,
+      homeCrest: home?.imageUrl,
+      awayCrest: away?.imageUrl,
+    );
+    if (mounted) await _cubit.refreshPrediction(match.id);
+  }
+
+  void _openMatch(MatchDTO match, PredictionHubState state) {
+    final home = state.teams.resolve(id: match.homeTeamId, name: match.homeTeam);
+    final away = state.teams.resolve(id: match.awayTeamId, name: match.awayTeam);
+    Navigator.pushNamed(context, AppRoutes.matchDetailsPage, arguments: {
+      'match': match,
+      'season': SeasonCollection.currentSeason,
+      'homeCrest': home?.imageUrl,
+      'awayCrest': away?.imageUrl,
+    });
+  }
+
+  void _challenge(PredictionHubState state, int? position) {
+    final l10n = AppLocalizations.of(context);
+    predictionHubShare(
+      state.mine != null && position != null
+          ? l10n.predictionHubChallengeText(position, state.region, appLink)
+          : l10n.predictionHubChallengeTextNoRank(state.region, appLink),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final regions = context.watch<RegionCubit>().state.regions;
-    final uid = context.watch<SessionCubit>().state.user?.id ?? '';
+    final user = context.watch<SessionCubit>().state.user;
+    final uid = user?.id ?? '';
+    final now = _cubit.now();
 
-    return BlocBuilder<PredictionRankingCubit, PredictionRankingState>(
+    return BlocBuilder<PredictionHubCubit, PredictionHubState>(
       builder: (context, state) {
-        final entries = state.entries;
-        final myIndex = uid.isEmpty ? -1 : entries.indexWhere((e) => e.uid == uid);
+        final myIndex = uid.isEmpty ? -1 : state.entries.indexWhere((e) => e.uid == uid);
         final myPosition = myIndex >= 0 ? state.positionAt(myIndex) : state.myPosition;
+        final onRanking = _tabs.index == 1;
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -60,46 +136,48 @@ class _PredictionRankingPageState extends State<PredictionRankingPage> {
               l10n.predictionRankingTitle,
               style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s20),
             ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: AppSizes.s12),
+                child: _RegionPill(region: state.region, onTap: () => _pickRegion(state.region)),
+              ),
+            ],
           ),
-          bottomNavigationBar:
-              uid.isEmpty || state.loading ? null : _MyPositionBar(entry: state.mine, position: myPosition),
-          body: RefreshIndicator(
-            color: AppColors.primary,
-            onRefresh: () => _load(state.region),
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s12, AppSizes.s16, AppSizes.s32),
-              children: [
-                // Região: campo que abre a lista com busca (cresce sem virar carrossel).
-                RegionSelectTile(
-                  label: l10n.registerRegionLabel,
+          bottomNavigationBar: onRanking && uid.isNotEmpty && !state.loading
+              ? _MyPositionBar(entry: state.mine, position: myPosition)
+              : null,
+          body: NestedScrollView(
+            headerSliverBuilder: (context, _) => [
+              SliverToBoxAdapter(
+                child: HubHero(
                   region: state.region,
-                  regions: regions,
-                  recent: BlocProvider.of<RegionCubit>(context).state.recentRegions,
-                  onChanged: (region) => _load(region),
+                  loggedIn: uid.isNotEmpty,
+                  mine: state.mine,
+                  position: myPosition,
+                  chase: PredictionHub.chase(state.entries, state.mine),
+                  leader: PredictionHub.leads(state.entries, state.mine),
+                  onSignIn: () => Navigator.pushNamedAndRemoveUntil(context, AppRoutes.loginPage, (_) => false),
                 ),
-                const SizedBox(height: AppSizes.s8),
-                Text(
-                  l10n.predictionRules,
-                  textAlign: TextAlign.center,
-                  style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+              ),
+              SliverPersistentHeader(pinned: true, delegate: _TabsHeader(_tabs, l10n)),
+            ],
+            body: TabBarView(
+              controller: _tabs,
+              children: [
+                _PlayTab(
+                  state: state,
+                  loggedIn: uid.isNotEmpty,
+                  now: now,
+                  onRefresh: () => _load(state.region),
+                  onPredict: (match) => _predict(match, state),
+                  onOpenMatch: (match) => _openMatch(match, state),
                 ),
-                const SizedBox(height: AppSizes.s16),
-                if (state.loading)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: AppSizes.s48),
-                    child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
-                  )
-                else if (state.errorMessage != null)
-                  ArenaEmptyState(message: l10n.predictionRankingError, icon: Icons.cloud_off_rounded)
-                else if (entries.isEmpty)
-                  ArenaEmptyState(message: l10n.predictionRankingEmpty, icon: Icons.scoreboard_outlined)
-                else ...[
-                  _Podium(entries: entries.take(3).toList(), positionAt: state.positionAt, uid: uid),
-                  const SizedBox(height: AppSizes.s16),
-                  for (var i = 3; i < entries.length; i++)
-                    _RankingRow(entry: entries[i], position: state.positionAt(i), mine: entries[i].uid == uid),
-                ],
+                _RankingTab(
+                  state: state,
+                  uid: uid,
+                  onRefresh: () => _load(state.region),
+                  onChallenge: () => _challenge(state, myPosition),
+                ),
               ],
             ),
           ),
@@ -109,155 +187,214 @@ class _PredictionRankingPageState extends State<PredictionRankingPage> {
   }
 }
 
-/// Inicial do nome num círculo (o ranking não tem foto).
-class _Initial extends StatelessWidget {
-  final String name;
-  final double size;
-  final Color border;
+/// Região atual num botão-pílula (abre a busca de regiões).
+class _RegionPill extends StatelessWidget {
+  final String region;
+  final VoidCallback onTap;
 
-  const _Initial({required this.name, required this.size, this.border = AppColors.greyLight});
-
-  @override
-  Widget build(BuildContext context) {
-    final initial = name.trim().isEmpty ? '?' : name.trim()[0].toUpperCase();
-    return Container(
-      width: size,
-      height: size,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: AppColors.primarySoft,
-        shape: BoxShape.circle,
-        border: Border.all(color: border, width: AppSizes.s2),
-      ),
-      child: Text(initial, style: AppTypography.title(color: AppColors.primaryDark).copyWith(fontSize: size * 0.4)),
-    );
-  }
-}
-
-/// Pódio: 2º, 1º e 3º lado a lado, o 1º mais alto.
-class _Podium extends StatelessWidget {
-  final List<PredictionRankingEntry> entries;
-  final int Function(int index) positionAt;
-  final String uid;
-
-  const _Podium({required this.entries, required this.positionAt, required this.uid});
+  const _RegionPill({required this.region, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final order = [if (entries.length > 1) 1, 0, if (entries.length > 2) 2];
-    return Container(
-      padding: const EdgeInsets.fromLTRB(AppSizes.s8, AppSizes.s16, AppSizes.s8, 0),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        border: Border.all(color: AppColors.greyLight),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          for (final index in order)
-            Expanded(
-              child: Builder(builder: (context) {
-                final entry = entries[index];
-                final position = positionAt(index);
-                final first = index == 0;
-                final medal = switch (position) { 1 => AppColors.gold, 2 => AppColors.silver, _ => AppColors.bronze };
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSizes.s4),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (first) const Icon(Icons.emoji_events_rounded, color: AppColors.gold, size: AppSizes.s28),
-                      _Initial(name: entry.name, size: first ? AppSizes.s64 : AppSizes.s52, border: medal),
-                      const SizedBox(height: AppSizes.s6),
-                      Text(
-                        entry.name,
-                        maxLines: 2,
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTypography.label(
-                          color: entry.uid == uid ? AppColors.primaryDark : AppColors.textPrimary,
-                        ).copyWith(fontSize: AppSizes.s12, height: 1.15),
-                      ),
-                      Text(
-                        l10n.predictionRankingPoints(entry.points),
-                        style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
-                      ),
-                      const SizedBox(height: AppSizes.s8),
-                      Container(
-                        height: switch (index) { 0 => AppSizes.s80, 1 => AppSizes.s60, _ => AppSizes.s44 },
-                        width: double.infinity,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: medal.withValues(alpha: 0.85),
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSizes.s10)),
-                        ),
-                        child: Text('$positionº', style: AppTypography.title(color: AppColors.white)),
-                      ),
-                    ],
-                  ),
-                );
-              }),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Linha do 4º em diante: posição, inicial, nome, exatos/palpites e pontos.
-class _RankingRow extends StatelessWidget {
-  final PredictionRankingEntry entry;
-  final int position;
-  final bool mine;
-
-  const _RankingRow({required this.entry, required this.position, required this.mine});
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSizes.s8),
-      padding: const EdgeInsets.symmetric(horizontal: AppSizes.s12, vertical: AppSizes.s10),
-      decoration: BoxDecoration(
-        color: mine ? AppColors.primarySoft : AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSizes.fieldRadius),
-        border: Border.all(color: mine ? AppColors.primary : AppColors.greyLight),
-      ),
-      child: Row(
-        children: [
-          SizedBox(
-            width: AppSizes.s32,
-            child: Text('$positionº', style: AppTypography.label(color: AppColors.textSecondary)),
-          ),
-          _Initial(name: entry.name, size: AppSizes.s36),
-          const SizedBox(width: AppSizes.s10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Material(
+      color: AppColors.white.withValues(alpha: 0.14),
+      shape: const StadiumBorder(),
+      child: InkWell(
+        key: const ValueKey('hub-region'),
+        customBorder: const StadiumBorder(),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSizes.s12, vertical: AppSizes.s6),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: AppSizes.s120),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  entry.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.label(color: AppColors.textPrimary),
+                const Icon(Icons.place_rounded, size: AppSizes.s16, color: AppColors.white),
+                const SizedBox(width: AppSizes.s4),
+                Flexible(
+                  child: Text(
+                    region,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s12),
+                  ),
                 ),
-                Text(
-                  l10n.predictionRankingStats(entry.exact, entry.count),
-                  style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
-                ),
+                const Icon(Icons.expand_more_rounded, size: AppSizes.s18, color: AppColors.white),
               ],
             ),
           ),
-          Text(l10n.predictionRankingPoints(entry.points), style: AppTypography.label(color: AppColors.primaryDark)),
+        ),
+      ),
+    );
+  }
+}
+
+class _TabsHeader extends SliverPersistentHeaderDelegate {
+  final TabController controller;
+  final AppLocalizations l10n;
+
+  _TabsHeader(this.controller, this.l10n);
+
+  @override
+  double get minExtent => kTextTabBarHeight;
+
+  @override
+  double get maxExtent => kTextTabBarHeight;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Material(
+      color: AppColors.surface,
+      elevation: overlapsContent ? 2 : 0,
+      child: TabBar(
+        controller: controller,
+        labelColor: AppColors.primaryDark,
+        unselectedLabelColor: AppColors.textSecondary,
+        indicatorColor: AppColors.gold,
+        indicatorWeight: 3,
+        labelStyle: AppTypography.label().copyWith(fontWeight: FontWeight.w800),
+        tabs: [
+          Tab(icon: null, text: l10n.predictionHubTabPlay),
+          Tab(text: l10n.predictionHubTabRanking),
+        ],
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant _TabsHeader oldDelegate) => oldDelegate.controller != controller;
+}
+
+/// Aba Palpitar: o jogo mais próximo em destaque, os demais em linha e os
+/// últimos palpites já jogados.
+class _PlayTab extends StatelessWidget {
+  final PredictionHubState state;
+  final bool loggedIn;
+  final DateTime now;
+  final Future<void> Function() onRefresh;
+  final ValueChanged<MatchDTO> onPredict;
+  final ValueChanged<MatchDTO> onOpenMatch;
+
+  const _PlayTab({
+    required this.state,
+    required this.loggedIn,
+    required this.now,
+    required this.onRefresh,
+    required this.onPredict,
+    required this.onOpenMatch,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final upcoming = state.upcoming;
+    return RefreshIndicator(
+      color: AppColors.primary,
+      onRefresh: onRefresh,
+      child: ListView(
+        padding: EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, safeBottom(context, AppSizes.s32)),
+        children: [
+          HubSectionTitle(l10n.predictionHubUpcoming),
+          if (state.loading && upcoming.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: AppSizes.s32),
+              child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+            )
+          else if (upcoming.isEmpty)
+            ArenaEmptyState(message: l10n.predictionHubNoUpcoming, icon: Icons.event_busy_rounded)
+          else ...[
+            HubFeaturedMatch(
+              match: upcoming.first,
+              teams: state.teams,
+              prediction: state.predictions[upcoming.first.id],
+              now: now,
+              onPredict: () => onPredict(upcoming.first),
+            ),
+            const SizedBox(height: AppSizes.s10),
+            for (final match in upcoming.skip(1))
+              HubMatchTile(
+                match: match,
+                teams: state.teams,
+                prediction: state.predictions[match.id],
+                now: now,
+                onPredict: () => onPredict(match),
+              ),
+          ],
+          if (loggedIn) ...[
+            HubSectionTitle(l10n.predictionHubRecent),
+            if (state.recent.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSizes.s4, vertical: AppSizes.s8),
+                child: Text(l10n.predictionHubRecentEmpty, style: AppTypography.subtitle()),
+              )
+            else
+              for (final match in state.recent)
+                HubRecentPick(
+                  key: ValueKey('hub-recent-${match.id}'),
+                  match: match,
+                  teams: state.teams,
+                  prediction: state.predictions[match.id] ?? PredictionDTO(uid: '', home: 0, away: 0),
+                  onTap: () => onOpenMatch(match),
+                ),
+          ],
         ],
       ),
     );
   }
 }
 
-/// "Sua posição", fixa embaixo (mesmo fora do top 50).
+/// Aba Ranking: "Palpiteiros" com "Desafiar amigos", o pódio e a lista.
+class _RankingTab extends StatelessWidget {
+  final PredictionHubState state;
+  final String uid;
+  final Future<void> Function() onRefresh;
+  final VoidCallback onChallenge;
+
+  const _RankingTab({required this.state, required this.uid, required this.onRefresh, required this.onChallenge});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final entries = state.entries;
+    return RefreshIndicator(
+      color: AppColors.primary,
+      onRefresh: onRefresh,
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s24),
+        children: [
+          HubSectionTitle(
+            l10n.predictionHubPredictors,
+            trailing: TextButton.icon(
+              key: const ValueKey('hub-challenge'),
+              onPressed: onChallenge,
+              style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+              icon: const Icon(Icons.group_add_rounded, size: AppSizes.s18),
+              label: Text(l10n.predictionHubChallenge),
+            ),
+          ),
+          if (state.loading && entries.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: AppSizes.s48),
+              child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+            )
+          else if (state.errorMessage != null && entries.isEmpty)
+            ArenaEmptyState(message: l10n.predictionRankingError, icon: Icons.cloud_off_rounded)
+          else if (entries.isEmpty)
+            ArenaEmptyState(message: l10n.predictionRankingEmpty, icon: Icons.scoreboard_outlined)
+          else ...[
+            HubPodium(entries: entries.take(3).toList(), positionAt: state.positionAt, uid: uid),
+            const SizedBox(height: AppSizes.s16),
+            for (var i = 3; i < entries.length; i++)
+              HubRankingRow(entry: entries[i], position: state.positionAt(i), mine: entries[i].uid == uid),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// "Sua posição", fixa embaixo na aba Ranking (mesmo fora do top 50).
 class _MyPositionBar extends StatelessWidget {
   final PredictionRankingEntry? entry;
   final int? position;
@@ -296,8 +433,7 @@ class _MyPositionBar extends StatelessWidget {
                 ],
               ),
             ),
-            if (entry != null && position != null)
-              Text('$positionº', style: AppTypography.display(color: AppColors.white)),
+            if (entry != null && position != null) Text('$positionº', style: hubDisplay(AppSizes.s32, AppColors.gold)),
           ],
         ),
       ),

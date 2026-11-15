@@ -3714,6 +3714,120 @@ class AppLocalizationsEn extends AppLocalizations {
   String get predictionRankingTitle => 'Prediction pool';
 
   @override
+  String get predictionHubHeroTitle => 'YOUR POOL';
+
+  @override
+  String get predictionHubStatPoints => 'pts';
+
+  @override
+  String get predictionHubStatExact => 'exact';
+
+  @override
+  String get predictionHubStatPicks => 'picks';
+
+  @override
+  String predictionHubPlace(String region) {
+    return 'place in $region';
+  }
+
+  @override
+  String predictionHubChase(int points, String name) {
+    return '$points pts to pass $name';
+  }
+
+  @override
+  String get predictionHubLeader => 'You lead the pool!';
+
+  @override
+  String get predictionHubNoPoints =>
+      'Predict the games and compete with your region!';
+
+  @override
+  String get predictionHubGuest =>
+      'Sign in to predict and climb your region\'s ranking.';
+
+  @override
+  String get predictionHubSignIn => 'SIGN IN';
+
+  @override
+  String get predictionHubHowTitle => 'How scoring works';
+
+  @override
+  String get predictionHubExact => 'Exact score';
+
+  @override
+  String get predictionHubWinnerDiff => 'Winner + margin';
+
+  @override
+  String get predictionHubWinner => 'Winner only';
+
+  @override
+  String get predictionHubTabPlay => 'Predict';
+
+  @override
+  String get predictionHubTabRanking => 'Ranking';
+
+  @override
+  String get predictionHubUpcoming => 'Upcoming games';
+
+  @override
+  String get predictionHubNoUpcoming =>
+      'No games open for predictions in this region right now.';
+
+  @override
+  String predictionHubClosesIn(String time) {
+    return 'Closes in $time';
+  }
+
+  @override
+  String get predictionHubPredict => 'PREDICT';
+
+  @override
+  String get predictionHubYourPick => 'Your pick';
+
+  @override
+  String get predictionHubChange => 'Change';
+
+  @override
+  String get predictionHubRecent => 'Your latest predictions';
+
+  @override
+  String get predictionHubRecentEmpty =>
+      'Your predictions for finished games show up here.';
+
+  @override
+  String get predictionHubPending => 'Waiting for scoring';
+
+  @override
+  String get predictionHubExactChip => 'Exact';
+
+  @override
+  String predictionHubYouSaid(int home, int away) {
+    return 'You: $home × $away';
+  }
+
+  @override
+  String predictionHubHitRate(int percent) {
+    return '$percent% hit rate';
+  }
+
+  @override
+  String get predictionHubChallenge => 'Challenge friends';
+
+  @override
+  String predictionHubChallengeText(int position, String region, String link) {
+    return 'I\'m #$position in the Arena Football pool in $region! Come predict and try to beat me ⚽\n$link';
+  }
+
+  @override
+  String predictionHubChallengeTextNoRank(String region, String link) {
+    return 'Come predict with me in the Arena Football pool in $region! ⚽\n$link';
+  }
+
+  @override
+  String get predictionHubPredictors => 'Predictors';
+
+  @override
   String get predictionRankingEmpty =>
       'Nobody has scored in this region yet. Predict the next matches!';
 

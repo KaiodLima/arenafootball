@@ -16,6 +16,12 @@ abstract class IPredictionsRepository {
 
   Future<Either<Failure, int>> count({required String matchId, String? season});
 
+  Future<Either<Failure, Map<String, PredictionDTO>>> getMine({
+    required List<String> matchIds,
+    required String uid,
+    String? season,
+  });
+
   Future<Either<Failure, List<PredictionRankingEntry>>> topOfRegion({required String regionId, String? season});
 
   Future<Either<Failure, PredictionRankingEntry?>> mine(

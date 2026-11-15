@@ -30,6 +30,25 @@ class PredictionsDataSource {
             logName: _logName,
           );
 
+  /// Palpites da conta nas partidas [matchIds] (leituras em paralelo, uma
+  /// por partida); só as que têm palpite entram no mapa (id da partida → palpite).
+  Future<Either<Failure, Map<String, PredictionDTO>>> getMine({
+    required List<String> matchIds,
+    required String uid,
+    String? season,
+  }) async {
+    try {
+      final docs = await Future.wait([for (final id in matchIds) _predictions(id, season).doc(uid).get()]);
+      return Right({
+        for (var i = 0; i < docs.length; i++)
+          if (docs[i].exists) matchIds[i]: PredictionDTO.fromFirestore(docs[i]),
+      });
+    } catch (e) {
+      AppLogger.e('getMine uid=$uid', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível carregar os seus palpites.'));
+    }
+  }
+
   /// Grava (ou troca) o palpite com a hora do servidor (a regra confere).
   Future<Either<Failure, void>> save({
     required String matchId,

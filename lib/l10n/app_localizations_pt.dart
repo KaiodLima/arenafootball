@@ -3731,6 +3731,120 @@ class AppLocalizationsPt extends AppLocalizations {
   String get predictionRankingTitle => 'Bolão';
 
   @override
+  String get predictionHubHeroTitle => 'SEU BOLÃO';
+
+  @override
+  String get predictionHubStatPoints => 'pts';
+
+  @override
+  String get predictionHubStatExact => 'exatos';
+
+  @override
+  String get predictionHubStatPicks => 'palpites';
+
+  @override
+  String predictionHubPlace(String region) {
+    return 'lugar em $region';
+  }
+
+  @override
+  String predictionHubChase(int points, String name) {
+    return 'Faltam $points pts para passar $name';
+  }
+
+  @override
+  String get predictionHubLeader => 'Você lidera o bolão!';
+
+  @override
+  String get predictionHubNoPoints =>
+      'Palpite nos jogos e dispute com a sua região!';
+
+  @override
+  String get predictionHubGuest =>
+      'Entre para palpitar e disputar o ranking da sua região.';
+
+  @override
+  String get predictionHubSignIn => 'ENTRAR';
+
+  @override
+  String get predictionHubHowTitle => 'Como pontua';
+
+  @override
+  String get predictionHubExact => 'Placar exato';
+
+  @override
+  String get predictionHubWinnerDiff => 'Vencedor + saldo';
+
+  @override
+  String get predictionHubWinner => 'Só o vencedor';
+
+  @override
+  String get predictionHubTabPlay => 'Palpitar';
+
+  @override
+  String get predictionHubTabRanking => 'Ranking';
+
+  @override
+  String get predictionHubUpcoming => 'Próximos jogos';
+
+  @override
+  String get predictionHubNoUpcoming =>
+      'Nenhum jogo aberto para palpite na região agora.';
+
+  @override
+  String predictionHubClosesIn(String time) {
+    return 'Fecha em $time';
+  }
+
+  @override
+  String get predictionHubPredict => 'PALPITAR';
+
+  @override
+  String get predictionHubYourPick => 'Seu palpite';
+
+  @override
+  String get predictionHubChange => 'Alterar';
+
+  @override
+  String get predictionHubRecent => 'Seus últimos palpites';
+
+  @override
+  String get predictionHubRecentEmpty =>
+      'Os seus palpites dos jogos encerrados aparecem aqui.';
+
+  @override
+  String get predictionHubPending => 'Aguardando apuração';
+
+  @override
+  String get predictionHubExactChip => 'Exato';
+
+  @override
+  String predictionHubYouSaid(int home, int away) {
+    return 'Você: $home × $away';
+  }
+
+  @override
+  String predictionHubHitRate(int percent) {
+    return '$percent% de aproveitamento';
+  }
+
+  @override
+  String get predictionHubChallenge => 'Desafiar amigos';
+
+  @override
+  String predictionHubChallengeText(int position, String region, String link) {
+    return 'Tô em $positionº no bolão do Arena Football em $region! Vem palpitar e tenta me passar ⚽\n$link';
+  }
+
+  @override
+  String predictionHubChallengeTextNoRank(String region, String link) {
+    return 'Vem palpitar comigo no bolão do Arena Football em $region! ⚽\n$link';
+  }
+
+  @override
+  String get predictionHubPredictors => 'Palpiteiros';
+
+  @override
   String get predictionRankingEmpty =>
       'Ninguém pontuou ainda nesta região. Palpite nas próximas partidas!';
 

@@ -1463,6 +1463,102 @@
   "predictionCount": "{count, plural, =0{Ninguém palpitou} =1{1 palpite nesta partida} other{{count} palpites nesta partida}}",
   "@predictionCount": {"placeholders": {"count": {"type": "int"}}},
   "predictionRankingTitle": "Bolão",
+  "predictionHubHeroTitle": "SEU BOLÃO",
+  "predictionHubStatPoints": "pts",
+  "predictionHubStatExact": "exatos",
+  "predictionHubStatPicks": "palpites",
+  "predictionHubPlace": "lugar em {region}",
+  "@predictionHubPlace": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "predictionHubChase": "Faltam {points} pts para passar {name}",
+  "@predictionHubChase": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "predictionHubLeader": "Você lidera o bolão!",
+  "predictionHubNoPoints": "Palpite nos jogos e dispute com a sua região!",
+  "predictionHubGuest": "Entre para palpitar e disputar o ranking da sua região.",
+  "predictionHubSignIn": "ENTRAR",
+  "predictionHubHowTitle": "Como pontua",
+  "predictionHubExact": "Placar exato",
+  "predictionHubWinnerDiff": "Vencedor + saldo",
+  "predictionHubWinner": "Só o vencedor",
+  "predictionHubTabPlay": "Palpitar",
+  "predictionHubTabRanking": "Ranking",
+  "predictionHubUpcoming": "Próximos jogos",
+  "predictionHubNoUpcoming": "Nenhum jogo aberto para palpite na região agora.",
+  "predictionHubClosesIn": "Fecha em {time}",
+  "@predictionHubClosesIn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "predictionHubPredict": "PALPITAR",
+  "predictionHubYourPick": "Seu palpite",
+  "predictionHubChange": "Alterar",
+  "predictionHubRecent": "Seus últimos palpites",
+  "predictionHubRecentEmpty": "Os seus palpites dos jogos encerrados aparecem aqui.",
+  "predictionHubPending": "Aguardando apuração",
+  "predictionHubExactChip": "Exato",
+  "predictionHubYouSaid": "Você: {home} × {away}",
+  "@predictionHubYouSaid": {
+    "placeholders": {
+      "home": {
+        "type": "int"
+      },
+      "away": {
+        "type": "int"
+      }
+    }
+  },
+  "predictionHubHitRate": "{percent}% de aproveitamento",
+  "@predictionHubHitRate": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "predictionHubChallenge": "Desafiar amigos",
+  "predictionHubChallengeText": "Tô em {position}º no bolão do Arena Football em {region}! Vem palpitar e tenta me passar ⚽\n{link}",
+  "@predictionHubChallengeText": {
+    "placeholders": {
+      "position": {
+        "type": "int"
+      },
+      "region": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      }
+    }
+  },
+  "predictionHubChallengeTextNoRank": "Vem palpitar comigo no bolão do Arena Football em {region}! ⚽\n{link}",
+  "@predictionHubChallengeTextNoRank": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      }
+    }
+  },
+  "predictionHubPredictors": "Palpiteiros",
   "predictionRankingEmpty": "Ninguém pontuou ainda nesta região. Palpite nas próximas partidas!",
   "predictionRankingError": "Não foi possível carregar o ranking do bolão.",
   "predictionRankingYou": "Sua posição",
