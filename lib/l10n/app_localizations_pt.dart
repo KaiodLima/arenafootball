@@ -112,6 +112,80 @@ class AppLocalizationsPt extends AppLocalizations {
   String get fanRankingTitle => 'Ranking de torcidas';
 
   @override
+  String get fanRankingScopeRegion => 'Região';
+
+  @override
+  String get fanRankingScopeOverall => 'Geral';
+
+  @override
+  String fanRankingBiggestIn(String region) {
+    return 'Maior torcida de $region';
+  }
+
+  @override
+  String get fanRankingBiggestOverall => 'Maior torcida do app';
+
+  @override
+  String get fanRankingTopTie => 'Empate no topo';
+
+  @override
+  String fanRankingShareOf(int percent) {
+    return '$percent% da torcida';
+  }
+
+  @override
+  String get fanRankingSplit => 'Divisão das torcidas';
+
+  @override
+  String get fanRankingOthers => 'Outros';
+
+  @override
+  String fanRankingGap(int count, String team) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Faltam $count torcedores para passar $team',
+      one: 'Falta 1 torcedor para passar $team',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fanRankingYouLead => 'Sua torcida lidera!';
+
+  @override
+  String get fanRankingRally => 'Convocar a torcida';
+
+  @override
+  String fanRankingRallyText(String team, String link) {
+    return 'Ajude o $team a subir no ranking de torcidas do Arena Football! Baixe o app e escolha o $team como time do coração ⚽\n$link';
+  }
+
+  @override
+  String get fanRankingChooseTitle => 'Entre na disputa!';
+
+  @override
+  String get fanRankingChooseText =>
+      'Escolha seu time do coração e ajude a sua torcida a subir no ranking.';
+
+  @override
+  String get fanRankingFullRanking => 'Ranking completo';
+
+  @override
+  String get fanRankingBattle => 'Guerra das torcidas';
+
+  @override
+  String fanRankingFansLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'torcedores',
+      one: 'torcedor',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String fanRankingFans(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

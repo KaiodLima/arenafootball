@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/features/fan_ranking/data/dtos/fan_ranking_dto.dart';
+import 'package:arena_soccer/features/fan_ranking/domain/fan_ranking_view.dart';
 
 /// Tela "Ranking de torcidas": o ranking da temporada (todas as regiões) e a
 /// região escolhida nos chips; a lista da região sai daqui, sem ler de novo.
@@ -9,10 +10,20 @@ class FanRankingState extends Equatable {
   final bool loading;
   final String? errorMessage;
 
-  const FanRankingState({this.ranking, this.region = '', this.loading = true, this.errorMessage});
+  /// Região escolhida ou o app inteiro ("Geral").
+  final FanRankingScope scope;
 
-  /// Times da região escolhida, na ordem do ranking.
-  List<FanRankingEntry> get entries => ranking?.entriesOf(region) ?? const [];
+  const FanRankingState({
+    this.ranking,
+    this.region = '',
+    this.loading = true,
+    this.errorMessage,
+    this.scope = FanRankingScope.region,
+  });
+
+  /// Times da região escolhida (ou de todas, no Geral), na ordem do ranking.
+  List<FanRankingEntry> get entries =>
+      scope == FanRankingScope.overall ? FanRankingView.overall(ranking) : ranking?.entriesOf(region) ?? const [];
 
   /// Torcedores contados na região (base das barras).
   int get regionFans => entries.fold(0, (sum, entry) => sum + entry.fans);
@@ -38,8 +49,10 @@ class FanRankingState extends Equatable {
     String? region,
     bool? loading,
     String? Function()? errorMessage,
+    FanRankingScope? scope,
   }) {
     return FanRankingState(
+      scope: scope ?? this.scope,
       ranking: ranking ?? this.ranking,
       region: region ?? this.region,
       loading: loading ?? this.loading,
@@ -48,5 +61,5 @@ class FanRankingState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [ranking, region, loading, errorMessage];
+  List<Object?> get props => [ranking, region, loading, errorMessage, scope];
 }

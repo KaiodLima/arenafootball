@@ -112,6 +112,80 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fanRankingTitle => 'Fan ranking';
 
   @override
+  String get fanRankingScopeRegion => 'Region';
+
+  @override
+  String get fanRankingScopeOverall => 'Overall';
+
+  @override
+  String fanRankingBiggestIn(String region) {
+    return 'Biggest crowd in $region';
+  }
+
+  @override
+  String get fanRankingBiggestOverall => 'Biggest crowd in the app';
+
+  @override
+  String get fanRankingTopTie => 'Tied at the top';
+
+  @override
+  String fanRankingShareOf(int percent) {
+    return '$percent% of the fans';
+  }
+
+  @override
+  String get fanRankingSplit => 'Crowd split';
+
+  @override
+  String get fanRankingOthers => 'Others';
+
+  @override
+  String fanRankingGap(int count, String team) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fans to pass $team',
+      one: '1 fan to pass $team',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fanRankingYouLead => 'Your crowd leads!';
+
+  @override
+  String get fanRankingRally => 'Rally the fans';
+
+  @override
+  String fanRankingRallyText(String team, String link) {
+    return 'Help $team climb the Arena Football crowd ranking! Get the app and pick $team as your team ⚽\n$link';
+  }
+
+  @override
+  String get fanRankingChooseTitle => 'Join the battle!';
+
+  @override
+  String get fanRankingChooseText =>
+      'Pick your team and help your crowd climb the ranking.';
+
+  @override
+  String get fanRankingFullRanking => 'Full ranking';
+
+  @override
+  String get fanRankingBattle => 'Crowd battle';
+
+  @override
+  String fanRankingFansLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'fans',
+      one: 'fan',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String fanRankingFans(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

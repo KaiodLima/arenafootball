@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/fan_ranking/domain/fan_ranking_view.dart';
 import 'package:arena_soccer/features/fan_ranking/domain/usecases/get_fan_ranking_cache_first_usecase.dart';
 import 'package:arena_soccer/features/fan_ranking/presentation/bloc/fan_ranking_state.dart';
 
@@ -22,6 +23,11 @@ class FanRankingCubit extends Cubit<FanRankingState> {
   }
 
   void selectRegion(String region) {
-    if (region != state.region) emit(state.copyWith(region: region));
+    if (region != state.region) emit(state.copyWith(region: region, scope: FanRankingScope.region));
+  }
+
+  /// Região ou Geral (só filtra, sem leitura).
+  void selectScope(FanRankingScope scope) {
+    if (scope != state.scope) emit(state.copyWith(scope: scope));
   }
 }

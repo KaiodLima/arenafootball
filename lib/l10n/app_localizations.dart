@@ -296,6 +296,108 @@ abstract class AppLocalizations {
   /// **'Ranking de torcidas'**
   String get fanRankingTitle;
 
+  /// No description provided for @fanRankingScopeRegion.
+  ///
+  /// In pt, this message translates to:
+  /// **'Região'**
+  String get fanRankingScopeRegion;
+
+  /// No description provided for @fanRankingScopeOverall.
+  ///
+  /// In pt, this message translates to:
+  /// **'Geral'**
+  String get fanRankingScopeOverall;
+
+  /// No description provided for @fanRankingBiggestIn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Maior torcida de {region}'**
+  String fanRankingBiggestIn(String region);
+
+  /// No description provided for @fanRankingBiggestOverall.
+  ///
+  /// In pt, this message translates to:
+  /// **'Maior torcida do app'**
+  String get fanRankingBiggestOverall;
+
+  /// No description provided for @fanRankingTopTie.
+  ///
+  /// In pt, this message translates to:
+  /// **'Empate no topo'**
+  String get fanRankingTopTie;
+
+  /// No description provided for @fanRankingShareOf.
+  ///
+  /// In pt, this message translates to:
+  /// **'{percent}% da torcida'**
+  String fanRankingShareOf(int percent);
+
+  /// No description provided for @fanRankingSplit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Divisão das torcidas'**
+  String get fanRankingSplit;
+
+  /// No description provided for @fanRankingOthers.
+  ///
+  /// In pt, this message translates to:
+  /// **'Outros'**
+  String get fanRankingOthers;
+
+  /// No description provided for @fanRankingGap.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{Falta 1 torcedor para passar {team}} other{Faltam {count} torcedores para passar {team}}}'**
+  String fanRankingGap(int count, String team);
+
+  /// No description provided for @fanRankingYouLead.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua torcida lidera!'**
+  String get fanRankingYouLead;
+
+  /// No description provided for @fanRankingRally.
+  ///
+  /// In pt, this message translates to:
+  /// **'Convocar a torcida'**
+  String get fanRankingRally;
+
+  /// No description provided for @fanRankingRallyText.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ajude o {team} a subir no ranking de torcidas do Arena Football! Baixe o app e escolha o {team} como time do coração ⚽\n{link}'**
+  String fanRankingRallyText(String team, String link);
+
+  /// No description provided for @fanRankingChooseTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entre na disputa!'**
+  String get fanRankingChooseTitle;
+
+  /// No description provided for @fanRankingChooseText.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha seu time do coração e ajude a sua torcida a subir no ranking.'**
+  String get fanRankingChooseText;
+
+  /// No description provided for @fanRankingFullRanking.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ranking completo'**
+  String get fanRankingFullRanking;
+
+  /// No description provided for @fanRankingBattle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Guerra das torcidas'**
+  String get fanRankingBattle;
+
+  /// No description provided for @fanRankingFansLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{torcedor} other{torcedores}}'**
+  String fanRankingFansLabel(int count);
+
   /// No description provided for @fanRankingFans.
   ///
   /// In pt, this message translates to:
