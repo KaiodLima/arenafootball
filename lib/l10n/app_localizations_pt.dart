@@ -6301,6 +6301,236 @@ class AppLocalizationsPt extends AppLocalizations {
   String get fanCardTitle => 'Carteirinha de torcedor';
 
   @override
+  String get eventPollTag => 'EVENTO';
+
+  @override
+  String get eventPollMenu => 'Evento de votação';
+
+  @override
+  String get eventPollFormTitleNew => 'Novo evento de votação';
+
+  @override
+  String get eventPollFormTitleEdit => 'Editar evento';
+
+  @override
+  String get eventPollFormIntro =>
+      'Crie uma votação para a torcida: gol mais bonito da rodada, defesa do mês, melhor torcida…';
+
+  @override
+  String get eventPollSectionEvent => 'Evento';
+
+  @override
+  String get eventPollSectionVoting => 'Votação';
+
+  @override
+  String get eventPollSectionOptions => 'Opções';
+
+  @override
+  String get eventPollFieldTitle => 'Título do evento';
+
+  @override
+  String get eventPollFieldTitleHint => 'Ex.: Gol mais bonito da rodada';
+
+  @override
+  String get eventPollFieldDescription => 'Descrição (opcional)';
+
+  @override
+  String get eventPollCoverAdd => 'Adicionar capa (opcional)';
+
+  @override
+  String get eventPollCoverChange => 'Trocar capa';
+
+  @override
+  String get eventPollCoverRemove => 'Remover capa';
+
+  @override
+  String get eventPollClosesDate => 'Data do encerramento';
+
+  @override
+  String get eventPollClosesTime => 'Horário do encerramento';
+
+  @override
+  String get eventPollShowPartial => 'Mostrar resultado parcial';
+
+  @override
+  String get eventPollShowPartialHint =>
+      'Quem já votou vê a parcial. Desligado, o resultado só aparece no encerramento.';
+
+  @override
+  String eventPollOptionLabel(int number) {
+    return 'Opção $number';
+  }
+
+  @override
+  String get eventPollOptionTitle => 'Título da opção';
+
+  @override
+  String get eventPollOptionTitleHint => 'Ex.: Gol do Dudu';
+
+  @override
+  String get eventPollOptionSubtitle => 'Detalhe (opcional)';
+
+  @override
+  String get eventPollOptionSubtitleHint => 'Ex.: Lava Jato x Volta, 2º tempo';
+
+  @override
+  String get eventPollOptionLink => 'Link do vídeo (opcional)';
+
+  @override
+  String get eventPollOptionLinkHint => 'Instagram, YouTube, TikTok…';
+
+  @override
+  String get eventPollOptionPhoto => 'Foto';
+
+  @override
+  String get eventPollAddOption => 'Adicionar opção';
+
+  @override
+  String get eventPollOptionsLocked =>
+      'Já há votos: as opções não podem mais ser alteradas.';
+
+  @override
+  String get eventPollErrorTitle => 'Informe o título do evento.';
+
+  @override
+  String get eventPollErrorRegion => 'Escolha a região.';
+
+  @override
+  String get eventPollErrorClosesAt => 'O encerramento precisa ser no futuro.';
+
+  @override
+  String get eventPollErrorFewOptions =>
+      'O evento precisa de pelo menos 2 opções.';
+
+  @override
+  String eventPollErrorOptionTitle(int number) {
+    return 'Dê um título à opção $number.';
+  }
+
+  @override
+  String eventPollErrorOptionLink(int number) {
+    return 'O link da opção $number não é válido.';
+  }
+
+  @override
+  String get eventPollPublish => 'PUBLICAR EVENTO';
+
+  @override
+  String get eventPollSaveChanges => 'SALVAR ALTERAÇÕES';
+
+  @override
+  String get eventPollPublished => 'Evento publicado!';
+
+  @override
+  String get eventPollSaved => 'Evento atualizado!';
+
+  @override
+  String eventPollEndsIn(String time) {
+    return 'Encerra em $time';
+  }
+
+  @override
+  String get eventPollEnded => 'Encerrado';
+
+  @override
+  String get eventPollVoteNow => 'VOTAR';
+
+  @override
+  String get eventPollSeeResult => 'VER RESULTADO';
+
+  @override
+  String get eventPollSeeOptions => 'VER OPÇÕES';
+
+  @override
+  String eventPollOptionsCount(int count) {
+    return '$count opções';
+  }
+
+  @override
+  String eventPollVotesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count votos',
+      one: '1 voto',
+      zero: 'nenhum voto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String eventPollWatchOn(String network) {
+    return 'Ver no $network';
+  }
+
+  @override
+  String get eventPollOpenLink => 'Ver vídeo';
+
+  @override
+  String eventPollVoteFor(String option) {
+    return 'VOTAR EM $option';
+  }
+
+  @override
+  String eventPollConfirmTitle(String option) {
+    return 'Votar em $option?';
+  }
+
+  @override
+  String get eventPollConfirmMessage =>
+      'O voto é único e não pode ser trocado depois.';
+
+  @override
+  String get eventPollConfirm => 'Votar';
+
+  @override
+  String get eventPollVoted => 'Voto registrado!';
+
+  @override
+  String get eventPollYourVote => 'Seu voto';
+
+  @override
+  String get eventPollHiddenResult =>
+      'Voto registrado. O resultado sai no encerramento.';
+
+  @override
+  String get eventPollWinner => 'VENCEDOR';
+
+  @override
+  String get eventPollTie => 'EMPATE';
+
+  @override
+  String get eventPollNoVotes => 'Nenhum voto registrado.';
+
+  @override
+  String get eventPollSignIn => 'Entre na sua conta para votar.';
+
+  @override
+  String get eventPollTapToVote => 'Escolha uma opção e confirme o seu voto.';
+
+  @override
+  String get eventPollClosedNotice => 'Votação encerrada.';
+
+  @override
+  String get eventPollCloseNow => 'Encerrar agora';
+
+  @override
+  String get eventPollCloseConfirm => 'Encerrar a votação agora?';
+
+  @override
+  String get eventPollCloseMessage =>
+      'Ninguém mais poderá votar e o resultado aparece para todos.';
+
+  @override
+  String get eventPollNotFound => 'Este evento não está mais disponível.';
+
+  @override
+  String get eventPollPartial => 'Parcial';
+
+  @override
+  String get eventPollFinal => 'Resultado final';
+
+  @override
   String get fanCardMember => 'SÓCIO TORCEDOR';
 
   @override

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/live_match_card.dart';
+import 'package:arena_soccer/features/event_polls/presentation/widgets/event_poll_feed_card.dart';
 import 'package:arena_soccer/features/partner_requests/presentation/bloc/partner_cubit.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
@@ -274,8 +275,42 @@ class _NewsItem extends StatelessWidget {
     );
   }
 
+  /// Evento de votação: menu do admin com editar no formulário do evento.
+  Widget? _eventMenu(BuildContext context) {
+    if (!isAdmin) return null;
+    final l10n = AppLocalizations.of(context);
+    return CardMenuButton(
+      onImage: true,
+      actions: [
+        CardMenuAction(
+          icon: Icons.edit_outlined,
+          label: l10n.commonEdit,
+          onSelected: () => Navigator.pushNamed(context, AppRoutes.eventPollFormPage, arguments: {'news': news}),
+        ),
+        CardMenuAction(
+          icon: Icons.swap_horiz_rounded,
+          label: l10n.newsMoveRegion,
+          onSelected: () => _moveRegion(context),
+        ),
+        CardMenuAction(
+          icon: Icons.delete_outline_rounded,
+          label: l10n.commonDelete,
+          destructive: true,
+          onSelected: () => _confirmDelete(context),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (news.isEvent) {
+      return EventPollFeedCard(
+        news: news,
+        trailing: _eventMenu(context),
+        onTap: () => Navigator.pushNamed(context, AppRoutes.eventPollPage, arguments: {'news': news}),
+      );
+    }
     if (news.isGoal) {
       return GoalCard(
         news: news,

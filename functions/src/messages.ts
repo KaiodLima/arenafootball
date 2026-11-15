@@ -6,6 +6,8 @@
  * acento, e o que não for [a-z0-9] vira "_".
  */
 
+import { EVENT_TAG, eventPushTitle } from './event_poll';
+
 /** Ações que podem emitir push (chaves de `config/notificacoes`). */
 export type ActionKey =
   | 'gol'
@@ -275,10 +277,16 @@ export function newsMessage(news: Doc, id = ''): PushMessage | null {
   const titulo = text(news.titulo);
   const region = text(news.fk_competicao);
   if (!titulo || !region) return null;
+  // Evento de votação do admin: o push convida a votar.
+  const event = tag === EVENT_TAG;
   return {
     tipo: 'noticia',
-    titulo: shorten(titulo, 80),
-    corpo: shorten(text(news.descricao).replace(/\s+/g, ' ') || 'Leia no Arena Football', 140),
+    titulo: shorten(event ? eventPushTitle(titulo) : titulo, 80),
+    corpo: shorten(
+      text(news.descricao).replace(/\s+/g, ' ') ||
+        (event ? 'Escolha a sua opção no Arena Football' : 'Leia no Arena Football'),
+      140,
+    ),
     aba: 'home',
     regiao: region,
     alvo: { topic: regionTopicOf(news) },

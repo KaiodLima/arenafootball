@@ -141,6 +141,10 @@ import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/themes/app_theme.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/profile_cubit.dart';
 import 'package:arena_soccer/features/auth/presentation/page/profile_page.dart';
+import 'package:arena_soccer/features/event_polls/presentation/bloc/event_poll_cubit.dart';
+import 'package:arena_soccer/features/event_polls/presentation/bloc/event_poll_form_cubit.dart';
+import 'package:arena_soccer/features/event_polls/presentation/page/event_poll_form_page.dart';
+import 'package:arena_soccer/features/event_polls/presentation/page/event_poll_page.dart';
 
 class ArenaApp extends StatelessWidget {
   const ArenaApp({super.key});
@@ -176,6 +180,22 @@ class ArenaApp extends StatelessWidget {
               create: (_) => ProfileCubit(sl(), sl(), sl()),
               child: const ProfilePage(),
             ),
+        // Evento de votação: a página (args: news do feed e/ou id) e o formulário do admin.
+        AppRoutes.eventPollPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          final news = args?['news'] as NewsDTO?;
+          return BlocProvider<EventPollCubit>(
+            create: (_) => EventPollCubit(sl()),
+            child: EventPollPage(eventId: news?.id ?? args?['id'] as String? ?? '', initial: news),
+          );
+        },
+        AppRoutes.eventPollFormPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+          return BlocProvider<EventPollFormCubit>(
+            create: (_) => EventPollFormCubit(sl()),
+            child: EventPollFormPage(editing: args?['news'] as NewsDTO?),
+          );
+        },
         AppRoutes.fanCardPage: (_) => BlocProvider<FanCardCubit>(
               create: (_) => FanCardCubit(sl(), sl(), sl()),
               child: const FanCardPage(),

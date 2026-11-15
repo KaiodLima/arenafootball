@@ -231,7 +231,7 @@ service cloud.firestore {
             'images', 'idAutor'])
           && (tag == 'publicidade'
             ? p.get('podePublicidade', true)
-            : p.get('podeNoticias', true) && !(tag in ['gol', 'resultado', 'votacao', 'aovivo', 'cartao']));
+            : p.get('podeNoticias', true) && !(tag in ['gol', 'resultado', 'votacao', 'aovivo', 'cartao', 'evento']));
       }
 
       function partnerHighlight(data, p) {
@@ -623,6 +623,44 @@ service cloud.firestore {
       allow delete: if isMatches() && isAdmin();
     }
 
+    // Evento de votação do admin (card `noticias/{id}` com `tag: "evento"`):
+    // voto único por conta (doc id = uid), só numa opção do evento, com a hora
+    // do servidor e enquanto ele está aberto (sem "Encerrar agora" e antes do
+    // `encerraEm`). Não altera nem apaga (só o admin). Cada um lê só o próprio.
+    match /noticias/{newsId}/votos_evento/{uid} {
+      function eventDoc() {
+        return get(/databases/$(database)/documents/noticias/$(newsId)).data;
+      }
+      function eventOpen(event) {
+        return event.get('tag', '') == 'evento' && event.get('encerrado', false) != true
+          && (!('encerraEm' in event) || request.time < event.encerraEm);
+      }
+
+      allow read: if signedIn() && (uid == request.auth.uid || isAdmin());
+      allow create: if signedIn() && uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['opcao', 'nome', 'uid', 'em'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.em == request.time
+        && request.resource.data.nome is string && request.resource.data.nome.size() <= 80
+        && request.resource.data.opcao in eventDoc().get('idsOpcoes', [])
+        && eventOpen(eventDoc());
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
+    // Apuração do evento (`apuracao/total`), gravada só pelas functions. A
+    // leitura segue a escolha do admin: com o parcial ligado, sempre; com ele
+    // desligado, só depois do encerramento (ou o admin).
+    match /noticias/{newsId}/apuracao/{docId} {
+      function resultVisible(event) {
+        return event.get('mostrarParcial', true) == true || event.get('encerrado', false) == true
+          || ('encerraEm' in event && request.time >= event.encerraEm);
+      }
+
+      allow read: if isAdmin() || resultVisible(get(/databases/$(database)/documents/noticias/$(newsId)).data);
+      allow write: if false;
+    }
+
     // Bolão: palpite de placar (doc id = uid), leitura pública. O dono grava
     // só o placar, o nome e a hora do servidor, enquanto a partida não
     // começou (status manual); o prazo pelo horário a function confere ao
@@ -786,7 +824,7 @@ service cloud.firestore {
           && data.get('idAutor', '') == request.auth.uid
           && data.get('idRegiao', '') == p.get('idRegiao', '-')
           && data.get('status', '') == 'pendente'
-          && !(data.get('tag', '') in ['gol', 'resultado', 'votacao', 'publicidade', 'aovivo', 'cartao'])
+          && !(data.get('tag', '') in ['gol', 'resultado', 'votacao', 'publicidade', 'aovivo', 'cartao', 'evento'])
           && data.keys().hasOnly(['id', 'data', 'criadoEm', 'status', 'titulo', 'descricao', 'urlImagem', 'link',
             'exibir', 'fk_competicao', 'idRegiao', 'time_casa', 'time_fora', 'gol_time_casa', 'gol_time_fora', 'tag',
             'images', 'idAutor']);

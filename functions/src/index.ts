@@ -90,6 +90,7 @@ import { isLegacyVoteCollection, seasonCollections, seasonsToSweep, userPhotoPat
 import { claimReconcilePlan, missingEnrollmentFix, needsClaimReconcile } from './claim_reconcile';
 import { FanRankingTeam, fanRankingTotal, rankingTeamOf, sortFanRanking } from './fan_ranking';
 import { shouldAutoFinish, shouldCloseVoting } from './voting_close';
+import { EVENT_VOTES, eventOptionIds, tallyDoc } from './event_poll';
 import {
   ResultTeam,
   recentDays,
@@ -981,6 +982,12 @@ export const onUserDeleted = functionsV1
     await deleteExisting(db, albumEvents.docs.map((e) => e.ref.collection('ranking').doc(uid)));
     await deleteExisting(db, (await db.collection('album_pacotes').where('uid', '==', uid).get()).docs.map((d) => d.ref));
 
+    // Votos nos eventos de votação do admin (noticias/{id}/votos_evento/{uid}).
+    await deleteExisting(
+      db,
+      (await db.collectionGroup(EVENT_VOTES).where('uid', '==', uid).get()).docs.map((d) => d.ref),
+    );
+
     // Votos de cada temporada (partidas{ano}/{id}/votos/{uid}) e vínculos de atleta e dono.
     const seasons = seasonsToSweep((await db.doc('config/temporadas').get()).data());
     let votesDeleted = 0;
@@ -1032,6 +1039,27 @@ export const onVoteCreated = onDocumentCreated('{colecao}/{matchId}/votos/{uid}'
   if (!/^partidas(\d{4})?$/.test(event.params.colecao)) return;
   const { FieldValue } = await admin();
   await (await progressRef(event.params.uid)).set({ votos: FieldValue.increment(1) }, { merge: true });
+});
+
+/**
+ * Evento de votação: a cada voto novo, reconta os votos de cada opção com
+ * `count()` (até 8 agregações) e grava `noticias/{id}/apuracao/total`. O app
+ * lê esse doc conforme o `mostrarParcial` do evento (regras).
+ */
+export const onEventVoteCreated = onDocumentCreated(`noticias/{newsId}/${EVENT_VOTES}/{uid}`, async (event) => {
+  const { db, FieldValue } = await admin();
+  const newsRef = db.collection('noticias').doc(event.params.newsId);
+  const ids = eventOptionIds((await newsRef.get()).data());
+  if (!ids.length) return;
+  const votes = newsRef.collection(EVENT_VOTES);
+  const counts: Record<string, number> = {};
+  for (const id of ids) {
+    counts[id] = (await votes.where('opcao', '==', id).count().get()).data().count;
+  }
+  await newsRef
+    .collection('apuracao')
+    .doc('total')
+    .set({ ...tallyDoc(counts), atualizadoEm: FieldValue.serverTimestamp() });
 });
 
 /** Perfil: escolheu o time do coração / pôs foto (grava só quando muda). */

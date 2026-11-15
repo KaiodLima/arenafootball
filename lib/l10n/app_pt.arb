@@ -3077,6 +3077,135 @@
   "colorPink": "Rosa",
   "fanCardMenu": "Minha carteirinha",
   "fanCardTitle": "Carteirinha de torcedor",
+  "eventPollTag": "EVENTO",
+  "eventPollMenu": "Evento de votação",
+  "eventPollFormTitleNew": "Novo evento de votação",
+  "eventPollFormTitleEdit": "Editar evento",
+  "eventPollFormIntro": "Crie uma votação para a torcida: gol mais bonito da rodada, defesa do mês, melhor torcida…",
+  "eventPollSectionEvent": "Evento",
+  "eventPollSectionVoting": "Votação",
+  "eventPollSectionOptions": "Opções",
+  "eventPollFieldTitle": "Título do evento",
+  "eventPollFieldTitleHint": "Ex.: Gol mais bonito da rodada",
+  "eventPollFieldDescription": "Descrição (opcional)",
+  "eventPollCoverAdd": "Adicionar capa (opcional)",
+  "eventPollCoverChange": "Trocar capa",
+  "eventPollCoverRemove": "Remover capa",
+  "eventPollClosesDate": "Data do encerramento",
+  "eventPollClosesTime": "Horário do encerramento",
+  "eventPollShowPartial": "Mostrar resultado parcial",
+  "eventPollShowPartialHint": "Quem já votou vê a parcial. Desligado, o resultado só aparece no encerramento.",
+  "eventPollOptionLabel": "Opção {number}",
+  "@eventPollOptionLabel": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "eventPollOptionTitle": "Título da opção",
+  "eventPollOptionTitleHint": "Ex.: Gol do Dudu",
+  "eventPollOptionSubtitle": "Detalhe (opcional)",
+  "eventPollOptionSubtitleHint": "Ex.: Lava Jato x Volta, 2º tempo",
+  "eventPollOptionLink": "Link do vídeo (opcional)",
+  "eventPollOptionLinkHint": "Instagram, YouTube, TikTok…",
+  "eventPollOptionPhoto": "Foto",
+  "eventPollAddOption": "Adicionar opção",
+  "eventPollOptionsLocked": "Já há votos: as opções não podem mais ser alteradas.",
+  "eventPollErrorTitle": "Informe o título do evento.",
+  "eventPollErrorRegion": "Escolha a região.",
+  "eventPollErrorClosesAt": "O encerramento precisa ser no futuro.",
+  "eventPollErrorFewOptions": "O evento precisa de pelo menos 2 opções.",
+  "eventPollErrorOptionTitle": "Dê um título à opção {number}.",
+  "@eventPollErrorOptionTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "eventPollErrorOptionLink": "O link da opção {number} não é válido.",
+  "@eventPollErrorOptionLink": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "eventPollPublish": "PUBLICAR EVENTO",
+  "eventPollSaveChanges": "SALVAR ALTERAÇÕES",
+  "eventPollPublished": "Evento publicado!",
+  "eventPollSaved": "Evento atualizado!",
+  "eventPollEndsIn": "Encerra em {time}",
+  "@eventPollEndsIn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "eventPollEnded": "Encerrado",
+  "eventPollVoteNow": "VOTAR",
+  "eventPollSeeResult": "VER RESULTADO",
+  "eventPollSeeOptions": "VER OPÇÕES",
+  "eventPollOptionsCount": "{count} opções",
+  "@eventPollOptionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventPollVotesCount": "{count, plural, =0{nenhum voto} =1{1 voto} other{{count} votos}}",
+  "@eventPollVotesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventPollWatchOn": "Ver no {network}",
+  "@eventPollWatchOn": {
+    "placeholders": {
+      "network": {
+        "type": "String"
+      }
+    }
+  },
+  "eventPollOpenLink": "Ver vídeo",
+  "eventPollVoteFor": "VOTAR EM {option}",
+  "@eventPollVoteFor": {
+    "placeholders": {
+      "option": {
+        "type": "String"
+      }
+    }
+  },
+  "eventPollConfirmTitle": "Votar em {option}?",
+  "@eventPollConfirmTitle": {
+    "placeholders": {
+      "option": {
+        "type": "String"
+      }
+    }
+  },
+  "eventPollConfirmMessage": "O voto é único e não pode ser trocado depois.",
+  "eventPollConfirm": "Votar",
+  "eventPollVoted": "Voto registrado!",
+  "eventPollYourVote": "Seu voto",
+  "eventPollHiddenResult": "Voto registrado. O resultado sai no encerramento.",
+  "eventPollWinner": "VENCEDOR",
+  "eventPollTie": "EMPATE",
+  "eventPollNoVotes": "Nenhum voto registrado.",
+  "eventPollSignIn": "Entre na sua conta para votar.",
+  "eventPollTapToVote": "Escolha uma opção e confirme o seu voto.",
+  "eventPollClosedNotice": "Votação encerrada.",
+  "eventPollCloseNow": "Encerrar agora",
+  "eventPollCloseConfirm": "Encerrar a votação agora?",
+  "eventPollCloseMessage": "Ninguém mais poderá votar e o resultado aparece para todos.",
+  "eventPollNotFound": "Este evento não está mais disponível.",
+  "eventPollPartial": "Parcial",
+  "eventPollFinal": "Resultado final",
   "fanCardMember": "SÓCIO TORCEDOR",
   "fanCardFlipHint": "Toque no cartão para virar",
   "fanCardValidSeason": "Válida na temporada {season}",

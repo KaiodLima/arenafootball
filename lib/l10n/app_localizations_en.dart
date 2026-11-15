@@ -6261,6 +6261,236 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fanCardTitle => 'Fan card';
 
   @override
+  String get eventPollTag => 'EVENT';
+
+  @override
+  String get eventPollMenu => 'Voting event';
+
+  @override
+  String get eventPollFormTitleNew => 'New voting event';
+
+  @override
+  String get eventPollFormTitleEdit => 'Edit event';
+
+  @override
+  String get eventPollFormIntro =>
+      'Create a vote for the fans: goal of the round, save of the month, best crowd…';
+
+  @override
+  String get eventPollSectionEvent => 'Event';
+
+  @override
+  String get eventPollSectionVoting => 'Voting';
+
+  @override
+  String get eventPollSectionOptions => 'Options';
+
+  @override
+  String get eventPollFieldTitle => 'Event title';
+
+  @override
+  String get eventPollFieldTitleHint => 'E.g.: Goal of the round';
+
+  @override
+  String get eventPollFieldDescription => 'Description (optional)';
+
+  @override
+  String get eventPollCoverAdd => 'Add a cover (optional)';
+
+  @override
+  String get eventPollCoverChange => 'Change cover';
+
+  @override
+  String get eventPollCoverRemove => 'Remove cover';
+
+  @override
+  String get eventPollClosesDate => 'Closing date';
+
+  @override
+  String get eventPollClosesTime => 'Closing time';
+
+  @override
+  String get eventPollShowPartial => 'Show partial results';
+
+  @override
+  String get eventPollShowPartialHint =>
+      'Those who voted see the partial count. Off, results only show when it closes.';
+
+  @override
+  String eventPollOptionLabel(int number) {
+    return 'Option $number';
+  }
+
+  @override
+  String get eventPollOptionTitle => 'Option title';
+
+  @override
+  String get eventPollOptionTitleHint => 'E.g.: Dudu\'s goal';
+
+  @override
+  String get eventPollOptionSubtitle => 'Detail (optional)';
+
+  @override
+  String get eventPollOptionSubtitleHint => 'E.g.: Lava Jato x Volta, 2nd half';
+
+  @override
+  String get eventPollOptionLink => 'Video link (optional)';
+
+  @override
+  String get eventPollOptionLinkHint => 'Instagram, YouTube, TikTok…';
+
+  @override
+  String get eventPollOptionPhoto => 'Photo';
+
+  @override
+  String get eventPollAddOption => 'Add option';
+
+  @override
+  String get eventPollOptionsLocked =>
+      'There are votes already: the options can no longer change.';
+
+  @override
+  String get eventPollErrorTitle => 'Enter the event title.';
+
+  @override
+  String get eventPollErrorRegion => 'Choose the region.';
+
+  @override
+  String get eventPollErrorClosesAt =>
+      'The closing time must be in the future.';
+
+  @override
+  String get eventPollErrorFewOptions => 'The event needs at least 2 options.';
+
+  @override
+  String eventPollErrorOptionTitle(int number) {
+    return 'Give option $number a title.';
+  }
+
+  @override
+  String eventPollErrorOptionLink(int number) {
+    return 'Option $number has an invalid link.';
+  }
+
+  @override
+  String get eventPollPublish => 'PUBLISH EVENT';
+
+  @override
+  String get eventPollSaveChanges => 'SAVE CHANGES';
+
+  @override
+  String get eventPollPublished => 'Event published!';
+
+  @override
+  String get eventPollSaved => 'Event updated!';
+
+  @override
+  String eventPollEndsIn(String time) {
+    return 'Ends in $time';
+  }
+
+  @override
+  String get eventPollEnded => 'Closed';
+
+  @override
+  String get eventPollVoteNow => 'VOTE';
+
+  @override
+  String get eventPollSeeResult => 'SEE RESULTS';
+
+  @override
+  String get eventPollSeeOptions => 'SEE OPTIONS';
+
+  @override
+  String eventPollOptionsCount(int count) {
+    return '$count options';
+  }
+
+  @override
+  String eventPollVotesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count votes',
+      one: '1 vote',
+      zero: 'no votes',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String eventPollWatchOn(String network) {
+    return 'Watch on $network';
+  }
+
+  @override
+  String get eventPollOpenLink => 'Watch video';
+
+  @override
+  String eventPollVoteFor(String option) {
+    return 'VOTE FOR $option';
+  }
+
+  @override
+  String eventPollConfirmTitle(String option) {
+    return 'Vote for $option?';
+  }
+
+  @override
+  String get eventPollConfirmMessage =>
+      'You only get one vote and it can\'t be changed.';
+
+  @override
+  String get eventPollConfirm => 'Vote';
+
+  @override
+  String get eventPollVoted => 'Vote recorded!';
+
+  @override
+  String get eventPollYourVote => 'Your vote';
+
+  @override
+  String get eventPollHiddenResult =>
+      'Vote recorded. Results come out when it closes.';
+
+  @override
+  String get eventPollWinner => 'WINNER';
+
+  @override
+  String get eventPollTie => 'TIE';
+
+  @override
+  String get eventPollNoVotes => 'No votes recorded.';
+
+  @override
+  String get eventPollSignIn => 'Sign in to vote.';
+
+  @override
+  String get eventPollTapToVote => 'Pick an option and confirm your vote.';
+
+  @override
+  String get eventPollClosedNotice => 'Voting closed.';
+
+  @override
+  String get eventPollCloseNow => 'Close now';
+
+  @override
+  String get eventPollCloseConfirm => 'Close the vote now?';
+
+  @override
+  String get eventPollCloseMessage =>
+      'Nobody else can vote and the results show for everyone.';
+
+  @override
+  String get eventPollNotFound => 'This event is no longer available.';
+
+  @override
+  String get eventPollPartial => 'Partial';
+
+  @override
+  String get eventPollFinal => 'Final result';
+
+  @override
   String get fanCardMember => 'FAN MEMBER';
 
   @override

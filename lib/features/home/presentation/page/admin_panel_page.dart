@@ -46,6 +46,11 @@ class AdminPanelPage extends StatelessWidget {
                     onTap: () => open(AppRoutes.registerNewsPage),
                   ),
                   ShortcutTile(
+                    title: l10n.eventPollMenu,
+                    icon: Icons.how_to_vote_outlined,
+                    onTap: () => open(AppRoutes.eventPollFormPage),
+                  ),
+                  ShortcutTile(
                     title: l10n.drawerRegisterHighlight,
                     icon: Icons.star_outline_rounded,
                     onTap: () => open(AppRoutes.manageHighlightsPage),

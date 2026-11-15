@@ -10436,6 +10436,402 @@ abstract class AppLocalizations {
   /// **'Carteirinha de torcedor'**
   String get fanCardTitle;
 
+  /// No description provided for @eventPollTag.
+  ///
+  /// In pt, this message translates to:
+  /// **'EVENTO'**
+  String get eventPollTag;
+
+  /// No description provided for @eventPollMenu.
+  ///
+  /// In pt, this message translates to:
+  /// **'Evento de votação'**
+  String get eventPollMenu;
+
+  /// No description provided for @eventPollFormTitleNew.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novo evento de votação'**
+  String get eventPollFormTitleNew;
+
+  /// No description provided for @eventPollFormTitleEdit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar evento'**
+  String get eventPollFormTitleEdit;
+
+  /// No description provided for @eventPollFormIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Crie uma votação para a torcida: gol mais bonito da rodada, defesa do mês, melhor torcida…'**
+  String get eventPollFormIntro;
+
+  /// No description provided for @eventPollSectionEvent.
+  ///
+  /// In pt, this message translates to:
+  /// **'Evento'**
+  String get eventPollSectionEvent;
+
+  /// No description provided for @eventPollSectionVoting.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votação'**
+  String get eventPollSectionVoting;
+
+  /// No description provided for @eventPollSectionOptions.
+  ///
+  /// In pt, this message translates to:
+  /// **'Opções'**
+  String get eventPollSectionOptions;
+
+  /// No description provided for @eventPollFieldTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Título do evento'**
+  String get eventPollFieldTitle;
+
+  /// No description provided for @eventPollFieldTitleHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ex.: Gol mais bonito da rodada'**
+  String get eventPollFieldTitleHint;
+
+  /// No description provided for @eventPollFieldDescription.
+  ///
+  /// In pt, this message translates to:
+  /// **'Descrição (opcional)'**
+  String get eventPollFieldDescription;
+
+  /// No description provided for @eventPollCoverAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar capa (opcional)'**
+  String get eventPollCoverAdd;
+
+  /// No description provided for @eventPollCoverChange.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar capa'**
+  String get eventPollCoverChange;
+
+  /// No description provided for @eventPollCoverRemove.
+  ///
+  /// In pt, this message translates to:
+  /// **'Remover capa'**
+  String get eventPollCoverRemove;
+
+  /// No description provided for @eventPollClosesDate.
+  ///
+  /// In pt, this message translates to:
+  /// **'Data do encerramento'**
+  String get eventPollClosesDate;
+
+  /// No description provided for @eventPollClosesTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'Horário do encerramento'**
+  String get eventPollClosesTime;
+
+  /// No description provided for @eventPollShowPartial.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mostrar resultado parcial'**
+  String get eventPollShowPartial;
+
+  /// No description provided for @eventPollShowPartialHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem já votou vê a parcial. Desligado, o resultado só aparece no encerramento.'**
+  String get eventPollShowPartialHint;
+
+  /// No description provided for @eventPollOptionLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Opção {number}'**
+  String eventPollOptionLabel(int number);
+
+  /// No description provided for @eventPollOptionTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Título da opção'**
+  String get eventPollOptionTitle;
+
+  /// No description provided for @eventPollOptionTitleHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ex.: Gol do Dudu'**
+  String get eventPollOptionTitleHint;
+
+  /// No description provided for @eventPollOptionSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Detalhe (opcional)'**
+  String get eventPollOptionSubtitle;
+
+  /// No description provided for @eventPollOptionSubtitleHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ex.: Lava Jato x Volta, 2º tempo'**
+  String get eventPollOptionSubtitleHint;
+
+  /// No description provided for @eventPollOptionLink.
+  ///
+  /// In pt, this message translates to:
+  /// **'Link do vídeo (opcional)'**
+  String get eventPollOptionLink;
+
+  /// No description provided for @eventPollOptionLinkHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Instagram, YouTube, TikTok…'**
+  String get eventPollOptionLinkHint;
+
+  /// No description provided for @eventPollOptionPhoto.
+  ///
+  /// In pt, this message translates to:
+  /// **'Foto'**
+  String get eventPollOptionPhoto;
+
+  /// No description provided for @eventPollAddOption.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar opção'**
+  String get eventPollAddOption;
+
+  /// No description provided for @eventPollOptionsLocked.
+  ///
+  /// In pt, this message translates to:
+  /// **'Já há votos: as opções não podem mais ser alteradas.'**
+  String get eventPollOptionsLocked;
+
+  /// No description provided for @eventPollErrorTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Informe o título do evento.'**
+  String get eventPollErrorTitle;
+
+  /// No description provided for @eventPollErrorRegion.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha a região.'**
+  String get eventPollErrorRegion;
+
+  /// No description provided for @eventPollErrorClosesAt.
+  ///
+  /// In pt, this message translates to:
+  /// **'O encerramento precisa ser no futuro.'**
+  String get eventPollErrorClosesAt;
+
+  /// No description provided for @eventPollErrorFewOptions.
+  ///
+  /// In pt, this message translates to:
+  /// **'O evento precisa de pelo menos 2 opções.'**
+  String get eventPollErrorFewOptions;
+
+  /// No description provided for @eventPollErrorOptionTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dê um título à opção {number}.'**
+  String eventPollErrorOptionTitle(int number);
+
+  /// No description provided for @eventPollErrorOptionLink.
+  ///
+  /// In pt, this message translates to:
+  /// **'O link da opção {number} não é válido.'**
+  String eventPollErrorOptionLink(int number);
+
+  /// No description provided for @eventPollPublish.
+  ///
+  /// In pt, this message translates to:
+  /// **'PUBLICAR EVENTO'**
+  String get eventPollPublish;
+
+  /// No description provided for @eventPollSaveChanges.
+  ///
+  /// In pt, this message translates to:
+  /// **'SALVAR ALTERAÇÕES'**
+  String get eventPollSaveChanges;
+
+  /// No description provided for @eventPollPublished.
+  ///
+  /// In pt, this message translates to:
+  /// **'Evento publicado!'**
+  String get eventPollPublished;
+
+  /// No description provided for @eventPollSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Evento atualizado!'**
+  String get eventPollSaved;
+
+  /// No description provided for @eventPollEndsIn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Encerra em {time}'**
+  String eventPollEndsIn(String time);
+
+  /// No description provided for @eventPollEnded.
+  ///
+  /// In pt, this message translates to:
+  /// **'Encerrado'**
+  String get eventPollEnded;
+
+  /// No description provided for @eventPollVoteNow.
+  ///
+  /// In pt, this message translates to:
+  /// **'VOTAR'**
+  String get eventPollVoteNow;
+
+  /// No description provided for @eventPollSeeResult.
+  ///
+  /// In pt, this message translates to:
+  /// **'VER RESULTADO'**
+  String get eventPollSeeResult;
+
+  /// No description provided for @eventPollSeeOptions.
+  ///
+  /// In pt, this message translates to:
+  /// **'VER OPÇÕES'**
+  String get eventPollSeeOptions;
+
+  /// No description provided for @eventPollOptionsCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} opções'**
+  String eventPollOptionsCount(int count);
+
+  /// No description provided for @eventPollVotesCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{nenhum voto} =1{1 voto} other{{count} votos}}'**
+  String eventPollVotesCount(int count);
+
+  /// No description provided for @eventPollWatchOn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver no {network}'**
+  String eventPollWatchOn(String network);
+
+  /// No description provided for @eventPollOpenLink.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver vídeo'**
+  String get eventPollOpenLink;
+
+  /// No description provided for @eventPollVoteFor.
+  ///
+  /// In pt, this message translates to:
+  /// **'VOTAR EM {option}'**
+  String eventPollVoteFor(String option);
+
+  /// No description provided for @eventPollConfirmTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votar em {option}?'**
+  String eventPollConfirmTitle(String option);
+
+  /// No description provided for @eventPollConfirmMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'O voto é único e não pode ser trocado depois.'**
+  String get eventPollConfirmMessage;
+
+  /// No description provided for @eventPollConfirm.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votar'**
+  String get eventPollConfirm;
+
+  /// No description provided for @eventPollVoted.
+  ///
+  /// In pt, this message translates to:
+  /// **'Voto registrado!'**
+  String get eventPollVoted;
+
+  /// No description provided for @eventPollYourVote.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu voto'**
+  String get eventPollYourVote;
+
+  /// No description provided for @eventPollHiddenResult.
+  ///
+  /// In pt, this message translates to:
+  /// **'Voto registrado. O resultado sai no encerramento.'**
+  String get eventPollHiddenResult;
+
+  /// No description provided for @eventPollWinner.
+  ///
+  /// In pt, this message translates to:
+  /// **'VENCEDOR'**
+  String get eventPollWinner;
+
+  /// No description provided for @eventPollTie.
+  ///
+  /// In pt, this message translates to:
+  /// **'EMPATE'**
+  String get eventPollTie;
+
+  /// No description provided for @eventPollNoVotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum voto registrado.'**
+  String get eventPollNoVotes;
+
+  /// No description provided for @eventPollSignIn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entre na sua conta para votar.'**
+  String get eventPollSignIn;
+
+  /// No description provided for @eventPollTapToVote.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha uma opção e confirme o seu voto.'**
+  String get eventPollTapToVote;
+
+  /// No description provided for @eventPollClosedNotice.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votação encerrada.'**
+  String get eventPollClosedNotice;
+
+  /// No description provided for @eventPollCloseNow.
+  ///
+  /// In pt, this message translates to:
+  /// **'Encerrar agora'**
+  String get eventPollCloseNow;
+
+  /// No description provided for @eventPollCloseConfirm.
+  ///
+  /// In pt, this message translates to:
+  /// **'Encerrar a votação agora?'**
+  String get eventPollCloseConfirm;
+
+  /// No description provided for @eventPollCloseMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ninguém mais poderá votar e o resultado aparece para todos.'**
+  String get eventPollCloseMessage;
+
+  /// No description provided for @eventPollNotFound.
+  ///
+  /// In pt, this message translates to:
+  /// **'Este evento não está mais disponível.'**
+  String get eventPollNotFound;
+
+  /// No description provided for @eventPollPartial.
+  ///
+  /// In pt, this message translates to:
+  /// **'Parcial'**
+  String get eventPollPartial;
+
+  /// No description provided for @eventPollFinal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resultado final'**
+  String get eventPollFinal;
+
   /// No description provided for @fanCardMember.
   ///
   /// In pt, this message translates to:

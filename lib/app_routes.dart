@@ -7,6 +7,8 @@ class AppRoutes {
   static const String chooseTeamPage = '/choose_team_page';
   static const String fanCardPage = '/fan_card_page';
   static const String profilePage = '/profile_page';
+  static const String eventPollPage = '/event_poll_page';
+  static const String eventPollFormPage = '/event_poll_form_page';
   static const String home = '/home';
 
   // Resultados globais (web scraping)

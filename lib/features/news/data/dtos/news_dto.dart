@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
+import 'package:arena_soccer/features/event_polls/domain/event_poll.dart';
 import 'package:arena_soccer/features/news/data/dtos/live_event.dart';
 
 /// Documento da coleção `noticias`. Notícias, cards de gol e anúncios
@@ -30,6 +31,9 @@ class NewsDTO extends Equatable {
 
   /// Card automático "Vote no craque" (Cloud Function ~15 min antes do fim).
   static const String voteTag = 'votacao';
+
+  /// Evento de votação do admin ("gol mais bonito da rodada").
+  static const String eventTag = 'evento';
 
   final String id;
   final DateTime? date;
@@ -113,6 +117,9 @@ class NewsDTO extends Equatable {
   /// encerrada; vazio = andamento). As functions marcam intervalo e fim.
   final String matchStatus;
 
+  /// Evento de votação (`tag: "evento"`): opções, prazo, parcial e encerrado.
+  final EventPoll? event;
+
   static const String matchStatusFinished = 'encerrada';
   static const String matchStatusHalfTime = 'intervalo';
   static const String matchStatusLive = 'andamento';
@@ -163,6 +170,7 @@ class NewsDTO extends Equatable {
     this.lastEvent,
     this.liveEvents = const [],
     this.matchStatus = '',
+    this.event,
   });
 
   bool get hasScorer => scorerId.isNotEmpty && scorerName.isNotEmpty;
@@ -180,6 +188,8 @@ class NewsDTO extends Equatable {
   bool get isLive => tag == liveTag;
 
   bool get isBookingCard => tag == bookingTag;
+
+  bool get isEvent => tag == eventTag;
 
   factory NewsDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? const {};
@@ -235,6 +245,9 @@ class NewsDTO extends Equatable {
           : null,
       liveEvents: LiveEvent.listFrom(data['lances']),
       matchStatus: data['status_partida']?.toString() ?? '',
+      event: data['tag'] == eventTag
+          ? EventPoll.fromMap(data, closesAt: (data['encerraEm'] as Timestamp?)?.toDate())
+          : null,
     );
   }
 
@@ -284,6 +297,7 @@ class NewsDTO extends Equatable {
       bestPlayerVotes: (json['bestPlayerVotes'] as num?)?.round() ?? 0,
       bestPlayerPercent: (json['bestPlayerPercent'] as num?)?.round() ?? 0,
       authorId: text('authorId'),
+      event: json['event'] is Map ? EventPoll.fromCache(Map<String, dynamic>.from(json['event'] as Map)) : null,
     );
   }
 
@@ -329,6 +343,7 @@ class NewsDTO extends Equatable {
         'bestPlayerVotes': bestPlayerVotes,
         'bestPlayerPercent': bestPlayerPercent,
         if (authorId.isNotEmpty) 'authorId': authorId,
+        if (event != null) 'event': event!.toCache(),
       };
 
   /// `data` fica de fora: na criação o DataSource grava o horário do
@@ -391,6 +406,8 @@ class NewsDTO extends Equatable {
         if (lastEvent != null) 'ultimo_lance': lastEvent!.toMap(),
         if (isLive) 'lances': [for (final e in liveEvents) e.toMap()],
         if (matchStatus.isNotEmpty) 'status_partida': matchStatus,
+        if (event != null) ...event!.toMap(),
+        if (event?.closesAt != null) 'encerraEm': Timestamp.fromDate(event!.closesAt!),
       };
 
   NewsDTO copyWith({
@@ -439,6 +456,7 @@ class NewsDTO extends Equatable {
     LiveEvent? lastEvent,
     List<LiveEvent>? liveEvents,
     String? matchStatus,
+    EventPoll? event,
   }) {
     return NewsDTO(
       id: id ?? this.id,
@@ -486,6 +504,7 @@ class NewsDTO extends Equatable {
       lastEvent: lastEvent ?? this.lastEvent,
       liveEvents: liveEvents ?? this.liveEvents,
       matchStatus: matchStatus ?? this.matchStatus,
+      event: event ?? this.event,
     );
   }
 
@@ -534,5 +553,6 @@ class NewsDTO extends Equatable {
         lastEvent,
         liveEvents,
         matchStatus,
+        event,
       ];
 }
