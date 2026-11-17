@@ -8,6 +8,7 @@ import {
   groupTeams,
   isFinishedMatch,
   legacyStandingFields,
+  stageChanged,
 } from '../standings';
 
 const group = { descricao: 'A', fk_campeonato: 7, time1: 'Lava Jato', idTime1: 'a', time2: 'Volta', idTime2: 'b', time3: 'Vila', idTime3: 'c', time4: '', idTime4: '' };
@@ -118,4 +119,19 @@ test('grupo de qualquer tamanho: lê as listas idsTimes/times', () => {
     groupTeams(big).map((t) => t.id),
     ['a', 'b', 'c', 'd', 'e', 'f'],
   );
+});
+
+test('partida vinculada a grupo: conta só no dela; fora dos grupos não conta; antiga segue implícita', () => {
+  const games = (matches: Record<string, unknown>[], groupId: string) => groupGames(teams, matches, 7, groupId).length;
+  const linked = match('a', 'b', 1, 0, { idGrupo: 'gA' });
+  assert.equal(games([linked], 'gA'), 1);
+  assert.equal(games([linked], 'gB'), 0);
+  assert.equal(games([match('a', 'b', 1, 0, { foraDosGrupos: true, fase: 'final' })], 'gA'), 0);
+  assert.equal(games([match('a', 'b', 1, 0)], 'gA'), 1);
+});
+
+test('stageChanged: troca de grupo ou de fora dos grupos', () => {
+  assert.equal(stageChanged({ idGrupo: 'gA' }, { idGrupo: 'gB' }), true);
+  assert.equal(stageChanged({}, { foraDosGrupos: true }), true);
+  assert.equal(stageChanged({ idGrupo: 'gA' }, { idGrupo: 'gA', fase: 'x' }), false);
 });

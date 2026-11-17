@@ -238,4 +238,44 @@ export default async function run(env, check) {
   await check('atleta novo em competição de outro recusado', assertFails(setDoc(doc(org, 'jogadores2026/p4'),
     { ...fresh, inscricoes: { c12: entry } })));
   await check('usuário comum não cria atleta', assertFails(setDoc(doc(other, 'jogadores2026/p5'), fresh)));
+
+  // Encerrar a competição (campeão entre os inscritos) e reabrir.
+  await seed('campeonatos/c6', { titulo: 'Copa Mar', id_campeonato: 13, ids_times: ['t1', 't2'], idOrganizador: 'org1' });
+  await seed('campeonatos_org/c13', { idOrganizador: 'org1', idCampeonatoDoc: 'c6' });
+  const champion = { idTime: 't1', nome: 'Leões', urlImagem: '', corPrimaria: '#112233' };
+  await check('campeão fora dos inscritos recusado', assertFails(updateDoc(doc(org, 'campeonatos/c6'),
+    { encerrado: true, encerradoEm: serverTimestamp(), campeao: { ...champion, idTime: 't9' } })));
+  await check('encerrar sem a hora do servidor recusado', assertFails(updateDoc(doc(org, 'campeonatos/c6'),
+    { encerrado: true, campeao: champion })));
+  await check('usuário comum não encerra', assertFails(updateDoc(doc(other, 'campeonatos/c6'),
+    { encerrado: true, encerradoEm: serverTimestamp(), campeao: champion })));
+  await check('organizador encerra com campeão e vice', assertSucceeds(updateDoc(doc(org, 'campeonatos/c6'), {
+    encerrado: true, encerradoEm: serverTimestamp(), campeao: champion,
+    vice: { idTime: 't2', nome: 'Tigres', urlImagem: '' },
+  })));
+  await check('encerrada: não muda os times', assertFails(updateDoc(doc(org, 'campeonatos/c6'),
+    { times: ['A'], ids_times: ['t1'] })));
+  await check('encerrada: detalhes continuam', assertSucceeds(updateDoc(doc(org, 'campeonatos/c6'), { descricao: 'Fim!' })));
+  await check('encerrada: não cadastra partida', assertFails(setDoc(doc(org, 'partidas2026/m20'),
+    match('m20', { id_campeonato: 13 }))));
+  await check('encerrada: não cria atleta nela', assertFails(setDoc(doc(org, 'jogadores2026/p20'),
+    { ...fresh, idJogador: 'p20', inscricoes: { c13: entry } })));
+  await check('reabrir mantendo o campeão recusado', assertFails(updateDoc(doc(org, 'campeonatos/c6'),
+    { encerrado: false })));
+  await check('organizador reabre', assertSucceeds(updateDoc(doc(org, 'campeonatos/c6'),
+    { encerrado: false, campeao: deleteField(), vice: deleteField() })));
+  await check('reaberta: cadastra partida', assertSucceeds(setDoc(doc(org, 'partidas2026/m21'),
+    match('m21', { id_campeonato: 13 }))));
+  await check('parceiro/usuário não cria card de campeão', assertFails(setDoc(doc(other, 'noticias/campeao_c6'),
+    { tag: 'campeao', titulo: 'x', exibir: 'true' })));
+
+  // Fase da partida (grupo ou mata-mata).
+  await check('organizador cadastra partida de grupo', assertSucceeds(setDoc(doc(org, 'partidas2026/m30'),
+    match('m30', { idGrupo: 'g1', grupo: 'A' }))));
+  await check('organizador cadastra a final', assertSucceeds(setDoc(doc(org, 'partidas2026/m31'),
+    match('m31', { foraDosGrupos: true, fase: 'final' }))));
+  await check('fase desconhecida recusada', assertFails(setDoc(doc(org, 'partidas2026/m32'),
+    match('m32', { foraDosGrupos: true, fase: 'copa' }))));
+  await check('organizador troca a fase da partida', assertSucceeds(updateDoc(doc(org, 'partidas2026/m30'),
+    { idGrupo: deleteField(), grupo: deleteField(), foraDosGrupos: true, fase: 'semifinal' })));
 }

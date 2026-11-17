@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
+import 'package:arena_soccer/features/championships/data/dtos/championship_podium.dart';
 import 'package:arena_soccer/features/championships/domain/standings_criterion.dart';
 
 /// Abrangência do campeonato: o municipal só aceita times da região-sede; o
@@ -71,7 +72,21 @@ class ChampionshipDTO extends Equatable {
   /// `idOrganizador`: uid de quem organiza (pedido aprovado); vazio = só o admin.
   final String organizerId;
 
+  /// `encerrado`: competição encerrada (admin/organizador); sem partidas
+  /// nem inscrições novas.
+  final bool closed;
+
+  /// `encerradoEm`: hora do servidor do encerramento.
+  final DateTime? closedAt;
+
+  /// `campeao`/`vice`: escolhidos ao encerrar.
+  final ChampionshipPodiumTeam? champion;
+  final ChampionshipPodiumTeam? runnerUp;
+
   bool get isIntermunicipal => scope == ChampionshipScope.intermunicipal;
+
+  /// Aceita partidas e inscrições novas.
+  bool get isOpen => !closed;
 
   const ChampionshipDTO({
     required this.id,
@@ -95,6 +110,10 @@ class ChampionshipDTO extends Equatable {
     this.regionIds = const [],
     this.tiebreakers = const [],
     this.organizerId = '',
+    this.closed = false,
+    this.closedAt,
+    this.champion,
+    this.runnerUp,
   });
 
   factory ChampionshipDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -122,6 +141,10 @@ class ChampionshipDTO extends Equatable {
       regionIds: (data[regionIdsField] as List?)?.map((t) => t.toString()).toList() ?? const [],
       tiebreakers: StandingsCriterion.fromKeys(data['desempate']),
       organizerId: data[organizerField]?.toString() ?? '',
+      closed: data['encerrado'] == true,
+      closedAt: (data['encerradoEm'] as Timestamp?)?.toDate(),
+      champion: ChampionshipPodiumTeam.fromMap(data['campeao']),
+      runnerUp: ChampionshipPodiumTeam.fromMap(data['vice']),
     );
   }
 
@@ -154,6 +177,10 @@ class ChampionshipDTO extends Equatable {
       regionIds: list(json['regionIds']),
       tiebreakers: StandingsCriterion.fromKeys(json['tiebreakers']),
       organizerId: json['organizerId']?.toString() ?? '',
+      closed: json['closed'] == true,
+      closedAt: json['closedAt'] is num ? DateTime.fromMillisecondsSinceEpoch((json['closedAt'] as num).toInt()) : null,
+      champion: ChampionshipPodiumTeam.fromMap(json['champion']),
+      runnerUp: ChampionshipPodiumTeam.fromMap(json['runnerUp']),
     );
   }
 
@@ -180,6 +207,10 @@ class ChampionshipDTO extends Equatable {
         'regionIds': regionIds,
         'tiebreakers': [for (final c in tiebreakers) c.key],
         'organizerId': organizerId,
+        'closed': closed,
+        if (closedAt != null) 'closedAt': closedAt!.millisecondsSinceEpoch,
+        if (champion != null) 'champion': champion!.toMap(),
+        if (runnerUp != null) 'runnerUp': runnerUp!.toMap(),
       };
 
   Map<String, dynamic> toMap() => {
@@ -227,6 +258,10 @@ class ChampionshipDTO extends Equatable {
     List<String>? regionIds,
     List<StandingsCriterion>? tiebreakers,
     String? organizerId,
+    bool? closed,
+    DateTime? Function()? closedAt,
+    ChampionshipPodiumTeam? Function()? champion,
+    ChampionshipPodiumTeam? Function()? runnerUp,
   }) {
     return ChampionshipDTO(
       id: id ?? this.id,
@@ -250,6 +285,10 @@ class ChampionshipDTO extends Equatable {
       regionIds: regionIds ?? this.regionIds,
       tiebreakers: tiebreakers ?? this.tiebreakers,
       organizerId: organizerId ?? this.organizerId,
+      closed: closed ?? this.closed,
+      closedAt: closedAt != null ? closedAt() : this.closedAt,
+      champion: champion != null ? champion() : this.champion,
+      runnerUp: runnerUp != null ? runnerUp() : this.runnerUp,
     );
   }
 
@@ -276,5 +315,9 @@ class ChampionshipDTO extends Equatable {
         regionIds,
         tiebreakers,
         organizerId,
+        closed,
+        closedAt,
+        champion,
+        runnerUp,
       ];
 }

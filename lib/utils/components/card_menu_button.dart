@@ -45,9 +45,12 @@ class CardMenuButton extends StatelessWidget {
                   color: actions[i].destructive ? AppColors.danger : AppColors.textPrimary,
                 ),
                 const SizedBox(width: AppSizes.s12),
-                Text(
-                  actions[i].label,
-                  style: TextStyle(color: actions[i].destructive ? AppColors.danger : AppColors.textPrimary),
+                // Rótulo longo (fonte grande do aparelho) quebra em vez de estourar o menu.
+                Flexible(
+                  child: Text(
+                    actions[i].label,
+                    style: TextStyle(color: actions[i].destructive ? AppColors.danger : AppColors.textPrimary),
+                  ),
                 ),
               ],
             ),

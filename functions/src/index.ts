@@ -90,6 +90,7 @@ import { isLegacyVoteCollection, seasonCollections, seasonsToSweep, userPhotoPat
 import { claimReconcilePlan, missingEnrollmentFix, needsClaimReconcile } from './claim_reconcile';
 import { FanRankingTeam, fanRankingTotal, rankingTeamOf, sortFanRanking } from './fan_ranking';
 import { shouldAutoFinish, shouldCloseVoting } from './voting_close';
+import { championChange, championMessage, championNews, championNewsId } from './champion_card';
 import { EVENT_VOTES, eventOptionIds, tallyDoc } from './event_poll';
 import {
   ResultTeam,
@@ -111,6 +112,7 @@ import {
   criteriaOf,
   groupChampionshipId,
   groupGames,
+  stageChanged,
   groupHasAny,
   groupTeams,
   isFinishedMatch,
@@ -315,6 +317,9 @@ export const onMatchUpdated = onDocumentUpdated('{colecao}/{matchId}', async (ev
     await postResult(colecao, await currentSeason(), matchId, after);
   } else if (after.resultadoNoticia && resultChanged(before, after)) {
     await updateResult(await currentSeason(), matchId, after);
+  } else if (isFinishedMatch(after) && stageChanged(before, after)) {
+    // Partida terminada trocada de grupo/fase: as tabelas acompanham.
+    await recomputeMatchGroups(await currentSeason(), after);
   }
 });
 
@@ -542,7 +547,7 @@ async function recomputeGroups(
     for (const doc of groupDocs) {
       const group = doc.data();
       const teams = groupTeams(group);
-      const rows = computeTable(teams, groupGames(teams, matchData, championshipId), criteria);
+      const rows = computeTable(teams, groupGames(teams, matchData, championshipId, doc.id), criteria);
       const groupName = String(group.descricao ?? '').trim();
       batch.set(db.collection(seasonCollection('tabelas', season)).doc(doc.id), {
         idCampeonato: championshipId,
@@ -602,12 +607,35 @@ export const onChampionshipUpdated = onDocumentUpdated('campeonatos/{id}', async
   const before = event.data?.before.data();
   const after = event.data?.after.data();
   if (!before || !after) return;
+  await syncChampionCard(event.params.id, before, after, event.id);
   const changed =
     JSON.stringify(before.desempate ?? null) !== JSON.stringify(after.desempate ?? null) ||
     String(before.recalcularEm?.toMillis?.() ?? '') !== String(after.recalcularEm?.toMillis?.() ?? '');
   if (!changed) return;
   await recomputeGroups(await currentSeason(), Number(after.id_campeonato) || 0);
 });
+
+/**
+ * Competição encerrada com campeão: posta (ou regrava) o card de campeão e
+ * avisa a região e a torcida; reaberta: o card fica oculto.
+ */
+async function syncChampionCard(docId: string, before: Record<string, unknown>, after: Record<string, unknown>, eventId: string) {
+  const change = championChange(before, after);
+  if (!change) return;
+  const { db, FieldValue } = await admin();
+  const ref = db.collection('noticias').doc(championNewsId(docId));
+  if (change === 'reopened') {
+    const current = await ref.get();
+    if (current.exists) await ref.update({ exibir: 'false' });
+    return;
+  }
+  const news = championNews(docId, after);
+  if (!news) return;
+  await ref.set({ ...news, data: FieldValue.serverTimestamp() });
+  logger.info('Card de campeão postado', { campeonato: docId });
+  const message = championMessage(after);
+  if (message) await deliver(`campeao_${eventId}`, message, `campeonatos/${docId}`);
+}
 
 /** Aviso manual enviado pelo painel. */
 export const onNoticeCreated = onDocumentCreated('push_avisos/{noticeId}', async (event) => {

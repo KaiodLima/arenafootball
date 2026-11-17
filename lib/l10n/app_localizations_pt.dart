@@ -2074,6 +2074,13 @@ class AppLocalizationsPt extends AppLocalizations {
       'Para quem pediu · campeonato aprovado ou recusado';
 
   @override
+  String get pushActionChampion => 'Campeão';
+
+  @override
+  String get pushActionChampionHint =>
+      'Região e torcida · competição encerrada com o campeão';
+
+  @override
   String get referralTitle => 'Indique amigos';
 
   @override
@@ -6352,6 +6359,76 @@ class AppLocalizationsPt extends AppLocalizations {
   String get championshipsCurrentBadge => 'EM ANDAMENTO';
 
   @override
+  String get championshipClosedBadge => 'ENCERRADA';
+
+  @override
+  String get championshipClose => 'Encerrar competição';
+
+  @override
+  String get championshipReopen => 'Reabrir competição';
+
+  @override
+  String championshipCloseTitle(String title) {
+    return 'Encerrar $title';
+  }
+
+  @override
+  String get championshipCloseHint =>
+      'Escolha o campeão (e o vice, se quiser). Encerrada, ninguém cria partidas nem inscreve times ou atletas nela; as partidas que já existem continuam editáveis.';
+
+  @override
+  String get championshipCloseNoTeams =>
+      'A competição não tem times inscritos.';
+
+  @override
+  String get championshipChampionLabel => 'Campeão';
+
+  @override
+  String get championshipRunnerUpLabel => 'Vice';
+
+  @override
+  String get championshipCloseConfirm => 'ENCERRAR';
+
+  @override
+  String championshipClosedDone(String team) {
+    return 'Competição encerrada! $team é o campeão.';
+  }
+
+  @override
+  String get championshipReopenTitle => 'Reabrir a competição?';
+
+  @override
+  String get championshipReopenMessage =>
+      'O campeão sai e o card de campeão some do feed. Partidas e inscrições voltam a ser liberadas.';
+
+  @override
+  String get championshipReopenDone => 'Competição reaberta.';
+
+  @override
+  String get championshipChampionTitle => 'CAMPEÃO';
+
+  @override
+  String championshipRunnerUp(String team) {
+    return 'Vice: $team';
+  }
+
+  @override
+  String championshipClosedChip(String team) {
+    return 'Encerrada · $team';
+  }
+
+  @override
+  String get championshipClosedShort => 'Encerrada';
+
+  @override
+  String championCardSeason(String season) {
+    return 'Temporada $season';
+  }
+
+  @override
+  String get championCardAction => 'Ver competição';
+
+  @override
   String get championshipsPrevious => 'Anteriores';
 
   @override
@@ -6462,6 +6539,72 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get matchFormChampionship => 'Campeonato';
+
+  @override
+  String get matchRoundTitle => 'Fase';
+
+  @override
+  String get matchRoundPick => 'Fase da partida';
+
+  @override
+  String get matchRoundNone => 'Sem fase definida';
+
+  @override
+  String get matchRoundGroupsSection =>
+      'Fase de grupos · conta na tabela do grupo';
+
+  @override
+  String get matchRoundKnockoutSection => 'Mata-mata · não conta na tabela';
+
+  @override
+  String matchRoundGroup(String name) {
+    return 'Grupo $name';
+  }
+
+  @override
+  String get matchRoundSuggested =>
+      'Sugerido pelos times: os dois estão nesse grupo.';
+
+  @override
+  String matchRoundMismatch(String group) {
+    return 'Os times não estão no $group: a partida não vai contar na tabela.';
+  }
+
+  @override
+  String get matchStageRoundOf16 => 'Oitavas de final';
+
+  @override
+  String get matchStageQuarterFinal => 'Quartas de final';
+
+  @override
+  String get matchStageSemiFinal => 'Semifinal';
+
+  @override
+  String get matchStageThirdPlace => 'Disputa de 3º lugar';
+
+  @override
+  String get matchStageFinal => 'Final';
+
+  @override
+  String get matchStageOther => 'Outra fase (mata-mata)';
+
+  @override
+  String get matchStageBadgeRoundOf16 => 'OITAVAS';
+
+  @override
+  String get matchStageBadgeQuarterFinal => 'QUARTAS';
+
+  @override
+  String get matchStageBadgeSemiFinal => 'SEMIFINAL';
+
+  @override
+  String get matchStageBadgeThirdPlace => '3º LUGAR';
+
+  @override
+  String get matchStageBadgeFinal => 'FINAL';
+
+  @override
+  String get matchStageBadgeOther => 'MATA-MATA';
 
   @override
   String get teamRequestMenu => 'Sou dono de time';

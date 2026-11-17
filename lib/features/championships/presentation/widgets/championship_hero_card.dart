@@ -78,6 +78,13 @@ class ChampionshipInfoChip extends StatelessWidget {
 
 /// Chips do campeonato: região, nº de times e regulamento (se houver).
 List<Widget> championshipInfoChips(AppLocalizations l10n, ChampionshipDTO championship) => [
+      if (championship.closed)
+        ChampionshipInfoChip(
+          icon: Icons.emoji_events_rounded,
+          label: championship.champion == null
+              ? l10n.championshipClosedShort
+              : l10n.championshipClosedChip(championship.champion!.name),
+        ),
       if (championship.region.isNotEmpty) ChampionshipInfoChip(icon: Icons.place_rounded, label: championship.region),
       if (championship.teams.isNotEmpty)
         ChampionshipInfoChip(
@@ -92,24 +99,34 @@ List<Widget> championshipInfoChips(AppLocalizations l10n, ChampionshipDTO champi
 class ChampionshipSeasonBadge extends StatelessWidget {
   final String season;
 
-  const ChampionshipSeasonBadge({super.key, required this.season});
+  /// Competição encerrada: "ENCERRADA · 2026" em dourado.
+  final bool closed;
+
+  const ChampionshipSeasonBadge({super.key, required this.season, this.closed = false});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final current = season.isEmpty || season == SeasonCollection.currentSeason;
-    final label = current
-        ? [l10n.championshipsCurrentBadge, if (season.isNotEmpty) season].join(' · ')
-        : l10n.championshipSeasonShort(season);
+    final label = closed
+        ? [l10n.championshipClosedBadge, if (season.isNotEmpty) season].join(' · ')
+        : current
+            ? [l10n.championshipsCurrentBadge, if (season.isNotEmpty) season].join(' · ')
+            : l10n.championshipSeasonShort(season);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s2),
       decoration: BoxDecoration(
-        color: current ? ArenaPalette.of(context).primary : AppColors.white.withValues(alpha: 0.2),
+        color: closed
+            ? AppColors.gold
+            : current
+                ? ArenaPalette.of(context).primary
+                : AppColors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(AppSizes.s6),
       ),
       child: Text(
         label,
-        style: AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s12, letterSpacing: 0.6),
+        style: AppTypography.label(color: closed ? AppColors.primaryDark : AppColors.white)
+            .copyWith(fontSize: AppSizes.s12, letterSpacing: 0.6),
       ),
     );
   }
@@ -147,7 +164,7 @@ class ChampionshipHeroCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ChampionshipSeasonBadge(season: championship.season),
+                    ChampionshipSeasonBadge(season: championship.season, closed: championship.closed),
                     const Spacer(),
                     Text(
                       championship.title,

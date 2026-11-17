@@ -12,6 +12,7 @@ import 'package:arena_soccer/features/championships/data/dtos/championship_dto.d
 import 'package:arena_soccer/features/championships/data/dtos/group_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/group_table_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/standing_dto.dart';
+import 'package:arena_soccer/features/championships/data/dtos/championship_podium.dart';
 
 class ChampionshipsDataSource {
   final FirebaseFirestore _firestore;
@@ -256,6 +257,47 @@ class ChampionshipsDataSource {
       teamIds: [...ids, team.id],
       regionIds: regionIds.toList(),
     );
+  }
+
+  /// Encerra a competição com o [champion] (e o [runnerUp], opcional): as
+  /// functions postam o card de campeão.
+  Future<Either<Failure, void>> closeChampionship(
+    String id, {
+    required ChampionshipPodiumTeam champion,
+    ChampionshipPodiumTeam? runnerUp,
+  }) async {
+    try {
+      await _championships.doc(id).update(closeFields(champion: champion, runnerUp: runnerUp));
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('closeChampionship id=$id', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível encerrar a competição.'));
+    }
+  }
+
+  /// Campos gravados pelo [closeChampionship].
+  static Map<String, Object?> closeFields(
+          {required ChampionshipPodiumTeam champion, ChampionshipPodiumTeam? runnerUp}) =>
+      {
+        'encerrado': true,
+        'encerradoEm': FieldValue.serverTimestamp(),
+        'campeao': champion.toMap(),
+        'vice': runnerUp == null ? FieldValue.delete() : runnerUp.toMap(),
+      };
+
+  /// Reabre a competição (o card de campeão some do feed pelas functions).
+  Future<Either<Failure, void>> reopenChampionship(String id) async {
+    try {
+      await _championships.doc(id).update({
+        'encerrado': false,
+        'campeao': FieldValue.delete(),
+        'vice': FieldValue.delete(),
+      });
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('reopenChampionship id=$id', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível reabrir a competição.'));
+    }
   }
 
   /// Apaga só o campeonato (partidas, grupos e classificação continuam).

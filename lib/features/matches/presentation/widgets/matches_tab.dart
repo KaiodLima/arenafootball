@@ -122,11 +122,13 @@ class _OrganizerMatchesState extends State<_OrganizerMatches> {
             region: championship.region,
             season: season,
             filterKey: _filterKey,
-            onRegister: () => Navigator.pushNamed(
-              context,
-              AppRoutes.registerMatchPage,
-              arguments: {'championship': championship},
-            ),
+            onRegister: championship.isOpen
+                ? () => Navigator.pushNamed(
+                      context,
+                      AppRoutes.registerMatchPage,
+                      arguments: {'championship': championship},
+                    )
+                : null,
           ),
         ),
       ],

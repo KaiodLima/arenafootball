@@ -235,6 +235,11 @@ class _NotificationsPanelPageState extends State<NotificationsPanelPage> {
         name: l10n.pushActionOrganizerAnswer,
         description: l10n.pushActionOrganizerAnswerHint
       ),
+    PushAction.champion => (
+        icon: Icons.emoji_events_rounded,
+        name: l10n.pushActionChampion,
+        description: l10n.pushActionChampionHint
+      ),
   };
 }
 

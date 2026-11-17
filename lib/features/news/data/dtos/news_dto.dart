@@ -35,6 +35,10 @@ class NewsDTO extends Equatable {
   /// Evento de votação do admin ("gol mais bonito da rodada").
   static const String eventTag = 'evento';
 
+  /// Card automático de campeão (Cloud Function ao encerrar a competição):
+  /// campeão em `time_casa`/`escudo_casa`/`cor_casa`, vice em `time_fora`.
+  static const String championTag = 'campeao';
+
   final String id;
   final DateTime? date;
   final String title;
@@ -85,6 +89,9 @@ class NewsDTO extends Equatable {
   final String homeColor;
   final String awayColor;
   final String championshipTitle;
+
+  /// `id_campeonato_doc`: doc da competição (card de campeão).
+  final String championshipDocId;
 
   /// Card "Vote no craque": a votação da partida está aberta (`votacao`, string).
   final bool votingOpen;
@@ -158,6 +165,7 @@ class NewsDTO extends Equatable {
     this.homeColor = '',
     this.awayColor = '',
     this.championshipTitle = '',
+    this.championshipDocId = '',
     this.votingOpen = false,
     this.bestPlayerChecked = false,
     this.bestPlayerName = '',
@@ -190,6 +198,8 @@ class NewsDTO extends Equatable {
   bool get isBookingCard => tag == bookingTag;
 
   bool get isEvent => tag == eventTag;
+
+  bool get isChampion => tag == championTag;
 
   factory NewsDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? const {};
@@ -231,6 +241,7 @@ class NewsDTO extends Equatable {
       homeColor: data['cor_casa']?.toString() ?? '',
       awayColor: data['cor_fora']?.toString() ?? '',
       championshipTitle: data['campeonato']?.toString() ?? '',
+      championshipDocId: data['id_campeonato_doc']?.toString() ?? '',
       votingOpen: data['votacao']?.toString() == 'true',
       bestPlayerChecked: data['craque_apurado'] == true,
       bestPlayerName: data['craque_nome']?.toString() ?? '',
@@ -290,6 +301,7 @@ class NewsDTO extends Equatable {
       homeColor: text('homeColor'),
       awayColor: text('awayColor'),
       championshipTitle: text('championshipTitle'),
+      championshipDocId: text('championshipDocId'),
       votingOpen: json['votingOpen'] == true,
       bestPlayerChecked: json['bestPlayerChecked'] == true,
       bestPlayerName: text('bestPlayerName'),
@@ -336,6 +348,7 @@ class NewsDTO extends Equatable {
         'homeColor': homeColor,
         'awayColor': awayColor,
         'championshipTitle': championshipTitle,
+        'championshipDocId': championshipDocId,
         'votingOpen': votingOpen,
         'bestPlayerChecked': bestPlayerChecked,
         'bestPlayerName': bestPlayerName,
@@ -394,6 +407,7 @@ class NewsDTO extends Equatable {
         if (homeColor.isNotEmpty) 'cor_casa': homeColor,
         if (awayColor.isNotEmpty) 'cor_fora': awayColor,
         if (championshipTitle.isNotEmpty) 'campeonato': championshipTitle,
+        if (championshipDocId.isNotEmpty) 'id_campeonato_doc': championshipDocId,
         if (isVoteCall) 'votacao': votingOpen.toString(),
         if (bestPlayerChecked) 'craque_apurado': true,
         if (bestPlayerName.isNotEmpty) 'craque_nome': bestPlayerName,
@@ -444,6 +458,7 @@ class NewsDTO extends Equatable {
     String? homeColor,
     String? awayColor,
     String? championshipTitle,
+    String? championshipDocId,
     bool? votingOpen,
     bool? bestPlayerChecked,
     String? bestPlayerName,
@@ -492,6 +507,7 @@ class NewsDTO extends Equatable {
       homeColor: homeColor ?? this.homeColor,
       awayColor: awayColor ?? this.awayColor,
       championshipTitle: championshipTitle ?? this.championshipTitle,
+      championshipDocId: championshipDocId ?? this.championshipDocId,
       votingOpen: votingOpen ?? this.votingOpen,
       bestPlayerChecked: bestPlayerChecked ?? this.bestPlayerChecked,
       bestPlayerName: bestPlayerName ?? this.bestPlayerName,
@@ -543,6 +559,7 @@ class NewsDTO extends Equatable {
         homeColor,
         awayColor,
         championshipTitle,
+        championshipDocId,
         votingOpen,
         bestPlayerChecked,
         bestPlayerName,

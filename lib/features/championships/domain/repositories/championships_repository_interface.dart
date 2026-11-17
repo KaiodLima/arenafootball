@@ -6,6 +6,7 @@ import 'package:arena_soccer/features/championships/data/dtos/group_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/group_table_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/standing_dto.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
+import 'package:arena_soccer/features/championships/data/dtos/championship_podium.dart';
 
 abstract class IChampionshipsRepository {
   Stream<Either<Failure, List<ChampionshipDTO>>> watchChampionships({String? region});
@@ -84,4 +85,12 @@ abstract class IChampionshipsRepository {
 
   /// Apaga todo o cache de campeonatos (listas e avulsos).
   Future<void> deleteChampionshipsCache();
+
+  Future<Either<Failure, void>> closeChampionship(
+    String id, {
+    required ChampionshipPodiumTeam champion,
+    ChampionshipPodiumTeam? runnerUp,
+  });
+
+  Future<Either<Failure, void>> reopenChampionship(String id);
 }

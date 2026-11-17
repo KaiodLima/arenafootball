@@ -22,6 +22,10 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/components/safe_bottom.dart';
+import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/champion_banner.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/close_championship_sheet.dart';
+import 'package:arena_soccer/utils/components/card_menu_button.dart';
 
 /// Detalhe do campeonato: hero escuro (banner, temporada, título e chips) que
 /// recolhe ao rolar, e abas Visão geral · Times · Regulamento. O campeonato já
@@ -38,16 +42,44 @@ class ChampionshipDetailsPage extends StatefulWidget {
 class _ChampionshipDetailsPageState extends State<ChampionshipDetailsPage> {
   static const double _heroHeight = 300;
 
+  /// A competição na tela (muda ao encerrar/reabrir).
+  late ChampionshipDTO _championship = widget.championship;
+
   @override
   void initState() {
     super.initState();
     BlocProvider.of<ChampionshipDetailsCubit>(context).load(widget.championship);
   }
 
+  /// Times da competição para o pódio, com o id da competição quando o
+  /// cadastro do time não foi achado (as regras conferem o id do campeão).
+  List<TeamDTO> _podiumTeams() {
+    final teams = BlocProvider.of<ChampionshipDetailsCubit>(context).state;
+    final ids = _championship.teamIds;
+    return [
+      for (var i = 0; i < teams.length; i++)
+        teams[i].id.isEmpty && i < ids.length ? teams[i].copyWith(id: ids[i]) : teams[i],
+    ];
+  }
+
+  Future<void> _close() async {
+    final updated = await closeChampionshipFlow(context, championship: _championship, teams: _podiumTeams());
+    if (updated != null && mounted) setState(() => _championship = updated);
+  }
+
+  Future<void> _reopen() async {
+    final updated = await reopenChampionshipFlow(context, championship: _championship);
+    if (updated != null && mounted) setState(() => _championship = updated);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final championship = widget.championship;
+    final championship = _championship;
+    final session = context.watch<SessionCubit>().state;
+    final uid = session.user?.id ?? '';
+    // Admin ou o organizador da competição.
+    final canManage = session.isAdmin || (uid.isNotEmpty && championship.organizerId == uid);
 
     return DefaultTabController(
       length: 4,
@@ -72,6 +104,29 @@ class _ChampionshipDetailsPageState extends State<ChampionshipDetailsPage> {
                   style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s18),
                 ),
               ),
+              actions: [
+                if (canManage)
+                  Padding(
+                    padding: const EdgeInsets.only(right: AppSizes.s8),
+                    child: CardMenuButton(
+                      key: const ValueKey('championship-manage'),
+                      actions: [
+                        if (championship.isOpen)
+                          CardMenuAction(
+                            icon: Icons.flag_rounded,
+                            label: l10n.championshipClose,
+                            onSelected: _close,
+                          )
+                        else
+                          CardMenuAction(
+                            icon: Icons.lock_open_rounded,
+                            label: l10n.championshipReopen,
+                            onSelected: _reopen,
+                          ),
+                      ],
+                    ),
+                  ),
+              ],
               flexibleSpace: FlexibleSpaceBar(
                 collapseMode: CollapseMode.parallax,
                 background: _Hero(championship: championship),
@@ -127,7 +182,7 @@ class _Hero extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              ChampionshipSeasonBadge(season: championship.season),
+              ChampionshipSeasonBadge(season: championship.season, closed: championship.closed),
               const SizedBox(height: AppSizes.s8),
               Text(
                 championship.title,
@@ -200,6 +255,10 @@ class _OverviewTab extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, safeBottom(context, AppSizes.s32)),
       children: [
+        if (c.closed && c.champion != null) ...[
+          const SizedBox(height: AppSizes.s16),
+          ChampionBanner(champion: c.champion!, runnerUp: c.runnerUp),
+        ],
         if (hasPodium || individual.isNotEmpty) ...[
           _SectionTitle(l10n.championshipFormSectionPrizes),
           if (hasPodium)

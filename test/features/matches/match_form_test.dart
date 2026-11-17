@@ -4,6 +4,9 @@ import 'package:arena_soccer/features/matches/data/datasources/matches_datasourc
 import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/championships/data/dtos/group_dto.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/championship_groups_usecases.dart';
+import 'package:arena_soccer/features/matches/domain/match_round.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/get_region_championship_cache_first_usecase.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_cache_first_usecase.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
@@ -476,4 +479,85 @@ void main() {
       await cubit.close();
     });
   });
+
+  group('Fase da partida', () {
+    const copa = ChampionshipDTO(
+      id: 'c',
+      championshipId: 7,
+      title: 'Copa Verde',
+      region: 'Floresta',
+      teams: ['Lava Jato', 'Volta', 'Riacho'],
+      teamIds: ['1', '2', '3'],
+    );
+
+    Future<(MatchFormCubit, _FakeRepository)> build() async {
+      final repository = _FakeRepository();
+      final championships = _FakeChampionships()..list = const [copa];
+      final cubit = MatchFormCubit(
+        CreateMatchUseCase(repository, _FakeChampionship()),
+        _FakeRegions(),
+        _FakeTeams(),
+        GetRegionMatchesUseCase(repository),
+        championships,
+        _FakeGroups(),
+      );
+      await cubit.load(initialRegion: 'Floresta', now: DateTime(2026, 10, 18));
+      await Future<void>.delayed(Duration.zero);
+      return (cubit, repository);
+    }
+
+    test('sugere o grupo dos dois times; sem grupo em comum, sem fase', () async {
+      final (cubit, _) = await build();
+      addTearDown(cubit.close);
+      expect(cubit.state.form.groups.map((g) => g.id), ['gA', 'gB']);
+      cubit.selectHomeTeam('Lava Jato');
+      cubit.selectAwayTeam('Volta');
+      expect(cubit.state.form.round, const MatchRound.group(groupId: 'gA', groupName: 'A'));
+      cubit.selectAwayTeam('Riacho');
+      expect(cubit.state.form.round, isNull);
+    });
+
+    test('escolha do usuário fica; grupo sem os dois times avisa; a final vai na partida', () async {
+      final (cubit, repository) = await build();
+      addTearDown(cubit.close);
+      cubit.selectHomeTeam('Lava Jato');
+      cubit.selectAwayTeam('Riacho');
+      cubit.selectRound(const MatchRound.group(groupId: 'gA', groupName: 'A'));
+      expect(cubit.state.form.roundMismatch, isTrue);
+      cubit.selectRound(const MatchRound.knockout(MatchStage.finalMatch));
+      expect(cubit.state.form.roundMismatch, isFalse);
+      cubit.selectTime('19:00');
+      await cubit.submit();
+      final created = repository.created.single;
+      expect(created.round, const MatchRound.knockout(MatchStage.finalMatch));
+      expect(created.toMap()['foraDosGrupos'], isTrue);
+      expect(created.toMap()['fase'], 'final');
+    });
+  });
+
+  test('MatchRound: lido e gravado; partida antiga sem fase', () {
+    const group = MatchRound.group(groupId: 'gA', groupName: 'A');
+    expect(MatchRound.fromMap(group.toMap()), group);
+    const semi = MatchRound.knockout(MatchStage.semiFinal);
+    expect(MatchRound.fromMap(semi.toMap()), semi);
+    expect(MatchRound.fromMap(const {'foraDosGrupos': true}), const MatchRound.knockout(MatchStage.other));
+    expect(MatchRound.fromMap(const {}), isNull);
+    final fields = MatchesDataSource.roundFields(semi);
+    expect(fields['fase'], 'semifinal');
+    expect(fields['idGrupo'], isNotNull, reason: 'o grupo antigo é apagado');
+  });
 }
+
+class _FakeGroups implements WatchChampionshipGroupsUseCase {
+  @override
+  Stream<Either<Failure, List<GroupDTO>>> call({required int championshipId, String? season}) => Stream.value(
+        Right(championshipId == 7 ? const [_groupB, _groupA] : const []),
+      );
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+const _groupA =
+    GroupDTO(id: 'gA', description: 'A', teams: ['Lava Jato', 'Volta'], teamIds: ['1', '2'], championshipId: 7);
+const _groupB = GroupDTO(id: 'gB', description: 'B', teams: ['Riacho'], teamIds: ['3'], championshipId: 7);

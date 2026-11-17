@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
+import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
+import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
+import 'package:arena_soccer/features/auth/presentation/bloc/session_state.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/championship_details_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/page/championship_details_page.dart';
@@ -53,6 +56,13 @@ class _SpyMatchesCubit extends MatchesCubit {
       calls.add((championshipId, filter, region, season));
 }
 
+class _Session extends Cubit<SessionState> implements SessionCubit {
+  _Session() : super(const SessionState(user: UserDTO(id: 'u1', name: 'Conta', email: 'c@x.com')));
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 void main() {
   testWidgets('aba "Jogos" existe e só pede as partidas da competição quando é aberta', (tester) async {
     final matches = _SpyMatchesCubit();
@@ -69,6 +79,7 @@ void main() {
       locale: const Locale('pt'),
       home: MultiBlocProvider(
         providers: [
+          BlocProvider<SessionCubit>(create: (_) => _Session()),
           BlocProvider<ChampionshipDetailsCubit>(create: (_) => ChampionshipDetailsCubit(_Teams())),
           BlocProvider<MatchesCubit>.value(value: matches),
         ],

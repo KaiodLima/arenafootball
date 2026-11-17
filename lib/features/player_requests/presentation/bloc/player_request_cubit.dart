@@ -263,7 +263,8 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
         _applyClaim();
         continue;
       }
-      final championships = [...response.right]..sort((a, b) => a.championshipId.compareTo(b.championshipId));
+      final championships = [...response.right.where((c) => c.isOpen)]
+        ..sort((a, b) => a.championshipId.compareTo(b.championshipId));
       final current = state.form.championshipId;
       final keep = championships.any((c) => c.championshipId == current);
       _updateForm(state.form.copyWith(

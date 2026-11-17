@@ -22,7 +22,8 @@ enum PushAction {
   albumPack('album_pacote', true),
   referral('indicacao', true),
   organizerRequest('solicitacao_organizador', true),
-  organizerRequestAnswer('solicitacao_organizador_resposta', true);
+  organizerRequestAnswer('solicitacao_organizador_resposta', true),
+  champion('campeao', true);
 
   final String key;
   final bool defaultEnabled;

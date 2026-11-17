@@ -6,6 +6,8 @@ import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/match_form_hints.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/create_match_usecase.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
+import 'package:arena_soccer/features/championships/data/dtos/group_dto.dart';
+import 'package:arena_soccer/features/matches/domain/match_round.dart';
 
 /// Primeiro dado que falta para cadastrar (erro mostrado na tela).
 enum MatchFormMissing { teams, sameTeam, date, time }
@@ -55,6 +57,15 @@ class MatchFormData extends Equatable {
   /// Partidas já cadastradas na região (sugestões e conflitos).
   final List<MatchDTO> existing;
 
+  /// Grupos do campeonato escolhido (campo "Fase").
+  final List<GroupDTO> groups;
+
+  /// Fase escolhida: grupo (conta na tabela dele) ou mata-mata; nula = sem fase.
+  final MatchRound? round;
+
+  /// O usuário escolheu a fase (a sugestão pelos times não muda mais).
+  final bool roundManual;
+
   const MatchFormData({
     this.regions = const [],
     this.selectedRegion,
@@ -71,7 +82,40 @@ class MatchFormData extends Equatable {
     this.durationMinutes = MatchDTO.defaultDurationMinutes,
     this.customVenue = false,
     this.existing = const [],
+    this.groups = const [],
+    this.round,
+    this.roundManual = false,
   });
+
+  /// O grupo [group] tem o time de nome [teamName]? Pelo id, com o nome de reserva.
+  bool groupHasTeam(GroupDTO group, String? teamName) {
+    if (teamName == null) return false;
+    final id = teamIdOf(teamName);
+    String fold(String v) => v.trim().toLowerCase();
+    for (var i = 0; i < group.teams.length; i++) {
+      final groupId = group.teamIdAt(i);
+      // Pelo id quando os dois têm; senão pelo nome (grupo/time antigo).
+      final same = groupId.isNotEmpty && id.isNotEmpty ? groupId == id : fold(group.teams[i]) == fold(teamName);
+      if (same) return true;
+    }
+    return false;
+  }
+
+  /// Grupo que tem os dois times escolhidos (sugestão da fase).
+  GroupDTO? get groupOfTeams => homeTeam == null || awayTeam == null
+      ? null
+      : groups.where((g) => groupHasTeam(g, homeTeam) && groupHasTeam(g, awayTeam)).firstOrNull;
+
+  /// Grupo escolhido sem os dois times: a partida não conta na tabela.
+  bool get roundMismatch {
+    final current = round;
+    if (current == null || !current.isGroup || homeTeam == null || awayTeam == null) return false;
+    final group = groups.where((g) => g.id == current.groupId).firstOrNull;
+    return group != null && !(groupHasTeam(group, homeTeam) && groupHasTeam(group, awayTeam));
+  }
+
+  /// O campo "Fase" aparece (há competição escolhida; amistoso não tem).
+  bool get showsRound => championshipId != null && championshipId! > 0;
 
   bool get sameTeam => homeTeam != null && homeTeam == awayTeam;
 
@@ -189,6 +233,7 @@ class MatchFormData extends Equatable {
         region: matchRegion,
         championshipId: championshipId ?? 0,
         regionIds: regionIdsOfTeams,
+        round: showsRound ? round : null,
       );
 
   MatchFormData copyWith({
@@ -207,6 +252,9 @@ class MatchFormData extends Equatable {
     int? durationMinutes,
     bool? customVenue,
     List<MatchDTO>? existing,
+    List<GroupDTO>? groups,
+    MatchRound? Function()? round,
+    bool? roundManual,
     bool clearTeams = false,
   }) {
     return MatchFormData(
@@ -225,6 +273,9 @@ class MatchFormData extends Equatable {
       durationMinutes: durationMinutes ?? this.durationMinutes,
       customVenue: customVenue ?? this.customVenue,
       existing: existing ?? this.existing,
+      groups: groups ?? this.groups,
+      round: round != null ? round() : this.round,
+      roundManual: roundManual ?? this.roundManual,
     );
   }
 
@@ -244,7 +295,10 @@ class MatchFormData extends Equatable {
         venue,
         durationMinutes,
         customVenue,
-        existing
+        existing,
+        groups,
+        round,
+        roundManual,
       ];
 }
 

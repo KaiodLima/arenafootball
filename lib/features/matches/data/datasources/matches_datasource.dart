@@ -11,6 +11,7 @@ import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
+import 'package:arena_soccer/features/matches/domain/match_round.dart';
 
 class MatchesDataSource {
   final FirebaseFirestore _firestore;
@@ -154,13 +155,34 @@ class MatchesDataSource {
     required String time,
     required int durationMinutes,
     required String venue,
+    MatchRound? round,
+    bool writeRound = false,
     String? season,
   }) =>
       _update(
         matchId,
-        {'data': date, 'horario': time, 'duracao': durationMinutes, 'local': venue},
+        {
+          'data': date,
+          'horario': time,
+          'duracao': durationMinutes,
+          'local': venue,
+          if (writeRound) ...roundFields(round),
+        },
         season: season,
       );
+
+  /// Campos da fase no `update`: os da fase escolhida e os da outra apagados
+  /// (nula = sem fase, apaga os quatro).
+  static Map<String, Object> roundFields(MatchRound? round) {
+    final delete = FieldValue.delete();
+    return {
+      MatchRound.groupIdField: delete,
+      MatchRound.groupNameField: delete,
+      MatchRound.outsideGroupsField: delete,
+      MatchRound.stageField: delete,
+      ...?round?.toMap(),
+    };
+  }
 
   /// `votacao` continua gravado como string.
   Future<Either<Failure, void>> setVotingOpen({required String matchId, required bool isOpen, String? season}) =>

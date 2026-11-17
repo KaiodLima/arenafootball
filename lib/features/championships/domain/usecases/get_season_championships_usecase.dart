@@ -13,8 +13,9 @@ class GetSeasonChampionshipsUseCase {
   Future<Either<Failure, List<ChampionshipDTO>>> call(String season) => _repository.getSeasonChampionships(season);
 
   /// Em quais o [team] pode jogar: as municipais da região dele e todas as
-  /// intermunicipais.
+  /// intermunicipais, só as não encerradas.
   static List<ChampionshipDTO> eligibleFor(List<ChampionshipDTO> championships, TeamDTO team) => championships
+      .where((c) => c.isOpen)
       .where((c) => c.isIntermunicipal || c.region.trim().toLowerCase() == team.region.trim().toLowerCase())
       .toList();
 }

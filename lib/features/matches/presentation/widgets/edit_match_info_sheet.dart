@@ -9,6 +9,11 @@ import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/features/matches/domain/match_round.dart';
+import 'package:arena_soccer/features/championships/data/dtos/group_dto.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/championship_groups_usecases.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/match_round_picker.dart';
+import 'package:arena_soccer/injection_container.dart';
 
 /// "Editar partida" (engrenagem do card/detalhe): data, horário, duração e
 /// local, com os times no topo (só leitura). Devolve os dados ao salvar
@@ -45,6 +50,27 @@ class _EditMatchInfoSheetState extends State<_EditMatchInfoSheet> {
   late String _time = widget.match.time;
   late int _duration = widget.match.durationMinutes;
   late final _venue = TextEditingController(text: widget.match.venue);
+  late MatchRound? _round = widget.match.round;
+
+  /// Fase só em partida de competição (amistoso não tem).
+  bool get _showsRound => widget.match.championshipId > 0;
+
+  /// Grupos da competição, lidos uma vez (ao abrir a escolha da fase).
+  List<GroupDTO>? _groups;
+
+  Future<void> _pickRound() async {
+    final groups = _groups ??= await _loadGroups();
+    if (!mounted) return;
+    final picked = await showMatchRoundPicker(context, groups: groups, selected: _round);
+    if (picked != null && mounted) setState(() => _round = picked.round);
+  }
+
+  Future<List<GroupDTO>> _loadGroups() async {
+    if (!sl.isRegistered<WatchChampionshipGroupsUseCase>()) return const [];
+    final response = await sl<WatchChampionshipGroupsUseCase>()(championshipId: widget.match.championshipId).first;
+    final groups = [...response.fold((_) => const <GroupDTO>[], (list) => list)];
+    return groups..sort((a, b) => a.description.compareTo(b.description));
+  }
 
   /// A data mantém o formato da partida: com ano se ela tinha ano.
   String _format(DateTime date) {
@@ -135,12 +161,25 @@ class _EditMatchInfoSheetState extends State<_EditMatchInfoSheet> {
             Text(l10n.reportWhere, style: AppTypography.label(color: AppColors.textPrimary)),
             const SizedBox(height: AppSizes.s8),
             ArenaTextField(controller: _venue, labelText: l10n.matchReportVenue),
+            if (_showsRound) ...[
+              const SizedBox(height: AppSizes.s16),
+              Text(l10n.matchRoundTitle, style: AppTypography.label(color: AppColors.textPrimary)),
+              const SizedBox(height: AppSizes.s8),
+              MatchRoundTile(round: _round, onTap: _pickRound),
+            ],
             const SizedBox(height: AppSizes.s20),
             ArenaButton.primary(
               title: l10n.playersPhotoSave,
               function: () => Navigator.pop(
                 context,
-                (date: _date, time: _time, durationMinutes: _duration, venue: _venue.text),
+                (
+                  date: _date,
+                  time: _time,
+                  durationMinutes: _duration,
+                  venue: _venue.text,
+                  round: _round,
+                  keepRound: !_showsRound,
+                ),
               ),
             ),
           ],

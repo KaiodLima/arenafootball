@@ -22,6 +22,7 @@ import 'package:arena_soccer/features/players/domain/usecases/watch_team_players
 import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/match_round.dart';
 
 const _today = MatchDTO(
   id: 'm1',
@@ -73,6 +74,8 @@ class _FakeMatchesRepository implements IMatchesRepository {
     required String time,
     required int durationMinutes,
     required String venue,
+    MatchRound? round,
+    bool writeRound = false,
     String? season,
   }) async =>
       const Right(null);

@@ -15,6 +15,9 @@ import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecas
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/match_time.dart';
+import 'package:arena_soccer/features/championships/data/dtos/group_dto.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/championship_groups_usecases.dart';
+import 'package:arena_soccer/features/matches/domain/match_round.dart';
 
 /// Cadastro de partida (admin). As partidas já cadastradas na região
 /// alimentam as sugestões (horários e locais) e o aviso de conflito.
@@ -25,20 +28,47 @@ class MatchFormCubit extends Cubit<MatchFormState> {
   final GetRegionMatchesUseCase getRegionMatchesUseCase;
   final GetRegionChampionshipsCacheFirstUseCase getRegionChampionshipsCacheFirstUseCase;
 
+  /// Grupos do campeonato (campo "Fase"); nulo = sem o campo (testes antigos).
+  final WatchChampionshipGroupsUseCase? watchChampionshipGroupsUseCase;
+
   MatchFormCubit(
     this.createMatchUseCase,
     this.getRegionsUseCase,
     this.getTeamsCacheFirstUseCase,
     this.getRegionMatchesUseCase,
-    this.getRegionChampionshipsCacheFirstUseCase,
-  ) : super(const EditingMatchFormState());
+    this.getRegionChampionshipsCacheFirstUseCase, [
+    this.watchChampionshipGroupsUseCase,
+  ]) : super(const EditingMatchFormState());
 
   /// Temporada da partida (organizador: a do campeonato; nula = a atual).
   String? _season;
 
   void _edit(MatchFormData form) {
-    if (!isClosed) emit(EditingMatchFormState(form: form));
+    if (!isClosed) emit(EditingMatchFormState(form: _suggestRound(form)));
   }
+
+  /// Sem escolha do usuário, a fase acompanha os times: o grupo que tem os
+  /// dois (senão, sem fase).
+  MatchFormData _suggestRound(MatchFormData form) {
+    if (form.roundManual || !form.showsRound) return form;
+    final group = form.groupOfTeams;
+    final round = group == null ? null : MatchRound.group(groupId: group.id, groupName: group.description);
+    return round == form.round ? form : form.copyWith(round: () => round);
+  }
+
+  /// Grupos do campeonato [championshipId] (uma leitura por troca).
+  Future<void> _loadGroups(int? championshipId) async {
+    final useCase = watchChampionshipGroupsUseCase;
+    if (useCase == null || championshipId == null || championshipId <= 0) return;
+    final response = await useCase(championshipId: championshipId, season: _season).first;
+    if (isClosed || state.form.championshipId != championshipId) return;
+    final groups = [...response.fold((_) => const <GroupDTO>[], (list) => list)]
+      ..sort((a, b) => a.description.compareTo(b.description));
+    _edit(state.form.copyWith(groups: groups));
+  }
+
+  /// "Fase" escolhida pelo usuário (nula = sem fase).
+  void selectRound(MatchRound? round) => _edit(state.form.copyWith(round: () => round, roundManual: true));
 
   /// [now] só para teste.
   Future<void> load({required String initialRegion, DateTime? now}) async {
@@ -73,6 +103,7 @@ class MatchFormCubit extends Cubit<MatchFormState> {
     final id = championship.championshipId;
     final form = state.form.copyWith(championships: [championship], championshipId: () => id);
     _edit(_withTeams(form.copyWith(teams: form.teamsFor(id))));
+    await _loadGroups(id);
   }
 
   Future<void> selectRegion(String region) async {
@@ -84,6 +115,9 @@ class MatchFormCubit extends Cubit<MatchFormState> {
       championships: const [],
       championshipId: () => null,
       existing: const [],
+      groups: const [],
+      round: () => null,
+      roundManual: false,
       clearTeams: true,
     ));
     await _loadRegionData(region);
@@ -111,7 +145,8 @@ class MatchFormCubit extends Cubit<MatchFormState> {
     // Sem as partidas, só faltam as sugestões e o aviso de conflito.
     final existing = matchesResponse.fold((_) => const <MatchDTO>[], (list) => list);
     // Sem os campeonatos, o UseCase resolve pelo campeonato da região.
-    final championships = championshipsResponse.fold((_) => const <ChampionshipDTO>[], (list) => list);
+    final championships =
+        championshipsResponse.fold((_) => const <ChampionshipDTO>[], (list) => list).where((c) => c.isOpen).toList();
     final championshipId = championships.firstOrNull?.championshipId;
 
     var form = state.form.copyWith(
@@ -124,6 +159,7 @@ class MatchFormCubit extends Cubit<MatchFormState> {
     form = _withTeams(form.copyWith(teams: form.teamsFor(championshipId)));
     if (form.venue.isEmpty && form.frequentVenues.isNotEmpty) form = form.copyWith(venue: form.frequentVenues.first);
     _edit(form);
+    await _loadGroups(championshipId);
   }
 
   MatchFormData _withTeams(MatchFormData form) => form.teams.isEmpty
@@ -134,11 +170,18 @@ class MatchFormCubit extends Cubit<MatchFormState> {
   /// passam a ser os dele; os escolhidos ficam se continuarem valendo.
   void selectChampionship(int? championshipId) {
     if (championshipId == state.form.championshipId) return;
-    final form = state.form.copyWith(championshipId: () => championshipId);
+    // Outra competição: os grupos e a fase da anterior não valem.
+    final form = state.form.copyWith(
+      championshipId: () => championshipId,
+      groups: const [],
+      round: () => null,
+      roundManual: false,
+    );
     final teams = form.teamsFor(championshipId);
     bool offered(String? name) => name != null && teams.any((t) => t.name == name);
     final next = form.copyWith(teams: teams);
     _edit(offered(form.homeTeam) && offered(form.awayTeam) ? next : _withTeams(next));
+    unawaited(_loadGroups(championshipId));
   }
 
   void selectHomeTeam(String team) => _edit(state.form.copyWith(homeTeam: team));

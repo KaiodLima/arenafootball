@@ -24,6 +24,7 @@ import 'package:arena_soccer/features/matches/presentation/widgets/delay_match_s
 import 'package:arena_soccer/features/matches/domain/usecases/set_match_phase_usecase.dart';
 import 'package:arena_soccer/utils/components/safe_bottom.dart';
 import 'package:arena_soccer/features/qr_codes/presentation/page/qr_poster_page.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/match_round_picker.dart';
 
 /// Detalhes da partida: cabeçalho com as cores dos dois times, escudos e
 /// placar (antes do jogo, o horário), depois os gols em linha do tempo, o
@@ -106,6 +107,11 @@ class MatchDetailsPage extends StatelessWidget {
                         style: AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s14),
                       ),
                     ),
+                    // Fase da partida ("GRUPO A", "FINAL"...).
+                    if (match.round != null) ...[
+                      const SizedBox(width: AppSizes.s6),
+                      MatchStageBadge(round: match.round!),
+                    ],
                   ],
                 ),
                 actions: [

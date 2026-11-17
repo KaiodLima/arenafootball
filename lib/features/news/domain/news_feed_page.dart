@@ -21,10 +21,16 @@ class NewsFeedPage {
     );
   }
 
-  /// Cards de gol, de resultado, de votação, de evento e de publicidade só aparecem com
+  /// Cards de gol, de resultado, de votação, de evento, de campeão e de publicidade só aparecem com
   /// `exibir == "true"`. Notícias comuns aparecem sempre (como no app antigo).
-  static bool _visibleInFeed(NewsDTO item) =>
-      (item.isGoal || item.isResult || item.isVoteCall || item.isAd || item.isLive || item.isBookingCard || item.isEvent)
-          ? item.isVisible
-          : true;
+  static bool _visibleInFeed(NewsDTO item) => (item.isGoal ||
+          item.isResult ||
+          item.isVoteCall ||
+          item.isAd ||
+          item.isLive ||
+          item.isBookingCard ||
+          item.isEvent ||
+          item.isChampion)
+      ? item.isVisible
+      : true;
 }

@@ -9,6 +9,7 @@ import 'package:arena_soccer/features/championships/data/dtos/group_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/group_table_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/standing_dto.dart';
 import 'package:arena_soccer/features/championships/domain/repositories/championships_repository_interface.dart';
+import 'package:arena_soccer/features/championships/data/dtos/championship_podium.dart';
 
 class ChampionshipsRepositoryImpl implements IChampionshipsRepository {
   final ChampionshipsDataSource _dataSource;
@@ -146,4 +147,16 @@ class ChampionshipsRepositoryImpl implements IChampionshipsRepository {
     if (response.isRight) await deleteChampionshipsCache();
     return response;
   }
+
+  @override
+  Future<Either<Failure, void>> closeChampionship(
+    String id, {
+    required ChampionshipPodiumTeam champion,
+    ChampionshipPodiumTeam? runnerUp,
+  }) async =>
+      _invalidate(await _dataSource.closeChampionship(id, champion: champion, runnerUp: runnerUp));
+
+  @override
+  Future<Either<Failure, void>> reopenChampionship(String id) async =>
+      _invalidate(await _dataSource.reopenChampionship(id));
 }

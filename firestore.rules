@@ -231,7 +231,7 @@ service cloud.firestore {
             'images', 'idAutor'])
           && (tag == 'publicidade'
             ? p.get('podePublicidade', true)
-            : p.get('podeNoticias', true) && !(tag in ['gol', 'resultado', 'votacao', 'aovivo', 'cartao', 'evento']));
+            : p.get('podeNoticias', true) && !(tag in ['gol', 'resultado', 'votacao', 'aovivo', 'cartao', 'evento', 'campeao']));
       }
 
       function partnerHighlight(data, p) {
@@ -387,11 +387,43 @@ service cloud.firestore {
         let sede = resource.data.get('idRegiao', '');
         return collection == 'campeonatos' && signedIn()
           && resource.data.get('idOrganizador', '') == request.auth.uid
-          && changed.hasOnly(['descricao', 'urlImagem', 'premio1', 'premio2', 'premio3', 'premioArtilheiro',
+          && (organizerDetailsUpdate(changed, sede) || organizerClose(changed) || organizerReopen(changed));
+      }
+
+      function organizerDetailsUpdate(changed, sede) {
+        return changed.hasOnly(['descricao', 'urlImagem', 'premio1', 'premio2', 'premio3', 'premioArtilheiro',
             'premioGoleiro', 'regras', 'times', 'ids_times', 'regulamentoUrl', 'regulamentoNome', 'idsRegioes',
             'desempate'])
+          // Encerrada: os times ficam como estão.
+          && (resource.data.get('encerrado', false) != true || !changed.hasAny(['times', 'ids_times']))
           && (resource.data.get('abrangencia', 'municipal') == 'intermunicipal'
             || request.resource.data.get('idsRegioes', []).hasOnly([sede]));
+      }
+
+      // Time do pódio (`campeao`/`vice`): cópias de exibição de um time inscrito.
+      function podiumTeam(t) {
+        return t is map
+          && t.keys().hasOnly(['idTime', 'nome', 'urlImagem', 'corPrimaria', 'corSecundaria'])
+          && t.get('nome', '') is string && t.get('nome', '').size() > 0
+          && t.get('idTime', '') in resource.data.get('ids_times', []);
+      }
+
+      // Encerrar: campeão (e vice, opcional) entre os inscritos, hora do servidor.
+      function organizerClose(changed) {
+        let d = request.resource.data;
+        return changed.hasOnly(['encerrado', 'encerradoEm', 'campeao', 'vice'])
+          && d.get('encerrado', false) == true
+          && d.get('encerradoEm', null) == request.time
+          && podiumTeam(d.get('campeao', null))
+          && (!('vice' in d) || podiumTeam(d.vice));
+      }
+
+      // Reabrir: sem campeão nem vice.
+      function organizerReopen(changed) {
+        let d = request.resource.data;
+        return changed.hasOnly(['encerrado', 'campeao', 'vice'])
+          && d.get('encerrado', true) == false
+          && !('campeao' in d) && !('vice' in d);
       }
 
       // Organizador montando o elenco da competição dele: o índice
@@ -401,6 +433,8 @@ service cloud.firestore {
         let idx = get(/databases/$(database)/documents/campeonatos_org/$(key)).data;
         let champ = get(/databases/$(database)/documents/campeonatos/$(idx.idCampeonatoDoc)).data;
         return signedIn() && idx.idOrganizador == request.auth.uid
+          // Competição encerrada: sem partidas nem elencos novos.
+          && champ.get('encerrado', false) != true
           && champ.get('ids_times', []).hasAny([teamId]);
       }
 
@@ -440,8 +474,20 @@ service cloud.firestore {
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['gols', 'golTimeCasa', 'golTimeFora',
             'cartoes', 'substituicoes', 'escalacao', 'arbitro', 'observacoes', 'data', 'horario', 'horarioOriginal',
             'duracao', 'local',
-            'votacao', 'status', 'statusEm', 'inicioEm', 'intervaloEm', 'segundoTempoEm'])
+            'votacao', 'status', 'statusEm', 'inicioEm', 'intervaloEm', 'segundoTempoEm',
+            'idGrupo', 'grupo', 'foraDosGrupos', 'fase'])
+          && validMatchRound(request.resource.data)
           && organizerOwnsKey('c' + string(resource.data.get('id_campeonato', -1)));
+      }
+
+      // Fase da partida: grupo (`idGrupo`/`grupo`, textos) ou mata-mata
+      // (`foraDosGrupos` + `fase` de uma lista fixa). A tabela só usa o grupo se
+      // ele for da mesma competição e tiver os dois times.
+      function validMatchRound(d) {
+        return d.get('idGrupo', '') is string && d.get('idGrupo', '').size() <= 64
+          && d.get('grupo', '') is string && d.get('grupo', '').size() <= 40
+          && d.get('foraDosGrupos', false) is bool
+          && (!('fase' in d) || d.fase in ['oitavas', 'quartas', 'semifinal', 'terceiro', 'final', 'outra']);
       }
 
       // Chave de `inscricoes` que mudou (até 8 inscrições; as regras não têm laço).
@@ -510,7 +556,9 @@ service cloud.firestore {
         return collection.matches('partidas([0-9]{4})?') && signedIn()
           && d.keys().hasOnly(['id_partida', 'timeC', 'timeF', 'idTimeC', 'idTimeF', 'data', 'horario', 'local',
             'id_campeonato', 'fk_competicao', 'idRegiao', 'golTimeCasa', 'golTimeFora', 'votacao', 'tituloVotacao',
-            'melhorJogador', 'quantidadeVotos', 'dataRegistro', 'idsRegioes', 'duracao'])
+            'melhorJogador', 'quantidadeVotos', 'dataRegistro', 'idsRegioes', 'duracao',
+            'idGrupo', 'grupo', 'foraDosGrupos', 'fase'])
+          && validMatchRound(d)
           && d.id_partida == docId
           && d.get('golTimeCasa', 0) == 0 && d.get('golTimeFora', 0) == 0
           // `quantidadeVotos` nasce '' no app (formato do app antigo) ou 0.
@@ -824,7 +872,7 @@ service cloud.firestore {
           && data.get('idAutor', '') == request.auth.uid
           && data.get('idRegiao', '') == p.get('idRegiao', '-')
           && data.get('status', '') == 'pendente'
-          && !(data.get('tag', '') in ['gol', 'resultado', 'votacao', 'publicidade', 'aovivo', 'cartao', 'evento'])
+          && !(data.get('tag', '') in ['gol', 'resultado', 'votacao', 'publicidade', 'aovivo', 'cartao', 'evento', 'campeao'])
           && data.keys().hasOnly(['id', 'data', 'criadoEm', 'status', 'titulo', 'descricao', 'urlImagem', 'link',
             'exibir', 'fk_competicao', 'idRegiao', 'time_casa', 'time_fora', 'gol_time_casa', 'gol_time_fora', 'tag',
             'images', 'idAutor']);

@@ -198,11 +198,12 @@ class _OrganizerTeamsList extends StatelessWidget {
     final header = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ShortcutTile(
-          title: l10n.organizerEnrollTeam,
-          icon: Icons.group_add_rounded,
-          onTap: () => _enroll(context),
-        ),
+        if (selected?.isOpen ?? true)
+          ShortcutTile(
+            title: l10n.organizerEnrollTeam,
+            icon: Icons.group_add_rounded,
+            onTap: () => _enroll(context),
+          ),
         ShortcutTile(
           title: l10n.organizerFormGroups,
           icon: Icons.grid_view_rounded,

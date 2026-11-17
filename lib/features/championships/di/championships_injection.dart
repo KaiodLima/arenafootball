@@ -21,6 +21,7 @@ import 'package:arena_soccer/features/championships/domain/usecases/watch_groups
 import 'package:arena_soccer/features/championships/domain/usecases/watch_standings_usecase.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/watch_group_table_usecase.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/request_tables_recompute_usecase.dart';
+import 'package:arena_soccer/features/championships/domain/usecases/close_championship_usecase.dart';
 
 final _sl = GetIt.instance;
 
@@ -37,6 +38,8 @@ void registerChampionshipsDependencies() {
   _sl.registerLazySingleton(() => WatchStandingsUseCase(_sl()));
   _sl.registerLazySingleton(() => WatchGroupTableUseCase(_sl()));
   _sl.registerLazySingleton(() => RequestTablesRecomputeUseCase(_sl()));
+  _sl.registerLazySingleton(() => CloseChampionshipUseCase(_sl()));
+  _sl.registerLazySingleton(() => ReopenChampionshipUseCase(_sl()));
   _sl.registerLazySingleton(() => SaveChampionshipUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => DeleteChampionshipUseCase(_sl()));
   _sl.registerLazySingleton(() => GetRegionChampionshipUseCase(_sl()));

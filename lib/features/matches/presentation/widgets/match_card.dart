@@ -14,6 +14,7 @@ import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/constants/team_colors.dart';
 import 'package:arena_soccer/features/matches/domain/match_time.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/match_round_picker.dart';
 
 /// Momento da partida para o centro do card: antes do jogo (horário grande e
 /// o dia), em andamento (do horário até horário + duração, ou iniciada na mão
@@ -301,7 +302,8 @@ class _MatchCardState extends State<MatchCard> {
     final homeWon = !status.upcoming && match.homeGoals > match.awayGoals;
     final awayWon = !status.upcoming && match.awayGoals > match.homeGoals;
     final venue = match.venue.trim();
-    final hasTop = championshipLabel != null || isAdmin;
+    final round = match.round;
+    final hasTop = championshipLabel != null || isAdmin || round != null;
     final predict = status.upcoming && widget.onPredict != null;
 
     Widget stripe(Color color) => Container(
@@ -331,7 +333,15 @@ class _MatchCardState extends State<MatchCard> {
                     ),
                   ] else
                     const Spacer(),
-                  if (isAdmin) CardMenuButton(actions: _menuActions(l10n, match, status, now)),
+                  // Fase: "GRUPO A", "SEMIFINAL", "FINAL"...
+                  if (round != null) ...[
+                    const SizedBox(width: AppSizes.s6),
+                    MatchStageBadge(round: round),
+                  ],
+                  if (isAdmin) ...[
+                    const SizedBox(width: AppSizes.s6),
+                    CardMenuButton(actions: _menuActions(l10n, match, status, now)),
+                  ],
                 ],
               ),
             ),
@@ -555,7 +565,19 @@ class _MatchCardState extends State<MatchCard> {
         padding: const EdgeInsets.fromLTRB(AppSizes.s10, AppSizes.s8, AppSizes.s4, AppSizes.s8),
         child: Row(
           children: [
-            SizedBox(width: AppSizes.s52, child: _CompactStatus(match: match, status: status, now: now)),
+            SizedBox(
+              width: AppSizes.s52,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _CompactStatus(match: match, status: status, now: now),
+                  if (match.round != null) ...[
+                    const SizedBox(height: AppSizes.s2),
+                    FittedBox(fit: BoxFit.scaleDown, child: MatchStageBadge(round: match.round!, compact: true)),
+                  ],
+                ],
+              ),
+            ),
             Container(
               width: 1,
               height: AppSizes.s36,

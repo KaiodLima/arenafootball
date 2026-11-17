@@ -87,7 +87,7 @@ class LinkPlayerCubit extends Cubit<LinkPlayerState> {
   /// Competições da temporada em que o [teamId]/[team] está inscrito.
   List<ChampionshipDTO> championshipsOf({required String teamId, required String team}) => [
         for (final c in state.championships)
-          if (_hasTeam(c, teamId, team)) c,
+          if (c.isOpen && _hasTeam(c, teamId, team)) c,
       ];
 
   static bool _hasTeam(ChampionshipDTO c, String teamId, String team) {

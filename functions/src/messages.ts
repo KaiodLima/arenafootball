@@ -30,7 +30,8 @@ export type ActionKey =
   | 'album_pacote'
   | 'indicacao'
   | 'solicitacao_organizador'
-  | 'solicitacao_organizador_resposta';
+  | 'solicitacao_organizador_resposta'
+  | 'campeao';
 
 /** Sem configuração gravada, vale este padrão (notícia vem desligada). */
 export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
@@ -55,6 +56,7 @@ export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
   indicacao: true,
   solicitacao_organizador: true,
   solicitacao_organizador_resposta: true,
+  campeao: true,
 };
 
 export type Target = { topic: string } | { condition: string };
@@ -269,6 +271,7 @@ export function newsMessage(news: Doc, id = ''): PushMessage | null {
     tag === 'aovivo' ||
     tag === 'resultado' ||
     tag === 'votacao' ||
+    tag === 'campeao' ||
     tag === 'publicidade' ||
     text(news.exibir) !== 'true'
   ) {

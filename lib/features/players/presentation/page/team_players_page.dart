@@ -104,7 +104,8 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
   int? _organizerChampionship(BuildContext context) {
     final id = widget.championshipId;
     if (!widget.onlyChampionship || id == null) return null;
-    final organizes = context.read<OrganizerModeCubit>().state.championships.any((c) => c.championshipId == id);
+    final organizes =
+        context.read<OrganizerModeCubit>().state.championships.any((c) => c.championshipId == id && c.isOpen);
     return organizes ? id : null;
   }
 
@@ -149,11 +150,13 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
       for (final c in state.view.championships)
         ChampionshipChecklistItem(
           c,
-          blockedReason: switch (player.enrollmentIn(c.championshipId)) {
-            final e? when !player.playsIn(c.championshipId, teamId: _team.id, teamName: _team.name) =>
-              l10n.enrollPlayerOtherTeam(e.team),
-            _ => null,
-          },
+          blockedReason: !c.isOpen
+              ? l10n.championshipClosedShort
+              : switch (player.enrollmentIn(c.championshipId)) {
+                  final e? when !player.playsIn(c.championshipId, teamId: _team.id, teamName: _team.name) =>
+                    l10n.enrollPlayerOtherTeam(e.team),
+                  _ => null,
+                },
         ),
     ];
     final selected = await showChampionshipChecklistSheet(

@@ -2064,6 +2064,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'To the requester · competition approved or declined';
 
   @override
+  String get pushActionChampion => 'Champion';
+
+  @override
+  String get pushActionChampionHint =>
+      'Region and fans · competition finished with the champion';
+
+  @override
   String get referralTitle => 'Invite friends';
 
   @override
@@ -6315,6 +6322,76 @@ class AppLocalizationsEn extends AppLocalizations {
   String get championshipsCurrentBadge => 'IN PROGRESS';
 
   @override
+  String get championshipClosedBadge => 'FINISHED';
+
+  @override
+  String get championshipClose => 'Finish competition';
+
+  @override
+  String get championshipReopen => 'Reopen competition';
+
+  @override
+  String championshipCloseTitle(String title) {
+    return 'Finish $title';
+  }
+
+  @override
+  String get championshipCloseHint =>
+      'Pick the champion (and the runner-up, if you want). Once finished, no one can add matches or enroll teams or players; existing matches can still be edited.';
+
+  @override
+  String get championshipCloseNoTeams =>
+      'The competition has no enrolled teams.';
+
+  @override
+  String get championshipChampionLabel => 'Champion';
+
+  @override
+  String get championshipRunnerUpLabel => 'Runner-up';
+
+  @override
+  String get championshipCloseConfirm => 'FINISH';
+
+  @override
+  String championshipClosedDone(String team) {
+    return 'Competition finished! $team is the champion.';
+  }
+
+  @override
+  String get championshipReopenTitle => 'Reopen the competition?';
+
+  @override
+  String get championshipReopenMessage =>
+      'The champion is removed and the champion card leaves the feed. Matches and enrollments are allowed again.';
+
+  @override
+  String get championshipReopenDone => 'Competition reopened.';
+
+  @override
+  String get championshipChampionTitle => 'CHAMPION';
+
+  @override
+  String championshipRunnerUp(String team) {
+    return 'Runner-up: $team';
+  }
+
+  @override
+  String championshipClosedChip(String team) {
+    return 'Finished · $team';
+  }
+
+  @override
+  String get championshipClosedShort => 'Finished';
+
+  @override
+  String championCardSeason(String season) {
+    return 'Season $season';
+  }
+
+  @override
+  String get championCardAction => 'See competition';
+
+  @override
   String get championshipsPrevious => 'Previous';
 
   @override
@@ -6424,6 +6501,73 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get matchFormChampionship => 'Championship';
+
+  @override
+  String get matchRoundTitle => 'Stage';
+
+  @override
+  String get matchRoundPick => 'Match stage';
+
+  @override
+  String get matchRoundNone => 'No stage set';
+
+  @override
+  String get matchRoundGroupsSection =>
+      'Group stage · counts in the group table';
+
+  @override
+  String get matchRoundKnockoutSection =>
+      'Knockout · does not count in the table';
+
+  @override
+  String matchRoundGroup(String name) {
+    return 'Group $name';
+  }
+
+  @override
+  String get matchRoundSuggested =>
+      'Suggested by the teams: both are in this group.';
+
+  @override
+  String matchRoundMismatch(String group) {
+    return 'The teams are not in $group: the match will not count in the table.';
+  }
+
+  @override
+  String get matchStageRoundOf16 => 'Round of 16';
+
+  @override
+  String get matchStageQuarterFinal => 'Quarter-final';
+
+  @override
+  String get matchStageSemiFinal => 'Semi-final';
+
+  @override
+  String get matchStageThirdPlace => 'Third-place match';
+
+  @override
+  String get matchStageFinal => 'Final';
+
+  @override
+  String get matchStageOther => 'Other stage (knockout)';
+
+  @override
+  String get matchStageBadgeRoundOf16 => 'ROUND OF 16';
+
+  @override
+  String get matchStageBadgeQuarterFinal => 'QUARTER-FINAL';
+
+  @override
+  String get matchStageBadgeSemiFinal => 'SEMI-FINAL';
+
+  @override
+  String get matchStageBadgeThirdPlace => '3RD PLACE';
+
+  @override
+  String get matchStageBadgeFinal => 'FINAL';
+
+  @override
+  String get matchStageBadgeOther => 'KNOCKOUT';
 
   @override
   String get teamRequestMenu => 'I own a team';

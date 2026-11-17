@@ -24,6 +24,7 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/team_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/match_round_picker.dart';
 
 /// Cadastro de partida (admin): região, confronto com escudos (⇄ inverte o
 /// mando), data e hora por atalhos ou seletores nativos, local sugerido pelos
@@ -65,6 +66,13 @@ class _MatchFormPageState extends State<MatchFormPage> {
     _venueController.dispose();
     _venueFocus.dispose();
     super.dispose();
+  }
+
+  /// Fase da partida: grupos do campeonato ou mata-mata.
+  Future<void> _pickRound(MatchFormData form) async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    final picked = await showMatchRoundPicker(context, groups: form.groups, selected: form.round);
+    if (picked != null) _cubit.selectRound(picked.round);
   }
 
   /// Lista de campeonatos com busca (como a de times) e o amistoso.
@@ -258,6 +266,22 @@ class _MatchFormPageState extends State<MatchFormPage> {
               ),
               const SizedBox(height: AppSizes.s12),
               _AppearsIn(form: form),
+              // Fase: grupo (conta na tabela dele) ou mata-mata (selo da fase).
+              if (form.showsRound) ...[
+                const SizedBox(height: AppSizes.s20),
+                _Label(l10n.matchRoundTitle),
+                MatchRoundTile(round: form.round, onTap: () => _pickRound(form)),
+                if (form.roundMismatch) ...[
+                  const SizedBox(height: AppSizes.s6),
+                  Text(
+                    l10n.matchRoundMismatch(groupLabel(l10n, form.round!.groupName)),
+                    style: AppTypography.label(color: AppColors.danger).copyWith(fontSize: AppSizes.s12),
+                  ),
+                ] else if (!form.roundManual && form.round != null) ...[
+                  const SizedBox(height: AppSizes.s6),
+                  Text(l10n.matchRoundSuggested, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+                ],
+              ],
               const SizedBox(height: AppSizes.s20),
               _Label(l10n.matchFormWhen),
               MatchDateChips(selected: form.date, onSelected: _cubit.selectDate),

@@ -3497,6 +3497,18 @@ abstract class AppLocalizations {
   /// **'Para quem pediu · campeonato aprovado ou recusado'**
   String get pushActionOrganizerAnswerHint;
 
+  /// No description provided for @pushActionChampion.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeão'**
+  String get pushActionChampion;
+
+  /// No description provided for @pushActionChampionHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Região e torcida · competição encerrada com o campeão'**
+  String get pushActionChampionHint;
+
   /// No description provided for @referralTitle.
   ///
   /// In pt, this message translates to:
@@ -10484,6 +10496,120 @@ abstract class AppLocalizations {
   /// **'EM ANDAMENTO'**
   String get championshipsCurrentBadge;
 
+  /// No description provided for @championshipClosedBadge.
+  ///
+  /// In pt, this message translates to:
+  /// **'ENCERRADA'**
+  String get championshipClosedBadge;
+
+  /// No description provided for @championshipClose.
+  ///
+  /// In pt, this message translates to:
+  /// **'Encerrar competição'**
+  String get championshipClose;
+
+  /// No description provided for @championshipReopen.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reabrir competição'**
+  String get championshipReopen;
+
+  /// No description provided for @championshipCloseTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Encerrar {title}'**
+  String championshipCloseTitle(String title);
+
+  /// No description provided for @championshipCloseHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha o campeão (e o vice, se quiser). Encerrada, ninguém cria partidas nem inscreve times ou atletas nela; as partidas que já existem continuam editáveis.'**
+  String get championshipCloseHint;
+
+  /// No description provided for @championshipCloseNoTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'A competição não tem times inscritos.'**
+  String get championshipCloseNoTeams;
+
+  /// No description provided for @championshipChampionLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeão'**
+  String get championshipChampionLabel;
+
+  /// No description provided for @championshipRunnerUpLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vice'**
+  String get championshipRunnerUpLabel;
+
+  /// No description provided for @championshipCloseConfirm.
+  ///
+  /// In pt, this message translates to:
+  /// **'ENCERRAR'**
+  String get championshipCloseConfirm;
+
+  /// No description provided for @championshipClosedDone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Competição encerrada! {team} é o campeão.'**
+  String championshipClosedDone(String team);
+
+  /// No description provided for @championshipReopenTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reabrir a competição?'**
+  String get championshipReopenTitle;
+
+  /// No description provided for @championshipReopenMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'O campeão sai e o card de campeão some do feed. Partidas e inscrições voltam a ser liberadas.'**
+  String get championshipReopenMessage;
+
+  /// No description provided for @championshipReopenDone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Competição reaberta.'**
+  String get championshipReopenDone;
+
+  /// No description provided for @championshipChampionTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'CAMPEÃO'**
+  String get championshipChampionTitle;
+
+  /// No description provided for @championshipRunnerUp.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vice: {team}'**
+  String championshipRunnerUp(String team);
+
+  /// No description provided for @championshipClosedChip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Encerrada · {team}'**
+  String championshipClosedChip(String team);
+
+  /// No description provided for @championshipClosedShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'Encerrada'**
+  String get championshipClosedShort;
+
+  /// No description provided for @championCardSeason.
+  ///
+  /// In pt, this message translates to:
+  /// **'Temporada {season}'**
+  String championCardSeason(String season);
+
+  /// No description provided for @championCardAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver competição'**
+  String get championCardAction;
+
   /// No description provided for @championshipsPrevious.
   ///
   /// In pt, this message translates to:
@@ -10669,6 +10795,126 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Campeonato'**
   String get matchFormChampionship;
+
+  /// No description provided for @matchRoundTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fase'**
+  String get matchRoundTitle;
+
+  /// No description provided for @matchRoundPick.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fase da partida'**
+  String get matchRoundPick;
+
+  /// No description provided for @matchRoundNone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem fase definida'**
+  String get matchRoundNone;
+
+  /// No description provided for @matchRoundGroupsSection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fase de grupos · conta na tabela do grupo'**
+  String get matchRoundGroupsSection;
+
+  /// No description provided for @matchRoundKnockoutSection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mata-mata · não conta na tabela'**
+  String get matchRoundKnockoutSection;
+
+  /// No description provided for @matchRoundGroup.
+  ///
+  /// In pt, this message translates to:
+  /// **'Grupo {name}'**
+  String matchRoundGroup(String name);
+
+  /// No description provided for @matchRoundSuggested.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sugerido pelos times: os dois estão nesse grupo.'**
+  String get matchRoundSuggested;
+
+  /// No description provided for @matchRoundMismatch.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os times não estão no {group}: a partida não vai contar na tabela.'**
+  String matchRoundMismatch(String group);
+
+  /// No description provided for @matchStageRoundOf16.
+  ///
+  /// In pt, this message translates to:
+  /// **'Oitavas de final'**
+  String get matchStageRoundOf16;
+
+  /// No description provided for @matchStageQuarterFinal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quartas de final'**
+  String get matchStageQuarterFinal;
+
+  /// No description provided for @matchStageSemiFinal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Semifinal'**
+  String get matchStageSemiFinal;
+
+  /// No description provided for @matchStageThirdPlace.
+  ///
+  /// In pt, this message translates to:
+  /// **'Disputa de 3º lugar'**
+  String get matchStageThirdPlace;
+
+  /// No description provided for @matchStageFinal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Final'**
+  String get matchStageFinal;
+
+  /// No description provided for @matchStageOther.
+  ///
+  /// In pt, this message translates to:
+  /// **'Outra fase (mata-mata)'**
+  String get matchStageOther;
+
+  /// No description provided for @matchStageBadgeRoundOf16.
+  ///
+  /// In pt, this message translates to:
+  /// **'OITAVAS'**
+  String get matchStageBadgeRoundOf16;
+
+  /// No description provided for @matchStageBadgeQuarterFinal.
+  ///
+  /// In pt, this message translates to:
+  /// **'QUARTAS'**
+  String get matchStageBadgeQuarterFinal;
+
+  /// No description provided for @matchStageBadgeSemiFinal.
+  ///
+  /// In pt, this message translates to:
+  /// **'SEMIFINAL'**
+  String get matchStageBadgeSemiFinal;
+
+  /// No description provided for @matchStageBadgeThirdPlace.
+  ///
+  /// In pt, this message translates to:
+  /// **'3º LUGAR'**
+  String get matchStageBadgeThirdPlace;
+
+  /// No description provided for @matchStageBadgeFinal.
+  ///
+  /// In pt, this message translates to:
+  /// **'FINAL'**
+  String get matchStageBadgeFinal;
+
+  /// No description provided for @matchStageBadgeOther.
+  ///
+  /// In pt, this message translates to:
+  /// **'MATA-MATA'**
+  String get matchStageBadgeOther;
 
   /// No description provided for @teamRequestMenu.
   ///

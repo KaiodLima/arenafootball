@@ -2,9 +2,20 @@ import 'package:either_dart/either.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/repositories/matches_repository_interface.dart';
+import 'package:arena_soccer/features/matches/domain/match_round.dart';
 
 /// Dados da partida editados pela engrenagem ("Editar partida").
-typedef MatchInfoEdit = ({String date, String time, int durationMinutes, String venue});
+///
+/// [round]: fase (grupo ou mata-mata); nula = sem fase. [keepRound] = a folha
+/// não mostrou o campo (amistoso): a fase gravada fica como está.
+typedef MatchInfoEdit = ({
+  String date,
+  String time,
+  int durationMinutes,
+  String venue,
+  MatchRound? round,
+  bool keepRound,
+});
 
 /// "Editar partida": grava só data, horário, duração e local (o que o admin
 /// e o organizador da competição podem mudar depois do cadastro). Devolve a
@@ -20,11 +31,13 @@ class UpdateMatchInfoUseCase {
       time: info.time.trim(),
       durationMinutes: info.durationMinutes,
       venue: info.venue.trim(),
+      round: info.keepRound ? null : () => info.round,
     );
     final same = updated.date == match.date &&
         updated.time == match.time &&
         updated.durationMinutes == match.durationMinutes &&
-        updated.venue == match.venue;
+        updated.venue == match.venue &&
+        updated.round == match.round;
     if (same) return Right(match);
     final response = await _repository.updateMatchInfo(
       matchId: match.id,
@@ -32,6 +45,8 @@ class UpdateMatchInfoUseCase {
       time: updated.time,
       durationMinutes: updated.durationMinutes,
       venue: updated.venue,
+      round: updated.round,
+      writeRound: updated.round != match.round,
       season: season,
     );
     return response.map((_) => updated);

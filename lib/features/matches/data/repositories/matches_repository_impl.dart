@@ -4,6 +4,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/matches/data/datasources/matches_datasource.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/repositories/matches_repository_interface.dart';
+import 'package:arena_soccer/features/matches/domain/match_round.dart';
 
 class MatchesRepositoryImpl implements IMatchesRepository {
   final MatchesDataSource _dataSource;
@@ -94,6 +95,8 @@ class MatchesRepositoryImpl implements IMatchesRepository {
     required String time,
     required int durationMinutes,
     required String venue,
+    MatchRound? round,
+    bool writeRound = false,
     String? season,
   }) =>
       _dataSource.updateMatchInfo(
@@ -102,6 +105,8 @@ class MatchesRepositoryImpl implements IMatchesRepository {
         time: time,
         durationMinutes: durationMinutes,
         venue: venue,
+        round: round,
+        writeRound: writeRound,
         season: season,
       );
 

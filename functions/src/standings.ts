@@ -99,11 +99,28 @@ interface Game {
   awayGoals: number;
 }
 
+/**
+ * A partida vale para o grupo [groupId]? Vinculada (`idGrupo`): só no dela;
+ * fora dos grupos (mata-mata): em nenhum; sem os campos (antiga): em todos
+ * (os times decidem, regra implícita).
+ */
+export function countsForGroup(match: Doc, groupId: string): boolean {
+  if (match.foraDosGrupos === true) return false;
+  const linked = text(match.idGrupo);
+  return !linked || !groupId || linked === groupId;
+}
+
+/** Vínculo da partida com a fase mudou (recalcular os grupos). */
+export const stageChanged = (before: Doc, after: Doc): boolean =>
+  text(before.idGrupo) !== text(after.idGrupo) ||
+  (before.foraDosGrupos === true) !== (after.foraDosGrupos === true);
+
 /** Jogos do grupo: terminados, do campeonato, entre dois times diferentes do grupo. */
-export function groupGames(teams: GroupTeam[], matches: Doc[], championshipId: number): Game[] {
+export function groupGames(teams: GroupTeam[], matches: Doc[], championshipId: number, groupId = ''): Game[] {
   const games: Game[] = [];
   for (const match of matches) {
     if (int(match.id_campeonato) !== championshipId || !isFinishedMatch(match)) continue;
+    if (!countsForGroup(match, groupId)) continue;
     const home = teamIndex(teams, match.idTimeC, match.timeC);
     const away = teamIndex(teams, match.idTimeF, match.timeF);
     if (home < 0 || away < 0 || home === away) continue;

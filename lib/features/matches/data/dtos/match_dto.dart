@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_report_dtos.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
+import 'package:arena_soccer/features/matches/domain/match_round.dart';
 
 /// Início/fim marcado na mão pelo admin (`status`); vale mais que o horário.
 enum MatchManualStatus {
@@ -61,6 +62,10 @@ class MatchDTO extends Equatable {
 
   /// `id_campeonato`: número do campeonato da região.
   final int championshipId;
+
+  /// Fase: grupo do campeonato (`idGrupo`/`grupo`) ou mata-mata
+  /// (`foraDosGrupos`/`fase`); nula = sem fase (partida antiga).
+  final MatchRound? round;
   final String region;
   final int homeGoals;
   final int awayGoals;
@@ -124,6 +129,7 @@ class MatchDTO extends Equatable {
     this.originalTime = '',
     this.venue = '',
     this.championshipId = 0,
+    this.round,
     this.region = '',
     this.homeGoals = 0,
     this.awayGoals = 0,
@@ -172,6 +178,7 @@ class MatchDTO extends Equatable {
       originalTime: data['horarioOriginal']?.toString() ?? '',
       venue: data['local']?.toString() ?? '',
       championshipId: _int(data['id_campeonato']),
+      round: MatchRound.fromMap(data),
       region: RegionRegistry.nameFromDoc(data),
       homeGoals: _int(data['golTimeCasa']),
       awayGoals: _int(data['golTimeFora']),
@@ -211,6 +218,7 @@ class MatchDTO extends Equatable {
         if (originalTime.isNotEmpty) 'horarioOriginal': originalTime,
         'local': venue,
         'id_campeonato': championshipId,
+        ...?round?.toMap(),
         ...RegionRegistry.fieldsFor(region),
         'golTimeCasa': homeGoals,
         'golTimeFora': awayGoals,
@@ -241,6 +249,7 @@ class MatchDTO extends Equatable {
     String? originalTime,
     String? venue,
     int? championshipId,
+    MatchRound? Function()? round,
     String? region,
     int? homeGoals,
     int? awayGoals,
@@ -274,6 +283,7 @@ class MatchDTO extends Equatable {
       originalTime: originalTime ?? this.originalTime,
       venue: venue ?? this.venue,
       championshipId: championshipId ?? this.championshipId,
+      round: round != null ? round() : this.round,
       region: region ?? this.region,
       homeGoals: homeGoals ?? this.homeGoals,
       awayGoals: awayGoals ?? this.awayGoals,
@@ -313,6 +323,7 @@ class MatchDTO extends Equatable {
         originalTime: originalTime,
         venue: venue,
         championshipId: championshipId,
+        round: round,
         region: region,
         homeGoals: homeGoals,
         awayGoals: awayGoals,
@@ -349,6 +360,7 @@ class MatchDTO extends Equatable {
         originalTime: originalTime,
         venue: venue,
         championshipId: championshipId,
+        round: round,
         region: region,
         homeGoals: homeGoals,
         awayGoals: awayGoals,
@@ -389,6 +401,7 @@ class MatchDTO extends Equatable {
         originalTime,
         venue,
         championshipId,
+        round,
         region,
         homeGoals,
         awayGoals,

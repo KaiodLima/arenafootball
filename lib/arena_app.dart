@@ -506,7 +506,7 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.registerMatchPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<MatchFormCubit>(
-            create: (_) => MatchFormCubit(sl(), sl(), sl(), sl(), sl()),
+            create: (_) => MatchFormCubit(sl(), sl(), sl(), sl(), sl(), sl()),
             child: MatchFormPage(organizerChampionship: args?['championship'] as ChampionshipDTO?),
           );
         },

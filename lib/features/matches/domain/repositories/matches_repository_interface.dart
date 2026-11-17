@@ -2,6 +2,7 @@ import 'package:either_dart/either.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
+import 'package:arena_soccer/features/matches/domain/match_round.dart';
 
 abstract class IMatchesRepository {
   /// Com [region], só as partidas daquela região (filtradas no servidor).
@@ -52,6 +53,8 @@ abstract class IMatchesRepository {
     required String time,
     required int durationMinutes,
     required String venue,
+    MatchRound? round,
+    bool writeRound = false,
     String? season,
   });
 

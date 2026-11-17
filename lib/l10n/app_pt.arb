@@ -1014,6 +1014,8 @@
   "pushActionOrganizerRequestHint": "Para os admins · alguém quer cadastrar um campeonato",
   "pushActionOrganizerAnswer": "Resposta ao organizador",
   "pushActionOrganizerAnswerHint": "Para quem pediu · campeonato aprovado ou recusado",
+  "pushActionChampion": "Campeão",
+  "pushActionChampionHint": "Região e torcida · competição encerrada com o campeão",
   "referralTitle": "Indique amigos",
   "referralPaused": "As indicações estão pausadas no momento.",
   "referralSettingsSwitch": "Indicações ligadas",
@@ -3167,6 +3169,60 @@
   "championshipRulesOpenError": "Não foi possível abrir o regulamento.",
   "homePublishChampionship": "Campeonato",
   "championshipsCurrentBadge": "EM ANDAMENTO",
+  "championshipClosedBadge": "ENCERRADA",
+  "championshipClose": "Encerrar competição",
+  "championshipReopen": "Reabrir competição",
+  "championshipCloseTitle": "Encerrar {title}",
+  "@championshipCloseTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "championshipCloseHint": "Escolha o campeão (e o vice, se quiser). Encerrada, ninguém cria partidas nem inscreve times ou atletas nela; as partidas que já existem continuam editáveis.",
+  "championshipCloseNoTeams": "A competição não tem times inscritos.",
+  "championshipChampionLabel": "Campeão",
+  "championshipRunnerUpLabel": "Vice",
+  "championshipCloseConfirm": "ENCERRAR",
+  "championshipClosedDone": "Competição encerrada! {team} é o campeão.",
+  "@championshipClosedDone": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "championshipReopenTitle": "Reabrir a competição?",
+  "championshipReopenMessage": "O campeão sai e o card de campeão some do feed. Partidas e inscrições voltam a ser liberadas.",
+  "championshipReopenDone": "Competição reaberta.",
+  "championshipChampionTitle": "CAMPEÃO",
+  "championshipRunnerUp": "Vice: {team}",
+  "@championshipRunnerUp": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "championshipClosedChip": "Encerrada · {team}",
+  "@championshipClosedChip": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "championshipClosedShort": "Encerrada",
+  "championCardSeason": "Temporada {season}",
+  "@championCardSeason": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "championCardAction": "Ver competição",
   "championshipsPrevious": "Anteriores",
   "championshipTabOverview": "Visão geral",
   "championshipTabMatches": "Jogos",
@@ -3247,6 +3303,40 @@
   "matchFormChampionshipSearch": "Buscar campeonato",
   "matchFormChampionshipNoResults": "Nenhum campeonato com esse nome",
   "matchFormChampionship": "Campeonato",
+  "matchRoundTitle": "Fase",
+  "matchRoundPick": "Fase da partida",
+  "matchRoundNone": "Sem fase definida",
+  "matchRoundGroupsSection": "Fase de grupos · conta na tabela do grupo",
+  "matchRoundKnockoutSection": "Mata-mata · não conta na tabela",
+  "matchRoundGroup": "Grupo {name}",
+  "@matchRoundGroup": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "matchRoundSuggested": "Sugerido pelos times: os dois estão nesse grupo.",
+  "matchRoundMismatch": "Os times não estão no {group}: a partida não vai contar na tabela.",
+  "@matchRoundMismatch": {
+    "placeholders": {
+      "group": {
+        "type": "String"
+      }
+    }
+  },
+  "matchStageRoundOf16": "Oitavas de final",
+  "matchStageQuarterFinal": "Quartas de final",
+  "matchStageSemiFinal": "Semifinal",
+  "matchStageThirdPlace": "Disputa de 3º lugar",
+  "matchStageFinal": "Final",
+  "matchStageOther": "Outra fase (mata-mata)",
+  "matchStageBadgeRoundOf16": "OITAVAS",
+  "matchStageBadgeQuarterFinal": "QUARTAS",
+  "matchStageBadgeSemiFinal": "SEMIFINAL",
+  "matchStageBadgeThirdPlace": "3º LUGAR",
+  "matchStageBadgeFinal": "FINAL",
+  "matchStageBadgeOther": "MATA-MATA",
   "teamRequestMenu": "Sou dono de time",
   "teamRequestTitle": "Sou dono de time",
   "teamRequestIntro": "Cadastre o seu time: um administrador analisa o pedido e, aprovado, você gerencia o elenco.",
