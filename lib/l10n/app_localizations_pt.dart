@@ -5212,6 +5212,108 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enrollPlayerTitle => 'Competições do atleta';
 
   @override
+  String get linkPlayerMenu => 'Vincular atleta';
+
+  @override
+  String get linkPlayerToTeamMenu => 'Vincular a time/competição';
+
+  @override
+  String linkPlayerSearchTitle(String team) {
+    return 'Vincular atleta ao $team';
+  }
+
+  @override
+  String get linkPlayerSearchHint => 'Buscar atleta pelo nome';
+
+  @override
+  String get linkPlayerNoTeam => 'Sem time';
+
+  @override
+  String get linkPlayerHasAccount => 'com conta';
+
+  @override
+  String get linkPlayerEmpty => 'Nenhum atleta encontrado.';
+
+  @override
+  String linkPlayerFilterAll(int count) {
+    return 'Todos ($count)';
+  }
+
+  @override
+  String linkPlayerFilterAccount(int count) {
+    return 'Com conta ($count)';
+  }
+
+  @override
+  String linkPlayerFilterNoAccount(int count) {
+    return 'Sem conta ($count)';
+  }
+
+  @override
+  String linkPlayerShowing(int shown, int total) {
+    return 'Mostrando $shown de $total';
+  }
+
+  @override
+  String linkPlayerCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count atletas',
+      one: '1 atleta',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get linkPlayerLoadMore => 'Carregar mais';
+
+  @override
+  String linkPlayerOptionsTitle(String player, String team) {
+    return 'Vincular $player ao $team';
+  }
+
+  @override
+  String get linkPlayerOptionsHint =>
+      'Escolha as competições em que ele vai jogar pelo time. Sem nenhuma, ele entra no elenco geral com este como time principal.';
+
+  @override
+  String get linkPlayerMakeMain => 'Tornar time principal';
+
+  @override
+  String get linkPlayerMakeMainHint =>
+      'O time que aparece no perfil do atleta e no ranking geral.';
+
+  @override
+  String get linkPlayerAlready => 'Já joga por este time';
+
+  @override
+  String get linkPlayerTransfer => 'Transferir';
+
+  @override
+  String get linkPlayerTransferTitle => 'Confirmar transferência?';
+
+  @override
+  String linkPlayerTransferMessage(String player, String championships) {
+    return '$player deixa de jogar pelo time antigo em: $championships. Os números dele nessas competições continuam.';
+  }
+
+  @override
+  String get linkPlayerSave => 'VINCULAR';
+
+  @override
+  String linkPlayerDone(String player, String team) {
+    return '$player vinculado ao $team!';
+  }
+
+  @override
+  String get linkPlayerPickTeam => 'Escolha o time';
+
+  @override
+  String get linkPlayerNoChampionships =>
+      'O time não está inscrito em nenhuma competição da temporada: o atleta entra no elenco geral.';
+
+  @override
   String enrollPlayerSubtitle(String name, String team) {
     return 'Em quais competições $name joga pelo $team?';
   }
@@ -5401,6 +5503,18 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get athleteShare => 'Compartilhar';
+
+  @override
+  String athleteClaimTitle(String name) {
+    return 'É você, $name?';
+  }
+
+  @override
+  String get athleteClaimHint =>
+      'Peça para vincular este cadastro à sua conta: os gols e as assistências dele passam a ser seus.';
+
+  @override
+  String get athleteClaimAction => 'Sou eu, pedir vínculo';
 
   @override
   String athleteShareText(String name, String team, int goals, int assists) {

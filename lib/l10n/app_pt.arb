@@ -2364,6 +2364,106 @@
   "enrollSaved": "Inscrições salvas.",
   "enrollLoadError": "Não foi possível carregar as competições.",
   "enrollPlayerTitle": "Competições do atleta",
+  "linkPlayerMenu": "Vincular atleta",
+  "linkPlayerToTeamMenu": "Vincular a time/competição",
+  "linkPlayerSearchTitle": "Vincular atleta ao {team}",
+  "@linkPlayerSearchTitle": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "linkPlayerSearchHint": "Buscar atleta pelo nome",
+  "linkPlayerNoTeam": "Sem time",
+  "linkPlayerHasAccount": "com conta",
+  "linkPlayerEmpty": "Nenhum atleta encontrado.",
+  "linkPlayerFilterAll": "Todos ({count})",
+  "@linkPlayerFilterAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "linkPlayerFilterAccount": "Com conta ({count})",
+  "@linkPlayerFilterAccount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "linkPlayerFilterNoAccount": "Sem conta ({count})",
+  "@linkPlayerFilterNoAccount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "linkPlayerShowing": "Mostrando {shown} de {total}",
+  "@linkPlayerShowing": {
+    "placeholders": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "linkPlayerCount": "{count, plural, =1{1 atleta} other{{count} atletas}}",
+  "@linkPlayerCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "linkPlayerLoadMore": "Carregar mais",
+  "linkPlayerOptionsTitle": "Vincular {player} ao {team}",
+  "@linkPlayerOptionsTitle": {
+    "placeholders": {
+      "player": {
+        "type": "String"
+      },
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "linkPlayerOptionsHint": "Escolha as competições em que ele vai jogar pelo time. Sem nenhuma, ele entra no elenco geral com este como time principal.",
+  "linkPlayerMakeMain": "Tornar time principal",
+  "linkPlayerMakeMainHint": "O time que aparece no perfil do atleta e no ranking geral.",
+  "linkPlayerAlready": "Já joga por este time",
+  "linkPlayerTransfer": "Transferir",
+  "linkPlayerTransferTitle": "Confirmar transferência?",
+  "linkPlayerTransferMessage": "{player} deixa de jogar pelo time antigo em: {championships}. Os números dele nessas competições continuam.",
+  "@linkPlayerTransferMessage": {
+    "placeholders": {
+      "player": {
+        "type": "String"
+      },
+      "championships": {
+        "type": "String"
+      }
+    }
+  },
+  "linkPlayerSave": "VINCULAR",
+  "linkPlayerDone": "{player} vinculado ao {team}!",
+  "@linkPlayerDone": {
+    "placeholders": {
+      "player": {
+        "type": "String"
+      },
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "linkPlayerPickTeam": "Escolha o time",
+  "linkPlayerNoChampionships": "O time não está inscrito em nenhuma competição da temporada: o atleta entra no elenco geral.",
   "enrollPlayerSubtitle": "Em quais competições {name} joga pelo {team}?",
   "@enrollPlayerSubtitle": {
     "placeholders": {
@@ -2513,6 +2613,16 @@
   "athleteLoadError": "Não foi possível carregar o jogador.",
   "athleteEdit": "Editar (admin)",
   "athleteShare": "Compartilhar",
+  "athleteClaimTitle": "É você, {name}?",
+  "@athleteClaimTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "athleteClaimHint": "Peça para vincular este cadastro à sua conta: os gols e as assistências dele passam a ser seus.",
+  "athleteClaimAction": "Sou eu, pedir vínculo",
   "athleteShareText": "{name} ({team}): {goals} gols e {assists} assistências · via Arena Football",
   "@athleteShareText": {
     "placeholders": {

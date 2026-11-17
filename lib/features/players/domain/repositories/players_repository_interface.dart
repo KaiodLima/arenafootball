@@ -2,6 +2,7 @@ import 'package:either_dart/either.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
+import 'package:arena_soccer/features/players/domain/player_link.dart';
 
 abstract class IPlayersRepository {
   Stream<Either<Failure, List<PlayerDTO>>> watchTeamPlayers(
@@ -84,4 +85,14 @@ abstract class IPlayersRepository {
   });
 
   Future<Either<Failure, PlayerDTO?>> getPlayerByUser({required String userId, String? season});
+
+  Future<Either<Failure, List<PlayerDTO>>> getLinkCandidates({required List<String> teamIds, String? season});
+
+  Future<Either<Failure, void>> linkToTeam(
+    PlayerDTO player,
+    PlayerLinkPlan plan, {
+    required String teamId,
+    required String team,
+    String? season,
+  });
 }

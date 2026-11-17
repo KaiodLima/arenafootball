@@ -8,6 +8,7 @@ import 'package:arena_soccer/core/utils/app_logger.dart';
 import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
+import 'package:arena_soccer/features/players/domain/player_link.dart';
 
 class PlayersDataSource {
   final FirebaseFirestore _firestore;
@@ -436,6 +437,68 @@ class PlayersDataSource {
     }.toList();
     return changes;
   }
+
+  /// Atletas que o admin pode vincular a um time: os dos times [teamIds] (da
+  /// região; por `idsTimes` e, nos docs antigos, por `idTime`, em blocos de
+  /// até 30 ids) e os sem time. Sem ler a temporada inteira.
+  Future<Either<Failure, List<PlayerDTO>>> getLinkCandidates({required List<String> teamIds, String? season}) async {
+    try {
+      final collection = _players(season);
+      final ids = teamIds.where((id) => id.isNotEmpty).toSet().toList();
+      final queries = <Future<QuerySnapshot<Map<String, dynamic>>>>[
+        collection.where('time', isEqualTo: '').get(),
+        for (var i = 0; i < ids.length; i += whereInLimit) ...[
+          collection
+              .where(PlayerDTO.teamIdsField, arrayContainsAny: ids.sublist(i, (i + whereInLimit).clamp(0, ids.length)))
+              .get(),
+          collection.where('idTime', whereIn: ids.sublist(i, (i + whereInLimit).clamp(0, ids.length))).get(),
+        ],
+      ];
+      final snapshots = await Future.wait(queries);
+      final byId = <String, PlayerDTO>{};
+      for (final snapshot in snapshots) {
+        for (final doc in snapshot.docs) {
+          byId[doc.id] = PlayerDTO.fromFirestore(doc);
+        }
+      }
+      return Right(byId.values.toList());
+    } catch (e) {
+      AppLogger.e('getLinkCandidates', name: 'PlayersDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _loadFallback));
+    }
+  }
+
+  /// Vincula o atleta conforme o [plan] (admin): grava as inscrições (novas
+  /// zeradas; as transferidas mantêm os números da competição), o `idsTimes`
+  /// e, se for o caso, o time principal. Uma gravação só.
+  Future<Either<Failure, void>> linkToTeam(
+    PlayerDTO player,
+    PlayerLinkPlan plan, {
+    required String teamId,
+    required String team,
+    String? season,
+  }) async {
+    if (plan.isEmpty) return const Right(null);
+    try {
+      await _players(season).doc(player.id).update(linkFields(plan, teamId: teamId, team: team));
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('linkToTeam id=${player.id}', name: 'PlayersDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
+    }
+  }
+
+  /// Campos gravados pelo [linkToTeam].
+  static Map<Object, Object?> linkFields(PlayerLinkPlan plan, {required String teamId, required String team}) => {
+        for (final e in plan.upserts) ...{
+          _enrollmentPath(e.championshipId, 'idTime'): e.teamId,
+          _enrollmentPath(e.championshipId, 'time'): e.team,
+          _enrollmentPath(e.championshipId, PlayerDTO.goalsField): FieldValue.increment(0),
+          _enrollmentPath(e.championshipId, PlayerDTO.assistsField): FieldValue.increment(0),
+        },
+        if (plan.setMain) ...{'time': team, 'idTime': teamId},
+        PlayerDTO.teamIdsField: plan.teamIds,
+      };
 
   /// Exclui o jogador (só os sem conta vinculada; os vinculados saem do
   /// elenco com [removeFromSquad]).

@@ -152,6 +152,7 @@ import 'package:arena_soccer/features/qr_codes/presentation/bloc/qr_codes_cubit.
 import 'package:arena_soccer/features/qr_codes/presentation/page/qr_codes_page.dart';
 import 'package:arena_soccer/features/qr_codes/presentation/bloc/now_cubit.dart';
 import 'package:arena_soccer/features/qr_codes/presentation/page/now_page.dart';
+import 'package:arena_soccer/features/player_requests/domain/player_claim_args.dart';
 
 class ArenaApp extends StatelessWidget {
   const ArenaApp({super.key});
@@ -350,9 +351,14 @@ class ArenaApp extends StatelessWidget {
             ),
           );
         },
-        AppRoutes.playerRequestPage: (_) => BlocProvider<PlayerRequestCubit>(
+        AppRoutes.playerRequestPage: (context) => BlocProvider<PlayerRequestCubit>(
               create: (_) => PlayerRequestCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl()),
-              child: const PlayerRequestPage(),
+              child: PlayerRequestPage(
+                claim: switch (ModalRoute.of(context)?.settings.arguments) {
+                  final PlayerClaimArgs args => args,
+                  _ => null,
+                },
+              ),
             ),
         AppRoutes.playerRequestsPanelPage: (_) => BlocProvider<PlayerRequestsPanelCubit>(
               create: (_) => PlayerRequestsPanelCubit(sl(), sl(), sl(), sl(), sl(), sl()),

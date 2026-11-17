@@ -7,6 +7,7 @@ import 'package:arena_soccer/features/championships/data/dtos/championship_dto.d
 import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_cache_first_usecase.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
+import 'package:arena_soccer/features/player_requests/domain/player_claim_args.dart';
 import 'package:arena_soccer/features/player_requests/domain/usecases/cancel_player_request_usecase.dart';
 import 'package:arena_soccer/features/player_requests/domain/usecases/submit_player_request_usecase.dart';
 import 'package:arena_soccer/features/player_requests/domain/usecases/watch_my_player_request_usecase.dart';
@@ -213,6 +214,27 @@ void main() {
     await cubit.selectChampionship(7);
     expect(cubit.state.form.unlinkedPlayers.map((p) => p.id), contains('p9'));
     await cubit.close();
+  });
+
+  group('"É você?" do perfil do atleta', () {
+    test('abre com o time e o atleta já marcados', () async {
+      final cubit =
+          PlayerRequestCubit(_WatchMine(), _Submit(), _Cancel(), _Regions(), _Teams(), _Squad(), _Championships());
+      addTearDown(cubit.close);
+      await cubit.start(
+        userId: 'u1',
+        userName: 'Eduardo',
+        email: 'e@x.com',
+        initialRegion: 'Floresta',
+        claim: const PlayerClaimArgs(playerId: 'p1', team: 'Lava Jato', teamId: '1', region: 'Floresta'),
+      );
+      for (var i = 0; i < 5; i++) {
+        await Future<void>.delayed(Duration.zero);
+      }
+      expect(cubit.state.form.selectedTeam, 'Lava Jato');
+      expect(cubit.state.form.claimedPlayer?.id, 'p1');
+      expect(cubit.state.form.name, 'Dudu');
+    });
   });
 }
 

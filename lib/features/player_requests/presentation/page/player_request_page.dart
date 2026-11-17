@@ -31,12 +31,16 @@ import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 import 'package:arena_soccer/utils/components/safe_bottom.dart';
+import 'package:arena_soccer/features/player_requests/domain/player_claim_args.dart';
 
 /// "Sou jogador": o usuário pede para entrar no elenco de um time da região.
 /// Sem pedido (ou editando), mostra o formulário; com pedido, a situação
 /// (pendente, aprovada ou rejeitada) em tempo real.
 class PlayerRequestPage extends StatefulWidget {
-  const PlayerRequestPage({super.key});
+  /// "É você?" do perfil do atleta: já abre com ele marcado.
+  final PlayerClaimArgs? claim;
+
+  const PlayerRequestPage({super.key, this.claim});
 
   @override
   State<PlayerRequestPage> createState() => _PlayerRequestPageState();
@@ -60,7 +64,8 @@ class _PlayerRequestPageState extends State<PlayerRequestPage> {
       userId: user.id,
       userName: user.name,
       email: user.email,
-      initialRegion: BlocProvider.of<RegionCubit>(context).state.selectedRegion,
+      initialRegion: widget.claim?.region ?? BlocProvider.of<RegionCubit>(context).state.selectedRegion,
+      claim: widget.claim,
     );
     _cubit.setAccountPlayer(BlocProvider.of<MyPlayerCubit>(context).state.player);
   }

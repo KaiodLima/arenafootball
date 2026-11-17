@@ -30,6 +30,7 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/constants/team_colors.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 import 'package:arena_soccer/utils/components/safe_bottom.dart';
+import 'package:arena_soccer/features/players/presentation/widgets/link_player_sheet.dart';
 
 /// Elenco de um time na temporada selecionada: topo com o escudo, as chips
 /// "Elenco geral" + uma por competição que o time joga, resumo, busca,
@@ -269,6 +270,20 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
                                     icon: Icons.emoji_events_outlined,
                                     label: l10n.enrollTeamMenu,
                                     onSelected: () => _enrollTeam(l10n),
+                                  ),
+                                  // Traz um atleta sem time ou de outro time (com ou sem conta).
+                                  CardMenuAction(
+                                    icon: Icons.person_add_alt_1_rounded,
+                                    label: l10n.linkPlayerMenu,
+                                    onSelected: () => showLinkPlayerToTeam(
+                                      context,
+                                      teamId: _team.id,
+                                      team: _team.name,
+                                      region: _team.region.isNotEmpty
+                                          ? _team.region
+                                          : BlocProvider.of<RegionCubit>(context).state.selectedRegion,
+                                      season: _season,
+                                    ),
                                   ),
                                   CardMenuAction(
                                     icon: Icons.delete_outline_rounded,

@@ -8,6 +8,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_state.dart';
+import 'package:arena_soccer/app_routes.dart';
+import 'package:arena_soccer/features/player_requests/domain/player_claim_args.dart';
+import 'package:arena_soccer/features/player_requests/domain/usecases/watch_my_player_request_usecase.dart';
+import 'package:arena_soccer/features/player_requests/presentation/bloc/my_player_cubit.dart';
+import 'package:arena_soccer/features/player_requests/presentation/bloc/my_player_state.dart';
+import 'package:arena_soccer/features/players/domain/usecases/watch_user_player_usecase.dart';
 import 'package:arena_soccer/features/players/presentation/page/player_profile_page.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_state.dart';
@@ -58,6 +64,9 @@ const _all = [
 ];
 
 class _FakePlayers implements IPlayersRepository {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+
   @override
   Future<Either<Failure, PlayerDTO?>> getPlayerByUser({required String userId, String? season}) async =>
       const Right(null);
@@ -251,6 +260,22 @@ class _Session extends Cubit<SessionState> implements SessionCubit {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+class _MyPlayer extends MyPlayerCubit {
+  _MyPlayer(PlayerDTO? player) : super(_NoRequest(), _NoUserPlayer()) {
+    emit(MyPlayerState(player: player));
+  }
+}
+
+class _NoRequest implements WatchMyPlayerRequestUseCase {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _NoUserPlayer implements WatchUserPlayerUseCase {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 class _Owned extends Cubit<OwnedTeamState> implements OwnedTeamCubit {
   _Owned() : super(const OwnedTeamState());
 
@@ -294,22 +319,37 @@ void main() {
 
   Future<void> settle() => Future<void>.delayed(const Duration(milliseconds: 10));
 
-  Future<void> pumpPage(WidgetTester tester, {required String uid, bool admin = false, bool playerMode = false}) async {
+  final pushed = <RouteSettings>[];
+
+  Future<void> pumpPage(
+    WidgetTester tester, {
+    required String uid,
+    bool admin = false,
+    bool playerMode = false,
+    String playerUserId = 'u1',
+    PlayerDTO? myPlayer,
+  }) async {
+    pushed.clear();
     await tester.pumpWidget(MultiBlocProvider(
       providers: [
         BlocProvider<SessionCubit>(create: (_) => _Session(uid, admin: admin, playerMode: playerMode)),
         BlocProvider<OwnedTeamCubit>(create: (_) => _Owned()),
         BlocProvider<RegionCubit>(create: (_) => _Region()),
+        BlocProvider<MyPlayerCubit>(create: (_) => _MyPlayer(myPlayer)),
         BlocProvider<PlayerProfileCubit>.value(value: cubit),
       ],
-      child: const MaterialApp(
+      child: MaterialApp(
+        onGenerateRoute: (settings) {
+          pushed.add(settings);
+          return MaterialPageRoute(builder: (_) => const SizedBox());
+        },
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: Locale('pt'),
-        home: PlayerProfilePage(playerId: 'dudu', season: '2023'),
+        home: const PlayerProfilePage(playerId: 'dudu', season: '2023'),
       ),
     ));
-    players.controller.add(Right(_dudu.copyWith(userId: 'u1')));
+    players.controller.add(Right(_dudu.copyWith(userId: playerUserId)));
     await tester.pump();
     await tester.pump();
   }
@@ -328,6 +368,34 @@ void main() {
   testWidgets('admin no modo jogador: vê como o atleta da conta ("Trocar minha foto")', (tester) async {
     await pumpPage(tester, uid: 'u1', admin: true, playerMode: true);
     expect(find.text('Trocar minha foto'), findsOneWidget);
+  });
+
+  testWidgets('"É você?": conta sem atleta vê no atleta sem conta e abre o "Sou jogador"', (tester) async {
+    await pumpPage(tester, uid: 'u2', playerUserId: '');
+    expect(find.text('É você, Dudu?'), findsOneWidget);
+    await tester.ensureVisible(find.byKey(const ValueKey('athlete-claim')));
+    await tester.tap(find.byKey(const ValueKey('athlete-claim')));
+    await tester.pumpAndSettle();
+    expect(pushed.single.name, AppRoutes.playerRequestPage);
+    expect(
+      pushed.single.arguments,
+      const PlayerClaimArgs(playerId: 'dudu', team: 'Lava Jato', teamId: '1', region: 'Floresta'),
+    );
+  });
+
+  testWidgets('"É você?" some no atleta com conta', (tester) async {
+    await pumpPage(tester, uid: 'u2');
+    expect(find.byKey(const ValueKey('athlete-claim')), findsNothing);
+  });
+
+  testWidgets('"É você?" some para a conta que já é atleta', (tester) async {
+    await pumpPage(tester, uid: 'u2', playerUserId: '', myPlayer: const PlayerDTO(id: 'x', name: 'X', team: 'Volta'));
+    expect(find.byKey(const ValueKey('athlete-claim')), findsNothing);
+  });
+
+  testWidgets('"É você?" some para o admin', (tester) async {
+    await pumpPage(tester, uid: 'u9', playerUserId: '', admin: true);
+    expect(find.byKey(const ValueKey('athlete-claim')), findsNothing);
   });
 
   testWidgets('o admin tem o editor completo, não o botão do atleta', (tester) async {

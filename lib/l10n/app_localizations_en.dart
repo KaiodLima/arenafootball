@@ -5184,6 +5184,108 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enrollPlayerTitle => 'Player\'s competitions';
 
   @override
+  String get linkPlayerMenu => 'Link player';
+
+  @override
+  String get linkPlayerToTeamMenu => 'Link to team/competition';
+
+  @override
+  String linkPlayerSearchTitle(String team) {
+    return 'Link a player to $team';
+  }
+
+  @override
+  String get linkPlayerSearchHint => 'Search player by name';
+
+  @override
+  String get linkPlayerNoTeam => 'No team';
+
+  @override
+  String get linkPlayerHasAccount => 'has account';
+
+  @override
+  String get linkPlayerEmpty => 'No players found.';
+
+  @override
+  String linkPlayerFilterAll(int count) {
+    return 'All ($count)';
+  }
+
+  @override
+  String linkPlayerFilterAccount(int count) {
+    return 'With account ($count)';
+  }
+
+  @override
+  String linkPlayerFilterNoAccount(int count) {
+    return 'No account ($count)';
+  }
+
+  @override
+  String linkPlayerShowing(int shown, int total) {
+    return 'Showing $shown of $total';
+  }
+
+  @override
+  String linkPlayerCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count players',
+      one: '1 player',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get linkPlayerLoadMore => 'Load more';
+
+  @override
+  String linkPlayerOptionsTitle(String player, String team) {
+    return 'Link $player to $team';
+  }
+
+  @override
+  String get linkPlayerOptionsHint =>
+      'Pick the competitions he will play for the team. With none, he joins the general squad with this as his main team.';
+
+  @override
+  String get linkPlayerMakeMain => 'Make main team';
+
+  @override
+  String get linkPlayerMakeMainHint =>
+      'The team shown on the player profile and in the overall ranking.';
+
+  @override
+  String get linkPlayerAlready => 'Already plays for this team';
+
+  @override
+  String get linkPlayerTransfer => 'Transfer';
+
+  @override
+  String get linkPlayerTransferTitle => 'Confirm transfer?';
+
+  @override
+  String linkPlayerTransferMessage(String player, String championships) {
+    return '$player stops playing for the old team in: $championships. His numbers in those competitions stay.';
+  }
+
+  @override
+  String get linkPlayerSave => 'LINK';
+
+  @override
+  String linkPlayerDone(String player, String team) {
+    return '$player linked to $team!';
+  }
+
+  @override
+  String get linkPlayerPickTeam => 'Pick the team';
+
+  @override
+  String get linkPlayerNoChampionships =>
+      'The team is not enrolled in any competition this season: the player joins the general squad.';
+
+  @override
   String enrollPlayerSubtitle(String name, String team) {
     return 'Which competitions does $name play for $team?';
   }
@@ -5373,6 +5475,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get athleteShare => 'Share';
+
+  @override
+  String athleteClaimTitle(String name) {
+    return 'Is this you, $name?';
+  }
+
+  @override
+  String get athleteClaimHint =>
+      'Ask to link this player to your account: his goals and assists become yours.';
+
+  @override
+  String get athleteClaimAction => 'It\'s me, request link';
 
   @override
   String athleteShareText(String name, String team, int goals, int assists) {

@@ -6,6 +6,7 @@ import 'package:arena_soccer/features/players/data/datasources/players_datasourc
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
 import 'package:arena_soccer/features/players/domain/repositories/players_repository_interface.dart';
+import 'package:arena_soccer/features/players/domain/player_link.dart';
 
 class PlayersRepositoryImpl implements IPlayersRepository {
   final PlayersDataSource _dataSource;
@@ -146,4 +147,18 @@ class PlayersRepositoryImpl implements IPlayersRepository {
   @override
   Future<Either<Failure, PlayerDTO?>> getPlayerByUser({required String userId, String? season}) =>
       _dataSource.getPlayerByUser(userId: userId, season: season);
+
+  @override
+  Future<Either<Failure, List<PlayerDTO>>> getLinkCandidates({required List<String> teamIds, String? season}) =>
+      _dataSource.getLinkCandidates(teamIds: teamIds, season: season);
+
+  @override
+  Future<Either<Failure, void>> linkToTeam(
+    PlayerDTO player,
+    PlayerLinkPlan plan, {
+    required String teamId,
+    required String team,
+    String? season,
+  }) =>
+      _dataSource.linkToTeam(player, plan, teamId: teamId, team: team, season: season);
 }

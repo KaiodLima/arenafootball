@@ -39,6 +39,11 @@ import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 import 'package:arena_soccer/utils/components/safe_bottom.dart';
+import 'package:arena_soccer/features/players/presentation/widgets/link_player_sheet.dart';
+import 'package:arena_soccer/core/utils/team_key.dart';
+import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
+import 'package:arena_soccer/features/player_requests/domain/player_claim_args.dart';
+import 'package:arena_soccer/features/player_requests/presentation/bloc/my_player_cubit.dart';
 
 /// Tela do atleta: foto, nome e time no topo; gols e assistências com a
 /// posição nos rankings da região; os cards de gol em que participou. O
@@ -126,6 +131,26 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
     );
   }
 
+  /// "Sou eu": abre o "Sou jogador" com este atleta já marcado.
+  void _claim(PlayerProfileState state) {
+    final player = state.player!;
+    final enrollment = player.enrollments
+        .where((e) => sameTeam(idA: e.teamId, nameA: e.team, idB: player.teamId, nameB: player.team))
+        .firstOrNull;
+    final region = state.team?.region ?? '';
+    Navigator.pushNamed(
+      context,
+      AppRoutes.playerRequestPage,
+      arguments: PlayerClaimArgs(
+        playerId: player.id,
+        team: player.team,
+        teamId: player.teamId,
+        region: region.isNotEmpty ? region : BlocProvider.of<RegionCubit>(context).state.selectedRegion,
+        championshipId: enrollment?.championshipId,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -133,6 +158,7 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
     final isAdmin = session.isAdmin;
     final uid = session.user?.id ?? '';
     final ownedTeam = context.watch<OwnedTeamCubit>().state;
+    final myPlayer = context.watch<MyPlayerCubit>().state;
 
     return BlocConsumer<PlayerProfileCubit, PlayerProfileState>(
       listenWhen: (_, current) =>
@@ -159,6 +185,18 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
                 player.enrollments.any((e) => ownedTeam.owns(id: e.teamId, name: e.team)));
         // O atleta da conta troca a própria foto (quem já é editor tem o editor completo).
         final self = player != null && !editor && uid.isNotEmpty && player.userId == uid;
+        // "É você?": conta sem atleta vendo um atleta sem conta da temporada atual.
+        final pending =
+            myPlayer.request?.status == PlayerRequestStatus.pending && myPlayer.request?.claimedPlayerId == player?.id;
+        final canClaim = player != null &&
+            !editor &&
+            uid.isNotEmpty &&
+            !session.isAccountAdmin &&
+            myPlayer.player == null &&
+            !pending &&
+            player.userId.isEmpty &&
+            player.team.trim().isNotEmpty &&
+            (widget.season == null || widget.season == SeasonCollection.currentSeason);
         if (self && widget.openPhotoPicker && !_pickerOpened) {
           _pickerOpened = true;
           WidgetsBinding.instance.addPostFrameCallback((_) => _pickOwnPhoto(l10n));
@@ -172,6 +210,19 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
             elevation: 0,
             title: Text(l10n.athleteTitle),
             actions: [
+              // Admin: vincula o atleta (com ou sem conta) a um time/competição.
+              if (player != null && isAdmin)
+                IconButton(
+                  key: const ValueKey('athlete-link-team'),
+                  tooltip: l10n.linkPlayerToTeamMenu,
+                  icon: const Icon(Icons.group_add_rounded),
+                  onPressed: () => showLinkTeamForPlayer(
+                    context,
+                    player: player,
+                    region: BlocProvider.of<RegionCubit>(context).state.selectedRegion,
+                    season: widget.season ?? SeasonCollection.currentSeason,
+                  ),
+                ),
               if (player != null)
                 IconButton(
                   tooltip: l10n.athleteShare,
@@ -190,6 +241,7 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
                 player: player,
                 isAdmin: editor,
                 onChangeOwnPhoto: self ? () => _pickOwnPhoto(l10n) : null,
+                onClaim: canClaim ? () => _claim(state) : null,
                 season: widget.season,
               ),
           },
@@ -259,12 +311,16 @@ class _Content extends StatelessWidget {
   /// O próprio atleta: troca só a foto.
   final VoidCallback? onChangeOwnPhoto;
 
+  /// "É você?": pedir o vínculo pelo "Sou jogador".
+  final VoidCallback? onClaim;
+
   const _Content({
     required this.state,
     required this.player,
     required this.isAdmin,
     required this.season,
     this.onChangeOwnPhoto,
+    this.onClaim,
   });
 
   @override
@@ -275,6 +331,7 @@ class _Content extends StatelessWidget {
       padding: EdgeInsets.only(bottom: safeBottom(context, AppSizes.s32)),
       children: [
         _HeroBox(child: _Header(state: state, player: player, onChangeOwnPhoto: onChangeOwnPhoto)),
+        if (onClaim != null) _ClaimCallout(player: player, onTap: onClaim!),
         Padding(
           padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, 0),
           child: Row(
@@ -1078,6 +1135,59 @@ class _AssignSheetState extends State<_AssignSheet> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// "É você, Fulano?": a conta sem atleta pede o vínculo deste cadastro.
+class _ClaimCallout extends StatelessWidget {
+  final PlayerDTO player;
+  final VoidCallback onTap;
+
+  const _ClaimCallout({required this.player, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final firstName = player.name.trim().split(RegExp(r'\s+')).first;
+    return ArenaCard(
+      margin: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, 0),
+      padding: const EdgeInsets.all(AppSizes.s16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: AppSizes.s40,
+                height: AppSizes.s40,
+                decoration: const BoxDecoration(color: AppColors.primarySoft, shape: BoxShape.circle),
+                child: const Icon(Icons.front_hand_rounded, color: AppColors.primaryDark, size: AppSizes.s20),
+              ),
+              const SizedBox(width: AppSizes.s12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.athleteClaimTitle(firstName),
+                      style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s16),
+                    ),
+                    const SizedBox(height: AppSizes.s2),
+                    Text(l10n.athleteClaimHint, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSizes.s12),
+          ArenaButton.outlined(
+            key: const ValueKey('athlete-claim'),
+            title: l10n.athleteClaimAction,
+            function: onTap,
+          ),
+        ],
       ),
     );
   }

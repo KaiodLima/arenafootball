@@ -8642,6 +8642,156 @@ abstract class AppLocalizations {
   /// **'Competições do atleta'**
   String get enrollPlayerTitle;
 
+  /// No description provided for @linkPlayerMenu.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vincular atleta'**
+  String get linkPlayerMenu;
+
+  /// No description provided for @linkPlayerToTeamMenu.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vincular a time/competição'**
+  String get linkPlayerToTeamMenu;
+
+  /// No description provided for @linkPlayerSearchTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vincular atleta ao {team}'**
+  String linkPlayerSearchTitle(String team);
+
+  /// No description provided for @linkPlayerSearchHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Buscar atleta pelo nome'**
+  String get linkPlayerSearchHint;
+
+  /// No description provided for @linkPlayerNoTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem time'**
+  String get linkPlayerNoTeam;
+
+  /// No description provided for @linkPlayerHasAccount.
+  ///
+  /// In pt, this message translates to:
+  /// **'com conta'**
+  String get linkPlayerHasAccount;
+
+  /// No description provided for @linkPlayerEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum atleta encontrado.'**
+  String get linkPlayerEmpty;
+
+  /// No description provided for @linkPlayerFilterAll.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos ({count})'**
+  String linkPlayerFilterAll(int count);
+
+  /// No description provided for @linkPlayerFilterAccount.
+  ///
+  /// In pt, this message translates to:
+  /// **'Com conta ({count})'**
+  String linkPlayerFilterAccount(int count);
+
+  /// No description provided for @linkPlayerFilterNoAccount.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem conta ({count})'**
+  String linkPlayerFilterNoAccount(int count);
+
+  /// No description provided for @linkPlayerShowing.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mostrando {shown} de {total}'**
+  String linkPlayerShowing(int shown, int total);
+
+  /// No description provided for @linkPlayerCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 atleta} other{{count} atletas}}'**
+  String linkPlayerCount(int count);
+
+  /// No description provided for @linkPlayerLoadMore.
+  ///
+  /// In pt, this message translates to:
+  /// **'Carregar mais'**
+  String get linkPlayerLoadMore;
+
+  /// No description provided for @linkPlayerOptionsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vincular {player} ao {team}'**
+  String linkPlayerOptionsTitle(String player, String team);
+
+  /// No description provided for @linkPlayerOptionsHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha as competições em que ele vai jogar pelo time. Sem nenhuma, ele entra no elenco geral com este como time principal.'**
+  String get linkPlayerOptionsHint;
+
+  /// No description provided for @linkPlayerMakeMain.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tornar time principal'**
+  String get linkPlayerMakeMain;
+
+  /// No description provided for @linkPlayerMakeMainHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'O time que aparece no perfil do atleta e no ranking geral.'**
+  String get linkPlayerMakeMainHint;
+
+  /// No description provided for @linkPlayerAlready.
+  ///
+  /// In pt, this message translates to:
+  /// **'Já joga por este time'**
+  String get linkPlayerAlready;
+
+  /// No description provided for @linkPlayerTransfer.
+  ///
+  /// In pt, this message translates to:
+  /// **'Transferir'**
+  String get linkPlayerTransfer;
+
+  /// No description provided for @linkPlayerTransferTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confirmar transferência?'**
+  String get linkPlayerTransferTitle;
+
+  /// No description provided for @linkPlayerTransferMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'{player} deixa de jogar pelo time antigo em: {championships}. Os números dele nessas competições continuam.'**
+  String linkPlayerTransferMessage(String player, String championships);
+
+  /// No description provided for @linkPlayerSave.
+  ///
+  /// In pt, this message translates to:
+  /// **'VINCULAR'**
+  String get linkPlayerSave;
+
+  /// No description provided for @linkPlayerDone.
+  ///
+  /// In pt, this message translates to:
+  /// **'{player} vinculado ao {team}!'**
+  String linkPlayerDone(String player, String team);
+
+  /// No description provided for @linkPlayerPickTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha o time'**
+  String get linkPlayerPickTeam;
+
+  /// No description provided for @linkPlayerNoChampionships.
+  ///
+  /// In pt, this message translates to:
+  /// **'O time não está inscrito em nenhuma competição da temporada: o atleta entra no elenco geral.'**
+  String get linkPlayerNoChampionships;
+
   /// No description provided for @enrollPlayerSubtitle.
   ///
   /// In pt, this message translates to:
@@ -8941,6 +9091,24 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Compartilhar'**
   String get athleteShare;
+
+  /// No description provided for @athleteClaimTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'É você, {name}?'**
+  String athleteClaimTitle(String name);
+
+  /// No description provided for @athleteClaimHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Peça para vincular este cadastro à sua conta: os gols e as assistências dele passam a ser seus.'**
+  String get athleteClaimHint;
+
+  /// No description provided for @athleteClaimAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sou eu, pedir vínculo'**
+  String get athleteClaimAction;
 
   /// No description provided for @athleteShareText.
   ///

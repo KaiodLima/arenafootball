@@ -25,6 +25,9 @@ const _squads = {
 
 class _FakeRepository implements IPlayersRepository {
   @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+
+  @override
   Future<Either<Failure, PlayerDTO?>> getPlayerByUser({required String userId, String? season}) async =>
       const Right(null);
   @override

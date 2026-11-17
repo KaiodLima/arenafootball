@@ -21,6 +21,7 @@ import 'package:arena_soccer/features/players/domain/usecases/update_player_usec
 import 'package:arena_soccer/features/players/domain/usecases/watch_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_user_player_usecase.dart';
+import 'package:arena_soccer/features/players/domain/usecases/link_player_usecase.dart';
 
 final _sl = GetIt.instance;
 
@@ -34,6 +35,7 @@ void registerPlayersDependencies() {
   // UseCases
   _sl.registerLazySingleton(() => WatchTeamPlayersUseCase(_sl()));
   _sl.registerLazySingleton(() => GetPlayersUseCase(_sl()));
+  _sl.registerLazySingleton(() => LinkPlayerUseCase(_sl()));
   _sl.registerLazySingleton(() => GetTopPlayersUseCase(_sl()));
   _sl.registerLazySingleton(() => CreatePlayerUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => AddPlayerStatsUseCase(_sl()));

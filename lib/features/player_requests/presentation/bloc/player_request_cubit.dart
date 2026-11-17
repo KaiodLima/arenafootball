@@ -15,6 +15,7 @@ import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
 import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
+import 'package:arena_soccer/features/player_requests/domain/player_claim_args.dart';
 
 /// "Sou jogador": acompanha o pedido do usuário em tempo real e cuida do
 /// formulário (enviar, editar enquanto pendente, reenviar após rejeição).
@@ -34,6 +35,11 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
   late String _initialRegion;
   PlayerDTO? _accountPlayer;
 
+  /// "É você?" do perfil do atleta: aplicado quando os times, as competições
+  /// e o pedido atual já chegaram (uma vez só).
+  PlayerClaimArgs? _claim;
+  bool _requestLoaded = false;
+
   PlayerRequestCubit(
     this.watchMyPlayerRequestUseCase,
     this.submitPlayerRequestUseCase,
@@ -49,8 +55,11 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
     required String userName,
     required String email,
     required String initialRegion,
+    PlayerClaimArgs? claim,
   }) async {
     _userId = userId;
+    _claim = claim;
+    _requestLoaded = false;
     // Nome da conta (ex.: completo do Google) cortado no limite das regras.
     final trimmed = userName.trim();
     _userName = trimmed.length > PlayerRequestForm.nameMaxLength
@@ -129,8 +138,50 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
         ? (state.request != null ? _blankForm(state.form) : state.form)
         : _formFrom(request, state.form);
     _emitReady(request: request, form: form, editing: false);
+    _requestLoaded = true;
     // Escudo do time do pedido: precisa dos times da região dele.
-    if (regionChanged) _loadTeams(request.region);
+    if (regionChanged && _claim == null) _loadTeams(request.region);
+    _applyClaim();
+  }
+
+  /// Preenche o formulário com o atleta do "É você?": com pedido pendente,
+  /// fica o pedido (o argumento é ignorado); respondido, vira pedido novo.
+  Future<void> _applyClaim() async {
+    final claim = _claim;
+    if (claim == null || !_requestLoaded) return;
+    final request = state.request;
+    if (request != null && request.status == PlayerRequestStatus.pending) {
+      _claim = null;
+      // O escudo do pedido precisa dos times da região dele.
+      if (request.region.isNotEmpty && request.region != state.form.selectedRegion) {
+        unawaited(_loadTeams(request.region));
+      }
+      return;
+    }
+    if (request != null && !state.editing) startNewRequest();
+    if (state.form.selectedRegion != claim.region && state.form.regions.contains(claim.region)) {
+      // Volta aqui quando os times da região do atleta chegarem.
+      unawaited(selectRegion(claim.region));
+      return;
+    }
+    final form = state.form;
+    if (form.loadingTeams || form.loadingChampionships) return;
+    _claim = null;
+    final team =
+        form.teams.where((t) => (claim.teamId.isNotEmpty && t.id == claim.teamId) || t.name == claim.team).firstOrNull;
+    if (team == null) return;
+    final championship = claim.championshipId;
+    final hasChampionship = championship != null && form.championships.any((c) => c.championshipId == championship);
+    _updateForm(state.form.copyWith(
+      selectedTeam: () => team.name,
+      championshipId: hasChampionship ? () => championship : null,
+      claimedPlayer: () => null,
+      unlinkedPlayers: const [],
+    ));
+    await _loadUnlinkedPlayers(team.name);
+    if (isClosed) return;
+    final player = state.form.unlinkedPlayers.where((p) => p.id == claim.playerId).firstOrNull;
+    if (player != null) claimPlayer(player);
   }
 
   /// Formulário preenchido com o pedido (para mostrar o escudo e para editar).
@@ -195,6 +246,7 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
             loadingTeams: false,
             selectedTeam: keep ? null : () => null,
           ));
+          _applyClaim();
         },
       );
     }
@@ -208,6 +260,7 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
       if (response.isLeft) {
         // Sem cache e sem rede: o pedido não sai sem saber das competições.
         _updateForm(state.form.copyWith(loadingChampionships: false, championshipsFailed: true));
+        _applyClaim();
         continue;
       }
       final championships = [...response.right]..sort((a, b) => a.championshipId.compareTo(b.championshipId));
@@ -220,6 +273,7 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
         // Uma competição só: já vem escolhida.
         championshipId: keep ? null : () => championships.length == 1 ? championships.first.championshipId : null,
       ));
+      _applyClaim();
     }
   }
 
