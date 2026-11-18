@@ -4,6 +4,8 @@ import 'package:arena_soccer/core/utils/search_text.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_athlete_dto.dart';
 import 'package:arena_soccer/features/fantasy/domain/fantasy_lineup.dart';
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_labels.dart';
+import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
+import 'package:arena_soccer/features/player_requests/presentation/widgets/player_request_labels.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
@@ -14,14 +16,14 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// Filtro da folha: atletas da [slot] (vaga fixa = a posição dela; livre =
-/// [position] escolhida nas fichas, nula = todas), do time [teamId] (vazio =
-/// todos) e com o nome contendo [query] (sem acento). Os mais goleadores
-/// primeiro, como vieram.
+/// Filtro da folha: atletas aceitos pela [slot], da [position] do cadastro
+/// escolhida nas fichas (nula = todas), do time [teamId] (vazio = todos) e com
+/// o nome contendo [query] (sem acento). Os mais goleadores primeiro, como
+/// vieram.
 List<FantasyAthleteDTO> filterFantasyAthletes(
   List<FantasyAthleteDTO> athletes, {
   required FantasySlot slot,
-  FantasySlot? position,
+  String? position,
   String teamId = '',
   String query = '',
 }) {
@@ -29,10 +31,20 @@ List<FantasyAthleteDTO> filterFantasyAthletes(
   return [
     for (final a in athletes)
       if (slot.accepts(a.position) &&
-          (position == null || a.slot == position) &&
+          (position == null || a.position == position) &&
           (teamId.isEmpty || a.teamId == teamId) &&
           (text.isEmpty || foldForSearch(a.name).contains(text)))
         a,
+  ];
+}
+
+/// Fichas de posição da folha: as posições do cadastro aceitas pela [slot]
+/// que têm atleta, na ordem goleiro → atacante (uma só = sem fichas).
+List<PlayerPosition> fantasyPickerPositions(List<FantasyAthleteDTO> athletes, FantasySlot slot) {
+  final present = {for (final a in athletes) a.position};
+  return [
+    for (final position in PlayerPosition.values)
+      if (slot.accepts(position.key) && present.contains(position.key)) position,
   ];
 }
 
@@ -70,7 +82,7 @@ class _Picker extends StatefulWidget {
 
 class _PickerState extends State<_Picker> {
   String _query = '';
-  FantasySlot? _position;
+  String? _position;
   TeamDTO? _team;
 
   List<TeamDTO> get _teams {
@@ -104,6 +116,7 @@ class _PickerState extends State<_Picker> {
       teamId: _team?.id ?? '',
       query: _query,
     );
+    final positions = fantasyPickerPositions(widget.athletes, widget.slot);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -120,6 +133,26 @@ class _PickerState extends State<_Picker> {
           child: ArenaSearchField(hint: l10n.fantasySearchAthlete, onChanged: (v) => setState(() => _query = v)),
         ),
         const SizedBox(height: AppSizes.s8),
+        // Posição do cadastro (só com mais de uma: ZAG, MEI e a livre).
+        if (positions.length > 1) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSizes.s16),
+            child: Wrap(
+              spacing: AppSizes.s6,
+              runSpacing: AppSizes.s6,
+              children: [
+                for (final position in <PlayerPosition?>[null, ...positions])
+                  ArenaChoiceChip(
+                    key: ValueKey('fantasy-filter-${position?.key ?? 'all'}'),
+                    label: position == null ? l10n.fantasyFilterAll : playerPositionLabel(l10n, position),
+                    selected: _position == position?.key,
+                    onTap: () => setState(() => _position = position?.key),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSizes.s6),
+        ],
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSizes.s16),
           child: Wrap(
@@ -127,15 +160,6 @@ class _PickerState extends State<_Picker> {
             runSpacing: AppSizes.s6,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              // Posição só na vaga livre (as outras já são de uma posição).
-              if (widget.slot == FantasySlot.flex)
-                for (final position in [null, ...FantasySlot.values.where((s) => s != FantasySlot.flex)])
-                  ArenaChoiceChip(
-                    key: ValueKey('fantasy-filter-${position?.key ?? 'all'}'),
-                    label: position == null ? l10n.fantasyFilterAll : fantasySlotLabel(l10n, position),
-                    selected: _position == position,
-                    onTap: () => setState(() => _position = position),
-                  ),
               ActionChip(
                 key: const ValueKey('fantasy-filter-team'),
                 avatar: const Icon(Icons.shield_outlined, size: AppSizes.s18),

@@ -229,8 +229,7 @@ void main() {
   test('filtro da folha: vaga, posição na livre, time e busca sem acento', () {
     expect(filterFantasyAthletes(_athletes, slot: FantasySlot.defender).map((a) => a.id), ['lb']);
     expect(filterFantasyAthletes(_athletes, slot: FantasySlot.flex).length, 5);
-    expect(filterFantasyAthletes(_athletes, slot: FantasySlot.flex, position: FantasySlot.midfielder).map((a) => a.id),
-        ['mf', 'dm']);
+    expect(filterFantasyAthletes(_athletes, slot: FantasySlot.flex, position: 'volante').map((a) => a.id), ['dm']);
     expect(filterFantasyAthletes(_athletes, slot: FantasySlot.flex, teamId: 't2').map((a) => a.id), ['mf', 'fw']);
     expect(filterFantasyAthletes(_athletes, slot: FantasySlot.flex, query: 'angelo').map((a) => a.id), ['fw']);
   });
@@ -428,6 +427,97 @@ void main() {
     expect(tapped, 'a2');
     await tester.tap(find.byKey(const ValueKey('fantasy-top-see-all')));
     expect(seeAll, isTrue);
+  });
+
+  test('formação: a LIVRE joga na linha da posição do atleta (vazia = meio)', () {
+    expect(fantasyFlexLine('atacante'), FantasySlot.forward);
+    expect(fantasyFlexLine('lateral'), FantasySlot.defender);
+    expect(fantasyFlexLine('volante'), FantasySlot.midfielder);
+    expect(fantasyFlexLine('goleiro'), FantasySlot.goalkeeper);
+    expect(fantasyFlexLine(null), FantasySlot.midfielder);
+    final f = FantasyPitch.formation(FantasySlot.forward);
+    expect(f[FantasySlot.flex], const Alignment(0.5, -0.9));
+    expect(f[FantasySlot.forward], const Alignment(-0.5, -0.9));
+    expect(f[FantasySlot.midfielder]!.x, 0);
+  });
+
+  testWidgets('campinho: LIVRE com atacante sobe para o ataque; com volante, volta ao meio', (tester) async {
+    tester.view.physicalSize = const Size(420, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    Widget pitch(String flexId) => MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('pt'),
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: FantasyPitch(
+                lineup: _full.place(FantasySlot.flex, flexId),
+                athletes: {
+                  for (final a in _athletes) a.id: a,
+                  'fw2': const FantasyAthleteDTO(id: 'fw2', name: 'Beto Ponta', position: 'atacante', teamId: 't2'),
+                },
+                editable: true,
+                onSlotTap: (_) {},
+                onCaptainTap: (_) {},
+              ),
+            ),
+          ),
+        );
+    Alignment at(String key) =>
+        tester.widget<AnimatedAlign>(find.byKey(ValueKey('fantasy-pos-$key'))).alignment as Alignment;
+    await tester.pumpWidget(pitch('fw2'));
+    await tester.pumpAndSettle();
+    expect(at('livre'), const Alignment(0.5, -0.9));
+    expect(at('ata'), const Alignment(-0.5, -0.9));
+    expect(at('mei'), const Alignment(0, -0.25));
+    await tester.pumpWidget(pitch('dm'));
+    await tester.pumpAndSettle();
+    expect(at('livre'), const Alignment(0.5, -0.25));
+    expect(at('mei'), const Alignment(-0.5, -0.25));
+    expect(at('ata'), const Alignment(0, -0.9));
+  });
+
+  test('fichas de posição: só as do cadastro aceitas pela vaga e com atleta', () {
+    String keys(FantasySlot slot) => fantasyPickerPositions(_athletes, slot).map((p) => p.key).join(',');
+    expect(keys(FantasySlot.defender), 'lateral');
+    expect(keys(FantasySlot.midfielder), 'volante,meia');
+    expect(keys(FantasySlot.flex), 'goleiro,lateral,volante,meia,atacante');
+    expect(keys(FantasySlot.forward), 'atacante');
+    expect(filterFantasyAthletes(_athletes, slot: FantasySlot.midfielder, position: 'meia').map((a) => a.id), ['mf']);
+  });
+
+  testWidgets('folha: filtro por posição na ZAG (zagueiro · lateral); a ATA não tem fichas', (tester) async {
+    const athletes = [
+      ..._athletes,
+      FantasyAthleteDTO(id: 'cb', name: 'Caio Zagueiro', position: 'zagueiro', teamId: 't2', team: 'Tigres'),
+    ];
+    late BuildContext ctx;
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('pt'),
+      home: Scaffold(body: Builder(builder: (context) {
+        ctx = context;
+        return const SizedBox.shrink();
+      })),
+    ));
+    showFantasyAthletePicker(ctx, slot: FantasySlot.defender, athletes: athletes, lineup: const FantasyLineup());
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('fantasy-filter-all')), findsOneWidget);
+    expect(find.byKey(const ValueKey('fantasy-athlete-cb')), findsOneWidget);
+    expect(find.byKey(const ValueKey('fantasy-athlete-lb')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('fantasy-filter-lateral')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('fantasy-athlete-cb')), findsNothing);
+    expect(find.byKey(const ValueKey('fantasy-athlete-lb')), findsOneWidget);
+    Navigator.pop(ctx);
+    await tester.pumpAndSettle();
+
+    showFantasyAthletePicker(ctx, slot: FantasySlot.forward, athletes: athletes, lineup: const FantasyLineup());
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('fantasy-filter-all')), findsNothing);
+    expect(find.byKey(const ValueKey('fantasy-athlete-fw')), findsOneWidget);
   });
 }
 

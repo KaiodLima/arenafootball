@@ -15,6 +15,8 @@ import 'package:arena_soccer/utils/constants/team_colors.dart';
 /// MEI e LIVRE lado a lado, ZAG e GOL embaixo). Cada vaga é uma figurinha
 /// (`StickerCard` do álbum, nas cores do time, com a vaga no selo do canto);
 /// vazia = espaço tracejado com "+". Braçadeira "C" (toque escolhe o capitão).
+/// A formação acompanha a LIVRE: ela joga na linha da posição do atleta
+/// escolhido, ao lado da vaga fixa dessa linha (animado).
 class FantasyPitch extends StatelessWidget {
   final FantasyLineup lineup;
   final Map<String, FantasyAthleteDTO> athletes;
@@ -35,13 +37,22 @@ class FantasyPitch extends StatelessWidget {
     required this.onCaptainTap,
   });
 
-  static const Map<FantasySlot, Alignment> _positions = {
-    FantasySlot.forward: Alignment(0, -0.9),
-    FantasySlot.midfielder: Alignment(-0.55, -0.25),
-    FantasySlot.flex: Alignment(0.55, -0.25),
-    FantasySlot.defender: Alignment(0, 0.4),
-    FantasySlot.goalkeeper: Alignment(0, 0.95),
+  /// Altura de cada linha no campinho.
+  static const Map<FantasySlot, double> _lineY = {
+    FantasySlot.forward: -0.9,
+    FantasySlot.midfielder: -0.25,
+    FantasySlot.defender: 0.4,
+    FantasySlot.goalkeeper: 0.95,
   };
+
+  /// Posição de cada vaga com a LIVRE na linha [flexLine]: a fixa dessa linha
+  /// vai para a esquerda e a LIVRE para a direita; as outras no centro.
+  static Map<FantasySlot, Alignment> formation(FantasySlot flexLine) => {
+        for (final entry in _lineY.entries) entry.key: Alignment(entry.key == flexLine ? -0.5 : 0, entry.value),
+        FantasySlot.flex: Alignment(0.5, _lineY[flexLine]!),
+      };
+
+  static const Duration _move = Duration(milliseconds: 450);
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +64,8 @@ class FantasyPitch extends StatelessWidget {
           builder: (context, box) {
             // Figurinha proporcional ao campinho (3:4).
             final cardWidth = (box.maxWidth * 0.22).clamp(AppSizes.s64, AppSizes.s100).toDouble();
+            final flexId = lineup.idAt(FantasySlot.flex);
+            final positions = formation(fantasyFlexLine(athletes[flexId ?? '']?.position));
             return Stack(
               children: [
                 const Positioned.fill(
@@ -68,8 +81,11 @@ class FantasyPitch extends StatelessWidget {
                 ),
                 const Positioned.fill(child: CustomPaint(painter: _PitchPainter())),
                 for (final slot in FantasySlot.values)
-                  Align(
-                    alignment: _positions[slot]!,
+                  AnimatedAlign(
+                    key: ValueKey('fantasy-pos-${slot.key}'),
+                    alignment: positions[slot]!,
+                    duration: _move,
+                    curve: Curves.easeOutBack,
                     child: _PitchSlot(
                       slot: slot,
                       width: cardWidth,
@@ -119,7 +135,7 @@ class _PitchSlot extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final filled = athleteId != null;
     final label = fantasySlotLabel(l10n, slot);
-    final Widget card;
+    Widget card;
     if (filled) {
       card = DecoratedBox(
         decoration: BoxDecoration(
@@ -149,6 +165,18 @@ class _PitchSlot extends StatelessWidget {
         label: label,
         icon: editable ? Icons.add_rounded : Icons.person_outline_rounded,
         sticker: StickerDTO(rare: slot == FantasySlot.flex),
+      );
+    }
+    // LIVRE: a figurinha "chega" com um leve aumento a cada atleta novo.
+    if (slot == FantasySlot.flex && filled) {
+      final arriving = card;
+      card = TweenAnimationBuilder<double>(
+        key: ValueKey('fantasy-flex-in-$athleteId'),
+        tween: Tween(begin: 0.85, end: 1),
+        duration: const Duration(milliseconds: 450),
+        curve: Curves.easeOutBack,
+        builder: (context, scale, child) => Transform.scale(scale: scale, child: child),
+        child: arriving,
       );
     }
     return SizedBox(

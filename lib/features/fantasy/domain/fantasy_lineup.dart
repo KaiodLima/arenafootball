@@ -31,6 +31,11 @@ FantasySlot? fantasySlotOf(String position) {
   return null;
 }
 
+/// Linha do campinho em que a vaga LIVRE joga: a da posição do atleta
+/// escolhido nela ([flexPosition] do cadastro); vazia/sem posição = meio.
+FantasySlot fantasyFlexLine(String? flexPosition) =>
+    flexPosition == null ? FantasySlot.midfielder : fantasySlotOf(flexPosition) ?? FantasySlot.midfielder;
+
 /// Problema da escalação.
 enum FantasyLineupError { incomplete, duplicate, noCaptain, position }
 
