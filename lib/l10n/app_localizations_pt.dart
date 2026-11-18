@@ -8169,4 +8169,18 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get deepLinkHighlightNotFound =>
       'Este destaque não está mais disponível.';
+
+  @override
+  String fantasyTopAthletesTitle(int round) {
+    return 'Craques da rodada $round';
+  }
+
+  @override
+  String get fantasyTopAthletesEmpty => 'Nenhum atleta pontuou nesta rodada.';
+
+  @override
+  String get fantasySeeAll => 'Ver todos';
+
+  @override
+  String get fantasyTabAthletes => 'Atletas';
 }

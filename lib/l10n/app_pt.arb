@@ -4342,5 +4342,10 @@
   "newsNotFound": "Esta notícia não está mais disponível.",
   "deepLinkAlbumClosed": "O álbum de figurinhas não está aberto agora.",
   "deepLinkMatchNotFound": "Esta partida não está mais disponível.",
-  "deepLinkHighlightNotFound": "Este destaque não está mais disponível."
+  "deepLinkHighlightNotFound": "Este destaque não está mais disponível.",
+  "fantasyTopAthletesTitle": "Craques da rodada {round}",
+  "@fantasyTopAthletesTitle": {"placeholders": {"round": {"type": "int"}}},
+  "fantasyTopAthletesEmpty": "Nenhum atleta pontuou nesta rodada.",
+  "fantasySeeAll": "Ver todos",
+  "fantasyTabAthletes": "Atletas"
 }

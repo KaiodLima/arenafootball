@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
+  roundParticipants,
   type AthleteScore,
   lineupPoints,
   parseMatch,
@@ -227,4 +228,20 @@ test('capitão 1,5× (também negativo) e a diferença aplicada no participante'
 test('campos da súmula que mudam a pontuação', () => {
   assert.equal(scoringFieldsChanged({ gols: [] }, { gols: [goal('g1', 'casa', 1)] }), true);
   assert.equal(scoringFieldsChanged({ votacao: 'true' }, { votacao: 'false' }), false);
+});
+
+test('craques da rodada: titulares, quem entrou e quem tem lance, sem repetir', () => {
+  const ids = roundParticipants([
+    {
+      escalacao: {
+        casa: [{ idJogador: 'a1' }, { idJogador: 'a2' }, { idJogador: 'r1', titular: false }],
+        fora: [{ idJogador: 'b1' }],
+      },
+      substituicoes: [{ lado: 'casa', idSai: 'a2', idEntra: 'r2', minuto: 60 }],
+      gols: [{ lado: 'casa', idJogador: 'a1', idAssistencia: 'r2' }],
+      cartoes: [{ lado: 'fora', tipo: 'amarelo', idJogador: 'b2' }],
+    },
+    { gols: [{ lado: 'fora', idJogador: 'c1' }], golTimeCasa: '0' },
+  ]);
+  assert.deepEqual([...ids].sort(), ['a1', 'a2', 'b1', 'b2', 'c1', 'r2']);
 });

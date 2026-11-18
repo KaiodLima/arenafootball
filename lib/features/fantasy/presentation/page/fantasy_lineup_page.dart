@@ -8,6 +8,9 @@ import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_lineup_c
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_athlete_picker.dart';
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_labels.dart';
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_pitch.dart';
+import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_score_sheet.dart';
+import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_top_athletes.dart';
+import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_ranking_page.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
@@ -238,6 +241,25 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
                 label: Text(l10n.fantasyDiscard),
               ),
             ),
+        ],
+        // Os atletas que mais pontuaram na última rodada fechada.
+        if (state.topRound != null) ...[
+          const SizedBox(height: AppSizes.s16),
+          FantasyTopAthletesCard(
+            round: state.topRound!,
+            athletes: state.topAthletes,
+            onAthleteTap: (athlete) => showFantasyAthleteScore(
+              context,
+              fantasyId: widget.championship.id,
+              round: state.topRound!,
+              athleteId: athlete.athleteId,
+            ),
+            onSeeAll: () => Navigator.pushNamed(
+              context,
+              AppRoutes.fantasyRankingPage,
+              arguments: FantasyRankingArgs(widget.championship, tab: FantasyRankingTab.athletes),
+            ),
+          ),
         ],
       ],
     );

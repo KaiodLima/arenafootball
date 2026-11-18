@@ -253,6 +253,20 @@ class FantasyDataSource {
     }
   }
 
+  /// "Craques da rodada": os atletas que mais pontuaram na rodada [round]
+  /// (auditoria das functions por `total`; índice automático).
+  Future<Either<Failure, List<FantasyAthleteScoreDTO>>> getTopAthletes(String fantasyId, int round,
+      {int limit = 20}) async {
+    try {
+      final snapshot =
+          await _round(fantasyId, round).collection('atletas').orderBy('total', descending: true).limit(limit).get();
+      return Right([for (final doc in snapshot.docs) FantasyAthleteScoreDTO.fromMap(doc.id, doc.data())]);
+    } catch (e) {
+      AppLogger.e('getTopAthletes $fantasyId/$round', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível carregar os craques da rodada.'));
+    }
+  }
+
   /// Pontuação auditada do atleta na rodada (nula = ainda sem apuração).
   Future<Either<Failure, FantasyAthleteScoreDTO?>> getAthleteScore(
       String fantasyId, int round, String athleteId) async {

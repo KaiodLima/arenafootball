@@ -12,19 +12,37 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_score_sheet.dart';
+import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_top_athletes.dart';
 
-/// Rankings do Arena Fantasy do campeonato: Rodada · Geral · Histórico.
+/// Abas do ranking do Fantasy (na ordem da tela).
+enum FantasyRankingTab { round, athletes, overall, history }
+
+/// Argumento da rota quando abre numa aba (senão, só o [ChampionshipDTO]).
+class FantasyRankingArgs {
+  final ChampionshipDTO championship;
+  final FantasyRankingTab tab;
+
+  const FantasyRankingArgs(this.championship, {this.tab = FantasyRankingTab.round});
+
+  /// Da rota: [FantasyRankingArgs] ou o [ChampionshipDTO].
+  static FantasyRankingArgs of(Object? arguments) =>
+      arguments is FantasyRankingArgs ? arguments : FantasyRankingArgs(arguments as ChampionshipDTO);
+}
+
+/// Rankings do Arena Fantasy do campeonato: Rodada · Atletas · Geral · Histórico.
 class FantasyRankingPage extends StatefulWidget {
   final ChampionshipDTO championship;
+  final FantasyRankingTab initialTab;
 
-  const FantasyRankingPage({super.key, required this.championship});
+  const FantasyRankingPage({super.key, required this.championship, this.initialTab = FantasyRankingTab.round});
 
   @override
   State<FantasyRankingPage> createState() => _FantasyRankingPageState();
 }
 
 class _FantasyRankingPageState extends State<FantasyRankingPage> with SingleTickerProviderStateMixin {
-  late final TabController _tabs = TabController(length: 3, vsync: this);
+  late final TabController _tabs =
+      TabController(length: FantasyRankingTab.values.length, vsync: this, initialIndex: widget.initialTab.index);
 
   FantasyRankingCubit get _cubit => context.read<FantasyRankingCubit>();
 
@@ -33,9 +51,14 @@ class _FantasyRankingPageState extends State<FantasyRankingPage> with SingleTick
     super.initState();
     _cubit.load(widget.championship, uid: context.read<SessionCubit>().state.user?.id ?? '');
     // Histórico: carrega só ao abrir a aba (uma leitura por rodada).
-    _tabs.addListener(() {
-      if (_tabs.index == 2) _cubit.loadHistory();
-    });
+    // Atletas: os craques da rodada só ao abrir a aba (uma consulta por rodada).
+    _onTab();
+    _tabs.addListener(_onTab);
+  }
+
+  void _onTab() {
+    if (_tabs.index == FantasyRankingTab.history.index) _cubit.loadHistory();
+    if (_tabs.index == FantasyRankingTab.athletes.index) _cubit.loadTopAthletes();
   }
 
   @override
@@ -75,6 +98,7 @@ class _FantasyRankingPageState extends State<FantasyRankingPage> with SingleTick
           dividerColor: AppColors.transparent,
           tabs: [
             Tab(text: l10n.fantasyTabRound),
+            Tab(text: l10n.fantasyTabAthletes),
             Tab(text: l10n.fantasyTabOverall),
             Tab(text: l10n.fantasyTabHistory),
           ],
@@ -85,6 +109,7 @@ class _FantasyRankingPageState extends State<FantasyRankingPage> with SingleTick
           controller: _tabs,
           children: [
             _RoundTab(state: state),
+            _AthletesTab(state: state, fantasyId: widget.championship.id),
             _OverallTab(state: state),
             _HistoryTab(state: state, fantasyId: widget.championship.id),
           ],
@@ -132,47 +157,13 @@ class _RoundTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final cubit = context.read<FantasyRankingCubit>();
     if (!state.roundsLoaded) return const Center(child: CircularProgressIndicator());
     if (state.rounds.isEmpty) {
       return ArenaEmptyState(message: l10n.fantasyNoClosedRound, icon: Icons.event_note_rounded);
     }
-    final round = state.round;
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(AppSizes.s8, AppSizes.s8, AppSizes.s8, 0),
-          child: Row(
-            children: [
-              IconButton(
-                key: const ValueKey('fantasy-round-older'),
-                onPressed: state.hasOlder ? cubit.olderRound : null,
-                icon: const Icon(Icons.chevron_left_rounded),
-              ),
-              Expanded(
-                child: Column(
-                  children: [
-                    Text(
-                      l10n.fantasyRoundTitle(state.selectedRound ?? 0),
-                      textAlign: TextAlign.center,
-                      style: AppTypography.title().copyWith(fontSize: AppSizes.s18),
-                    ),
-                    if (round != null && !round.finished)
-                      Text(
-                        round.scored ? l10n.fantasyRoundPartial : l10n.fantasyAwaitingScore,
-                        style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
-                      ),
-                  ],
-                ),
-              ),
-              IconButton(
-                key: const ValueKey('fantasy-round-newer'),
-                onPressed: state.hasNewer ? cubit.newerRound : null,
-                icon: const Icon(Icons.chevron_right_rounded),
-              ),
-            ],
-          ),
-        ),
+        _RoundSelector(state: state),
         Expanded(
           child: state.roundLoading
               ? const Center(child: CircularProgressIndicator())
@@ -186,6 +177,105 @@ class _RoundTab extends StatelessWidget {
             position: state.myRound.position,
             emptyText: l10n.fantasyNotPlayedRound,
           ),
+      ],
+    );
+  }
+}
+
+/// ◀ Rodada N ▶ entre as rodadas fechadas (abas Rodada e Atletas).
+class _RoundSelector extends StatelessWidget {
+  final FantasyRankingState state;
+
+  const _RoundSelector({required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final cubit = context.read<FantasyRankingCubit>();
+    final round = state.round;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(AppSizes.s8, AppSizes.s8, AppSizes.s8, 0),
+      child: Row(
+        children: [
+          IconButton(
+            key: const ValueKey('fantasy-round-older'),
+            onPressed: state.hasOlder ? cubit.olderRound : null,
+            icon: const Icon(Icons.chevron_left_rounded),
+          ),
+          Expanded(
+            child: Column(
+              children: [
+                Text(
+                  l10n.fantasyRoundTitle(state.selectedRound ?? 0),
+                  textAlign: TextAlign.center,
+                  style: AppTypography.title().copyWith(fontSize: AppSizes.s18),
+                ),
+                if (round != null && !round.finished)
+                  Text(
+                    round.scored ? l10n.fantasyRoundPartial : l10n.fantasyAwaitingScore,
+                    style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+                  ),
+              ],
+            ),
+          ),
+          IconButton(
+            key: const ValueKey('fantasy-round-newer'),
+            onPressed: state.hasNewer ? cubit.newerRound : null,
+            icon: const Icon(Icons.chevron_right_rounded),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Aba Atletas: os que mais pontuaram na rodada escolhida (top 20), toque =
+/// pontuação detalhada.
+class _AthletesTab extends StatelessWidget {
+  final FantasyRankingState state;
+  final String fantasyId;
+
+  const _AthletesTab({required this.state, required this.fantasyId});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    if (!state.roundsLoaded) return const Center(child: CircularProgressIndicator());
+    if (state.rounds.isEmpty) {
+      return ArenaEmptyState(message: l10n.fantasyNoClosedRound, icon: Icons.event_note_rounded);
+    }
+    final round = state.selectedRound ?? 0;
+    final positions = fantasyAthletePositions(state.topAthletes);
+    return Column(
+      children: [
+        _RoundSelector(state: state),
+        Expanded(
+          child: state.topLoading
+              ? const Center(child: CircularProgressIndicator())
+              : state.topAthletes.isEmpty
+                  ? ArenaEmptyState(message: l10n.fantasyTopAthletesEmpty, icon: Icons.sports_soccer_rounded)
+                  : RefreshIndicator(
+                      onRefresh: () async => context.read<FantasyRankingCubit>().refresh(),
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: EdgeInsets.fromLTRB(
+                            AppSizes.s16, AppSizes.s8, AppSizes.s16, safeBottom(context, AppSizes.s24)),
+                        children: [
+                          for (var i = 0; i < state.topAthletes.length; i++)
+                            FantasyTopAthleteRow(
+                              athlete: state.topAthletes[i],
+                              position: positions[i],
+                              onTap: () => showFantasyAthleteScore(
+                                context,
+                                fantasyId: fantasyId,
+                                round: round,
+                                athleteId: state.topAthletes[i].athleteId,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+        ),
       ],
     );
   }

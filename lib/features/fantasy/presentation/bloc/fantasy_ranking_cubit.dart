@@ -7,6 +7,7 @@ import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_athlete_dto.dart
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_config_dto.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_ranking_dtos.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_round_dtos.dart';
+import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_score_dto.dart';
 import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_config_usecases.dart';
 import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_lineup_usecases.dart';
 import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_ranking_usecases.dart';
@@ -40,6 +41,10 @@ class FantasyRankingState extends Equatable {
   final bool historyLoading;
   final bool historyLoaded;
   final Map<String, FantasyAthleteDTO> athletes;
+
+  /// Aba Atletas: os que mais pontuaram na [selectedRound] (top 20).
+  final List<FantasyAthleteScoreDTO> topAthletes;
+  final bool topLoading;
   final String? failure;
 
   const FantasyRankingState({
@@ -58,6 +63,8 @@ class FantasyRankingState extends Equatable {
     this.historyLoading = false,
     this.historyLoaded = false,
     this.athletes = const {},
+    this.topAthletes = const [],
+    this.topLoading = false,
     this.failure,
   });
 
@@ -87,6 +94,8 @@ class FantasyRankingState extends Equatable {
     bool? historyLoading,
     bool? historyLoaded,
     Map<String, FantasyAthleteDTO>? athletes,
+    List<FantasyAthleteScoreDTO>? topAthletes,
+    bool? topLoading,
     String? failure,
   }) =>
       FantasyRankingState(
@@ -105,6 +114,8 @@ class FantasyRankingState extends Equatable {
         historyLoading: historyLoading ?? this.historyLoading,
         historyLoaded: historyLoaded ?? this.historyLoaded,
         athletes: athletes ?? this.athletes,
+        topAthletes: topAthletes ?? this.topAthletes,
+        topLoading: topLoading ?? this.topLoading,
         failure: failure,
       );
 
@@ -125,6 +136,8 @@ class FantasyRankingState extends Equatable {
         historyLoading,
         historyLoaded,
         athletes,
+        topAthletes,
+        topLoading,
         failure,
       ];
 }
@@ -139,6 +152,9 @@ class FantasyRankingCubit extends Cubit<FantasyRankingState> {
   final WatchFantasyParticipantUseCase _participant;
   final GetFantasyAthletesCacheFirstUseCase _athletes;
 
+  /// Aba Atletas; nulo = sem a aba (testes antigos).
+  final GetFantasyTopAthletesCacheFirstUseCase? _topAthletes;
+
   FantasyRankingCubit(
     this._watchConfig,
     this._ranking,
@@ -146,14 +162,20 @@ class FantasyRankingCubit extends Cubit<FantasyRankingState> {
     this._rounds,
     this._lineup,
     this._participant,
-    this._athletes,
-  ) : super(const FantasyRankingState());
+    this._athletes, {
+    GetFantasyTopAthletesCacheFirstUseCase? topAthletes,
+  })  : _topAthletes = topAthletes,
+        super(const FantasyRankingState());
 
   StreamSubscription<Object?>? _configSub;
   StreamSubscription<Object?>? _roundSub;
   StreamSubscription<Object?>? _overallSub;
   StreamSubscription<Object?>? _athletesSub;
+  StreamSubscription<Object?>? _topSub;
   String _fantasyId = '';
+
+  /// A aba Atletas já abriu: trocar de rodada recarrega a lista.
+  bool _topWanted = false;
 
   Future<void> load(ChampionshipDTO championship, {required String uid}) async {
     _fantasyId = championship.id;
@@ -216,6 +238,26 @@ class FantasyRankingCubit extends Cubit<FantasyRankingState> {
       final mine = await _myRound(round, entries);
       if (!isClosed && state.selectedRound == round) emit(state.copyWith(myRound: mine));
     });
+    if (_topWanted) _loadTop(round, force: force);
+  }
+
+  /// Aba Atletas aberta: carrega os craques da rodada escolhida.
+  void loadTopAthletes() {
+    if (_topWanted) return;
+    _topWanted = true;
+    final round = state.selectedRound;
+    if (round != null) _loadTop(round);
+  }
+
+  void _loadTop(int round, {bool force = false}) {
+    final topAthletes = _topAthletes;
+    if (topAthletes == null) return;
+    _topSub?.cancel();
+    emit(state.copyWith(topLoading: true, topAthletes: const []));
+    _topSub = topAthletes(_fantasyId, round, force: force).listen((response) {
+      if (isClosed || state.selectedRound != round) return;
+      emit(state.copyWith(topAthletes: response.fold((_) => const [], (list) => list), topLoading: false));
+    });
   }
 
   Future<FantasyMyPosition> _myRound(int round, List<FantasyRankingEntry> entries) async {
@@ -271,7 +313,7 @@ class FantasyRankingCubit extends Cubit<FantasyRankingState> {
   @override
   Future<void> close() async {
     await Future.wait([
-      for (final sub in [_configSub, _roundSub, _overallSub, _athletesSub])
+      for (final sub in [_configSub, _roundSub, _overallSub, _athletesSub, _topSub])
         if (sub != null) sub.cancel(),
     ]);
     return super.close();

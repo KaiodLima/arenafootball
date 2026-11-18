@@ -554,17 +554,19 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.referralSettingsPage: (_) => const ReferralSettingsPage(),
         // Arena Fantasy do campeonato: entrar e montar a escalação da rodada.
         AppRoutes.fantasyLineupPage: (context) => BlocProvider<FantasyLineupCubit>(
-              create: (_) => FantasyLineupCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), teams: sl()),
+              create: (_) =>
+                  FantasyLineupCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), teams: sl(), rounds: sl(), topAthletes: sl()),
               child: FantasyLineupPage(
                 championship: ModalRoute.of(context)!.settings.arguments as ChampionshipDTO,
               ),
             ),
         // Arena Fantasy: rankings da rodada e geral e o histórico da conta.
         AppRoutes.fantasyRankingPage: (context) => BlocProvider<FantasyRankingCubit>(
-              create: (_) => FantasyRankingCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl()),
-              child: FantasyRankingPage(
-                championship: ModalRoute.of(context)!.settings.arguments as ChampionshipDTO,
-              ),
+              create: (_) => FantasyRankingCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), topAthletes: sl()),
+              child: Builder(builder: (context) {
+                final args = FantasyRankingArgs.of(ModalRoute.of(context)!.settings.arguments);
+                return FantasyRankingPage(championship: args.championship, initialTab: args.tab);
+              }),
             ),
         // Arena Fantasy: home com os campeonatos ativos da região.
         AppRoutes.fantasyHomePage: (_) => BlocProvider<FantasyHomeCubit>(

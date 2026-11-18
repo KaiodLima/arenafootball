@@ -156,6 +156,28 @@ export function parseMatch(data: Doc): ParsedMatch {
   };
 }
 
+/**
+ * Quem participou das partidas (lista "Craques da rodada"): titulares, quem
+ * entrou nas substituições e quem tem gol, assistência ou cartão. Sem repetir.
+ */
+export function roundParticipants(matches: Doc[]): string[] {
+  const ids = new Set<string>();
+  for (const data of matches) {
+    const match = parseMatch(data);
+    for (const side of ['casa', 'fora'] as Side[]) {
+      match.lineup[side].filter((e) => e.starter).forEach((e) => ids.add(e.id));
+    }
+    match.subs.forEach((s) => ids.add(s.inId));
+    match.goals.forEach((g) => {
+      ids.add(g.scorerId);
+      ids.add(g.assistId);
+    });
+    match.bookings.forEach((b) => ids.add(b.playerId));
+  }
+  ids.delete('');
+  return [...ids];
+}
+
 /** Lado do atleta na partida: escalação, lances ou o time dele na competição. */
 export function sideOf(match: ParsedMatch, playerId: string, teamId = ''): Side | null {
   for (const side of ['casa', 'fora'] as Side[]) {

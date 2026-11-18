@@ -13454,6 +13454,30 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Este destaque não está mais disponível.'**
   String get deepLinkHighlightNotFound;
+
+  /// No description provided for @fantasyTopAthletesTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Craques da rodada {round}'**
+  String fantasyTopAthletesTitle(int round);
+
+  /// No description provided for @fantasyTopAthletesEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum atleta pontuou nesta rodada.'**
+  String get fantasyTopAthletesEmpty;
+
+  /// No description provided for @fantasySeeAll.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver todos'**
+  String get fantasySeeAll;
+
+  /// No description provided for @fantasyTabAthletes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atletas'**
+  String get fantasyTabAthletes;
 }
 
 class _AppLocalizationsDelegate

@@ -2485,5 +2485,10 @@
   "newsNotFound": "This news item is no longer available.",
   "deepLinkAlbumClosed": "The sticker album is not open right now.",
   "deepLinkMatchNotFound": "This match is no longer available.",
-  "deepLinkHighlightNotFound": "This highlight is no longer available."
+  "deepLinkHighlightNotFound": "This highlight is no longer available.",
+  "fantasyTopAthletesTitle": "Top players of round {round}",
+  "@fantasyTopAthletesTitle": {"placeholders": {"round": {"type": "int"}}},
+  "fantasyTopAthletesEmpty": "No player scored in this round.",
+  "fantasySeeAll": "See all",
+  "fantasyTabAthletes": "Players"
 }

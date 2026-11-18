@@ -169,6 +169,7 @@ import {
   SCORING_VERSION,
   lineupPoints,
   pointsDelta,
+  roundParticipants,
   scoreAthlete,
   scoringFieldsChanged,
 } from './fantasy_scoring';
@@ -1098,9 +1099,11 @@ async function scoreFantasyRound(fantasyRef: DocRef, config: FantasyDoc, round: 
     .map((d) => ({ id: d.id, data: d.data() ?? {} }));
 
   const lineups = await roundRef.collection(FANTASY_LINEUPS).get();
-  const athleteIds = [
-    ...new Set(lineups.docs.flatMap((d) => (Array.isArray(d.data().idsAtletas) ? d.data().idsAtletas.map(String) : []))),
-  ].filter(Boolean);
+  const drafted = new Set(
+    lineups.docs.flatMap((d) => (Array.isArray(d.data().idsAtletas) ? d.data().idsAtletas.map(String) : [])),
+  );
+  // Também quem jogou e ninguém escalou ("Craques da rodada" no app).
+  const athleteIds = [...new Set([...drafted, ...roundParticipants(finished.map((m) => m.data))])].filter(Boolean);
   const playersCol = db.collection(seasonCollection('jogadores', season));
   const players = athleteIds.length ? await db.getAll(...athleteIds.map((id) => playersCol.doc(id))) : [];
   const enrollmentKey = `c${Number(config.idCampeonato ?? 0)}`;
@@ -1108,8 +1111,11 @@ async function scoreFantasyRound(fantasyRef: DocRef, config: FantasyDoc, round: 
   let batch = db.batch();
   let pending = 0;
   for (const player of players) {
+    if (!player.exists && !drafted.has(player.id)) continue;
     const data = player.data() ?? {};
     const enrollment = ((data.inscricoes ?? {}) as Record<string, FantasyDoc>)[enrollmentKey];
+    // Não escalado: só quem está inscrito na competição com time (regra do Fantasy).
+    if (!drafted.has(player.id) && !text(enrollment?.idTime)) continue;
     const result = scoreAthlete(finished, {
       id: player.id,
       posicao: data.posicao,

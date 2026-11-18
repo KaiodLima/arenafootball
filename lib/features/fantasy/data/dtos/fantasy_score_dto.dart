@@ -116,6 +116,20 @@ class FantasyAthleteScoreDTO extends Equatable {
     );
   }
 
+  /// Só o que a lista "Craques da rodada" mostra (o detalhe é lido na folha).
+  Map<String, dynamic> toCache() => {
+        'id': athleteId,
+        'nome': name,
+        'urlImagem': photoUrl,
+        'time': team,
+        'total': total,
+        'minutos': minutes,
+        'posicao': position,
+      };
+
+  factory FantasyAthleteScoreDTO.fromCache(Map<String, dynamic> json) =>
+      FantasyAthleteScoreDTO.fromMap(json['id']?.toString() ?? '', json);
+
   /// Os itens da mesma regra somados (várias partidas na rodada).
   List<FantasyScoreItem> get groupedItems {
     final byRule = <String, FantasyScoreItem>{};

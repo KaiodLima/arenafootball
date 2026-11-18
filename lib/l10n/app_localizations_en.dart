@@ -8125,4 +8125,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get deepLinkHighlightNotFound =>
       'This highlight is no longer available.';
+
+  @override
+  String fantasyTopAthletesTitle(int round) {
+    return 'Top players of round $round';
+  }
+
+  @override
+  String get fantasyTopAthletesEmpty => 'No player scored in this round.';
+
+  @override
+  String get fantasySeeAll => 'See all';
+
+  @override
+  String get fantasyTabAthletes => 'Players';
 }

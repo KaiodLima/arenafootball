@@ -26,6 +26,24 @@ class GetFantasyRankingCacheFirstUseCase {
       );
 }
 
+/// "Craques da rodada": os atletas que mais pontuaram na rodada [round]
+/// (top 20), pelo fluxo [cacheFirst] (validade [CacheTtl.ranking]).
+class GetFantasyTopAthletesCacheFirstUseCase {
+  final IFantasyRepository _repository;
+
+  GetFantasyTopAthletesCacheFirstUseCase(this._repository);
+
+  Stream<Either<Failure, List<FantasyAthleteScoreDTO>>> call(String fantasyId, int round, {bool force = false}) =>
+      cacheFirst<List<FantasyAthleteScoreDTO>>(
+        readCache: () => _repository.getCachedTopAthletes(fantasyId, round),
+        fetchRemote: () => _repository.getTopAthletes(fantasyId, round),
+        saveCache: (list) => _repository.saveTopAthletesCache(fantasyId, round, list),
+        ttl: CacheTtl.ranking,
+        force: force,
+        logName: 'GetFantasyTopAthletesCacheFirstUseCase',
+      );
+}
+
 /// Posição de quem tem [points] fora do top 50: os que têm mais + 1.
 class GetFantasyPositionUseCase {
   final IFantasyRepository _repository;

@@ -13,6 +13,9 @@ import 'package:arena_soccer/features/championships/data/dtos/championship_dto.d
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_athlete_dto.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_config_dto.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_round_dtos.dart';
+import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_score_dto.dart';
+import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_ranking_usecases.dart';
+import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_top_athletes.dart';
 import 'package:arena_soccer/features/fantasy/domain/fantasy_lineup.dart';
 import 'package:arena_soccer/features/fantasy/domain/repositories/fantasy_repository_interface.dart';
 import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_config_usecases.dart';
@@ -44,6 +47,40 @@ class _Repo implements IFantasyRepository {
   final lineup = StreamController<Either<Failure, FantasyLineupDTO?>>.broadcast();
   final joined = <String>[];
   final saved = <(int, FantasyLineupDTO)>[];
+
+  @override
+  Future<Either<Failure, List<FantasyRoundDTO>>> getRounds(String fantasyId) async => Right([
+        FantasyRoundDTO.fromMap('1', {'status': 'fechada'}),
+        FantasyRoundDTO.fromMap('3', {'status': 'fechada'}),
+        FantasyRoundDTO.fromMap('4', {'status': 'aberta'}),
+      ]);
+
+  final top = <int, List<FantasyAthleteScoreDTO>>{
+    1: [
+      FantasyAthleteScoreDTO.fromMap(
+          'fw', {'nome': 'Ângelo Atacante', 'time': 'Tigres', 'total': 22, 'posicao': 'ata'}),
+      FantasyAthleteScoreDTO.fromMap('mf', {'nome': 'Mateus Meia', 'total': 15, 'posicao': 'mei'}),
+    ],
+    3: [
+      FantasyAthleteScoreDTO.fromMap('gk', {'nome': 'Rafael Goleiro', 'time': 'Leões', 'total': 18, 'posicao': 'gol'}),
+      FantasyAthleteScoreDTO.fromMap('cb', {'nome': 'Caio Zagueiro', 'total': 18, 'posicao': 'zag'}),
+      FantasyAthleteScoreDTO.fromMap('dm', {'nome': 'Davi Volante', 'total': 9, 'posicao': 'mei'}),
+    ],
+  };
+
+  @override
+  Future<Either<Failure, List<FantasyAthleteScoreDTO>>> getTopAthletes(String fantasyId, int round) async =>
+      Right(top[round] ?? const []);
+
+  @override
+  Future<Either<Failure, CachedValue<List<FantasyAthleteScoreDTO>>?>> getCachedTopAthletes(
+          String fantasyId, int round) async =>
+      const Right(null);
+
+  @override
+  Future<Either<Failure, void>> saveTopAthletesCache(
+          String fantasyId, int round, List<FantasyAthleteScoreDTO> list) async =>
+      const Right(null);
 
   @override
   Stream<Either<Failure, FantasyConfigDTO>> watchConfig(ChampionshipDTO championship) => config.stream;
@@ -334,6 +371,63 @@ void main() {
     expect(zag.style.accent, const Color(0xFFC62828));
     await tester.tap(find.byKey(const ValueKey('fantasy-captain-mei')));
     expect(captain, 'mf');
+  });
+
+  test('craques da rodada: a última rodada fechada e o top dela', () async {
+    final repo = _Repo();
+    final cubit = FantasyLineupCubit(
+      WatchFantasyConfigUseCase(repo),
+      WatchFantasyRoundUseCase(repo),
+      WatchFantasyParticipantUseCase(repo),
+      WatchFantasyLineupUseCase(repo),
+      JoinFantasyUseCase(repo),
+      SaveFantasyLineupUseCase(repo),
+      GetFantasyAthletesCacheFirstUseCase(repo),
+      clock: () => _now,
+      tick: null,
+      rounds: GetFantasyRoundsUseCase(repo),
+      topAthletes: GetFantasyTopAthletesCacheFirstUseCase(repo),
+    );
+    addTearDown(cubit.close);
+    cubit.load(_copa, uid: '');
+    repo.config.add(Right(_config));
+    for (var i = 0; i < 10; i++) {
+      await Future<void>.delayed(Duration.zero);
+    }
+    expect(cubit.state.topRound, 3);
+    expect(cubit.state.topAthletes.map((a) => a.athleteId), ['gk', 'cb', 'dm']);
+  });
+
+  testWidgets('card dos craques: até 5, posição com empate, toque e "Ver todos"', (tester) async {
+    final athletes = [
+      for (var i = 0; i < 7; i++)
+        FantasyAthleteScoreDTO.fromMap('a$i', {'nome': 'Atleta $i', 'total': i < 2 ? 20 : 20 - i, 'posicao': 'ata'}),
+    ];
+    String? tapped;
+    var seeAll = false;
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('pt'),
+      home: Scaffold(
+        body: SingleChildScrollView(
+          child: FantasyTopAthletesCard(
+            round: 3,
+            athletes: athletes,
+            onAthleteTap: (a) => tapped = a.athleteId,
+            onSeeAll: () => seeAll = true,
+          ),
+        ),
+      ),
+    ));
+    expect(find.text('Craques da rodada 3'), findsOneWidget);
+    expect(find.byType(FantasyTopAthleteRow), findsNWidgets(5));
+    expect(find.text('1º'), findsNWidgets(2));
+    expect(find.text('Atleta 5'), findsNothing);
+    await tester.tap(find.byKey(const ValueKey('fantasy-top-a2')));
+    expect(tapped, 'a2');
+    await tester.tap(find.byKey(const ValueKey('fantasy-top-see-all')));
+    expect(seeAll, isTrue);
   });
 }
 

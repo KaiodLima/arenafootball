@@ -6,9 +6,11 @@ import 'package:arena_soccer/features/championships/data/dtos/championship_dto.d
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_athlete_dto.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_config_dto.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_round_dtos.dart';
+import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_score_dto.dart';
 import 'package:arena_soccer/features/fantasy/domain/fantasy_lineup.dart';
 import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_config_usecases.dart';
 import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_lineup_usecases.dart';
+import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_ranking_usecases.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_by_ids_usecase.dart';
 
@@ -32,6 +34,10 @@ class FantasyLineupState extends Equatable {
 
   /// Times do campeonato por id (cores e escudo das figurinhas).
   final Map<String, TeamDTO> teams;
+
+  /// "Craques da rodada": a última rodada fechada e os que mais pontuaram nela.
+  final int? topRound;
+  final List<FantasyAthleteScoreDTO> topAthletes;
   final bool busy;
   final FantasyLineupEvent event;
   final String? failure;
@@ -48,6 +54,8 @@ class FantasyLineupState extends Equatable {
     this.athletes = const [],
     this.athletesLoaded = false,
     this.teams = const {},
+    this.topRound,
+    this.topAthletes = const [],
     this.busy = false,
     this.event = FantasyLineupEvent.none,
     this.failure,
@@ -84,6 +92,8 @@ class FantasyLineupState extends Equatable {
     List<FantasyAthleteDTO>? athletes,
     bool? athletesLoaded,
     Map<String, TeamDTO>? teams,
+    int? topRound,
+    List<FantasyAthleteScoreDTO>? topAthletes,
     bool? busy,
     FantasyLineupEvent? event,
     String? failure,
@@ -100,6 +110,8 @@ class FantasyLineupState extends Equatable {
         athletes: athletes ?? this.athletes,
         athletesLoaded: athletesLoaded ?? this.athletesLoaded,
         teams: teams ?? this.teams,
+        topRound: topRound ?? this.topRound,
+        topAthletes: topAthletes ?? this.topAthletes,
         busy: busy ?? this.busy,
         event: event ?? FantasyLineupEvent.none,
         failure: failure,
@@ -118,6 +130,8 @@ class FantasyLineupState extends Equatable {
         athletes,
         athletesLoaded,
         teams,
+        topRound,
+        topAthletes,
         busy,
         event,
         failure,
@@ -140,6 +154,10 @@ class FantasyLineupCubit extends Cubit<FantasyLineupState> {
   /// Times do campeonato (cores das figurinhas); nulo = sem as cores (testes).
   final GetTeamsByIdsUseCase? _teams;
 
+  /// "Craques da rodada"; nulos = sem o card (testes).
+  final GetFantasyRoundsUseCase? _rounds;
+  final GetFantasyTopAthletesCacheFirstUseCase? _topAthletes;
+
   /// Intervalo do relógio da tela (o prazo passa com ela aberta); nulo = sem relógio (testes).
   final Duration? _tick;
 
@@ -154,9 +172,13 @@ class FantasyLineupCubit extends Cubit<FantasyLineupState> {
     DateTime Function()? clock,
     Duration? tick = const Duration(seconds: 30),
     GetTeamsByIdsUseCase? teams,
+    GetFantasyRoundsUseCase? rounds,
+    GetFantasyTopAthletesCacheFirstUseCase? topAthletes,
   })  : _clock = clock ?? DateTime.now,
         _tick = tick,
         _teams = teams,
+        _rounds = rounds,
+        _topAthletes = topAthletes,
         super(FantasyLineupState(now: (clock ?? DateTime.now)()));
 
   StreamSubscription<Object?>? _configSub;
@@ -164,6 +186,7 @@ class FantasyLineupCubit extends Cubit<FantasyLineupState> {
   StreamSubscription<Object?>? _participantSub;
   StreamSubscription<Object?>? _lineupSub;
   StreamSubscription<Object?>? _athletesSub;
+  StreamSubscription<Object?>? _topSub;
   Timer? _ticker;
   int? _watchedRound;
   String _name = '';
@@ -200,11 +223,28 @@ class FantasyLineupCubit extends Cubit<FantasyLineupState> {
     response.fold((_) {}, (list) => emit(state.copyWith(teams: {for (final t in list) t.id: t})));
   }
 
+  /// Última rodada fechada (uma leitura das rodadas) e o top dela (cache).
+  Future<void> _loadTopAthletes(String fantasyId) async {
+    final rounds = _rounds;
+    final topAthletes = _topAthletes;
+    if (rounds == null || topAthletes == null) return;
+    final response = await rounds(fantasyId);
+    if (isClosed) return;
+    final closed = response.fold((_) => const <FantasyRoundDTO>[], (list) => list.where((r) => r.closed).toList());
+    if (closed.isEmpty) return;
+    final last = closed.map((r) => r.number).reduce((a, b) => a > b ? a : b);
+    _topSub = topAthletes(fantasyId, last).listen((r) {
+      if (isClosed) return;
+      emit(state.copyWith(topRound: last, topAthletes: r.fold((_) => const [], (list) => list)));
+    });
+  }
+
   void _onConfig(FantasyConfigDTO config) {
     final first = state.config == null;
     emit(state.copyWith(config: config));
     if (first) {
       _loadAthletes(config);
+      _loadTopAthletes(config.championshipDocId);
       if (state.uid.isNotEmpty) {
         _participantSub = _watchParticipant(config.championshipDocId, state.uid).listen((response) {
           if (isClosed) return;
@@ -317,7 +357,7 @@ class FantasyLineupCubit extends Cubit<FantasyLineupState> {
   Future<void> close() async {
     _ticker?.cancel();
     await Future.wait([
-      for (final sub in [_configSub, _roundSub, _participantSub, _lineupSub, _athletesSub])
+      for (final sub in [_configSub, _roundSub, _participantSub, _lineupSub, _athletesSub, _topSub])
         if (sub != null) sub.cancel(),
     ]);
     return super.close();

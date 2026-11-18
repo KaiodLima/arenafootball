@@ -118,4 +118,23 @@ class FantasyRepositoryImpl implements IFantasyRepository {
   @override
   Future<Either<Failure, FantasyAthleteScoreDTO?>> getAthleteScore(String fantasyId, int round, String athleteId) =>
       _dataSource.getAthleteScore(fantasyId, round, athleteId);
+
+  @override
+  Future<Either<Failure, List<FantasyAthleteScoreDTO>>> getTopAthletes(String fantasyId, int round) =>
+      _dataSource.getTopAthletes(fantasyId, round);
+
+  @override
+  Future<Either<Failure, CachedValue<List<FantasyAthleteScoreDTO>>?>> getCachedTopAthletes(
+          String fantasyId, int round) =>
+      _cache.read<List<FantasyAthleteScoreDTO>>(
+        CacheKeys.fantasyTopAthletes(fantasyId: fantasyId, round: round),
+        (json) => [
+          for (final item in json as List) FantasyAthleteScoreDTO.fromCache(Map<String, dynamic>.from(item as Map)),
+        ],
+      );
+
+  @override
+  Future<Either<Failure, void>> saveTopAthletesCache(String fantasyId, int round, List<FantasyAthleteScoreDTO> list) =>
+      _cache
+          .save(CacheKeys.fantasyTopAthletes(fantasyId: fantasyId, round: round), [for (final a in list) a.toCache()]);
 }

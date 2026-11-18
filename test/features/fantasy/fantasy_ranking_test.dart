@@ -12,6 +12,7 @@ import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_athlete_dto.dart
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_config_dto.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_ranking_dtos.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_round_dtos.dart';
+import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_score_dto.dart';
 import 'package:arena_soccer/features/fantasy/domain/repositories/fantasy_repository_interface.dart';
 import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_config_usecases.dart';
 import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_lineup_usecases.dart';
@@ -44,6 +45,33 @@ class _Repo implements IFantasyRepository {
   };
   final lineups = <int, FantasyLineupDTO?>{1: _lineupU1, 2: const FantasyLineupDTO(uid: 'u1')};
   final counts = <String>[];
+
+  final top = <int, List<FantasyAthleteScoreDTO>>{
+    1: [
+      FantasyAthleteScoreDTO.fromMap(
+          'fw', {'nome': 'Ângelo Atacante', 'time': 'Tigres', 'total': 22, 'posicao': 'ata'}),
+      FantasyAthleteScoreDTO.fromMap('mf', {'nome': 'Mateus Meia', 'total': 15, 'posicao': 'mei'}),
+    ],
+    2: [
+      FantasyAthleteScoreDTO.fromMap('gk', {'nome': 'Rafael Goleiro', 'time': 'Leões', 'total': 18, 'posicao': 'gol'}),
+      FantasyAthleteScoreDTO.fromMap('cb', {'nome': 'Caio Zagueiro', 'total': 18, 'posicao': 'zag'}),
+      FantasyAthleteScoreDTO.fromMap('dm', {'nome': 'Davi Volante', 'total': 9, 'posicao': 'mei'}),
+    ],
+  };
+
+  @override
+  Future<Either<Failure, List<FantasyAthleteScoreDTO>>> getTopAthletes(String fantasyId, int round) async =>
+      Right(top[round] ?? const []);
+
+  @override
+  Future<Either<Failure, CachedValue<List<FantasyAthleteScoreDTO>>?>> getCachedTopAthletes(
+          String fantasyId, int round) async =>
+      const Right(null);
+
+  @override
+  Future<Either<Failure, void>> saveTopAthletesCache(
+          String fantasyId, int round, List<FantasyAthleteScoreDTO> list) async =>
+      const Right(null);
 
   @override
   Stream<Either<Failure, FantasyConfigDTO>> watchConfig(ChampionshipDTO championship) => Stream.value(Right(
@@ -125,6 +153,7 @@ FantasyRankingCubit _cubit(_Repo repo) => FantasyRankingCubit(
       GetFantasyLineupUseCase(repo),
       WatchFantasyParticipantUseCase(repo),
       GetFantasyAthletesCacheFirstUseCase(repo),
+      topAthletes: GetFantasyTopAthletesCacheFirstUseCase(repo),
     );
 
 Future<void> _settle() async {
@@ -222,5 +251,37 @@ void main() {
     expect(find.text('Ângelo Atacante'), findsOneWidget);
     expect(find.text('22,5'), findsOneWidget);
     expect(find.text('Aguardando apuração'), findsOneWidget);
+  });
+
+  testWidgets('aba Atletas: craques da rodada escolhida, empate na mesma posição, troca de rodada', (tester) async {
+    tester.view.physicalSize = const Size(420, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final repo = _Repo();
+    final cubit = _cubit(repo);
+    addTearDown(cubit.close);
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('pt'),
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider<SessionCubit>.value(value: _Session()),
+          BlocProvider<FantasyRankingCubit>.value(value: cubit),
+        ],
+        child: const FantasyRankingPage(championship: _copa, initialTab: FantasyRankingTab.athletes),
+      ),
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('Rodada 2'), findsOneWidget);
+    expect(find.text('Rafael Goleiro'), findsOneWidget);
+    expect(find.text('GOL · Leões'), findsOneWidget);
+    expect(find.text('1º'), findsNWidgets(2));
+    expect(find.text('3º'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('fantasy-round-older')));
+    await tester.pumpAndSettle();
+    expect(find.text('Ângelo Atacante'), findsOneWidget);
+    expect(find.text('22'), findsOneWidget);
+    expect(find.text('Rafael Goleiro'), findsNothing);
   });
 }
