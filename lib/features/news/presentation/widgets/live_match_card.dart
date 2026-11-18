@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_report_dtos.dart';
+import 'package:arena_soccer/features/matches/domain/match_clock.dart';
+import 'package:arena_soccer/features/news/data/dtos/live_clock.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/booking_icon.dart';
 import 'package:arena_soccer/features/news/data/dtos/live_event.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
@@ -23,7 +27,10 @@ class LiveMatchCard extends StatelessWidget {
   /// Toque no atleta do lance em destaque (abre a tela dele).
   final void Function(String playerId, String name)? onPlayerTap;
 
-  const LiveMatchCard({super.key, required this.news, this.trailing, this.onTap, this.onPlayerTap});
+  /// Hora fixa (teste): o minuto não anda.
+  final DateTime? now;
+
+  const LiveMatchCard({super.key, required this.news, this.trailing, this.onTap, this.onPlayerTap, this.now});
 
   /// Quantos lances anteriores aparecem na mini linha do tempo.
   static const int previousCount = 3;
@@ -109,7 +116,14 @@ class LiveMatchCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(child: _Team(name: news.homeTeam, crest: news.homeCrest, accent: homeAccent)),
-                      _Score(home: news.homeGoals, away: news.awayGoals, minute: finished ? null : last?.minute),
+                      _Score(
+                        home: news.homeGoals,
+                        away: news.awayGoals,
+                        clock: finished ? null : news.liveClock,
+                        halfTime: halfTime,
+                        lastMinute: finished ? null : last?.minute,
+                        now: now,
+                      ),
                       Expanded(child: _Team(name: news.awayTeam, crest: news.awayCrest, accent: awayAccent)),
                     ],
                   ),
@@ -277,16 +291,72 @@ class _Team extends StatelessWidget {
   }
 }
 
-/// Placar grande e, embaixo, o minuto do último lance.
-class _Score extends StatelessWidget {
+/// Placar grande e, embaixo, o minuto corrido pelo relógio da partida
+/// ([clock], anda a cada 30 s; "Intervalo" parado). Card antigo sem relógio:
+/// o minuto do último lance ([lastMinute]).
+class _Score extends StatefulWidget {
   final String home;
   final String away;
-  final int? minute;
+  final LiveClock? clock;
+  final bool halfTime;
+  final int? lastMinute;
+  final DateTime? now;
 
-  const _Score({required this.home, required this.away, required this.minute});
+  const _Score({
+    required this.home,
+    required this.away,
+    required this.clock,
+    required this.halfTime,
+    required this.lastMinute,
+    this.now,
+  });
+
+  @override
+  State<_Score> createState() => _ScoreState();
+}
+
+class _ScoreState extends State<_Score> {
+  Timer? _tick;
+
+  @override
+  void initState() {
+    super.initState();
+    _schedule();
+  }
+
+  @override
+  void didUpdateWidget(covariant _Score oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.clock != widget.clock || oldWidget.halfTime != widget.halfTime) _schedule();
+  }
+
+  void _schedule() {
+    _tick?.cancel();
+    _tick = null;
+    if (widget.now != null || widget.clock == null || widget.halfTime) return;
+    _tick = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _tick?.cancel();
+    super.dispose();
+  }
+
+  String? _label(AppLocalizations l10n) {
+    final clock = widget.clock;
+    if (clock == null) return widget.lastMinute == null ? null : "${widget.lastMinute}'";
+    if (widget.halfTime) return l10n.reportHalfTime;
+    final state = MatchClock.of(clock.toMatch(), widget.now ?? DateTime.now());
+    if (state.phase == MatchClockPhase.halfTime) return l10n.reportHalfTime;
+    return state.minuteLabel;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final label = _label(AppLocalizations.of(context));
     return SizedBox(
       width: AppSizes.s100,
       child: Column(
@@ -295,7 +365,7 @@ class _Score extends StatelessWidget {
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
-              '${home.isEmpty ? '0' : home} – ${away.isEmpty ? '0' : away}',
+              '${widget.home.isEmpty ? '0' : widget.home} – ${widget.away.isEmpty ? '0' : widget.away}',
               style: AppTypography.display(color: AppColors.textPrimary).copyWith(
                 fontSize: AppSizes.s36,
                 height: 1.1,
@@ -303,16 +373,17 @@ class _Score extends StatelessWidget {
               ),
             ),
           ),
-          if (minute != null) ...[
+          if (label != null) ...[
             const SizedBox(height: AppSizes.s4),
             Container(
+              key: const ValueKey('live-card-minute'),
               padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s2),
               decoration: BoxDecoration(
                 color: AppColors.danger.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSizes.s10),
               ),
               child: Text(
-                "$minute'",
+                label,
                 style: AppTypography.label(color: AppColors.danger).copyWith(fontSize: AppSizes.s12),
               ),
             ),

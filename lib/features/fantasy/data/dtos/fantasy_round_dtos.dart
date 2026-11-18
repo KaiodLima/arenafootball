@@ -66,6 +66,15 @@ class FantasyRoundDTO extends Equatable {
   /// Ainda dá para montar/trocar a escalação.
   bool isOpenAt(DateTime now) => status == 'aberta' && closesAt != null && now.isBefore(closesAt!);
 
+  /// Em andamento (mercado fechado): o 1º jogo já começou e nem todas as
+  /// partidas terminaram/foram apuradas. A próxima rodada só abre depois.
+  bool inProgressAt(DateTime now) =>
+      (status == 'aberta' || status == 'fechada') &&
+      matchIds.isNotEmpty &&
+      closesAt != null &&
+      !now.isBefore(closesAt!) &&
+      !finished;
+
   @override
   List<Object?> get props =>
       [number, matchIds, closesAt, status, scored, finished, matchesFinished, lineups, processedAt, params];

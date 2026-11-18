@@ -231,7 +231,7 @@ service cloud.firestore {
             'images', 'idAutor'])
           && (tag == 'publicidade'
             ? p.get('podePublicidade', true)
-            : p.get('podeNoticias', true) && !(tag in ['gol', 'resultado', 'votacao', 'aovivo', 'cartao', 'evento', 'campeao']));
+            : p.get('podeNoticias', true) && !(tag in ['gol', 'resultado', 'votacao', 'aovivo', 'cartao', 'evento', 'campeao', 'fantasy']));
       }
 
       function partnerHighlight(data, p) {
@@ -874,7 +874,7 @@ service cloud.firestore {
           && data.get('idAutor', '') == request.auth.uid
           && data.get('idRegiao', '') == p.get('idRegiao', '-')
           && data.get('status', '') == 'pendente'
-          && !(data.get('tag', '') in ['gol', 'resultado', 'votacao', 'publicidade', 'aovivo', 'cartao', 'evento', 'campeao'])
+          && !(data.get('tag', '') in ['gol', 'resultado', 'votacao', 'publicidade', 'aovivo', 'cartao', 'evento', 'campeao', 'fantasy'])
           && data.keys().hasOnly(['id', 'data', 'criadoEm', 'status', 'titulo', 'descricao', 'urlImagem', 'link',
             'exibir', 'fk_competicao', 'idRegiao', 'time_casa', 'time_fora', 'gol_time_casa', 'gol_time_fora', 'tag',
             'images', 'idAutor']);
@@ -1109,6 +1109,8 @@ service cloud.firestore {
         return signedIn() && request.auth.uid == uid
           && f.ativo == true
           && r.status == 'aberta' && request.time < r.fechaEm
+          // Mercado: só a rodada atual (com uma em andamento, a próxima não abre).
+          && f.get('rodadaAtual', 0) == int(round)
           && exists(/databases/$(database)/documents/fantasy/$(championshipDocId)/participantes/$(uid))
           && d.keys().hasOnly(['uid', 'nome', 'urlImagem', 'atletas', 'idsAtletas', 'capitao', 'atualizadoEm', 'copiada',
             'pontos', 'pontosAtletas', 'aplicado', 'processadoEm'])

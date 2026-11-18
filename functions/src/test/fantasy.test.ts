@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   currentRound,
+  roundInProgress,
   fantasyChampions,
   fantasyRounds,
   frozenParams,
@@ -126,4 +127,23 @@ test('reapuração pedida: só quando o reapurarEm muda', () => {
   assert.equal(rescoreRequested({ reapurarEm: at(1) }, { reapurarEm: at(1), participantes: 3 }), false);
   assert.equal(rescoreRequested({ ativo: false }, { ativo: true }), false);
   assert.equal(rescoreRequested({ reapurarEm: at(1) }, undefined), false);
+});
+
+test('mercado fechado: a rodada em andamento segura a atual até ser finalizada', () => {
+  const now = new Date('2026-11-15T12:00:00Z');
+  const started = { numero: 1, fechaEm: new Date('2026-11-15T11:30:00Z'), status: 'aberta', idsPartidas: ['a'] };
+  const next = { numero: 2, fechaEm: new Date('2026-11-21T18:00:00Z'), status: 'aberta', idsPartidas: ['b'] };
+  // Iniciada na mão (ainda aberta) ou já fechada: a atual continua sendo a 1.
+  assert.equal(currentRound([started, next], now), 1);
+  assert.equal(currentRound([{ ...started, status: 'fechada' }, next], now), 1);
+  assert.equal(roundInProgress([{ ...started, status: 'fechada' }, next], now), 1);
+  // Todas as partidas terminadas e apuradas: abre a próxima.
+  assert.equal(currentRound([{ ...started, status: 'fechada', finalizada: true }, next], now), 2);
+  assert.equal(roundInProgress([{ ...started, finalizada: true }, next], now), null);
+  // Rodada sem partidas ou vazia não segura; nenhuma aberta = 0.
+  assert.equal(currentRound([{ ...started, idsPartidas: [] }, next], now), 2);
+  assert.equal(currentRound([{ ...started, status: 'vazia' }, next], now), 2);
+  assert.equal(currentRound([{ ...started, status: 'fechada', finalizada: true }], now), 0);
+  // Prazo ainda no futuro: não está em andamento.
+  assert.equal(roundInProgress([next], now), null);
 });

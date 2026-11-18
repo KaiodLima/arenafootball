@@ -13478,6 +13478,60 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Atletas'**
   String get fantasyTabAthletes;
+
+  /// No description provided for @fantasyCardBadge.
+  ///
+  /// In pt, this message translates to:
+  /// **'ARENA FANTASY · RODADA {round}'**
+  String fantasyCardBadge(int round);
+
+  /// No description provided for @fantasyCardTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Craques da rodada'**
+  String get fantasyCardTitle;
+
+  /// No description provided for @fantasyCardAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escalar meu time'**
+  String get fantasyCardAction;
+
+  /// No description provided for @fantasyCardPoints.
+  ///
+  /// In pt, this message translates to:
+  /// **'{points} pts'**
+  String fantasyCardPoints(String points);
+
+  /// No description provided for @pushActionFantasyRound.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arena Fantasy'**
+  String get pushActionFantasyRound;
+
+  /// No description provided for @pushActionFantasyRoundHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Região · craques da rodada quando ela é apurada'**
+  String get pushActionFantasyRoundHint;
+
+  /// No description provided for @reportStartersFull.
+  ///
+  /// In pt, this message translates to:
+  /// **'Já há 11 titulares. Tire um titular para escalar outro.'**
+  String get reportStartersFull;
+
+  /// No description provided for @fantasyRoundInProgress.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rodada {round} em andamento. A próxima rodada abre quando todos os jogos terminarem.'**
+  String fantasyRoundInProgress(int round);
+
+  /// No description provided for @fantasyRoundInProgressShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'Em andamento'**
+  String get fantasyRoundInProgressShort;
 }
 
 class _AppLocalizationsDelegate

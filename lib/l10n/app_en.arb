@@ -2490,5 +2490,17 @@
   "@fantasyTopAthletesTitle": {"placeholders": {"round": {"type": "int"}}},
   "fantasyTopAthletesEmpty": "No player scored in this round.",
   "fantasySeeAll": "See all",
-  "fantasyTabAthletes": "Players"
+  "fantasyTabAthletes": "Players",
+  "fantasyCardBadge": "ARENA FANTASY · ROUND {round}",
+  "@fantasyCardBadge": {"placeholders": {"round": {"type": "int"}}},
+  "fantasyCardTitle": "Top players of the round",
+  "fantasyCardAction": "Pick my team",
+  "fantasyCardPoints": "{points} pts",
+  "@fantasyCardPoints": {"placeholders": {"points": {"type": "String"}}},
+  "pushActionFantasyRound": "Arena Fantasy",
+  "pushActionFantasyRoundHint": "Region · top players when the round is scored",
+  "reportStartersFull": "There are already 11 starters. Remove one to add another.",
+  "fantasyRoundInProgress": "Round {round} in progress. The next round opens when all matches are over.",
+  "@fantasyRoundInProgress": {"placeholders": {"round": {"type": "int"}}},
+  "fantasyRoundInProgressShort": "In progress"
 }

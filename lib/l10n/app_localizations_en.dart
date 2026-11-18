@@ -8139,4 +8139,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fantasyTabAthletes => 'Players';
+
+  @override
+  String fantasyCardBadge(int round) {
+    return 'ARENA FANTASY · ROUND $round';
+  }
+
+  @override
+  String get fantasyCardTitle => 'Top players of the round';
+
+  @override
+  String get fantasyCardAction => 'Pick my team';
+
+  @override
+  String fantasyCardPoints(String points) {
+    return '$points pts';
+  }
+
+  @override
+  String get pushActionFantasyRound => 'Arena Fantasy';
+
+  @override
+  String get pushActionFantasyRoundHint =>
+      'Region · top players when the round is scored';
+
+  @override
+  String get reportStartersFull =>
+      'There are already 11 starters. Remove one to add another.';
+
+  @override
+  String fantasyRoundInProgress(int round) {
+    return 'Round $round in progress. The next round opens when all matches are over.';
+  }
+
+  @override
+  String get fantasyRoundInProgressShort => 'In progress';
 }

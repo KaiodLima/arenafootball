@@ -1,5 +1,5 @@
 import { assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
-import { deleteDoc, doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import { deleteDoc, doc, getDoc, serverTimestamp, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
 
 /** Arena Fantasy: configuração por campeonato (`fantasy/{idDocCampeonato}`). */
 export default async function run(env, check) {
@@ -101,6 +101,14 @@ export default async function run(env, check) {
   await check('cliente não grava rodada', assertFails(updateDoc(doc(admin, 'fantasy/fx/rodadas/1'), { status: 'fechada' })));
   await check('não apaga a escalação', assertFails(deleteDoc(mine())));
 
+  // Mercado fechado: com a rodada 1 em andamento (rodadaAtual 1), a 2 aberta não aceita escalação.
+  await seed('fantasy/fx/rodadas/2', { numero: 2, status: 'aberta', fechaEm: future, idsPartidas: ['m2'] });
+  await check('rodada seguinte com a atual em andamento recusada', assertFails(setDoc(mine(2), lineup())));
+  await env.withSecurityRulesDisabled((ctx) => updateDoc(doc(ctx.firestore(), 'fantasy/fx'), { rodadaAtual: 2 }));
+  await check('rodada 1 finalizada: escala a 2', assertSucceeds(setDoc(mine(2), lineup())));
+  await check('a 1 já não é a atual', assertFails(setDoc(mine(), lineup())));
+  await env.withSecurityRulesDisabled((ctx) => updateDoc(doc(ctx.firestore(), 'fantasy/fx'), { rodadaAtual: 1 }));
+
   // --- Fase 5: "Reapurar rodadas" do admin ---
   await check('admin pede a reapuração', assertSucceeds(setDoc(doc(admin, 'fantasy/fx'),
     { reapurarEm: serverTimestamp(), atualizadoEm: serverTimestamp() }, { merge: true })));
@@ -114,4 +122,23 @@ export default async function run(env, check) {
   await check('convidado lê os pontos do atleta', assertSucceeds(getDoc(doc(guest, 'fantasy/fx/rodadas/1/atletas/gk'))));
   await check('cliente não grava pontos do atleta', assertFails(setDoc(doc(admin, 'fantasy/fx/rodadas/1/atletas/gk'), { total: 99 })));
   await check('cliente não grava aplicado', assertFails(setDoc(mine(), lineup(undefined, { aplicado: 10 }))));
+
+  // Card "Craques da rodada" (tag `fantasy`): só as functions gravam; o parceiro não usa a tag.
+  await seed('solicitacoes_parceiro/pp', { uid: 'pp', status: 'aprovada', idRegiao: 'co', regiao: 'Colônia' });
+  const partnerDb = env.authenticatedContext('pp').firestore();
+  const now = new Date(Date.now() - 3 * 3600000);
+  const day = `${now.getUTCFullYear()}-${now.getUTCMonth() + 1}-${now.getUTCDate()}`;
+  const partnerPost = (n, tag) => {
+    const id = `not${n}_pp_${day}`;
+    const batch = writeBatch(partnerDb);
+    batch.set(doc(partnerDb, `noticias/${id}`), {
+      id, titulo: 'x', descricao: 'y', exibir: 'true', fk_competicao: 'Colônia', idRegiao: 'co', tag, idAutor: 'pp',
+    });
+    batch.set(doc(partnerDb, `vagas_parceiro/${id}`), { idAutor: 'pp', criadoEm: serverTimestamp() });
+    return batch.commit();
+  };
+  await check('parceiro não cria card do Fantasy', assertFails(partnerPost(0, 'fantasy')));
+  await check('parceiro cria notícia comum na vaga', assertSucceeds(partnerPost(0, '')));
+  await check('usuário não cria card do Fantasy', assertFails(setDoc(doc(user, 'noticias/fantasy_fx_r1'),
+    { tag: 'fantasy', titulo: 'x', exibir: 'true' })));
 }

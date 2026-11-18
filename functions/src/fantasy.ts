@@ -45,8 +45,42 @@ export function fantasyRounds(matches: { id: string; data: Doc }[], season: stri
     .sort((a, b) => a.numero - b.numero);
 }
 
-/** Rodada atual: a menor ainda aberta (prazo no futuro); 0 = nenhuma. */
-export function currentRound(rounds: { numero: number; fechaEm: Date | null; status?: string }[], now: Date): number {
+/** Rodada para a `rodadaAtual` (o que importa: prazo, status, partidas e se terminou). */
+export interface RoundState {
+  numero: number;
+  fechaEm: Date | null;
+  status?: string;
+  idsPartidas?: string[];
+  finalizada?: boolean;
+}
+
+/**
+ * Rodada em andamento (mercado fechado): a menor com partidas, prazo vencido
+ * e ainda não finalizada (nem todas as partidas terminadas e apuradas),
+ * aberta ou já fechada; nula = nenhuma.
+ */
+export function roundInProgress(rounds: RoundState[], now: Date): number | null {
+  const playing = rounds
+    .filter(
+      (r) =>
+        (r.status === 'aberta' || r.status === 'fechada') &&
+        (r.idsPartidas?.length ?? 0) > 0 &&
+        r.fechaEm !== null &&
+        r.fechaEm <= now &&
+        r.finalizada !== true,
+    )
+    .map((r) => r.numero)
+    .sort((a, b) => a - b);
+  return playing[0] ?? null;
+}
+
+/**
+ * Rodada atual: a em andamento (mercado fechado até ela terminar, estilo
+ * Cartola); sem ela, a menor aberta com prazo no futuro; 0 = nenhuma.
+ */
+export function currentRound(rounds: RoundState[], now: Date): number {
+  const playing = roundInProgress(rounds, now);
+  if (playing !== null) return playing;
   const open = rounds
     .filter((r) => r.status !== 'fechada' && r.fechaEm !== null && r.fechaEm > now)
     .map((r) => r.numero)

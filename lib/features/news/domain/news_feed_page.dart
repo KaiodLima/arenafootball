@@ -21,7 +21,7 @@ class NewsFeedPage {
     );
   }
 
-  /// Cards de gol, de resultado, de votação, de evento, de campeão e de publicidade só aparecem com
+  /// Cards de gol, de resultado, de votação, de evento, de campeão, do Fantasy e de publicidade só aparecem com
   /// `exibir == "true"`. Notícias comuns aparecem sempre (como no app antigo).
   static bool _visibleInFeed(NewsDTO item) => (item.isGoal ||
           item.isResult ||
@@ -30,7 +30,8 @@ class NewsFeedPage {
           item.isLive ||
           item.isBookingCard ||
           item.isEvent ||
-          item.isChampion)
+          item.isChampion ||
+          item.isFantasyRound)
       ? item.isVisible
       : true;
 }

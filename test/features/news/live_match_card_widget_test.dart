@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:arena_soccer/features/news/data/dtos/live_clock.dart';
 import 'package:arena_soccer/features/news/data/dtos/live_event.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/live_match_card.dart';
@@ -49,7 +50,7 @@ NewsDTO _card(LiveEvent? last, List<LiveEvent> events) => NewsDTO(
       liveEvents: events,
     );
 
-Future<void> _pump(WidgetTester tester, NewsDTO news, double width) async {
+Future<void> _pump(WidgetTester tester, NewsDTO news, double width, {DateTime? now}) async {
   await tester.pumpWidget(MaterialApp(
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
@@ -59,7 +60,7 @@ Future<void> _pump(WidgetTester tester, NewsDTO news, double width) async {
         child: Center(
           child: SizedBox(
             width: width,
-            child: LiveMatchCard(news: news, onTap: () {}, onPlayerTap: (_, __) {}),
+            child: LiveMatchCard(news: news, onTap: () {}, onPlayerTap: (_, __) {}, now: now),
           ),
         ),
       ),
@@ -107,5 +108,24 @@ void main() {
     await _pump(tester, _card(_goal, const [_goal]).copyWith(matchStatus: NewsDTO.matchStatusHalfTime), 412);
     expect(find.text('INTERVALO'), findsOneWidget);
     expect(find.text('AO VIVO'), findsNothing);
+  });
+
+  testWidgets('minuto corrido pelo relógio da partida (não o do último lance)', (tester) async {
+    final now = DateTime(2026, 11, 18, 16, 30);
+    final started = now.subtract(const Duration(minutes: 27, seconds: 50));
+    final live = _card(_goal, const [_goal]).copyWith(
+      liveClock: LiveClock(date: '18/11', time: '16:00', status: 'andamento', startedAt: started),
+    );
+    await _pump(tester, live, 412, now: now);
+    final minute = find.byKey(const ValueKey('live-card-minute'));
+    expect(find.descendant(of: minute, matching: find.text("28'")), findsOneWidget);
+    // Intervalo: parado em "Intervalo".
+    await _pump(tester, live.copyWith(matchStatus: NewsDTO.matchStatusHalfTime), 412, now: now);
+    expect(find.descendant(of: minute, matching: find.text('Intervalo')), findsOneWidget);
+    // Card antigo sem relógio: o minuto do último lance.
+    await _pump(tester, _card(_goal, const [_goal]), 412, now: now);
+    expect(find.descendant(of: minute, matching: find.text("12'")), findsOneWidget);
+    // Relógio no cache do feed.
+    expect(NewsDTO.fromCache(live.toCache()).liveClock, live.liveClock);
   });
 }

@@ -23,7 +23,8 @@ enum PushAction {
   referral('indicacao', true),
   organizerRequest('solicitacao_organizador', true),
   organizerRequestAnswer('solicitacao_organizador_resposta', true),
-  champion('campeao', true);
+  champion('campeao', true),
+  fantasyRound('fantasy_rodada', true);
 
   final String key;
   final bool defaultEnabled;

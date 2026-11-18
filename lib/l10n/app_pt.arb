@@ -4347,5 +4347,17 @@
   "@fantasyTopAthletesTitle": {"placeholders": {"round": {"type": "int"}}},
   "fantasyTopAthletesEmpty": "Nenhum atleta pontuou nesta rodada.",
   "fantasySeeAll": "Ver todos",
-  "fantasyTabAthletes": "Atletas"
+  "fantasyTabAthletes": "Atletas",
+  "fantasyCardBadge": "ARENA FANTASY · RODADA {round}",
+  "@fantasyCardBadge": {"placeholders": {"round": {"type": "int"}}},
+  "fantasyCardTitle": "Craques da rodada",
+  "fantasyCardAction": "Escalar meu time",
+  "fantasyCardPoints": "{points} pts",
+  "@fantasyCardPoints": {"placeholders": {"points": {"type": "String"}}},
+  "pushActionFantasyRound": "Arena Fantasy",
+  "pushActionFantasyRoundHint": "Região · craques da rodada quando ela é apurada",
+  "reportStartersFull": "Já há 11 titulares. Tire um titular para escalar outro.",
+  "fantasyRoundInProgress": "Rodada {round} em andamento. A próxima rodada abre quando todos os jogos terminarem.",
+  "@fantasyRoundInProgress": {"placeholders": {"round": {"type": "int"}}},
+  "fantasyRoundInProgressShort": "Em andamento"
 }

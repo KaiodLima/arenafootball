@@ -90,14 +90,17 @@ class FantasyHomeCard extends StatelessWidget {
         ? l10n.fantasyBadgeNoRound
         : round.closesAt != null && round.isOpenAt(now)
             ? '${l10n.fantasyRoundTitle(round.number)} · ${fantasyDeadlineLabel(l10n, round.closesAt!, now)}'
-            : '${l10n.fantasyRoundTitle(round.number)} · ${l10n.fantasyRoundLocked}';
+            : '${l10n.fantasyRoundTitle(round.number)} · '
+                '${round.inProgressAt(now) ? l10n.fantasyRoundInProgressShort : l10n.fantasyRoundLocked}';
     final (statusText, statusIcon, statusColor) = switch (status) {
       FantasyHomeStatus.notJoined => (l10n.fantasyHomeJoin, Icons.login_rounded, AppColors.primaryDark),
       FantasyHomeStatus.noRound => (l10n.fantasyBadgeNoRound, Icons.event_busy_rounded, AppColors.textSecondary),
       FantasyHomeStatus.pickTeam => (l10n.fantasyHomePickTeam, Icons.warning_amber_rounded, AppColors.warning),
       FantasyHomeStatus.copied => (l10n.fantasyHomeCopied, Icons.content_copy_rounded, AppColors.primaryDark),
       FantasyHomeStatus.confirmed => (l10n.fantasyHomeConfirmed, Icons.check_circle_rounded, AppColors.primaryStrong),
-      FantasyHomeStatus.locked => (l10n.fantasyLockedNotice, Icons.lock_rounded, AppColors.textSecondary),
+      FantasyHomeStatus.locked => round?.inProgressAt(now) == true
+          ? (l10n.fantasyRoundInProgress(round!.number), Icons.sports_soccer_rounded, AppColors.primaryDark)
+          : (l10n.fantasyLockedNotice, Icons.lock_rounded, AppColors.textSecondary),
     };
     return Container(
       key: ValueKey('fantasy-home-${config.championshipDocId}'),

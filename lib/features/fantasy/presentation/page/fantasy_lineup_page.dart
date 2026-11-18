@@ -213,7 +213,12 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
             const SizedBox(height: AppSizes.s12),
           ],
           if (!state.roundOpen) ...[
-            _Notice(icon: Icons.lock_rounded, text: l10n.fantasyLockedNotice),
+            state.round!.inProgressAt(state.now)
+                ? _Notice(
+                    icon: Icons.sports_soccer_rounded,
+                    text: l10n.fantasyRoundInProgress(state.round!.number),
+                  )
+                : _Notice(icon: Icons.lock_rounded, text: l10n.fantasyLockedNotice),
             const SizedBox(height: AppSizes.s12),
           ],
           FantasyPitch(
@@ -282,7 +287,9 @@ class _Header extends StatelessWidget {
         ? l10n.fantasyNoOpenRoundShort
         : state.roundOpen && round.closesAt != null
             ? fantasyDeadlineLabel(l10n, round.closesAt!, state.now)
-            : l10n.fantasyRoundLocked;
+            : round.inProgressAt(state.now)
+                ? l10n.fantasyRoundInProgressShort
+                : l10n.fantasyRoundLocked;
     return Container(
       padding: const EdgeInsets.all(AppSizes.s16),
       decoration: BoxDecoration(

@@ -28,6 +28,7 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/champion_card.dart';
+import 'package:arena_soccer/features/news/presentation/widgets/fantasy_round_card.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/championships_cubit.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_podium.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
@@ -216,6 +217,26 @@ class _NewsItem extends StatelessWidget {
 
   /// Detalhe da competição do card de campeão: a da aba Campeonatos (já
   /// carregada) ou, sem ela, montada do card.
+  /// Card do Fantasy: a escalação do campeonato (o carregado na aba, senão o
+  /// mínimo gravado no card).
+  void _openFantasy(BuildContext context) {
+    final loaded = BlocProvider.of<ChampionshipsCubit>(context)
+        .state
+        .championships
+        .where((c) => c.id == news.championshipDocId)
+        .firstOrNull;
+    final championship = loaded ??
+        ChampionshipDTO(
+          id: news.championshipDocId,
+          championshipId: news.championshipId ?? 0,
+          title: news.championshipTitle,
+          imageUrl: news.imageUrl,
+          region: news.region,
+          season: news.season,
+        );
+    Navigator.pushNamed(context, AppRoutes.fantasyLineupPage, arguments: championship);
+  }
+
   void _openChampionship(BuildContext context) {
     final loaded = BlocProvider.of<ChampionshipsCubit>(context)
         .state
@@ -370,6 +391,14 @@ class _NewsItem extends StatelessWidget {
         news: news,
         trailing: _adminMenu(context, onImage: true, canEdit: false),
         onTap: news.matchId.isEmpty ? null : () => _openVoting(context),
+      );
+    }
+    if (news.isFantasyRound) {
+      return FantasyRoundCard(
+        news: news,
+        trailing: _adminMenu(context, onImage: true, canEdit: false),
+        onTap: news.championshipDocId.isEmpty ? null : () => _openFantasy(context),
+        onAthleteTap: (athlete) => _openAthlete(context, athlete.id, athlete.name),
       );
     }
     if (news.isChampion) {

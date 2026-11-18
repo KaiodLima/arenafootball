@@ -8183,4 +8183,39 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get fantasyTabAthletes => 'Atletas';
+
+  @override
+  String fantasyCardBadge(int round) {
+    return 'ARENA FANTASY · RODADA $round';
+  }
+
+  @override
+  String get fantasyCardTitle => 'Craques da rodada';
+
+  @override
+  String get fantasyCardAction => 'Escalar meu time';
+
+  @override
+  String fantasyCardPoints(String points) {
+    return '$points pts';
+  }
+
+  @override
+  String get pushActionFantasyRound => 'Arena Fantasy';
+
+  @override
+  String get pushActionFantasyRoundHint =>
+      'Região · craques da rodada quando ela é apurada';
+
+  @override
+  String get reportStartersFull =>
+      'Já há 11 titulares. Tire um titular para escalar outro.';
+
+  @override
+  String fantasyRoundInProgress(int round) {
+    return 'Rodada $round em andamento. A próxima rodada abre quando todos os jogos terminarem.';
+  }
+
+  @override
+  String get fantasyRoundInProgressShort => 'Em andamento';
 }

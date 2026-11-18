@@ -519,6 +519,60 @@ void main() {
     expect(find.byKey(const ValueKey('fantasy-filter-all')), findsNothing);
     expect(find.byKey(const ValueKey('fantasy-athlete-fw')), findsOneWidget);
   });
+
+  test('rodada em andamento: começou, tem partidas e não foi finalizada', () {
+    final started =
+        FantasyRoundDTO(number: 1, status: 'aberta', closesAt: DateTime(2026, 11, 18, 11), matchIds: const ['m1']);
+    expect(started.inProgressAt(_now), isTrue);
+    expect(started.isOpenAt(_now), isFalse);
+    expect(
+        FantasyRoundDTO(number: 1, status: 'fechada', closesAt: DateTime(2026, 11, 18, 11), matchIds: const ['m1'])
+            .inProgressAt(_now),
+        isTrue);
+    expect(
+        FantasyRoundDTO(
+                number: 1,
+                status: 'fechada',
+                closesAt: DateTime(2026, 11, 18, 11),
+                matchIds: const ['m1'],
+                finished: true)
+            .inProgressAt(_now),
+        isFalse);
+    expect(_openRound.inProgressAt(_now), isFalse);
+  });
+
+  testWidgets('tela: rodada em andamento trava o campinho e avisa que a próxima abre depois', (tester) async {
+    tester.view.physicalSize = const Size(420, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final repo = _Repo();
+    final cubit = _cubit(repo);
+    addTearDown(cubit.close);
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('pt'),
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider<SessionCubit>.value(value: _Session()),
+          BlocProvider<FantasyLineupCubit>.value(value: cubit),
+        ],
+        child: const FantasyLineupPage(championship: _copa),
+      ),
+    ));
+    repo.config.add(Right(_config));
+    await tester.pump();
+    repo.participant.add(const Right(FantasyParticipantDTO(uid: 'u1', name: 'Ana')));
+    repo.round.add(Right(
+        FantasyRoundDTO(number: 2, status: 'aberta', closesAt: DateTime(2026, 11, 18, 11), matchIds: const ['m1'])));
+    repo.lineup.add(const Right(FantasyLineupDTO(uid: 'u1', lineup: _full)));
+    await tester.pump();
+    await tester.pump();
+    expect(find.text('Rodada 2 em andamento. A próxima rodada abre quando todos os jogos terminarem.'), findsOneWidget);
+    expect(find.text('Em andamento'), findsOneWidget);
+    expect(cubit.state.editable, isFalse);
+    expect(find.text('Confirmar escalação'), findsNothing);
+  });
 }
 
 extension on FantasyLineup {

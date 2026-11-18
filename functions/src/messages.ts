@@ -31,7 +31,8 @@ export type ActionKey =
   | 'indicacao'
   | 'solicitacao_organizador'
   | 'solicitacao_organizador_resposta'
-  | 'campeao';
+  | 'campeao'
+  | 'fantasy_rodada';
 
 /** Sem configuração gravada, vale este padrão (notícia vem desligada). */
 export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
@@ -57,6 +58,7 @@ export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
   solicitacao_organizador: true,
   solicitacao_organizador_resposta: true,
   campeao: true,
+  fantasy_rodada: true,
 };
 
 export type Target = { topic: string } | { condition: string };
@@ -272,6 +274,7 @@ export function newsMessage(news: Doc, id = ''): PushMessage | null {
     tag === 'resultado' ||
     tag === 'votacao' ||
     tag === 'campeao' ||
+    tag === 'fantasy' ||
     tag === 'publicidade' ||
     text(news.exibir) !== 'true'
   ) {

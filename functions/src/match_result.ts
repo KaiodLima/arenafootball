@@ -40,8 +40,47 @@ export function liveCardStatusUpdate(status: LiveCardStatus, match: Doc): Doc {
   const suffix = status === 'encerrada' ? 'fim de jogo' : status === 'intervalo' ? 'intervalo' : 'ao vivo';
   return {
     status_partida: status,
+    relogio: liveClockOf(match),
     titulo: `${text(match.timeC)} ${int(match.golTimeCasa)} × ${int(match.golTimeFora)} ${text(match.timeF)} · ${suffix}`,
   };
+}
+
+/** Campos da partida que o relógio do card ao vivo usa (minuto corrido no app). */
+export const LIVE_CLOCK_FIELDS = [
+  'data',
+  'horario',
+  'duracao',
+  'status',
+  'inicioEm',
+  'intervaloEm',
+  'segundoTempoEm',
+  'statusEm',
+] as const;
+
+/**
+ * Relógio da partida copiado no card ao vivo (`relogio`): data, horário,
+ * duração, status e os horários do servidor (Timestamp como estão).
+ */
+export function liveClockOf(match: Doc): Doc {
+  const clock: Doc = {
+    data: text(match.data),
+    horario: text(match.horario),
+    duracao: int(match.duracao) > 0 ? int(match.duracao) : 90,
+    status: text(match.status),
+  };
+  for (const field of ['inicioEm', 'intervaloEm', 'segundoTempoEm', 'statusEm'] as const) {
+    if (match[field] !== undefined && match[field] !== null) clock[field] = match[field];
+  }
+  return clock;
+}
+
+/** Mudou algo do relógio (início, intervalo, 2º tempo, horário, duração, status). */
+export function liveClockChanged(before: Doc, after: Doc): boolean {
+  const key = (value: unknown) =>
+    value && typeof value === 'object' && 'toMillis' in value
+      ? String((value as { toMillis: () => number }).toMillis())
+      : String(value ?? '');
+  return LIVE_CLOCK_FIELDS.some((field) => key(before[field]) !== key(after[field]));
 }
 
 export type ResultGroup = 'vitoria' | 'goleada' | 'empate' | 'zero';
