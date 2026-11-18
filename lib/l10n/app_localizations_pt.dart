@@ -6633,6 +6633,86 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchdayMore => 'Próxima rodada';
 
   @override
+  String get fantasyTitle => 'Arena Fantasy';
+
+  @override
+  String get fantasyActive => 'Fantasy ativado';
+
+  @override
+  String get fantasyActiveOn =>
+      'Torcedores podem entrar e montar o time nas rodadas abertas deste campeonato.';
+
+  @override
+  String get fantasyActiveOff =>
+      'Desligado: ninguém entra nem troca a escalação. Nada é apagado (histórico e pontos ficam).';
+
+  @override
+  String fantasyParticipants(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count participantes',
+      one: '1 participante',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fantasyParams => 'Pontuação';
+
+  @override
+  String get fantasyMinMinutes => 'Mínimo para pontuar';
+
+  @override
+  String get fantasyMinMinutesHint =>
+      'Abaixo disso o atleta não pontua na rodada.';
+
+  @override
+  String get fantasyDefenseMinutes => 'Mínimo para o bônus defensivo';
+
+  @override
+  String get fantasyDefenseMinutesHint =>
+      'Jogo sem sofrer gols só vale com esse tempo em campo.';
+
+  @override
+  String get fantasyCaptain => 'Multiplicador do capitão';
+
+  @override
+  String get fantasyCaptainHint => 'Vale também para pontuação negativa.';
+
+  @override
+  String fantasyMinutesValue(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get fantasyRestoreDefaults =>
+      'Restaurar padrões (20 min · 45 min · 1,5×)';
+
+  @override
+  String get fantasyParamsNote =>
+      'Os parâmetros valem para as próximas rodadas: cada rodada guarda os seus ao fechar, e rodadas fechadas não mudam.';
+
+  @override
+  String get fantasySave => 'Salvar';
+
+  @override
+  String get fantasySaved => 'Arena Fantasy salvo.';
+
+  @override
+  String get fantasySaveError => 'Não foi possível salvar o Arena Fantasy.';
+
+  @override
+  String get fantasyErrorRange => 'Os minutos vão de 0 a 120.';
+
+  @override
+  String get fantasyErrorDefenseBelowMin =>
+      'O mínimo do bônus defensivo não pode ser menor que o mínimo para pontuar.';
+
+  @override
+  String get fantasyErrorCaptain => 'O capitão vai de 1× a 3×.';
+
+  @override
   String get teamRequestMenu => 'Sou dono de time';
 
   @override

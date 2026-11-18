@@ -3358,6 +3358,41 @@
   "matchdaySuggested": "Rodada sugerida pelos jogos da competição perto dessa data.",
   "matchdayLess": "Rodada anterior",
   "matchdayMore": "Próxima rodada",
+  "fantasyTitle": "Arena Fantasy",
+  "fantasyActive": "Fantasy ativado",
+  "fantasyActiveOn": "Torcedores podem entrar e montar o time nas rodadas abertas deste campeonato.",
+  "fantasyActiveOff": "Desligado: ninguém entra nem troca a escalação. Nada é apagado (histórico e pontos ficam).",
+  "fantasyParticipants": "{count, plural, =1{1 participante} other{{count} participantes}}",
+  "@fantasyParticipants": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fantasyParams": "Pontuação",
+  "fantasyMinMinutes": "Mínimo para pontuar",
+  "fantasyMinMinutesHint": "Abaixo disso o atleta não pontua na rodada.",
+  "fantasyDefenseMinutes": "Mínimo para o bônus defensivo",
+  "fantasyDefenseMinutesHint": "Jogo sem sofrer gols só vale com esse tempo em campo.",
+  "fantasyCaptain": "Multiplicador do capitão",
+  "fantasyCaptainHint": "Vale também para pontuação negativa.",
+  "fantasyMinutesValue": "{minutes} min",
+  "@fantasyMinutesValue": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "fantasyRestoreDefaults": "Restaurar padrões (20 min · 45 min · 1,5×)",
+  "fantasyParamsNote": "Os parâmetros valem para as próximas rodadas: cada rodada guarda os seus ao fechar, e rodadas fechadas não mudam.",
+  "fantasySave": "Salvar",
+  "fantasySaved": "Arena Fantasy salvo.",
+  "fantasySaveError": "Não foi possível salvar o Arena Fantasy.",
+  "fantasyErrorRange": "Os minutos vão de 0 a 120.",
+  "fantasyErrorDefenseBelowMin": "O mínimo do bônus defensivo não pode ser menor que o mínimo para pontuar.",
+  "fantasyErrorCaptain": "O capitão vai de 1× a 3×.",
   "teamRequestMenu": "Sou dono de time",
   "teamRequestTitle": "Sou dono de time",
   "teamRequestIntro": "Cadastre o seu time: um administrador analisa o pedido e, aprovado, você gerencia o elenco.",

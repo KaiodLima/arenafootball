@@ -34,6 +34,7 @@ import 'package:arena_soccer/features/maintenance/di/maintenance_injection.dart'
 import 'package:arena_soccer/features/album/di/album_injection.dart';
 import 'package:arena_soccer/features/teams/di/teams_injection.dart';
 import 'package:arena_soccer/features/voting/di/voting_injection.dart';
+import 'package:arena_soccer/features/fantasy/di/fantasy_injection.dart';
 
 final sl = GetIt.instance;
 
@@ -60,6 +61,7 @@ Future<void> init() async {
   registerNotificationsDependencies();
   registerFanRankingDependencies();
   registerReferralsDependencies();
+  registerFantasyDependencies();
   registerOrganizerRequestsDependencies();
   registerShareArtDependencies();
   registerAchievementsDependencies();

@@ -10958,6 +10958,132 @@ abstract class AppLocalizations {
   /// **'Próxima rodada'**
   String get matchdayMore;
 
+  /// No description provided for @fantasyTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arena Fantasy'**
+  String get fantasyTitle;
+
+  /// No description provided for @fantasyActive.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fantasy ativado'**
+  String get fantasyActive;
+
+  /// No description provided for @fantasyActiveOn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Torcedores podem entrar e montar o time nas rodadas abertas deste campeonato.'**
+  String get fantasyActiveOn;
+
+  /// No description provided for @fantasyActiveOff.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desligado: ninguém entra nem troca a escalação. Nada é apagado (histórico e pontos ficam).'**
+  String get fantasyActiveOff;
+
+  /// No description provided for @fantasyParticipants.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 participante} other{{count} participantes}}'**
+  String fantasyParticipants(int count);
+
+  /// No description provided for @fantasyParams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pontuação'**
+  String get fantasyParams;
+
+  /// No description provided for @fantasyMinMinutes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mínimo para pontuar'**
+  String get fantasyMinMinutes;
+
+  /// No description provided for @fantasyMinMinutesHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abaixo disso o atleta não pontua na rodada.'**
+  String get fantasyMinMinutesHint;
+
+  /// No description provided for @fantasyDefenseMinutes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mínimo para o bônus defensivo'**
+  String get fantasyDefenseMinutes;
+
+  /// No description provided for @fantasyDefenseMinutesHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogo sem sofrer gols só vale com esse tempo em campo.'**
+  String get fantasyDefenseMinutesHint;
+
+  /// No description provided for @fantasyCaptain.
+  ///
+  /// In pt, this message translates to:
+  /// **'Multiplicador do capitão'**
+  String get fantasyCaptain;
+
+  /// No description provided for @fantasyCaptainHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vale também para pontuação negativa.'**
+  String get fantasyCaptainHint;
+
+  /// No description provided for @fantasyMinutesValue.
+  ///
+  /// In pt, this message translates to:
+  /// **'{minutes} min'**
+  String fantasyMinutesValue(int minutes);
+
+  /// No description provided for @fantasyRestoreDefaults.
+  ///
+  /// In pt, this message translates to:
+  /// **'Restaurar padrões (20 min · 45 min · 1,5×)'**
+  String get fantasyRestoreDefaults;
+
+  /// No description provided for @fantasyParamsNote.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os parâmetros valem para as próximas rodadas: cada rodada guarda os seus ao fechar, e rodadas fechadas não mudam.'**
+  String get fantasyParamsNote;
+
+  /// No description provided for @fantasySave.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salvar'**
+  String get fantasySave;
+
+  /// No description provided for @fantasySaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arena Fantasy salvo.'**
+  String get fantasySaved;
+
+  /// No description provided for @fantasySaveError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível salvar o Arena Fantasy.'**
+  String get fantasySaveError;
+
+  /// No description provided for @fantasyErrorRange.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os minutos vão de 0 a 120.'**
+  String get fantasyErrorRange;
+
+  /// No description provided for @fantasyErrorDefenseBelowMin.
+  ///
+  /// In pt, this message translates to:
+  /// **'O mínimo do bônus defensivo não pode ser menor que o mínimo para pontuar.'**
+  String get fantasyErrorDefenseBelowMin;
+
+  /// No description provided for @fantasyErrorCaptain.
+  ///
+  /// In pt, this message translates to:
+  /// **'O capitão vai de 1× a 3×.'**
+  String get fantasyErrorCaptain;
+
   /// No description provided for @teamRequestMenu.
   ///
   /// In pt, this message translates to:

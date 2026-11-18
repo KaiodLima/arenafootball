@@ -191,7 +191,7 @@ service cloud.firestore {
       function writable() {
         return !(collection in ['config', 'notificacoes_envios', 'push_avisos', 'solicitacoes_jogador',
           'solicitacoes_time', 'solicitacoes_parceiro', 'noticias_pendentes', 'album_pacotes',
-          'indicacoes', 'codigos_indicacao', 'solicitacoes_organizador']);
+          'indicacoes', 'codigos_indicacao', 'solicitacoes_organizador', 'fantasy']);
       }
 
       // Dia de hoje em Brasília (UTC-3), igual ao `PartnerSlots.brasiliaDay`.
@@ -1012,6 +1012,32 @@ service cloud.firestore {
 
     // Temporada atual e lista do seletor: todo mundo lê (inclusive convidado),
     // só o admin troca (painel "Temporadas").
+    // Arena Fantasy: configuração por campeonato (`fantasy/{idDocCampeonato}`;
+    // leitura pública pela regra geral). Só o admin grava a chave, os
+    // parâmetros e as cópias do campeonato; `rodadaAtual`, `participantes` e
+    // `campeao` são das functions e ele não mexe. Não se apaga (histórico).
+    match /fantasy/{championshipDocId} {
+      function validFantasyConfig(d) {
+        return d.keys().hasOnly(['idCampeonato', 'temporada', 'titulo', 'urlImagem', 'fk_competicao', 'idRegiao',
+            'idsRegioes', 'ativo', 'minMinutos', 'minMinutosDefesa', 'capitao', 'atualizadoEm',
+            'rodadaAtual', 'participantes', 'campeao'])
+          && d.ativo is bool
+          && d.minMinutos is int && d.minMinutos >= 0 && d.minMinutos <= 120
+          && d.minMinutosDefesa is int && d.minMinutosDefesa >= d.minMinutos && d.minMinutosDefesa <= 120
+          && d.capitao is number && d.capitao >= 1 && d.capitao <= 3
+          && d.get('idCampeonato', 0) is int
+          && d.get('temporada', '') is string && d.get('titulo', '') is string && d.get('urlImagem', '') is string
+          && d.get('idsRegioes', []) is list
+          && d.atualizadoEm == request.time;
+      }
+
+      allow create: if isAdmin() && validFantasyConfig(request.resource.data)
+        && !request.resource.data.keys().hasAny(['rodadaAtual', 'participantes', 'campeao']);
+      allow update: if isAdmin() && validFantasyConfig(request.resource.data)
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['rodadaAtual', 'participantes', 'campeao']);
+      allow delete: if false;
+    }
+
     match /config/temporadas {
       allow read: if true;
       allow write: if isAdmin();

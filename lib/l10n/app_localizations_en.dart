@@ -6596,6 +6596,85 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchdayMore => 'Next matchday';
 
   @override
+  String get fantasyTitle => 'Arena Fantasy';
+
+  @override
+  String get fantasyActive => 'Fantasy enabled';
+
+  @override
+  String get fantasyActiveOn =>
+      'Fans can join and pick their team in the open matchdays of this championship.';
+
+  @override
+  String get fantasyActiveOff =>
+      'Off: nobody joins or changes lineups. Nothing is deleted (history and points stay).';
+
+  @override
+  String fantasyParticipants(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count participants',
+      one: '1 participant',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fantasyParams => 'Scoring';
+
+  @override
+  String get fantasyMinMinutes => 'Minimum to score';
+
+  @override
+  String get fantasyMinMinutesHint => 'Below this the player scores nothing.';
+
+  @override
+  String get fantasyDefenseMinutes => 'Minimum for the clean-sheet bonus';
+
+  @override
+  String get fantasyDefenseMinutesHint =>
+      'Clean sheet only counts with this time on the pitch.';
+
+  @override
+  String get fantasyCaptain => 'Captain multiplier';
+
+  @override
+  String get fantasyCaptainHint => 'Also applies to negative scores.';
+
+  @override
+  String fantasyMinutesValue(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get fantasyRestoreDefaults =>
+      'Restore defaults (20 min · 45 min · 1.5×)';
+
+  @override
+  String get fantasyParamsNote =>
+      'Settings apply to upcoming matchdays: each matchday keeps its own when it closes, and closed matchdays never change.';
+
+  @override
+  String get fantasySave => 'Save';
+
+  @override
+  String get fantasySaved => 'Arena Fantasy saved.';
+
+  @override
+  String get fantasySaveError => 'Could not save Arena Fantasy.';
+
+  @override
+  String get fantasyErrorRange => 'Minutes go from 0 to 120.';
+
+  @override
+  String get fantasyErrorDefenseBelowMin =>
+      'The clean-sheet minimum cannot be lower than the minimum to score.';
+
+  @override
+  String get fantasyErrorCaptain => 'The captain goes from 1× to 3×.';
+
+  @override
   String get teamRequestMenu => 'I own a team';
 
   @override

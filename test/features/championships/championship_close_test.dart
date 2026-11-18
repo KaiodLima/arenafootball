@@ -161,6 +161,20 @@ void main() {
       await pump(tester, session: _Session(uid: 'u9'), championship: _copa.copyWith(organizerId: 'org1'));
       expect(find.byKey(const ValueKey('championship-manage')), findsNothing);
     });
+
+    testWidgets('engrenagem: "Arena Fantasy" só para o admin', (tester) async {
+      await pump(tester, session: _Session(admin: true));
+      await tester.tap(find.byKey(const ValueKey('championship-manage')));
+      await tester.pumpAndSettle();
+      expect(find.text('Arena Fantasy'), findsOneWidget);
+    });
+
+    testWidgets('engrenagem: o organizador não vê o "Arena Fantasy"', (tester) async {
+      await pump(tester, session: _Session(uid: 'org1'), championship: _copa.copyWith(organizerId: 'org1'));
+      await tester.tap(find.byKey(const ValueKey('championship-manage')));
+      await tester.pumpAndSettle();
+      expect(find.text('Arena Fantasy'), findsNothing);
+    });
   });
 
   testWidgets('card de campeão: selo, time, competição e vice', (tester) async {

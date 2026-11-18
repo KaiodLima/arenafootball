@@ -67,6 +67,9 @@ class _ChampionshipDetailsPageState extends State<ChampionshipDetailsPage> {
     if (updated != null && mounted) setState(() => _championship = updated);
   }
 
+  /// Admin: Arena Fantasy deste campeonato (liga/desliga e parâmetros).
+  void _openFantasy() => Navigator.pushNamed(context, AppRoutes.fantasySettingsPage, arguments: _championship);
+
   Future<void> _reopen() async {
     final updated = await reopenChampionshipFlow(context, championship: _championship);
     if (updated != null && mounted) setState(() => _championship = updated);
@@ -122,6 +125,12 @@ class _ChampionshipDetailsPageState extends State<ChampionshipDetailsPage> {
                             icon: Icons.lock_open_rounded,
                             label: l10n.championshipReopen,
                             onSelected: _reopen,
+                          ),
+                        if (session.isAdmin)
+                          CardMenuAction(
+                            icon: Icons.stadium_rounded,
+                            label: l10n.fantasyTitle,
+                            onSelected: _openFantasy,
                           ),
                       ],
                     ),

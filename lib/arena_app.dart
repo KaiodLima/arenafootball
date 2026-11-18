@@ -153,6 +153,8 @@ import 'package:arena_soccer/features/qr_codes/presentation/page/qr_codes_page.d
 import 'package:arena_soccer/features/qr_codes/presentation/bloc/now_cubit.dart';
 import 'package:arena_soccer/features/qr_codes/presentation/page/now_page.dart';
 import 'package:arena_soccer/features/player_requests/domain/player_claim_args.dart';
+import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_settings_cubit.dart';
+import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_settings_page.dart';
 
 class ArenaApp extends StatelessWidget {
   const ArenaApp({super.key});
@@ -539,6 +541,13 @@ class ArenaApp extends StatelessWidget {
               child: const ReferralPage(),
             ),
         AppRoutes.referralSettingsPage: (_) => const ReferralSettingsPage(),
+        // Arena Fantasy do campeonato (admin): liga/desliga e os parâmetros.
+        AppRoutes.fantasySettingsPage: (context) => BlocProvider<FantasySettingsCubit>(
+              create: (_) => FantasySettingsCubit(sl(), sl()),
+              child: FantasySettingsPage(
+                championship: ModalRoute.of(context)!.settings.arguments as ChampionshipDTO,
+              ),
+            ),
         AppRoutes.organizerRequestPage: (_) => BlocProvider<OrganizerRequestCubit>(
               create: (_) => OrganizerRequestCubit(sl(), sl(), sl(), sl(), sl()),
               child: const OrganizerRequestPage(),
