@@ -8,6 +8,7 @@ import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_lineup_c
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_athlete_picker.dart';
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_labels.dart';
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_pitch.dart';
+import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_round_dtos.dart';
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_score_sheet.dart';
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_top_athletes.dart';
 import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_ranking_page.dart';
@@ -46,7 +47,23 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
   }
 
   Future<void> _onSlotTap(FantasyLineupState state, FantasySlot slot) async {
-    if (!state.editable) return;
+    if (!state.editable || state.showingLast) {
+      // Rodada travada (ou o resultado da anterior): o atleta que já jogou
+      // abre a pontuação detalhada.
+      final lineup = state.showingLast ? state.lastLineup : state.saved;
+      final round = state.showingLast ? state.lastRound : state.round;
+      final id = lineup?.lineup.idAt(slot);
+      if (id == null || round == null || !lineup!.playedIds.contains(id)) return;
+      await showFantasyAthleteScore(
+        context,
+        fantasyId: widget.championship.id,
+        round: round.number,
+        athleteId: id,
+        captain: lineup.lineup.captainId == id,
+        athlete: state.athleteById[id],
+      );
+      return;
+    }
     final current = state.draft.idAt(slot);
     if (current != null) {
       final action = await _slotActions(state, slot, current);
@@ -151,7 +168,7 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
               ),
             ],
           ),
-          bottomNavigationBar: state.editable
+          bottomNavigationBar: state.editable && !state.showingLast
               ? ArenaSubmitBar(
                   title: l10n.fantasyConfirmLineup,
                   loading: state.busy,
@@ -205,11 +222,37 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
           _Notice(icon: Icons.login_rounded, text: l10n.fantasyGuest)
         else if (!state.joined)
           _JoinCard(busy: state.busy, onJoin: _cubit.join)
-        else if (state.round == null)
+        else if (state.hasLastResult) ...[
+          _RoundSwitch(state: state, onChanged: _cubit.showLast),
+          const SizedBox(height: AppSizes.s12),
+        ],
+        if (state.isGuest || !state.joined)
+          const SizedBox.shrink()
+        else if (state.showingLast) ...[
+          // Resultado da rodada anterior: o parcial/final e os pontos de cada atleta.
+          if (state.lastLineup!.points != null) ...[
+            _RoundScoreCard(round: state.lastRound!, points: state.lastLineup!.points!),
+            const SizedBox(height: AppSizes.s12),
+          ],
+          FantasyPitch(
+            key: const ValueKey('fantasy-last-pitch'),
+            lineup: state.lastLineup!.lineup,
+            athletes: state.athleteById,
+            teams: state.teams,
+            points: state.lastLineup!.playedPoints,
+            editable: false,
+            onSlotTap: (slot) => _onSlotTap(state, slot),
+            onCaptainTap: (_) {},
+          ),
+        ] else if (state.round == null)
           _Notice(icon: Icons.event_busy_rounded, text: l10n.fantasyNoOpenRound)
         else ...[
           if (state.saved?.copied == true && !state.dirty) ...[
             _Notice(icon: Icons.content_copy_rounded, text: l10n.fantasyCopiedLineup),
+            const SizedBox(height: AppSizes.s12),
+          ],
+          if (!state.roundOpen && state.saved?.points != null) ...[
+            _RoundScoreCard(round: state.round!, points: state.saved!.points!),
             const SizedBox(height: AppSizes.s12),
           ],
           if (!state.roundOpen) ...[
@@ -225,6 +268,7 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
             lineup: state.draft,
             athletes: state.athleteById,
             teams: state.teams,
+            points: state.roundOpen ? const {} : (state.saved?.playedPoints ?? const {}),
             editable: state.editable,
             onSlotTap: (slot) => _onSlotTap(state, slot),
             onCaptainTap: _cubit.setCaptain,
@@ -366,6 +410,119 @@ class _JoinCard extends StatelessWidget {
             isLoading: busy,
             function: onJoin,
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// "Sua pontuação na rodada N": o parcial (ou final) da conta na rodada,
+/// gravado pelas functions a cada partida terminada.
+/// Seletor no alto da tela: o resultado da rodada anterior (com os pontos)
+/// ou a rodada atual (escalar / em andamento).
+class _RoundSwitch extends StatelessWidget {
+  final FantasyLineupState state;
+  final ValueChanged<bool> onChanged;
+
+  const _RoundSwitch({required this.state, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final last = state.lastRound!;
+    final points = state.lastLineup!.points;
+    final round = state.round;
+    final currentLabel = round == null
+        ? l10n.fantasyNoOpenRoundShort
+        : '${l10n.fantasyRoundTitle(round.number)} · '
+            '${state.roundOpen ? l10n.fantasySwitchPick : round.inProgressAt(state.now) ? l10n.fantasyRoundInProgressShort : l10n.fantasyRoundLocked}';
+    Widget tab(bool isLast, String label) {
+      final selected = state.showingLast == isLast;
+      return Expanded(
+        child: GestureDetector(
+          key: ValueKey(isLast ? 'fantasy-switch-last' : 'fantasy-switch-current'),
+          onTap: () => onChanged(isLast),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s10),
+            decoration: BoxDecoration(
+              color: selected ? AppColors.primaryDark : AppColors.transparent,
+              borderRadius: BorderRadius.circular(AppSizes.s12),
+            ),
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: AppTypography.label(color: selected ? AppColors.white : AppColors.textSecondary)
+                  .copyWith(fontSize: AppSizes.s12, fontWeight: FontWeight.w800),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(AppSizes.s4),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSizes.s16),
+        border: Border.all(color: AppColors.greyLight),
+      ),
+      child: Row(
+        children: [
+          tab(
+            true,
+            '${l10n.fantasyRoundTitle(last.number)} · ${l10n.fantasySwitchResult}'
+            '${points == null ? '' : ' · ${l10n.fantasyCardPoints(fantasyPointsLabel(points))}'}',
+          ),
+          tab(false, currentLabel),
+        ],
+      ),
+    );
+  }
+}
+
+class _RoundScoreCard extends StatelessWidget {
+  final FantasyRoundDTO round;
+  final double points;
+
+  const _RoundScoreCard({required this.round, required this.points});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final status = round.finished
+        ? l10n.fantasyRoundFinal
+        : l10n.fantasyRoundPartialCount(round.matchesFinished, round.matchIds.length);
+    return Container(
+      key: const ValueKey('fantasy-round-score'),
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.s16, vertical: AppSizes.s12),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(colors: [AppColors.primaryDark, AppColors.primaryMedium]),
+        borderRadius: BorderRadius.circular(AppSizes.cardRadius),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.scoreboard_rounded, color: AppColors.gold),
+          const SizedBox(width: AppSizes.s12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.fantasyRoundScoreTitle(round.number),
+                    style: AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s14)),
+                Text(status,
+                    style: AppTypography.subtitle(color: AppColors.whiteSoft).copyWith(fontSize: AppSizes.s12)),
+              ],
+            ),
+          ),
+          Text(
+            fantasyPointsLabel(points),
+            style: AppTypography.title(color: AppColors.gold).copyWith(fontSize: AppSizes.s28),
+          ),
+          const SizedBox(width: AppSizes.s4),
+          Text('pts', style: AppTypography.subtitle(color: AppColors.whiteSoft).copyWith(fontSize: AppSizes.s12)),
         ],
       ),
     );

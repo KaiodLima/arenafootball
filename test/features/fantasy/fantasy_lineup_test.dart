@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -121,6 +122,41 @@ class _Repo implements IFantasyRepository {
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// Com a rodada 1 encerrada (resultado) e a 2 aberta.
+class _PastRepo extends _Repo {
+  final DateTime processedAt;
+
+  _PastRepo(this.processedAt);
+
+  @override
+  Stream<Either<Failure, FantasyRoundDTO?>> watchRound(String fantasyId, int round) => round == 1
+      ? Stream.value(Right(FantasyRoundDTO.fromMap('1', {
+          'status': 'fechada',
+          'fechaEm': Timestamp.fromDate(DateTime(2026, 11, 17, 16)),
+          'idsPartidas': ['m1'],
+          'finalizada': true,
+          'apuracao': {'partidas': 1, 'encerradas': 1, 'processadoEm': Timestamp.fromDate(processedAt)},
+        })))
+      : super.watchRound(fantasyId, round);
+
+  @override
+  Stream<Either<Failure, FantasyLineupDTO?>> watchLineup(String fantasyId, int round, String uid) => round == 1
+      ? Stream.value(const Right(FantasyLineupDTO(
+          uid: 'u1',
+          lineup: _full,
+          points: 20,
+          athletePoints: {'fw': 22.5, 'gk': -2.5, 'lb': 0, 'mf': 0, 'dm': 0},
+          playedIds: ['fw', 'gk'],
+        )))
+      : super.watchLineup(fantasyId, round, uid);
+
+  @override
+  Future<Either<Failure, List<FantasyRoundDTO>>> getRounds(String fantasyId) async => Right([
+        FantasyRoundDTO.fromMap('1', {'status': 'fechada'}),
+        FantasyRoundDTO.fromMap('2', {'status': 'aberta'}),
+      ]);
 }
 
 class _Session extends Cubit<SessionState> implements SessionCubit {
@@ -572,6 +608,126 @@ void main() {
     expect(find.text('Em andamento'), findsOneWidget);
     expect(cubit.state.editable, isFalse);
     expect(find.text('Confirmar escalação'), findsNothing);
+  });
+
+  test('quem já jogou: pontos só deles', () {
+    final dto = FantasyLineupDTO.fromMap('u1', {
+      'atletas': {'gol': 'gk', 'zag': 'lb', 'mei': 'mf', 'ata': 'fw', 'livre': 'dm'},
+      'capitao': 'fw',
+      'pontos': 12,
+      'pontosAtletas': {'gk': -3, 'lb': 0, 'mf': 0, 'fw': 15, 'dm': 0},
+      'atletasJogaram': ['fw', 'gk', 'lb'],
+    });
+    expect(dto.playedIds, ['fw', 'gk', 'lb']);
+    expect(dto.playedPoints, {'fw': 15.0, 'gk': -3.0, 'lb': 0.0});
+  });
+
+  testWidgets('tela: rodada em andamento mostra o parcial e os pontos de quem já jogou', (tester) async {
+    tester.view.physicalSize = const Size(420, 1400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final repo = _Repo();
+    final cubit = _cubit(repo);
+    addTearDown(cubit.close);
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('pt'),
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider<SessionCubit>.value(value: _Session()),
+          BlocProvider<FantasyLineupCubit>.value(value: cubit),
+        ],
+        child: const FantasyLineupPage(championship: _copa),
+      ),
+    ));
+    repo.config.add(Right(_config));
+    await tester.pump();
+    repo.participant.add(const Right(FantasyParticipantDTO(uid: 'u1', name: 'Ana', points: 23.5)));
+    repo.round.add(Right(FantasyRoundDTO(
+      number: 2,
+      status: 'fechada',
+      closesAt: DateTime(2026, 11, 18, 11),
+      matchIds: const ['m1', 'm2'],
+      matchesFinished: 1,
+    )));
+    repo.lineup.add(const Right(FantasyLineupDTO(
+      uid: 'u1',
+      lineup: _full,
+      points: 23.5,
+      athletePoints: {'fw': 15, 'gk': -3, 'mf': 0, 'lb': 0, 'dm': 0},
+      playedIds: ['fw', 'gk'],
+    )));
+    await tester.pump();
+    await tester.pump();
+    expect(find.byKey(const ValueKey('fantasy-round-score')), findsOneWidget);
+    expect(find.text('Sua pontuação na rodada 2'), findsOneWidget);
+    expect(find.text('Parcial · 1 de 2 jogos'), findsOneWidget);
+    expect(find.descendant(of: find.byKey(const ValueKey('fantasy-round-score')), matching: find.text('23,5')),
+        findsOneWidget);
+    expect(find.descendant(of: find.byKey(const ValueKey('fantasy-points-ata')), matching: find.text('+15')),
+        findsOneWidget);
+    expect(find.descendant(of: find.byKey(const ValueKey('fantasy-points-gol')), matching: find.text('-3')),
+        findsOneWidget);
+    expect(find.byKey(const ValueKey('fantasy-points-mei')), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('rodada encerrada: abre no resultado (pontos e figurinhas) e o seletor volta para escalar',
+      (tester) async {
+    tester.view.physicalSize = const Size(420, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final repo = _PastRepo(_now.subtract(const Duration(hours: 1)));
+    final cubit = FantasyLineupCubit(
+      WatchFantasyConfigUseCase(repo),
+      WatchFantasyRoundUseCase(repo),
+      WatchFantasyParticipantUseCase(repo),
+      WatchFantasyLineupUseCase(repo),
+      JoinFantasyUseCase(repo),
+      SaveFantasyLineupUseCase(repo),
+      GetFantasyAthletesCacheFirstUseCase(repo),
+      clock: () => _now,
+      tick: null,
+      rounds: GetFantasyRoundsUseCase(repo),
+    );
+    addTearDown(cubit.close);
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('pt'),
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider<SessionCubit>.value(value: _Session()),
+          BlocProvider<FantasyLineupCubit>.value(value: cubit),
+        ],
+        child: const FantasyLineupPage(championship: _copa),
+      ),
+    ));
+    repo.config.add(Right(_config));
+    await tester.pump();
+    repo.participant.add(const Right(FantasyParticipantDTO(uid: 'u1', name: 'Ana', points: 20)));
+    repo.round.add(Right(_openRound));
+    repo.lineup.add(const Right(FantasyLineupDTO(uid: 'u1', lineup: _full, copied: true)));
+    for (var i = 0; i < 5; i++) {
+      await tester.pump();
+    }
+    // Abre no resultado da rodada 1 (encerrada há 1 h).
+    expect(cubit.state.showingLast, isTrue);
+    expect(find.text('Rodada 1 · Resultado · 20 pts'), findsOneWidget);
+    expect(find.text('Rodada 2 · Escalar'), findsOneWidget);
+    expect(find.text('Sua pontuação na rodada 1'), findsOneWidget);
+    expect(find.text('Final'), findsOneWidget);
+    expect(find.descendant(of: find.byKey(const ValueKey('fantasy-points-ata')), matching: find.text('+22,5')),
+        findsOneWidget);
+    expect(find.text('Confirmar escalação'), findsNothing);
+    // Seletor: volta para a rodada 2 (escalar).
+    await tester.tap(find.byKey(const ValueKey('fantasy-switch-current')));
+    await tester.pump();
+    expect(cubit.state.showingLast, isFalse);
+    expect(find.byKey(const ValueKey('fantasy-last-pitch')), findsNothing);
+    expect(find.text('Confirmar escalação'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }
 

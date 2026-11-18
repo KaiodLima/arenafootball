@@ -412,6 +412,15 @@ export function lineupPoints(
   return { pontos, pontosAtletas };
 }
 
+/**
+ * Atletas da escalação [athleteIds] que já jogaram na rodada: têm alguma
+ * partida terminada ([played] = os ids com partida apurada). O app mostra os
+ * pontos só deles ("fez 0" ≠ "ainda não jogou").
+ */
+export function playedAthletes(athleteIds: string[], played: Set<string>): string[] {
+  return athleteIds.filter((id) => played.has(id));
+}
+
 /** Diferença a somar no participante (o que mudou desde o último [applied]). */
 export const pointsDelta = (points: number, applied: unknown): number =>
   round2(points - (typeof applied === 'number' && Number.isFinite(applied) ? applied : 0));

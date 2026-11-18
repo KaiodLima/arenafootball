@@ -8174,4 +8174,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fantasyRoundInProgressShort => 'In progress';
+
+  @override
+  String fantasyRoundScoreTitle(int round) {
+    return 'Your score in round $round';
+  }
+
+  @override
+  String fantasyRoundPartialCount(int done, int total) {
+    return 'Partial · $done of $total matches';
+  }
+
+  @override
+  String get fantasyRoundFinal => 'Final';
+
+  @override
+  String get fantasySwitchResult => 'Result';
+
+  @override
+  String get fantasySwitchPick => 'Pick team';
 }

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
+  playedAthletes,
   roundParticipants,
   type AthleteScore,
   lineupPoints,
@@ -244,4 +245,9 @@ test('craques da rodada: titulares, quem entrou e quem tem lance, sem repetir', 
     { gols: [{ lado: 'fora', idJogador: 'c1' }], golTimeCasa: '0' },
   ]);
   assert.deepEqual([...ids].sort(), ['a1', 'a2', 'b1', 'b2', 'c1', 'r2']);
+});
+
+test('quem já jogou: só os da escalação com partida apurada', () => {
+  assert.deepEqual(playedAthletes(['gk', 'cb', 'mf', 'fw', 'dm'], new Set(['fw', 'gk', 'x'])), ['gk', 'fw']);
+  assert.deepEqual(playedAthletes(['gk'], new Set()), []);
 });

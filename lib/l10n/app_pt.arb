@@ -4359,5 +4359,12 @@
   "reportStartersFull": "Já há 11 titulares. Tire um titular para escalar outro.",
   "fantasyRoundInProgress": "Rodada {round} em andamento. A próxima rodada abre quando todos os jogos terminarem.",
   "@fantasyRoundInProgress": {"placeholders": {"round": {"type": "int"}}},
-  "fantasyRoundInProgressShort": "Em andamento"
+  "fantasyRoundInProgressShort": "Em andamento",
+  "fantasyRoundScoreTitle": "Sua pontuação na rodada {round}",
+  "@fantasyRoundScoreTitle": {"placeholders": {"round": {"type": "int"}}},
+  "fantasyRoundPartialCount": "Parcial · {done} de {total} jogos",
+  "@fantasyRoundPartialCount": {"placeholders": {"done": {"type": "int"}, "total": {"type": "int"}}},
+  "fantasyRoundFinal": "Final",
+  "fantasySwitchResult": "Resultado",
+  "fantasySwitchPick": "Escalar"
 }

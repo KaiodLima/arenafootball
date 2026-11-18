@@ -8218,4 +8218,23 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get fantasyRoundInProgressShort => 'Em andamento';
+
+  @override
+  String fantasyRoundScoreTitle(int round) {
+    return 'Sua pontuação na rodada $round';
+  }
+
+  @override
+  String fantasyRoundPartialCount(int done, int total) {
+    return 'Parcial · $done de $total jogos';
+  }
+
+  @override
+  String get fantasyRoundFinal => 'Final';
+
+  @override
+  String get fantasySwitchResult => 'Resultado';
+
+  @override
+  String get fantasySwitchPick => 'Escalar';
 }

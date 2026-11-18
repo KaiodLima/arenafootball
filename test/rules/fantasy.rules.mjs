@@ -122,6 +122,7 @@ export default async function run(env, check) {
   await check('convidado lê os pontos do atleta', assertSucceeds(getDoc(doc(guest, 'fantasy/fx/rodadas/1/atletas/gk'))));
   await check('cliente não grava pontos do atleta', assertFails(setDoc(doc(admin, 'fantasy/fx/rodadas/1/atletas/gk'), { total: 99 })));
   await check('cliente não grava aplicado', assertFails(setDoc(mine(), lineup(undefined, { aplicado: 10 }))));
+  await check('cliente não grava quem jogou', assertFails(setDoc(mine(), lineup(undefined, { atletasJogaram: ['gk'] }))));
 
   // Card "Craques da rodada" (tag `fantasy`): só as functions gravam; o parceiro não usa a tag.
   await seed('solicitacoes_parceiro/pp', { uid: 'pp', status: 'aprovada', idRegiao: 'co', regiao: 'Colônia' });

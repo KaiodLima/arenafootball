@@ -128,6 +128,10 @@ class FantasyLineupDTO extends Equatable {
   final double? points;
   final Map<String, double> athletePoints;
 
+  /// Atletas da escalação que já jogaram na rodada (`atletasJogaram`): só
+  /// eles mostram os pontos ("fez 0" ≠ "ainda não jogou").
+  final List<String> playedIds;
+
   const FantasyLineupDTO({
     required this.uid,
     this.name = '',
@@ -136,7 +140,14 @@ class FantasyLineupDTO extends Equatable {
     this.copied = false,
     this.points,
     this.athletePoints = const {},
+    this.playedIds = const [],
   });
+
+  /// Pontos dos que já jogaram (id → pontos, capitão multiplicado).
+  Map<String, double> get playedPoints => {
+        for (final id in playedIds)
+          if (athletePoints.containsKey(id)) id: athletePoints[id]!,
+      };
 
   factory FantasyLineupDTO.fromMap(String id, Map<String, dynamic> data) {
     final raw = (data['atletas'] as Map?)?.map((k, v) => MapEntry(k.toString(), v.toString())) ?? const {};
@@ -156,6 +167,7 @@ class FantasyLineupDTO extends Equatable {
         for (final entry in ((data['pontosAtletas'] as Map?) ?? const {}).entries)
           if (entry.value is num) entry.key.toString(): (entry.value as num).toDouble(),
       },
+      playedIds: [for (final id in (data['atletasJogaram'] as List?) ?? const []) id.toString()],
     );
   }
 
@@ -172,5 +184,5 @@ class FantasyLineupDTO extends Equatable {
       };
 
   @override
-  List<Object?> get props => [uid, name, photoUrl, lineup, copied, points, athletePoints];
+  List<Object?> get props => [uid, name, photoUrl, lineup, copied, points, athletePoints, playedIds];
 }

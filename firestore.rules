@@ -1083,7 +1083,8 @@ service cloud.firestore {
         match /escalacoes/{uid} {
           allow read: if true;
           allow create: if validFantasyLineup(uid, round)
-            && !request.resource.data.keys().hasAny(['pontos', 'pontosAtletas', 'aplicado', 'processadoEm']);
+            && !request.resource.data.keys().hasAny(['pontos', 'pontosAtletas', 'atletasJogaram', 'aplicado',
+              'processadoEm']);
           allow update: if validFantasyLineup(uid, round)
             && request.resource.data.diff(resource.data).affectedKeys()
               .hasOnly(['nome', 'urlImagem', 'atletas', 'idsAtletas', 'capitao', 'atualizadoEm', 'copiada']);
@@ -1113,7 +1114,7 @@ service cloud.firestore {
           && f.get('rodadaAtual', 0) == int(round)
           && exists(/databases/$(database)/documents/fantasy/$(championshipDocId)/participantes/$(uid))
           && d.keys().hasOnly(['uid', 'nome', 'urlImagem', 'atletas', 'idsAtletas', 'capitao', 'atualizadoEm', 'copiada',
-            'pontos', 'pontosAtletas', 'aplicado', 'processadoEm'])
+            'pontos', 'pontosAtletas', 'atletasJogaram', 'aplicado', 'processadoEm'])
           && d.uid == uid
           && d.nome is string && d.nome.size() <= 60
           && d.get('urlImagem', '') is string && d.get('urlImagem', '').size() <= 1000

@@ -38,6 +38,14 @@ class FantasyLineupState extends Equatable {
   /// "Craques da rodada": a última rodada fechada e os que mais pontuaram nela.
   final int? topRound;
   final List<FantasyAthleteScoreDTO> topAthletes;
+
+  /// Rodada anterior já fechada (resultado) e a escalação da conta nela; a
+  /// tela mostra o seletor Resultado · Escalar quando há [lastLineup].
+  final FantasyRoundDTO? lastRound;
+  final FantasyLineupDTO? lastLineup;
+
+  /// A tela está no resultado da rodada anterior (só leitura).
+  final bool viewingLast;
   final bool busy;
   final FantasyLineupEvent event;
   final String? failure;
@@ -56,6 +64,9 @@ class FantasyLineupState extends Equatable {
     this.teams = const {},
     this.topRound,
     this.topAthletes = const [],
+    this.lastRound,
+    this.lastLineup,
+    this.viewingLast = false,
     this.busy = false,
     this.event = FantasyLineupEvent.none,
     this.failure,
@@ -72,6 +83,12 @@ class FantasyLineupState extends Equatable {
   bool get roundOpen => round != null && round!.isOpenAt(now);
 
   bool get editable => joined && roundOpen && config?.active == true;
+
+  /// Há resultado da rodada anterior para mostrar (a conta escalou nela).
+  bool get hasLastResult => lastRound != null && lastLineup != null && lastRound!.number != round?.number;
+
+  /// Mostrando o resultado da rodada anterior (no lugar da atual).
+  bool get showingLast => viewingLast && hasLastResult;
 
   Map<String, FantasyAthleteDTO> get athleteById => {for (final a in athletes) a.id: a};
 
@@ -94,6 +111,9 @@ class FantasyLineupState extends Equatable {
     Map<String, TeamDTO>? teams,
     int? topRound,
     List<FantasyAthleteScoreDTO>? topAthletes,
+    FantasyRoundDTO? Function()? lastRound,
+    FantasyLineupDTO? Function()? lastLineup,
+    bool? viewingLast,
     bool? busy,
     FantasyLineupEvent? event,
     String? failure,
@@ -112,6 +132,9 @@ class FantasyLineupState extends Equatable {
         teams: teams ?? this.teams,
         topRound: topRound ?? this.topRound,
         topAthletes: topAthletes ?? this.topAthletes,
+        lastRound: lastRound != null ? lastRound() : this.lastRound,
+        lastLineup: lastLineup != null ? lastLineup() : this.lastLineup,
+        viewingLast: viewingLast ?? this.viewingLast,
         busy: busy ?? this.busy,
         event: event ?? FantasyLineupEvent.none,
         failure: failure,
@@ -132,6 +155,9 @@ class FantasyLineupState extends Equatable {
         teams,
         topRound,
         topAthletes,
+        lastRound,
+        lastLineup,
+        viewingLast,
         busy,
         event,
         failure,
@@ -187,6 +213,12 @@ class FantasyLineupCubit extends Cubit<FantasyLineupState> {
   StreamSubscription<Object?>? _lineupSub;
   StreamSubscription<Object?>? _athletesSub;
   StreamSubscription<Object?>? _topSub;
+  StreamSubscription<Object?>? _lastRoundSub;
+  StreamSubscription<Object?>? _lastLineupSub;
+  int? _lastFollowed;
+
+  /// A tela já escolheu sozinha entre resultado e escalar (só uma vez).
+  bool _viewChosen = false;
   Timer? _ticker;
   int? _watchedRound;
   String _name = '';
@@ -223,28 +255,68 @@ class FantasyLineupCubit extends Cubit<FantasyLineupState> {
     response.fold((_) {}, (list) => emit(state.copyWith(teams: {for (final t in list) t.id: t})));
   }
 
-  /// Última rodada fechada (uma leitura das rodadas) e o top dela (cache).
-  Future<void> _loadTopAthletes(String fantasyId) async {
+  /// Rodada anterior fechada (uma leitura das rodadas): o top dela (cache) e,
+  /// com conta, a rodada e a escalação da conta nela (resultado na tela).
+  /// Refeito quando a rodada atual muda (rodada encerrada com a tela aberta).
+  Future<void> _loadPastRound(FantasyConfigDTO config) async {
     final rounds = _rounds;
-    final topAthletes = _topAthletes;
-    if (rounds == null || topAthletes == null) return;
+    if (rounds == null) return;
+    final fantasyId = config.championshipDocId;
     final response = await rounds(fantasyId);
     if (isClosed) return;
-    final closed = response.fold((_) => const <FantasyRoundDTO>[], (list) => list.where((r) => r.closed).toList());
+    final current = config.currentRound;
+    final closed = response.fold(
+      (_) => const <FantasyRoundDTO>[],
+      (list) => list.where((r) => r.closed && r.number != current).toList(),
+    );
     if (closed.isEmpty) return;
     final last = closed.map((r) => r.number).reduce((a, b) => a > b ? a : b);
-    _topSub = topAthletes(fantasyId, last).listen((r) {
+    if (_lastFollowed == last) return;
+    _lastFollowed = last;
+    final topAthletes = _topAthletes;
+    if (topAthletes != null) {
+      await _topSub?.cancel();
+      _topSub = topAthletes(fantasyId, last).listen((r) {
+        if (isClosed) return;
+        emit(state.copyWith(topRound: last, topAthletes: r.fold((_) => const [], (list) => list)));
+      });
+    }
+    if (state.uid.isEmpty) return;
+    await _lastRoundSub?.cancel();
+    await _lastLineupSub?.cancel();
+    _lastRoundSub = _watchRound(fantasyId, last).listen((r) {
       if (isClosed) return;
-      emit(state.copyWith(topRound: last, topAthletes: r.fold((_) => const [], (list) => list)));
+      emit(state.copyWith(lastRound: () => r.fold((_) => null, (v) => v)));
+      _chooseView();
+    });
+    _lastLineupSub = _watchLineup(fantasyId, last, state.uid).listen((r) {
+      if (isClosed) return;
+      emit(state.copyWith(lastLineup: () => r.fold((_) => null, (v) => v)));
+      _chooseView();
     });
   }
+
+  /// Logo depois do fim (apuração nas últimas 24 h, com pontos), a tela abre
+  /// no resultado da rodada anterior; senão, na escalação. Uma vez só.
+  void _chooseView() {
+    if (_viewChosen) return;
+    final round = state.lastRound;
+    final lineup = state.lastLineup;
+    if (round == null || lineup == null) return;
+    _viewChosen = true;
+    final processed = round.processedAt;
+    final recent = processed != null && _clock().difference(processed) < const Duration(hours: 24);
+    if (recent && lineup.points != null) emit(state.copyWith(viewingLast: true));
+  }
+
+  /// Seletor: resultado da rodada anterior ([last] = true) ou a atual.
+  void showLast(bool last) => emit(state.copyWith(viewingLast: last));
 
   void _onConfig(FantasyConfigDTO config) {
     final first = state.config == null;
     emit(state.copyWith(config: config));
     if (first) {
       _loadAthletes(config);
-      _loadTopAthletes(config.championshipDocId);
       if (state.uid.isNotEmpty) {
         _participantSub = _watchParticipant(config.championshipDocId, state.uid).listen((response) {
           if (isClosed) return;
@@ -255,7 +327,10 @@ class FantasyLineupCubit extends Cubit<FantasyLineupState> {
         });
       }
     }
-    if (_watchedRound != config.currentRound) _followRound(config);
+    if (_watchedRound != config.currentRound) {
+      _followRound(config);
+      _loadPastRound(config);
+    }
   }
 
   void _followRound(FantasyConfigDTO config) {
@@ -357,7 +432,16 @@ class FantasyLineupCubit extends Cubit<FantasyLineupState> {
   Future<void> close() async {
     _ticker?.cancel();
     await Future.wait([
-      for (final sub in [_configSub, _roundSub, _participantSub, _lineupSub, _athletesSub, _topSub])
+      for (final sub in [
+        _configSub,
+        _roundSub,
+        _participantSub,
+        _lineupSub,
+        _athletesSub,
+        _topSub,
+        _lastRoundSub,
+        _lastLineupSub,
+      ])
         if (sub != null) sub.cancel(),
     ]);
     return super.close();

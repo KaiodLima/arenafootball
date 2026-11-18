@@ -13532,6 +13532,36 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Em andamento'**
   String get fantasyRoundInProgressShort;
+
+  /// No description provided for @fantasyRoundScoreTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua pontuação na rodada {round}'**
+  String fantasyRoundScoreTitle(int round);
+
+  /// No description provided for @fantasyRoundPartialCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'Parcial · {done} de {total} jogos'**
+  String fantasyRoundPartialCount(int done, int total);
+
+  /// No description provided for @fantasyRoundFinal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Final'**
+  String get fantasyRoundFinal;
+
+  /// No description provided for @fantasySwitchResult.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resultado'**
+  String get fantasySwitchResult;
+
+  /// No description provided for @fantasySwitchPick.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escalar'**
+  String get fantasySwitchPick;
 }
 
 class _AppLocalizationsDelegate

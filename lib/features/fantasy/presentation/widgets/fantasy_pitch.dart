@@ -4,6 +4,7 @@ import 'package:arena_soccer/features/album/presentation/widgets/sticker_card.da
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_athlete_dto.dart';
 import 'package:arena_soccer/features/fantasy/domain/fantasy_lineup.dart';
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_labels.dart';
+import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_score_sheet.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
@@ -23,6 +24,9 @@ class FantasyPitch extends StatelessWidget {
 
   /// Times por id (cores e escudo das figurinhas); sem o time, a cor da marca.
   final Map<String, TeamDTO> teams;
+
+  /// Pontos na rodada dos atletas que já jogaram (id → pontos); vazio = sem pílulas.
+  final Map<String, double> points;
   final bool editable;
   final ValueChanged<FantasySlot> onSlotTap;
   final ValueChanged<String> onCaptainTap;
@@ -32,6 +36,7 @@ class FantasyPitch extends StatelessWidget {
     required this.lineup,
     required this.athletes,
     this.teams = const {},
+    this.points = const {},
     required this.editable,
     required this.onSlotTap,
     required this.onCaptainTap,
@@ -92,6 +97,7 @@ class FantasyPitch extends StatelessWidget {
                       athlete: athletes[lineup.idAt(slot) ?? ''],
                       team: teams[athletes[lineup.idAt(slot) ?? '']?.teamId ?? ''],
                       athleteId: lineup.idAt(slot),
+                      points: points[lineup.idAt(slot) ?? ''],
                       captain: lineup.idAt(slot) != null && lineup.idAt(slot) == lineup.captainId,
                       editable: editable,
                       onTap: () => onSlotTap(slot),
@@ -113,6 +119,9 @@ class _PitchSlot extends StatelessWidget {
   final FantasyAthleteDTO? athlete;
   final TeamDTO? team;
   final String? athleteId;
+
+  /// Pontos na rodada (nulo = ainda não jogou).
+  final double? points;
   final bool captain;
   final bool editable;
   final VoidCallback onTap;
@@ -124,6 +133,7 @@ class _PitchSlot extends StatelessWidget {
     required this.athlete,
     required this.team,
     required this.athleteId,
+    this.points,
     required this.captain,
     required this.editable,
     required this.onTap,
@@ -189,6 +199,13 @@ class _PitchSlot extends StatelessWidget {
           clipBehavior: Clip.none,
           children: [
             card,
+            if (filled && points != null)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: -AppSizes.s8,
+                child: Center(child: _PointsPill(key: ValueKey('fantasy-points-${slot.key}'), points: points!)),
+              ),
             if (filled)
               Positioned(
                 right: -AppSizes.s6,
@@ -216,6 +233,36 @@ class _PitchSlot extends StatelessWidget {
               ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Pílula dos pontos do atleta na rodada: verde (+), vermelha (−) ou cinza (0).
+class _PointsPill extends StatelessWidget {
+  final double points;
+
+  const _PointsPill({super.key, required this.points});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = points > 0
+        ? AppColors.primaryStrong
+        : points < 0
+            ? AppColors.danger
+            : AppColors.textSecondary;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.s8, vertical: AppSizes.s2),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(AppSizes.s10),
+        border: Border.all(color: AppColors.white, width: 1.5),
+        boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: AppSizes.s4)],
+      ),
+      child: Text(
+        fantasySignedPoints(points),
+        style:
+            AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s12, fontWeight: FontWeight.w900),
       ),
     );
   }

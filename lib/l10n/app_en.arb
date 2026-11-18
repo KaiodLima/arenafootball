@@ -2502,5 +2502,12 @@
   "reportStartersFull": "There are already 11 starters. Remove one to add another.",
   "fantasyRoundInProgress": "Round {round} in progress. The next round opens when all matches are over.",
   "@fantasyRoundInProgress": {"placeholders": {"round": {"type": "int"}}},
-  "fantasyRoundInProgressShort": "In progress"
+  "fantasyRoundInProgressShort": "In progress",
+  "fantasyRoundScoreTitle": "Your score in round {round}",
+  "@fantasyRoundScoreTitle": {"placeholders": {"round": {"type": "int"}}},
+  "fantasyRoundPartialCount": "Partial · {done} of {total} matches",
+  "@fantasyRoundPartialCount": {"placeholders": {"done": {"type": "int"}, "total": {"type": "int"}}},
+  "fantasyRoundFinal": "Final",
+  "fantasySwitchResult": "Result",
+  "fantasySwitchPick": "Pick team"
 }

@@ -178,6 +178,7 @@ import {
 import {
   SCORING_VERSION,
   lineupPoints,
+  playedAthletes,
   pointsDelta,
   roundParticipants,
   scoreAthlete,
@@ -1162,6 +1163,7 @@ async function scoreFantasyRound(fantasyRef: DocRef, config: FantasyDoc, round: 
   const players = athleteIds.length ? await db.getAll(...athleteIds.map((id) => playersCol.doc(id))) : [];
   const enrollmentKey = `c${Number(config.idCampeonato ?? 0)}`;
   const totals: Record<string, number> = {};
+  const played = new Set<string>();
   const cardAthletes: FantasyCardAthlete[] = [];
   let batch = db.batch();
   let pending = 0;
@@ -1177,6 +1179,7 @@ async function scoreFantasyRound(fantasyRef: DocRef, config: FantasyDoc, round: 
       teamId: String(enrollment?.idTime ?? data.idTime ?? ''),
     }, params);
     totals[player.id] = result.total;
+    if (result.partidas.length > 0) played.add(player.id);
     cardAthletes.push({
       idJogador: player.id,
       nome: String(data.nome ?? ''),
@@ -1215,6 +1218,7 @@ async function scoreFantasyRound(fantasyRef: DocRef, config: FantasyDoc, round: 
       tx.update(lineup.ref, {
         pontos,
         pontosAtletas,
+        atletasJogaram: playedAthletes(ids, played),
         aplicado: pontos,
         processadoEm: FieldValue.serverTimestamp(),
       });
