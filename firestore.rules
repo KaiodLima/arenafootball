@@ -1071,6 +1071,12 @@ service cloud.firestore {
         // (gol: goleiro; zag: zagueiro/lateral; mei: volante/meia; ata:
         // atacante; livre: qualquer) e o capitão entre eles. Pontos são das
         // functions.
+        // Pontos de cada atleta na rodada (auditoria; só as functions gravam).
+        match /atletas/{athleteId} {
+          allow read: if true;
+          allow write: if false;
+        }
+
         match /escalacoes/{uid} {
           allow read: if true;
           allow create: if validFantasyLineup(uid, round)

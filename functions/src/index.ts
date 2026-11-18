@@ -163,6 +163,13 @@ import {
   roundFieldsChanged,
   roundSync,
 } from './fantasy';
+import {
+  SCORING_VERSION,
+  lineupPoints,
+  pointsDelta,
+  scoreAthlete,
+  scoringFieldsChanged,
+} from './fantasy_scoring';
 
 setGlobalOptions({ region: 'us-central1', maxInstances: 5 });
 
@@ -311,6 +318,14 @@ export const onMatchUpdated = onDocumentUpdated('{colecao}/{matchId}', async (ev
   if (!before || !after) return;
   // Arena Fantasy: rodada, data, horário ou início mudou → as rodadas acompanham.
   if (roundFieldsChanged(before, after)) await syncFantasyForMatches(before, after);
+  // Arena Fantasy: partida terminou, deixou de estar terminada ou a súmula
+  // terminada mudou → a rodada é apurada de novo (do zero, idempotente).
+  if (
+    (isFinishedMatch(before) || isFinishedMatch(after)) &&
+    (isFinishedMatch(before) !== isFinishedMatch(after) || scoringFieldsChanged(before, after))
+  ) {
+    await scoreFantasyForMatches(before, after);
+  }
   const { colecao, matchId } = event.params;
   const justFinished = before.status !== 'encerrada' && after.status === 'encerrada';
   // Card "Vote no craque": encerrada na mão antes dos 15 min finais → posta agora.
@@ -620,6 +635,7 @@ export const onMatchOrGroupDeleted = onDocumentDeleted('{colecao}/{docId}', asyn
   if (!data || !(await isCurrentMatchCollection(colecao))) return;
   if (matchdayOf(data.rodada) !== null) await syncFantasyForMatches(data);
   if (!isFinishedMatch(data)) return;
+  if (matchdayOf(data.rodada) !== null) await scoreFantasyForMatches(data);
   await recomputeMatchGroups(await currentSeason(), data);
 });
 
@@ -1021,6 +1037,127 @@ async function closeFantasyRounds(now: Date): Promise<void> {
     if (next !== null) await copyFantasyLineups(fantasyRef, Number(round.id), next);
     logger.info('Fantasy: rodada fechada', { fantasy: fantasyRef.id, round: round.id });
   }
+}
+
+/** Fantasy do campeonato [championshipId] na temporada (ligado ou não: a apuração segue). */
+async function fantasyOf(championshipId: number, season: string) {
+  const { db } = await admin();
+  const found = await db
+    .collection(FANTASY)
+    .where('idCampeonato', '==', championshipId)
+    .where('temporada', '==', season)
+    .limit(1)
+    .get();
+  return found.docs[0];
+}
+
+/** Apura as rodadas do Fantasy das partidas [docs] (antes e depois da mudança). */
+async function scoreFantasyForMatches(...docs: (FantasyDoc | undefined)[]): Promise<void> {
+  const season = await currentSeason();
+  const rounds = new Map<number, Set<number>>();
+  for (const doc of docs) {
+    const championshipId = Number(doc?.id_campeonato ?? 0);
+    const round = matchdayOf(doc?.rodada);
+    if (!Number.isInteger(championshipId) || championshipId <= 0 || round === null) continue;
+    rounds.set(championshipId, (rounds.get(championshipId) ?? new Set()).add(round));
+  }
+  for (const [championshipId, numbers] of rounds) {
+    try {
+      const fantasy = await fantasyOf(championshipId, season);
+      if (!fantasy) continue;
+      for (const round of numbers) await scoreFantasyRound(fantasy.ref, fantasy.data(), round, season);
+    } catch (error) {
+      logger.error('Fantasy: rodada não apurada', { championshipId, error: String(error) });
+    }
+  }
+}
+
+/**
+ * Apuração da rodada [round], sempre do zero: pontos de cada atleta escalado
+ * (doc de auditoria em `rodadas/{n}/atletas`), das escalações e, por
+ * transação, a diferença no total do participante (`aplicado`): reprocessar
+ * não soma duas vezes e a súmula corrigida muda só a diferença.
+ */
+async function scoreFantasyRound(fantasyRef: DocRef, config: FantasyDoc, round: number, season: string): Promise<void> {
+  const { db, FieldValue } = await admin();
+  const roundRef = fantasyRef.collection(FANTASY_ROUNDS).doc(String(round));
+  const roundSnap = await roundRef.get();
+  if (!roundSnap.exists) return;
+  const roundData = roundSnap.data() ?? {};
+  const params = frozenParams((roundData.parametros as FantasyDoc | undefined) ?? config);
+  const matchIds = Array.isArray(roundData.idsPartidas) ? roundData.idsPartidas.map(String) : [];
+  const matchesCol = db.collection(seasonCollection('partidas', season));
+  const matchDocs = matchIds.length ? await db.getAll(...matchIds.map((id) => matchesCol.doc(id))) : [];
+  const finished = matchDocs
+    .filter((d) => d.exists && isFinishedMatch(d.data() ?? {}))
+    .map((d) => ({ id: d.id, data: d.data() ?? {} }));
+
+  const lineups = await roundRef.collection(FANTASY_LINEUPS).get();
+  const athleteIds = [
+    ...new Set(lineups.docs.flatMap((d) => (Array.isArray(d.data().idsAtletas) ? d.data().idsAtletas.map(String) : []))),
+  ].filter(Boolean);
+  const playersCol = db.collection(seasonCollection('jogadores', season));
+  const players = athleteIds.length ? await db.getAll(...athleteIds.map((id) => playersCol.doc(id))) : [];
+  const enrollmentKey = `c${Number(config.idCampeonato ?? 0)}`;
+  const totals: Record<string, number> = {};
+  let batch = db.batch();
+  let pending = 0;
+  for (const player of players) {
+    const data = player.data() ?? {};
+    const enrollment = ((data.inscricoes ?? {}) as Record<string, FantasyDoc>)[enrollmentKey];
+    const result = scoreAthlete(finished, {
+      id: player.id,
+      posicao: data.posicao,
+      teamId: String(enrollment?.idTime ?? data.idTime ?? ''),
+    }, params);
+    totals[player.id] = result.total;
+    batch.set(roundRef.collection('atletas').doc(player.id), {
+      ...result,
+      nome: String(data.nome ?? ''),
+      urlImagem: String(data.urlImagem ?? ''),
+      idTime: String(enrollment?.idTime ?? data.idTime ?? ''),
+      time: String(enrollment?.time ?? data.time ?? ''),
+      parametros: params,
+      versaoCalculo: SCORING_VERSION,
+      processadoEm: FieldValue.serverTimestamp(),
+    });
+    if (++pending === 400) {
+      await batch.commit();
+      batch = db.batch();
+      pending = 0;
+    }
+  }
+  if (pending) await batch.commit();
+
+  for (const lineup of lineups.docs) {
+    const participantRef = fantasyRef.collection(FANTASY_PARTICIPANTS).doc(lineup.id);
+    await db.runTransaction(async (tx) => {
+      const snap = await tx.get(lineup.ref);
+      const data = snap.data() ?? {};
+      const ids = Array.isArray(data.idsAtletas) ? data.idsAtletas.map(String) : [];
+      const { pontos, pontosAtletas } = lineupPoints(ids, String(data.capitao ?? ''), totals, params.capitao);
+      const delta = pointsDelta(pontos, data.aplicado);
+      tx.update(lineup.ref, {
+        pontos,
+        pontosAtletas,
+        aplicado: pontos,
+        processadoEm: FieldValue.serverTimestamp(),
+      });
+      if (delta !== 0) tx.set(participantRef, { pontos: FieldValue.increment(delta) }, { merge: true });
+    });
+  }
+
+  await roundRef.update({
+    apuracao: {
+      partidas: matchIds.length,
+      encerradas: finished.length,
+      escalacoes: lineups.size,
+      versao: SCORING_VERSION,
+      processadoEm: FieldValue.serverTimestamp(),
+    },
+    finalizada: matchIds.length > 0 && finished.length === matchIds.length,
+  });
+  logger.info('Fantasy: rodada apurada', { fantasy: fantasyRef.id, round, finished: finished.length });
 }
 
 /** Admin ligou o Fantasy: monta as rodadas pelas partidas que já têm rodada. */

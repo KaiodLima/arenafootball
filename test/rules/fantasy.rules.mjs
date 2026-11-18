@@ -100,4 +100,10 @@ export default async function run(env, check) {
   await check('convidado lê a escalação', assertSucceeds(getDoc(doc(guest, 'fantasy/fx/rodadas/1/escalacoes/u1'))));
   await check('cliente não grava rodada', assertFails(updateDoc(doc(admin, 'fantasy/fx/rodadas/1'), { status: 'fechada' })));
   await check('não apaga a escalação', assertFails(deleteDoc(mine())));
+
+  // --- Fase 3: pontos (auditoria por atleta) só das functions ---
+  await seed('fantasy/fx/rodadas/1/atletas/gk', { total: 15, itens: [] });
+  await check('convidado lê os pontos do atleta', assertSucceeds(getDoc(doc(guest, 'fantasy/fx/rodadas/1/atletas/gk'))));
+  await check('cliente não grava pontos do atleta', assertFails(setDoc(doc(admin, 'fantasy/fx/rodadas/1/atletas/gk'), { total: 99 })));
+  await check('cliente não grava aplicado', assertFails(setDoc(mine(), lineup(undefined, { aplicado: 10 }))));
 }
