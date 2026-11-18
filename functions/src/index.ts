@@ -161,6 +161,7 @@ import {
   matchdayOf,
   nextOpenRound,
   previousClosedRound,
+  rescoreRequested,
   roundFieldsChanged,
   roundSync,
 } from './fantasy';
@@ -1189,10 +1190,24 @@ async function syncFantasyChampion(championshipDocId: string, before: FantasyDoc
 export const onFantasyWritten = onDocumentWritten(`${FANTASY}/{fantasyId}`, async (event) => {
   const before = event.data?.before.data();
   const after = event.data?.after.data();
-  if (!after || after.ativo !== true || before?.ativo === true) return;
-  const season = typeof after.temporada === 'string' && after.temporada ? after.temporada : await currentSeason();
   const ref = event.data?.after.ref;
-  if (ref) await syncFantasyRounds(ref, after, season);
+  if (!after || !ref) return;
+  const season = typeof after.temporada === 'string' && after.temporada ? after.temporada : await currentSeason();
+  // "Reapurar rodadas" do admin: rodadas pelas partidas e todas as fechadas
+  // apuradas de novo (seguro: a escalação só recebe a diferença).
+  if (rescoreRequested(before, after)) {
+    await syncFantasyRounds(ref, after, season);
+    const rounds = await ref.collection(FANTASY_ROUNDS).where('status', '==', 'fechada').get();
+    for (const round of rounds.docs) {
+      await scoreFantasyRound(ref, after, Number(round.id), season).catch((error) =>
+        logger.error('Fantasy: reapuração falhou', { fantasy: ref.id, round: round.id, error: String(error) }),
+      );
+    }
+    logger.info('Fantasy: reapuração feita', { fantasy: ref.id, rounds: rounds.size });
+    return;
+  }
+  if (after.ativo !== true || before?.ativo === true) return;
+  await syncFantasyRounds(ref, after, season);
 });
 
 /** Participante novo: a contagem do Fantasy sobe. */

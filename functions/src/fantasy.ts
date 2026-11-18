@@ -163,3 +163,12 @@ export function fantasyChampions(participants: { id: string; data: Doc }[]): Fan
   if (best <= 0) return [];
   return list.filter((p) => p.pontos === best).sort((a, b) => a.nome.localeCompare(b.nome));
 }
+
+/** O admin pediu "Reapurar rodadas" (`reapurarEm` mudou). */
+export function rescoreRequested(before: Doc | undefined, after: Doc | undefined): boolean {
+  const millis = (value: unknown): string =>
+    value && typeof value === 'object' && 'toMillis' in value
+      ? String((value as { toMillis: () => number }).toMillis())
+      : String(value ?? '');
+  return !!after && after.reapurarEm !== undefined && millis(before?.reapurarEm) !== millis(after.reapurarEm);
+}

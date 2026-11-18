@@ -9,6 +9,7 @@ import {
   matchdayOf,
   nextOpenRound,
   previousClosedRound,
+  rescoreRequested,
   roundFieldsChanged,
   roundSync,
 } from '../fantasy';
@@ -116,4 +117,13 @@ test('campeão do Fantasy: maior pontuação; empate = todos; sem pontos, ningu�
   assert.deepEqual(fantasyChampions([p('b', 90), p('a', 90), p('c', 10)]).map((c) => c.uid), ['a', 'b']);
   assert.deepEqual(fantasyChampions([p('a', 0)]), []);
   assert.deepEqual(fantasyChampions([]), []);
+});
+
+test('reapuração pedida: só quando o reapurarEm muda', () => {
+  const at = (ms: number) => ({ toMillis: () => ms });
+  assert.equal(rescoreRequested({}, { reapurarEm: at(1) }), true);
+  assert.equal(rescoreRequested({ reapurarEm: at(1) }, { reapurarEm: at(2) }), true);
+  assert.equal(rescoreRequested({ reapurarEm: at(1) }, { reapurarEm: at(1), participantes: 3 }), false);
+  assert.equal(rescoreRequested({ ativo: false }, { ativo: true }), false);
+  assert.equal(rescoreRequested({ reapurarEm: at(1) }, undefined), false);
 });

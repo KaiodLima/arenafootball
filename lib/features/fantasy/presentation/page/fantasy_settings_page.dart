@@ -10,6 +10,7 @@ import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/app_routes.dart';
 
 /// Admin → engrenagem do campeonato → "Arena Fantasy": liga/desliga o Fantasy
 /// daquele campeonato e ajusta os parâmetros (`fantasy/{idDocCampeonato}`).
@@ -175,6 +176,39 @@ class _FantasySettingsPageState extends State<FantasySettingsPage> {
                         ),
                       ],
                     ),
+                    // Acompanhar: rodadas/apuração, participantes e o ranking.
+                    const SizedBox(height: AppSizes.s24),
+                    Text(l10n.fantasyFollowTitle, style: AppTypography.title().copyWith(fontSize: AppSizes.s16)),
+                    const SizedBox(height: AppSizes.s8),
+                    _Panel(
+                      child: Column(
+                        children: [
+                          _FollowTile(
+                            keyName: 'fantasy-follow-rounds',
+                            icon: Icons.fact_check_outlined,
+                            title: l10n.fantasyFollowRounds,
+                            onTap: () => Navigator.pushNamed(context, AppRoutes.fantasyAdminPage,
+                                arguments: {'championship': widget.championship, 'tab': 0}),
+                          ),
+                          const Divider(height: 1, color: AppColors.greyLight),
+                          _FollowTile(
+                            keyName: 'fantasy-follow-participants',
+                            icon: Icons.groups_rounded,
+                            title: l10n.fantasyFollowParticipants,
+                            onTap: () => Navigator.pushNamed(context, AppRoutes.fantasyAdminPage,
+                                arguments: {'championship': widget.championship, 'tab': 1}),
+                          ),
+                          const Divider(height: 1, color: AppColors.greyLight),
+                          _FollowTile(
+                            keyName: 'fantasy-follow-ranking',
+                            icon: Icons.emoji_events_outlined,
+                            title: l10n.fantasyRankingTitle,
+                            onTap: () => Navigator.pushNamed(context, AppRoutes.fantasyRankingPage,
+                                arguments: widget.championship),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
         );
@@ -249,4 +283,23 @@ class _Stepper extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Linha da seção "Acompanhar".
+class _FollowTile extends StatelessWidget {
+  final String keyName;
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
+
+  const _FollowTile({required this.keyName, required this.icon, required this.title, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) => ListTile(
+        key: ValueKey(keyName),
+        leading: Icon(icon, color: AppColors.primaryDark),
+        title: Text(title, style: AppTypography.label(color: AppColors.textPrimary)),
+        trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary),
+        onTap: onTap,
+      );
 }

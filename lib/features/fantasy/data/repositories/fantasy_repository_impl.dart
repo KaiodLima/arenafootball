@@ -103,4 +103,14 @@ class FantasyRepositoryImpl implements IFantasyRepository {
   @override
   Future<Either<Failure, FantasyLineupDTO?>> getLineup(String fantasyId, int round, String uid) =>
       _dataSource.getLineup(fantasyId, round, uid);
+
+  @override
+  Stream<Either<Failure, List<FantasyRoundDTO>>> watchRounds(String fantasyId) => _dataSource.watchRounds(fantasyId);
+
+  @override
+  Future<Either<Failure, List<FantasyParticipantDTO>>> getParticipants(String fantasyId, {DateTime? before}) =>
+      _dataSource.getParticipants(fantasyId, before: before);
+
+  @override
+  Future<Either<Failure, void>> requestRescore(String fantasyId) => _dataSource.requestRescore(fantasyId);
 }

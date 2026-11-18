@@ -11492,6 +11492,168 @@ abstract class AppLocalizations {
   /// **'Ver ranking'**
   String get fantasySeeRanking;
 
+  /// No description provided for @fantasyFollowTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Acompanhar'**
+  String get fantasyFollowTitle;
+
+  /// No description provided for @fantasyFollowRounds.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rodadas e apuração'**
+  String get fantasyFollowRounds;
+
+  /// No description provided for @fantasyFollowParticipants.
+  ///
+  /// In pt, this message translates to:
+  /// **'Participantes'**
+  String get fantasyFollowParticipants;
+
+  /// No description provided for @fantasyAdminRounds.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rodadas'**
+  String get fantasyAdminRounds;
+
+  /// No description provided for @fantasyAdminParticipants.
+  ///
+  /// In pt, this message translates to:
+  /// **'Participantes'**
+  String get fantasyAdminParticipants;
+
+  /// No description provided for @fantasyAdminNoRounds.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma rodada ainda. Marque a rodada nas partidas do campeonato.'**
+  String get fantasyAdminNoRounds;
+
+  /// No description provided for @fantasyAdminNoParticipants.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ninguém entrou ainda.'**
+  String get fantasyAdminNoParticipants;
+
+  /// No description provided for @fantasyAdminNoLineups.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem escalação em rodada fechada.'**
+  String get fantasyAdminNoLineups;
+
+  /// No description provided for @fantasyStatusOpen.
+  ///
+  /// In pt, this message translates to:
+  /// **'ABERTA'**
+  String get fantasyStatusOpen;
+
+  /// No description provided for @fantasyStatusClosed.
+  ///
+  /// In pt, this message translates to:
+  /// **'FECHADA'**
+  String get fantasyStatusClosed;
+
+  /// No description provided for @fantasyStatusEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'SEM PARTIDAS'**
+  String get fantasyStatusEmpty;
+
+  /// No description provided for @fantasyStatusFinished.
+  ///
+  /// In pt, this message translates to:
+  /// **'FINALIZADA'**
+  String get fantasyStatusFinished;
+
+  /// No description provided for @fantasyAdminDeadline.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prazo: {when}'**
+  String fantasyAdminDeadline(String when);
+
+  /// No description provided for @fantasyAdminMatches.
+  ///
+  /// In pt, this message translates to:
+  /// **'Partidas terminadas: {finished} de {total}'**
+  String fantasyAdminMatches(int finished, int total);
+
+  /// No description provided for @fantasyAdminLineups.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 escalação apurada} other{{count} escalações apuradas}}'**
+  String fantasyAdminLineups(int count);
+
+  /// No description provided for @fantasyAdminScoredAt.
+  ///
+  /// In pt, this message translates to:
+  /// **'Apurada em {when}'**
+  String fantasyAdminScoredAt(String when);
+
+  /// No description provided for @fantasyAdminNotScored.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ainda não apurada'**
+  String get fantasyAdminNotScored;
+
+  /// No description provided for @fantasyAdminParams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Parâmetros: {min} min · {defense} min · {captain}'**
+  String fantasyAdminParams(int min, int defense, String captain);
+
+  /// No description provided for @fantasyAdminSince.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desde a rodada {round}'**
+  String fantasyAdminSince(int round);
+
+  /// No description provided for @fantasyAdminSinceStart.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desde o início'**
+  String get fantasyAdminSinceStart;
+
+  /// No description provided for @fantasyLoadMore.
+  ///
+  /// In pt, this message translates to:
+  /// **'Carregar mais'**
+  String get fantasyLoadMore;
+
+  /// No description provided for @fantasyRescore.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reapurar rodadas'**
+  String get fantasyRescore;
+
+  /// No description provided for @fantasyRescoreTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reapurar as rodadas?'**
+  String get fantasyRescoreTitle;
+
+  /// No description provided for @fantasyRescoreText.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todas as rodadas fechadas são recalculadas pela súmula atual. Os pontos só mudam onde a súmula ou os cadastros mudaram; nada é somado duas vezes.'**
+  String get fantasyRescoreText;
+
+  /// No description provided for @fantasyRescoreRequested.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reapuração pedida. Pode levar alguns segundos.'**
+  String get fantasyRescoreRequested;
+
+  /// No description provided for @fantasyRescoreError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível pedir a reapuração.'**
+  String get fantasyRescoreError;
+
+  /// No description provided for @fantasyCancel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cancelar'**
+  String get fantasyCancel;
+
   /// No description provided for @teamRequestMenu.
   ///
   /// In pt, this message translates to:

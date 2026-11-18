@@ -211,4 +211,44 @@ class FantasyDataSource {
       return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível carregar a escalação.'));
     }
   }
+
+  /// Rodadas ao vivo (painel do admin; poucos docs).
+  Stream<Either<Failure, List<FantasyRoundDTO>>> watchRounds(String fantasyId) {
+    return _doc(fantasyId).collection('rodadas').snapshots().toEither(
+          (snapshot) => [for (final doc in snapshot.docs) FantasyRoundDTO.fromMap(doc.id, doc.data())]
+            ..sort((a, b) => b.number.compareTo(a.number)),
+          fallbackMessage: 'Não foi possível carregar as rodadas.',
+          logName: _logName,
+        );
+  }
+
+  static const int participantsPage = 30;
+
+  /// Participantes do mais recente ao mais antigo, 30 por vez (depois de
+  /// [before], a hora de entrada do último da página anterior).
+  Future<Either<Failure, List<FantasyParticipantDTO>>> getParticipants(String fantasyId, {DateTime? before}) async {
+    try {
+      var query = _doc(fantasyId).collection('participantes').orderBy('entrouEm', descending: true);
+      if (before != null) query = query.startAfter([Timestamp.fromDate(before)]);
+      final snapshot = await query.limit(participantsPage).get();
+      return Right([for (final doc in snapshot.docs) FantasyParticipantDTO.fromMap(doc.id, doc.data())]);
+    } catch (e) {
+      AppLogger.e('getParticipants $fantasyId', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível carregar os participantes.'));
+    }
+  }
+
+  /// Admin: "Reapurar rodadas" (as functions apuram de novo as fechadas).
+  Future<Either<Failure, void>> requestRescore(String fantasyId) async {
+    try {
+      await _doc(fantasyId).set(
+        {'reapurarEm': FieldValue.serverTimestamp(), 'atualizadoEm': FieldValue.serverTimestamp()},
+        SetOptions(merge: true),
+      );
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('requestRescore $fantasyId', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível pedir a reapuração.'));
+    }
+  }
 }

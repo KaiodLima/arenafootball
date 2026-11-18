@@ -6942,6 +6942,108 @@ class AppLocalizationsPt extends AppLocalizations {
   String get fantasySeeRanking => 'Ver ranking';
 
   @override
+  String get fantasyFollowTitle => 'Acompanhar';
+
+  @override
+  String get fantasyFollowRounds => 'Rodadas e apuração';
+
+  @override
+  String get fantasyFollowParticipants => 'Participantes';
+
+  @override
+  String get fantasyAdminRounds => 'Rodadas';
+
+  @override
+  String get fantasyAdminParticipants => 'Participantes';
+
+  @override
+  String get fantasyAdminNoRounds =>
+      'Nenhuma rodada ainda. Marque a rodada nas partidas do campeonato.';
+
+  @override
+  String get fantasyAdminNoParticipants => 'Ninguém entrou ainda.';
+
+  @override
+  String get fantasyAdminNoLineups => 'Sem escalação em rodada fechada.';
+
+  @override
+  String get fantasyStatusOpen => 'ABERTA';
+
+  @override
+  String get fantasyStatusClosed => 'FECHADA';
+
+  @override
+  String get fantasyStatusEmpty => 'SEM PARTIDAS';
+
+  @override
+  String get fantasyStatusFinished => 'FINALIZADA';
+
+  @override
+  String fantasyAdminDeadline(String when) {
+    return 'Prazo: $when';
+  }
+
+  @override
+  String fantasyAdminMatches(int finished, int total) {
+    return 'Partidas terminadas: $finished de $total';
+  }
+
+  @override
+  String fantasyAdminLineups(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count escalações apuradas',
+      one: '1 escalação apurada',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fantasyAdminScoredAt(String when) {
+    return 'Apurada em $when';
+  }
+
+  @override
+  String get fantasyAdminNotScored => 'Ainda não apurada';
+
+  @override
+  String fantasyAdminParams(int min, int defense, String captain) {
+    return 'Parâmetros: $min min · $defense min · $captain';
+  }
+
+  @override
+  String fantasyAdminSince(int round) {
+    return 'Desde a rodada $round';
+  }
+
+  @override
+  String get fantasyAdminSinceStart => 'Desde o início';
+
+  @override
+  String get fantasyLoadMore => 'Carregar mais';
+
+  @override
+  String get fantasyRescore => 'Reapurar rodadas';
+
+  @override
+  String get fantasyRescoreTitle => 'Reapurar as rodadas?';
+
+  @override
+  String get fantasyRescoreText =>
+      'Todas as rodadas fechadas são recalculadas pela súmula atual. Os pontos só mudam onde a súmula ou os cadastros mudaram; nada é somado duas vezes.';
+
+  @override
+  String get fantasyRescoreRequested =>
+      'Reapuração pedida. Pode levar alguns segundos.';
+
+  @override
+  String get fantasyRescoreError => 'Não foi possível pedir a reapuração.';
+
+  @override
+  String get fantasyCancel => 'Cancelar';
+
+  @override
   String get teamRequestMenu => 'Sou dono de time';
 
   @override

@@ -160,6 +160,8 @@ import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_lineup_p
 import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_badge_cubit.dart';
 import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_ranking_cubit.dart';
 import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_ranking_page.dart';
+import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_admin_cubit.dart';
+import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_admin_page.dart';
 
 class ArenaApp extends StatelessWidget {
   const ArenaApp({super.key});
@@ -562,6 +564,17 @@ class ArenaApp extends StatelessWidget {
                 championship: ModalRoute.of(context)!.settings.arguments as ChampionshipDTO,
               ),
             ),
+        // Arena Fantasy (admin): rodadas/apuração e participantes.
+        AppRoutes.fantasyAdminPage: (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          return BlocProvider<FantasyAdminCubit>(
+            create: (_) => FantasyAdminCubit(sl(), sl(), sl(), sl(), sl(), sl()),
+            child: FantasyAdminPage(
+              championship: args['championship'] as ChampionshipDTO,
+              initialTab: args['tab'] as int? ?? 0,
+            ),
+          );
+        },
         // Arena Fantasy do campeonato (admin): liga/desliga e os parâmetros.
         AppRoutes.fantasySettingsPage: (context) => BlocProvider<FantasySettingsCubit>(
               create: (_) => FantasySettingsCubit(sl(), sl()),

@@ -19,6 +19,13 @@ class FantasyRoundDTO extends Equatable {
   /// Todas as partidas da rodada terminaram e foram apuradas.
   final bool finished;
 
+  /// Apuração (painel do admin): partidas terminadas, escalações apuradas e
+  /// quando; e os parâmetros congelados ao fechar (nulos = ainda aberta).
+  final int matchesFinished;
+  final int lineups;
+  final DateTime? processedAt;
+  final ({int minMinutes, int minDefenseMinutes, double captain})? params;
+
   const FantasyRoundDTO({
     required this.number,
     this.matchIds = const [],
@@ -26,6 +33,10 @@ class FantasyRoundDTO extends Equatable {
     this.status = '',
     this.scored = false,
     this.finished = false,
+    this.matchesFinished = 0,
+    this.lineups = 0,
+    this.processedAt,
+    this.params,
   });
 
   bool get closed => status == 'fechada';
@@ -39,6 +50,16 @@ class FantasyRoundDTO extends Equatable {
       status: map['status']?.toString() ?? '',
       scored: map['apuracao'] is Map,
       finished: map['finalizada'] == true,
+      matchesFinished: ((map['apuracao'] as Map?)?['encerradas'] as num?)?.toInt() ?? 0,
+      lineups: ((map['apuracao'] as Map?)?['escalacoes'] as num?)?.toInt() ?? 0,
+      processedAt: _dateOf((map['apuracao'] as Map?)?['processadoEm']),
+      params: map['parametros'] is Map
+          ? (
+              minMinutes: ((map['parametros'] as Map)['minMinutos'] as num?)?.toInt() ?? 20,
+              minDefenseMinutes: ((map['parametros'] as Map)['minMinutosDefesa'] as num?)?.toInt() ?? 45,
+              captain: ((map['parametros'] as Map)['capitao'] as num?)?.toDouble() ?? 1.5,
+            )
+          : null,
     );
   }
 
@@ -46,7 +67,8 @@ class FantasyRoundDTO extends Equatable {
   bool isOpenAt(DateTime now) => status == 'aberta' && closesAt != null && now.isBefore(closesAt!);
 
   @override
-  List<Object?> get props => [number, matchIds, closesAt, status, scored, finished];
+  List<Object?> get props =>
+      [number, matchIds, closesAt, status, scored, finished, matchesFinished, lineups, processedAt, params];
 }
 
 /// Participante do Fantasy (`fantasy/{id}/participantes/{uid}`).
@@ -58,6 +80,7 @@ class FantasyParticipantDTO extends Equatable {
 
   /// Pontos acumulados (só as functions gravam).
   final double points;
+  final DateTime? joinedAt;
 
   const FantasyParticipantDTO({
     required this.uid,
@@ -65,6 +88,7 @@ class FantasyParticipantDTO extends Equatable {
     this.photoUrl = '',
     this.firstRound = 0,
     this.points = 0,
+    this.joinedAt,
   });
 
   factory FantasyParticipantDTO.fromMap(String id, Map<String, dynamic> data) => FantasyParticipantDTO(
@@ -73,10 +97,11 @@ class FantasyParticipantDTO extends Equatable {
         photoUrl: data['urlImagem']?.toString() ?? '',
         firstRound: (data['rodadaInicial'] as num?)?.toInt() ?? 0,
         points: (data['pontos'] as num?)?.toDouble() ?? 0,
+        joinedAt: _dateOf(data['entrouEm']),
       );
 
   @override
-  List<Object?> get props => [uid, name, photoUrl, firstRound, points];
+  List<Object?> get props => [uid, name, photoUrl, firstRound, points, joinedAt];
 }
 
 /// Escalação do participante na rodada (`rodadas/{n}/escalacoes/{uid}`).

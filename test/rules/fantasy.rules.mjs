@@ -101,6 +101,14 @@ export default async function run(env, check) {
   await check('cliente não grava rodada', assertFails(updateDoc(doc(admin, 'fantasy/fx/rodadas/1'), { status: 'fechada' })));
   await check('não apaga a escalação', assertFails(deleteDoc(mine())));
 
+  // --- Fase 5: "Reapurar rodadas" do admin ---
+  await check('admin pede a reapuração', assertSucceeds(setDoc(doc(admin, 'fantasy/fx'),
+    { reapurarEm: serverTimestamp(), atualizadoEm: serverTimestamp() }, { merge: true })));
+  await check('usuário comum não pede a reapuração', assertFails(setDoc(doc(user, 'fantasy/fx'),
+    { reapurarEm: serverTimestamp(), atualizadoEm: serverTimestamp() }, { merge: true })));
+  await check('reapurarEm como texto recusado', assertFails(setDoc(doc(admin, 'fantasy/fx'),
+    { reapurarEm: 'agora', atualizadoEm: serverTimestamp() }, { merge: true })));
+
   // --- Fase 3: pontos (auditoria por atleta) só das functions ---
   await seed('fantasy/fx/rodadas/1/atletas/gk', { total: 15, itens: [] });
   await check('convidado lê os pontos do atleta', assertSucceeds(getDoc(doc(guest, 'fantasy/fx/rodadas/1/atletas/gk'))));

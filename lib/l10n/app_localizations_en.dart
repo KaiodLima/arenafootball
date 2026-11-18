@@ -6900,6 +6900,108 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fantasySeeRanking => 'See ranking';
 
   @override
+  String get fantasyFollowTitle => 'Follow up';
+
+  @override
+  String get fantasyFollowRounds => 'Matchdays and scoring';
+
+  @override
+  String get fantasyFollowParticipants => 'Participants';
+
+  @override
+  String get fantasyAdminRounds => 'Matchdays';
+
+  @override
+  String get fantasyAdminParticipants => 'Participants';
+
+  @override
+  String get fantasyAdminNoRounds =>
+      'No matchday yet. Set the matchday on the championship matches.';
+
+  @override
+  String get fantasyAdminNoParticipants => 'Nobody joined yet.';
+
+  @override
+  String get fantasyAdminNoLineups => 'No lineup in a closed matchday.';
+
+  @override
+  String get fantasyStatusOpen => 'OPEN';
+
+  @override
+  String get fantasyStatusClosed => 'CLOSED';
+
+  @override
+  String get fantasyStatusEmpty => 'NO MATCHES';
+
+  @override
+  String get fantasyStatusFinished => 'FINISHED';
+
+  @override
+  String fantasyAdminDeadline(String when) {
+    return 'Deadline: $when';
+  }
+
+  @override
+  String fantasyAdminMatches(int finished, int total) {
+    return 'Finished matches: $finished of $total';
+  }
+
+  @override
+  String fantasyAdminLineups(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count lineups scored',
+      one: '1 lineup scored',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fantasyAdminScoredAt(String when) {
+    return 'Scored at $when';
+  }
+
+  @override
+  String get fantasyAdminNotScored => 'Not scored yet';
+
+  @override
+  String fantasyAdminParams(int min, int defense, String captain) {
+    return 'Settings: $min min · $defense min · $captain';
+  }
+
+  @override
+  String fantasyAdminSince(int round) {
+    return 'Since matchday $round';
+  }
+
+  @override
+  String get fantasyAdminSinceStart => 'Since the start';
+
+  @override
+  String get fantasyLoadMore => 'Load more';
+
+  @override
+  String get fantasyRescore => 'Rescore matchdays';
+
+  @override
+  String get fantasyRescoreTitle => 'Rescore the matchdays?';
+
+  @override
+  String get fantasyRescoreText =>
+      'All closed matchdays are recalculated from the current match reports. Points only change where something changed; nothing is added twice.';
+
+  @override
+  String get fantasyRescoreRequested =>
+      'Rescore requested. It may take a few seconds.';
+
+  @override
+  String get fantasyRescoreError => 'Could not request the rescore.';
+
+  @override
+  String get fantasyCancel => 'Cancel';
+
+  @override
   String get teamRequestMenu => 'I own a team';
 
   @override

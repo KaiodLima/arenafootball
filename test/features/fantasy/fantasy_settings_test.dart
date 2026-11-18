@@ -164,5 +164,9 @@ void main() {
     expect(repo.saved.single.active, isTrue);
     expect(repo.saved.single.minMinutes, 25);
     expect(find.text('Arena Fantasy salvo.'), findsOneWidget);
+    // Seção "Acompanhar": rodadas, participantes e ranking.
+    await tester.scrollUntilVisible(find.byKey(const ValueKey('fantasy-follow-ranking')), 200);
+    expect(find.byKey(const ValueKey('fantasy-follow-rounds')), findsOneWidget);
+    expect(find.byKey(const ValueKey('fantasy-follow-participants')), findsOneWidget);
   });
 }

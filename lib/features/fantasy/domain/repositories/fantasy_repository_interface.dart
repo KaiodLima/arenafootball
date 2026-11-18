@@ -49,4 +49,10 @@ abstract class IFantasyRepository {
   Future<Either<Failure, List<FantasyRoundDTO>>> getRounds(String fantasyId);
 
   Future<Either<Failure, FantasyLineupDTO?>> getLineup(String fantasyId, int round, String uid);
+
+  Stream<Either<Failure, List<FantasyRoundDTO>>> watchRounds(String fantasyId);
+
+  Future<Either<Failure, List<FantasyParticipantDTO>>> getParticipants(String fantasyId, {DateTime? before});
+
+  Future<Either<Failure, void>> requestRescore(String fantasyId);
 }

@@ -3513,6 +3513,84 @@
   "fantasyUnknownAthlete": "Atleta",
   "fantasyMyTotal": "Seu total no Fantasy",
   "fantasySeeRanking": "Ver ranking",
+  "fantasyFollowTitle": "Acompanhar",
+  "fantasyFollowRounds": "Rodadas e apuração",
+  "fantasyFollowParticipants": "Participantes",
+  "fantasyAdminRounds": "Rodadas",
+  "fantasyAdminParticipants": "Participantes",
+  "fantasyAdminNoRounds": "Nenhuma rodada ainda. Marque a rodada nas partidas do campeonato.",
+  "fantasyAdminNoParticipants": "Ninguém entrou ainda.",
+  "fantasyAdminNoLineups": "Sem escalação em rodada fechada.",
+  "fantasyStatusOpen": "ABERTA",
+  "fantasyStatusClosed": "FECHADA",
+  "fantasyStatusEmpty": "SEM PARTIDAS",
+  "fantasyStatusFinished": "FINALIZADA",
+  "fantasyAdminDeadline": "Prazo: {when}",
+  "@fantasyAdminDeadline": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "fantasyAdminMatches": "Partidas terminadas: {finished} de {total}",
+  "@fantasyAdminMatches": {
+    "placeholders": {
+      "finished": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "fantasyAdminLineups": "{count, plural, =1{1 escalação apurada} other{{count} escalações apuradas}}",
+  "@fantasyAdminLineups": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fantasyAdminScoredAt": "Apurada em {when}",
+  "@fantasyAdminScoredAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "fantasyAdminNotScored": "Ainda não apurada",
+  "fantasyAdminParams": "Parâmetros: {min} min · {defense} min · {captain}",
+  "@fantasyAdminParams": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "defense": {
+        "type": "int"
+      },
+      "captain": {
+        "type": "String"
+      }
+    }
+  },
+  "fantasyAdminSince": "Desde a rodada {round}",
+  "@fantasyAdminSince": {
+    "placeholders": {
+      "round": {
+        "type": "int"
+      }
+    }
+  },
+  "fantasyAdminSinceStart": "Desde o início",
+  "fantasyLoadMore": "Carregar mais",
+  "fantasyRescore": "Reapurar rodadas",
+  "fantasyRescoreTitle": "Reapurar as rodadas?",
+  "fantasyRescoreText": "Todas as rodadas fechadas são recalculadas pela súmula atual. Os pontos só mudam onde a súmula ou os cadastros mudaram; nada é somado duas vezes.",
+  "fantasyRescoreRequested": "Reapuração pedida. Pode levar alguns segundos.",
+  "fantasyRescoreError": "Não foi possível pedir a reapuração.",
+  "fantasyCancel": "Cancelar",
   "teamRequestMenu": "Sou dono de time",
   "teamRequestTitle": "Sou dono de time",
   "teamRequestIntro": "Cadastre o seu time: um administrador analisa o pedido e, aprovado, você gerencia o elenco.",

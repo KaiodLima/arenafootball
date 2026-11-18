@@ -74,6 +74,7 @@ class AppRoutes {
   static const String fantasySettingsPage = '/fantasy_settings_page';
   static const String fantasyLineupPage = '/fantasy_lineup_page';
   static const String fantasyRankingPage = '/fantasy_ranking_page';
+  static const String fantasyAdminPage = '/fantasy_admin_page';
   static const String organizerRequestPage = '/organizer_request_page';
   static const String organizerRequestsPanelPage = '/organizer_requests_panel_page';
   static const String organizerGroupsPage = '/organizer_groups_page';

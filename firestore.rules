@@ -1019,7 +1019,7 @@ service cloud.firestore {
     match /fantasy/{championshipDocId} {
       function validFantasyConfig(d) {
         return d.keys().hasOnly(['idCampeonato', 'temporada', 'titulo', 'urlImagem', 'fk_competicao', 'idRegiao',
-            'idsRegioes', 'ativo', 'minMinutos', 'minMinutosDefesa', 'capitao', 'atualizadoEm',
+            'idsRegioes', 'ativo', 'minMinutos', 'minMinutosDefesa', 'capitao', 'atualizadoEm', 'reapurarEm',
             'rodadaAtual', 'participantes', 'campeao', 'campeaoEm'])
           && d.ativo is bool
           && d.minMinutos is int && d.minMinutos >= 0 && d.minMinutos <= 120
@@ -1028,6 +1028,8 @@ service cloud.firestore {
           && d.get('idCampeonato', 0) is int
           && d.get('temporada', '') is string && d.get('titulo', '') is string && d.get('urlImagem', '') is string
           && d.get('idsRegioes', []) is list
+          // "Reapurar rodadas": hora do pedido (as functions apuram de novo).
+          && (!('reapurarEm' in d) || d.reapurarEm is timestamp)
           && d.atualizadoEm == request.time;
       }
 
