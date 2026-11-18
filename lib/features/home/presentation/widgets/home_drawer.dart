@@ -14,6 +14,8 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/components/arena_gold_avatar.dart';
+import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_badge_cubit.dart';
+import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 
 /// Fontes esportivas empacotadas (as mesmas dos cards do feed e das artes).
 const _display = 'Anton';
@@ -91,6 +93,13 @@ class HomeDrawer extends StatelessWidget {
     this.referralsEnabled,
   });
 
+  bool _fantasyActive(BuildContext context) {
+    final fantasy = _maybeOf<FantasyBadgeCubit>(context);
+    if (fantasy == null) return false;
+    final region = _maybeOf<RegionCubit>(context)?.state.selectedRegion ?? '';
+    return fantasy.state.forRegion(region).isNotEmpty;
+  }
+
   void _open(BuildContext context, String route) {
     Navigator.pop(context);
     Navigator.pushNamed(context, route);
@@ -119,6 +128,14 @@ class HomeDrawer extends StatelessWidget {
         color: AppColors.primaryStrong,
         onTap: () => _open(context, AppRoutes.predictionRankingPage),
       ),
+      // Arena Fantasy: só com Fantasy ativo na região.
+      if (_fantasyActive(context))
+        _Shortcut(
+          icon: Icons.stadium_rounded,
+          title: l10n.fantasyTitle,
+          color: AppColors.primaryDark,
+          onTap: () => _open(context, AppRoutes.fantasyHomePage),
+        ),
       if (loggedIn)
         _Shortcut(
           key: tourKeys?.achievements,

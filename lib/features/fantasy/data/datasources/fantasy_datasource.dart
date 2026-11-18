@@ -12,6 +12,7 @@ import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_ranking_dtos.dar
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_round_dtos.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
+import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_score_dto.dart';
 
 /// Arena Fantasy: a configuração por campeonato (`fantasy/{idDocCampeonato}`),
 /// as rodadas, o participante, a escalação e os atletas elegíveis.
@@ -249,6 +250,18 @@ class FantasyDataSource {
     } catch (e) {
       AppLogger.e('requestRescore $fantasyId', name: _logName, error: e);
       return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível pedir a reapuração.'));
+    }
+  }
+
+  /// Pontuação auditada do atleta na rodada (nula = ainda sem apuração).
+  Future<Either<Failure, FantasyAthleteScoreDTO?>> getAthleteScore(
+      String fantasyId, int round, String athleteId) async {
+    try {
+      final doc = await _round(fantasyId, round).collection('atletas').doc(athleteId).get();
+      return Right(doc.exists ? FantasyAthleteScoreDTO.fromMap(doc.id, doc.data() ?? const {}) : null);
+    } catch (e) {
+      AppLogger.e('getAthleteScore $fantasyId/$round/$athleteId', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível carregar a pontuação.'));
     }
   }
 }

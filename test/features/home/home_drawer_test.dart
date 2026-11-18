@@ -4,7 +4,12 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_config_dto.dart';
+import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_badge_cubit.dart';
+import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
+import 'package:arena_soccer/features/regions/presentation/bloc/region_state.dart';
 import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
 import 'package:arena_soccer/features/home/presentation/widgets/home_drawer.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
@@ -19,6 +24,20 @@ Future<void> _font(String family, List<String> paths) async {
     if (file.existsSync()) loader.addFont(Future.value(ByteData.sublistView(file.readAsBytesSync())));
   }
   await loader.load();
+}
+
+class _Badge extends Cubit<FantasyBadgeState> implements FantasyBadgeCubit {
+  _Badge(List<FantasyConfigDTO> active) : super(FantasyBadgeState(active: active));
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _Region extends Cubit<RegionState> implements RegionCubit {
+  _Region() : super(const RegionState(selectedRegion: 'Floresta'));
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 const _fan = UserDTO(id: 'u1', name: 'Kaio Lima', email: 'k@x.com', favoriteTeam: 'Lava Jato');
@@ -122,6 +141,33 @@ void main() {
     expect(find.text('Sou jogador'), findsNothing);
     expect(find.text('Sair'), findsNothing);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Arena Fantasy no menu só com Fantasy ativo na região', (tester) async {
+    tester.view.physicalSize = const Size(392, 1100);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    Future<void> show(List<FantasyConfigDTO> active) => tester.pumpWidget(MaterialApp(
+          key: UniqueKey(),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('pt'),
+          home: MultiBlocProvider(
+            providers: [
+              BlocProvider<FantasyBadgeCubit>.value(value: _Badge(active)),
+              BlocProvider<RegionCubit>.value(value: _Region()),
+            ],
+            child: Scaffold(body: _drawer(user: _fan)),
+          ),
+        ));
+    await show(const [
+      FantasyConfigDTO(championshipDocId: 'd1', title: 'Copa Verde', region: 'Floresta', active: true),
+    ]);
+    expect(find.text('ARENA FANTASY'), findsOneWidget);
+    await show(const [
+      FantasyConfigDTO(championshipDocId: 'd2', title: 'Copa Azul', region: 'Colônia', active: true),
+    ]);
+    expect(find.text('ARENA FANTASY'), findsNothing);
   });
 
   testWidgets('torcedor: nível, atalhos da conta e indicação pelo liga/desliga', (tester) async {

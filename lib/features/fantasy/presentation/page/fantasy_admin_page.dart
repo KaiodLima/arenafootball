@@ -13,6 +13,7 @@ import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_score_sheet.dart';
 
 /// "22/11 18:00" (hora do aparelho).
 String _when(DateTime date) {
@@ -76,7 +77,7 @@ class _FantasyAdminPageState extends State<FantasyAdminPage> {
           top: false,
           child: SizedBox(
             height: MediaQuery.of(context).size.height * 0.8,
-            child: _ParticipantSheet(participant: participant),
+            child: _ParticipantSheet(participant: participant, fantasyId: widget.championship.id),
           ),
         ),
       ),
@@ -317,8 +318,9 @@ class _ParticipantsTab extends StatelessWidget {
 /// Folha do participante: as escalações dele em cada rodada fechada.
 class _ParticipantSheet extends StatelessWidget {
   final FantasyParticipantDTO participant;
+  final String fantasyId;
 
-  const _ParticipantSheet({required this.participant});
+  const _ParticipantSheet({required this.participant, required this.fantasyId});
 
   @override
   Widget build(BuildContext context) {
@@ -352,7 +354,19 @@ class _ParticipantSheet extends StatelessWidget {
             else if (state.history.isEmpty)
               Text(l10n.fantasyAdminNoLineups, style: AppTypography.subtitle())
             else
-              for (final item in state.history) FantasyHistoryCard(item: item, athletes: state.athletes),
+              for (final item in state.history)
+                FantasyHistoryCard(
+                  item: item,
+                  athletes: state.athletes,
+                  onAthleteTap: (id, captain) => showFantasyAthleteScore(
+                    context,
+                    fantasyId: fantasyId,
+                    round: item.round.number,
+                    athleteId: id,
+                    captain: captain,
+                    athlete: state.athletes[id],
+                  ),
+                ),
           ],
         );
       },

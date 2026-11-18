@@ -3591,6 +3591,85 @@
   "fantasyRescoreRequested": "Reapuração pedida. Pode levar alguns segundos.",
   "fantasyRescoreError": "Não foi possível pedir a reapuração.",
   "fantasyCancel": "Cancelar",
+  "fantasyRuleBase": "Pontuação-base",
+  "fantasyRuleGoal": "Gols",
+  "fantasyRuleAssist": "Assistências",
+  "fantasyRuleWin": "Vitória",
+  "fantasyRuleLoss": "Derrota",
+  "fantasyRuleDraw": "Empate",
+  "fantasyRuleYellow": "Cartão amarelo",
+  "fantasyRuleRed": "Cartão vermelho",
+  "fantasyRuleConceded": "Gols sofridos",
+  "fantasyRuleTeamGoals": "Gols da equipe",
+  "fantasyRuleCleanSheet": "Sem sofrer gols",
+  "fantasyReasonShort": "Não atingiu o mínimo de {min} minutos (jogou {played}): só valem gols, assistências e cartões.",
+  "@fantasyReasonShort": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "played": {
+        "type": "int"
+      }
+    }
+  },
+  "fantasyReasonNoBonus": "Menos de {min} minutos em campo: sem o bônus de não sofrer gols.",
+  "@fantasyReasonNoBonus": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
+  "fantasyReasonNotOnField": "Não entrou em campo.",
+  "fantasyReasonNoLineup": "A súmula não tem a escalação do time.",
+  "fantasyReasonSubNoMinute": "Substituição sem o minuto na súmula.",
+  "fantasyReasonEstimated": "Minutos estimados pela súmula (jogo inteiro).",
+  "fantasyReasonNoPosition": "Atleta sem posição no cadastro.",
+  "fantasyReasonDidNotPlay": "Não jogou nesta rodada.",
+  "fantasyReasonNoMatches": "Nenhuma partida da rodada terminou ainda.",
+  "fantasyMinutesPlayed": "{minutes} min em campo",
+  "@fantasyMinutesPlayed": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "fantasyMinutesEstimated": "{minutes} min em campo (estimados)",
+  "@fantasyMinutesEstimated": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "fantasyScoreTotal": "Total individual",
+  "fantasyScoreCaptain": "Capitão ({mult})",
+  "@fantasyScoreCaptain": {
+    "placeholders": {
+      "mult": {
+        "type": "String"
+      }
+    }
+  },
+  "fantasyScoreNotes": "Observações",
+  "fantasyHomeEmpty": "Nenhum Arena Fantasy ativo na sua região.",
+  "fantasyHomeIntro": "Monte seu time com os atletas do campeonato e pontue pelo desempenho real nas partidas.",
+  "fantasyHomeJoin": "Entre e monte seu time",
+  "fantasyHomePickTeam": "Monte seu time desta rodada",
+  "fantasyHomeCopied": "Escalação copiada da rodada anterior",
+  "fantasyHomeConfirmed": "Escalação confirmada",
+  "fantasyHomePosition": "pts · {position}º",
+  "@fantasyHomePosition": {
+    "placeholders": {
+      "position": {
+        "type": "int"
+      }
+    }
+  },
+  "fantasyHomePlay": "Escalar",
+  "fantasyHomeEnter": "Entrar",
   "teamRequestMenu": "Sou dono de time",
   "teamRequestTitle": "Sou dono de time",
   "teamRequestIntro": "Cadastre o seu time: um administrador analisa o pedido e, aprovado, você gerencia o elenco.",

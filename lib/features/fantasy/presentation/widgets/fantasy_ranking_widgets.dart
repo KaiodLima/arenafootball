@@ -248,7 +248,10 @@ class FantasyHistoryCard extends StatelessWidget {
   final FantasyHistoryItem item;
   final Map<String, FantasyAthleteDTO> athletes;
 
-  const FantasyHistoryCard({super.key, required this.item, required this.athletes});
+  /// Toque no atleta (pontuação detalhada); nulo = só leitura.
+  final void Function(String athleteId, bool captain)? onAthleteTap;
+
+  const FantasyHistoryCard({super.key, required this.item, required this.athletes, this.onAthleteTap});
 
   @override
   Widget build(BuildContext context) {
@@ -305,42 +308,46 @@ class FantasyHistoryCard extends StatelessWidget {
                 final id = lineup.lineup.idAt(slot)!;
                 final captain = id == lineup.lineup.captainId;
                 final athletePoints = lineup.athletePoints[id];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: AppSizes.s2),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: AppSizes.s44,
-                        child: Text(
-                          fantasySlotLabel(l10n, slot),
-                          style: AppTypography.label(color: AppColors.textSecondary).copyWith(fontSize: AppSizes.s10),
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          athletes[id]?.name ?? l10n.fantasyUnknownAthlete,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s14),
-                        ),
-                      ),
-                      if (captain)
-                        Container(
-                          key: ValueKey('fantasy-history-captain-$id'),
-                          margin: const EdgeInsets.only(right: AppSizes.s8),
-                          padding: const EdgeInsets.symmetric(horizontal: AppSizes.s6),
-                          decoration:
-                              BoxDecoration(color: AppColors.gold, borderRadius: BorderRadius.circular(AppSizes.s6)),
+                return InkWell(
+                  key: ValueKey('fantasy-history-athlete-${item.round.number}-$id'),
+                  onTap: onAthleteTap == null ? null : () => onAthleteTap!(id, captain),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: AppSizes.s6),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: AppSizes.s44,
                           child: Text(
-                            l10n.fantasyCaptainShort,
-                            style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s12),
+                            fantasySlotLabel(l10n, slot),
+                            style: AppTypography.label(color: AppColors.textSecondary).copyWith(fontSize: AppSizes.s10),
                           ),
                         ),
-                      Text(
-                        athletePoints == null ? '–' : fantasyPointsLabel(athletePoints),
-                        style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s14),
-                      ),
-                    ],
+                        Expanded(
+                          child: Text(
+                            athletes[id]?.name ?? l10n.fantasyUnknownAthlete,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s14),
+                          ),
+                        ),
+                        if (captain)
+                          Container(
+                            key: ValueKey('fantasy-history-captain-$id'),
+                            margin: const EdgeInsets.only(right: AppSizes.s8),
+                            padding: const EdgeInsets.symmetric(horizontal: AppSizes.s6),
+                            decoration:
+                                BoxDecoration(color: AppColors.gold, borderRadius: BorderRadius.circular(AppSizes.s6)),
+                            child: Text(
+                              l10n.fantasyCaptainShort,
+                              style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s12),
+                            ),
+                          ),
+                        Text(
+                          athletePoints == null ? '–' : fantasyPointsLabel(athletePoints),
+                          style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s14),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }),

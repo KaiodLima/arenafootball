@@ -1,5 +1,6 @@
 import 'package:arena_soccer/features/fantasy/domain/fantasy_lineup.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_score_dto.dart';
 
 /// Sigla da vaga no campinho ("GOL", "ZAG", "MEI", "ATA", "LIVRE").
 String fantasySlotLabel(AppLocalizations l10n, FantasySlot slot) => switch (slot) {
@@ -9,6 +10,12 @@ String fantasySlotLabel(AppLocalizations l10n, FantasySlot slot) => switch (slot
       FantasySlot.forward => l10n.fantasySlotForward,
       FantasySlot.flex => l10n.fantasySlotFlex,
     };
+
+/// Sigla pela chave da posição gravada pelas functions (`gol`/`zag`/`mei`/`ata`).
+String fantasyPositionLabelOfKey(AppLocalizations l10n, String key) {
+  final slot = FantasySlot.fromKey(key);
+  return slot == null ? '' : fantasySlotLabel(l10n, slot);
+}
 
 /// Título da folha de atletas da vaga.
 String fantasyPickTitle(AppLocalizations l10n, FantasySlot slot) => switch (slot) {
@@ -39,3 +46,34 @@ String fantasyDeadlineLabel(AppLocalizations l10n, DateTime closesAt, DateTime n
           : '${left.inMinutes < 1 ? 1 : left.inMinutes}min';
   return l10n.fantasyClosesIn(text);
 }
+
+/// Nome da regra da pontuação (`regra` das functions).
+String fantasyRuleLabel(AppLocalizations l10n, String rule) => switch (rule) {
+      'base' => l10n.fantasyRuleBase,
+      'gol' => l10n.fantasyRuleGoal,
+      'assistencia' => l10n.fantasyRuleAssist,
+      'vitoria' => l10n.fantasyRuleWin,
+      'derrota' => l10n.fantasyRuleLoss,
+      'empate' => l10n.fantasyRuleDraw,
+      'amarelo' => l10n.fantasyRuleYellow,
+      'vermelho' => l10n.fantasyRuleRed,
+      'gols_sofridos' => l10n.fantasyRuleConceded,
+      'gols_equipe' => l10n.fantasyRuleTeamGoals,
+      'sem_sofrer_gols' => l10n.fantasyRuleCleanSheet,
+      _ => rule,
+    };
+
+/// Texto do motivo (por que não pontuou / observação) do [score].
+String fantasyReasonLabel(AppLocalizations l10n, FantasyScoreReason reason, FantasyAthleteScoreDTO score) =>
+    switch (reason.code) {
+      'minutos_insuficientes' => l10n.fantasyReasonShort(score.minMinutes, score.minutesIn(reason.matchId)),
+      'bonus_minutos_insuficientes' => l10n.fantasyReasonNoBonus(score.minDefenseMinutes),
+      'nao_entrou' => l10n.fantasyReasonNotOnField,
+      'sem_escalacao' => l10n.fantasyReasonNoLineup,
+      'substituicao_sem_minuto' => l10n.fantasyReasonSubNoMinute,
+      'minutos_estimados' => l10n.fantasyReasonEstimated,
+      'sem_posicao' => l10n.fantasyReasonNoPosition,
+      'nao_jogou' => l10n.fantasyReasonDidNotPlay,
+      'sem_partidas' => l10n.fantasyReasonNoMatches,
+      _ => reason.code,
+    };

@@ -11,6 +11,7 @@ import 'package:arena_soccer/utils/components/safe_bottom.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_score_sheet.dart';
 
 /// Rankings do Arena Fantasy do campeonato: Rodada · Geral · Histórico.
 class FantasyRankingPage extends StatefulWidget {
@@ -85,7 +86,7 @@ class _FantasyRankingPageState extends State<FantasyRankingPage> with SingleTick
           children: [
             _RoundTab(state: state),
             _OverallTab(state: state),
-            _HistoryTab(state: state),
+            _HistoryTab(state: state, fantasyId: widget.championship.id),
           ],
         ),
       ),
@@ -230,8 +231,9 @@ class _OverallTab extends StatelessWidget {
 
 class _HistoryTab extends StatelessWidget {
   final FantasyRankingState state;
+  final String fantasyId;
 
-  const _HistoryTab({required this.state});
+  const _HistoryTab({required this.state, required this.fantasyId});
 
   @override
   Widget build(BuildContext context) {
@@ -245,7 +247,19 @@ class _HistoryTab extends StatelessWidget {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s24)),
         children: [
-          for (final item in state.history) FantasyHistoryCard(item: item, athletes: state.athletes),
+          for (final item in state.history)
+            FantasyHistoryCard(
+              item: item,
+              athletes: state.athletes,
+              onAthleteTap: (id, captain) => showFantasyAthleteScore(
+                context,
+                fantasyId: fantasyId,
+                round: item.round.number,
+                athleteId: id,
+                captain: captain,
+                athlete: state.athletes[id],
+              ),
+            ),
         ],
       ),
     );

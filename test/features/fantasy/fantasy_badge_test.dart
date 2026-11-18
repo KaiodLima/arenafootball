@@ -77,6 +77,7 @@ void main() {
       locale: const Locale('pt'),
       onGenerateRoute: (settings) {
         if (settings.name == AppRoutes.fantasyLineupPage) pushed.add(settings.arguments);
+        if (settings.name == AppRoutes.fantasyHomePage) pushed.add(settings.name);
         return MaterialPageRoute(builder: (_) => const Scaffold(body: Text('escalação')));
       },
       home: MultiBlocProvider(
@@ -104,18 +105,14 @@ void main() {
     expect((pushed.single as ChampionshipDTO).id, 'd1');
   });
 
-  testWidgets('dois Fantasy: a folha para escolher; sem rodada aberta, "Fantasy"', (tester) async {
+  testWidgets('dois Fantasy: abre a home do Fantasy; sem rodada aberta, "Fantasy"', (tester) async {
     final (pushed, repo) = await pump(tester);
     repo.active.add(Right([_fantasy('d1', 'Copa Verde'), _fantasy('d3', 'Taça Floresta')]));
     await tester.pump();
     expect(find.text('Fantasy'), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('fantasy-badge')));
     await tester.pumpAndSettle();
-    expect(find.text('Copa Verde'), findsOneWidget);
-    expect(find.text('Taça Floresta'), findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('fantasy-pick-d3')));
-    await tester.pumpAndSettle();
-    expect((pushed.single as ChampionshipDTO).id, 'd3');
+    expect(pushed.single, AppRoutes.fantasyHomePage);
   });
 
   testWidgets('região de fora: sem selo', (tester) async {

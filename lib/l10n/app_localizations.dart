@@ -11654,6 +11654,210 @@ abstract class AppLocalizations {
   /// **'Cancelar'**
   String get fantasyCancel;
 
+  /// No description provided for @fantasyRuleBase.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pontuação-base'**
+  String get fantasyRuleBase;
+
+  /// No description provided for @fantasyRuleGoal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gols'**
+  String get fantasyRuleGoal;
+
+  /// No description provided for @fantasyRuleAssist.
+  ///
+  /// In pt, this message translates to:
+  /// **'Assistências'**
+  String get fantasyRuleAssist;
+
+  /// No description provided for @fantasyRuleWin.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vitória'**
+  String get fantasyRuleWin;
+
+  /// No description provided for @fantasyRuleLoss.
+  ///
+  /// In pt, this message translates to:
+  /// **'Derrota'**
+  String get fantasyRuleLoss;
+
+  /// No description provided for @fantasyRuleDraw.
+  ///
+  /// In pt, this message translates to:
+  /// **'Empate'**
+  String get fantasyRuleDraw;
+
+  /// No description provided for @fantasyRuleYellow.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cartão amarelo'**
+  String get fantasyRuleYellow;
+
+  /// No description provided for @fantasyRuleRed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cartão vermelho'**
+  String get fantasyRuleRed;
+
+  /// No description provided for @fantasyRuleConceded.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gols sofridos'**
+  String get fantasyRuleConceded;
+
+  /// No description provided for @fantasyRuleTeamGoals.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gols da equipe'**
+  String get fantasyRuleTeamGoals;
+
+  /// No description provided for @fantasyRuleCleanSheet.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem sofrer gols'**
+  String get fantasyRuleCleanSheet;
+
+  /// No description provided for @fantasyReasonShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não atingiu o mínimo de {min} minutos (jogou {played}): só valem gols, assistências e cartões.'**
+  String fantasyReasonShort(int min, int played);
+
+  /// No description provided for @fantasyReasonNoBonus.
+  ///
+  /// In pt, this message translates to:
+  /// **'Menos de {min} minutos em campo: sem o bônus de não sofrer gols.'**
+  String fantasyReasonNoBonus(int min);
+
+  /// No description provided for @fantasyReasonNotOnField.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não entrou em campo.'**
+  String get fantasyReasonNotOnField;
+
+  /// No description provided for @fantasyReasonNoLineup.
+  ///
+  /// In pt, this message translates to:
+  /// **'A súmula não tem a escalação do time.'**
+  String get fantasyReasonNoLineup;
+
+  /// No description provided for @fantasyReasonSubNoMinute.
+  ///
+  /// In pt, this message translates to:
+  /// **'Substituição sem o minuto na súmula.'**
+  String get fantasyReasonSubNoMinute;
+
+  /// No description provided for @fantasyReasonEstimated.
+  ///
+  /// In pt, this message translates to:
+  /// **'Minutos estimados pela súmula (jogo inteiro).'**
+  String get fantasyReasonEstimated;
+
+  /// No description provided for @fantasyReasonNoPosition.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atleta sem posição no cadastro.'**
+  String get fantasyReasonNoPosition;
+
+  /// No description provided for @fantasyReasonDidNotPlay.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não jogou nesta rodada.'**
+  String get fantasyReasonDidNotPlay;
+
+  /// No description provided for @fantasyReasonNoMatches.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma partida da rodada terminou ainda.'**
+  String get fantasyReasonNoMatches;
+
+  /// No description provided for @fantasyMinutesPlayed.
+  ///
+  /// In pt, this message translates to:
+  /// **'{minutes} min em campo'**
+  String fantasyMinutesPlayed(int minutes);
+
+  /// No description provided for @fantasyMinutesEstimated.
+  ///
+  /// In pt, this message translates to:
+  /// **'{minutes} min em campo (estimados)'**
+  String fantasyMinutesEstimated(int minutes);
+
+  /// No description provided for @fantasyScoreTotal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Total individual'**
+  String get fantasyScoreTotal;
+
+  /// No description provided for @fantasyScoreCaptain.
+  ///
+  /// In pt, this message translates to:
+  /// **'Capitão ({mult})'**
+  String fantasyScoreCaptain(String mult);
+
+  /// No description provided for @fantasyScoreNotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Observações'**
+  String get fantasyScoreNotes;
+
+  /// No description provided for @fantasyHomeEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum Arena Fantasy ativo na sua região.'**
+  String get fantasyHomeEmpty;
+
+  /// No description provided for @fantasyHomeIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Monte seu time com os atletas do campeonato e pontue pelo desempenho real nas partidas.'**
+  String get fantasyHomeIntro;
+
+  /// No description provided for @fantasyHomeJoin.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entre e monte seu time'**
+  String get fantasyHomeJoin;
+
+  /// No description provided for @fantasyHomePickTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Monte seu time desta rodada'**
+  String get fantasyHomePickTeam;
+
+  /// No description provided for @fantasyHomeCopied.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escalação copiada da rodada anterior'**
+  String get fantasyHomeCopied;
+
+  /// No description provided for @fantasyHomeConfirmed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escalação confirmada'**
+  String get fantasyHomeConfirmed;
+
+  /// No description provided for @fantasyHomePosition.
+  ///
+  /// In pt, this message translates to:
+  /// **'pts · {position}º'**
+  String fantasyHomePosition(int position);
+
+  /// No description provided for @fantasyHomePlay.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escalar'**
+  String get fantasyHomePlay;
+
+  /// No description provided for @fantasyHomeEnter.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entrar'**
+  String get fantasyHomeEnter;
+
   /// No description provided for @teamRequestMenu.
   ///
   /// In pt, this message translates to:

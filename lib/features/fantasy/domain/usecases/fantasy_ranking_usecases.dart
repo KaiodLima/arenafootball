@@ -5,6 +5,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_ranking_dtos.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_round_dtos.dart';
 import 'package:arena_soccer/features/fantasy/domain/repositories/fantasy_repository_interface.dart';
+import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_score_dto.dart';
 
 /// Ranking da rodada [round] (nula = geral) pelo fluxo [cacheFirst]
 /// (validade [CacheTtl.ranking]); [force] ignora a validade.
@@ -54,4 +55,14 @@ class GetFantasyLineupUseCase {
 
   Future<Either<Failure, FantasyLineupDTO?>> call(String fantasyId, int round, String uid) =>
       _repository.getLineup(fantasyId, round, uid);
+}
+
+/// Pontuação detalhada do atleta na rodada (uma leitura).
+class GetFantasyAthleteScoreUseCase {
+  final IFantasyRepository _repository;
+
+  GetFantasyAthleteScoreUseCase(this._repository);
+
+  Future<Either<Failure, FantasyAthleteScoreDTO?>> call(String fantasyId, int round, String athleteId) =>
+      _repository.getAthleteScore(fantasyId, round, athleteId);
 }

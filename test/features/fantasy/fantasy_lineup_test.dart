@@ -19,7 +19,10 @@ import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_config_use
 import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_lineup_usecases.dart';
 import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_lineup_cubit.dart';
 import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_lineup_page.dart';
+import 'package:arena_soccer/features/album/presentation/widgets/sticker_card.dart';
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_athlete_picker.dart';
+import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_pitch.dart';
+import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
@@ -252,7 +255,7 @@ void main() {
   });
 
   testWidgets('tela: campinho, folha da vaga e confirmar', (tester) async {
-    tester.view.physicalSize = const Size(420, 900);
+    tester.view.physicalSize = const Size(420, 1200);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     final repo = _Repo();
@@ -290,12 +293,47 @@ void main() {
     expect(find.byKey(const ValueKey('fantasy-athlete-lb')), findsNothing);
     await tester.tap(find.byKey(const ValueKey('fantasy-athlete-gk')));
     await tester.pumpAndSettle();
-    expect(find.text('Goleiro'), findsOneWidget);
+    expect(find.text('GOLEIRO'), findsOneWidget);
 
     await tester.tap(find.text('Confirmar escalação'));
     await tester.pump();
     expect(repo.saved.single.$2.lineup.idAt(FantasySlot.goalkeeper), 'gk');
     expect(repo.saved.single.$2.lineup.captainId, 'fw');
+  });
+
+  testWidgets('campinho: vagas em figurinha nas cores do time, vazia tracejada, braçadeira escolhe o capitão',
+      (tester) async {
+    tester.view.physicalSize = const Size(420, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    String? captain;
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('pt'),
+      home: Scaffold(
+        body: SingleChildScrollView(
+          child: FantasyPitch(
+            lineup: _full.remove(FantasySlot.goalkeeper),
+            athletes: {for (final a in _athletes) a.id: a},
+            teams: const {'t1': TeamDTO(id: 't1', name: 'Leões', region: '', primaryColor: '#C62828')},
+            editable: true,
+            onSlotTap: (_) {},
+            onCaptainTap: (id) => captain = id,
+          ),
+        ),
+      ),
+    ));
+    expect(find.byType(StickerCard), findsNWidgets(4));
+    expect(find.byType(EmptySlot), findsOneWidget);
+    expect(find.text('ZAG'), findsOneWidget);
+    expect(find.text('GOL'), findsOneWidget);
+    expect(find.text('LATERAL'), findsOneWidget);
+    final zag = tester.widget<StickerCard>(
+        find.descendant(of: find.byKey(const ValueKey('fantasy-slot-zag')), matching: find.byType(StickerCard)));
+    expect(zag.style.accent, const Color(0xFFC62828));
+    await tester.tap(find.byKey(const ValueKey('fantasy-captain-mei')));
+    expect(captain, 'mf');
   });
 }
 

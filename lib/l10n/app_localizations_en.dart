@@ -7002,6 +7002,124 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fantasyCancel => 'Cancel';
 
   @override
+  String get fantasyRuleBase => 'Base score';
+
+  @override
+  String get fantasyRuleGoal => 'Goals';
+
+  @override
+  String get fantasyRuleAssist => 'Assists';
+
+  @override
+  String get fantasyRuleWin => 'Win';
+
+  @override
+  String get fantasyRuleLoss => 'Loss';
+
+  @override
+  String get fantasyRuleDraw => 'Draw';
+
+  @override
+  String get fantasyRuleYellow => 'Yellow card';
+
+  @override
+  String get fantasyRuleRed => 'Red card';
+
+  @override
+  String get fantasyRuleConceded => 'Goals conceded';
+
+  @override
+  String get fantasyRuleTeamGoals => 'Team goals';
+
+  @override
+  String get fantasyRuleCleanSheet => 'Clean sheet';
+
+  @override
+  String fantasyReasonShort(int min, int played) {
+    return 'Below the $min-minute minimum (played $played): only goals, assists and cards count.';
+  }
+
+  @override
+  String fantasyReasonNoBonus(int min) {
+    return 'Under $min minutes on the pitch: no clean-sheet bonus.';
+  }
+
+  @override
+  String get fantasyReasonNotOnField => 'Did not play.';
+
+  @override
+  String get fantasyReasonNoLineup =>
+      'The match report has no lineup for the team.';
+
+  @override
+  String get fantasyReasonSubNoMinute =>
+      'Substitution without the minute in the report.';
+
+  @override
+  String get fantasyReasonEstimated =>
+      'Minutes estimated from the report (whole match).';
+
+  @override
+  String get fantasyReasonNoPosition => 'Player without a position.';
+
+  @override
+  String get fantasyReasonDidNotPlay => 'Did not play this matchday.';
+
+  @override
+  String get fantasyReasonNoMatches => 'No matchday game has finished yet.';
+
+  @override
+  String fantasyMinutesPlayed(int minutes) {
+    return '$minutes min on the pitch';
+  }
+
+  @override
+  String fantasyMinutesEstimated(int minutes) {
+    return '$minutes min on the pitch (estimated)';
+  }
+
+  @override
+  String get fantasyScoreTotal => 'Individual total';
+
+  @override
+  String fantasyScoreCaptain(String mult) {
+    return 'Captain ($mult)';
+  }
+
+  @override
+  String get fantasyScoreNotes => 'Notes';
+
+  @override
+  String get fantasyHomeEmpty => 'No active Arena Fantasy in your region.';
+
+  @override
+  String get fantasyHomeIntro =>
+      'Build your team with the championship players and score by their real performance.';
+
+  @override
+  String get fantasyHomeJoin => 'Join and build your team';
+
+  @override
+  String get fantasyHomePickTeam => 'Pick your team for this matchday';
+
+  @override
+  String get fantasyHomeCopied => 'Lineup copied from the previous matchday';
+
+  @override
+  String get fantasyHomeConfirmed => 'Lineup confirmed';
+
+  @override
+  String fantasyHomePosition(int position) {
+    return 'pts · #$position';
+  }
+
+  @override
+  String get fantasyHomePlay => 'Pick';
+
+  @override
+  String get fantasyHomeEnter => 'Join';
+
+  @override
   String get teamRequestMenu => 'I own a team';
 
   @override

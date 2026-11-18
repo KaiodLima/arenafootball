@@ -6,6 +6,7 @@ import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_athlete_dto.dart
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_config_dto.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_ranking_dtos.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_round_dtos.dart';
+import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_score_dto.dart';
 
 abstract class IFantasyRepository {
   Stream<Either<Failure, FantasyConfigDTO>> watchConfig(ChampionshipDTO championship);
@@ -55,4 +56,6 @@ abstract class IFantasyRepository {
   Future<Either<Failure, List<FantasyParticipantDTO>>> getParticipants(String fantasyId, {DateTime? before});
 
   Future<Either<Failure, void>> requestRescore(String fantasyId);
+
+  Future<Either<Failure, FantasyAthleteScoreDTO?>> getAthleteScore(String fantasyId, int round, String athleteId);
 }

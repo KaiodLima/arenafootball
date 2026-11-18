@@ -9,6 +9,8 @@ import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_round_dtos.dart'
 import 'package:arena_soccer/features/fantasy/domain/fantasy_lineup.dart';
 import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_config_usecases.dart';
 import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_lineup_usecases.dart';
+import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_by_ids_usecase.dart';
 
 /// Resultado da última ação (para o snackbar).
 enum FantasyLineupEvent { none, joined, saved, failed }
@@ -27,6 +29,9 @@ class FantasyLineupState extends Equatable {
   final FantasyLineup draft;
   final List<FantasyAthleteDTO> athletes;
   final bool athletesLoaded;
+
+  /// Times do campeonato por id (cores e escudo das figurinhas).
+  final Map<String, TeamDTO> teams;
   final bool busy;
   final FantasyLineupEvent event;
   final String? failure;
@@ -42,6 +47,7 @@ class FantasyLineupState extends Equatable {
     this.draft = const FantasyLineup(),
     this.athletes = const [],
     this.athletesLoaded = false,
+    this.teams = const {},
     this.busy = false,
     this.event = FantasyLineupEvent.none,
     this.failure,
@@ -77,6 +83,7 @@ class FantasyLineupState extends Equatable {
     FantasyLineup? draft,
     List<FantasyAthleteDTO>? athletes,
     bool? athletesLoaded,
+    Map<String, TeamDTO>? teams,
     bool? busy,
     FantasyLineupEvent? event,
     String? failure,
@@ -92,6 +99,7 @@ class FantasyLineupState extends Equatable {
         draft: draft ?? this.draft,
         athletes: athletes ?? this.athletes,
         athletesLoaded: athletesLoaded ?? this.athletesLoaded,
+        teams: teams ?? this.teams,
         busy: busy ?? this.busy,
         event: event ?? FantasyLineupEvent.none,
         failure: failure,
@@ -109,6 +117,7 @@ class FantasyLineupState extends Equatable {
         draft,
         athletes,
         athletesLoaded,
+        teams,
         busy,
         event,
         failure,
@@ -128,6 +137,9 @@ class FantasyLineupCubit extends Cubit<FantasyLineupState> {
   final GetFantasyAthletesCacheFirstUseCase _athletes;
   final DateTime Function() _clock;
 
+  /// Times do campeonato (cores das figurinhas); nulo = sem as cores (testes).
+  final GetTeamsByIdsUseCase? _teams;
+
   /// Intervalo do relógio da tela (o prazo passa com ela aberta); nulo = sem relógio (testes).
   final Duration? _tick;
 
@@ -141,8 +153,10 @@ class FantasyLineupCubit extends Cubit<FantasyLineupState> {
     this._athletes, {
     DateTime Function()? clock,
     Duration? tick = const Duration(seconds: 30),
+    GetTeamsByIdsUseCase? teams,
   })  : _clock = clock ?? DateTime.now,
         _tick = tick,
+        _teams = teams,
         super(FantasyLineupState(now: (clock ?? DateTime.now)()));
 
   StreamSubscription<Object?>? _configSub;
@@ -160,6 +174,7 @@ class FantasyLineupCubit extends Cubit<FantasyLineupState> {
     _name = name;
     _photoUrl = photoUrl;
     emit(state.copyWith(uid: uid, participantLoaded: uid.isEmpty));
+    _loadTeams(championship);
     _configSub?.cancel();
     _configSub = _watchConfig(championship).listen((response) {
       if (isClosed) return;
@@ -173,6 +188,16 @@ class FantasyLineupCubit extends Cubit<FantasyLineupState> {
         if (!isClosed) emit(state.copyWith(now: _clock()));
       });
     }
+  }
+
+  /// Uma leitura dos times inscritos (cache do Firestore); falha = sem cores.
+  Future<void> _loadTeams(ChampionshipDTO championship) async {
+    final ids = championship.teamIds.where((id) => id.isNotEmpty).toList();
+    final teams = _teams;
+    if (teams == null || ids.isEmpty) return;
+    final response = await teams(ids: ids, season: championship.season.isEmpty ? null : championship.season);
+    if (isClosed) return;
+    response.fold((_) {}, (list) => emit(state.copyWith(teams: {for (final t in list) t.id: t})));
   }
 
   void _onConfig(FantasyConfigDTO config) {

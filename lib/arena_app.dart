@@ -162,6 +162,8 @@ import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_ranking_
 import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_ranking_page.dart';
 import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_admin_cubit.dart';
 import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_admin_page.dart';
+import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_home_cubit.dart';
+import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_home_page.dart';
 
 class ArenaApp extends StatelessWidget {
   const ArenaApp({super.key});
@@ -552,7 +554,7 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.referralSettingsPage: (_) => const ReferralSettingsPage(),
         // Arena Fantasy do campeonato: entrar e montar a escalação da rodada.
         AppRoutes.fantasyLineupPage: (context) => BlocProvider<FantasyLineupCubit>(
-              create: (_) => FantasyLineupCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl()),
+              create: (_) => FantasyLineupCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), teams: sl()),
               child: FantasyLineupPage(
                 championship: ModalRoute.of(context)!.settings.arguments as ChampionshipDTO,
               ),
@@ -563,6 +565,11 @@ class ArenaApp extends StatelessWidget {
               child: FantasyRankingPage(
                 championship: ModalRoute.of(context)!.settings.arguments as ChampionshipDTO,
               ),
+            ),
+        // Arena Fantasy: home com os campeonatos ativos da região.
+        AppRoutes.fantasyHomePage: (_) => BlocProvider<FantasyHomeCubit>(
+              create: (_) => FantasyHomeCubit(sl(), sl(), sl(), sl(), sl()),
+              child: const FantasyHomePage(),
             ),
         // Arena Fantasy (admin): rodadas/apuração e participantes.
         AppRoutes.fantasyAdminPage: (context) {

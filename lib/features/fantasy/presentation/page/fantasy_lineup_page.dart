@@ -216,6 +216,7 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
           FantasyPitch(
             lineup: state.draft,
             athletes: state.athleteById,
+            teams: state.teams,
             editable: state.editable,
             onSlotTap: (slot) => _onSlotTap(state, slot),
             onCaptainTap: _cubit.setCaptain,

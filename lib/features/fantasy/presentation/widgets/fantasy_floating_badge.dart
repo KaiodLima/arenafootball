@@ -10,54 +10,18 @@ import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_config_dto.dart'
 import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_badge_cubit.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
-import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
-/// Abre o Fantasy: um só = direto na escalação; vários = a folha para escolher.
+/// Abre o Fantasy: um só = direto na escalação; vários = a home do Fantasy.
 Future<void> openFantasyFrom(BuildContext context, List<FantasyConfigDTO> fantasies) async {
   if (fantasies.isEmpty) return;
-  final picked = fantasies.length == 1 ? fantasies.single : await _pickFantasy(context, fantasies);
-  if (picked == null || !context.mounted) return;
-  await Navigator.pushNamed(context, AppRoutes.fantasyLineupPage, arguments: picked.toChampionship());
-}
-
-Future<FantasyConfigDTO?> _pickFantasy(BuildContext context, List<FantasyConfigDTO> fantasies) {
-  final l10n = AppLocalizations.of(context);
-  return showModalBottomSheet<FantasyConfigDTO>(
-    context: context,
-    showDragHandle: true,
-    isScrollControlled: true,
-    builder: (context) => SafeArea(
-      top: false,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.7),
-        child: ListView(
-          shrinkWrap: true,
-          padding: const EdgeInsets.only(bottom: AppSizes.s16),
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSizes.s20, 0, AppSizes.s20, AppSizes.s8),
-              child: Text(l10n.fantasyTitle, style: AppTypography.title().copyWith(fontSize: AppSizes.s20)),
-            ),
-            for (final f in fantasies)
-              ListTile(
-                key: ValueKey('fantasy-pick-${f.championshipDocId}'),
-                leading: TeamCrest(imageUrl: f.imageUrl, size: AppSizes.s40),
-                title: Text(f.title, maxLines: 1, overflow: TextOverflow.ellipsis),
-                subtitle: Text(
-                  f.currentRound > 0 ? l10n.fantasyBadgeRoundOpen(f.currentRound) : l10n.fantasyBadgeNoRound,
-                  style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
-                ),
-                trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: () => Navigator.pop(context, f),
-              ),
-          ],
-        ),
-      ),
-    ),
-  );
+  if (fantasies.length > 1) {
+    await Navigator.pushNamed(context, AppRoutes.fantasyHomePage);
+    return;
+  }
+  await Navigator.pushNamed(context, AppRoutes.fantasyLineupPage, arguments: fantasies.single.toChampionship());
 }
 
 /// Selo flutuante do Arena Fantasy na home (conta logada + Fantasy ativo na

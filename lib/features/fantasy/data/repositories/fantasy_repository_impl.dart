@@ -9,6 +9,7 @@ import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_config_dto.dart'
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_ranking_dtos.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_round_dtos.dart';
 import 'package:arena_soccer/features/fantasy/domain/repositories/fantasy_repository_interface.dart';
+import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_score_dto.dart';
 
 class FantasyRepositoryImpl implements IFantasyRepository {
   final FantasyDataSource _dataSource;
@@ -113,4 +114,8 @@ class FantasyRepositoryImpl implements IFantasyRepository {
 
   @override
   Future<Either<Failure, void>> requestRescore(String fantasyId) => _dataSource.requestRescore(fantasyId);
+
+  @override
+  Future<Either<Failure, FantasyAthleteScoreDTO?>> getAthleteScore(String fantasyId, int round, String athleteId) =>
+      _dataSource.getAthleteScore(fantasyId, round, athleteId);
 }

@@ -7044,6 +7044,123 @@ class AppLocalizationsPt extends AppLocalizations {
   String get fantasyCancel => 'Cancelar';
 
   @override
+  String get fantasyRuleBase => 'Pontuação-base';
+
+  @override
+  String get fantasyRuleGoal => 'Gols';
+
+  @override
+  String get fantasyRuleAssist => 'Assistências';
+
+  @override
+  String get fantasyRuleWin => 'Vitória';
+
+  @override
+  String get fantasyRuleLoss => 'Derrota';
+
+  @override
+  String get fantasyRuleDraw => 'Empate';
+
+  @override
+  String get fantasyRuleYellow => 'Cartão amarelo';
+
+  @override
+  String get fantasyRuleRed => 'Cartão vermelho';
+
+  @override
+  String get fantasyRuleConceded => 'Gols sofridos';
+
+  @override
+  String get fantasyRuleTeamGoals => 'Gols da equipe';
+
+  @override
+  String get fantasyRuleCleanSheet => 'Sem sofrer gols';
+
+  @override
+  String fantasyReasonShort(int min, int played) {
+    return 'Não atingiu o mínimo de $min minutos (jogou $played): só valem gols, assistências e cartões.';
+  }
+
+  @override
+  String fantasyReasonNoBonus(int min) {
+    return 'Menos de $min minutos em campo: sem o bônus de não sofrer gols.';
+  }
+
+  @override
+  String get fantasyReasonNotOnField => 'Não entrou em campo.';
+
+  @override
+  String get fantasyReasonNoLineup => 'A súmula não tem a escalação do time.';
+
+  @override
+  String get fantasyReasonSubNoMinute => 'Substituição sem o minuto na súmula.';
+
+  @override
+  String get fantasyReasonEstimated =>
+      'Minutos estimados pela súmula (jogo inteiro).';
+
+  @override
+  String get fantasyReasonNoPosition => 'Atleta sem posição no cadastro.';
+
+  @override
+  String get fantasyReasonDidNotPlay => 'Não jogou nesta rodada.';
+
+  @override
+  String get fantasyReasonNoMatches =>
+      'Nenhuma partida da rodada terminou ainda.';
+
+  @override
+  String fantasyMinutesPlayed(int minutes) {
+    return '$minutes min em campo';
+  }
+
+  @override
+  String fantasyMinutesEstimated(int minutes) {
+    return '$minutes min em campo (estimados)';
+  }
+
+  @override
+  String get fantasyScoreTotal => 'Total individual';
+
+  @override
+  String fantasyScoreCaptain(String mult) {
+    return 'Capitão ($mult)';
+  }
+
+  @override
+  String get fantasyScoreNotes => 'Observações';
+
+  @override
+  String get fantasyHomeEmpty => 'Nenhum Arena Fantasy ativo na sua região.';
+
+  @override
+  String get fantasyHomeIntro =>
+      'Monte seu time com os atletas do campeonato e pontue pelo desempenho real nas partidas.';
+
+  @override
+  String get fantasyHomeJoin => 'Entre e monte seu time';
+
+  @override
+  String get fantasyHomePickTeam => 'Monte seu time desta rodada';
+
+  @override
+  String get fantasyHomeCopied => 'Escalação copiada da rodada anterior';
+
+  @override
+  String get fantasyHomeConfirmed => 'Escalação confirmada';
+
+  @override
+  String fantasyHomePosition(int position) {
+    return 'pts · $positionº';
+  }
+
+  @override
+  String get fantasyHomePlay => 'Escalar';
+
+  @override
+  String get fantasyHomeEnter => 'Entrar';
+
+  @override
   String get teamRequestMenu => 'Sou dono de time';
 
   @override
