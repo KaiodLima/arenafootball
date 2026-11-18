@@ -157,6 +157,8 @@ class MatchesDataSource {
     required String venue,
     MatchRound? round,
     bool writeRound = false,
+    int? matchday,
+    bool writeMatchday = false,
     String? season,
   }) =>
       _update(
@@ -167,6 +169,7 @@ class MatchesDataSource {
           'duracao': durationMinutes,
           'local': venue,
           if (writeRound) ...roundFields(round),
+          if (writeMatchday) MatchDTO.matchdayField: matchday ?? FieldValue.delete(),
         },
         season: season,
       );

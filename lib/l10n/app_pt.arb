@@ -3337,6 +3337,27 @@
   "matchStageBadgeThirdPlace": "3º LUGAR",
   "matchStageBadgeFinal": "FINAL",
   "matchStageBadgeOther": "MATA-MATA",
+  "matchdayTitle": "Rodada",
+  "matchdayNone": "Sem rodada",
+  "matchdayValue": "{number}ª rodada",
+  "@matchdayValue": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "matchdayBadge": "RODADA {number}",
+  "@matchdayBadge": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "matchdaySuggested": "Rodada sugerida pelos jogos da competição perto dessa data.",
+  "matchdayLess": "Rodada anterior",
+  "matchdayMore": "Próxima rodada",
   "teamRequestMenu": "Sou dono de time",
   "teamRequestTitle": "Sou dono de time",
   "teamRequestIntro": "Cadastre o seu time: um administrador analisa o pedido e, aprovado, você gerencia o elenco.",

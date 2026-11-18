@@ -97,6 +97,8 @@ class MatchesRepositoryImpl implements IMatchesRepository {
     required String venue,
     MatchRound? round,
     bool writeRound = false,
+    int? matchday,
+    bool writeMatchday = false,
     String? season,
   }) =>
       _dataSource.updateMatchInfo(
@@ -107,6 +109,8 @@ class MatchesRepositoryImpl implements IMatchesRepository {
         venue: venue,
         round: round,
         writeRound: writeRound,
+        matchday: matchday,
+        writeMatchday: writeMatchday,
         season: season,
       );
 

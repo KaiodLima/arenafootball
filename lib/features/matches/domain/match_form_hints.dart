@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/match_time.dart';
@@ -102,5 +104,41 @@ class MatchFormHints {
       if (!dates.contains(day)) dates.add(day);
     }
     return dates..sort();
+  }
+
+  /// Dia "dd/MM/aaaa" (ou "dd/MM") sem hora; nulo se não der para ler.
+  static DateTime? _dayOf(String date) {
+    final parts = date.trim().split('/');
+    if (parts.length < 2) return null;
+    final day = int.tryParse(parts[0]);
+    final month = int.tryParse(parts[1]);
+    final year = parts.length > 2 ? int.tryParse(parts[2]) : 0;
+    if (day == null || month == null || year == null) return null;
+    return DateTime.utc(year, month, day);
+  }
+
+  /// Rodada sugerida para uma partida do campeonato [championshipId] no dia
+  /// [date], pelas partidas já cadastradas: a das partidas até 3 dias antes ou
+  /// depois (a mesma rodada no fim de semana); senão, a maior rodada antes
+  /// dessa data + 1. Nula = nenhuma partida do campeonato tem rodada.
+  static int? suggestedMatchday(List<MatchDTO> matches, {required int? championshipId, required String date}) {
+    if (championshipId == null || championshipId <= 0) return null;
+    final day = _dayOf(date);
+    final numbered = [
+      for (final m in matches)
+        if (m.championshipId == championshipId && m.matchday != null) m
+    ];
+    if (numbered.isEmpty || day == null) return null;
+    int? near;
+    int? before;
+    for (final m in numbered) {
+      final other = _dayOf(m.date);
+      if (other == null) continue;
+      final gap = other.difference(day).inDays;
+      if (gap.abs() <= 3) near = max(near ?? 0, m.matchday!);
+      if (gap < -3) before = max(before ?? 0, m.matchday!);
+    }
+    if (near != null) return near;
+    return before == null ? null : before + 1;
   }
 }

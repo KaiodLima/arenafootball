@@ -66,6 +66,12 @@ class MatchDTO extends Equatable {
   /// Fase: grupo do campeonato (`idGrupo`/`grupo`) ou mata-mata
   /// (`foraDosGrupos`/`fase`); nula = sem fase (partida antiga).
   final MatchRound? round;
+
+  /// `rodada`: número da rodada da competição (1 em diante); nulo = sem
+  /// rodada (amistoso ou partida antiga). Base das rodadas do Arena Fantasy.
+  final int? matchday;
+
+  static const matchdayField = 'rodada';
   final String region;
   final int homeGoals;
   final int awayGoals;
@@ -130,6 +136,7 @@ class MatchDTO extends Equatable {
     this.venue = '',
     this.championshipId = 0,
     this.round,
+    this.matchday,
     this.region = '',
     this.homeGoals = 0,
     this.awayGoals = 0,
@@ -161,6 +168,12 @@ class MatchDTO extends Equatable {
 
   static DateTime? _time(Object? value) => value is Timestamp ? value.toDate() : null;
 
+  /// Rodada gravada: inteiro positivo; o resto vira nulo.
+  static int? matchdayOf(Object? value) {
+    final number = value is num ? value.toInt() : int.tryParse(value?.toString() ?? '');
+    return number != null && number > 0 ? number : null;
+  }
+
   static int _int(Object? value) => value is num ? value.toInt() : int.tryParse(value?.toString() ?? '') ?? 0;
 
   factory MatchDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -179,6 +192,7 @@ class MatchDTO extends Equatable {
       venue: data['local']?.toString() ?? '',
       championshipId: _int(data['id_campeonato']),
       round: MatchRound.fromMap(data),
+      matchday: matchdayOf(data[matchdayField]),
       region: RegionRegistry.nameFromDoc(data),
       homeGoals: _int(data['golTimeCasa']),
       awayGoals: _int(data['golTimeFora']),
@@ -219,6 +233,7 @@ class MatchDTO extends Equatable {
         'local': venue,
         'id_campeonato': championshipId,
         ...?round?.toMap(),
+        if (matchday != null) matchdayField: matchday!,
         ...RegionRegistry.fieldsFor(region),
         'golTimeCasa': homeGoals,
         'golTimeFora': awayGoals,
@@ -250,6 +265,7 @@ class MatchDTO extends Equatable {
     String? venue,
     int? championshipId,
     MatchRound? Function()? round,
+    int? Function()? matchday,
     String? region,
     int? homeGoals,
     int? awayGoals,
@@ -284,6 +300,7 @@ class MatchDTO extends Equatable {
       venue: venue ?? this.venue,
       championshipId: championshipId ?? this.championshipId,
       round: round != null ? round() : this.round,
+      matchday: matchday != null ? matchday() : this.matchday,
       region: region ?? this.region,
       homeGoals: homeGoals ?? this.homeGoals,
       awayGoals: awayGoals ?? this.awayGoals,
@@ -324,6 +341,7 @@ class MatchDTO extends Equatable {
         venue: venue,
         championshipId: championshipId,
         round: round,
+        matchday: matchday,
         region: region,
         homeGoals: homeGoals,
         awayGoals: awayGoals,
@@ -361,6 +379,7 @@ class MatchDTO extends Equatable {
         venue: venue,
         championshipId: championshipId,
         round: round,
+        matchday: matchday,
         region: region,
         homeGoals: homeGoals,
         awayGoals: awayGoals,
@@ -402,6 +421,7 @@ class MatchDTO extends Equatable {
         venue,
         championshipId,
         round,
+        matchday,
         region,
         homeGoals,
         awayGoals,

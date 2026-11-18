@@ -10916,6 +10916,48 @@ abstract class AppLocalizations {
   /// **'MATA-MATA'**
   String get matchStageBadgeOther;
 
+  /// No description provided for @matchdayTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rodada'**
+  String get matchdayTitle;
+
+  /// No description provided for @matchdayNone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem rodada'**
+  String get matchdayNone;
+
+  /// No description provided for @matchdayValue.
+  ///
+  /// In pt, this message translates to:
+  /// **'{number}ª rodada'**
+  String matchdayValue(int number);
+
+  /// No description provided for @matchdayBadge.
+  ///
+  /// In pt, this message translates to:
+  /// **'RODADA {number}'**
+  String matchdayBadge(int number);
+
+  /// No description provided for @matchdaySuggested.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rodada sugerida pelos jogos da competição perto dessa data.'**
+  String get matchdaySuggested;
+
+  /// No description provided for @matchdayLess.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rodada anterior'**
+  String get matchdayLess;
+
+  /// No description provided for @matchdayMore.
+  ///
+  /// In pt, this message translates to:
+  /// **'Próxima rodada'**
+  String get matchdayMore;
+
   /// No description provided for @teamRequestMenu.
   ///
   /// In pt, this message translates to:

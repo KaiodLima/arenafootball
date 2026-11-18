@@ -66,6 +66,11 @@ class MatchFormData extends Equatable {
   /// O usuário escolheu a fase (a sugestão pelos times não muda mais).
   final bool roundManual;
 
+  /// Rodada da competição (nula = sem rodada) e se o usuário escolheu na mão
+  /// (senão, acompanha a sugestão pela data).
+  final int? matchday;
+  final bool matchdayManual;
+
   const MatchFormData({
     this.regions = const [],
     this.selectedRegion,
@@ -85,6 +90,8 @@ class MatchFormData extends Equatable {
     this.groups = const [],
     this.round,
     this.roundManual = false,
+    this.matchday,
+    this.matchdayManual = false,
   });
 
   /// O grupo [group] tem o time de nome [teamName]? Pelo id, com o nome de reserva.
@@ -116,6 +123,9 @@ class MatchFormData extends Equatable {
 
   /// O campo "Fase" aparece (há competição escolhida; amistoso não tem).
   bool get showsRound => championshipId != null && championshipId! > 0;
+
+  /// Rodada sugerida pelas partidas do campeonato já cadastradas.
+  int? get suggestedMatchday => MatchFormHints.suggestedMatchday(existing, championshipId: championshipId, date: date);
 
   bool get sameTeam => homeTeam != null && homeTeam == awayTeam;
 
@@ -234,6 +244,7 @@ class MatchFormData extends Equatable {
         championshipId: championshipId ?? 0,
         regionIds: regionIdsOfTeams,
         round: showsRound ? round : null,
+        matchday: showsRound ? matchday : null,
       );
 
   MatchFormData copyWith({
@@ -255,6 +266,8 @@ class MatchFormData extends Equatable {
     List<GroupDTO>? groups,
     MatchRound? Function()? round,
     bool? roundManual,
+    int? Function()? matchday,
+    bool? matchdayManual,
     bool clearTeams = false,
   }) {
     return MatchFormData(
@@ -276,6 +289,8 @@ class MatchFormData extends Equatable {
       groups: groups ?? this.groups,
       round: round != null ? round() : this.round,
       roundManual: roundManual ?? this.roundManual,
+      matchday: matchday != null ? matchday() : this.matchday,
+      matchdayManual: matchdayManual ?? this.matchdayManual,
     );
   }
 
@@ -299,6 +314,8 @@ class MatchFormData extends Equatable {
         groups,
         round,
         roundManual,
+        matchday,
+        matchdayManual,
       ];
 }
 

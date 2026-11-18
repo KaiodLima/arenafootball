@@ -6607,6 +6607,32 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchStageBadgeOther => 'MATA-MATA';
 
   @override
+  String get matchdayTitle => 'Rodada';
+
+  @override
+  String get matchdayNone => 'Sem rodada';
+
+  @override
+  String matchdayValue(int number) {
+    return '$numberª rodada';
+  }
+
+  @override
+  String matchdayBadge(int number) {
+    return 'RODADA $number';
+  }
+
+  @override
+  String get matchdaySuggested =>
+      'Rodada sugerida pelos jogos da competição perto dessa data.';
+
+  @override
+  String get matchdayLess => 'Rodada anterior';
+
+  @override
+  String get matchdayMore => 'Próxima rodada';
+
+  @override
   String get teamRequestMenu => 'Sou dono de time';
 
   @override

@@ -55,6 +55,7 @@ class CreateMatchUseCase {
         durationMinutes: match.durationMinutes,
         // Amistoso não tem fase.
         round: friendly ? null : match.round,
+        matchday: friendly ? null : match.matchday,
         // Escolhido no formulário; amistoso, nenhum; sem escolha, o da região.
         championshipId: friendly
             ? 0

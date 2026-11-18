@@ -6570,6 +6570,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchStageBadgeOther => 'KNOCKOUT';
 
   @override
+  String get matchdayTitle => 'Matchday';
+
+  @override
+  String get matchdayNone => 'No matchday';
+
+  @override
+  String matchdayValue(int number) {
+    return 'Matchday $number';
+  }
+
+  @override
+  String matchdayBadge(int number) {
+    return 'MATCHDAY $number';
+  }
+
+  @override
+  String get matchdaySuggested =>
+      'Matchday suggested by the competition games near this date.';
+
+  @override
+  String get matchdayLess => 'Previous matchday';
+
+  @override
+  String get matchdayMore => 'Next matchday';
+
+  @override
   String get teamRequestMenu => 'I own a team';
 
   @override

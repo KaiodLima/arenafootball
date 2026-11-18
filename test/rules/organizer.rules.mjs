@@ -278,4 +278,8 @@ export default async function run(env, check) {
     match('m32', { foraDosGrupos: true, fase: 'copa' }))));
   await check('organizador troca a fase da partida', assertSucceeds(updateDoc(doc(org, 'partidas2026/m30'),
     { idGrupo: deleteField(), grupo: deleteField(), foraDosGrupos: true, fase: 'semifinal' })));
+  await check('organizador cadastra partida com rodada', assertSucceeds(setDoc(doc(org, 'partidas2026/m33'),
+    match('m33', { rodada: 3 }))));
+  await check('rodada 0 recusada', assertFails(setDoc(doc(org, 'partidas2026/m34'), match('m34', { rodada: 0 }))));
+  await check('organizador muda a rodada', assertSucceeds(updateDoc(doc(org, 'partidas2026/m33'), { rodada: 4 })));
 }

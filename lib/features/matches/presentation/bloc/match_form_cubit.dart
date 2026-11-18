@@ -44,7 +44,7 @@ class MatchFormCubit extends Cubit<MatchFormState> {
   String? _season;
 
   void _edit(MatchFormData form) {
-    if (!isClosed) emit(EditingMatchFormState(form: _suggestRound(form)));
+    if (!isClosed) emit(EditingMatchFormState(form: _suggestMatchday(_suggestRound(form))));
   }
 
   /// Sem escolha do usuário, a fase acompanha os times: o grupo que tem os
@@ -54,6 +54,14 @@ class MatchFormCubit extends Cubit<MatchFormState> {
     final group = form.groupOfTeams;
     final round = group == null ? null : MatchRound.group(groupId: group.id, groupName: group.description);
     return round == form.round ? form : form.copyWith(round: () => round);
+  }
+
+  /// Sem escolha do usuário, a rodada acompanha a data (partidas do
+  /// campeonato já cadastradas, sem leitura nova).
+  MatchFormData _suggestMatchday(MatchFormData form) {
+    if (form.matchdayManual || !form.showsRound) return form;
+    final matchday = form.suggestedMatchday;
+    return matchday == form.matchday ? form : form.copyWith(matchday: () => matchday);
   }
 
   /// Grupos do campeonato [championshipId] (uma leitura por troca).
@@ -69,6 +77,9 @@ class MatchFormCubit extends Cubit<MatchFormState> {
 
   /// "Fase" escolhida pelo usuário (nula = sem fase).
   void selectRound(MatchRound? round) => _edit(state.form.copyWith(round: () => round, roundManual: true));
+
+  /// "Rodada" escolhida pelo usuário (nula = sem rodada).
+  void selectMatchday(int? matchday) => _edit(state.form.copyWith(matchday: () => matchday, matchdayManual: true));
 
   /// [now] só para teste.
   Future<void> load({required String initialRegion, DateTime? now}) async {
@@ -118,6 +129,8 @@ class MatchFormCubit extends Cubit<MatchFormState> {
       groups: const [],
       round: () => null,
       roundManual: false,
+      matchday: () => null,
+      matchdayManual: false,
       clearTeams: true,
     ));
     await _loadRegionData(region);
@@ -176,6 +189,8 @@ class MatchFormCubit extends Cubit<MatchFormState> {
       groups: const [],
       round: () => null,
       roundManual: false,
+      matchday: () => null,
+      matchdayManual: false,
     );
     final teams = form.teamsFor(championshipId);
     bool offered(String? name) => name != null && teams.any((t) => t.name == name);

@@ -25,6 +25,7 @@ import 'package:arena_soccer/utils/constants/team_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_round_picker.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/matchday_widgets.dart';
 
 /// Cadastro de partida (admin): região, confronto com escudos (⇄ inverte o
 /// mando), data e hora por atalhos ou seletores nativos, local sugerido pelos
@@ -280,6 +281,13 @@ class _MatchFormPageState extends State<MatchFormPage> {
                 ] else if (!form.roundManual && form.round != null) ...[
                   const SizedBox(height: AppSizes.s6),
                   Text(l10n.matchRoundSuggested, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+                ],
+                // Rodada da competição (base das rodadas do Arena Fantasy).
+                const SizedBox(height: AppSizes.s12),
+                MatchdayStepper(value: form.matchday, onChanged: _cubit.selectMatchday),
+                if (!form.matchdayManual && form.matchday != null) ...[
+                  const SizedBox(height: AppSizes.s6),
+                  Text(l10n.matchdaySuggested, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
                 ],
               ],
               const SizedBox(height: AppSizes.s20),
