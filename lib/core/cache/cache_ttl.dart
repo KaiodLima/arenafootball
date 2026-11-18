@@ -15,6 +15,9 @@ abstract final class CacheTtl {
 
   /// Ranking de torcidas (o servidor recalcula de hora em hora).
   static const Duration fanRanking = Duration(minutes: 30);
+
+  /// Atletas elegíveis no Arena Fantasy (inscrições mudam pouco).
+  static const Duration fantasyAthletes = Duration(minutes: 30);
   static const Duration globalResults = Duration(minutes: 5);
 
   /// Apuração de votação encerrada (lida só depois de fechar).

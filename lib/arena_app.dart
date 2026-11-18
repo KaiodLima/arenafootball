@@ -155,6 +155,9 @@ import 'package:arena_soccer/features/qr_codes/presentation/page/now_page.dart';
 import 'package:arena_soccer/features/player_requests/domain/player_claim_args.dart';
 import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_settings_cubit.dart';
 import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_settings_page.dart';
+import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_lineup_cubit.dart';
+import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_lineup_page.dart';
+import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_badge_cubit.dart';
 
 class ArenaApp extends StatelessWidget {
   const ArenaApp({super.key});
@@ -239,6 +242,8 @@ class ArenaApp extends StatelessWidget {
                 BlocProvider<ChampionshipsCubit>(create: (_) => ChampionshipsCubit(sl())),
                 BlocProvider<MatchesCubit>(create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl())),
                 BlocProvider<NewsFeedCubit>(create: (_) => NewsFeedCubit(sl(), sl(), sl(), sl())),
+                // Selo do Arena Fantasy (Fantasy ativos da temporada).
+                BlocProvider<FantasyBadgeCubit>(create: (_) => FantasyBadgeCubit(sl())),
               ],
               child: const HomePage(),
             ),
@@ -541,6 +546,13 @@ class ArenaApp extends StatelessWidget {
               child: const ReferralPage(),
             ),
         AppRoutes.referralSettingsPage: (_) => const ReferralSettingsPage(),
+        // Arena Fantasy do campeonato: entrar e montar a escalação da rodada.
+        AppRoutes.fantasyLineupPage: (context) => BlocProvider<FantasyLineupCubit>(
+              create: (_) => FantasyLineupCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl()),
+              child: FantasyLineupPage(
+                championship: ModalRoute.of(context)!.settings.arguments as ChampionshipDTO,
+              ),
+            ),
         // Arena Fantasy do campeonato (admin): liga/desliga e os parâmetros.
         AppRoutes.fantasySettingsPage: (context) => BlocProvider<FantasySettingsCubit>(
               create: (_) => FantasySettingsCubit(sl(), sl()),

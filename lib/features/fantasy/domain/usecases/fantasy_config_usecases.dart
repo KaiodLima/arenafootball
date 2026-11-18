@@ -31,3 +31,12 @@ class SaveFantasyConfigUseCase {
         .saveConfig(config.copyWith(captainMultiplier: FantasySettings.roundCaptain(config.captainMultiplier)));
   }
 }
+
+/// Fantasy ativos da temporada (selo da home).
+class WatchActiveFantasiesUseCase {
+  final IFantasyRepository _repository;
+
+  WatchActiveFantasiesUseCase(this._repository);
+
+  Stream<Either<Failure, List<FantasyConfigDTO>>> call(String season) => _repository.watchActive(season);
+}

@@ -1036,6 +1036,89 @@ service cloud.firestore {
       allow update: if isAdmin() && validFantasyConfig(request.resource.data)
         && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['rodadaAtual', 'participantes', 'campeao']);
       allow delete: if false;
+
+      function fantasyConfig() {
+        return get(/databases/$(database)/documents/fantasy/$(championshipDocId)).data;
+      }
+
+      // Participante: o próprio uid entra uma vez, com o Fantasy ativo; a 1ª
+      // rodada dele é a atual (sem pontos retroativos: só pontua quem tem
+      // escalação na rodada). Depois só troca nome/foto; não sai.
+      match /participantes/{uid} {
+        allow read: if true;
+        allow create: if signedIn() && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['uid', 'nome', 'urlImagem', 'entrouEm', 'rodadaInicial'])
+          && request.resource.data.uid == uid
+          && request.resource.data.nome is string && request.resource.data.nome.size() <= 60
+          && request.resource.data.get('urlImagem', '') is string
+          && request.resource.data.get('urlImagem', '').size() <= 1000
+          && request.resource.data.entrouEm == request.time
+          && fantasyConfig().ativo == true
+          && request.resource.data.rodadaInicial == fantasyConfig().get('rodadaAtual', 0);
+        allow update: if signedIn() && request.auth.uid == uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nome', 'urlImagem'])
+          && request.resource.data.nome is string && request.resource.data.nome.size() <= 60;
+        allow delete: if false;
+      }
+
+      // Rodadas: só as functions gravam (pelas partidas com `rodada`).
+      match /rodadas/{round} {
+        allow read: if true;
+        allow write: if false;
+
+        // Escalação do dono na rodada aberta, até o prazo (`fechaEm`): as 5
+        // vagas com atletas inscritos na competição na posição da vaga
+        // (gol: goleiro; zag: zagueiro/lateral; mei: volante/meia; ata:
+        // atacante; livre: qualquer) e o capitão entre eles. Pontos são das
+        // functions.
+        match /escalacoes/{uid} {
+          allow read: if true;
+          allow create: if validFantasyLineup(uid, round)
+            && !request.resource.data.keys().hasAny(['pontos', 'pontosAtletas', 'aplicado', 'processadoEm']);
+          allow update: if validFantasyLineup(uid, round)
+            && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['nome', 'urlImagem', 'atletas', 'idsAtletas', 'capitao', 'atualizadoEm', 'copiada']);
+          allow delete: if false;
+        }
+      }
+
+      // Atleta [id] de `jogadores{temporada}` inscrito na competição ([key] =
+      // `c<id_campeonato>`, com time) numa das [positions].
+      function eligibleAthlete(col, key, id, positions) {
+        let p = get(/databases/$(database)/documents/$(col)/$(id)).data;
+        return p.get('inscricoes', {}).get(key, {}).get('idTime', '') != ''
+          && p.get('posicao', '') in positions;
+      }
+
+      function validFantasyLineup(uid, round) {
+        let d = request.resource.data;
+        let f = fantasyConfig();
+        let r = get(/databases/$(database)/documents/fantasy/$(championshipDocId)/rodadas/$(round)).data;
+        let a = d.atletas;
+        let col = f.temporada == '2023' ? 'jogadores' : 'jogadores' + f.temporada;
+        let key = 'c' + string(f.idCampeonato);
+        return signedIn() && request.auth.uid == uid
+          && f.ativo == true
+          && r.status == 'aberta' && request.time < r.fechaEm
+          && exists(/databases/$(database)/documents/fantasy/$(championshipDocId)/participantes/$(uid))
+          && d.keys().hasOnly(['uid', 'nome', 'urlImagem', 'atletas', 'idsAtletas', 'capitao', 'atualizadoEm', 'copiada',
+            'pontos', 'pontosAtletas', 'aplicado', 'processadoEm'])
+          && d.uid == uid
+          && d.nome is string && d.nome.size() <= 60
+          && d.get('urlImagem', '') is string && d.get('urlImagem', '').size() <= 1000
+          && d.atualizadoEm == request.time
+          && d.get('copiada', false) == false
+          && a is map && a.keys().hasOnly(['gol', 'zag', 'mei', 'ata', 'livre'])
+          && a.keys().hasAll(['gol', 'zag', 'mei', 'ata', 'livre'])
+          && d.idsAtletas == [a.gol, a.zag, a.mei, a.ata, a.livre]
+          && d.idsAtletas.toSet().size() == 5
+          && d.capitao in d.idsAtletas
+          && eligibleAthlete(col, key, a.gol, ['goleiro'])
+          && eligibleAthlete(col, key, a.zag, ['zagueiro', 'lateral'])
+          && eligibleAthlete(col, key, a.mei, ['volante', 'meia'])
+          && eligibleAthlete(col, key, a.ata, ['atacante'])
+          && eligibleAthlete(col, key, a.livre, ['goleiro', 'zagueiro', 'lateral', 'volante', 'meia', 'atacante']);
+      }
     }
 
     match /config/temporadas {

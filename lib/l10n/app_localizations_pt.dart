@@ -6713,6 +6713,177 @@ class AppLocalizationsPt extends AppLocalizations {
   String get fantasyErrorCaptain => 'O capitão vai de 1× a 3×.';
 
   @override
+  String get fantasySlotGoalkeeper => 'GOL';
+
+  @override
+  String get fantasySlotDefender => 'ZAG';
+
+  @override
+  String get fantasySlotMidfielder => 'MEI';
+
+  @override
+  String get fantasySlotForward => 'ATA';
+
+  @override
+  String get fantasySlotFlex => 'LIVRE';
+
+  @override
+  String get fantasyPickGoalkeeper => 'Escolha o goleiro';
+
+  @override
+  String get fantasyPickDefender => 'Escolha o zagueiro';
+
+  @override
+  String get fantasyPickMidfielder => 'Escolha o meio-campista';
+
+  @override
+  String get fantasyPickForward => 'Escolha o atacante';
+
+  @override
+  String get fantasyPickFlex => 'Escolha o atleta da vaga livre';
+
+  @override
+  String get fantasyRoundLocked => 'Travada';
+
+  @override
+  String fantasyClosesIn(String time) {
+    return 'Fecha em $time';
+  }
+
+  @override
+  String get fantasyCaptainShort => 'C';
+
+  @override
+  String get fantasyFilterTeam => 'Filtrar por time';
+
+  @override
+  String get fantasySearchAthlete => 'Buscar atleta';
+
+  @override
+  String get fantasyFilterAll => 'Todos';
+
+  @override
+  String get fantasyFilterAllTeams => 'Todos os times';
+
+  @override
+  String get fantasyNoAthletes => 'Nenhum atleta inscrito nessa posição.';
+
+  @override
+  String get fantasyInLineup => 'na escalação';
+
+  @override
+  String fantasyAthleteStats(int goals, int assists) {
+    return '$goals G · $assists A';
+  }
+
+  @override
+  String get fantasySwapAthlete => 'Trocar atleta';
+
+  @override
+  String get fantasyMakeCaptain => 'Tornar capitão';
+
+  @override
+  String get fantasyRemoveAthlete => 'Tirar da escalação';
+
+  @override
+  String get fantasyErrorIncomplete => 'Preencha as 5 vagas.';
+
+  @override
+  String get fantasyErrorCaptainMissing =>
+      'Escolha o capitão: toque no \"C\" de um atleta.';
+
+  @override
+  String get fantasyErrorDuplicate =>
+      'O mesmo atleta não pode ocupar duas vagas.';
+
+  @override
+  String get fantasyErrorPosition =>
+      'Algum atleta está fora da posição da vaga.';
+
+  @override
+  String get fantasyJoined => 'Você entrou no Arena Fantasy!';
+
+  @override
+  String get fantasyLineupSaved => 'Escalação confirmada.';
+
+  @override
+  String get fantasyLineupSaveError => 'Não foi possível salvar a escalação.';
+
+  @override
+  String get fantasyConfirmLineup => 'Confirmar escalação';
+
+  @override
+  String get fantasyInactive =>
+      'O Arena Fantasy deste campeonato está desligado.';
+
+  @override
+  String get fantasyGuest => 'Entre na sua conta para jogar o Arena Fantasy.';
+
+  @override
+  String get fantasyNoOpenRound =>
+      'Nenhuma rodada aberta agora. A próxima abre quando as partidas da rodada forem cadastradas.';
+
+  @override
+  String get fantasyNoOpenRoundShort => 'Sem rodada';
+
+  @override
+  String get fantasyCopiedLineup =>
+      'Escalação copiada da rodada anterior. Troque o que quiser até o prazo.';
+
+  @override
+  String get fantasyLockedNotice =>
+      'Prazo encerrado: a escalação desta rodada está travada.';
+
+  @override
+  String fantasyCaptainTip(String mult) {
+    return 'Toque no \"C\" para escolher o capitão: ele pontua $mult.';
+  }
+
+  @override
+  String get fantasyDiscard => 'Desfazer alterações';
+
+  @override
+  String fantasyRoundTitle(int number) {
+    return 'Rodada $number';
+  }
+
+  @override
+  String get fantasyJoinTitle => 'Monte seu time no Arena Fantasy';
+
+  @override
+  String get fantasyJoinText =>
+      'Escolha 5 atletas do campeonato e um capitão. Eles pontuam pelo desempenho real nas partidas. Você joga a partir da próxima rodada aberta.';
+
+  @override
+  String get fantasyJoin => 'Entrar no Arena Fantasy';
+
+  @override
+  String get fantasyEntrySubtitle =>
+      'Monte seu time com os atletas do campeonato';
+
+  @override
+  String fantasyEntryRound(int number) {
+    return 'Rodada $number aberta · monte seu time';
+  }
+
+  @override
+  String get fantasyEntryAction => 'Jogar';
+
+  @override
+  String get fantasyBadgePlay => 'Escalar!';
+
+  @override
+  String get fantasyBadgeIdle => 'Fantasy';
+
+  @override
+  String fantasyBadgeRoundOpen(int number) {
+    return 'Rodada $number aberta';
+  }
+
+  @override
+  String get fantasyBadgeNoRound => 'Sem rodada aberta';
+
+  @override
   String get teamRequestMenu => 'Sou dono de time';
 
   @override

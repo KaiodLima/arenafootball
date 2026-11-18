@@ -48,6 +48,7 @@ import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/features/album/presentation/bloc/album_event_cubit.dart';
+import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_floating_badge.dart';
 
 /// Casca da home: header escuro (saudação + região), folha clara com a aba
 /// selecionada, barra de navegação inferior e, para o admin, o botão "Publicar".
@@ -563,6 +564,8 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   Positioned.fill(child: AlbumFloatingBadge(tourKey: _tourAlbum)),
+                  // Arena Fantasy (embaixo à direita; o do álbum fica à esquerda).
+                  const Positioned.fill(child: FantasyFloatingBadge()),
                 ],
               ),
               bottomNavigationBar: KeyedSubtree(

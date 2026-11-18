@@ -11084,6 +11084,306 @@ abstract class AppLocalizations {
   /// **'O capitão vai de 1× a 3×.'**
   String get fantasyErrorCaptain;
 
+  /// No description provided for @fantasySlotGoalkeeper.
+  ///
+  /// In pt, this message translates to:
+  /// **'GOL'**
+  String get fantasySlotGoalkeeper;
+
+  /// No description provided for @fantasySlotDefender.
+  ///
+  /// In pt, this message translates to:
+  /// **'ZAG'**
+  String get fantasySlotDefender;
+
+  /// No description provided for @fantasySlotMidfielder.
+  ///
+  /// In pt, this message translates to:
+  /// **'MEI'**
+  String get fantasySlotMidfielder;
+
+  /// No description provided for @fantasySlotForward.
+  ///
+  /// In pt, this message translates to:
+  /// **'ATA'**
+  String get fantasySlotForward;
+
+  /// No description provided for @fantasySlotFlex.
+  ///
+  /// In pt, this message translates to:
+  /// **'LIVRE'**
+  String get fantasySlotFlex;
+
+  /// No description provided for @fantasyPickGoalkeeper.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha o goleiro'**
+  String get fantasyPickGoalkeeper;
+
+  /// No description provided for @fantasyPickDefender.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha o zagueiro'**
+  String get fantasyPickDefender;
+
+  /// No description provided for @fantasyPickMidfielder.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha o meio-campista'**
+  String get fantasyPickMidfielder;
+
+  /// No description provided for @fantasyPickForward.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha o atacante'**
+  String get fantasyPickForward;
+
+  /// No description provided for @fantasyPickFlex.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha o atleta da vaga livre'**
+  String get fantasyPickFlex;
+
+  /// No description provided for @fantasyRoundLocked.
+  ///
+  /// In pt, this message translates to:
+  /// **'Travada'**
+  String get fantasyRoundLocked;
+
+  /// No description provided for @fantasyClosesIn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fecha em {time}'**
+  String fantasyClosesIn(String time);
+
+  /// No description provided for @fantasyCaptainShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'C'**
+  String get fantasyCaptainShort;
+
+  /// No description provided for @fantasyFilterTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Filtrar por time'**
+  String get fantasyFilterTeam;
+
+  /// No description provided for @fantasySearchAthlete.
+  ///
+  /// In pt, this message translates to:
+  /// **'Buscar atleta'**
+  String get fantasySearchAthlete;
+
+  /// No description provided for @fantasyFilterAll.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos'**
+  String get fantasyFilterAll;
+
+  /// No description provided for @fantasyFilterAllTeams.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos os times'**
+  String get fantasyFilterAllTeams;
+
+  /// No description provided for @fantasyNoAthletes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum atleta inscrito nessa posição.'**
+  String get fantasyNoAthletes;
+
+  /// No description provided for @fantasyInLineup.
+  ///
+  /// In pt, this message translates to:
+  /// **'na escalação'**
+  String get fantasyInLineup;
+
+  /// No description provided for @fantasyAthleteStats.
+  ///
+  /// In pt, this message translates to:
+  /// **'{goals} G · {assists} A'**
+  String fantasyAthleteStats(int goals, int assists);
+
+  /// No description provided for @fantasySwapAthlete.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar atleta'**
+  String get fantasySwapAthlete;
+
+  /// No description provided for @fantasyMakeCaptain.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tornar capitão'**
+  String get fantasyMakeCaptain;
+
+  /// No description provided for @fantasyRemoveAthlete.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tirar da escalação'**
+  String get fantasyRemoveAthlete;
+
+  /// No description provided for @fantasyErrorIncomplete.
+  ///
+  /// In pt, this message translates to:
+  /// **'Preencha as 5 vagas.'**
+  String get fantasyErrorIncomplete;
+
+  /// No description provided for @fantasyErrorCaptainMissing.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha o capitão: toque no \"C\" de um atleta.'**
+  String get fantasyErrorCaptainMissing;
+
+  /// No description provided for @fantasyErrorDuplicate.
+  ///
+  /// In pt, this message translates to:
+  /// **'O mesmo atleta não pode ocupar duas vagas.'**
+  String get fantasyErrorDuplicate;
+
+  /// No description provided for @fantasyErrorPosition.
+  ///
+  /// In pt, this message translates to:
+  /// **'Algum atleta está fora da posição da vaga.'**
+  String get fantasyErrorPosition;
+
+  /// No description provided for @fantasyJoined.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você entrou no Arena Fantasy!'**
+  String get fantasyJoined;
+
+  /// No description provided for @fantasyLineupSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escalação confirmada.'**
+  String get fantasyLineupSaved;
+
+  /// No description provided for @fantasyLineupSaveError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível salvar a escalação.'**
+  String get fantasyLineupSaveError;
+
+  /// No description provided for @fantasyConfirmLineup.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confirmar escalação'**
+  String get fantasyConfirmLineup;
+
+  /// No description provided for @fantasyInactive.
+  ///
+  /// In pt, this message translates to:
+  /// **'O Arena Fantasy deste campeonato está desligado.'**
+  String get fantasyInactive;
+
+  /// No description provided for @fantasyGuest.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entre na sua conta para jogar o Arena Fantasy.'**
+  String get fantasyGuest;
+
+  /// No description provided for @fantasyNoOpenRound.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma rodada aberta agora. A próxima abre quando as partidas da rodada forem cadastradas.'**
+  String get fantasyNoOpenRound;
+
+  /// No description provided for @fantasyNoOpenRoundShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem rodada'**
+  String get fantasyNoOpenRoundShort;
+
+  /// No description provided for @fantasyCopiedLineup.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escalação copiada da rodada anterior. Troque o que quiser até o prazo.'**
+  String get fantasyCopiedLineup;
+
+  /// No description provided for @fantasyLockedNotice.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prazo encerrado: a escalação desta rodada está travada.'**
+  String get fantasyLockedNotice;
+
+  /// No description provided for @fantasyCaptainTip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Toque no \"C\" para escolher o capitão: ele pontua {mult}.'**
+  String fantasyCaptainTip(String mult);
+
+  /// No description provided for @fantasyDiscard.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desfazer alterações'**
+  String get fantasyDiscard;
+
+  /// No description provided for @fantasyRoundTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rodada {number}'**
+  String fantasyRoundTitle(int number);
+
+  /// No description provided for @fantasyJoinTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Monte seu time no Arena Fantasy'**
+  String get fantasyJoinTitle;
+
+  /// No description provided for @fantasyJoinText.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha 5 atletas do campeonato e um capitão. Eles pontuam pelo desempenho real nas partidas. Você joga a partir da próxima rodada aberta.'**
+  String get fantasyJoinText;
+
+  /// No description provided for @fantasyJoin.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entrar no Arena Fantasy'**
+  String get fantasyJoin;
+
+  /// No description provided for @fantasyEntrySubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Monte seu time com os atletas do campeonato'**
+  String get fantasyEntrySubtitle;
+
+  /// No description provided for @fantasyEntryRound.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rodada {number} aberta · monte seu time'**
+  String fantasyEntryRound(int number);
+
+  /// No description provided for @fantasyEntryAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Jogar'**
+  String get fantasyEntryAction;
+
+  /// No description provided for @fantasyBadgePlay.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escalar!'**
+  String get fantasyBadgePlay;
+
+  /// No description provided for @fantasyBadgeIdle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fantasy'**
+  String get fantasyBadgeIdle;
+
+  /// No description provided for @fantasyBadgeRoundOpen.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rodada {number} aberta'**
+  String fantasyBadgeRoundOpen(int number);
+
+  /// No description provided for @fantasyBadgeNoRound.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem rodada aberta'**
+  String get fantasyBadgeNoRound;
+
   /// No description provided for @teamRequestMenu.
   ///
   /// In pt, this message translates to:

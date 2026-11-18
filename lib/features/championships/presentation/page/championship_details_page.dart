@@ -26,6 +26,7 @@ import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart'
 import 'package:arena_soccer/features/championships/presentation/widgets/champion_banner.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/close_championship_sheet.dart';
 import 'package:arena_soccer/utils/components/card_menu_button.dart';
+import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_entry_card.dart';
 
 /// Detalhe do campeonato: hero escuro (banner, temporada, título e chips) que
 /// recolhe ao rolar, e abas Visão geral · Times · Regulamento. O campeonato já
@@ -268,6 +269,8 @@ class _OverviewTab extends StatelessWidget {
           const SizedBox(height: AppSizes.s16),
           ChampionBanner(champion: c.champion!, runnerUp: c.runnerUp),
         ],
+        // Arena Fantasy ativo: atalho para montar o time.
+        FantasyEntryCard(championship: c),
         if (hasPodium || individual.isNotEmpty) ...[
           _SectionTitle(l10n.championshipFormSectionPrizes),
           if (hasPodium)

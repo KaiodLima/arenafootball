@@ -36,6 +36,9 @@ class _Repo implements IFantasyRepository {
     saved.add(config);
     return const Right(null);
   }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 void main() {

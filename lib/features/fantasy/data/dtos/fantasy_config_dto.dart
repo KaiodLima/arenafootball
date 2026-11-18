@@ -81,6 +81,27 @@ class FantasyConfigDTO extends Equatable {
         regionIds: championship.regionIds,
       );
 
+  /// Campeonato montado pelas cópias (abre o Fantasy sem ler `campeonatos`).
+  ChampionshipDTO toChampionship() => ChampionshipDTO(
+        id: championshipDocId,
+        championshipId: championshipId,
+        title: title,
+        imageUrl: imageUrl,
+        region: region,
+        season: season,
+        regionIds: regionIds,
+      );
+
+  /// Vale para a região [regionName] (vazia = todas): pelo id em
+  /// `idsRegioes` ou pela região-sede.
+  bool appliesTo(String regionName) {
+    final name = regionName.trim();
+    if (name.isEmpty) return true;
+    final id = RegionRegistry.idOf(name);
+    if (id.isNotEmpty && regionIds.contains(id)) return true;
+    return region.trim().toLowerCase() == name.toLowerCase();
+  }
+
   /// Os parâmetros com os valores padrão (a chave e as cópias ficam).
   FantasyConfigDTO withDefaults() => copyWith(
         minMinutes: FantasyLimits.defaultMinMinutes,

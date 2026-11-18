@@ -3393,6 +3393,101 @@
   "fantasyErrorRange": "Os minutos vão de 0 a 120.",
   "fantasyErrorDefenseBelowMin": "O mínimo do bônus defensivo não pode ser menor que o mínimo para pontuar.",
   "fantasyErrorCaptain": "O capitão vai de 1× a 3×.",
+  "fantasySlotGoalkeeper": "GOL",
+  "fantasySlotDefender": "ZAG",
+  "fantasySlotMidfielder": "MEI",
+  "fantasySlotForward": "ATA",
+  "fantasySlotFlex": "LIVRE",
+  "fantasyPickGoalkeeper": "Escolha o goleiro",
+  "fantasyPickDefender": "Escolha o zagueiro",
+  "fantasyPickMidfielder": "Escolha o meio-campista",
+  "fantasyPickForward": "Escolha o atacante",
+  "fantasyPickFlex": "Escolha o atleta da vaga livre",
+  "fantasyRoundLocked": "Travada",
+  "fantasyClosesIn": "Fecha em {time}",
+  "@fantasyClosesIn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "fantasyCaptainShort": "C",
+  "fantasyFilterTeam": "Filtrar por time",
+  "fantasySearchAthlete": "Buscar atleta",
+  "fantasyFilterAll": "Todos",
+  "fantasyFilterAllTeams": "Todos os times",
+  "fantasyNoAthletes": "Nenhum atleta inscrito nessa posição.",
+  "fantasyInLineup": "na escalação",
+  "fantasyAthleteStats": "{goals} G · {assists} A",
+  "@fantasyAthleteStats": {
+    "placeholders": {
+      "goals": {
+        "type": "int"
+      },
+      "assists": {
+        "type": "int"
+      }
+    }
+  },
+  "fantasySwapAthlete": "Trocar atleta",
+  "fantasyMakeCaptain": "Tornar capitão",
+  "fantasyRemoveAthlete": "Tirar da escalação",
+  "fantasyErrorIncomplete": "Preencha as 5 vagas.",
+  "fantasyErrorCaptainMissing": "Escolha o capitão: toque no \"C\" de um atleta.",
+  "fantasyErrorDuplicate": "O mesmo atleta não pode ocupar duas vagas.",
+  "fantasyErrorPosition": "Algum atleta está fora da posição da vaga.",
+  "fantasyJoined": "Você entrou no Arena Fantasy!",
+  "fantasyLineupSaved": "Escalação confirmada.",
+  "fantasyLineupSaveError": "Não foi possível salvar a escalação.",
+  "fantasyConfirmLineup": "Confirmar escalação",
+  "fantasyInactive": "O Arena Fantasy deste campeonato está desligado.",
+  "fantasyGuest": "Entre na sua conta para jogar o Arena Fantasy.",
+  "fantasyNoOpenRound": "Nenhuma rodada aberta agora. A próxima abre quando as partidas da rodada forem cadastradas.",
+  "fantasyNoOpenRoundShort": "Sem rodada",
+  "fantasyCopiedLineup": "Escalação copiada da rodada anterior. Troque o que quiser até o prazo.",
+  "fantasyLockedNotice": "Prazo encerrado: a escalação desta rodada está travada.",
+  "fantasyCaptainTip": "Toque no \"C\" para escolher o capitão: ele pontua {mult}.",
+  "@fantasyCaptainTip": {
+    "placeholders": {
+      "mult": {
+        "type": "String"
+      }
+    }
+  },
+  "fantasyDiscard": "Desfazer alterações",
+  "fantasyRoundTitle": "Rodada {number}",
+  "@fantasyRoundTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "fantasyJoinTitle": "Monte seu time no Arena Fantasy",
+  "fantasyJoinText": "Escolha 5 atletas do campeonato e um capitão. Eles pontuam pelo desempenho real nas partidas. Você joga a partir da próxima rodada aberta.",
+  "fantasyJoin": "Entrar no Arena Fantasy",
+  "fantasyEntrySubtitle": "Monte seu time com os atletas do campeonato",
+  "fantasyEntryRound": "Rodada {number} aberta · monte seu time",
+  "@fantasyEntryRound": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "fantasyEntryAction": "Jogar",
+  "fantasyBadgePlay": "Escalar!",
+  "fantasyBadgeIdle": "Fantasy",
+  "fantasyBadgeRoundOpen": "Rodada {number} aberta",
+  "@fantasyBadgeRoundOpen": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "fantasyBadgeNoRound": "Sem rodada aberta",
   "teamRequestMenu": "Sou dono de time",
   "teamRequestTitle": "Sou dono de time",
   "teamRequestIntro": "Cadastre o seu time: um administrador analisa o pedido e, aprovado, você gerencia o elenco.",
