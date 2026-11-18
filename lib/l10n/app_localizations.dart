@@ -11384,6 +11384,114 @@ abstract class AppLocalizations {
   /// **'Sem rodada aberta'**
   String get fantasyBadgeNoRound;
 
+  /// No description provided for @fantasyRankingTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ranking do Fantasy'**
+  String get fantasyRankingTitle;
+
+  /// No description provided for @fantasyTabRound.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rodada'**
+  String get fantasyTabRound;
+
+  /// No description provided for @fantasyTabOverall.
+  ///
+  /// In pt, this message translates to:
+  /// **'Geral'**
+  String get fantasyTabOverall;
+
+  /// No description provided for @fantasyTabHistory.
+  ///
+  /// In pt, this message translates to:
+  /// **'Histórico'**
+  String get fantasyTabHistory;
+
+  /// No description provided for @fantasyNoClosedRound.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhuma rodada fechada ainda. O ranking da rodada aparece depois do prazo.'**
+  String get fantasyNoClosedRound;
+
+  /// No description provided for @fantasyRoundPartial.
+  ///
+  /// In pt, this message translates to:
+  /// **'Parcial: ainda há partidas da rodada'**
+  String get fantasyRoundPartial;
+
+  /// No description provided for @fantasyAwaitingScore.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aguardando apuração'**
+  String get fantasyAwaitingScore;
+
+  /// No description provided for @fantasyRankingEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ninguém pontuou ainda.'**
+  String get fantasyRankingEmpty;
+
+  /// No description provided for @fantasyNotPlayedRound.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você não escalou nesta rodada.'**
+  String get fantasyNotPlayedRound;
+
+  /// No description provided for @fantasyNotJoined.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você ainda não entrou no Arena Fantasy deste campeonato.'**
+  String get fantasyNotJoined;
+
+  /// No description provided for @fantasyHistoryEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você ainda não jogou nenhuma rodada.'**
+  String get fantasyHistoryEmpty;
+
+  /// No description provided for @fantasyMyPosition.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua posição'**
+  String get fantasyMyPosition;
+
+  /// No description provided for @fantasyChampionTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'CAMPEÃO DO ARENA FANTASY'**
+  String get fantasyChampionTitle;
+
+  /// No description provided for @fantasyChampionsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'CAMPEÕES DO ARENA FANTASY'**
+  String get fantasyChampionsTitle;
+
+  /// No description provided for @fantasyPointsValue.
+  ///
+  /// In pt, this message translates to:
+  /// **'{points} pts'**
+  String fantasyPointsValue(String points);
+
+  /// No description provided for @fantasyUnknownAthlete.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atleta'**
+  String get fantasyUnknownAthlete;
+
+  /// No description provided for @fantasyMyTotal.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu total no Fantasy'**
+  String get fantasyMyTotal;
+
+  /// No description provided for @fantasySeeRanking.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver ranking'**
+  String get fantasySeeRanking;
+
   /// No description provided for @teamRequestMenu.
   ///
   /// In pt, this message translates to:

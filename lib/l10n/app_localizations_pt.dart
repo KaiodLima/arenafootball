@@ -6884,6 +6884,64 @@ class AppLocalizationsPt extends AppLocalizations {
   String get fantasyBadgeNoRound => 'Sem rodada aberta';
 
   @override
+  String get fantasyRankingTitle => 'Ranking do Fantasy';
+
+  @override
+  String get fantasyTabRound => 'Rodada';
+
+  @override
+  String get fantasyTabOverall => 'Geral';
+
+  @override
+  String get fantasyTabHistory => 'Histórico';
+
+  @override
+  String get fantasyNoClosedRound =>
+      'Nenhuma rodada fechada ainda. O ranking da rodada aparece depois do prazo.';
+
+  @override
+  String get fantasyRoundPartial => 'Parcial: ainda há partidas da rodada';
+
+  @override
+  String get fantasyAwaitingScore => 'Aguardando apuração';
+
+  @override
+  String get fantasyRankingEmpty => 'Ninguém pontuou ainda.';
+
+  @override
+  String get fantasyNotPlayedRound => 'Você não escalou nesta rodada.';
+
+  @override
+  String get fantasyNotJoined =>
+      'Você ainda não entrou no Arena Fantasy deste campeonato.';
+
+  @override
+  String get fantasyHistoryEmpty => 'Você ainda não jogou nenhuma rodada.';
+
+  @override
+  String get fantasyMyPosition => 'Sua posição';
+
+  @override
+  String get fantasyChampionTitle => 'CAMPEÃO DO ARENA FANTASY';
+
+  @override
+  String get fantasyChampionsTitle => 'CAMPEÕES DO ARENA FANTASY';
+
+  @override
+  String fantasyPointsValue(String points) {
+    return '$points pts';
+  }
+
+  @override
+  String get fantasyUnknownAthlete => 'Atleta';
+
+  @override
+  String get fantasyMyTotal => 'Seu total no Fantasy';
+
+  @override
+  String get fantasySeeRanking => 'Ver ranking';
+
+  @override
   String get teamRequestMenu => 'Sou dono de time';
 
   @override

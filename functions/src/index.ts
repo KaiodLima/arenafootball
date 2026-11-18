@@ -154,6 +154,7 @@ import {
   FANTASY_PARTICIPANTS,
   FANTASY_ROUNDS,
   currentRound,
+  fantasyChampions,
   fantasyRounds,
   frozenParams,
   lineupCopy,
@@ -645,6 +646,9 @@ export const onChampionshipUpdated = onDocumentUpdated('campeonatos/{id}', async
   const after = event.data?.after.data();
   if (!before || !after) return;
   await syncChampionCard(event.params.id, before, after, event.id);
+  await syncFantasyChampion(event.params.id, before, after).catch((error) =>
+    logger.error('Fantasy: campeão não gravado', { id: event.params.id, error: String(error) }),
+  );
   const changed =
     JSON.stringify(before.desempate ?? null) !== JSON.stringify(after.desempate ?? null) ||
     String(before.recalcularEm?.toMillis?.() ?? '') !== String(after.recalcularEm?.toMillis?.() ?? '');
@@ -1160,6 +1164,27 @@ async function scoreFantasyRound(fantasyRef: DocRef, config: FantasyDoc, round: 
   logger.info('Fantasy: rodada apurada', { fantasy: fantasyRef.id, round, finished: finished.length });
 }
 
+/**
+ * Competição encerrada: o Fantasy dela (mesmo id do doc) ganha o campeão
+ * (maior pontuação; empate = todos). Reaberta: o campeão sai.
+ */
+async function syncFantasyChampion(championshipDocId: string, before: FantasyDoc, after: FantasyDoc): Promise<void> {
+  const closedBefore = before.encerrado === true;
+  const closedAfter = after.encerrado === true;
+  if (closedBefore === closedAfter) return;
+  const { db, FieldValue } = await admin();
+  const ref = db.collection(FANTASY).doc(championshipDocId);
+  if (!(await ref.get()).exists) return;
+  if (!closedAfter) {
+    await ref.update({ campeao: FieldValue.delete(), campeaoEm: FieldValue.delete() });
+    return;
+  }
+  const top = await ref.collection(FANTASY_PARTICIPANTS).orderBy('pontos', 'desc').limit(10).get();
+  const champions = fantasyChampions(top.docs.map((d) => ({ id: d.id, data: d.data() })));
+  await ref.update({ campeao: champions, campeaoEm: FieldValue.serverTimestamp() });
+  logger.info('Fantasy: campeão gravado', { fantasy: championshipDocId, champions: champions.length });
+}
+
 /** Admin ligou o Fantasy: monta as rodadas pelas partidas que já têm rodada. */
 export const onFantasyWritten = onDocumentWritten(`${FANTASY}/{fantasyId}`, async (event) => {
   const before = event.data?.before.data();
@@ -1179,6 +1204,8 @@ export const onFantasyParticipantCreated = onDocumentCreated(
       .collection(FANTASY)
       .doc(event.params.fantasyId)
       .update({ participantes: FieldValue.increment(1) });
+    // Entra no ranking geral com 0 (o `increment(0)` não apaga pontos já somados).
+    await event.data?.ref.set({ pontos: FieldValue.increment(0) }, { merge: true });
   },
 );
 

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   currentRound,
+  fantasyChampions,
   fantasyRounds,
   frozenParams,
   lineupCopy,
@@ -107,4 +108,12 @@ test('próxima aberta e última fechada', () => {
   assert.equal(nextOpenRound(rounds, 5), null);
   assert.equal(previousClosedRound(rounds, 5), 2);
   assert.equal(previousClosedRound(rounds, 1), null);
+});
+
+test('campeão do Fantasy: maior pontuação; empate = todos; sem pontos, ninguém', () => {
+  const p = (id: string, pontos: number) => ({ id, data: { nome: id.toUpperCase(), pontos } });
+  assert.deepEqual(fantasyChampions([p('a', 80), p('b', 95.5), p('c', 40)]).map((c) => c.uid), ['b']);
+  assert.deepEqual(fantasyChampions([p('b', 90), p('a', 90), p('c', 10)]).map((c) => c.uid), ['a', 'b']);
+  assert.deepEqual(fantasyChampions([p('a', 0)]), []);
+  assert.deepEqual(fantasyChampions([]), []);
 });

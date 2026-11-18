@@ -4,6 +4,7 @@ import 'package:arena_soccer/features/fantasy/data/repositories/fantasy_reposito
 import 'package:arena_soccer/features/fantasy/domain/repositories/fantasy_repository_interface.dart';
 import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_config_usecases.dart';
 import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_lineup_usecases.dart';
+import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_ranking_usecases.dart';
 
 final _sl = GetIt.instance;
 
@@ -24,4 +25,8 @@ void registerFantasyDependencies() {
   _sl.registerLazySingleton(() => WatchFantasyLineupUseCase(_sl()));
   _sl.registerLazySingleton(() => SaveFantasyLineupUseCase(_sl()));
   _sl.registerLazySingleton(() => GetFantasyAthletesCacheFirstUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetFantasyRankingCacheFirstUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetFantasyPositionUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetFantasyRoundsUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetFantasyLineupUseCase(_sl()));
 }

@@ -18,6 +18,8 @@ import 'package:arena_soccer/utils/components/team_crest.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
+import 'package:arena_soccer/app_routes.dart';
+import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_ranking_dtos.dart';
 
 /// Arena Fantasy do campeonato: entrar e montar a escalação da rodada aberta
 /// (5 atletas no campinho + capitão), até o prazo.
@@ -101,6 +103,8 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
     );
   }
 
+  void _openRanking() => Navigator.pushNamed(context, AppRoutes.fantasyRankingPage, arguments: widget.championship);
+
   String? _errorText(AppLocalizations l10n, FantasyLineupState state) => switch (state.error) {
         FantasyLineupError.incomplete => l10n.fantasyErrorIncomplete,
         FantasyLineupError.noCaptain => l10n.fantasyErrorCaptainMissing,
@@ -135,6 +139,14 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
               l10n.fantasyTitle,
               style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s20),
             ),
+            actions: [
+              IconButton(
+                key: const ValueKey('fantasy-open-ranking'),
+                tooltip: l10n.fantasyRankingTitle,
+                icon: const Icon(Icons.emoji_events_rounded, color: AppColors.gold),
+                onPressed: _openRanking,
+              ),
+            ],
           ),
           bottomNavigationBar: state.editable
               ? ArenaSubmitBar(
@@ -167,6 +179,25 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
       children: [
         _Header(championship: widget.championship, state: state),
         const SizedBox(height: AppSizes.s16),
+        // Total geral da conta + atalho para os rankings.
+        if (state.joined) ...[
+          Material(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(AppSizes.cardRadius),
+            child: ListTile(
+              key: const ValueKey('fantasy-my-total'),
+              onTap: _openRanking,
+              leading: const Icon(Icons.leaderboard_rounded, color: AppColors.primaryDark),
+              title: Text(l10n.fantasyMyTotal, style: AppTypography.label(color: AppColors.textSecondary)),
+              subtitle: Text(
+                l10n.fantasyPointsValue(fantasyPointsLabel(state.participant!.points)),
+                style: AppTypography.title().copyWith(fontSize: AppSizes.s18),
+              ),
+              trailing: Text(l10n.fantasySeeRanking, style: AppTypography.label().copyWith(fontSize: AppSizes.s12)),
+            ),
+          ),
+          const SizedBox(height: AppSizes.s16),
+        ],
         if (state.isGuest)
           _Notice(icon: Icons.login_rounded, text: l10n.fantasyGuest)
         else if (!state.joined)

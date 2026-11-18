@@ -7,6 +7,26 @@ import 'package:arena_soccer/features/fantasy/domain/fantasy_settings.dart';
 /// Sem o doc = desligado com os padrões. O admin grava a chave, os parâmetros
 /// e as cópias do campeonato; `rodadaAtual`, `participantes` e `campeao` só
 /// as functions gravam.
+/// Campeão do Fantasy (gravado pela function ao encerrar a competição).
+class FantasyChampionDTO extends Equatable {
+  final String uid;
+  final String name;
+  final String photoUrl;
+  final double points;
+
+  const FantasyChampionDTO({required this.uid, this.name = '', this.photoUrl = '', this.points = 0});
+
+  factory FantasyChampionDTO.fromMap(Map<String, dynamic> data) => FantasyChampionDTO(
+        uid: data['uid']?.toString() ?? '',
+        name: data['nome']?.toString() ?? '',
+        photoUrl: data['urlImagem']?.toString() ?? '',
+        points: (data['pontos'] as num?)?.toDouble() ?? 0,
+      );
+
+  @override
+  List<Object?> get props => [uid, name, photoUrl, points];
+}
+
 class FantasyConfigDTO extends Equatable {
   /// Id do doc do campeonato (= id do doc do Fantasy).
   final String championshipDocId;
@@ -25,6 +45,9 @@ class FantasyConfigDTO extends Equatable {
   final int currentRound;
   final int participants;
 
+  /// Campeões (empate = vários); vazio = competição não encerrada.
+  final List<FantasyChampionDTO> champions;
+
   static const String collection = 'fantasy';
 
   const FantasyConfigDTO({
@@ -41,6 +64,7 @@ class FantasyConfigDTO extends Equatable {
     this.captainMultiplier = FantasyLimits.defaultCaptain,
     this.currentRound = 0,
     this.participants = 0,
+    this.champions = const [],
   });
 
   /// Configuração nova do [championship] (desligada, com os padrões).
@@ -66,6 +90,10 @@ class FantasyConfigDTO extends Equatable {
       captainMultiplier: (map['capitao'] as num?)?.toDouble() ?? FantasyLimits.defaultCaptain,
       currentRound: asInt(map['rodadaAtual'], 0),
       participants: asInt(map['participantes'], 0),
+      champions: [
+        for (final item in (map['campeao'] as List?) ?? const [])
+          if (item is Map) FantasyChampionDTO.fromMap(Map<String, dynamic>.from(item)),
+      ],
     );
     return championship == null ? config : config.withChampionship(championship);
   }
@@ -150,6 +178,7 @@ class FantasyConfigDTO extends Equatable {
       captainMultiplier: captainMultiplier ?? this.captainMultiplier,
       currentRound: currentRound,
       participants: participants,
+      champions: champions,
     );
   }
 
@@ -168,5 +197,6 @@ class FantasyConfigDTO extends Equatable {
         captainMultiplier,
         currentRound,
         participants,
+        champions,
       ];
 }

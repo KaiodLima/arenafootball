@@ -139,3 +139,27 @@ export function previousClosedRound(rounds: { numero: number; status?: string }[
     .sort((a, b) => b - a);
   return previous[0] ?? null;
 }
+
+/** Campeão do Fantasy (na lista do participante). */
+export interface FantasyChampion {
+  uid: string;
+  nome: string;
+  urlImagem: string;
+  pontos: number;
+}
+
+/**
+ * Campeão(ões) do Fantasy: os participantes com mais pontos (empate = todos).
+ * Sem participante com pontos acima de zero, ninguém.
+ */
+export function fantasyChampions(participants: { id: string; data: Doc }[]): FantasyChampion[] {
+  const list = participants.map((p) => ({
+    uid: p.id,
+    nome: String(p.data.nome ?? ''),
+    urlImagem: String(p.data.urlImagem ?? ''),
+    pontos: typeof p.data.pontos === 'number' && Number.isFinite(p.data.pontos) ? p.data.pontos : 0,
+  }));
+  const best = Math.max(0, ...list.map((p) => p.pontos));
+  if (best <= 0) return [];
+  return list.filter((p) => p.pontos === best).sort((a, b) => a.nome.localeCompare(b.nome));
+}

@@ -158,6 +158,8 @@ import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_settings
 import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_lineup_cubit.dart';
 import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_lineup_page.dart';
 import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_badge_cubit.dart';
+import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_ranking_cubit.dart';
+import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_ranking_page.dart';
 
 class ArenaApp extends StatelessWidget {
   const ArenaApp({super.key});
@@ -550,6 +552,13 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.fantasyLineupPage: (context) => BlocProvider<FantasyLineupCubit>(
               create: (_) => FantasyLineupCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl()),
               child: FantasyLineupPage(
+                championship: ModalRoute.of(context)!.settings.arguments as ChampionshipDTO,
+              ),
+            ),
+        // Arena Fantasy: rankings da rodada e geral e o histórico da conta.
+        AppRoutes.fantasyRankingPage: (context) => BlocProvider<FantasyRankingCubit>(
+              create: (_) => FantasyRankingCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl()),
+              child: FantasyRankingPage(
                 championship: ModalRoute.of(context)!.settings.arguments as ChampionshipDTO,
               ),
             ),

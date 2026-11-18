@@ -89,6 +89,10 @@ abstract final class CacheKeys {
   static String fantasyAthletes({String? season, required int championshipId}) =>
       'fantasy_athletes_${_season(season)}_c${championshipId}_cache';
 
+  /// Ranking do Arena Fantasy [fantasyId]: da rodada [round] ou geral (nula).
+  static String fantasyRanking({required String fantasyId, int? round}) =>
+      'fantasy_ranking_${fantasyId}_${round ?? 'geral'}_cache';
+
   static String _season(String? season) => (season == null || season.isEmpty) ? SeasonCollection.currentSeason : season;
 
   static String _region(String? region) {

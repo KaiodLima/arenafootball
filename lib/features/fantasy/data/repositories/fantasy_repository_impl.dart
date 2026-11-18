@@ -6,6 +6,7 @@ import 'package:arena_soccer/features/championships/data/dtos/championship_dto.d
 import 'package:arena_soccer/features/fantasy/data/datasources/fantasy_datasource.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_athlete_dto.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_config_dto.dart';
+import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_ranking_dtos.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_round_dtos.dart';
 import 'package:arena_soccer/features/fantasy/domain/repositories/fantasy_repository_interface.dart';
 
@@ -70,4 +71,36 @@ class FantasyRepositoryImpl implements IFantasyRepository {
         CacheKeys.fantasyAthletes(season: config.season, championshipId: config.championshipId),
         [for (final a in athletes) a.toCache()],
       );
+
+  @override
+  Future<Either<Failure, List<FantasyRankingEntry>>> getRoundRanking(String fantasyId, int round) =>
+      _dataSource.getRoundRanking(fantasyId, round);
+
+  @override
+  Future<Either<Failure, List<FantasyRankingEntry>>> getOverallRanking(String fantasyId) =>
+      _dataSource.getOverallRanking(fantasyId);
+
+  @override
+  Future<Either<Failure, CachedValue<List<FantasyRankingEntry>>?>> getCachedRanking(String fantasyId, int? round) =>
+      _cache.read<List<FantasyRankingEntry>>(
+        CacheKeys.fantasyRanking(fantasyId: fantasyId, round: round),
+        (json) => [
+          for (final item in json as List) FantasyRankingEntry.fromCache(Map<String, dynamic>.from(item as Map)),
+        ],
+      );
+
+  @override
+  Future<Either<Failure, void>> saveRankingCache(String fantasyId, int? round, List<FantasyRankingEntry> entries) =>
+      _cache.save(CacheKeys.fantasyRanking(fantasyId: fantasyId, round: round), [for (final e in entries) e.toCache()]);
+
+  @override
+  Future<Either<Failure, int>> countAbove(String fantasyId, double points, {int? round}) =>
+      _dataSource.countAbove(fantasyId, points, round: round);
+
+  @override
+  Future<Either<Failure, List<FantasyRoundDTO>>> getRounds(String fantasyId) => _dataSource.getRounds(fantasyId);
+
+  @override
+  Future<Either<Failure, FantasyLineupDTO?>> getLineup(String fantasyId, int round, String uid) =>
+      _dataSource.getLineup(fantasyId, round, uid);
 }

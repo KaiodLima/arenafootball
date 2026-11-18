@@ -4,6 +4,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_athlete_dto.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_config_dto.dart';
+import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_ranking_dtos.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_round_dtos.dart';
 
 abstract class IFantasyRepository {
@@ -34,4 +35,18 @@ abstract class IFantasyRepository {
   Future<Either<Failure, CachedValue<List<FantasyAthleteDTO>>?>> getCachedAthletes(FantasyConfigDTO config);
 
   Future<Either<Failure, void>> saveAthletesCache(FantasyConfigDTO config, List<FantasyAthleteDTO> athletes);
+
+  Future<Either<Failure, List<FantasyRankingEntry>>> getRoundRanking(String fantasyId, int round);
+
+  Future<Either<Failure, List<FantasyRankingEntry>>> getOverallRanking(String fantasyId);
+
+  Future<Either<Failure, CachedValue<List<FantasyRankingEntry>>?>> getCachedRanking(String fantasyId, int? round);
+
+  Future<Either<Failure, void>> saveRankingCache(String fantasyId, int? round, List<FantasyRankingEntry> entries);
+
+  Future<Either<Failure, int>> countAbove(String fantasyId, double points, {int? round});
+
+  Future<Either<Failure, List<FantasyRoundDTO>>> getRounds(String fantasyId);
+
+  Future<Either<Failure, FantasyLineupDTO?>> getLineup(String fantasyId, int round, String uid);
 }

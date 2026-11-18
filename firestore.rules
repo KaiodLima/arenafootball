@@ -1020,7 +1020,7 @@ service cloud.firestore {
       function validFantasyConfig(d) {
         return d.keys().hasOnly(['idCampeonato', 'temporada', 'titulo', 'urlImagem', 'fk_competicao', 'idRegiao',
             'idsRegioes', 'ativo', 'minMinutos', 'minMinutosDefesa', 'capitao', 'atualizadoEm',
-            'rodadaAtual', 'participantes', 'campeao'])
+            'rodadaAtual', 'participantes', 'campeao', 'campeaoEm'])
           && d.ativo is bool
           && d.minMinutos is int && d.minMinutos >= 0 && d.minMinutos <= 120
           && d.minMinutosDefesa is int && d.minMinutosDefesa >= d.minMinutos && d.minMinutosDefesa <= 120
@@ -1032,9 +1032,10 @@ service cloud.firestore {
       }
 
       allow create: if isAdmin() && validFantasyConfig(request.resource.data)
-        && !request.resource.data.keys().hasAny(['rodadaAtual', 'participantes', 'campeao']);
+        && !request.resource.data.keys().hasAny(['rodadaAtual', 'participantes', 'campeao', 'campeaoEm']);
       allow update: if isAdmin() && validFantasyConfig(request.resource.data)
-        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['rodadaAtual', 'participantes', 'campeao']);
+        && !request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['rodadaAtual', 'participantes', 'campeao', 'campeaoEm']);
       allow delete: if false;
 
       function fantasyConfig() {

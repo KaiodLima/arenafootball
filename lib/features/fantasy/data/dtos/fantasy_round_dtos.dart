@@ -13,7 +13,22 @@ class FantasyRoundDTO extends Equatable {
   /// `aberta`, `fechada` ou `vazia` (sem partidas).
   final String status;
 
-  const FantasyRoundDTO({required this.number, this.matchIds = const [], this.closesAt, this.status = ''});
+  /// Já teve apuração (alguma partida terminada processada).
+  final bool scored;
+
+  /// Todas as partidas da rodada terminaram e foram apuradas.
+  final bool finished;
+
+  const FantasyRoundDTO({
+    required this.number,
+    this.matchIds = const [],
+    this.closesAt,
+    this.status = '',
+    this.scored = false,
+    this.finished = false,
+  });
+
+  bool get closed => status == 'fechada';
 
   factory FantasyRoundDTO.fromMap(String id, Map<String, dynamic>? data) {
     final map = data ?? const <String, dynamic>{};
@@ -22,6 +37,8 @@ class FantasyRoundDTO extends Equatable {
       matchIds: (map['idsPartidas'] as List?)?.map((e) => e.toString()).toList() ?? const [],
       closesAt: _dateOf(map['fechaEm']),
       status: map['status']?.toString() ?? '',
+      scored: map['apuracao'] is Map,
+      finished: map['finalizada'] == true,
     );
   }
 
@@ -29,7 +46,7 @@ class FantasyRoundDTO extends Equatable {
   bool isOpenAt(DateTime now) => status == 'aberta' && closesAt != null && now.isBefore(closesAt!);
 
   @override
-  List<Object?> get props => [number, matchIds, closesAt, status];
+  List<Object?> get props => [number, matchIds, closesAt, status, scored, finished];
 }
 
 /// Participante do Fantasy (`fantasy/{id}/participantes/{uid}`).
@@ -72,12 +89,19 @@ class FantasyLineupDTO extends Equatable {
   /// Cópia automática da rodada anterior (o dono troca até o prazo).
   final bool copied;
 
+  /// Pontos da rodada (nulo = ainda sem apuração) e os de cada atleta, com o
+  /// capitão já multiplicado (só as functions gravam).
+  final double? points;
+  final Map<String, double> athletePoints;
+
   const FantasyLineupDTO({
     required this.uid,
     this.name = '',
     this.photoUrl = '',
     this.lineup = const FantasyLineup(),
     this.copied = false,
+    this.points,
+    this.athletePoints = const {},
   });
 
   factory FantasyLineupDTO.fromMap(String id, Map<String, dynamic> data) {
@@ -93,6 +117,11 @@ class FantasyLineupDTO extends Equatable {
       photoUrl: data['urlImagem']?.toString() ?? '',
       lineup: FantasyLineup(athletes: athletes, captainId: data['capitao']?.toString() ?? ''),
       copied: data['copiada'] == true,
+      points: (data['pontos'] as num?)?.toDouble(),
+      athletePoints: {
+        for (final entry in ((data['pontosAtletas'] as Map?) ?? const {}).entries)
+          if (entry.value is num) entry.key.toString(): (entry.value as num).toDouble(),
+      },
     );
   }
 
@@ -109,5 +138,5 @@ class FantasyLineupDTO extends Equatable {
       };
 
   @override
-  List<Object?> get props => [uid, name, photoUrl, lineup, copied];
+  List<Object?> get props => [uid, name, photoUrl, lineup, copied, points, athletePoints];
 }

@@ -6843,6 +6843,63 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fantasyBadgeNoRound => 'No open matchday';
 
   @override
+  String get fantasyRankingTitle => 'Fantasy ranking';
+
+  @override
+  String get fantasyTabRound => 'Matchday';
+
+  @override
+  String get fantasyTabOverall => 'Overall';
+
+  @override
+  String get fantasyTabHistory => 'History';
+
+  @override
+  String get fantasyNoClosedRound =>
+      'No closed matchday yet. The matchday ranking shows after the deadline.';
+
+  @override
+  String get fantasyRoundPartial => 'Partial: matchday games still to finish';
+
+  @override
+  String get fantasyAwaitingScore => 'Awaiting scoring';
+
+  @override
+  String get fantasyRankingEmpty => 'Nobody scored yet.';
+
+  @override
+  String get fantasyNotPlayedRound => 'You did not pick a team this matchday.';
+
+  @override
+  String get fantasyNotJoined => 'You have not joined this Arena Fantasy yet.';
+
+  @override
+  String get fantasyHistoryEmpty => 'You have not played any matchday yet.';
+
+  @override
+  String get fantasyMyPosition => 'Your position';
+
+  @override
+  String get fantasyChampionTitle => 'ARENA FANTASY CHAMPION';
+
+  @override
+  String get fantasyChampionsTitle => 'ARENA FANTASY CHAMPIONS';
+
+  @override
+  String fantasyPointsValue(String points) {
+    return '$points pts';
+  }
+
+  @override
+  String get fantasyUnknownAthlete => 'Player';
+
+  @override
+  String get fantasyMyTotal => 'Your Fantasy total';
+
+  @override
+  String get fantasySeeRanking => 'See ranking';
+
+  @override
   String get teamRequestMenu => 'I own a team';
 
   @override
