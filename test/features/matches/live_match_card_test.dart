@@ -47,6 +47,9 @@ void main() {
     // Texto para o app antigo (mostra como notícia).
     expect(card2.title, 'Leões 2 × 0 Tigres · ao vivo');
     expect(card2.description, "⚽ 40' Bia");
+    // O relógio da partida vai junto (minuto corrido no feed).
+    expect(card2.liveClock?.durationMinutes, second.durationMinutes);
+    expect(card2.liveClock?.startedAt, second.startedAt);
   });
 
   test('cartão e substituição também entram no card, na ordem do minuto', () {

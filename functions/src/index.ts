@@ -62,6 +62,8 @@ import {
   PushMessage,
   currentSeasonOf,
   dailyGameMessage,
+  forTest,
+  isTestDoc,
   describeTarget,
   goalMessage,
   bookingMessage,
@@ -91,6 +93,13 @@ import { claimReconcilePlan, missingEnrollmentFix, needsClaimReconcile } from '.
 import { FanRankingTeam, fanRankingTotal, rankingTeamOf, sortFanRanking } from './fan_ranking';
 import { shouldAutoFinish, shouldCloseVoting } from './voting_close';
 import { championChange, championMessage, championNews, championNewsId } from './champion_card';
+import {
+  type FantasyCardAthlete,
+  fantasyRoundMessage,
+  fantasyRoundNews,
+  fantasyRoundNewsId,
+  fantasyTopThree,
+} from './fantasy_card';
 import { EVENT_VOTES, eventOptionIds, tallyDoc } from './event_poll';
 import {
   ResultTeam,
@@ -101,6 +110,8 @@ import {
   shouldPostResult,
   liveCardStatusOf,
   liveCardStatusUpdate,
+  liveClockChanged,
+  liveClockOf,
   liveNewsId,
   LiveCardStatus,
 } from './match_result';
@@ -148,6 +159,38 @@ import {
   votePageData,
   nowPageData,
 } from './share_page';
+import {
+  FANTASY,
+  FANTASY_LINEUPS,
+  FANTASY_PARTICIPANTS,
+  FANTASY_ROUNDS,
+  type RoundAction,
+  type RoundState,
+  currentRound,
+  fantasyChampions,
+  fantasyRounds,
+  frozenParams,
+  lineupCopy,
+  matchdayOf,
+  nextOpenRound,
+  previousClosedRound,
+  orphanRoundUpdate,
+  rescoreRequested,
+  roundActionRequested,
+  roundFinalized,
+  resetRequested,
+  roundFieldsChanged,
+  roundSync,
+} from './fantasy';
+import {
+  SCORING_VERSION,
+  lineupPoints,
+  playedAthletes,
+  pointsDelta,
+  roundParticipants,
+  scoreAthlete,
+  scoringFieldsChanged,
+} from './fantasy_scoring';
 
 setGlobalOptions({ region: 'us-central1', maxInstances: 5 });
 
@@ -235,7 +278,9 @@ export const onNewsCreated = onDocumentCreated('noticias/{newsId}', async (event
       : data.tag === 'cartao'
         ? bookingMessage(data, await currentSeason())
         : newsMessage(data, event.params.newsId);
-  if (message) await deliver(`${message.tipo}_${event.id}`, message, `noticias/${event.params.newsId}`);
+  if (message) {
+    await deliver(`${message.tipo}_${event.id}`, forTest(message, isTestDoc(data)), `noticias/${event.params.newsId}`);
+  }
 });
 
 let seasonCache: { value: string; at: number } | undefined;
@@ -273,8 +318,12 @@ export const onMatchCreated = onDocumentCreated('{colecao}/{matchId}', async (ev
   }
   if (!(await isCurrentMatchCollection(event.params.colecao))) return;
   const data = event.data?.data();
+  // Arena Fantasy: partida com rodada entra nas rodadas do campeonato.
+  if (data && matchdayOf(data.rodada) !== null) await syncFantasyForMatches(data);
   const message = data ? matchCreatedMessage(data, { id: event.params.matchId, season: await currentSeason() }) : null;
-  if (message) await deliver(`partida_${event.id}`, message, `${event.params.colecao}/${event.params.matchId}`);
+  if (message) {
+    await deliver(`partida_${event.id}`, forTest(message, isTestDoc(data)), `${event.params.colecao}/${event.params.matchId}`);
+  }
 });
 
 /** Votação de melhor jogador aberta/encerrada. */
@@ -289,9 +338,23 @@ export const onMatchUpdated = onDocumentUpdated('{colecao}/{matchId}', async (ev
   const message =
     before && after ? votingMessage(before, after, { id: event.params.matchId, season: await currentSeason() }) : null;
   if (message) {
-    await deliver(`${message.tipo}_${event.id}`, message, `${event.params.colecao}/${event.params.matchId}`);
+    await deliver(
+      `${message.tipo}_${event.id}`,
+      forTest(message, isTestDoc(after)),
+      `${event.params.colecao}/${event.params.matchId}`,
+    );
   }
   if (!before || !after) return;
+  // Arena Fantasy: rodada, data, horário ou início mudou → as rodadas acompanham.
+  if (roundFieldsChanged(before, after)) await syncFantasyForMatches(before, after);
+  // Arena Fantasy: partida terminou, deixou de estar terminada ou a súmula
+  // terminada mudou → a rodada é apurada de novo (do zero, idempotente).
+  if (
+    (isFinishedMatch(before) || isFinishedMatch(after)) &&
+    (isFinishedMatch(before) !== isFinishedMatch(after) || scoringFieldsChanged(before, after))
+  ) {
+    await scoreFantasyForMatches(before, after);
+  }
   const { colecao, matchId } = event.params;
   const justFinished = before.status !== 'encerrada' && after.status === 'encerrada';
   // Card "Vote no craque": encerrada na mão antes dos 15 min finais → posta agora.
@@ -311,7 +374,17 @@ export const onMatchUpdated = onDocumentUpdated('{colecao}/{matchId}', async (ev
   }
   // Card ao vivo: intervalo / 2º tempo acompanham (o fim é marcado no postResult).
   const liveStatus = before.status !== after.status ? liveCardStatusOf(after.status) : null;
-  if (liveStatus && liveStatus !== 'encerrada') await syncLiveCardStatus(matchId, liveStatus, after);
+  if (liveStatus && liveStatus !== 'encerrada') {
+    await syncLiveCardStatus(matchId, liveStatus, after);
+  } else if (liveClockChanged(before, after)) {
+    // Só o relógio mudou (início manual, atrasou, duração): o minuto do card acompanha.
+    const { db } = await admin();
+    await db
+      .collection('noticias')
+      .doc(liveNewsId(matchId))
+      .update({ relogio: liveClockOf(after) })
+      .catch(() => undefined);
+  }
   // Card de resultado: o admin encerrou agora → posta; placar corrigido → atualiza.
   if (justFinished && !after.resultadoNoticia) {
     await postResult(colecao, await currentSeason(), matchId, after);
@@ -598,7 +671,10 @@ export const onMatchOrGroupDeleted = onDocumentDeleted('{colecao}/{docId}', asyn
     await onGroupChanged(docId, data, undefined);
     return;
   }
-  if (!data || !(await isCurrentMatchCollection(colecao)) || !isFinishedMatch(data)) return;
+  if (!data || !(await isCurrentMatchCollection(colecao))) return;
+  if (matchdayOf(data.rodada) !== null) await syncFantasyForMatches(data);
+  if (!isFinishedMatch(data)) return;
+  if (matchdayOf(data.rodada) !== null) await scoreFantasyForMatches(data);
   await recomputeMatchGroups(await currentSeason(), data);
 });
 
@@ -608,6 +684,9 @@ export const onChampionshipUpdated = onDocumentUpdated('campeonatos/{id}', async
   const after = event.data?.after.data();
   if (!before || !after) return;
   await syncChampionCard(event.params.id, before, after, event.id);
+  await syncFantasyChampion(event.params.id, before, after).catch((error) =>
+    logger.error('Fantasy: campeão não gravado', { id: event.params.id, error: String(error) }),
+  );
   const changed =
     JSON.stringify(before.desempate ?? null) !== JSON.stringify(after.desempate ?? null) ||
     String(before.recalcularEm?.toMillis?.() ?? '') !== String(after.recalcularEm?.toMillis?.() ?? '');
@@ -793,7 +872,13 @@ export const dailyGames = onSchedule({ schedule: '0 9 * * *', timeZone: 'America
   const matches = await db.collection(collection).where('data', '==', today).get();
   for (const doc of matches.docs) {
     const message = dailyGameMessage(doc.data(), { id: doc.id, season: await currentSeason() });
-    if (message) await deliver(`jogo_do_dia_${today.replace('/', '-')}_${doc.id}`, message, `${collection}/${doc.id}`);
+    if (message) {
+      await deliver(
+        `jogo_do_dia_${today.replace('/', '-')}_${doc.id}`,
+        forTest(message, isTestDoc(doc.data())),
+        `${collection}/${doc.id}`,
+      );
+    }
   }
 });
 
@@ -832,7 +917,572 @@ export const closeVotings = onSchedule({ schedule: 'every 15 minutes', timeZone:
   }
   // Na mesma rodada: push de quem tem pacotinho liberado (24 h depois do último).
   await notifyAlbumPacks(now);
+  // Na mesma rodada: rodadas do Arena Fantasy com o prazo vencido fecham.
+  await closeFantasyRounds(now).catch((error) => logger.error('Fantasy: rodadas não fechadas', { error: String(error) }));
 });
+
+// ---------------------------------------------------------------------------
+// Arena Fantasy (fase 2): rodadas pelas partidas, fechamento e cópia das
+// escalações. A lógica fica em fantasy.ts (pura).
+// ---------------------------------------------------------------------------
+
+type FantasyDoc = Record<string, unknown>;
+type DocRef = FirebaseFirestore.DocumentReference;
+
+const dateOfValue = (value: unknown): Date | null =>
+  value instanceof Date ? value : ((value as { toDate?: () => Date } | null)?.toDate?.() ?? null);
+
+/** Rodada gravada (status, prazo e partidas). */
+function storedRoundOf(data: FantasyDoc) {
+  return {
+    status: typeof data.status === 'string' ? data.status : undefined,
+    fechaEm: dateOfValue(data.fechaEm),
+    idsPartidas: Array.isArray(data.idsPartidas) ? data.idsPartidas.map(String) : [],
+    finalizada: data.finalizada === true,
+    prazoManual: data.prazoManual === true,
+    fechadaManual: data.fechadaManual === true,
+  };
+}
+
+/** Fantasy ativo do campeonato [championshipId] na temporada [season]. */
+async function activeFantasyOf(championshipId: number, season: string) {
+  const { db } = await admin();
+  const found = await db
+    .collection(FANTASY)
+    .where('idCampeonato', '==', championshipId)
+    .where('temporada', '==', season)
+    .where('ativo', '==', true)
+    .limit(1)
+    .get();
+  return found.docs[0];
+}
+
+/** Sincroniza as rodadas dos Fantasy ativos das competições das partidas [docs]. */
+async function syncFantasyForMatches(...docs: (FantasyDoc | undefined)[]): Promise<void> {
+  const season = await currentSeason();
+  const ids = new Set(docs.map((d) => Number(d?.id_campeonato ?? 0)).filter((n) => Number.isInteger(n) && n > 0));
+  for (const id of ids) {
+    try {
+      const fantasy = await activeFantasyOf(id, season);
+      if (fantasy) await syncFantasyRounds(fantasy.ref, fantasy.data(), season);
+    } catch (error) {
+      logger.error('Fantasy: rodadas não sincronizadas', { championshipId: id, error: String(error) });
+    }
+  }
+}
+
+/**
+ * Rodadas do Fantasy [fantasyRef] a partir das partidas da competição: cria
+ * as novas (abertas, com o prazo), atualiza prazo/partidas das abertas, só as
+ * partidas das fechadas; rodada aberta sem partidas fica `vazia`. Grava a
+ * `rodadaAtual` e copia as escalações para a rodada nova (D3).
+ */
+async function syncFantasyRounds(fantasyRef: DocRef, config: FantasyDoc, season: string): Promise<void> {
+  const { db, FieldValue } = await admin();
+  const championshipId = Number(config.idCampeonato ?? 0);
+  if (!Number.isInteger(championshipId) || championshipId <= 0) return;
+  const matches = await db
+    .collection(seasonCollection('partidas', season))
+    .where('id_campeonato', '==', championshipId)
+    .get();
+  const computed = fantasyRounds(matches.docs.map((d) => ({ id: d.id, data: d.data() })), season);
+  const roundsRef = fantasyRef.collection(FANTASY_ROUNDS);
+  const existing = await roundsRef.get();
+  const stored = new Map(existing.docs.map((d) => [d.id, storedRoundOf(d.data())]));
+  const batch = db.batch();
+  let writes = 0;
+  const created: number[] = [];
+  const after = new Map<number, RoundState>();
+  for (const [id, round] of stored) after.set(Number(id), { numero: Number(id), ...round });
+  for (const round of computed) {
+    const key = String(round.numero);
+    const change = roundSync(stored.get(key), round);
+    if (!change) continue;
+    // Fechada que reabriu sozinha: sai dos parâmetros congelados.
+    const reopened = stored.get(key)?.status === 'fechada' && change.status === 'aberta';
+    batch.set(
+      roundsRef.doc(key),
+      reopened ? { ...change, parametros: FieldValue.delete(), fechadaEm: FieldValue.delete() } : change,
+      { merge: true },
+    );
+    writes++;
+    if (!stored.has(key) || stored.get(key)?.status === 'vazia') created.push(round.numero);
+    const previous = after.get(round.numero);
+    after.set(round.numero, {
+      ...previous,
+      numero: round.numero,
+      status: typeof change.status === 'string' ? change.status : previous?.status,
+      fechaEm: change.fechaEm instanceof Date ? change.fechaEm : (previous?.fechaEm ?? null),
+      idsPartidas: round.idsPartidas,
+    });
+  }
+  const computedIds = new Set(computed.map((r) => r.numero));
+  // Rodada que ficou sem partidas (apagadas): aberta vira vazia; fechada fica
+  // finalizada e sem partidas (não segura o mercado como "em andamento").
+  for (const [id, round] of stored) {
+    if (computedIds.has(Number(id))) continue;
+    const change = orphanRoundUpdate(round);
+    if (!change) continue;
+    batch.update(roundsRef.doc(id), change);
+    after.set(Number(id), { numero: Number(id), ...round, ...(change as Partial<RoundState>), fechaEm: round.fechaEm });
+    writes++;
+  }
+  const now = new Date();
+  const current = currentRound([...after.values()], now);
+  if (current !== Number(config.rodadaAtual ?? 0)) {
+    batch.update(fantasyRef, { rodadaAtual: current });
+    writes++;
+  }
+  if (writes) await batch.commit();
+  const list = [...after.values()];
+  for (const numero of created) {
+    const from = previousClosedRound(list, numero);
+    if (from !== null) await copyFantasyLineups(fantasyRef, from, numero);
+  }
+  // Partida iniciada na mão: o prazo venceu agora; fecha na hora (sem esperar o agendamento).
+  for (const round of list) {
+    if (round.status === 'aberta' && round.fechaEm !== null && round.fechaEm <= now) {
+      await closeFantasyRound(fantasyRef, roundsRef.doc(String(round.numero)), now);
+    }
+  }
+}
+
+/** Recalcula a `rodadaAtual` pelas rodadas gravadas (rodada finalizada reabre o mercado). */
+async function refreshCurrentRound(fantasyRef: DocRef, now = new Date()): Promise<void> {
+  const [config, all] = await Promise.all([fantasyRef.get(), fantasyRef.collection(FANTASY_ROUNDS).get()]);
+  const list = all.docs.map((d) => ({ numero: Number(d.id), ...storedRoundOf(d.data()) }));
+  const current = currentRound(list, now);
+  if (current !== Number(config.data()?.rodadaAtual ?? 0)) await fantasyRef.update({ rodadaAtual: current });
+}
+
+/** Copia as escalações da rodada [from] para a [to] de quem ainda não tem escalação nela (D3). */
+async function copyFantasyLineups(fantasyRef: DocRef, from: number, to: number): Promise<number> {
+  const { db, FieldValue } = await admin();
+  const rounds = fantasyRef.collection(FANTASY_ROUNDS);
+  const [source, target] = await Promise.all([
+    rounds.doc(String(from)).collection(FANTASY_LINEUPS).get(),
+    rounds.doc(String(to)).collection(FANTASY_LINEUPS).get(),
+  ]);
+  const taken = new Set(target.docs.map((d) => d.id));
+  let batch = db.batch();
+  let pending = 0;
+  let copied = 0;
+  for (const doc of source.docs) {
+    if (taken.has(doc.id)) continue;
+    const copy = lineupCopy(doc.data());
+    if (!copy) continue;
+    batch.set(rounds.doc(String(to)).collection(FANTASY_LINEUPS).doc(doc.id), {
+      ...copy,
+      atualizadoEm: FieldValue.serverTimestamp(),
+    });
+    pending++;
+    copied++;
+    if (pending === 400) {
+      await batch.commit();
+      batch = db.batch();
+      pending = 0;
+    }
+  }
+  if (pending) await batch.commit();
+  if (copied) logger.info('Fantasy: escalações copiadas', { fantasy: fantasyRef.id, from, to, copied });
+  return copied;
+}
+
+/**
+ * Rodadas abertas com o prazo vencido: fecham com os parâmetros congelados,
+ * a `rodadaAtual` avança e as escalações vão para a próxima rodada aberta.
+ */
+async function closeFantasyRounds(now: Date): Promise<void> {
+  const { db } = await admin();
+  const due = await db
+    .collectionGroup(FANTASY_ROUNDS)
+    .where('status', '==', 'aberta')
+    .where('fechaEm', '<=', now)
+    .limit(50)
+    .get();
+  for (const round of due.docs) {
+    const fantasyRef = round.ref.parent.parent;
+    if (!fantasyRef || fantasyRef.parent.id !== FANTASY) continue;
+    await closeFantasyRound(fantasyRef, round.ref, now);
+  }
+}
+
+/**
+ * Fecha a rodada [roundRef] (se ainda aberta): parâmetros congelados, a
+ * `rodadaAtual` recalculada (fica nela enquanto estiver em andamento) e as
+ * escalações copiadas para a próxima rodada aberta.
+ */
+async function closeFantasyRound(fantasyRef: DocRef, roundRef: DocRef, now: Date): Promise<void> {
+  const { db, FieldValue } = await admin();
+  const config = (await fantasyRef.get()).data() ?? {};
+  const closed = await db.runTransaction(async (tx) => {
+    const snap = await tx.get(roundRef);
+    if (snap.data()?.status !== 'aberta') return false;
+    tx.update(roundRef, { status: 'fechada', parametros: frozenParams(config), fechadaEm: FieldValue.serverTimestamp() });
+    return true;
+  });
+  if (!closed) return;
+  const all = await fantasyRef.collection(FANTASY_ROUNDS).get();
+  const list = all.docs.map((d) => ({
+    numero: Number(d.id),
+    ...storedRoundOf(d.id === roundRef.id ? { ...d.data(), status: 'fechada' } : d.data()),
+  }));
+  await fantasyRef.update({ rodadaAtual: currentRound(list, now) });
+  const next = nextOpenRound(list, Number(roundRef.id));
+  if (next !== null) await copyFantasyLineups(fantasyRef, Number(roundRef.id), next);
+  logger.info('Fantasy: rodada fechada', { fantasy: fantasyRef.id, round: roundRef.id });
+}
+
+/** Fantasy do campeonato [championshipId] na temporada (ligado ou não: a apuração segue). */
+async function fantasyOf(championshipId: number, season: string) {
+  const { db } = await admin();
+  const found = await db
+    .collection(FANTASY)
+    .where('idCampeonato', '==', championshipId)
+    .where('temporada', '==', season)
+    .limit(1)
+    .get();
+  return found.docs[0];
+}
+
+/** Apura as rodadas do Fantasy das partidas [docs] (antes e depois da mudança). */
+async function scoreFantasyForMatches(...docs: (FantasyDoc | undefined)[]): Promise<void> {
+  const season = await currentSeason();
+  const rounds = new Map<number, Set<number>>();
+  for (const doc of docs) {
+    const championshipId = Number(doc?.id_campeonato ?? 0);
+    const round = matchdayOf(doc?.rodada);
+    if (!Number.isInteger(championshipId) || championshipId <= 0 || round === null) continue;
+    rounds.set(championshipId, (rounds.get(championshipId) ?? new Set()).add(round));
+  }
+  for (const [championshipId, numbers] of rounds) {
+    try {
+      const fantasy = await fantasyOf(championshipId, season);
+      if (!fantasy) continue;
+      for (const round of numbers) await scoreFantasyRound(fantasy.ref, fantasy.data(), round, season);
+    } catch (error) {
+      logger.error('Fantasy: rodada não apurada', { championshipId, error: String(error) });
+    }
+  }
+}
+
+/**
+ * Apuração da rodada [round], sempre do zero: pontos de cada atleta escalado
+ * (doc de auditoria em `rodadas/{n}/atletas`), das escalações e, por
+ * transação, a diferença no total do participante (`aplicado`): reprocessar
+ * não soma duas vezes e a súmula corrigida muda só a diferença.
+ */
+async function scoreFantasyRound(fantasyRef: DocRef, config: FantasyDoc, round: number, season: string): Promise<void> {
+  const { db, FieldValue } = await admin();
+  const roundRef = fantasyRef.collection(FANTASY_ROUNDS).doc(String(round));
+  const roundSnap = await roundRef.get();
+  if (!roundSnap.exists) return;
+  const roundData = roundSnap.data() ?? {};
+  const params = frozenParams((roundData.parametros as FantasyDoc | undefined) ?? config);
+  const matchIds = Array.isArray(roundData.idsPartidas) ? roundData.idsPartidas.map(String) : [];
+  const matchesCol = db.collection(seasonCollection('partidas', season));
+  const matchDocs = matchIds.length ? await db.getAll(...matchIds.map((id) => matchesCol.doc(id))) : [];
+  const finished = matchDocs
+    .filter((d) => d.exists && isFinishedMatch(d.data() ?? {}))
+    .map((d) => ({ id: d.id, data: d.data() ?? {} }));
+
+  const lineups = await roundRef.collection(FANTASY_LINEUPS).get();
+  const drafted = new Set(
+    lineups.docs.flatMap((d) => (Array.isArray(d.data().idsAtletas) ? d.data().idsAtletas.map(String) : [])),
+  );
+  // Também quem jogou e ninguém escalou ("Craques da rodada" no app).
+  const athleteIds = [...new Set([...drafted, ...roundParticipants(finished.map((m) => m.data))])].filter(Boolean);
+  const playersCol = db.collection(seasonCollection('jogadores', season));
+  const players = athleteIds.length ? await db.getAll(...athleteIds.map((id) => playersCol.doc(id))) : [];
+  const enrollmentKey = `c${Number(config.idCampeonato ?? 0)}`;
+  const totals: Record<string, number> = {};
+  const played = new Set<string>();
+  const cardAthletes: FantasyCardAthlete[] = [];
+  let batch = db.batch();
+  let pending = 0;
+  for (const player of players) {
+    if (!player.exists && !drafted.has(player.id)) continue;
+    const data = player.data() ?? {};
+    const enrollment = ((data.inscricoes ?? {}) as Record<string, FantasyDoc>)[enrollmentKey];
+    // Não escalado: só quem está inscrito na competição com time (regra do Fantasy).
+    if (!drafted.has(player.id) && !text(enrollment?.idTime)) continue;
+    const result = scoreAthlete(finished, {
+      id: player.id,
+      posicao: data.posicao,
+      teamId: String(enrollment?.idTime ?? data.idTime ?? ''),
+    }, params);
+    totals[player.id] = result.total;
+    if (result.partidas.length > 0) played.add(player.id);
+    cardAthletes.push({
+      idJogador: player.id,
+      nome: String(data.nome ?? ''),
+      time: String(enrollment?.time ?? data.time ?? ''),
+      idTime: String(enrollment?.idTime ?? data.idTime ?? ''),
+      urlImagem: String(data.urlImagem ?? ''),
+      posicao: String(result.posicao ?? ''),
+      pontos: result.total,
+    });
+    batch.set(roundRef.collection('atletas').doc(player.id), {
+      ...result,
+      nome: String(data.nome ?? ''),
+      urlImagem: String(data.urlImagem ?? ''),
+      idTime: String(enrollment?.idTime ?? data.idTime ?? ''),
+      time: String(enrollment?.time ?? data.time ?? ''),
+      parametros: params,
+      versaoCalculo: SCORING_VERSION,
+      processadoEm: FieldValue.serverTimestamp(),
+    });
+    if (++pending === 400) {
+      await batch.commit();
+      batch = db.batch();
+      pending = 0;
+    }
+  }
+  if (pending) await batch.commit();
+
+  for (const lineup of lineups.docs) {
+    const participantRef = fantasyRef.collection(FANTASY_PARTICIPANTS).doc(lineup.id);
+    await db.runTransaction(async (tx) => {
+      const snap = await tx.get(lineup.ref);
+      const data = snap.data() ?? {};
+      const ids = Array.isArray(data.idsAtletas) ? data.idsAtletas.map(String) : [];
+      const { pontos, pontosAtletas } = lineupPoints(ids, String(data.capitao ?? ''), totals, params.capitao);
+      const delta = pointsDelta(pontos, data.aplicado);
+      tx.update(lineup.ref, {
+        pontos,
+        pontosAtletas,
+        atletasJogaram: playedAthletes(ids, played),
+        aplicado: pontos,
+        processadoEm: FieldValue.serverTimestamp(),
+      });
+      if (delta !== 0) tx.set(participantRef, { pontos: FieldValue.increment(delta) }, { merge: true });
+    });
+  }
+
+  await roundRef.update({
+    apuracao: {
+      partidas: matchIds.length,
+      encerradas: finished.length,
+      escalacoes: lineups.size,
+      versao: SCORING_VERSION,
+      processadoEm: FieldValue.serverTimestamp(),
+    },
+    // Só as partidas que ainda existem (apagada não segura a rodada).
+    finalizada: roundFinalized(matchDocs.filter((d) => d.exists).length, finished.length),
+  });
+  logger.info('Fantasy: rodada apurada', { fantasy: fantasyRef.id, round, finished: finished.length });
+  // Rodada finalizada reabre o mercado (a próxima); reaberta, fecha de novo.
+  await refreshCurrentRound(fantasyRef).catch((error) =>
+    logger.error('Fantasy: rodada atual não recalculada', { fantasy: fantasyRef.id, error: String(error) }),
+  );
+  const finalized = finished.length > 0 && roundFinalized(matchDocs.filter((d) => d.exists).length, finished.length);
+  const hasTest = finished.some((m) => isTestDoc(m.data));
+  await syncFantasyRoundCard(fantasyRef.id, config, round, finalized ? fantasyTopThree(cardAthletes) : [], hasTest).catch(
+    (error) => logger.error('Fantasy: card da rodada não gravado', { fantasy: fantasyRef.id, round, error: String(error) }),
+  );
+}
+
+/**
+ * Card "Craques da rodada" no feed: rodada finalizada com [top] cria o card
+ * (hora do servidor + push) ou regrava os campos mantendo a `data` (súmula
+ * corrigida não sobe no feed nem manda push de novo); sem top (não
+ * finalizada / ninguém pontuou), o card que existir fica oculto.
+ */
+async function syncFantasyRoundCard(
+  fantasyId: string,
+  config: FantasyDoc,
+  round: number,
+  top: ReturnType<typeof fantasyTopThree>,
+  test = false,
+) {
+  const { db, FieldValue } = await admin();
+  const ref = db.collection('noticias').doc(fantasyRoundNewsId(fantasyId, round));
+  const current = await ref.get();
+  const built = fantasyRoundNews(fantasyId, config, round, top);
+  // Rodada com partida de teste: o card é de teste (só o admin vê; push só para os admins).
+  const news = built && test ? { ...built, teste: true } : built;
+  if (!news) {
+    if (current.exists && current.data()?.exibir !== 'false') await ref.update({ exibir: 'false' });
+    return;
+  }
+  if (current.exists) {
+    await ref.set(news, { merge: true });
+    return;
+  }
+  await ref.set({ ...news, data: FieldValue.serverTimestamp() });
+  logger.info('Card do Fantasy postado', { fantasy: fantasyId, round });
+  const message = fantasyRoundMessage(news);
+  if (message) await deliver(`fantasy_${fantasyId}_r${round}`, forTest(message, test), `fantasy/${fantasyId}/rodadas/${round}`);
+}
+
+/**
+ * Competição encerrada: o Fantasy dela (mesmo id do doc) ganha o campeão
+ * (maior pontuação; empate = todos). Reaberta: o campeão sai.
+ */
+async function syncFantasyChampion(championshipDocId: string, before: FantasyDoc, after: FantasyDoc): Promise<void> {
+  const closedBefore = before.encerrado === true;
+  const closedAfter = after.encerrado === true;
+  if (closedBefore === closedAfter) return;
+  const { db, FieldValue } = await admin();
+  const ref = db.collection(FANTASY).doc(championshipDocId);
+  if (!(await ref.get()).exists) return;
+  if (!closedAfter) {
+    await ref.update({ campeao: FieldValue.delete(), campeaoEm: FieldValue.delete() });
+    return;
+  }
+  const top = await ref.collection(FANTASY_PARTICIPANTS).orderBy('pontos', 'desc').limit(10).get();
+  const champions = fantasyChampions(top.docs.map((d) => ({ id: d.id, data: d.data() })));
+  await ref.update({ campeao: champions, campeaoEm: FieldValue.serverTimestamp() });
+  logger.info('Fantasy: campeão gravado', { fantasy: championshipDocId, champions: champions.length });
+}
+
+/**
+ * "Fechar agora": fecha a rodada (parâmetros congelados, prazo = agora,
+ * escalações copiadas) e marca `fechadaManual` (a sincronia não reabre).
+ * "Reabrir": aberta até o prazo do admin (`prazoManual`: a sincronia não
+ * troca). Depois, a `rodadaAtual` é recalculada.
+ */
+async function applyRoundAction(fantasyRef: DocRef, action: RoundAction): Promise<void> {
+  const { FieldValue } = await admin();
+  const roundRef = fantasyRef.collection(FANTASY_ROUNDS).doc(String(action.numero));
+  const snap = await roundRef.get();
+  if (!snap.exists) return;
+  const now = new Date();
+  if (action.acao === 'fechar') {
+    if (snap.data()?.status === 'aberta') {
+      await roundRef.update({ fechaEm: now, prazoManual: FieldValue.delete() });
+      await closeFantasyRound(fantasyRef, roundRef, now);
+    }
+    await roundRef.update({ fechadaManual: true });
+  } else {
+    if (!action.prazo || action.prazo <= now) return;
+    await roundRef.update({
+      status: 'aberta',
+      fechaEm: action.prazo,
+      prazoManual: true,
+      fechadaManual: FieldValue.delete(),
+      parametros: FieldValue.delete(),
+      fechadaEm: FieldValue.delete(),
+      finalizada: FieldValue.delete(),
+    });
+  }
+  await refreshCurrentRound(fantasyRef, now);
+  logger.info('Fantasy: rodada mudada pelo admin', { fantasy: fantasyRef.id, round: action.numero, action: action.acao });
+}
+
+/**
+ * "Zerar pontuações (testes)": participantes com 0, escalações sem os pontos,
+ * rodadas sem a auditoria dos atletas e sem a `apuracao` (status, prazo,
+ * partidas e `finalizada` ficam: o mercado não muda), sem campeão e sem os
+ * cards "Craques da rodada" no feed. Grava `zeradoEm` ao terminar.
+ */
+async function resetFantasyScores(fantasyRef: DocRef): Promise<void> {
+  const { db, FieldValue } = await admin();
+  let batch = db.batch();
+  let pending = 0;
+  const flush = async (force = false) => {
+    if (pending && (force || pending >= 400)) {
+      await batch.commit();
+      batch = db.batch();
+      pending = 0;
+    }
+  };
+  const participants = await fantasyRef.collection(FANTASY_PARTICIPANTS).get();
+  for (const p of participants.docs) {
+    batch.update(p.ref, { pontos: 0 });
+    pending++;
+    await flush();
+  }
+  const rounds = await fantasyRef.collection(FANTASY_ROUNDS).get();
+  for (const round of rounds.docs) {
+    const [lineups, athletes] = await Promise.all([
+      round.ref.collection(FANTASY_LINEUPS).get(),
+      round.ref.collection('atletas').get(),
+    ]);
+    for (const lineup of lineups.docs) {
+      batch.update(lineup.ref, {
+        pontos: FieldValue.delete(),
+        pontosAtletas: FieldValue.delete(),
+        atletasJogaram: FieldValue.delete(),
+        aplicado: FieldValue.delete(),
+        processadoEm: FieldValue.delete(),
+      });
+      pending++;
+      await flush();
+    }
+    for (const athlete of athletes.docs) {
+      batch.delete(athlete.ref);
+      pending++;
+      await flush();
+    }
+    batch.update(round.ref, { apuracao: FieldValue.delete() });
+    batch.delete(db.collection('noticias').doc(fantasyRoundNewsId(fantasyRef.id, Number(round.id))));
+    pending += 2;
+    await flush();
+  }
+  batch.update(fantasyRef, {
+    campeao: FieldValue.delete(),
+    campeaoEm: FieldValue.delete(),
+    zeradoEm: FieldValue.serverTimestamp(),
+  });
+  pending++;
+  await flush(true);
+  logger.info('Fantasy: pontuações zeradas', {
+    fantasy: fantasyRef.id,
+    participants: participants.size,
+    rounds: rounds.size,
+  });
+}
+
+/** Admin ligou o Fantasy: monta as rodadas pelas partidas que já têm rodada. */
+export const onFantasyWritten = onDocumentWritten(`${FANTASY}/{fantasyId}`, async (event) => {
+  const before = event.data?.before.data();
+  const after = event.data?.after.data();
+  const ref = event.data?.after.ref;
+  if (!after || !ref) return;
+  const season = typeof after.temporada === 'string' && after.temporada ? after.temporada : await currentSeason();
+  // "Abrir/Fechar rodada" do admin.
+  const roundAction = roundActionRequested(before, after);
+  if (roundAction) {
+    await applyRoundAction(ref, roundAction);
+    return;
+  }
+  // "Zerar pontuações (testes)" do admin: antes do reapurar (os dois no mesmo
+  // pedido = zera e não reapura).
+  if (resetRequested(before, after)) {
+    await resetFantasyScores(ref);
+    return;
+  }
+  // "Reapurar rodadas" do admin: rodadas pelas partidas e todas as fechadas
+  // apuradas de novo (seguro: a escalação só recebe a diferença).
+  if (rescoreRequested(before, after)) {
+    await syncFantasyRounds(ref, after, season);
+    const rounds = await ref.collection(FANTASY_ROUNDS).where('status', '==', 'fechada').get();
+    for (const round of rounds.docs) {
+      await scoreFantasyRound(ref, after, Number(round.id), season).catch((error) =>
+        logger.error('Fantasy: reapuração falhou', { fantasy: ref.id, round: round.id, error: String(error) }),
+      );
+    }
+    logger.info('Fantasy: reapuração feita', { fantasy: ref.id, rounds: rounds.size });
+    return;
+  }
+  if (after.ativo !== true || before?.ativo === true) return;
+  await syncFantasyRounds(ref, after, season);
+});
+
+/** Participante novo: a contagem do Fantasy sobe. */
+export const onFantasyParticipantCreated = onDocumentCreated(
+  `${FANTASY}/{fantasyId}/${FANTASY_PARTICIPANTS}/{uid}`,
+  async (event) => {
+    const { db, FieldValue } = await admin();
+    await db
+      .collection(FANTASY)
+      .doc(event.params.fantasyId)
+      .update({ participantes: FieldValue.increment(1) });
+    // Entra no ranking geral com 0 (o `increment(0)` não apaga pontos já somados).
+    await event.data?.ref.set({ pontos: FieldValue.increment(0) }, { merge: true });
+  },
+);
 
 /**
  * Pacotinhos liberados: os álbuns com `avisoEm` vencido recebem o push

@@ -98,4 +98,17 @@ class PreferencesService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_playerModeKey(uid), value);
   }
+
+  /// Modo torcedor do admin (ver o app como usuário comum), por conta.
+  static String _fanModeKey(String uid) => 'modoTorcedor_$uid';
+
+  Future<bool> getFanMode(String uid) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_fanModeKey(uid)) ?? false;
+  }
+
+  Future<void> setFanMode(String uid, bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_fanModeKey(uid), value);
+  }
 }

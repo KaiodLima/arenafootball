@@ -4,6 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
+import 'package:arena_soccer/features/matches/domain/match_report.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_report_dtos.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/save_match_report_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/set_match_phase_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/toggle_match_voting_usecase.dart';
@@ -98,5 +101,59 @@ void main() {
     expect(find.text('Quando'), findsOneWidget);
     expect(tester.takeException(), isNull);
     await cubit.close();
+  });
+
+  group('no máximo 11 titulares', () {
+    final full = MatchLineup(home: [
+      for (var i = 1; i <= 11; i++) LineupEntry(playerId: 's$i', playerName: 'Titular $i'),
+    ]);
+    MatchDTO match() => MatchDTO(
+        id: 'm1', homeTeam: 'Alfa', awayTeam: 'Beta', homeTeamId: 'tA', awayTeamId: 'tB', venue: 'Campo', lineup: full);
+
+    test('domínio e cubit: o 12º não entra; reserva libera a vaga', () async {
+      expect(MatchReport.canAddStarter(full.home, 'novo'), isFalse);
+      expect(MatchReport.canAddStarter(full.home, 's1'), isTrue);
+      final cubit = MatchReportCubit(_Squads(), _Save(), _Phase(), _Voting(), _Create(), _Delay());
+      addTearDown(cubit.close);
+      await cubit.load(match: match());
+      const extra = PlayerDTO(id: 'novo', name: 'Novo', team: 'Alfa', teamId: 'tA');
+      cubit.setRole(MatchSide.home, extra, LineupRole.starter);
+      expect(cubit.state.notice, MatchReportNotice.startersFull);
+      expect(MatchReport.lineupCount(cubit.state.match!.lineup.home).starters, 11);
+      expect(cubit.state.match!.lineup.home.any((e) => e.playerId == 'novo'), isFalse);
+      cubit.setRole(MatchSide.home, extra, LineupRole.sub);
+      expect(cubit.state.match!.lineup.home.any((e) => e.playerId == 'novo' && !e.starter), isTrue);
+      cubit.setRole(
+          MatchSide.home, const PlayerDTO(id: 's1', name: 'Titular 1', team: 'Alfa', teamId: 'tA'), LineupRole.sub);
+      cubit.setRole(MatchSide.home, extra, LineupRole.starter);
+      expect(cubit.state.notice, isNot(MatchReportNotice.startersFull));
+      expect(MatchReport.lineupCount(cubit.state.match!.lineup.home).starters, 11);
+      expect(cubit.state.match!.lineup.home.any((e) => e.playerId == 'novo' && e.starter), isTrue);
+    });
+
+    testWidgets('tela: "Titular" com 11 titulares avisa e não escala', (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 2.75;
+      addTearDown(tester.view.reset);
+      final cubit = MatchReportCubit(_Squads(), _Save(), _Phase(), _Voting(), _Create(), _Delay());
+      await cubit.load(match: match());
+      await tester.pumpWidget(MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('pt'),
+        home: BlocProvider.value(value: cubit, child: const MatchReportPage()),
+      ));
+      await tester.pump();
+      await tester.tap(find.text('Escalação'));
+      await tester.pumpAndSettle();
+      expect(find.text('Titulares 11/11'), findsOneWidget);
+      // O atleta fora da escalação fica por último.
+      await tester.scrollUntilVisible(find.text('Atleta Alfa'), 200, scrollable: find.byType(Scrollable).last);
+      await tester.tap(find.byKey(const ValueKey('report-role-starter')).last);
+      await tester.pump();
+      expect(find.text('Já há 11 titulares. Tire um titular para escalar outro.'), findsOneWidget);
+      expect(find.text('Titulares 11/11'), findsOneWidget);
+      await cubit.close();
+    });
   });
 }

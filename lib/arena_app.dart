@@ -153,6 +153,17 @@ import 'package:arena_soccer/features/qr_codes/presentation/page/qr_codes_page.d
 import 'package:arena_soccer/features/qr_codes/presentation/bloc/now_cubit.dart';
 import 'package:arena_soccer/features/qr_codes/presentation/page/now_page.dart';
 import 'package:arena_soccer/features/player_requests/domain/player_claim_args.dart';
+import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_settings_cubit.dart';
+import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_settings_page.dart';
+import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_lineup_cubit.dart';
+import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_lineup_page.dart';
+import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_badge_cubit.dart';
+import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_ranking_cubit.dart';
+import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_ranking_page.dart';
+import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_admin_cubit.dart';
+import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_admin_page.dart';
+import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_home_cubit.dart';
+import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_home_page.dart';
 
 class ArenaApp extends StatelessWidget {
   const ArenaApp({super.key});
@@ -237,6 +248,8 @@ class ArenaApp extends StatelessWidget {
                 BlocProvider<ChampionshipsCubit>(create: (_) => ChampionshipsCubit(sl())),
                 BlocProvider<MatchesCubit>(create: (_) => MatchesCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), sl())),
                 BlocProvider<NewsFeedCubit>(create: (_) => NewsFeedCubit(sl(), sl(), sl(), sl())),
+                // Selo do Arena Fantasy (Fantasy ativos da temporada).
+                BlocProvider<FantasyBadgeCubit>(create: (_) => FantasyBadgeCubit(sl())),
               ],
               child: const HomePage(),
             ),
@@ -539,6 +552,45 @@ class ArenaApp extends StatelessWidget {
               child: const ReferralPage(),
             ),
         AppRoutes.referralSettingsPage: (_) => const ReferralSettingsPage(),
+        // Arena Fantasy do campeonato: entrar e montar a escalação da rodada.
+        AppRoutes.fantasyLineupPage: (context) => BlocProvider<FantasyLineupCubit>(
+              create: (_) =>
+                  FantasyLineupCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), teams: sl(), rounds: sl(), topAthletes: sl()),
+              child: FantasyLineupPage(
+                championship: ModalRoute.of(context)!.settings.arguments as ChampionshipDTO,
+              ),
+            ),
+        // Arena Fantasy: rankings da rodada e geral e o histórico da conta.
+        AppRoutes.fantasyRankingPage: (context) => BlocProvider<FantasyRankingCubit>(
+              create: (_) => FantasyRankingCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), topAthletes: sl()),
+              child: Builder(builder: (context) {
+                final args = FantasyRankingArgs.of(ModalRoute.of(context)!.settings.arguments);
+                return FantasyRankingPage(championship: args.championship, initialTab: args.tab);
+              }),
+            ),
+        // Arena Fantasy: home com os campeonatos ativos da região.
+        AppRoutes.fantasyHomePage: (_) => BlocProvider<FantasyHomeCubit>(
+              create: (_) => FantasyHomeCubit(sl(), sl(), sl(), sl(), sl()),
+              child: const FantasyHomePage(),
+            ),
+        // Arena Fantasy (admin): rodadas/apuração e participantes.
+        AppRoutes.fantasyAdminPage: (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          return BlocProvider<FantasyAdminCubit>(
+            create: (_) => FantasyAdminCubit(sl(), sl(), sl(), sl(), sl(), sl(), reset: sl(), roundAction: sl()),
+            child: FantasyAdminPage(
+              championship: args['championship'] as ChampionshipDTO,
+              initialTab: args['tab'] as int? ?? 0,
+            ),
+          );
+        },
+        // Arena Fantasy do campeonato (admin): liga/desliga e os parâmetros.
+        AppRoutes.fantasySettingsPage: (context) => BlocProvider<FantasySettingsCubit>(
+              create: (_) => FantasySettingsCubit(sl(), sl()),
+              child: FantasySettingsPage(
+                championship: ModalRoute.of(context)!.settings.arguments as ChampionshipDTO,
+              ),
+            ),
         AppRoutes.organizerRequestPage: (_) => BlocProvider<OrganizerRequestCubit>(
               create: (_) => OrganizerRequestCubit(sl(), sl(), sl(), sl(), sl()),
               child: const OrganizerRequestPage(),

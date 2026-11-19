@@ -14,6 +14,7 @@ import 'package:arena_soccer/features/championships/data/dtos/group_dto.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/championship_groups_usecases.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_round_picker.dart';
 import 'package:arena_soccer/injection_container.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/matchday_widgets.dart';
 
 /// "Editar partida" (engrenagem do card/detalhe): data, horário, duração e
 /// local, com os times no topo (só leitura). Devolve os dados ao salvar
@@ -51,6 +52,7 @@ class _EditMatchInfoSheetState extends State<_EditMatchInfoSheet> {
   late int _duration = widget.match.durationMinutes;
   late final _venue = TextEditingController(text: widget.match.venue);
   late MatchRound? _round = widget.match.round;
+  late int? _matchday = widget.match.matchday;
 
   /// Fase só em partida de competição (amistoso não tem).
   bool get _showsRound => widget.match.championshipId > 0;
@@ -166,6 +168,8 @@ class _EditMatchInfoSheetState extends State<_EditMatchInfoSheet> {
               Text(l10n.matchRoundTitle, style: AppTypography.label(color: AppColors.textPrimary)),
               const SizedBox(height: AppSizes.s8),
               MatchRoundTile(round: _round, onTap: _pickRound),
+              const SizedBox(height: AppSizes.s8),
+              MatchdayStepper(value: _matchday, onChanged: (value) => setState(() => _matchday = value)),
             ],
             const SizedBox(height: AppSizes.s20),
             ArenaButton.primary(
@@ -178,6 +182,7 @@ class _EditMatchInfoSheetState extends State<_EditMatchInfoSheet> {
                   durationMinutes: _duration,
                   venue: _venue.text,
                   round: _round,
+                  matchday: _matchday,
                   keepRound: !_showsRound,
                 ),
               ),

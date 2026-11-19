@@ -248,6 +248,14 @@ void main() {
       await organizer.close();
     });
 
+    test('partida de teste: a chave grava "teste" na partida criada', () async {
+      cubit.setTest(true);
+      cubit.selectTime('19:30');
+      await cubit.submit();
+      expect(repository.created.last.isTest, isTrue);
+      expect(repository.created.last.toMap()['teste'], isTrue);
+    });
+
     test('sem conexão: libera o formulário para o próximo registro', () async {
       repository.offline = true;
       cubit.selectTime('20:00');
@@ -533,6 +541,37 @@ void main() {
       expect(created.toMap()['foraDosGrupos'], isTrue);
       expect(created.toMap()['fase'], 'final');
     });
+
+    test('rodada escolhida vai na partida (campo `rodada`)', () async {
+      final (cubit, repository) = await build();
+      addTearDown(cubit.close);
+      cubit.selectHomeTeam('Lava Jato');
+      cubit.selectAwayTeam('Volta');
+      cubit.selectMatchday(4);
+      expect(cubit.state.form.matchdayManual, isTrue);
+      cubit.selectTime('19:00');
+      await cubit.submit();
+      expect(repository.created.single.matchday, 4);
+      expect(repository.created.single.toMap()['rodada'], 4);
+    });
+  });
+
+  test('rodada sugerida: a do mesmo fim de semana; senão a maior antes + 1', () {
+    MatchDTO m(String date, int? matchday, {int championship = 7}) => MatchDTO(
+        id: date,
+        homeTeam: 'A',
+        awayTeam: 'B',
+        date: date,
+        time: '18:00',
+        championshipId: championship,
+        matchday: matchday);
+    final matches = [m('07/11/2026', 1), m('14/11/2026', 2), m('15/11/2026', 2), m('14/11/2026', 9, championship: 8)];
+    expect(MatchFormHints.suggestedMatchday(matches, championshipId: 7, date: '16/11/2026'), 2);
+    expect(MatchFormHints.suggestedMatchday(matches, championshipId: 7, date: '21/11/2026'), 3);
+    expect(MatchFormHints.suggestedMatchday(matches, championshipId: 7, date: '01/10/2026'), isNull);
+    expect(MatchFormHints.suggestedMatchday(matches, championshipId: 9, date: '21/11/2026'), isNull);
+    expect(MatchDTO.matchdayOf('3'), 3);
+    expect(MatchDTO.matchdayOf(0), isNull);
   });
 
   test('MatchRound: lido e gravado; partida antiga sem fase', () {

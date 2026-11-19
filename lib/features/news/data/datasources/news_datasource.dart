@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/firebase/test_content.dart';
 import 'package:arena_soccer/features/partner_requests/domain/partner_slots.dart';
 import 'package:arena_soccer/features/news/data/dtos/pending_news_dto.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
@@ -98,7 +99,9 @@ class NewsDataSource {
   Future<Either<Failure, NewsDTO?>> getNewsById(String id) async {
     try {
       final doc = await _news.doc(id).get();
-      return Right(doc.exists ? NewsDTO.fromFirestore(doc) : null);
+      final news = doc.exists ? NewsDTO.fromFirestore(doc) : null;
+      // Card de partida de teste: só o admin abre.
+      return Right(news != null && TestContent.allows(news.isTest) ? news : null);
     } catch (e) {
       AppLogger.e('getNewsById id=$id', name: 'NewsDataSource', error: e);
       return Left(mapFirebaseError(e, fallbackMessage: _loadFallback));

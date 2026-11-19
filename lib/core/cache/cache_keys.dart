@@ -85,6 +85,18 @@ abstract final class CacheKeys {
   /// Ranking de torcidas da [season] (doc da function, todas as regiões).
   static String fanRanking(String season) => 'fan_ranking_${_season(season)}_cache';
 
+  /// Atletas elegíveis no Arena Fantasy da competição [championshipId].
+  static String fantasyAthletes({String? season, required int championshipId}) =>
+      'fantasy_athletes_${_season(season)}_c${championshipId}_cache';
+
+  /// "Craques da rodada": atletas que mais pontuaram na rodada [round].
+  static String fantasyTopAthletes({required String fantasyId, required int round}) =>
+      'fantasy_top_athletes_${fantasyId}_${round}_cache';
+
+  /// Ranking do Arena Fantasy [fantasyId]: da rodada [round] ou geral (nula).
+  static String fantasyRanking({required String fantasyId, int? round}) =>
+      'fantasy_ranking_${fantasyId}_${round ?? 'geral'}_cache';
+
   static String _season(String? season) => (season == null || season.isEmpty) ? SeasonCollection.currentSeason : season;
 
   static String _region(String? region) {

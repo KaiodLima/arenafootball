@@ -6,6 +6,8 @@ import {
   isMatchOver,
   liveCardStatusOf,
   liveCardStatusUpdate,
+  liveClockChanged,
+  liveClockOf,
   liveNewsId,
   recentDays,
   resultChanged,
@@ -123,6 +125,7 @@ test('card ao vivo: fase da partida e o título do app antigo', () => {
   assert.equal(liveNewsId('m1'), 'aovivo_m1');
   assert.deepEqual(liveCardStatusUpdate('encerrada', match), {
     status_partida: 'encerrada',
+    relogio: { data: '', horario: '', duracao: 90, status: '' },
     titulo: 'Leões 2 × 1 Tigres · fim de jogo',
   });
   assert.equal(liveCardStatusUpdate('intervalo', match).titulo, 'Leões 2 × 1 Tigres · intervalo');
@@ -130,4 +133,29 @@ test('card ao vivo: fase da partida e o título do app antigo', () => {
   assert.equal(liveCardStatusOf('intervalo'), 'intervalo');
   assert.equal(liveCardStatusOf('aguardando'), null);
   assert.equal(liveCardStatusOf(undefined), null);
+});
+
+test('card ao vivo: relógio copiado da partida e o que muda o minuto', () => {
+  const started = { toMillis: () => 1000 };
+  const match = { data: '18/11', horario: '16:00', duracao: '70', status: 'andamento', inicioEm: started, golTimeCasa: 1 };
+  assert.deepEqual(liveClockOf(match), {
+    data: '18/11',
+    horario: '16:00',
+    duracao: 70,
+    status: 'andamento',
+    inicioEm: started,
+  });
+  assert.equal(liveClockOf({}).duracao, 90);
+  assert.equal(liveClockChanged(match, { ...match, inicioEm: { toMillis: () => 2000 } }), true);
+  assert.equal(liveClockChanged(match, { ...match, horario: '16:15' }), true);
+  assert.equal(liveClockChanged(match, { ...match, segundoTempoEm: started }), true);
+  assert.equal(liveClockChanged(match, { ...match, duracao: '80' }), true);
+  assert.equal(liveClockChanged(match, { ...match, golTimeCasa: 2, votacao: 'true' }), false);
+  assert.equal(liveClockChanged(match, { ...match, inicioEm: { toMillis: () => 1000 } }), false);
+});
+
+test('card de resultado da partida de teste também é de teste', () => {
+  const base = { timeC: 'A', timeF: 'B', golTimeCasa: 1, golTimeFora: 0, fk_competicao: 'Floresta' };
+  assert.equal(resultNews({ ...base, teste: true }, 'm1', '2026').teste, true);
+  assert.equal('teste' in resultNews(base, 'm1', '2026'), false);
 });

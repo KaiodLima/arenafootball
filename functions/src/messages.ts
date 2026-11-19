@@ -31,7 +31,8 @@ export type ActionKey =
   | 'indicacao'
   | 'solicitacao_organizador'
   | 'solicitacao_organizador_resposta'
-  | 'campeao';
+  | 'campeao'
+  | 'fantasy_rodada';
 
 /** Sem configuração gravada, vale este padrão (notícia vem desligada). */
 export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
@@ -57,6 +58,7 @@ export const DEFAULT_ENABLED: Record<ActionKey, boolean> = {
   solicitacao_organizador: true,
   solicitacao_organizador_resposta: true,
   campeao: true,
+  fantasy_rodada: true,
 };
 
 export type Target = { topic: string } | { condition: string };
@@ -272,6 +274,7 @@ export function newsMessage(news: Doc, id = ''): PushMessage | null {
     tag === 'resultado' ||
     tag === 'votacao' ||
     tag === 'campeao' ||
+    tag === 'fantasy' ||
     tag === 'publicidade' ||
     text(news.exibir) !== 'true'
   ) {
@@ -664,3 +667,18 @@ export function todayKey(now: Date = new Date()): string {
   const get = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
   return `${get('day')}/${get('month')}`;
 }
+
+/** Partida de teste (`teste: true`, só o admin cadastra e vê). */
+export const isTestDoc = (doc: Doc | undefined): boolean => doc?.teste === true;
+
+/** Push de partida de teste: só para o tópico `admins`, com "[TESTE]" no título. */
+export function testOnly(message: PushMessage): PushMessage {
+  return {
+    ...message,
+    titulo: message.titulo.startsWith('[TESTE]') ? message.titulo : `[TESTE] ${message.titulo}`,
+    alvo: { topic: 'admins' },
+  };
+}
+
+/** O push como vai: o de teste só para os admins. */
+export const forTest = (message: PushMessage, test: boolean): PushMessage => (test ? testOnly(message) : message);

@@ -86,12 +86,18 @@ class OwnedTeamSync extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocListener<SessionCubit, SessionState>(
-      listenWhen: (previous, current) => previous.user?.id != current.user?.id || previous.isAdmin != current.isAdmin,
+      listenWhen: (previous, current) =>
+          previous.user?.id != current.user?.id ||
+          previous.isAdmin != current.isAdmin ||
+          previous.inFanMode != current.inFanMode,
       listener: (context, state) {
-        BlocProvider.of<OwnedTeamCubit>(context).follow(state.user?.id);
-        BlocProvider.of<MyPlayerCubit>(context).follow(state.user?.id);
-        BlocProvider.of<PartnerCubit>(context).follow(state.user?.id);
-        BlocProvider.of<OrganizerModeCubit>(context).follow(state.user?.id, isAdmin: state.isAdmin);
+        // Modo torcedor do admin: como uma conta comum, sem atleta, time,
+        // parceria nem campeonatos.
+        final uid = state.inFanMode ? null : state.user?.id;
+        BlocProvider.of<OwnedTeamCubit>(context).follow(uid);
+        BlocProvider.of<MyPlayerCubit>(context).follow(uid);
+        BlocProvider.of<PartnerCubit>(context).follow(uid);
+        BlocProvider.of<OrganizerModeCubit>(context).follow(uid, isAdmin: state.isAdmin);
         BlocProvider.of<AlbumEventCubit>(context).follow(state.user?.id, isAdmin: state.isAdmin);
       },
       child: child,

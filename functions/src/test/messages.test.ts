@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
+  forTest,
+  isTestDoc,
+  testOnly,
   dailyGameMessage,
   goalMessage,
   bookingMessage,
@@ -311,4 +314,22 @@ test('vermelho: push "Expulso!" para a região e os times; aovivo/cartao não vi
   assert.equal(message?.corpo, "Ana (Leões) · 63'");
   assert.equal(newsMessage({ ...card, exibir: 'true', titulo: 'x' }), null);
   assert.equal(newsMessage({ tag: 'aovivo', exibir: 'true', titulo: 'Leões 1 × 0 Tigres · ao vivo', fk_competicao: 'Floresta' }), null);
+});
+
+test('partida de teste: push só para os admins, com [TESTE] no título', () => {
+  const message = {
+    tipo: 'gol' as const,
+    titulo: 'GOL!',
+    corpo: 'x',
+    aba: 'home' as const,
+    regiao: 'Floresta',
+    alvo: { topic: 'regiaoid_r1' },
+  };
+  assert.deepEqual(testOnly(message).alvo, { topic: 'admins' });
+  assert.equal(testOnly(message).titulo, '[TESTE] GOL!');
+  assert.equal(testOnly(testOnly(message)).titulo, '[TESTE] GOL!');
+  assert.equal(forTest(message, false), message);
+  assert.equal(isTestDoc({ teste: true }), true);
+  assert.equal(isTestDoc({ teste: 'true' }), false);
+  assert.equal(isTestDoc(undefined), false);
 });

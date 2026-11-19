@@ -27,7 +27,8 @@ class RepairPlayerTotalsUseCase {
     }
 
     for (final match in matches) {
-      if (match.championshipId > 0) continue;
+      // Partida de teste não conta nos números dos atletas.
+      if (match.championshipId > 0 || match.isTest) continue;
       for (final goal in match.goals) {
         bump(goal.scorerId, goals: 1);
         if (goal.hasAssistant) bump(goal.assistantId, assists: 1);
@@ -55,7 +56,7 @@ class RepairPlayerTotalsUseCase {
     }
 
     for (final match in matches) {
-      if (match.championshipId <= 0) continue;
+      if (match.championshipId <= 0 || match.isTest) continue;
       for (final goal in match.goals) {
         bump(goal.scorerId, match, goal.side, goals: 1);
         if (goal.hasAssistant) bump(goal.assistantId, match, goal.side, assists: 1);

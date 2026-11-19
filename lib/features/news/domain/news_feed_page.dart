@@ -1,3 +1,4 @@
+import 'package:arena_soccer/core/firebase/test_content.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 
 /// Tamanho de cada página do feed (a primeira, ao vivo, e as antigas).
@@ -21,16 +22,19 @@ class NewsFeedPage {
     );
   }
 
-  /// Cards de gol, de resultado, de votação, de evento, de campeão e de publicidade só aparecem com
+  /// Cards de gol, de resultado, de votação, de evento, de campeão, do Fantasy e de publicidade só aparecem com
   /// `exibir == "true"`. Notícias comuns aparecem sempre (como no app antigo).
-  static bool _visibleInFeed(NewsDTO item) => (item.isGoal ||
+  static bool _visibleInFeed(NewsDTO item) => TestContent.allows(item.isTest) && _shown(item);
+
+  static bool _shown(NewsDTO item) => (item.isGoal ||
           item.isResult ||
           item.isVoteCall ||
           item.isAd ||
           item.isLive ||
           item.isBookingCard ||
           item.isEvent ||
-          item.isChampion)
+          item.isChampion ||
+          item.isFantasyRound)
       ? item.isVisible
       : true;
 }

@@ -39,6 +39,9 @@ class StickerCard extends StatelessWidget {
   /// brilho em loop (só no escudo).
   final double? sheen;
 
+  /// Texto do selo do canto no lugar do número (ex.: a vaga do Fantasy).
+  final String? label;
+
   const StickerCard({
     super.key,
     required this.sticker,
@@ -47,6 +50,7 @@ class StickerCard extends StatelessWidget {
     this.onTap,
     this.heroTag,
     this.sheen,
+    this.label,
   });
 
   /// Brilho holográfico: o escudo e as raras.
@@ -83,7 +87,7 @@ class StickerCard extends StatelessWidget {
               // pacotinho e no voo do Hero (sem ele, sublinhado amarelo).
               child: Material(
                 type: MaterialType.transparency,
-                child: _Face(sticker: sticker, style: style, k: k),
+                child: _Face(sticker: sticker, style: style, k: k, label: label),
               ),
             ),
           );
@@ -166,8 +170,9 @@ class _Face extends StatelessWidget {
   final StickerDTO sticker;
   final StickerStyle style;
   final double k;
+  final String? label;
 
-  const _Face({required this.sticker, required this.style, required this.k});
+  const _Face({required this.sticker, required this.style, required this.k, this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -274,7 +279,7 @@ class _Face extends StatelessWidget {
                   border: Border.all(color: AppColors.white, width: AppSizes.s1 * k),
                 ),
                 child: Text(
-                  '${sticker.number}',
+                  label ?? '${sticker.number}',
                   style: AppTypography.label(color: _onColor(second))
                       .copyWith(fontSize: AppSizes.s10 * k, fontWeight: FontWeight.w900, height: 1.1),
                 ),
@@ -484,7 +489,13 @@ class RareTag extends StatelessWidget {
 class EmptySlot extends StatelessWidget {
   final StickerDTO sticker;
 
-  const EmptySlot({super.key, required this.sticker});
+  /// Texto grande no lugar do número (ex.: a vaga do Fantasy).
+  final String? label;
+
+  /// Ícone no lugar do padrão (atleta/escudo/estrela).
+  final IconData? icon;
+
+  const EmptySlot({super.key, required this.sticker, this.label, this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -505,27 +516,32 @@ class EmptySlot extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                rare
-                    ? Icons.star_rounded
-                    : crest
-                        ? Icons.shield_outlined
-                        : Icons.person_outline_rounded,
+                icon ??
+                    (rare
+                        ? Icons.star_rounded
+                        : crest
+                            ? Icons.shield_outlined
+                            : Icons.person_outline_rounded),
                 color: rare ? AppColors.gold : AppColors.white.withValues(alpha: 0.35),
                 size: AppSizes.s24,
               ),
-              Text(
-                '${sticker.number}',
-                style: AppTypography.display(color: AppColors.white.withValues(alpha: 0.85))
-                    .copyWith(fontSize: AppSizes.s28),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label ?? '${sticker.number}',
+                  style: AppTypography.display(color: AppColors.white.withValues(alpha: 0.85))
+                      .copyWith(fontSize: AppSizes.s28),
+                ),
               ),
-              Text(
-                sticker.name,
-                maxLines: 2,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                style:
-                    AppTypography.label(color: AppColors.white.withValues(alpha: 0.6)).copyWith(fontSize: AppSizes.s10),
-              ),
+              if (sticker.name.isNotEmpty)
+                Text(
+                  sticker.name,
+                  maxLines: 2,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.label(color: AppColors.white.withValues(alpha: 0.6))
+                      .copyWith(fontSize: AppSizes.s10),
+                ),
             ],
           ),
         ),

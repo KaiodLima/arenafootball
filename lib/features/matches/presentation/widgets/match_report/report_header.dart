@@ -13,6 +13,7 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_round_picker.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/matchday_widgets.dart';
 
 /// Etapa do jogo na linha de etapas da súmula.
 enum ReportStage { before, firstHalf, halfTime, secondHalf, finished }
@@ -169,10 +170,21 @@ class _ReportHeaderView extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s8, AppSizes.s16, AppSizes.s16),
         child: Column(
           children: [
-            if (match.round != null)
+            if (match.round != null || match.matchday != null || match.isTest)
               Padding(
                 padding: const EdgeInsets.only(bottom: AppSizes.s8),
-                child: MatchStageBadge(round: match.round!),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (match.round != null) MatchStageBadge(round: match.round!),
+                    if (match.round != null && match.matchday != null) const SizedBox(width: AppSizes.s6),
+                    if (match.matchday != null) MatchdayBadge(matchday: match.matchday!),
+                    if (match.isTest) ...[
+                      const SizedBox(width: AppSizes.s6),
+                      const MatchTestBadge(),
+                    ],
+                  ],
+                ),
               ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,

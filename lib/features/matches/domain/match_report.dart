@@ -186,6 +186,13 @@ class MatchReport {
           if (s.side == side) s.outId
       };
 
+  /// Titulares por time na escalação.
+  static const int maxStarters = 11;
+
+  /// Dá para pôr [playerId] como titular: ele já é, ou há menos de [maxStarters].
+  static bool canAddStarter(List<LineupEntry> entries, String playerId) =>
+      entries.any((e) => e.starter && e.playerId == playerId) || entries.where((e) => e.starter).length < maxStarters;
+
   /// Titulares e reservas de um lado.
   static ({int starters, int subs}) lineupCount(List<LineupEntry> entries) =>
       (starters: entries.where((e) => e.starter).length, subs: entries.where((e) => !e.starter).length);

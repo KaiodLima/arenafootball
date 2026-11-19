@@ -233,6 +233,8 @@ class MatchReportPage extends StatelessWidget {
             );
           case MatchReportNotice.playerAdded:
             showSnackBar(context: context, message: l10n.matchReportPlayerAdded);
+          case MatchReportNotice.startersFull:
+            showSnackBar(context: context, message: l10n.reportStartersFull, isSuccess: false);
           case MatchReportNotice.phaseChanged:
           case null:
             break;

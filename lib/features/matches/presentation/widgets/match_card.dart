@@ -15,6 +15,7 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/constants/team_colors.dart';
 import 'package:arena_soccer/features/matches/domain/match_time.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_round_picker.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/matchday_widgets.dart';
 
 /// Momento da partida para o centro do card: antes do jogo (horário grande e
 /// o dia), em andamento (do horário até horário + duração, ou iniciada na mão
@@ -338,6 +339,14 @@ class _MatchCardState extends State<MatchCard> {
                     const SizedBox(width: AppSizes.s6),
                     MatchStageBadge(round: round),
                   ],
+                  if (match.matchday != null) ...[
+                    const SizedBox(width: AppSizes.s6),
+                    MatchdayBadge(matchday: match.matchday!),
+                  ],
+                  if (match.isTest) ...[
+                    const SizedBox(width: AppSizes.s6),
+                    const MatchTestBadge(),
+                  ],
                   if (isAdmin) ...[
                     const SizedBox(width: AppSizes.s6),
                     CardMenuButton(actions: _menuActions(l10n, match, status, now)),
@@ -574,6 +583,14 @@ class _MatchCardState extends State<MatchCard> {
                   if (match.round != null) ...[
                     const SizedBox(height: AppSizes.s2),
                     FittedBox(fit: BoxFit.scaleDown, child: MatchStageBadge(round: match.round!, compact: true)),
+                  ],
+                  if (match.matchday != null) ...[
+                    const SizedBox(height: AppSizes.s2),
+                    FittedBox(fit: BoxFit.scaleDown, child: MatchdayBadge(matchday: match.matchday!, compact: true)),
+                  ],
+                  if (match.isTest) ...[
+                    const SizedBox(height: AppSizes.s2),
+                    const FittedBox(fit: BoxFit.scaleDown, child: MatchTestBadge(compact: true)),
                   ],
                 ],
               ),

@@ -25,7 +25,8 @@ class UpdateMatchGoalsUseCase {
     final saved = await _matches.updateGoals(matchId: match.id, goals: after, season: season);
     if (saved.isLeft) return Left(saved.left);
 
-    final delta = MatchGoal.statsDelta(before, after);
+    // Partida de teste: grava a lista de gols, mas não mexe nos números dos atletas.
+    final delta = match.isTest ? const <String, Never>{} : MatchGoal.statsDelta(before, after);
     for (final entry in delta.entries) {
       final home = entry.value.side == MatchSide.home;
       final enrollment = match.championshipId > 0

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/firebase/test_content.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_report_dtos.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
@@ -35,7 +36,8 @@ class MatchesDataSource {
       query = RegionRegistry.whereRegionOrIn(query, region, listField: MatchDTO.regionIdsField);
     }
     return query.orderBy('dataRegistro', descending: true).snapshots().toEither(
-          (snapshot) => snapshot.docs.map(MatchDTO.fromFirestore).toList(),
+          // Partida de teste: só o admin vê.
+          (snapshot) => snapshot.docs.map(MatchDTO.fromFirestore).where((m) => TestContent.allows(m.isTest)).toList(),
           fallbackMessage: 'Não foi possível carregar as partidas.',
           logName: _logName,
         );
@@ -44,10 +46,14 @@ class MatchesDataSource {
   /// Uma partida ao vivo (tela de detalhes); null se o doc foi apagado.
   Stream<Either<Failure, MatchDTO?>> watchMatch({required String matchId, String? season}) {
     return _matches(season).doc(matchId).snapshots().toEither(
-          (doc) => doc.exists ? MatchDTO.fromFirestore(doc) : null,
-          fallbackMessage: 'Não foi possível carregar a partida.',
-          logName: _logName,
-        );
+      (doc) {
+        if (!doc.exists) return null;
+        final match = MatchDTO.fromFirestore(doc);
+        return TestContent.allows(match.isTest) ? match : null;
+      },
+      fallbackMessage: 'Não foi possível carregar a partida.',
+      logName: _logName,
+    );
   }
 
   /// Gravação na fila do Firestore (sem conexão): a partida sai quando a rede voltar.
@@ -157,6 +163,8 @@ class MatchesDataSource {
     required String venue,
     MatchRound? round,
     bool writeRound = false,
+    int? matchday,
+    bool writeMatchday = false,
     String? season,
   }) =>
       _update(
@@ -167,6 +175,7 @@ class MatchesDataSource {
           'duracao': durationMinutes,
           'local': venue,
           if (writeRound) ...roundFields(round),
+          if (writeMatchday) MatchDTO.matchdayField: matchday ?? FieldValue.delete(),
         },
         season: season,
       );
@@ -255,7 +264,8 @@ class MatchesDataSource {
   Future<Either<Failure, List<MatchDTO>>> getElectedMatches({required String playerId, String? season}) async {
     try {
       final result = await _matches(season).where('${MatchDTO.electedField}.idJogador', isEqualTo: playerId).get();
-      return Right(result.docs.map(MatchDTO.fromFirestore).toList());
+      // Partida de teste não vira troféu (nem para o admin).
+      return Right(result.docs.map(MatchDTO.fromFirestore).where((m) => !m.isTest).toList());
     } catch (e) {
       AppLogger.e('getElectedMatches id=$playerId', name: 'MatchesDataSource', error: e);
       return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível carregar os troféus.'));

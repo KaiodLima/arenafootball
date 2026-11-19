@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/firebase/test_content.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/services/preferences_service.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
@@ -14,6 +15,14 @@ import 'package:arena_soccer/features/auth/domain/usecases/sign_out_usecase.dart
 import 'package:arena_soccer/features/auth/presentation/bloc/session_state.dart';
 
 class SessionCubit extends Cubit<SessionState> {
+  /// Conteúdo de teste do admin: visível só com a conta admin na sessão.
+  @override
+  void onChange(Change<SessionState> change) {
+    super.onChange(change);
+    // O modo torcedor vê como o usuário comum (sem as partidas de teste).
+    TestContent.configure(visible: change.nextState.isAccountAdmin && !change.nextState.inFanMode);
+  }
+
   final GetCurrentUserUseCase getCurrentUserUseCase;
   final SignOutUseCase signOutUseCase;
   final DeleteAccountUseCase deleteAccountUseCase;
@@ -36,23 +45,35 @@ class SessionCubit extends Cubit<SessionState> {
     this.preferences,
   ]) : super(const CheckingSessionState());
 
-  /// O modo jogador guardado para a conta (só conta admin).
-  Future<bool> _savedPlayerMode(UserDTO user) async {
+  /// O modo guardado para a conta (só conta admin): jogador ou torcedor.
+  Future<AdminViewMode> _savedViewMode(UserDTO user) async {
     final prefs = preferences;
-    if (!user.isAdmin || prefs == null) return false;
-    return prefs.getPlayerMode(user.id);
+    if (!user.isAdmin || prefs == null) return AdminViewMode.admin;
+    if (await prefs.getFanMode(user.id)) return AdminViewMode.fan;
+    if (await prefs.getPlayerMode(user.id)) return AdminViewMode.player;
+    return AdminViewMode.admin;
   }
 
-  Future<AuthenticatedSessionState> _authenticated(UserDTO user) async =>
-      AuthenticatedSessionState(user: user, playerMode: await _savedPlayerMode(user));
+  static AuthenticatedSessionState _withMode(UserDTO user, AdminViewMode mode) => AuthenticatedSessionState(
+        user: user,
+        playerMode: user.isAdmin && mode == AdminViewMode.player,
+        fanMode: user.isAdmin && mode == AdminViewMode.fan,
+      );
 
-  /// Liga/desliga o modo jogador do admin (toggle do topo da home).
-  Future<void> setPlayerMode(bool value) async {
+  Future<AuthenticatedSessionState> _authenticated(UserDTO user) async => _withMode(user, await _savedViewMode(user));
+
+  /// Troca o modo de visão do admin (toggle do topo da home): admin, jogador
+  /// ou torcedor. Guardado no aparelho por conta.
+  Future<void> setViewMode(AdminViewMode mode) async {
     final user = state.user;
-    if (user == null || !user.isAdmin || state.playerMode == value) return;
-    emit(AuthenticatedSessionState(user: user, playerMode: value));
-    await preferences?.setPlayerMode(user.id, value);
+    if (user == null || !user.isAdmin || state.viewMode == mode) return;
+    emit(_withMode(user, mode));
+    await preferences?.setPlayerMode(user.id, mode == AdminViewMode.player);
+    await preferences?.setFanMode(user.id, mode == AdminViewMode.fan);
   }
+
+  /// Liga/desliga o modo jogador do admin (atalho do [setViewMode]).
+  Future<void> setPlayerMode(bool value) => setViewMode(value ? AdminViewMode.player : AdminViewMode.admin);
 
   static const String _logName = 'SessionCubit';
 
@@ -93,7 +114,7 @@ class SessionCubit extends Cubit<SessionState> {
   Future<void> updateUser(UserDTO user) async {
     if (!state.isAuthenticated) return;
     // Mantém o modo (deixou de ser admin, o modo some sozinho: `isAccountAdmin`).
-    emit(AuthenticatedSessionState(user: user, playerMode: state.playerMode && user.isAdmin));
+    emit(_withMode(user, state.viewMode));
     await saveUserCacheUseCase(user);
   }
 

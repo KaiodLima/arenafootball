@@ -240,6 +240,11 @@ class _NotificationsPanelPageState extends State<NotificationsPanelPage> {
         name: l10n.pushActionChampion,
         description: l10n.pushActionChampionHint
       ),
+    PushAction.fantasyRound => (
+        icon: Icons.star_rounded,
+        name: l10n.pushActionFantasyRound,
+        description: l10n.pushActionFantasyRoundHint
+      ),
   };
 }
 

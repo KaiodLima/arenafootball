@@ -26,6 +26,7 @@ import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart'
 import 'package:arena_soccer/features/championships/presentation/widgets/champion_banner.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/close_championship_sheet.dart';
 import 'package:arena_soccer/utils/components/card_menu_button.dart';
+import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_entry_card.dart';
 
 /// Detalhe do campeonato: hero escuro (banner, temporada, título e chips) que
 /// recolhe ao rolar, e abas Visão geral · Times · Regulamento. O campeonato já
@@ -66,6 +67,9 @@ class _ChampionshipDetailsPageState extends State<ChampionshipDetailsPage> {
     final updated = await closeChampionshipFlow(context, championship: _championship, teams: _podiumTeams());
     if (updated != null && mounted) setState(() => _championship = updated);
   }
+
+  /// Admin: Arena Fantasy deste campeonato (liga/desliga e parâmetros).
+  void _openFantasy() => Navigator.pushNamed(context, AppRoutes.fantasySettingsPage, arguments: _championship);
 
   Future<void> _reopen() async {
     final updated = await reopenChampionshipFlow(context, championship: _championship);
@@ -122,6 +126,12 @@ class _ChampionshipDetailsPageState extends State<ChampionshipDetailsPage> {
                             icon: Icons.lock_open_rounded,
                             label: l10n.championshipReopen,
                             onSelected: _reopen,
+                          ),
+                        if (session.isAdmin)
+                          CardMenuAction(
+                            icon: Icons.stadium_rounded,
+                            label: l10n.fantasyTitle,
+                            onSelected: _openFantasy,
                           ),
                       ],
                     ),
@@ -259,6 +269,8 @@ class _OverviewTab extends StatelessWidget {
           const SizedBox(height: AppSizes.s16),
           ChampionBanner(champion: c.champion!, runnerUp: c.runnerUp),
         ],
+        // Arena Fantasy ativo: atalho para montar o time.
+        FantasyEntryCard(championship: c),
         if (hasPodium || individual.isNotEmpty) ...[
           _SectionTitle(l10n.championshipFormSectionPrizes),
           if (hasPodium)

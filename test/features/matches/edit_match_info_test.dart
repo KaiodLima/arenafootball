@@ -10,6 +10,7 @@ import 'package:arena_soccer/features/matches/presentation/widgets/match_card.da
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/features/matches/domain/match_round.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_round_picker.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/matchday_widgets.dart';
 
 class _Repo implements IMatchesRepository {
   final calls = <Map<String, Object>>[];
@@ -23,9 +24,18 @@ class _Repo implements IMatchesRepository {
     required String venue,
     MatchRound? round,
     bool writeRound = false,
+    int? matchday,
+    bool writeMatchday = false,
     String? season,
   }) async {
-    calls.add({'id': matchId, 'data': date, 'horario': time, 'duracao': durationMinutes, 'local': venue});
+    calls.add({
+      'id': matchId,
+      'data': date,
+      'horario': time,
+      'duracao': durationMinutes,
+      'local': venue,
+      if (writeMatchday) 'rodada': matchday ?? 'apagar',
+    });
     return const Right(null);
   }
 
@@ -61,6 +71,7 @@ void main() {
         durationMinutes: 90,
         venue: 'Campo do Ipê',
         round: null,
+        matchday: null,
         keepRound: true
       ),
     );
@@ -74,6 +85,7 @@ void main() {
         durationMinutes: 80,
         venue: ' Arena Orlandão ',
         round: null,
+        matchday: null,
         keepRound: true
       ),
     );
@@ -112,6 +124,7 @@ void main() {
       durationMinutes: 85,
       venue: 'Arena Orlandão',
       round: null,
+      matchday: null,
       keepRound: true
     ));
   });
@@ -176,5 +189,68 @@ void main() {
     await tester.pumpAndSettle();
     expect(result?.round, const MatchRound.knockout(MatchStage.finalMatch));
     expect(result?.keepRound, isFalse);
+  });
+
+  test('use case: grava a rodada só quando muda; tirar a rodada apaga o campo', () async {
+    final repo = _Repo();
+    final useCase = UpdateMatchInfoUseCase(repo);
+    const match =
+        MatchDTO(id: 'm3', homeTeam: 'A', awayTeam: 'B', date: '15/11/2026', time: '18:00', championshipId: 7);
+    final set = await useCase(
+      match: match,
+      info: (
+        date: '15/11/2026',
+        time: '18:00',
+        durationMinutes: 90,
+        venue: '',
+        round: null,
+        matchday: 3,
+        keepRound: false
+      ),
+    );
+    expect(repo.calls.single['rodada'], 3);
+    expect(set.right.matchday, 3);
+    await useCase(
+      match: set.right,
+      info: (
+        date: '15/11/2026',
+        time: '18:00',
+        durationMinutes: 90,
+        venue: '',
+        round: null,
+        matchday: null,
+        keepRound: false
+      ),
+    );
+    expect(repo.calls.last['rodada'], 'apagar');
+  });
+
+  testWidgets('folha: −/+ da rodada e o selo "RODADA 2"', (tester) async {
+    MatchInfoEdit? result;
+    const match =
+        MatchDTO(id: 'm4', homeTeam: 'A', awayTeam: 'B', date: '15/11/2026', time: '18:00', championshipId: 7);
+    await tester.pumpWidget(_app(Builder(
+      builder: (context) => Column(children: [
+        const MatchdayBadge(matchday: 2),
+        TextButton(
+          onPressed: () async => result = await showEditMatchInfoSheet(context, match: match),
+          child: const Text('abrir'),
+        ),
+      ]),
+    )));
+    expect(find.text('RODADA 2'), findsOneWidget);
+    await tester.tap(find.text('abrir'));
+    await tester.pumpAndSettle();
+    expect(find.text('Sem rodada'), findsOneWidget);
+    await tester.ensureVisible(find.byKey(const ValueKey('matchday-more')));
+    await tester.tap(find.byKey(const ValueKey('matchday-more')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('matchday-more')));
+    await tester.pumpAndSettle();
+    expect(find.text('2ª rodada'), findsOneWidget);
+    await tester.ensureVisible(find.text('Salvar'));
+    await tester.tap(find.text('Salvar'));
+    await tester.pumpAndSettle();
+    expect(result?.matchday, 2);
   });
 }

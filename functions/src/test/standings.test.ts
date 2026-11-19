@@ -135,3 +135,8 @@ test('stageChanged: troca de grupo ou de fora dos grupos', () => {
   assert.equal(stageChanged({}, { foraDosGrupos: true }), true);
   assert.equal(stageChanged({ idGrupo: 'gA' }, { idGrupo: 'gA', fase: 'x' }), false);
 });
+
+test('partida de teste não conta na classificação', () => {
+  assert.equal(groupGames(teams, [match('a', 'b', 1, 0, { teste: true })], 7, 'gA').length, 0);
+  assert.equal(groupGames(teams, [match('a', 'b', 1, 0, { teste: false })], 7, 'gA').length, 1);
+});

@@ -3,6 +3,7 @@ import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_report_dtos.dart';
 import 'package:arena_soccer/features/matches/domain/match_clock.dart';
 import 'package:arena_soccer/features/matches/domain/match_report.dart';
+import 'package:arena_soccer/features/news/data/dtos/live_clock.dart';
 import 'package:arena_soccer/features/news/data/dtos/live_event.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
@@ -164,6 +165,8 @@ class LiveMatchCard {
       lastEvent: highlight,
       liveEvents: events,
       matchStatus: status,
+      liveClock: LiveClock.of(match),
+      isTest: match.isTest,
     );
   }
 
@@ -193,6 +196,7 @@ class LiveMatchCard {
       matchId: match.id,
       championshipId: match.championshipId > 0 ? match.championshipId : null,
       regionIds: match.regionIds,
+      isTest: match.isTest,
     );
   }
 }

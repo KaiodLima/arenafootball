@@ -67,3 +67,9 @@ test('apuração no card: eleito com o time pelo id; sem eleito apaga os campos'
     craque_percentual: null,
   });
 });
+
+test('card de votação da partida de teste também é de teste', () => {
+  const base = { timeC: 'A', timeF: 'B', fk_competicao: 'Floresta' };
+  assert.equal(voteCardNews({ ...base, teste: true }, 'm1', '2026').teste, true);
+  assert.equal('teste' in voteCardNews(base, 'm1', '2026'), false);
+});

@@ -187,4 +187,17 @@ void main() {
     expect(matches.saved?.single.scorerId, 'dudu');
     await cubit.close();
   });
+
+  test('partida de teste: grava a lista de gols, mas não mexe nos números dos atletas', () async {
+    final matches = _Matches();
+    final players = _Players();
+    final result = await UpdateMatchGoalsUseCase(matches, players)(
+      match: _match.copyWith(isTest: true),
+      before: const [],
+      after: const [MatchGoal(id: 'n', side: MatchSide.home, scorerId: 'dudu', assistantId: 'ana')],
+    );
+    expect(result.right.homeGoals, 1);
+    expect(matches.saved?.length, 1);
+    expect(players.calls, isEmpty);
+  });
 }

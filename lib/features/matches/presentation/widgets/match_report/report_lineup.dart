@@ -55,6 +55,7 @@ class _ReportLineupState extends State<ReportLineup> {
     final squad = state.squadOf(_side);
     final entries = {for (final e in match.lineup.of(_side)) e.playerId: e};
     final count = MatchReport.lineupCount(match.lineup.of(_side));
+    final startersFull = count.starters >= MatchReport.maxStarters;
     List<PlayerDTO> group(LineupRole role) => squad.where((p) => state.roleOf(_side, p.id) == role).toList()
       ..sort((a, b) => (entries[a.id]?.number ?? 999).compareTo(entries[b.id]?.number ?? 999));
 
@@ -98,6 +99,7 @@ class _ReportLineupState extends State<ReportLineup> {
                   entry: entries[player.id],
                   role: role,
                   color: color,
+                  starterLocked: startersFull && role != LineupRole.starter,
                   onRole: (next) => widget.onRole(_side, player, next),
                   onNumber: () {
                     final entry = entries[player.id];
@@ -232,6 +234,9 @@ class _PlayerRow extends StatelessWidget {
   final LineupEntry? entry;
   final LineupRole role;
   final Color color;
+
+  /// Já há 11 titulares: o "Titular" deste atleta fica apagado.
+  final bool starterLocked;
   final ValueChanged<LineupRole> onRole;
   final VoidCallback onNumber;
 
@@ -240,6 +245,7 @@ class _PlayerRow extends StatelessWidget {
     required this.entry,
     required this.role,
     required this.color,
+    this.starterLocked = false,
     required this.onRole,
     required this.onNumber,
   });
@@ -295,7 +301,7 @@ class _PlayerRow extends StatelessWidget {
               ],
             ),
           ),
-          _RolePill(role: role, color: color, onChanged: onRole),
+          _RolePill(role: role, color: color, starterLocked: starterLocked, onChanged: onRole),
         ],
       ),
     );
@@ -306,16 +312,21 @@ class _PlayerRow extends StatelessWidget {
 class _RolePill extends StatelessWidget {
   final LineupRole role;
   final Color color;
+
+  /// "Titular" apagado (11 titulares); o toque ainda chega ao cubit, que avisa.
+  final bool starterLocked;
   final ValueChanged<LineupRole> onChanged;
 
-  const _RolePill({required this.role, required this.color, required this.onChanged});
+  const _RolePill({required this.role, required this.color, this.starterLocked = false, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     Widget segment(LineupRole value, String label) {
       final selected = role == value;
+      final locked = value == LineupRole.starter && starterLocked;
       return GestureDetector(
+        key: ValueKey('report-role-${value.name}'),
         onTap: () => onChanged(selected ? LineupRole.none : value),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
@@ -326,8 +337,13 @@ class _RolePill extends StatelessWidget {
           ),
           child: Text(
             label,
-            style: AppTypography.label(color: selected ? AppColors.white : AppColors.textSecondary)
-                .copyWith(fontSize: AppSizes.s12, fontWeight: FontWeight.w700),
+            style: AppTypography.label(
+              color: selected
+                  ? AppColors.white
+                  : locked
+                      ? AppColors.textSecondary.withValues(alpha: 0.35)
+                      : AppColors.textSecondary,
+            ).copyWith(fontSize: AppSizes.s12, fontWeight: FontWeight.w700),
           ),
         ),
       );

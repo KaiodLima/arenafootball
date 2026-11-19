@@ -191,7 +191,7 @@ service cloud.firestore {
       function writable() {
         return !(collection in ['config', 'notificacoes_envios', 'push_avisos', 'solicitacoes_jogador',
           'solicitacoes_time', 'solicitacoes_parceiro', 'noticias_pendentes', 'album_pacotes',
-          'indicacoes', 'codigos_indicacao', 'solicitacoes_organizador']);
+          'indicacoes', 'codigos_indicacao', 'solicitacoes_organizador', 'fantasy']);
       }
 
       // Dia de hoje em Brasília (UTC-3), igual ao `PartnerSlots.brasiliaDay`.
@@ -231,7 +231,7 @@ service cloud.firestore {
             'images', 'idAutor'])
           && (tag == 'publicidade'
             ? p.get('podePublicidade', true)
-            : p.get('podeNoticias', true) && !(tag in ['gol', 'resultado', 'votacao', 'aovivo', 'cartao', 'evento', 'campeao']));
+            : p.get('podeNoticias', true) && !(tag in ['gol', 'resultado', 'votacao', 'aovivo', 'cartao', 'evento', 'campeao', 'fantasy']));
       }
 
       function partnerHighlight(data, p) {
@@ -475,7 +475,7 @@ service cloud.firestore {
             'cartoes', 'substituicoes', 'escalacao', 'arbitro', 'observacoes', 'data', 'horario', 'horarioOriginal',
             'duracao', 'local',
             'votacao', 'status', 'statusEm', 'inicioEm', 'intervaloEm', 'segundoTempoEm',
-            'idGrupo', 'grupo', 'foraDosGrupos', 'fase'])
+            'idGrupo', 'grupo', 'foraDosGrupos', 'fase', 'rodada'])
           && validMatchRound(request.resource.data)
           && organizerOwnsKey('c' + string(resource.data.get('id_campeonato', -1)));
       }
@@ -487,7 +487,9 @@ service cloud.firestore {
         return d.get('idGrupo', '') is string && d.get('idGrupo', '').size() <= 64
           && d.get('grupo', '') is string && d.get('grupo', '').size() <= 40
           && d.get('foraDosGrupos', false) is bool
-          && (!('fase' in d) || d.fase in ['oitavas', 'quartas', 'semifinal', 'terceiro', 'final', 'outra']);
+          && (!('fase' in d) || d.fase in ['oitavas', 'quartas', 'semifinal', 'terceiro', 'final', 'outra'])
+          // Rodada da competição (Arena Fantasy): inteiro de 1 a 99.
+          && (!('rodada' in d) || (d.rodada is int && d.rodada >= 1 && d.rodada <= 99));
       }
 
       // Chave de `inscricoes` que mudou (até 8 inscrições; as regras não têm laço).
@@ -557,7 +559,7 @@ service cloud.firestore {
           && d.keys().hasOnly(['id_partida', 'timeC', 'timeF', 'idTimeC', 'idTimeF', 'data', 'horario', 'local',
             'id_campeonato', 'fk_competicao', 'idRegiao', 'golTimeCasa', 'golTimeFora', 'votacao', 'tituloVotacao',
             'melhorJogador', 'quantidadeVotos', 'dataRegistro', 'idsRegioes', 'duracao',
-            'idGrupo', 'grupo', 'foraDosGrupos', 'fase'])
+            'idGrupo', 'grupo', 'foraDosGrupos', 'fase', 'rodada'])
           && validMatchRound(d)
           && d.id_partida == docId
           && d.get('golTimeCasa', 0) == 0 && d.get('golTimeFora', 0) == 0
@@ -872,7 +874,7 @@ service cloud.firestore {
           && data.get('idAutor', '') == request.auth.uid
           && data.get('idRegiao', '') == p.get('idRegiao', '-')
           && data.get('status', '') == 'pendente'
-          && !(data.get('tag', '') in ['gol', 'resultado', 'votacao', 'publicidade', 'aovivo', 'cartao', 'evento', 'campeao'])
+          && !(data.get('tag', '') in ['gol', 'resultado', 'votacao', 'publicidade', 'aovivo', 'cartao', 'evento', 'campeao', 'fantasy'])
           && data.keys().hasOnly(['id', 'data', 'criadoEm', 'status', 'titulo', 'descricao', 'urlImagem', 'link',
             'exibir', 'fk_competicao', 'idRegiao', 'time_casa', 'time_fora', 'gol_time_casa', 'gol_time_fora', 'tag',
             'images', 'idAutor']);
@@ -1010,6 +1012,139 @@ service cloud.firestore {
 
     // Temporada atual e lista do seletor: todo mundo lê (inclusive convidado),
     // só o admin troca (painel "Temporadas").
+    // Arena Fantasy: configuração por campeonato (`fantasy/{idDocCampeonato}`;
+    // leitura pública pela regra geral). Só o admin grava a chave, os
+    // parâmetros e as cópias do campeonato; `rodadaAtual`, `participantes` e
+    // `campeao` são das functions e ele não mexe. Não se apaga (histórico).
+    match /fantasy/{championshipDocId} {
+      function validRoundAction(a) {
+        return a is map && a.keys().hasOnly(['numero', 'acao', 'em', 'prazo'])
+          && a.numero is int && a.numero >= 1 && a.numero <= 99
+          && a.acao in ['abrir', 'fechar']
+          && a.em is timestamp
+          && (a.acao == 'fechar' || (a.get('prazo', null) is timestamp && a.prazo > request.time));
+      }
+
+      function validFantasyConfig(d) {
+        return d.keys().hasOnly(['idCampeonato', 'temporada', 'titulo', 'urlImagem', 'fk_competicao', 'idRegiao',
+            'idsRegioes', 'ativo', 'minMinutos', 'minMinutosDefesa', 'capitao', 'atualizadoEm', 'reapurarEm',
+            'zerarEm', 'zeradoEm', 'acaoRodada', 'rodadaAtual', 'participantes', 'campeao', 'campeaoEm'])
+          && d.ativo is bool
+          && d.minMinutos is int && d.minMinutos >= 0 && d.minMinutos <= 120
+          && d.minMinutosDefesa is int && d.minMinutosDefesa >= d.minMinutos && d.minMinutosDefesa <= 120
+          && d.capitao is number && d.capitao >= 1 && d.capitao <= 3
+          && d.get('idCampeonato', 0) is int
+          && d.get('temporada', '') is string && d.get('titulo', '') is string && d.get('urlImagem', '') is string
+          && d.get('idsRegioes', []) is list
+          // "Reapurar rodadas": hora do pedido (as functions apuram de novo).
+          && (!('reapurarEm' in d) || d.reapurarEm is timestamp)
+          // "Zerar pontuações (testes)": hora do pedido (as functions zeram).
+          && (!('zerarEm' in d) || d.zerarEm is timestamp)
+          // "Abrir/Fechar rodada" do admin: rodada, ação e (abrir) o prazo no futuro.
+          && (!('acaoRodada' in d) || validRoundAction(d.acaoRodada))
+          && d.atualizadoEm == request.time;
+      }
+
+      allow create: if isAdmin() && validFantasyConfig(request.resource.data)
+        && !request.resource.data.keys().hasAny(['rodadaAtual', 'participantes', 'campeao', 'campeaoEm', 'zeradoEm']);
+      allow update: if isAdmin() && validFantasyConfig(request.resource.data)
+        && !request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['rodadaAtual', 'participantes', 'campeao', 'campeaoEm', 'zeradoEm']);
+      allow delete: if false;
+
+      function fantasyConfig() {
+        return get(/databases/$(database)/documents/fantasy/$(championshipDocId)).data;
+      }
+
+      // Participante: o próprio uid entra uma vez, com o Fantasy ativo; a 1ª
+      // rodada dele é a atual (sem pontos retroativos: só pontua quem tem
+      // escalação na rodada). Depois só troca nome/foto; não sai.
+      match /participantes/{uid} {
+        allow read: if true;
+        allow create: if signedIn() && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['uid', 'nome', 'urlImagem', 'entrouEm', 'rodadaInicial'])
+          && request.resource.data.uid == uid
+          && request.resource.data.nome is string && request.resource.data.nome.size() <= 60
+          && request.resource.data.get('urlImagem', '') is string
+          && request.resource.data.get('urlImagem', '').size() <= 1000
+          && request.resource.data.entrouEm == request.time
+          && fantasyConfig().ativo == true
+          && request.resource.data.rodadaInicial == fantasyConfig().get('rodadaAtual', 0);
+        allow update: if signedIn() && request.auth.uid == uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nome', 'urlImagem'])
+          && request.resource.data.nome is string && request.resource.data.nome.size() <= 60;
+        allow delete: if false;
+      }
+
+      // Rodadas: só as functions gravam (pelas partidas com `rodada`).
+      match /rodadas/{round} {
+        allow read: if true;
+        allow write: if false;
+
+        // Escalação do dono na rodada aberta, até o prazo (`fechaEm`): as 5
+        // vagas com atletas inscritos na competição na posição da vaga
+        // (gol: goleiro; zag: zagueiro/lateral; mei: volante/meia; ata:
+        // atacante; livre: qualquer) e o capitão entre eles. Pontos são das
+        // functions.
+        // Pontos de cada atleta na rodada (auditoria; só as functions gravam).
+        match /atletas/{athleteId} {
+          allow read: if true;
+          allow write: if false;
+        }
+
+        match /escalacoes/{uid} {
+          allow read: if true;
+          allow create: if validFantasyLineup(uid, round)
+            && !request.resource.data.keys().hasAny(['pontos', 'pontosAtletas', 'atletasJogaram', 'aplicado',
+              'processadoEm']);
+          allow update: if validFantasyLineup(uid, round)
+            && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['nome', 'urlImagem', 'atletas', 'idsAtletas', 'capitao', 'atualizadoEm', 'copiada']);
+          allow delete: if false;
+        }
+      }
+
+      // Atleta [id] de `jogadores{temporada}` inscrito na competição ([key] =
+      // `c<id_campeonato>`, com time) numa das [positions].
+      function eligibleAthlete(col, key, id, positions) {
+        let p = get(/databases/$(database)/documents/$(col)/$(id)).data;
+        return p.get('inscricoes', {}).get(key, {}).get('idTime', '') != ''
+          && p.get('posicao', '') in positions;
+      }
+
+      function validFantasyLineup(uid, round) {
+        let d = request.resource.data;
+        let f = fantasyConfig();
+        let r = get(/databases/$(database)/documents/fantasy/$(championshipDocId)/rodadas/$(round)).data;
+        let a = d.atletas;
+        let col = f.temporada == '2023' ? 'jogadores' : 'jogadores' + f.temporada;
+        let key = 'c' + string(f.idCampeonato);
+        return signedIn() && request.auth.uid == uid
+          && f.ativo == true
+          && r.status == 'aberta' && request.time < r.fechaEm
+          // Mercado: só a rodada atual (com uma em andamento, a próxima não abre).
+          && f.get('rodadaAtual', 0) == int(round)
+          && exists(/databases/$(database)/documents/fantasy/$(championshipDocId)/participantes/$(uid))
+          && d.keys().hasOnly(['uid', 'nome', 'urlImagem', 'atletas', 'idsAtletas', 'capitao', 'atualizadoEm', 'copiada',
+            'pontos', 'pontosAtletas', 'atletasJogaram', 'aplicado', 'processadoEm'])
+          && d.uid == uid
+          && d.nome is string && d.nome.size() <= 60
+          && d.get('urlImagem', '') is string && d.get('urlImagem', '').size() <= 1000
+          && d.atualizadoEm == request.time
+          && d.get('copiada', false) == false
+          && a is map && a.keys().hasOnly(['gol', 'zag', 'mei', 'ata', 'livre'])
+          && a.keys().hasAll(['gol', 'zag', 'mei', 'ata', 'livre'])
+          && d.idsAtletas == [a.gol, a.zag, a.mei, a.ata, a.livre]
+          && d.idsAtletas.toSet().size() == 5
+          && d.capitao in d.idsAtletas
+          && eligibleAthlete(col, key, a.gol, ['goleiro'])
+          && eligibleAthlete(col, key, a.zag, ['zagueiro', 'lateral'])
+          && eligibleAthlete(col, key, a.mei, ['volante', 'meia'])
+          && eligibleAthlete(col, key, a.ata, ['atacante'])
+          && eligibleAthlete(col, key, a.livre, ['goleiro', 'zagueiro', 'lateral', 'volante', 'meia', 'atacante']);
+      }
+    }
+
     match /config/temporadas {
       allow read: if true;
       allow write: if isAdmin();

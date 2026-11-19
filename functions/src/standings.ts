@@ -120,6 +120,8 @@ export function groupGames(teams: GroupTeam[], matches: Doc[], championshipId: n
   const games: Game[] = [];
   for (const match of matches) {
     if (int(match.id_campeonato) !== championshipId || !isFinishedMatch(match)) continue;
+    // Partida de teste (só o admin vê) não conta na classificação.
+    if (match.teste === true) continue;
     if (!countsForGroup(match, groupId)) continue;
     const home = teamIndex(teams, match.idTimeC, match.timeC);
     const away = teamIndex(teams, match.idTimeF, match.timeF);

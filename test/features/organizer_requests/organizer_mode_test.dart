@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:arena_soccer/l10n/app_localizations_pt.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/watch_championships_usecase.dart';
 import 'package:arena_soccer/features/championships/domain/repositories/championships_repository_interface.dart';
@@ -173,15 +174,34 @@ void main() {
     expect(find.byIcon(Icons.sports_soccer_rounded), findsOneWidget);
   });
 
-  test('ciclo do toggle: admin → organizador → jogador → admin; organizador comum ↔', () {
+  test('ciclo do toggle: admin → organizador → jogador → torcedor → admin; organizador comum ↔', () {
     HomeMode next(HomeMode m, {bool admin = false, bool organizer = false}) =>
         nextHomeMode(m, isAccountAdmin: admin, isOrganizer: organizer);
     expect(next(HomeMode.standard, admin: true), HomeMode.organizer);
     expect(next(HomeMode.organizer, admin: true), HomeMode.player);
-    expect(next(HomeMode.player, admin: true), HomeMode.standard);
+    expect(next(HomeMode.player, admin: true), HomeMode.fan);
+    expect(next(HomeMode.fan, admin: true), HomeMode.standard);
     expect(next(HomeMode.standard, organizer: true), HomeMode.organizer);
     expect(next(HomeMode.organizer, organizer: true), HomeMode.standard);
     expect(next(HomeMode.standard), HomeMode.standard);
+  });
+
+  testWidgets('toggle do admin: admin · organizador · jogador · torcedor', (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('pt'),
+      home: const Scaffold(body: HomeModeToggle(mode: HomeMode.fan, showPlayer: true)),
+    ));
+    for (final icon in [
+      Icons.admin_panel_settings_rounded,
+      Icons.emoji_events_rounded,
+      Icons.sports_soccer_rounded,
+      Icons.favorite_rounded,
+    ]) {
+      expect(find.byIcon(icon), findsOneWidget);
+    }
+    expect(find.byTooltip('${AppLocalizationsPt().organizerModeToggle} (Modo torcedor)'), findsOneWidget);
   });
 
   testWidgets('paleta: verde por padrão, azul no tema do organizador', (tester) async {

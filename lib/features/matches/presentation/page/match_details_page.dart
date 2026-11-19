@@ -25,6 +25,7 @@ import 'package:arena_soccer/features/matches/domain/usecases/set_match_phase_us
 import 'package:arena_soccer/utils/components/safe_bottom.dart';
 import 'package:arena_soccer/features/qr_codes/presentation/page/qr_poster_page.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_round_picker.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/matchday_widgets.dart';
 
 /// Detalhes da partida: cabeçalho com as cores dos dois times, escudos e
 /// placar (antes do jogo, o horário), depois os gols em linha do tempo, o
@@ -111,6 +112,14 @@ class MatchDetailsPage extends StatelessWidget {
                     if (match.round != null) ...[
                       const SizedBox(width: AppSizes.s6),
                       MatchStageBadge(round: match.round!),
+                    ],
+                    if (match.matchday != null) ...[
+                      const SizedBox(width: AppSizes.s6),
+                      MatchdayBadge(matchday: match.matchday!),
+                    ],
+                    if (match.isTest) ...[
+                      const SizedBox(width: AppSizes.s6),
+                      const MatchTestBadge(),
                     ],
                   ],
                 ),
@@ -244,7 +253,8 @@ class MatchDetailsPage extends StatelessWidget {
                 )
               else
                 SliverPadding(
-                  padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s32)),
+                  padding:
+                      EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s32)),
                   sliver: SliverList.list(
                     children: [
                       MatchGoalsTimeline(match: match),

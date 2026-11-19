@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_card.dart';
+import 'package:arena_soccer/features/matches/domain/match_round.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/card_menu_button.dart';
 
@@ -16,7 +17,8 @@ import 'package:arena_soccer/utils/components/card_menu_button.dart';
 // Quinta, 13/11/2026, 15h em Brasília.
 final _now = DateTime.utc(2026, 11, 13, 18);
 
-const _upcoming = MatchDTO(id: 'a', homeTeam: 'Lava Jato FC', awayTeam: 'Volta Redonda', date: '13/11/2026', time: '19:30');
+const _upcoming =
+    MatchDTO(id: 'a', homeTeam: 'Lava Jato FC', awayTeam: 'Volta Redonda', date: '13/11/2026', time: '19:30');
 const _finished = MatchDTO(
   id: 'b',
   homeTeam: 'Associação Atlética Floresta do Vale Unidos',
@@ -35,7 +37,8 @@ const _live = MatchDTO(
   homeGoals: 0,
   awayGoals: 2,
 );
-const _tomorrow = MatchDTO(id: 'd', homeTeam: 'Riacho FC', awayTeam: 'Volta Redonda', date: '14/11/2026', time: '16:00');
+const _tomorrow =
+    MatchDTO(id: 'd', homeTeam: 'Riacho FC', awayTeam: 'Volta Redonda', date: '14/11/2026', time: '16:00');
 
 Widget _card(MatchDTO match, {bool admin = false, VoidCallback? onTap, VoidCallback? onPredict}) => MatchCard(
       match: match,
@@ -70,6 +73,26 @@ Future<void> _pump(WidgetTester tester, List<Widget> cards) async {
 }
 
 void main() {
+  testWidgets('selos: fase e rodada juntos; só a rodada também aparece', (tester) async {
+    await _pump(tester, [
+      _card(const MatchDTO(
+        id: 'r1',
+        homeTeam: 'Lava Jato FC',
+        awayTeam: 'Volta Redonda',
+        date: '13/11/2026',
+        time: '19:30',
+        round: MatchRound.group(groupId: 'gA', groupName: 'A'),
+        matchday: 3,
+      )),
+      _card(const MatchDTO(
+          id: 'r2', homeTeam: 'Riacho FC', awayTeam: 'Mulekada', date: '14/11/2026', time: '16:00', matchday: 4)),
+    ]);
+    expect(find.text('GRUPO A'), findsOneWidget);
+    expect(find.text('RODADA 3'), findsOneWidget);
+    expect(find.text('RODADA 4'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('antes do jogo: horário e "HOJE", sem placar; atalhos de palpite e divulgar', (tester) async {
     await _pump(tester, [_card(_upcoming, onPredict: () {})]);
     expect(find.text('19:30'), findsOneWidget);

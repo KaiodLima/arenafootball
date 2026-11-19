@@ -270,6 +270,8 @@ export default async function run(env, check) {
     { tag: 'campeao', titulo: 'x', exibir: 'true' })));
 
   // Fase da partida (grupo ou mata-mata).
+  await check('organizador não cria partida de teste', assertFails(setDoc(doc(org, 'partidas2026/m29'),
+    match('m29', { teste: true }))));
   await check('organizador cadastra partida de grupo', assertSucceeds(setDoc(doc(org, 'partidas2026/m30'),
     match('m30', { idGrupo: 'g1', grupo: 'A' }))));
   await check('organizador cadastra a final', assertSucceeds(setDoc(doc(org, 'partidas2026/m31'),
@@ -278,4 +280,8 @@ export default async function run(env, check) {
     match('m32', { foraDosGrupos: true, fase: 'copa' }))));
   await check('organizador troca a fase da partida', assertSucceeds(updateDoc(doc(org, 'partidas2026/m30'),
     { idGrupo: deleteField(), grupo: deleteField(), foraDosGrupos: true, fase: 'semifinal' })));
+  await check('organizador cadastra partida com rodada', assertSucceeds(setDoc(doc(org, 'partidas2026/m33'),
+    match('m33', { rodada: 3 }))));
+  await check('rodada 0 recusada', assertFails(setDoc(doc(org, 'partidas2026/m34'), match('m34', { rodada: 0 }))));
+  await check('organizador muda a rodada', assertSucceeds(updateDoc(doc(org, 'partidas2026/m33'), { rodada: 4 })));
 }

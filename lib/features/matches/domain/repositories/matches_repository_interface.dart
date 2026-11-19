@@ -55,6 +55,8 @@ abstract class IMatchesRepository {
     required String venue,
     MatchRound? round,
     bool writeRound = false,
+    int? matchday,
+    bool writeMatchday = false,
     String? season,
   });
 

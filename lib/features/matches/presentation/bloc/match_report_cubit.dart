@@ -20,7 +20,7 @@ import 'package:arena_soccer/features/matches/domain/usecases/delay_match_usecas
 enum LineupRole { none, starter, sub }
 
 /// Aviso de ação concluída na súmula.
-enum MatchReportNotice { saved, playerAdded, phaseChanged, eventAdded }
+enum MatchReportNotice { saved, playerAdded, phaseChanged, eventAdded, startersFull }
 
 class MatchReportState extends Equatable {
   /// A partida como está gravada (base do "tem mudança") e a em edição.
@@ -401,6 +401,11 @@ class MatchReportCubit extends Cubit<MatchReportState> {
     final match = state.match;
     if (match == null) return;
     final current = match.lineup.of(side);
+    // No máximo 11 titulares: o 12º não entra (escalação antiga com mais só diminui).
+    if (role == LineupRole.starter && !MatchReport.canAddStarter(current, player.id)) {
+      emit(state.copyWith(notice: () => MatchReportNotice.startersFull));
+      return;
+    }
     final existing = current.where((e) => e.playerId == player.id).firstOrNull;
     final rest = current.where((e) => e.playerId != player.id).toList();
     final entries = role == LineupRole.none
@@ -457,7 +462,7 @@ class MatchReportCubit extends Cubit<MatchReportState> {
           notice: () => MatchReportNotice.playerAdded,
         ));
         final starters = MatchReport.lineupCount(state.match!.lineup.of(side)).starters;
-        setRole(side, created, starters < 11 ? LineupRole.starter : LineupRole.sub);
+        setRole(side, created, starters < MatchReport.maxStarters ? LineupRole.starter : LineupRole.sub);
       },
     );
   }

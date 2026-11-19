@@ -76,6 +76,8 @@ class _FakeMatchesRepository implements IMatchesRepository {
     required String venue,
     MatchRound? round,
     bool writeRound = false,
+    int? matchday,
+    bool writeMatchday = false,
     String? season,
   }) async =>
       const Right(null);

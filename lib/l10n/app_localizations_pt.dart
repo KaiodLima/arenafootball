@@ -6607,6 +6607,560 @@ class AppLocalizationsPt extends AppLocalizations {
   String get matchStageBadgeOther => 'MATA-MATA';
 
   @override
+  String get matchdayTitle => 'Rodada';
+
+  @override
+  String get matchdayNone => 'Sem rodada';
+
+  @override
+  String matchdayValue(int number) {
+    return '$numberª rodada';
+  }
+
+  @override
+  String matchdayBadge(int number) {
+    return 'RODADA $number';
+  }
+
+  @override
+  String get matchdaySuggested =>
+      'Rodada sugerida pelos jogos da competição perto dessa data.';
+
+  @override
+  String get matchdayLess => 'Rodada anterior';
+
+  @override
+  String get matchdayMore => 'Próxima rodada';
+
+  @override
+  String get fantasyTitle => 'Arena Fantasy';
+
+  @override
+  String get fantasyActive => 'Fantasy ativado';
+
+  @override
+  String get fantasyActiveOn =>
+      'Torcedores podem entrar e montar o time nas rodadas abertas deste campeonato.';
+
+  @override
+  String get fantasyActiveOff =>
+      'Desligado: ninguém entra nem troca a escalação. Nada é apagado (histórico e pontos ficam).';
+
+  @override
+  String fantasyParticipants(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count participantes',
+      one: '1 participante',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fantasyParams => 'Pontuação';
+
+  @override
+  String get fantasyMinMinutes => 'Mínimo para pontuar';
+
+  @override
+  String get fantasyMinMinutesHint =>
+      'Abaixo disso o atleta não pontua na rodada.';
+
+  @override
+  String get fantasyDefenseMinutes => 'Mínimo para o bônus defensivo';
+
+  @override
+  String get fantasyDefenseMinutesHint =>
+      'Jogo sem sofrer gols só vale com esse tempo em campo.';
+
+  @override
+  String get fantasyCaptain => 'Multiplicador do capitão';
+
+  @override
+  String get fantasyCaptainHint => 'Vale também para pontuação negativa.';
+
+  @override
+  String fantasyMinutesValue(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get fantasyRestoreDefaults =>
+      'Restaurar padrões (20 min · 45 min · 1,5×)';
+
+  @override
+  String get fantasyParamsNote =>
+      'Os parâmetros valem para as próximas rodadas: cada rodada guarda os seus ao fechar, e rodadas fechadas não mudam.';
+
+  @override
+  String get fantasySave => 'Salvar';
+
+  @override
+  String get fantasySaved => 'Arena Fantasy salvo.';
+
+  @override
+  String get fantasySaveError => 'Não foi possível salvar o Arena Fantasy.';
+
+  @override
+  String get fantasyErrorRange => 'Os minutos vão de 0 a 120.';
+
+  @override
+  String get fantasyErrorDefenseBelowMin =>
+      'O mínimo do bônus defensivo não pode ser menor que o mínimo para pontuar.';
+
+  @override
+  String get fantasyErrorCaptain => 'O capitão vai de 1× a 3×.';
+
+  @override
+  String get fantasySlotGoalkeeper => 'GOL';
+
+  @override
+  String get fantasySlotDefender => 'ZAG';
+
+  @override
+  String get fantasySlotMidfielder => 'MEI';
+
+  @override
+  String get fantasySlotForward => 'ATA';
+
+  @override
+  String get fantasySlotFlex => 'LIVRE';
+
+  @override
+  String get fantasyPickGoalkeeper => 'Escolha o goleiro';
+
+  @override
+  String get fantasyPickDefender => 'Escolha o zagueiro';
+
+  @override
+  String get fantasyPickMidfielder => 'Escolha o meio-campista';
+
+  @override
+  String get fantasyPickForward => 'Escolha o atacante';
+
+  @override
+  String get fantasyPickFlex => 'Escolha o atleta da vaga livre';
+
+  @override
+  String get fantasyRoundLocked => 'Travada';
+
+  @override
+  String fantasyClosesIn(String time) {
+    return 'Fecha em $time';
+  }
+
+  @override
+  String get fantasyCaptainShort => 'C';
+
+  @override
+  String get fantasyFilterTeam => 'Filtrar por time';
+
+  @override
+  String get fantasySearchAthlete => 'Buscar atleta';
+
+  @override
+  String get fantasyFilterAll => 'Todos';
+
+  @override
+  String get fantasyFilterAllTeams => 'Todos os times';
+
+  @override
+  String get fantasyNoAthletes => 'Nenhum atleta inscrito nessa posição.';
+
+  @override
+  String get fantasyInLineup => 'na escalação';
+
+  @override
+  String fantasyAthleteStats(int goals, int assists) {
+    return '$goals G · $assists A';
+  }
+
+  @override
+  String get fantasySwapAthlete => 'Trocar atleta';
+
+  @override
+  String get fantasyMakeCaptain => 'Tornar capitão';
+
+  @override
+  String get fantasyRemoveAthlete => 'Tirar da escalação';
+
+  @override
+  String get fantasyErrorIncomplete => 'Preencha as 5 vagas.';
+
+  @override
+  String get fantasyErrorCaptainMissing =>
+      'Escolha o capitão: toque no \"C\" de um atleta.';
+
+  @override
+  String get fantasyErrorDuplicate =>
+      'O mesmo atleta não pode ocupar duas vagas.';
+
+  @override
+  String get fantasyErrorPosition =>
+      'Algum atleta está fora da posição da vaga.';
+
+  @override
+  String get fantasyJoined => 'Você entrou no Arena Fantasy!';
+
+  @override
+  String get fantasyLineupSaved => 'Escalação confirmada.';
+
+  @override
+  String get fantasyLineupSaveError => 'Não foi possível salvar a escalação.';
+
+  @override
+  String get fantasyConfirmLineup => 'Confirmar escalação';
+
+  @override
+  String get fantasyInactive =>
+      'O Arena Fantasy deste campeonato está desligado.';
+
+  @override
+  String get fantasyGuest => 'Entre na sua conta para jogar o Arena Fantasy.';
+
+  @override
+  String get fantasyNoOpenRound =>
+      'Nenhuma rodada aberta agora. A próxima abre quando as partidas da rodada forem cadastradas.';
+
+  @override
+  String get fantasyNoOpenRoundShort => 'Sem rodada';
+
+  @override
+  String get fantasyCopiedLineup =>
+      'Escalação copiada da rodada anterior. Troque o que quiser até o prazo.';
+
+  @override
+  String get fantasyLockedNotice =>
+      'Prazo encerrado: a escalação desta rodada está travada.';
+
+  @override
+  String fantasyCaptainTip(String mult) {
+    return 'Toque no \"C\" para escolher o capitão: ele pontua $mult.';
+  }
+
+  @override
+  String get fantasyDiscard => 'Desfazer alterações';
+
+  @override
+  String fantasyRoundTitle(int number) {
+    return 'Rodada $number';
+  }
+
+  @override
+  String get fantasyJoinTitle => 'Monte seu time no Arena Fantasy';
+
+  @override
+  String get fantasyJoinText =>
+      'Escolha 5 atletas do campeonato e um capitão. Eles pontuam pelo desempenho real nas partidas. Você joga a partir da próxima rodada aberta.';
+
+  @override
+  String get fantasyJoin => 'Entrar no Arena Fantasy';
+
+  @override
+  String get fantasyEntrySubtitle =>
+      'Monte seu time com os atletas do campeonato';
+
+  @override
+  String fantasyEntryRound(int number) {
+    return 'Rodada $number aberta · monte seu time';
+  }
+
+  @override
+  String get fantasyEntryAction => 'Jogar';
+
+  @override
+  String get fantasyBadgePlay => 'Escalar!';
+
+  @override
+  String get fantasyBadgeIdle => 'Fantasy';
+
+  @override
+  String fantasyBadgeRoundOpen(int number) {
+    return 'Rodada $number aberta';
+  }
+
+  @override
+  String get fantasyBadgeNoRound => 'Sem rodada aberta';
+
+  @override
+  String get fantasyRankingTitle => 'Ranking do Fantasy';
+
+  @override
+  String get fantasyTabRound => 'Rodada';
+
+  @override
+  String get fantasyTabOverall => 'Geral';
+
+  @override
+  String get fantasyTabHistory => 'Histórico';
+
+  @override
+  String get fantasyNoClosedRound =>
+      'Nenhuma rodada fechada ainda. O ranking da rodada aparece depois do prazo.';
+
+  @override
+  String get fantasyRoundPartial => 'Parcial: ainda há partidas da rodada';
+
+  @override
+  String get fantasyAwaitingScore => 'Aguardando apuração';
+
+  @override
+  String get fantasyRankingEmpty => 'Ninguém pontuou ainda.';
+
+  @override
+  String get fantasyNotPlayedRound => 'Você não escalou nesta rodada.';
+
+  @override
+  String get fantasyNotJoined =>
+      'Você ainda não entrou no Arena Fantasy deste campeonato.';
+
+  @override
+  String get fantasyHistoryEmpty => 'Você ainda não jogou nenhuma rodada.';
+
+  @override
+  String get fantasyMyPosition => 'Sua posição';
+
+  @override
+  String get fantasyChampionTitle => 'CAMPEÃO DO ARENA FANTASY';
+
+  @override
+  String get fantasyChampionsTitle => 'CAMPEÕES DO ARENA FANTASY';
+
+  @override
+  String fantasyPointsValue(String points) {
+    return '$points pts';
+  }
+
+  @override
+  String get fantasyUnknownAthlete => 'Atleta';
+
+  @override
+  String get fantasyMyTotal => 'Seu total no Fantasy';
+
+  @override
+  String get fantasySeeRanking => 'Ver ranking';
+
+  @override
+  String get fantasyFollowTitle => 'Acompanhar';
+
+  @override
+  String get fantasyFollowRounds => 'Rodadas e apuração';
+
+  @override
+  String get fantasyFollowParticipants => 'Participantes';
+
+  @override
+  String get fantasyAdminRounds => 'Rodadas';
+
+  @override
+  String get fantasyAdminParticipants => 'Participantes';
+
+  @override
+  String get fantasyAdminNoRounds =>
+      'Nenhuma rodada ainda. Marque a rodada nas partidas do campeonato.';
+
+  @override
+  String get fantasyAdminNoParticipants => 'Ninguém entrou ainda.';
+
+  @override
+  String get fantasyAdminNoLineups => 'Sem escalação em rodada fechada.';
+
+  @override
+  String get fantasyStatusOpen => 'ABERTA';
+
+  @override
+  String get fantasyStatusClosed => 'FECHADA';
+
+  @override
+  String get fantasyStatusEmpty => 'SEM PARTIDAS';
+
+  @override
+  String get fantasyStatusFinished => 'FINALIZADA';
+
+  @override
+  String fantasyAdminDeadline(String when) {
+    return 'Prazo: $when';
+  }
+
+  @override
+  String fantasyAdminMatches(int finished, int total) {
+    return 'Partidas terminadas: $finished de $total';
+  }
+
+  @override
+  String fantasyAdminLineups(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count escalações apuradas',
+      one: '1 escalação apurada',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fantasyAdminScoredAt(String when) {
+    return 'Apurada em $when';
+  }
+
+  @override
+  String get fantasyAdminNotScored => 'Ainda não apurada';
+
+  @override
+  String fantasyAdminParams(int min, int defense, String captain) {
+    return 'Parâmetros: $min min · $defense min · $captain';
+  }
+
+  @override
+  String fantasyAdminSince(int round) {
+    return 'Desde a rodada $round';
+  }
+
+  @override
+  String get fantasyAdminSinceStart => 'Desde o início';
+
+  @override
+  String get fantasyLoadMore => 'Carregar mais';
+
+  @override
+  String get fantasyRescore => 'Reapurar rodadas';
+
+  @override
+  String get fantasyRescoreTitle => 'Reapurar as rodadas?';
+
+  @override
+  String get fantasyRescoreText =>
+      'Todas as rodadas fechadas são recalculadas pela súmula atual. Os pontos só mudam onde a súmula ou os cadastros mudaram; nada é somado duas vezes.';
+
+  @override
+  String get fantasyRescoreRequested =>
+      'Reapuração pedida. Pode levar alguns segundos.';
+
+  @override
+  String get fantasyRescoreError => 'Não foi possível pedir a reapuração.';
+
+  @override
+  String get fantasyCancel => 'Cancelar';
+
+  @override
+  String get fantasyRuleBase => 'Pontuação-base';
+
+  @override
+  String get fantasyRuleGoal => 'Gols';
+
+  @override
+  String get fantasyRuleAssist => 'Assistências';
+
+  @override
+  String get fantasyRuleWin => 'Vitória';
+
+  @override
+  String get fantasyRuleLoss => 'Derrota';
+
+  @override
+  String get fantasyRuleDraw => 'Empate';
+
+  @override
+  String get fantasyRuleYellow => 'Cartão amarelo';
+
+  @override
+  String get fantasyRuleRed => 'Cartão vermelho';
+
+  @override
+  String get fantasyRuleConceded => 'Gols sofridos';
+
+  @override
+  String get fantasyRuleTeamGoals => 'Gols da equipe';
+
+  @override
+  String get fantasyRuleCleanSheet => 'Sem sofrer gols';
+
+  @override
+  String fantasyReasonShort(int min, int played) {
+    return 'Não atingiu o mínimo de $min minutos (jogou $played): só valem gols, assistências e cartões.';
+  }
+
+  @override
+  String fantasyReasonNoBonus(int min) {
+    return 'Menos de $min minutos em campo: sem o bônus de não sofrer gols.';
+  }
+
+  @override
+  String get fantasyReasonNotOnField => 'Não entrou em campo.';
+
+  @override
+  String get fantasyReasonNoLineup => 'A súmula não tem a escalação do time.';
+
+  @override
+  String get fantasyReasonSubNoMinute => 'Substituição sem o minuto na súmula.';
+
+  @override
+  String get fantasyReasonEstimated =>
+      'Minutos estimados pela súmula (jogo inteiro).';
+
+  @override
+  String get fantasyReasonNoPosition => 'Atleta sem posição no cadastro.';
+
+  @override
+  String get fantasyReasonDidNotPlay => 'Não jogou nesta rodada.';
+
+  @override
+  String get fantasyReasonNoMatches =>
+      'Nenhuma partida da rodada terminou ainda.';
+
+  @override
+  String fantasyMinutesPlayed(int minutes) {
+    return '$minutes min em campo';
+  }
+
+  @override
+  String fantasyMinutesEstimated(int minutes) {
+    return '$minutes min em campo (estimados)';
+  }
+
+  @override
+  String get fantasyScoreTotal => 'Total individual';
+
+  @override
+  String fantasyScoreCaptain(String mult) {
+    return 'Capitão ($mult)';
+  }
+
+  @override
+  String get fantasyScoreNotes => 'Observações';
+
+  @override
+  String get fantasyHomeEmpty => 'Nenhum Arena Fantasy ativo na sua região.';
+
+  @override
+  String get fantasyHomeIntro =>
+      'Monte seu time com os atletas do campeonato e pontue pelo desempenho real nas partidas.';
+
+  @override
+  String get fantasyHomeJoin => 'Entre e monte seu time';
+
+  @override
+  String get fantasyHomePickTeam => 'Monte seu time desta rodada';
+
+  @override
+  String get fantasyHomeCopied => 'Escalação copiada da rodada anterior';
+
+  @override
+  String get fantasyHomeConfirmed => 'Escalação confirmada';
+
+  @override
+  String fantasyHomePosition(int position) {
+    return 'pts · $positionº';
+  }
+
+  @override
+  String get fantasyHomePlay => 'Escalar';
+
+  @override
+  String get fantasyHomeEnter => 'Entrar';
+
+  @override
   String get teamRequestMenu => 'Sou dono de time';
 
   @override
@@ -7615,4 +8169,209 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get deepLinkHighlightNotFound =>
       'Este destaque não está mais disponível.';
+
+  @override
+  String fantasyTopAthletesTitle(int round) {
+    return 'Craques da rodada $round';
+  }
+
+  @override
+  String get fantasyTopAthletesEmpty => 'Nenhum atleta pontuou nesta rodada.';
+
+  @override
+  String get fantasySeeAll => 'Ver todos';
+
+  @override
+  String get fantasyTabAthletes => 'Atletas';
+
+  @override
+  String fantasyCardBadge(int round) {
+    return 'ARENA FANTASY · RODADA $round';
+  }
+
+  @override
+  String get fantasyCardTitle => 'Craques da rodada';
+
+  @override
+  String get fantasyCardAction => 'Escalar meu time';
+
+  @override
+  String fantasyCardPoints(String points) {
+    return '$points pts';
+  }
+
+  @override
+  String get pushActionFantasyRound => 'Arena Fantasy';
+
+  @override
+  String get pushActionFantasyRoundHint =>
+      'Região · craques da rodada quando ela é apurada';
+
+  @override
+  String get reportStartersFull =>
+      'Já há 11 titulares. Tire um titular para escalar outro.';
+
+  @override
+  String fantasyRoundInProgress(int round) {
+    return 'Rodada $round em andamento. A próxima rodada abre quando todos os jogos terminarem.';
+  }
+
+  @override
+  String get fantasyRoundInProgressShort => 'Em andamento';
+
+  @override
+  String fantasyRoundScoreTitle(int round) {
+    return 'Sua pontuação na rodada $round';
+  }
+
+  @override
+  String fantasyRoundPartialCount(int done, int total) {
+    return 'Parcial · $done de $total jogos';
+  }
+
+  @override
+  String get fantasyRoundFinal => 'Final';
+
+  @override
+  String get fantasySwitchResult => 'Resultado';
+
+  @override
+  String get fantasySwitchPick => 'Escalar';
+
+  @override
+  String get fantasyResetMenu => 'Zerar pontuações (testes)';
+
+  @override
+  String get fantasyResetTitle => 'Zerar as pontuações deste Fantasy?';
+
+  @override
+  String get fantasyResetText =>
+      'Para a fase de testes: o total de todos os participantes volta a 0, as escalações perdem os pontos, a pontuação de cada atleta nas rodadas é apagada, o campeão sai e os cards \"Craques da rodada\" saem do feed. Participantes, escalações e rodadas continuam. Os pontos só voltam com \"Reapurar rodadas\" ou quando uma partida da rodada terminar de novo.';
+
+  @override
+  String get fantasyResetContinue => 'Continuar';
+
+  @override
+  String get fantasyResetSureTitle => 'Tem certeza?';
+
+  @override
+  String get fantasyResetSureText => 'Não dá para desfazer.';
+
+  @override
+  String get fantasyResetAction => 'Zerar pontuações';
+
+  @override
+  String get fantasyResetRequested =>
+      'Pedido enviado: as pontuações serão zeradas em instantes.';
+
+  @override
+  String get fantasyResetError =>
+      'Não foi possível pedir para zerar as pontuações.';
+
+  @override
+  String get matchFormTest => 'Partida de teste';
+
+  @override
+  String get matchFormTestHint =>
+      'Só o admin vê · pushes só para os admins · não conta na classificação nem nos números dos atletas';
+
+  @override
+  String get matchTestBadge => 'TESTE';
+
+  @override
+  String get homeModeFan => 'Modo torcedor';
+
+  @override
+  String get homeModeFanBanner =>
+      'Modo torcedor: você vê o app como um usuário comum';
+
+  @override
+  String get fantasyRoundClose => 'Fechar agora';
+
+  @override
+  String get fantasyRoundReopen => 'Reabrir';
+
+  @override
+  String fantasyRoundCloseTitle(int round) {
+    return 'Fechar a rodada $round agora?';
+  }
+
+  @override
+  String get fantasyRoundCloseText =>
+      'As escalações travam na hora (os parâmetros desta rodada são congelados) e são copiadas para a próxima rodada. Para voltar, use \"Reabrir\".';
+
+  @override
+  String get fantasyRoundCloseRequested =>
+      'Pedido enviado: a rodada será fechada em instantes.';
+
+  @override
+  String get fantasyRoundOpenRequested =>
+      'Pedido enviado: a rodada será reaberta em instantes.';
+
+  @override
+  String get fantasyRoundActionError => 'Não foi possível mudar a rodada.';
+
+  @override
+  String get fantasyRoundDeadlinePast => 'Escolha um prazo no futuro.';
+
+  @override
+  String get fantasyRoundManualDeadline => 'Prazo definido pelo admin';
+
+  @override
+  String get fantasyRoundManualClosed => 'Fechada pelo admin';
+
+  @override
+  String get athleteInviteAction => 'Conheço esse jogador';
+
+  @override
+  String athleteInviteTitle(String name) {
+    return '⚽ $name, você já está no Arena Football!';
+  }
+
+  @override
+  String athleteInviteTeam(String team) {
+    return 'do $team';
+  }
+
+  @override
+  String athleteInviteTeamIn(String team, String championship) {
+    return 'do $team na $championship';
+  }
+
+  @override
+  String athleteInviteStats(int goals, int assists) {
+    return 'e seus números já estão lá: $goals gols e $assists assistências. 🔥';
+  }
+
+  @override
+  String get athleteInviteNoStats =>
+      'e sua página de atleta já está esperando por você. 🔥';
+
+  @override
+  String athleteInviteBody(String name, String where, String numbers) {
+    return 'O atleta $name $where parece ser você — $numbers';
+  }
+
+  @override
+  String get athleteInviteBenefits =>
+      'Crie sua conta grátis, diga \"Sou eu\" e tenha sua carreira na palma da mão:\n📊 seus gols e assistências em cada competição\n🏆 concorra a craque da partida\n🎴 sua figurinha no álbum\n🖼️ artes de atleta pra postar';
+
+  @override
+  String get athleteInviteCta =>
+      '👉 Toque no link, baixe o app e confirme que é você:';
+
+  @override
+  String get athleteInviteCardTitle => 'Você está no Arena Football!';
+
+  @override
+  String get athleteInviteCardGoals => 'GOLS';
+
+  @override
+  String get athleteInviteCardAssists => 'ASSISTÊNCIAS';
+
+  @override
+  String get athleteInviteCardCta => 'Crie sua conta e diga: \"Sou eu!\"';
+
+  @override
+  String get athleteInviteSheetTitle => 'Convidar atleta';
 }
