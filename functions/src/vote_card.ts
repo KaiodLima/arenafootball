@@ -128,6 +128,8 @@ export function voteCardNews(
     ...(text(match.idRegiao) ? { idRegiao: text(match.idRegiao) } : {}),
     // Times de regiões diferentes: o card aparece no feed de cada uma.
     ...matchRegionIds(match),
+    // Partida de teste: o card também é (só o admin vê).
+    ...(match.teste === true ? { teste: true } : {}),
   };
 }
 

@@ -123,8 +123,8 @@ class HomeHeader extends StatelessWidget {
                       style: AppTypography.title(color: AppColors.white),
                     ),
                     const SizedBox(height: AppSizes.s2),
-                    if (mode == HomeMode.player)
-                      _PlayerModeBanner(onExit: onExitPlayerMode)
+                    if (mode == HomeMode.player || mode == HomeMode.fan)
+                      _PlayerModeBanner(onExit: onExitPlayerMode, fan: mode == HomeMode.fan)
                     else
                       Text(organizerMode ? l10n.organizerModeSubtitle : l10n.homeSubtitle(region),
                           style: AppTypography.subtitle(color: AppColors.whiteSoft)),
@@ -171,7 +171,10 @@ class _CircleButton extends StatelessWidget {
 class _PlayerModeBanner extends StatelessWidget {
   final VoidCallback? onExit;
 
-  const _PlayerModeBanner({this.onExit});
+  /// Modo torcedor (senão, o jogador).
+  final bool fan;
+
+  const _PlayerModeBanner({this.onExit, this.fan = false});
 
   @override
   Widget build(BuildContext context) {
@@ -186,11 +189,11 @@ class _PlayerModeBanner extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.sports_soccer_rounded, size: AppSizes.s16, color: AppColors.white),
+          Icon(fan ? Icons.favorite_rounded : Icons.sports_soccer_rounded, size: AppSizes.s16, color: AppColors.white),
           const SizedBox(width: AppSizes.s6),
           Flexible(
             child: Text(
-              l10n.homeModePlayerBanner,
+              fan ? l10n.homeModeFanBanner : l10n.homeModePlayerBanner,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: AppTypography.subtitle(color: AppColors.white).copyWith(fontSize: AppSizes.s12),
@@ -250,6 +253,7 @@ class HomeModeToggle extends StatelessWidget {
       HomeMode.standard => showPlayer ? l10n.homeModeAdmin : l10n.organizerModeFan,
       HomeMode.organizer => l10n.organizerModeOrganizer,
       HomeMode.player => l10n.homeModePlayer,
+      HomeMode.fan => l10n.homeModeFan,
     };
 
     return Tooltip(
@@ -268,9 +272,12 @@ class HomeModeToggle extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  side(Icons.favorite_rounded, mode == HomeMode.standard),
+                  // Admin: admin · organizador · jogador · torcedor; os outros: torcedor · organizador.
+                  side(showPlayer ? Icons.admin_panel_settings_rounded : Icons.favorite_rounded,
+                      mode == HomeMode.standard),
                   side(Icons.emoji_events_rounded, mode == HomeMode.organizer),
                   if (showPlayer) side(Icons.sports_soccer_rounded, mode == HomeMode.player),
+                  if (showPlayer) side(Icons.favorite_rounded, mode == HomeMode.fan),
                 ],
               ),
             ),

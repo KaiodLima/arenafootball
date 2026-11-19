@@ -8237,4 +8237,51 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get fantasySwitchPick => 'Escalar';
+
+  @override
+  String get fantasyResetMenu => 'Zerar pontuações (testes)';
+
+  @override
+  String get fantasyResetTitle => 'Zerar as pontuações deste Fantasy?';
+
+  @override
+  String get fantasyResetText =>
+      'Para a fase de testes: o total de todos os participantes volta a 0, as escalações perdem os pontos, a pontuação de cada atleta nas rodadas é apagada, o campeão sai e os cards \"Craques da rodada\" saem do feed. Participantes, escalações e rodadas continuam. Os pontos só voltam com \"Reapurar rodadas\" ou quando uma partida da rodada terminar de novo.';
+
+  @override
+  String get fantasyResetContinue => 'Continuar';
+
+  @override
+  String get fantasyResetSureTitle => 'Tem certeza?';
+
+  @override
+  String get fantasyResetSureText => 'Não dá para desfazer.';
+
+  @override
+  String get fantasyResetAction => 'Zerar pontuações';
+
+  @override
+  String get fantasyResetRequested =>
+      'Pedido enviado: as pontuações serão zeradas em instantes.';
+
+  @override
+  String get fantasyResetError =>
+      'Não foi possível pedir para zerar as pontuações.';
+
+  @override
+  String get matchFormTest => 'Partida de teste';
+
+  @override
+  String get matchFormTestHint =>
+      'Só o admin vê · pushes só para os admins · não conta na classificação nem nos números dos atletas';
+
+  @override
+  String get matchTestBadge => 'TESTE';
+
+  @override
+  String get homeModeFan => 'Modo torcedor';
+
+  @override
+  String get homeModeFanBanner =>
+      'Modo torcedor: você vê o app como um usuário comum';
 }

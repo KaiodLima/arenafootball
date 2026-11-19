@@ -62,6 +62,8 @@ import {
   PushMessage,
   currentSeasonOf,
   dailyGameMessage,
+  forTest,
+  isTestDoc,
   describeTarget,
   goalMessage,
   bookingMessage,
@@ -171,7 +173,10 @@ import {
   matchdayOf,
   nextOpenRound,
   previousClosedRound,
+  orphanRoundUpdate,
   rescoreRequested,
+  roundFinalized,
+  resetRequested,
   roundFieldsChanged,
   roundSync,
 } from './fantasy';
@@ -271,7 +276,9 @@ export const onNewsCreated = onDocumentCreated('noticias/{newsId}', async (event
       : data.tag === 'cartao'
         ? bookingMessage(data, await currentSeason())
         : newsMessage(data, event.params.newsId);
-  if (message) await deliver(`${message.tipo}_${event.id}`, message, `noticias/${event.params.newsId}`);
+  if (message) {
+    await deliver(`${message.tipo}_${event.id}`, forTest(message, isTestDoc(data)), `noticias/${event.params.newsId}`);
+  }
 });
 
 let seasonCache: { value: string; at: number } | undefined;
@@ -312,7 +319,9 @@ export const onMatchCreated = onDocumentCreated('{colecao}/{matchId}', async (ev
   // Arena Fantasy: partida com rodada entra nas rodadas do campeonato.
   if (data && matchdayOf(data.rodada) !== null) await syncFantasyForMatches(data);
   const message = data ? matchCreatedMessage(data, { id: event.params.matchId, season: await currentSeason() }) : null;
-  if (message) await deliver(`partida_${event.id}`, message, `${event.params.colecao}/${event.params.matchId}`);
+  if (message) {
+    await deliver(`partida_${event.id}`, forTest(message, isTestDoc(data)), `${event.params.colecao}/${event.params.matchId}`);
+  }
 });
 
 /** Votação de melhor jogador aberta/encerrada. */
@@ -327,7 +336,11 @@ export const onMatchUpdated = onDocumentUpdated('{colecao}/{matchId}', async (ev
   const message =
     before && after ? votingMessage(before, after, { id: event.params.matchId, season: await currentSeason() }) : null;
   if (message) {
-    await deliver(`${message.tipo}_${event.id}`, message, `${event.params.colecao}/${event.params.matchId}`);
+    await deliver(
+      `${message.tipo}_${event.id}`,
+      forTest(message, isTestDoc(after)),
+      `${event.params.colecao}/${event.params.matchId}`,
+    );
   }
   if (!before || !after) return;
   // Arena Fantasy: rodada, data, horário ou início mudou → as rodadas acompanham.
@@ -857,7 +870,13 @@ export const dailyGames = onSchedule({ schedule: '0 9 * * *', timeZone: 'America
   const matches = await db.collection(collection).where('data', '==', today).get();
   for (const doc of matches.docs) {
     const message = dailyGameMessage(doc.data(), { id: doc.id, season: await currentSeason() });
-    if (message) await deliver(`jogo_do_dia_${today.replace('/', '-')}_${doc.id}`, message, `${collection}/${doc.id}`);
+    if (message) {
+      await deliver(
+        `jogo_do_dia_${today.replace('/', '-')}_${doc.id}`,
+        forTest(message, isTestDoc(doc.data())),
+        `${collection}/${doc.id}`,
+      );
+    }
   }
 });
 
@@ -988,10 +1007,14 @@ async function syncFantasyRounds(fantasyRef: DocRef, config: FantasyDoc, season:
     });
   }
   const computedIds = new Set(computed.map((r) => r.numero));
+  // Rodada que ficou sem partidas (apagadas): aberta vira vazia; fechada fica
+  // finalizada e sem partidas (não segura o mercado como "em andamento").
   for (const [id, round] of stored) {
-    if (round.status !== 'aberta' || computedIds.has(Number(id))) continue;
-    batch.update(roundsRef.doc(id), { status: 'vazia', idsPartidas: [] });
-    after.set(Number(id), { numero: Number(id), status: 'vazia', fechaEm: round.fechaEm, idsPartidas: [] });
+    if (computedIds.has(Number(id))) continue;
+    const change = orphanRoundUpdate(round);
+    if (!change) continue;
+    batch.update(roundsRef.doc(id), change);
+    after.set(Number(id), { numero: Number(id), ...round, ...(change as Partial<RoundState>), fechaEm: round.fechaEm });
     writes++;
   }
   const now = new Date();
@@ -1234,15 +1257,17 @@ async function scoreFantasyRound(fantasyRef: DocRef, config: FantasyDoc, round: 
       versao: SCORING_VERSION,
       processadoEm: FieldValue.serverTimestamp(),
     },
-    finalizada: matchIds.length > 0 && finished.length === matchIds.length,
+    // Só as partidas que ainda existem (apagada não segura a rodada).
+    finalizada: roundFinalized(matchDocs.filter((d) => d.exists).length, finished.length),
   });
   logger.info('Fantasy: rodada apurada', { fantasy: fantasyRef.id, round, finished: finished.length });
   // Rodada finalizada reabre o mercado (a próxima); reaberta, fecha de novo.
   await refreshCurrentRound(fantasyRef).catch((error) =>
     logger.error('Fantasy: rodada atual não recalculada', { fantasy: fantasyRef.id, error: String(error) }),
   );
-  const finalized = matchIds.length > 0 && finished.length === matchIds.length;
-  await syncFantasyRoundCard(fantasyRef.id, config, round, finalized ? fantasyTopThree(cardAthletes) : []).catch(
+  const finalized = finished.length > 0 && roundFinalized(matchDocs.filter((d) => d.exists).length, finished.length);
+  const hasTest = finished.some((m) => isTestDoc(m.data));
+  await syncFantasyRoundCard(fantasyRef.id, config, round, finalized ? fantasyTopThree(cardAthletes) : [], hasTest).catch(
     (error) => logger.error('Fantasy: card da rodada não gravado', { fantasy: fantasyRef.id, round, error: String(error) }),
   );
 }
@@ -1253,11 +1278,19 @@ async function scoreFantasyRound(fantasyRef: DocRef, config: FantasyDoc, round: 
  * corrigida não sobe no feed nem manda push de novo); sem top (não
  * finalizada / ninguém pontuou), o card que existir fica oculto.
  */
-async function syncFantasyRoundCard(fantasyId: string, config: FantasyDoc, round: number, top: ReturnType<typeof fantasyTopThree>) {
+async function syncFantasyRoundCard(
+  fantasyId: string,
+  config: FantasyDoc,
+  round: number,
+  top: ReturnType<typeof fantasyTopThree>,
+  test = false,
+) {
   const { db, FieldValue } = await admin();
   const ref = db.collection('noticias').doc(fantasyRoundNewsId(fantasyId, round));
   const current = await ref.get();
-  const news = fantasyRoundNews(fantasyId, config, round, top);
+  const built = fantasyRoundNews(fantasyId, config, round, top);
+  // Rodada com partida de teste: o card é de teste (só o admin vê; push só para os admins).
+  const news = built && test ? { ...built, teste: true } : built;
   if (!news) {
     if (current.exists && current.data()?.exibir !== 'false') await ref.update({ exibir: 'false' });
     return;
@@ -1269,7 +1302,7 @@ async function syncFantasyRoundCard(fantasyId: string, config: FantasyDoc, round
   await ref.set({ ...news, data: FieldValue.serverTimestamp() });
   logger.info('Card do Fantasy postado', { fantasy: fantasyId, round });
   const message = fantasyRoundMessage(news);
-  if (message) await deliver(`fantasy_${fantasyId}_r${round}`, message, `fantasy/${fantasyId}/rodadas/${round}`);
+  if (message) await deliver(`fantasy_${fantasyId}_r${round}`, forTest(message, test), `fantasy/${fantasyId}/rodadas/${round}`);
 }
 
 /**
@@ -1293,6 +1326,70 @@ async function syncFantasyChampion(championshipDocId: string, before: FantasyDoc
   logger.info('Fantasy: campeão gravado', { fantasy: championshipDocId, champions: champions.length });
 }
 
+/**
+ * "Zerar pontuações (testes)": participantes com 0, escalações sem os pontos,
+ * rodadas sem a auditoria dos atletas e sem a `apuracao` (status, prazo,
+ * partidas e `finalizada` ficam: o mercado não muda), sem campeão e sem os
+ * cards "Craques da rodada" no feed. Grava `zeradoEm` ao terminar.
+ */
+async function resetFantasyScores(fantasyRef: DocRef): Promise<void> {
+  const { db, FieldValue } = await admin();
+  let batch = db.batch();
+  let pending = 0;
+  const flush = async (force = false) => {
+    if (pending && (force || pending >= 400)) {
+      await batch.commit();
+      batch = db.batch();
+      pending = 0;
+    }
+  };
+  const participants = await fantasyRef.collection(FANTASY_PARTICIPANTS).get();
+  for (const p of participants.docs) {
+    batch.update(p.ref, { pontos: 0 });
+    pending++;
+    await flush();
+  }
+  const rounds = await fantasyRef.collection(FANTASY_ROUNDS).get();
+  for (const round of rounds.docs) {
+    const [lineups, athletes] = await Promise.all([
+      round.ref.collection(FANTASY_LINEUPS).get(),
+      round.ref.collection('atletas').get(),
+    ]);
+    for (const lineup of lineups.docs) {
+      batch.update(lineup.ref, {
+        pontos: FieldValue.delete(),
+        pontosAtletas: FieldValue.delete(),
+        atletasJogaram: FieldValue.delete(),
+        aplicado: FieldValue.delete(),
+        processadoEm: FieldValue.delete(),
+      });
+      pending++;
+      await flush();
+    }
+    for (const athlete of athletes.docs) {
+      batch.delete(athlete.ref);
+      pending++;
+      await flush();
+    }
+    batch.update(round.ref, { apuracao: FieldValue.delete() });
+    batch.delete(db.collection('noticias').doc(fantasyRoundNewsId(fantasyRef.id, Number(round.id))));
+    pending += 2;
+    await flush();
+  }
+  batch.update(fantasyRef, {
+    campeao: FieldValue.delete(),
+    campeaoEm: FieldValue.delete(),
+    zeradoEm: FieldValue.serverTimestamp(),
+  });
+  pending++;
+  await flush(true);
+  logger.info('Fantasy: pontuações zeradas', {
+    fantasy: fantasyRef.id,
+    participants: participants.size,
+    rounds: rounds.size,
+  });
+}
+
 /** Admin ligou o Fantasy: monta as rodadas pelas partidas que já têm rodada. */
 export const onFantasyWritten = onDocumentWritten(`${FANTASY}/{fantasyId}`, async (event) => {
   const before = event.data?.before.data();
@@ -1300,6 +1397,12 @@ export const onFantasyWritten = onDocumentWritten(`${FANTASY}/{fantasyId}`, asyn
   const ref = event.data?.after.ref;
   if (!after || !ref) return;
   const season = typeof after.temporada === 'string' && after.temporada ? after.temporada : await currentSeason();
+  // "Zerar pontuações (testes)" do admin: antes do reapurar (os dois no mesmo
+  // pedido = zera e não reapura).
+  if (resetRequested(before, after)) {
+    await resetFantasyScores(ref);
+    return;
+  }
   // "Reapurar rodadas" do admin: rodadas pelas partidas e todas as fechadas
   // apuradas de novo (seguro: a escalação só recebe a diferença).
   if (rescoreRequested(before, after)) {

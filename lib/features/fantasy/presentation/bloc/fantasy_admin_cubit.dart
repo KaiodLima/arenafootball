@@ -14,6 +14,9 @@ import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_ranking_us
 /// Resultado do "Reapurar rodadas" (snackbar).
 enum FantasyRescoreResult { none, requested, failed }
 
+/// Resultado do "Zerar pontuações (testes)" (snackbar).
+enum FantasyResetResult { none, requested, failed }
+
 class FantasyAdminState extends Equatable {
   /// Rodadas, a mais recente primeiro.
   final List<FantasyRoundDTO> rounds;
@@ -31,6 +34,8 @@ class FantasyAdminState extends Equatable {
   final Map<String, FantasyAthleteDTO> athletes;
   final bool rescoring;
   final FantasyRescoreResult rescore;
+  final bool resetting;
+  final FantasyResetResult reset;
   final String? failure;
 
   const FantasyAdminState({
@@ -45,6 +50,8 @@ class FantasyAdminState extends Equatable {
     this.athletes = const {},
     this.rescoring = false,
     this.rescore = FantasyRescoreResult.none,
+    this.resetting = false,
+    this.reset = FantasyResetResult.none,
     this.failure,
   });
 
@@ -60,6 +67,8 @@ class FantasyAdminState extends Equatable {
     Map<String, FantasyAthleteDTO>? athletes,
     bool? rescoring,
     FantasyRescoreResult? rescore,
+    bool? resetting,
+    FantasyResetResult? reset,
     String? failure,
   }) =>
       FantasyAdminState(
@@ -74,6 +83,8 @@ class FantasyAdminState extends Equatable {
         athletes: athletes ?? this.athletes,
         rescoring: rescoring ?? this.rescoring,
         rescore: rescore ?? FantasyRescoreResult.none,
+        resetting: resetting ?? this.resetting,
+        reset: reset ?? FantasyResetResult.none,
         failure: failure,
       );
 
@@ -90,6 +101,8 @@ class FantasyAdminState extends Equatable {
         athletes,
         rescoring,
         rescore,
+        resetting,
+        reset,
         failure,
       ];
 }
@@ -104,14 +117,19 @@ class FantasyAdminCubit extends Cubit<FantasyAdminState> {
   final GetFantasyPositionUseCase _position;
   final GetFantasyAthletesCacheFirstUseCase _athletes;
 
+  /// "Zerar pontuações (testes)"; nulo = sem a ação (testes antigos).
+  final RequestFantasyResetUseCase? _reset;
+
   FantasyAdminCubit(
     this._watchRounds,
     this._participants,
     this._rescore,
     this._lineup,
     this._position,
-    this._athletes,
-  ) : super(const FantasyAdminState());
+    this._athletes, {
+    RequestFantasyResetUseCase? reset,
+  })  : _reset = reset,
+        super(const FantasyAdminState());
 
   StreamSubscription<Object?>? _roundsSub;
   StreamSubscription<Object?>? _athletesSub;
@@ -182,6 +200,21 @@ class FantasyAdminCubit extends Cubit<FantasyAdminState> {
       (failure) =>
           emit(state.copyWith(rescoring: false, rescore: FantasyRescoreResult.failed, failure: failure.toString())),
       (_) => emit(state.copyWith(rescoring: false, rescore: FantasyRescoreResult.requested)),
+    );
+  }
+
+  /// "Zerar pontuações (testes)": as functions zeram os pontos do Fantasy
+  /// (participantes, escalações, auditoria, campeão e os cards do feed).
+  Future<void> resetScores() async {
+    final reset = _reset;
+    if (reset == null || state.resetting) return;
+    emit(state.copyWith(resetting: true));
+    final response = await reset(_fantasyId);
+    if (isClosed) return;
+    response.fold(
+      (failure) =>
+          emit(state.copyWith(resetting: false, reset: FantasyResetResult.failed, failure: failure.toString())),
+      (_) => emit(state.copyWith(resetting: false, reset: FantasyResetResult.requested)),
     );
   }
 

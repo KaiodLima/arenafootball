@@ -71,6 +71,9 @@ class MatchFormData extends Equatable {
   final int? matchday;
   final bool matchdayManual;
 
+  /// Partida de teste do admin: só o admin vê, pushes só para os admins.
+  final bool isTest;
+
   const MatchFormData({
     this.regions = const [],
     this.selectedRegion,
@@ -92,6 +95,7 @@ class MatchFormData extends Equatable {
     this.roundManual = false,
     this.matchday,
     this.matchdayManual = false,
+    this.isTest = false,
   });
 
   /// O grupo [group] tem o time de nome [teamName]? Pelo id, com o nome de reserva.
@@ -245,6 +249,7 @@ class MatchFormData extends Equatable {
         regionIds: regionIdsOfTeams,
         round: showsRound ? round : null,
         matchday: showsRound ? matchday : null,
+        isTest: isTest,
       );
 
   MatchFormData copyWith({
@@ -268,6 +273,7 @@ class MatchFormData extends Equatable {
     bool? roundManual,
     int? Function()? matchday,
     bool? matchdayManual,
+    bool? isTest,
     bool clearTeams = false,
   }) {
     return MatchFormData(
@@ -291,6 +297,7 @@ class MatchFormData extends Equatable {
       roundManual: roundManual ?? this.roundManual,
       matchday: matchday != null ? matchday() : this.matchday,
       matchdayManual: matchdayManual ?? this.matchdayManual,
+      isTest: isTest ?? this.isTest,
     );
   }
 
@@ -316,6 +323,7 @@ class MatchFormData extends Equatable {
         roundManual,
         matchday,
         matchdayManual,
+        isTest,
       ];
 }
 

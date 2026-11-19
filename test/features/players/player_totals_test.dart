@@ -67,4 +67,14 @@ void main() {
     expect(counts['dudu'], (goals: 2, assists: 0));
     expect(counts['ana'], (goals: 0, assists: 1));
   });
+
+  test('correção dos números ignora partidas de teste', () {
+    const goal = MatchGoal(id: '1', side: MatchSide.home, scorerId: 'dudu');
+    final matches = const [
+      MatchDTO(homeTeam: 'A', awayTeam: 'B', goals: [goal], isTest: true),
+      MatchDTO(homeTeam: 'A', awayTeam: 'C', championshipId: 7, goals: [goal], isTest: true),
+    ];
+    expect(RepairPlayerTotalsUseCase.friendlyCounts(matches), isEmpty);
+    expect(RepairPlayerTotalsUseCase.championshipCounts(matches), isEmpty);
+  });
 }

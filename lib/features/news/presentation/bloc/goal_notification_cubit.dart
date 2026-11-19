@@ -281,6 +281,8 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
         scoringTeamSecondaryColor: form.teamOf(form.scoringTeam)?.secondaryColor ?? '',
         // Ligado à partida: o push do gol abre ela (`id_partida`).
         matchId: form.updateMatch ? form.linkedMatch?.id ?? '' : '',
+        // Partida de teste: o card também é (só o admin vê; push só para os admins).
+        isTest: form.linkedMatch?.isTest ?? false,
         championshipId: form.championshipId,
         regionIds: form.regionIds,
       ),

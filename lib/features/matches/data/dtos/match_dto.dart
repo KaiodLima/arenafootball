@@ -72,6 +72,11 @@ class MatchDTO extends Equatable {
   final int? matchday;
 
   static const matchdayField = 'rodada';
+
+  /// Partida de teste do admin (`teste: true`): só o admin vê, os pushes vão
+  /// só para os admins e não conta na classificação nem nos números dos atletas.
+  final bool isTest;
+  static const testField = 'teste';
   final String region;
   final int homeGoals;
   final int awayGoals;
@@ -137,6 +142,7 @@ class MatchDTO extends Equatable {
     this.championshipId = 0,
     this.round,
     this.matchday,
+    this.isTest = false,
     this.region = '',
     this.homeGoals = 0,
     this.awayGoals = 0,
@@ -193,6 +199,7 @@ class MatchDTO extends Equatable {
       championshipId: _int(data['id_campeonato']),
       round: MatchRound.fromMap(data),
       matchday: matchdayOf(data[matchdayField]),
+      isTest: data[testField] == true,
       region: RegionRegistry.nameFromDoc(data),
       homeGoals: _int(data['golTimeCasa']),
       awayGoals: _int(data['golTimeFora']),
@@ -234,6 +241,7 @@ class MatchDTO extends Equatable {
         'id_campeonato': championshipId,
         ...?round?.toMap(),
         if (matchday != null) matchdayField: matchday!,
+        if (isTest) testField: true,
         ...RegionRegistry.fieldsFor(region),
         'golTimeCasa': homeGoals,
         'golTimeFora': awayGoals,
@@ -266,6 +274,7 @@ class MatchDTO extends Equatable {
     int? championshipId,
     MatchRound? Function()? round,
     int? Function()? matchday,
+    bool? isTest,
     String? region,
     int? homeGoals,
     int? awayGoals,
@@ -301,6 +310,7 @@ class MatchDTO extends Equatable {
       championshipId: championshipId ?? this.championshipId,
       round: round != null ? round() : this.round,
       matchday: matchday != null ? matchday() : this.matchday,
+      isTest: isTest ?? this.isTest,
       region: region ?? this.region,
       homeGoals: homeGoals ?? this.homeGoals,
       awayGoals: awayGoals ?? this.awayGoals,
@@ -342,6 +352,7 @@ class MatchDTO extends Equatable {
         championshipId: championshipId,
         round: round,
         matchday: matchday,
+        isTest: isTest,
         region: region,
         homeGoals: homeGoals,
         awayGoals: awayGoals,
@@ -380,6 +391,7 @@ class MatchDTO extends Equatable {
         championshipId: championshipId,
         round: round,
         matchday: matchday,
+        isTest: isTest,
         region: region,
         homeGoals: homeGoals,
         awayGoals: awayGoals,
@@ -422,6 +434,7 @@ class MatchDTO extends Equatable {
         championshipId,
         round,
         matchday,
+        isTest,
         region,
         homeGoals,
         awayGoals,

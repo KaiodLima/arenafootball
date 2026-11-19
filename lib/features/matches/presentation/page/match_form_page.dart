@@ -334,6 +334,26 @@ class _MatchFormPageState extends State<MatchFormPage> {
                 const SizedBox(height: AppSizes.s10),
                 _ConflictBanner(text: _conflictText(conflict, l10n)),
               ],
+              // Partida de teste: só no cadastro do admin (o organizador não tem).
+              if (!organizer) ...[
+                const SizedBox(height: AppSizes.s20),
+                Container(
+                  decoration: BoxDecoration(
+                    color: form.isTest ? AppColors.warning.withValues(alpha: 0.12) : AppColors.surface,
+                    borderRadius: BorderRadius.circular(AppSizes.s14),
+                    border: Border.all(color: form.isTest ? AppColors.warning : AppColors.greyLight),
+                  ),
+                  child: SwitchListTile(
+                    key: const ValueKey('match-form-test'),
+                    value: form.isTest,
+                    onChanged: _cubit.setTest,
+                    secondary: const Icon(Icons.science_outlined, color: AppColors.warning),
+                    title: Text(l10n.matchFormTest, style: AppTypography.label(color: AppColors.textPrimary)),
+                    subtitle:
+                        Text(l10n.matchFormTestHint, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+                  ),
+                ),
+              ],
               if (form.homeTeam != null && form.awayTeam != null && !form.sameTeam) ...[
                 const SizedBox(height: AppSizes.s24),
                 _Label(l10n.matchFormPreview, trailing: form.date),

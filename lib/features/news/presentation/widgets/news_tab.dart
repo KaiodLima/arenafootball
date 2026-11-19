@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/matchday_widgets.dart';
 import 'package:arena_soccer/features/news/presentation/widgets/live_match_card.dart';
 import 'package:arena_soccer/features/event_polls/presentation/widgets/event_poll_feed_card.dart';
 import 'package:arena_soccer/features/partner_requests/presentation/bloc/partner_cubit.dart';
@@ -357,8 +358,20 @@ class _NewsItem extends StatelessWidget {
     );
   }
 
+  /// Card de partida de teste (só o admin vê): o selo "TESTE" por cima.
   @override
   Widget build(BuildContext context) {
+    final card = _card(context);
+    if (!news.isTest) return card;
+    return Stack(
+      children: [
+        card,
+        const Positioned(top: AppSizes.s8, left: AppSizes.s8, child: MatchTestBadge()),
+      ],
+    );
+  }
+
+  Widget _card(BuildContext context) {
     if (news.isEvent) {
       return EventPollFeedCard(
         news: news,

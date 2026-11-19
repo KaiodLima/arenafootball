@@ -10,7 +10,10 @@ import {
   matchdayOf,
   nextOpenRound,
   previousClosedRound,
+  orphanRoundUpdate,
   rescoreRequested,
+  roundFinalized,
+  resetRequested,
   roundFieldsChanged,
   roundSync,
 } from '../fantasy';
@@ -146,4 +149,31 @@ test('mercado fechado: a rodada em andamento segura a atual até ser finalizada'
   assert.equal(currentRound([{ ...started, status: 'fechada', finalizada: true }], now), 0);
   // Prazo ainda no futuro: não está em andamento.
   assert.equal(roundInProgress([next], now), null);
+});
+
+test('zerar pontuações: só com zerarEm novo ou trocado', () => {
+  const stamp = (ms: number) => ({ toMillis: () => ms });
+  assert.equal(resetRequested({}, { zerarEm: stamp(1) }), true);
+  assert.equal(resetRequested({ zerarEm: stamp(1) }, { zerarEm: stamp(2) }), true);
+  assert.equal(resetRequested({ zerarEm: stamp(1) }, { zerarEm: stamp(1), ativo: false }), false);
+  assert.equal(resetRequested({}, { reapurarEm: stamp(1) }), false);
+  assert.equal(resetRequested({ zerarEm: stamp(1) }, undefined), false);
+});
+
+test('rodada sem partidas (apagadas): aberta vira vazia; fechada fica finalizada e não trava o mercado', () => {
+  assert.deepEqual(orphanRoundUpdate({ status: 'aberta', idsPartidas: ['m1'] }), { status: 'vazia', idsPartidas: [] });
+  assert.deepEqual(orphanRoundUpdate({ status: 'fechada', idsPartidas: ['m1'] }), { idsPartidas: [], finalizada: true });
+  assert.equal(orphanRoundUpdate({ status: 'fechada', idsPartidas: [], finalizada: true }), null);
+  assert.equal(orphanRoundUpdate({ status: 'vazia', idsPartidas: [] }), null);
+  // Limpa, a rodada fechada não é mais "em andamento".
+  const now = new Date('2026-11-19T12:00:00Z');
+  const orphan = { numero: 1, fechaEm: new Date('2026-11-18T18:00:00Z'), status: 'fechada', idsPartidas: [], finalizada: true };
+  const next = { numero: 2, fechaEm: new Date('2026-11-21T18:00:00Z'), status: 'aberta', idsPartidas: ['m2'] };
+  assert.equal(currentRound([orphan, next], now), 2);
+});
+
+test('rodada finalizada: só as partidas que ainda existem contam', () => {
+  assert.equal(roundFinalized(2, 2), true);
+  assert.equal(roundFinalized(2, 1), false);
+  assert.equal(roundFinalized(0, 0), true);
 });

@@ -166,6 +166,7 @@ class LiveMatchCard {
       liveEvents: events,
       matchStatus: status,
       liveClock: LiveClock.of(match),
+      isTest: match.isTest,
     );
   }
 
@@ -195,6 +196,7 @@ class LiveMatchCard {
       matchId: match.id,
       championshipId: match.championshipId > 0 ? match.championshipId : null,
       regionIds: match.regionIds,
+      isTest: match.isTest,
     );
   }
 }

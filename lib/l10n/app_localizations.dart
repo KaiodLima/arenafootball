@@ -13562,6 +13562,90 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Escalar'**
   String get fantasySwitchPick;
+
+  /// No description provided for @fantasyResetMenu.
+  ///
+  /// In pt, this message translates to:
+  /// **'Zerar pontuações (testes)'**
+  String get fantasyResetMenu;
+
+  /// No description provided for @fantasyResetTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Zerar as pontuações deste Fantasy?'**
+  String get fantasyResetTitle;
+
+  /// No description provided for @fantasyResetText.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para a fase de testes: o total de todos os participantes volta a 0, as escalações perdem os pontos, a pontuação de cada atleta nas rodadas é apagada, o campeão sai e os cards \"Craques da rodada\" saem do feed. Participantes, escalações e rodadas continuam. Os pontos só voltam com \"Reapurar rodadas\" ou quando uma partida da rodada terminar de novo.'**
+  String get fantasyResetText;
+
+  /// No description provided for @fantasyResetContinue.
+  ///
+  /// In pt, this message translates to:
+  /// **'Continuar'**
+  String get fantasyResetContinue;
+
+  /// No description provided for @fantasyResetSureTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tem certeza?'**
+  String get fantasyResetSureTitle;
+
+  /// No description provided for @fantasyResetSureText.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não dá para desfazer.'**
+  String get fantasyResetSureText;
+
+  /// No description provided for @fantasyResetAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Zerar pontuações'**
+  String get fantasyResetAction;
+
+  /// No description provided for @fantasyResetRequested.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedido enviado: as pontuações serão zeradas em instantes.'**
+  String get fantasyResetRequested;
+
+  /// No description provided for @fantasyResetError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível pedir para zerar as pontuações.'**
+  String get fantasyResetError;
+
+  /// No description provided for @matchFormTest.
+  ///
+  /// In pt, this message translates to:
+  /// **'Partida de teste'**
+  String get matchFormTest;
+
+  /// No description provided for @matchFormTestHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Só o admin vê · pushes só para os admins · não conta na classificação nem nos números dos atletas'**
+  String get matchFormTestHint;
+
+  /// No description provided for @matchTestBadge.
+  ///
+  /// In pt, this message translates to:
+  /// **'TESTE'**
+  String get matchTestBadge;
+
+  /// No description provided for @homeModeFan.
+  ///
+  /// In pt, this message translates to:
+  /// **'Modo torcedor'**
+  String get homeModeFan;
+
+  /// No description provided for @homeModeFanBanner.
+  ///
+  /// In pt, this message translates to:
+  /// **'Modo torcedor: você vê o app como um usuário comum'**
+  String get homeModeFanBanner;
 }
 
 class _AppLocalizationsDelegate

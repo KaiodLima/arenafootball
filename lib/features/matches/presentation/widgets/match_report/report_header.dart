@@ -170,7 +170,7 @@ class _ReportHeaderView extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s8, AppSizes.s16, AppSizes.s16),
         child: Column(
           children: [
-            if (match.round != null || match.matchday != null)
+            if (match.round != null || match.matchday != null || match.isTest)
               Padding(
                 padding: const EdgeInsets.only(bottom: AppSizes.s8),
                 child: Row(
@@ -179,6 +179,10 @@ class _ReportHeaderView extends StatelessWidget {
                     if (match.round != null) MatchStageBadge(round: match.round!),
                     if (match.round != null && match.matchday != null) const SizedBox(width: AppSizes.s6),
                     if (match.matchday != null) MatchdayBadge(matchday: match.matchday!),
+                    if (match.isTest) ...[
+                      const SizedBox(width: AppSizes.s6),
+                      const MatchTestBadge(),
+                    ],
                   ],
                 ),
               ),

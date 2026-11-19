@@ -391,8 +391,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// Modo atual da home (toggle do topo).
-  HomeMode _modeOf(SessionState session, OrganizerModeState organizer) =>
-      session.inPlayerMode ? HomeMode.player : (organizer.active ? HomeMode.organizer : HomeMode.standard);
+  HomeMode _modeOf(SessionState session, OrganizerModeState organizer) => session.inFanMode
+      ? HomeMode.fan
+      : session.inPlayerMode
+          ? HomeMode.player
+          : (organizer.active ? HomeMode.organizer : HomeMode.standard);
 
   /// Toque no toggle: admin → organizador → jogador → admin; organizador
   /// comum: torcedor ↔ organizador.
@@ -409,7 +412,11 @@ class _HomePageState extends State<HomePage> {
     if (next == current) return;
     if (current == HomeMode.organizer) await organizerCubit.toggle();
     if (next == HomeMode.organizer && !organizerCubit.state.active) await organizerCubit.toggle();
-    await sessionCubit.setPlayerMode(next == HomeMode.player);
+    await sessionCubit.setViewMode(switch (next) {
+      HomeMode.player => AdminViewMode.player,
+      HomeMode.fan => AdminViewMode.fan,
+      _ => AdminViewMode.admin,
+    });
     if (!mounted) return;
     final l10n = AppLocalizations.of(context);
     showSnackBar(
@@ -417,15 +424,16 @@ class _HomePageState extends State<HomePage> {
       message: switch (next) {
         HomeMode.organizer => l10n.organizerModeOrganizer,
         HomeMode.player => l10n.homeModePlayer,
+        HomeMode.fan => l10n.homeModeFan,
         HomeMode.standard => session.isAccountAdmin ? l10n.homeModeAdmin : l10n.organizerModeFan,
       },
       durationSeconds: 2,
     );
   }
 
-  /// "Sair" da faixa do modo jogador: volta ao modo admin.
+  /// "Sair" da faixa do modo jogador/torcedor: volta ao modo admin.
   Future<void> _exitPlayerMode() async {
-    await BlocProvider.of<SessionCubit>(context).setPlayerMode(false);
+    await BlocProvider.of<SessionCubit>(context).setViewMode(AdminViewMode.admin);
     if (!mounted) return;
     showSnackBar(context: context, message: AppLocalizations.of(context).homeModeAdmin, durationSeconds: 2);
   }

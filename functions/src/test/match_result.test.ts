@@ -153,3 +153,9 @@ test('card ao vivo: relógio copiado da partida e o que muda o minuto', () => {
   assert.equal(liveClockChanged(match, { ...match, golTimeCasa: 2, votacao: 'true' }), false);
   assert.equal(liveClockChanged(match, { ...match, inicioEm: { toMillis: () => 1000 } }), false);
 });
+
+test('card de resultado da partida de teste também é de teste', () => {
+  const base = { timeC: 'A', timeF: 'B', golTimeCasa: 1, golTimeFora: 0, fk_competicao: 'Floresta' };
+  assert.equal(resultNews({ ...base, teste: true }, 'm1', '2026').teste, true);
+  assert.equal('teste' in resultNews(base, 'm1', '2026'), false);
+});

@@ -270,6 +270,8 @@ export default async function run(env, check) {
     { tag: 'campeao', titulo: 'x', exibir: 'true' })));
 
   // Fase da partida (grupo ou mata-mata).
+  await check('organizador não cria partida de teste', assertFails(setDoc(doc(org, 'partidas2026/m29'),
+    match('m29', { teste: true }))));
   await check('organizador cadastra partida de grupo', assertSucceeds(setDoc(doc(org, 'partidas2026/m30'),
     match('m30', { idGrupo: 'g1', grupo: 'A' }))));
   await check('organizador cadastra a final', assertSucceeds(setDoc(doc(org, 'partidas2026/m31'),

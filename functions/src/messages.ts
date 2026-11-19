@@ -667,3 +667,18 @@ export function todayKey(now: Date = new Date()): string {
   const get = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
   return `${get('day')}/${get('month')}`;
 }
+
+/** Partida de teste (`teste: true`, só o admin cadastra e vê). */
+export const isTestDoc = (doc: Doc | undefined): boolean => doc?.teste === true;
+
+/** Push de partida de teste: só para o tópico `admins`, com "[TESTE]" no título. */
+export function testOnly(message: PushMessage): PushMessage {
+  return {
+    ...message,
+    titulo: message.titulo.startsWith('[TESTE]') ? message.titulo : `[TESTE] ${message.titulo}`,
+    alvo: { topic: 'admins' },
+  };
+}
+
+/** O push como vai: o de teste só para os admins. */
+export const forTest = (message: PushMessage, test: boolean): PushMessage => (test ? testOnly(message) : message);

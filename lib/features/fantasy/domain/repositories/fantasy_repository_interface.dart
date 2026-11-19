@@ -57,6 +57,8 @@ abstract class IFantasyRepository {
 
   Future<Either<Failure, void>> requestRescore(String fantasyId);
 
+  Future<Either<Failure, void>> requestReset(String fantasyId);
+
   Future<Either<Failure, FantasyAthleteScoreDTO?>> getAthleteScore(String fantasyId, int round, String athleteId);
 
   Future<Either<Failure, List<FantasyAthleteScoreDTO>>> getTopAthletes(String fantasyId, int round);

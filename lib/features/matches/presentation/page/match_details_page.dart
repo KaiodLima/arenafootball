@@ -117,6 +117,10 @@ class MatchDetailsPage extends StatelessWidget {
                       const SizedBox(width: AppSizes.s6),
                       MatchdayBadge(matchday: match.matchday!),
                     ],
+                    if (match.isTest) ...[
+                      const SizedBox(width: AppSizes.s6),
+                      const MatchTestBadge(),
+                    ],
                   ],
                 ),
                 actions: [
@@ -249,7 +253,8 @@ class MatchDetailsPage extends StatelessWidget {
                 )
               else
                 SliverPadding(
-                  padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s32)),
+                  padding:
+                      EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s32)),
                   sliver: SliverList.list(
                     children: [
                       MatchGoalsTimeline(match: match),

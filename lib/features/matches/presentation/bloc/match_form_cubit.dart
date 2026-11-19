@@ -79,6 +79,9 @@ class MatchFormCubit extends Cubit<MatchFormState> {
   void selectRound(MatchRound? round) => _edit(state.form.copyWith(round: () => round, roundManual: true));
 
   /// "Rodada" escolhida pelo usuário (nula = sem rodada).
+  /// "Partida de teste" (só o admin).
+  void setTest(bool value) => _edit(state.form.copyWith(isTest: value));
+
   void selectMatchday(int? matchday) => _edit(state.form.copyWith(matchday: () => matchday, matchdayManual: true));
 
   /// [now] só para teste.

@@ -69,6 +69,7 @@ class PublishGoalCardsUseCase {
     final scoring = teams[scoringId];
     return NewsDTO(
       tag: NewsDTO.goalTag,
+      isTest: match.isTest,
       // No feed quem aparece é o card ao vivo da partida; o card de gol
       // fica oculto (dispara o push e lista os gols no perfil do atleta).
       isVisible: false,

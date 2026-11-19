@@ -22,6 +22,15 @@ class GetFantasyParticipantsUseCase {
       _repository.getParticipants(fantasyId, before: before);
 }
 
+/// "Zerar pontuações (testes)" (admin): as functions zeram os pontos do Fantasy.
+class RequestFantasyResetUseCase {
+  final IFantasyRepository _repository;
+
+  RequestFantasyResetUseCase(this._repository);
+
+  Future<Either<Failure, void>> call(String fantasyId) => _repository.requestReset(fantasyId);
+}
+
 /// "Reapurar rodadas" (admin).
 class RequestFantasyRescoreUseCase {
   final IFantasyRepository _repository;

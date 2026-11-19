@@ -88,3 +88,32 @@ class MatchdayBadge extends StatelessWidget {
     );
   }
 }
+
+/// Selo "TESTE" (âmbar) da partida de teste do admin e dos cards dela.
+class MatchTestBadge extends StatelessWidget {
+  final bool compact;
+
+  const MatchTestBadge({super.key, this.compact = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const ValueKey('match-test-badge'),
+      padding: EdgeInsets.symmetric(horizontal: compact ? AppSizes.s6 : AppSizes.s8, vertical: AppSizes.s2),
+      decoration: BoxDecoration(color: AppColors.warning, borderRadius: BorderRadius.circular(AppSizes.s6)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.science_outlined, size: compact ? AppSizes.s10 : AppSizes.s12, color: AppColors.black),
+          const SizedBox(width: AppSizes.s2),
+          Text(
+            AppLocalizations.of(context).matchTestBadge,
+            maxLines: 1,
+            style: AppTypography.label(color: AppColors.black).copyWith(
+                fontSize: compact ? AppSizes.s10 : AppSizes.s12, fontWeight: FontWeight.w900, letterSpacing: 0.6),
+          ),
+        ],
+      ),
+    );
+  }
+}

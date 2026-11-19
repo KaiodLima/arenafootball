@@ -4366,5 +4366,19 @@
   "@fantasyRoundPartialCount": {"placeholders": {"done": {"type": "int"}, "total": {"type": "int"}}},
   "fantasyRoundFinal": "Final",
   "fantasySwitchResult": "Resultado",
-  "fantasySwitchPick": "Escalar"
+  "fantasySwitchPick": "Escalar",
+  "fantasyResetMenu": "Zerar pontuações (testes)",
+  "fantasyResetTitle": "Zerar as pontuações deste Fantasy?",
+  "fantasyResetText": "Para a fase de testes: o total de todos os participantes volta a 0, as escalações perdem os pontos, a pontuação de cada atleta nas rodadas é apagada, o campeão sai e os cards \"Craques da rodada\" saem do feed. Participantes, escalações e rodadas continuam. Os pontos só voltam com \"Reapurar rodadas\" ou quando uma partida da rodada terminar de novo.",
+  "fantasyResetContinue": "Continuar",
+  "fantasyResetSureTitle": "Tem certeza?",
+  "fantasyResetSureText": "Não dá para desfazer.",
+  "fantasyResetAction": "Zerar pontuações",
+  "fantasyResetRequested": "Pedido enviado: as pontuações serão zeradas em instantes.",
+  "fantasyResetError": "Não foi possível pedir para zerar as pontuações.",
+  "matchFormTest": "Partida de teste",
+  "matchFormTestHint": "Só o admin vê · pushes só para os admins · não conta na classificação nem nos números dos atletas",
+  "matchTestBadge": "TESTE",
+  "homeModeFan": "Modo torcedor",
+  "homeModeFanBanner": "Modo torcedor: você vê o app como um usuário comum"
 }

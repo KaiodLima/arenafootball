@@ -65,6 +65,39 @@ class _FantasyAdminPageState extends State<FantasyAdminPage> {
     if (ok == true && mounted) await _cubit.rescore();
   }
 
+  /// Confirmação dupla: o que é apagado e, depois, "não dá para desfazer".
+  Future<void> _confirmReset() async {
+    final l10n = AppLocalizations.of(context);
+    Future<bool> ask(String title, String text, String action, Key key) async =>
+        await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(title),
+            content: Text(text),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(context, false), child: Text(l10n.fantasyCancel)),
+              TextButton(
+                key: key,
+                style: TextButton.styleFrom(foregroundColor: AppColors.danger),
+                onPressed: () => Navigator.pop(context, true),
+                child: Text(action),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+    if (!await ask(l10n.fantasyResetTitle, l10n.fantasyResetText, l10n.fantasyResetContinue,
+        const ValueKey('fantasy-reset-confirm-1'))) {
+      return;
+    }
+    if (!mounted) return;
+    if (!await ask(l10n.fantasyResetSureTitle, l10n.fantasyResetSureText, l10n.fantasyResetAction,
+        const ValueKey('fantasy-reset-confirm-2'))) {
+      return;
+    }
+    if (mounted) await _cubit.resetScores();
+  }
+
   Future<void> _openParticipant(FantasyParticipantDTO participant) async {
     _cubit.openParticipant(participant.uid);
     await showModalBottomSheet<void>(
@@ -92,14 +125,27 @@ class _FantasyAdminPageState extends State<FantasyAdminPage> {
       length: 2,
       initialIndex: widget.initialTab,
       child: BlocListener<FantasyAdminCubit, FantasyAdminState>(
-        listenWhen: (_, current) => current.rescore != FantasyRescoreResult.none,
-        listener: (context, state) => showSnackBar(
-          context: context,
-          message: state.rescore == FantasyRescoreResult.requested
-              ? l10n.fantasyRescoreRequested
-              : (state.failure ?? l10n.fantasyRescoreError),
-          isSuccess: state.rescore == FantasyRescoreResult.requested,
-        ),
+        listenWhen: (_, current) =>
+            current.rescore != FantasyRescoreResult.none || current.reset != FantasyResetResult.none,
+        listener: (context, state) {
+          if (state.reset != FantasyResetResult.none) {
+            showSnackBar(
+              context: context,
+              message: state.reset == FantasyResetResult.requested
+                  ? l10n.fantasyResetRequested
+                  : (state.failure ?? l10n.fantasyResetError),
+              isSuccess: state.reset == FantasyResetResult.requested,
+            );
+            return;
+          }
+          showSnackBar(
+            context: context,
+            message: state.rescore == FantasyRescoreResult.requested
+                ? l10n.fantasyRescoreRequested
+                : (state.failure ?? l10n.fantasyRescoreError),
+            isSuccess: state.rescore == FantasyRescoreResult.requested,
+          );
+        },
         child: Scaffold(
           backgroundColor: AppColors.background,
           appBar: AppBar(
@@ -133,6 +179,29 @@ class _FantasyAdminPageState extends State<FantasyAdminPage> {
                         )
                       : const Icon(Icons.refresh_rounded),
                   onPressed: state.rescoring ? null : _confirmRescore,
+                ),
+              ),
+              BlocBuilder<FantasyAdminCubit, FantasyAdminState>(
+                buildWhen: (a, b) => a.resetting != b.resetting,
+                builder: (context, state) => PopupMenuButton<String>(
+                  key: const ValueKey('fantasy-admin-menu'),
+                  enabled: !state.resetting,
+                  onSelected: (_) => _confirmReset(),
+                  itemBuilder: (context) => [
+                    PopupMenuItem<String>(
+                      key: const ValueKey('fantasy-reset'),
+                      value: 'reset',
+                      child: Row(
+                        children: [
+                          const Icon(Icons.restart_alt_rounded, color: AppColors.danger),
+                          const SizedBox(width: AppSizes.s10),
+                          Flexible(
+                            child: Text(l10n.fantasyResetMenu, style: AppTypography.label(color: AppColors.danger)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

@@ -253,6 +253,20 @@ class FantasyDataSource {
     }
   }
 
+  /// "Zerar pontuações (testes)": as functions zeram os pontos do Fantasy.
+  Future<Either<Failure, void>> requestReset(String fantasyId) async {
+    try {
+      await _doc(fantasyId).set(
+        {'zerarEm': FieldValue.serverTimestamp(), 'atualizadoEm': FieldValue.serverTimestamp()},
+        SetOptions(merge: true),
+      );
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('requestReset $fantasyId', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível pedir para zerar as pontuações.'));
+    }
+  }
+
   /// "Craques da rodada": os atletas que mais pontuaram na rodada [round]
   /// (auditoria das functions por `total`; índice automático).
   Future<Either<Failure, List<FantasyAthleteScoreDTO>>> getTopAthletes(String fantasyId, int round,

@@ -1,6 +1,7 @@
 import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:arena_soccer/core/firebase/test_content.dart';
 import 'package:arena_soccer/core/services/preferences_service.dart';
 import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
@@ -105,6 +106,33 @@ void main() {
     await fan.signedIn(user);
     await fan.setPlayerMode(true);
     expect(fan.state.playerMode, isFalse);
+  });
+
+  test('modo torcedor: sem admin nas telas, exclusivo com o jogador, guardado e sem as partidas de teste', () async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = PreferencesService();
+    const admin = UserDTO(id: 'adm', name: 'Admin', email: 'a@x.com', isAdmin: true);
+    const fanState = AuthenticatedSessionState(user: admin, fanMode: true);
+    expect((fanState.isAdmin, fanState.isAccountAdmin, fanState.inFanMode, fanState.inPlayerMode),
+        (false, true, true, false));
+    expect(fanState.viewMode, AdminViewMode.fan);
+    // Conta comum ignora o modo.
+    expect(const AuthenticatedSessionState(user: user, fanMode: true).inFanMode, isFalse);
+
+    final cubit = build(prefs);
+    await cubit.signedIn(admin);
+    expect(TestContent.visible, isTrue);
+    await cubit.setViewMode(AdminViewMode.player);
+    await cubit.setViewMode(AdminViewMode.fan);
+    expect((cubit.state.inFanMode, cubit.state.inPlayerMode, cubit.state.isAdmin), (true, false, false));
+    expect(TestContent.visible, isFalse, reason: 'o torcedor não vê partida de teste');
+
+    final again = build(prefs);
+    await again.signedIn(admin);
+    expect(again.state.inFanMode, isTrue, reason: 'lembrado no aparelho');
+    await again.setViewMode(AdminViewMode.admin);
+    expect((again.state.isAdmin, again.state.inFanMode), (true, false));
+    TestContent.configure(visible: false);
   });
 
   setUp(() => auth = _FakeAuth());

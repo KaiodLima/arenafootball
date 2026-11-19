@@ -116,6 +116,9 @@ class FantasyRepositoryImpl implements IFantasyRepository {
   Future<Either<Failure, void>> requestRescore(String fantasyId) => _dataSource.requestRescore(fantasyId);
 
   @override
+  Future<Either<Failure, void>> requestReset(String fantasyId) => _dataSource.requestReset(fantasyId);
+
+  @override
   Future<Either<Failure, FantasyAthleteScoreDTO?>> getAthleteScore(String fantasyId, int round, String athleteId) =>
       _dataSource.getAthleteScore(fantasyId, round, athleteId);
 

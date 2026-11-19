@@ -8193,4 +8193,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fantasySwitchPick => 'Pick team';
+
+  @override
+  String get fantasyResetMenu => 'Reset scores (testing)';
+
+  @override
+  String get fantasyResetTitle => 'Reset the scores of this Fantasy?';
+
+  @override
+  String get fantasyResetText =>
+      'For the testing phase: every participant total goes back to 0, lineups lose their points, each player round score is deleted, the champion is cleared and the \"Top players of the round\" cards leave the feed. Participants, lineups and rounds stay. Points only come back with \"Rescore rounds\" or when a round match finishes again.';
+
+  @override
+  String get fantasyResetContinue => 'Continue';
+
+  @override
+  String get fantasyResetSureTitle => 'Are you sure?';
+
+  @override
+  String get fantasyResetSureText => 'This cannot be undone.';
+
+  @override
+  String get fantasyResetAction => 'Reset scores';
+
+  @override
+  String get fantasyResetRequested =>
+      'Request sent: scores will be reset in a moment.';
+
+  @override
+  String get fantasyResetError => 'Could not request the score reset.';
+
+  @override
+  String get matchFormTest => 'Test match';
+
+  @override
+  String get matchFormTestHint =>
+      'Only admins see it · pushes go to admins only · does not count in standings or player stats';
+
+  @override
+  String get matchTestBadge => 'TEST';
+
+  @override
+  String get homeModeFan => 'Fan mode';
+
+  @override
+  String get homeModeFanBanner => 'Fan mode: you see the app as a regular user';
 }

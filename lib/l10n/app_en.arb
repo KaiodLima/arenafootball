@@ -2509,5 +2509,19 @@
   "@fantasyRoundPartialCount": {"placeholders": {"done": {"type": "int"}, "total": {"type": "int"}}},
   "fantasyRoundFinal": "Final",
   "fantasySwitchResult": "Result",
-  "fantasySwitchPick": "Pick team"
+  "fantasySwitchPick": "Pick team",
+  "fantasyResetMenu": "Reset scores (testing)",
+  "fantasyResetTitle": "Reset the scores of this Fantasy?",
+  "fantasyResetText": "For the testing phase: every participant total goes back to 0, lineups lose their points, each player round score is deleted, the champion is cleared and the \"Top players of the round\" cards leave the feed. Participants, lineups and rounds stay. Points only come back with \"Rescore rounds\" or when a round match finishes again.",
+  "fantasyResetContinue": "Continue",
+  "fantasyResetSureTitle": "Are you sure?",
+  "fantasyResetSureText": "This cannot be undone.",
+  "fantasyResetAction": "Reset scores",
+  "fantasyResetRequested": "Request sent: scores will be reset in a moment.",
+  "fantasyResetError": "Could not request the score reset.",
+  "matchFormTest": "Test match",
+  "matchFormTestHint": "Only admins see it · pushes go to admins only · does not count in standings or player stats",
+  "matchTestBadge": "TEST",
+  "homeModeFan": "Fan mode",
+  "homeModeFanBanner": "Fan mode: you see the app as a regular user"
 }

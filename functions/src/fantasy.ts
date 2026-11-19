@@ -117,6 +117,27 @@ export function roundSync(existing: StoredRound | undefined, computed: ComputedR
   };
 }
 
+/**
+ * Rodada gravada que ficou sem partidas (apagadas ou mudadas de rodada):
+ * aberta vira `vazia`; fechada fica fechada, sem partidas e `finalizada` (não
+ * segura o mercado; os pontos e o histórico ficam). Nulo = nada a gravar.
+ */
+export function orphanRoundUpdate(round: { status?: string; idsPartidas?: string[]; finalizada?: boolean }): Doc | null {
+  const ids = round.idsPartidas ?? [];
+  if (round.status === 'aberta') return { status: 'vazia', idsPartidas: [] };
+  if (round.status === 'fechada' && (ids.length > 0 || round.finalizada !== true)) {
+    return { idsPartidas: [], finalizada: true };
+  }
+  return null;
+}
+
+/**
+ * Rodada finalizada: todas as partidas dela que ainda existem terminaram
+ * ([existing] = quantas existem, [finished] = quantas terminaram). Partida
+ * apagada não segura a rodada; sem nenhuma, finalizada.
+ */
+export const roundFinalized = (existing: number, finished: number): boolean => finished >= existing;
+
 /** Parâmetros congelados na rodada ao fechar (os da configuração naquele momento). */
 export function frozenParams(config: Doc): { minMinutos: number; minMinutosDefesa: number; capitao: number } {
   const num = (value: unknown, fallback: number) => (typeof value === 'number' && Number.isFinite(value) ? value : fallback);
@@ -199,10 +220,16 @@ export function fantasyChampions(participants: { id: string; data: Doc }[]): Fan
 }
 
 /** O admin pediu "Reapurar rodadas" (`reapurarEm` mudou). */
+const stampMillis = (value: unknown): string =>
+  value && typeof value === 'object' && 'toMillis' in value
+    ? String((value as { toMillis: () => number }).toMillis())
+    : String(value ?? '');
+
 export function rescoreRequested(before: Doc | undefined, after: Doc | undefined): boolean {
-  const millis = (value: unknown): string =>
-    value && typeof value === 'object' && 'toMillis' in value
-      ? String((value as { toMillis: () => number }).toMillis())
-      : String(value ?? '');
-  return !!after && after.reapurarEm !== undefined && millis(before?.reapurarEm) !== millis(after.reapurarEm);
+  return !!after && after.reapurarEm !== undefined && stampMillis(before?.reapurarEm) !== stampMillis(after.reapurarEm);
+}
+
+/** "Zerar pontuações (testes)" do admin: `zerarEm` novo ou trocado. */
+export function resetRequested(before: Doc | undefined, after: Doc | undefined): boolean {
+  return !!after && after.zerarEm !== undefined && stampMillis(before?.zerarEm) !== stampMillis(after.zerarEm);
 }

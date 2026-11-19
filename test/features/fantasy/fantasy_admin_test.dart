@@ -44,6 +44,13 @@ class _Repo implements IFantasyRepository {
   final rounds = StreamController<Either<Failure, List<FantasyRoundDTO>>>.broadcast();
   final pages = <DateTime?>[];
   var rescores = 0;
+  var resets = 0;
+
+  @override
+  Future<Either<Failure, void>> requestReset(String fantasyId) async {
+    resets++;
+    return const Right(null);
+  }
 
   List<FantasyParticipantDTO> _page(int start, int count) => [
         for (var i = start; i < start + count; i++)
@@ -109,6 +116,7 @@ FantasyAdminCubit _cubit(_Repo repo) => FantasyAdminCubit(
       GetFantasyLineupUseCase(repo),
       GetFantasyPositionUseCase(repo),
       GetFantasyAthletesCacheFirstUseCase(repo),
+      reset: RequestFantasyResetUseCase(repo),
     );
 
 Future<void> _settle() async {
@@ -185,5 +193,47 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('fantasy-history-1')), findsOneWidget);
     expect(find.text('Ângelo Atacante'), findsOneWidget);
+  });
+
+  testWidgets('zerar pontuações: menu, duas confirmações e só então o pedido; cancelar não pede', (tester) async {
+    tester.view.physicalSize = const Size(420, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final repo = _Repo();
+    final cubit = _cubit(repo);
+    addTearDown(cubit.close);
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('pt'),
+      home: BlocProvider.value(value: cubit, child: const FantasyAdminPage(championship: _copa)),
+    ));
+    repo.rounds.add(Right(_rounds));
+    await tester.pumpAndSettle();
+
+    Future<void> openMenu() async {
+      await tester.tap(find.byKey(const ValueKey('fantasy-admin-menu')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('fantasy-reset')));
+      await tester.pumpAndSettle();
+    }
+
+    // Cancelar na 2ª confirmação: nada é pedido.
+    await openMenu();
+    expect(find.text('Zerar as pontuações deste Fantasy?'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('fantasy-reset-confirm-1')));
+    await tester.pumpAndSettle();
+    expect(find.text('Tem certeza?'), findsOneWidget);
+    await tester.tap(find.text('Cancelar'));
+    await tester.pumpAndSettle();
+    expect(repo.resets, 0);
+
+    await openMenu();
+    await tester.tap(find.byKey(const ValueKey('fantasy-reset-confirm-1')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('fantasy-reset-confirm-2')));
+    await tester.pumpAndSettle();
+    expect(repo.resets, 1);
+    expect(find.text('Pedido enviado: as pontuações serão zeradas em instantes.'), findsOneWidget);
   });
 }

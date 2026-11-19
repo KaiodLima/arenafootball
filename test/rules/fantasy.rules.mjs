@@ -114,6 +114,14 @@ export default async function run(env, check) {
     { reapurarEm: serverTimestamp(), atualizadoEm: serverTimestamp() }, { merge: true })));
   await check('usuário comum não pede a reapuração', assertFails(setDoc(doc(user, 'fantasy/fx'),
     { reapurarEm: serverTimestamp(), atualizadoEm: serverTimestamp() }, { merge: true })));
+  await check('admin pede para zerar as pontuações', assertSucceeds(setDoc(doc(admin, 'fantasy/fx'),
+    { zerarEm: serverTimestamp(), atualizadoEm: serverTimestamp() }, { merge: true })));
+  await check('usuário comum não zera', assertFails(setDoc(doc(user, 'fantasy/fx'),
+    { zerarEm: serverTimestamp(), atualizadoEm: serverTimestamp() }, { merge: true })));
+  await check('zerarEm como texto recusado', assertFails(setDoc(doc(admin, 'fantasy/fx'),
+    { zerarEm: 'agora', atualizadoEm: serverTimestamp() }, { merge: true })));
+  await check('admin não grava zeradoEm (das functions)', assertFails(setDoc(doc(admin, 'fantasy/fx'),
+    { zeradoEm: serverTimestamp(), atualizadoEm: serverTimestamp() }, { merge: true })));
   await check('reapurarEm como texto recusado', assertFails(setDoc(doc(admin, 'fantasy/fx'),
     { reapurarEm: 'agora', atualizadoEm: serverTimestamp() }, { merge: true })));
 

@@ -130,6 +130,9 @@ class NewsDTO extends Equatable {
   /// encerrada; vazio = andamento). As functions marcam intervalo e fim.
   final String matchStatus;
 
+  /// Card de partida de teste (`teste: true`): só o admin vê.
+  final bool isTest;
+
   /// Card ao vivo: o relógio da partida (`relogio`) para o minuto corrido;
   /// nulo em card antigo (o minuto é o do último lance).
   final LiveClock? liveClock;
@@ -193,6 +196,7 @@ class NewsDTO extends Equatable {
     this.liveEvents = const [],
     this.matchStatus = '',
     this.liveClock,
+    this.isTest = false,
     this.event,
     this.fantasyRound = 0,
     this.fantasyAthletes = const [],
@@ -276,6 +280,7 @@ class NewsDTO extends Equatable {
       liveEvents: LiveEvent.listFrom(data['lances']),
       matchStatus: data['status_partida']?.toString() ?? '',
       liveClock: LiveClock.fromMap(data['relogio']),
+      isTest: data['teste'] == true,
       event: data['tag'] == eventTag
           ? EventPoll.fromMap(data, closesAt: (data['encerraEm'] as Timestamp?)?.toDate())
           : null,
@@ -333,6 +338,7 @@ class NewsDTO extends Equatable {
       authorId: text('authorId'),
       event: json['event'] is Map ? EventPoll.fromCache(Map<String, dynamic>.from(json['event'] as Map)) : null,
       liveClock: LiveClock.fromMap(json['liveClock']),
+      isTest: json['isTest'] == true,
       fantasyRound: (json['fantasyRound'] as num?)?.toInt() ?? 0,
       fantasyAthletes: FantasyNewsAthlete.listFrom(json['fantasyAthletes']),
     );
@@ -383,6 +389,7 @@ class NewsDTO extends Equatable {
         if (authorId.isNotEmpty) 'authorId': authorId,
         if (event != null) 'event': event!.toCache(),
         if (liveClock != null) 'liveClock': liveClock!.toCache(),
+        if (isTest) 'isTest': true,
         if (fantasyRound > 0) 'fantasyRound': fantasyRound,
         if (fantasyAthletes.isNotEmpty) 'fantasyAthletes': [for (final a in fantasyAthletes) a.toMap()],
       };
@@ -449,6 +456,7 @@ class NewsDTO extends Equatable {
         if (isLive) 'lances': [for (final e in liveEvents) e.toMap()],
         if (matchStatus.isNotEmpty) 'status_partida': matchStatus,
         if (liveClock != null) 'relogio': liveClock!.toMap(),
+        if (isTest) 'teste': true,
         if (event != null) ...event!.toMap(),
         if (event?.closesAt != null) 'encerraEm': Timestamp.fromDate(event!.closesAt!),
       };
@@ -501,6 +509,7 @@ class NewsDTO extends Equatable {
     List<LiveEvent>? liveEvents,
     String? matchStatus,
     LiveClock? liveClock,
+    bool? isTest,
     EventPoll? event,
     int? fantasyRound,
     List<FantasyNewsAthlete>? fantasyAthletes,
@@ -553,6 +562,7 @@ class NewsDTO extends Equatable {
       liveEvents: liveEvents ?? this.liveEvents,
       matchStatus: matchStatus ?? this.matchStatus,
       liveClock: liveClock ?? this.liveClock,
+      isTest: isTest ?? this.isTest,
       event: event ?? this.event,
       fantasyRound: fantasyRound ?? this.fantasyRound,
       fantasyAthletes: fantasyAthletes ?? this.fantasyAthletes,
@@ -606,6 +616,7 @@ class NewsDTO extends Equatable {
         liveEvents,
         matchStatus,
         liveClock,
+        isTest,
         event,
         fantasyRound,
         fantasyAthletes,

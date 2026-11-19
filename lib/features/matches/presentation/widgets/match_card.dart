@@ -343,6 +343,10 @@ class _MatchCardState extends State<MatchCard> {
                     const SizedBox(width: AppSizes.s6),
                     MatchdayBadge(matchday: match.matchday!),
                   ],
+                  if (match.isTest) ...[
+                    const SizedBox(width: AppSizes.s6),
+                    const MatchTestBadge(),
+                  ],
                   if (isAdmin) ...[
                     const SizedBox(width: AppSizes.s6),
                     CardMenuButton(actions: _menuActions(l10n, match, status, now)),
@@ -583,6 +587,10 @@ class _MatchCardState extends State<MatchCard> {
                   if (match.matchday != null) ...[
                     const SizedBox(height: AppSizes.s2),
                     FittedBox(fit: BoxFit.scaleDown, child: MatchdayBadge(matchday: match.matchday!, compact: true)),
+                  ],
+                  if (match.isTest) ...[
+                    const SizedBox(height: AppSizes.s2),
+                    const FittedBox(fit: BoxFit.scaleDown, child: MatchTestBadge(compact: true)),
                   ],
                 ],
               ),

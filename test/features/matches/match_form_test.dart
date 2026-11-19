@@ -248,6 +248,14 @@ void main() {
       await organizer.close();
     });
 
+    test('partida de teste: a chave grava "teste" na partida criada', () async {
+      cubit.setTest(true);
+      cubit.selectTime('19:30');
+      await cubit.submit();
+      expect(repository.created.last.isTest, isTrue);
+      expect(repository.created.last.toMap()['teste'], isTrue);
+    });
+
     test('sem conexão: libera o formulário para o próximo registro', () async {
       repository.offline = true;
       cubit.selectTime('20:00');
