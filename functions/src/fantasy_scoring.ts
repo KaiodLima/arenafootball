@@ -17,6 +17,7 @@ export interface ScoringParams {
   capitao: number;
 }
 
+// Espelhado em lib/features/fantasy/domain/fantasy_scoring_rules.dart (tela de regras): mude junto.
 export const POINTS = {
   base: 10,
   goal: 5,

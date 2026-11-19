@@ -10,6 +10,7 @@ import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_athle
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_labels.dart';
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_pitch.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_round_dtos.dart';
+import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_config_dto.dart';
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_score_sheet.dart';
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_top_athletes.dart';
 import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_ranking_page.dart';
@@ -170,6 +171,9 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
 
   void _openRanking() => Navigator.pushNamed(context, AppRoutes.fantasyRankingPage, arguments: widget.championship);
 
+  void _openRules(FantasyConfigDTO? config) =>
+      Navigator.pushNamed(context, AppRoutes.fantasyRulesPage, arguments: config);
+
   String? _errorText(AppLocalizations l10n, FantasyLineupState state) => switch (state.error) {
         FantasyLineupError.incomplete => l10n.fantasyErrorIncomplete,
         FantasyLineupError.noCaptain => l10n.fantasyErrorCaptainMissing,
@@ -207,6 +211,12 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
               style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s20),
             ),
             actions: [
+              IconButton(
+                key: const ValueKey('fantasy-open-rules'),
+                tooltip: l10n.fantasyRulesTitle,
+                icon: const Icon(Icons.menu_book_rounded),
+                onPressed: () => _openRules(state.config),
+              ),
               IconButton(
                 key: const ValueKey('fantasy-open-ranking'),
                 tooltip: l10n.fantasyRankingTitle,
@@ -271,7 +281,7 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
         if (state.isGuest)
           _Notice(icon: Icons.login_rounded, text: l10n.fantasyGuest)
         else if (!state.joined)
-          _JoinCard(busy: state.busy, onJoin: _cubit.join)
+          _JoinCard(busy: state.busy, onJoin: _cubit.join, onRules: () => _openRules(config))
         else if (state.hasLastResult) ...[
           _RoundSwitch(state: state, onChanged: _cubit.showLast),
           const SizedBox(height: AppSizes.s12),
@@ -444,8 +454,9 @@ class _Header extends StatelessWidget {
 class _JoinCard extends StatelessWidget {
   final bool busy;
   final VoidCallback onJoin;
+  final VoidCallback onRules;
 
-  const _JoinCard({required this.busy, required this.onJoin});
+  const _JoinCard({required this.busy, required this.onJoin, required this.onRules});
 
   @override
   Widget build(BuildContext context) {
@@ -469,6 +480,12 @@ class _JoinCard extends StatelessWidget {
             title: l10n.fantasyJoin,
             isLoading: busy,
             function: onJoin,
+          ),
+          const SizedBox(height: AppSizes.s8),
+          ArenaButton.outlined(
+            key: const ValueKey('fantasy-join-rules'),
+            title: l10n.fantasyRulesSeeRules,
+            function: onRules,
           ),
         ],
       ),

@@ -89,6 +89,24 @@ class _FantasyHomePageState extends State<FantasyHomePage> {
         titleSpacing: 0,
         title: Text(l10n.fantasyTitle,
             style: AppTypography.title(color: AppColors.white).copyWith(fontSize: AppSizes.s20)),
+        actions: [
+          // Regras: a config do único Fantasy da região; com vários, os padrões.
+          BlocBuilder<FantasyHomeCubit, FantasyHomeState>(
+            builder: (context, state) {
+              final items = state.loaded ? state.forRegion(region) : const <FantasyHomeItem>[];
+              return IconButton(
+                key: const ValueKey('fantasy-open-rules'),
+                tooltip: l10n.fantasyRulesTitle,
+                icon: const Icon(Icons.menu_book_rounded),
+                onPressed: () => Navigator.pushNamed(
+                  context,
+                  AppRoutes.fantasyRulesPage,
+                  arguments: items.length == 1 ? items.single.config : null,
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: BlocBuilder<FantasyHomeCubit, FantasyHomeState>(
         builder: (context, state) {

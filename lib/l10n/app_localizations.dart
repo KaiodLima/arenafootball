@@ -12236,6 +12236,198 @@ abstract class AppLocalizations {
   /// **'Sem sofrer gols'**
   String get fantasyRuleCleanSheet;
 
+  /// No description provided for @fantasyRulesTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Regras e pontuação'**
+  String get fantasyRulesTitle;
+
+  /// No description provided for @fantasyRulesSeeRules.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver regras'**
+  String get fantasyRulesSeeRules;
+
+  /// No description provided for @fantasyRulesDefaultsNote.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os minutos e o multiplicador do capitão abaixo são os padrões e podem variar por campeonato.'**
+  String get fantasyRulesDefaultsNote;
+
+  /// No description provided for @fantasyRulesHowToPlay.
+  ///
+  /// In pt, this message translates to:
+  /// **'Como jogar'**
+  String get fantasyRulesHowToPlay;
+
+  /// No description provided for @fantasyRulesHowToPlayText.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escale 5 atletas, um em cada vaga, e escolha 1 capitão. Só entram atletas inscritos no campeonato.'**
+  String get fantasyRulesHowToPlayText;
+
+  /// No description provided for @fantasyRulesSlotGoalkeeper.
+  ///
+  /// In pt, this message translates to:
+  /// **'Goleiro'**
+  String get fantasyRulesSlotGoalkeeper;
+
+  /// No description provided for @fantasyRulesSlotDefender.
+  ///
+  /// In pt, this message translates to:
+  /// **'Zagueiro ou lateral'**
+  String get fantasyRulesSlotDefender;
+
+  /// No description provided for @fantasyRulesSlotMidfielder.
+  ///
+  /// In pt, this message translates to:
+  /// **'Volante ou meia'**
+  String get fantasyRulesSlotMidfielder;
+
+  /// No description provided for @fantasyRulesSlotForward.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atacante'**
+  String get fantasyRulesSlotForward;
+
+  /// No description provided for @fantasyRulesSlotFlex.
+  ///
+  /// In pt, this message translates to:
+  /// **'Qualquer posição'**
+  String get fantasyRulesSlotFlex;
+
+  /// No description provided for @fantasyRulesFlexNote.
+  ///
+  /// In pt, this message translates to:
+  /// **'Na vaga LIVRE, o atleta pontua pela posição dele no cadastro.'**
+  String get fantasyRulesFlexNote;
+
+  /// No description provided for @fantasyRulesRound.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rodada e prazo'**
+  String get fantasyRulesRound;
+
+  /// No description provided for @fantasyRulesRoundLock.
+  ///
+  /// In pt, this message translates to:
+  /// **'A escalação trava quando começa o 1º jogo da rodada.'**
+  String get fantasyRulesRoundLock;
+
+  /// No description provided for @fantasyRulesRoundCopy.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não mexeu na escalação? Ela é copiada para a próxima rodada.'**
+  String get fantasyRulesRoundCopy;
+
+  /// No description provided for @fantasyRulesRoundPoints.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os pontos saem depois dos jogos, pela súmula oficial da partida.'**
+  String get fantasyRulesRoundPoints;
+
+  /// No description provided for @fantasyRulesScoring.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pontuação'**
+  String get fantasyRulesScoring;
+
+  /// No description provided for @fantasyRulesPlay.
+  ///
+  /// In pt, this message translates to:
+  /// **'Lance'**
+  String get fantasyRulesPlay;
+
+  /// No description provided for @fantasyRulesPoints.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pontos'**
+  String get fantasyRulesPoints;
+
+  /// No description provided for @fantasyRulesScoringNote.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gols e assistências contam cada um. O 2º amarelo vira o vermelho e o amarelo não conta de novo.'**
+  String get fantasyRulesScoringNote;
+
+  /// No description provided for @fantasyRulesByPosition.
+  ///
+  /// In pt, this message translates to:
+  /// **'Por posição'**
+  String get fantasyRulesByPosition;
+
+  /// No description provided for @fantasyRulesPosition.
+  ///
+  /// In pt, this message translates to:
+  /// **'Posição'**
+  String get fantasyRulesPosition;
+
+  /// No description provided for @fantasyRulesConcededEach.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gols sofridos (por gol)'**
+  String get fantasyRulesConcededEach;
+
+  /// No description provided for @fantasyRulesPositionNote.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gols sofridos e gols da equipe contam só com o atleta em campo. Gols da equipe: só o MEI, por gol do time.'**
+  String get fantasyRulesPositionNote;
+
+  /// No description provided for @fantasyRulesMinutes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Minutos em campo'**
+  String get fantasyRulesMinutes;
+
+  /// No description provided for @fantasyRulesMinutesShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'Com menos de {min} min, contam só gols, assistências e cartões.'**
+  String fantasyRulesMinutesShort(int min);
+
+  /// No description provided for @fantasyRulesMinutesDefense.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem sofrer gols só com {min} min ou mais em campo.'**
+  String fantasyRulesMinutesDefense(int min);
+
+  /// No description provided for @fantasyRulesCaptain.
+  ///
+  /// In pt, this message translates to:
+  /// **'Capitão'**
+  String get fantasyRulesCaptain;
+
+  /// No description provided for @fantasyRulesCaptainText.
+  ///
+  /// In pt, this message translates to:
+  /// **'O capitão pontua {mult}, inclusive na pontuação negativa.'**
+  String fantasyRulesCaptainText(String mult);
+
+  /// No description provided for @fantasyRulesRanking.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ranking'**
+  String get fantasyRulesRanking;
+
+  /// No description provided for @fantasyRulesRankingText.
+  ///
+  /// In pt, this message translates to:
+  /// **'Há o ranking de cada rodada e o geral, com a soma das rodadas.'**
+  String get fantasyRulesRankingText;
+
+  /// No description provided for @fantasyRulesRankingTies.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mesmo total = mesma posição.'**
+  String get fantasyRulesRankingTies;
+
+  /// No description provided for @fantasyRulesRankingChampion.
+  ///
+  /// In pt, this message translates to:
+  /// **'Campeão: o maior total geral ao fim da competição; empate = todos campeões.'**
+  String get fantasyRulesRankingChampion;
+
   /// No description provided for @fantasyReasonShort.
   ///
   /// In pt, this message translates to:

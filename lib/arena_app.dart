@@ -164,6 +164,8 @@ import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_admin_cu
 import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_admin_page.dart';
 import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_home_cubit.dart';
 import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_home_page.dart';
+import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_rules_page.dart';
+import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_config_dto.dart';
 
 class ArenaApp extends StatelessWidget {
   const ArenaApp({super.key});
@@ -572,6 +574,10 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.fantasyHomePage: (_) => BlocProvider<FantasyHomeCubit>(
               create: (_) => FantasyHomeCubit(sl(), sl(), sl(), sl(), sl()),
               child: const FantasyHomePage(),
+            ),
+        // Arena Fantasy: regras e pontuação (config do campeonato opcional; sem ela, os padrões).
+        AppRoutes.fantasyRulesPage: (context) => FantasyRulesPage(
+              config: ModalRoute.of(context)!.settings.arguments as FantasyConfigDTO?,
             ),
         // Arena Fantasy (admin): rodadas/apuração e participantes.
         AppRoutes.fantasyAdminPage: (context) {

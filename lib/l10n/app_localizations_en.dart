@@ -7333,6 +7333,118 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fantasyRuleCleanSheet => 'Clean sheet';
 
   @override
+  String get fantasyRulesTitle => 'Rules and scoring';
+
+  @override
+  String get fantasyRulesSeeRules => 'See the rules';
+
+  @override
+  String get fantasyRulesDefaultsNote =>
+      'The minutes and the captain multiplier below are the defaults and may vary by championship.';
+
+  @override
+  String get fantasyRulesHowToPlay => 'How to play';
+
+  @override
+  String get fantasyRulesHowToPlayText =>
+      'Pick 5 athletes, one per slot, and choose 1 captain. Only athletes registered in the championship can be picked.';
+
+  @override
+  String get fantasyRulesSlotGoalkeeper => 'Goalkeeper';
+
+  @override
+  String get fantasyRulesSlotDefender => 'Centre-back or full-back';
+
+  @override
+  String get fantasyRulesSlotMidfielder => 'Defensive or attacking midfielder';
+
+  @override
+  String get fantasyRulesSlotForward => 'Forward';
+
+  @override
+  String get fantasyRulesSlotFlex => 'Any position';
+
+  @override
+  String get fantasyRulesFlexNote =>
+      'In the FLEX slot, the athlete scores by their registered position.';
+
+  @override
+  String get fantasyRulesRound => 'Matchday and deadline';
+
+  @override
+  String get fantasyRulesRoundLock =>
+      'The lineup locks when the matchday\'s 1st match starts.';
+
+  @override
+  String get fantasyRulesRoundCopy =>
+      'Didn\'t change your lineup? It is copied to the next matchday.';
+
+  @override
+  String get fantasyRulesRoundPoints =>
+      'Points come after the games, from the official match report.';
+
+  @override
+  String get fantasyRulesScoring => 'Scoring';
+
+  @override
+  String get fantasyRulesPlay => 'Play';
+
+  @override
+  String get fantasyRulesPoints => 'Points';
+
+  @override
+  String get fantasyRulesScoringNote =>
+      'Each goal and assist counts. A 2nd yellow becomes the red and the yellow isn\'t counted again.';
+
+  @override
+  String get fantasyRulesByPosition => 'By position';
+
+  @override
+  String get fantasyRulesPosition => 'Position';
+
+  @override
+  String get fantasyRulesConcededEach => 'Goals conceded (per goal)';
+
+  @override
+  String get fantasyRulesPositionNote =>
+      'Goals conceded and team goals only count while the athlete is on the pitch. Team goals: MID only, per team goal.';
+
+  @override
+  String get fantasyRulesMinutes => 'Minutes on the pitch';
+
+  @override
+  String fantasyRulesMinutesShort(int min) {
+    return 'Under $min min, only goals, assists and cards count.';
+  }
+
+  @override
+  String fantasyRulesMinutesDefense(int min) {
+    return 'Clean sheet only with $min min or more on the pitch.';
+  }
+
+  @override
+  String get fantasyRulesCaptain => 'Captain';
+
+  @override
+  String fantasyRulesCaptainText(String mult) {
+    return 'The captain scores $mult, negative points included.';
+  }
+
+  @override
+  String get fantasyRulesRanking => 'Ranking';
+
+  @override
+  String get fantasyRulesRankingText =>
+      'There is a ranking for each matchday and an overall one, with the sum of the matchdays.';
+
+  @override
+  String get fantasyRulesRankingTies => 'Same total = same position.';
+
+  @override
+  String get fantasyRulesRankingChampion =>
+      'Champion: the highest overall total when the competition ends; ties = all champions.';
+
+  @override
   String fantasyReasonShort(int min, int played) {
     return 'Below the $min-minute minimum (played $played): only goals, assists and cards count.';
   }

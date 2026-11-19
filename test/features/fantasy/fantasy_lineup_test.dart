@@ -23,6 +23,8 @@ import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_config_use
 import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_lineup_usecases.dart';
 import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_lineup_cubit.dart';
 import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_lineup_page.dart';
+import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_rules_page.dart';
+import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/album/presentation/widgets/sticker_card.dart';
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_athlete_picker.dart';
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_pitch.dart';
@@ -728,6 +730,61 @@ void main() {
     expect(find.byKey(const ValueKey('fantasy-last-pitch')), findsNothing);
     expect(find.text('Confirmar escalação'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('regras: o livro da AppBar e o "Ver regras" do convite abrem a tela com a config', (tester) async {
+    tester.view.physicalSize = const Size(420, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final repo = _Repo();
+    final cubit = _cubit(repo);
+    addTearDown(cubit.close);
+    final opened = <Object?>[];
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('pt'),
+      routes: {
+        AppRoutes.fantasyRulesPage: (context) {
+          final config = ModalRoute.of(context)!.settings.arguments as FantasyConfigDTO?;
+          opened.add(config);
+          return FantasyRulesPage(config: config);
+        },
+      },
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider<SessionCubit>.value(value: _Session()),
+          BlocProvider<FantasyLineupCubit>.value(value: cubit),
+        ],
+        child: const FantasyLineupPage(championship: _copa),
+      ),
+    ));
+    final config = FantasyConfigDTO.fromMap(
+        'doc1', {'ativo': true, 'rodadaAtual': 2, 'minMinutos': 30, 'capitao': 2.0},
+        championship: _copa);
+    repo.config.add(Right(config));
+    await tester.pump();
+    repo.participant.add(const Right(null));
+    repo.round.add(Right(_openRound));
+    repo.lineup.add(const Right(null));
+    await tester.pump();
+    await tester.pump();
+
+    await tester.tap(find.byKey(const ValueKey('fantasy-open-rules')));
+    await tester.pumpAndSettle();
+    expect(find.byType(FantasyRulesPage), findsOneWidget);
+    expect(find.text('Regras e pontuação'), findsOneWidget);
+    final sent = opened.single as FantasyConfigDTO;
+    expect(sent.championshipDocId, 'doc1');
+    expect(sent.minMinutes, 30);
+    expect(sent.captainMultiplier, 2.0);
+    tester.state<NavigatorState>(find.byType(Navigator)).pop();
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('fantasy-join-rules')));
+    await tester.pumpAndSettle();
+    expect(find.byType(FantasyRulesPage), findsOneWidget);
+    expect(opened, hasLength(2));
   });
 }
 

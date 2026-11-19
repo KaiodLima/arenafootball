@@ -7377,6 +7377,118 @@ class AppLocalizationsPt extends AppLocalizations {
   String get fantasyRuleCleanSheet => 'Sem sofrer gols';
 
   @override
+  String get fantasyRulesTitle => 'Regras e pontuação';
+
+  @override
+  String get fantasyRulesSeeRules => 'Ver regras';
+
+  @override
+  String get fantasyRulesDefaultsNote =>
+      'Os minutos e o multiplicador do capitão abaixo são os padrões e podem variar por campeonato.';
+
+  @override
+  String get fantasyRulesHowToPlay => 'Como jogar';
+
+  @override
+  String get fantasyRulesHowToPlayText =>
+      'Escale 5 atletas, um em cada vaga, e escolha 1 capitão. Só entram atletas inscritos no campeonato.';
+
+  @override
+  String get fantasyRulesSlotGoalkeeper => 'Goleiro';
+
+  @override
+  String get fantasyRulesSlotDefender => 'Zagueiro ou lateral';
+
+  @override
+  String get fantasyRulesSlotMidfielder => 'Volante ou meia';
+
+  @override
+  String get fantasyRulesSlotForward => 'Atacante';
+
+  @override
+  String get fantasyRulesSlotFlex => 'Qualquer posição';
+
+  @override
+  String get fantasyRulesFlexNote =>
+      'Na vaga LIVRE, o atleta pontua pela posição dele no cadastro.';
+
+  @override
+  String get fantasyRulesRound => 'Rodada e prazo';
+
+  @override
+  String get fantasyRulesRoundLock =>
+      'A escalação trava quando começa o 1º jogo da rodada.';
+
+  @override
+  String get fantasyRulesRoundCopy =>
+      'Não mexeu na escalação? Ela é copiada para a próxima rodada.';
+
+  @override
+  String get fantasyRulesRoundPoints =>
+      'Os pontos saem depois dos jogos, pela súmula oficial da partida.';
+
+  @override
+  String get fantasyRulesScoring => 'Pontuação';
+
+  @override
+  String get fantasyRulesPlay => 'Lance';
+
+  @override
+  String get fantasyRulesPoints => 'Pontos';
+
+  @override
+  String get fantasyRulesScoringNote =>
+      'Gols e assistências contam cada um. O 2º amarelo vira o vermelho e o amarelo não conta de novo.';
+
+  @override
+  String get fantasyRulesByPosition => 'Por posição';
+
+  @override
+  String get fantasyRulesPosition => 'Posição';
+
+  @override
+  String get fantasyRulesConcededEach => 'Gols sofridos (por gol)';
+
+  @override
+  String get fantasyRulesPositionNote =>
+      'Gols sofridos e gols da equipe contam só com o atleta em campo. Gols da equipe: só o MEI, por gol do time.';
+
+  @override
+  String get fantasyRulesMinutes => 'Minutos em campo';
+
+  @override
+  String fantasyRulesMinutesShort(int min) {
+    return 'Com menos de $min min, contam só gols, assistências e cartões.';
+  }
+
+  @override
+  String fantasyRulesMinutesDefense(int min) {
+    return 'Sem sofrer gols só com $min min ou mais em campo.';
+  }
+
+  @override
+  String get fantasyRulesCaptain => 'Capitão';
+
+  @override
+  String fantasyRulesCaptainText(String mult) {
+    return 'O capitão pontua $mult, inclusive na pontuação negativa.';
+  }
+
+  @override
+  String get fantasyRulesRanking => 'Ranking';
+
+  @override
+  String get fantasyRulesRankingText =>
+      'Há o ranking de cada rodada e o geral, com a soma das rodadas.';
+
+  @override
+  String get fantasyRulesRankingTies => 'Mesmo total = mesma posição.';
+
+  @override
+  String get fantasyRulesRankingChampion =>
+      'Campeão: o maior total geral ao fim da competição; empate = todos campeões.';
+
+  @override
   String fantasyReasonShort(int min, int played) {
     return 'Não atingiu o mínimo de $min minutos (jogou $played): só valem gols, assistências e cartões.';
   }

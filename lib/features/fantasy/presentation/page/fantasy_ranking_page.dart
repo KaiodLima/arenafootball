@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/core/services/tour_service.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
@@ -127,6 +128,17 @@ class _FantasyRankingPageState extends State<FantasyRankingPage> with SingleTick
             ),
           ],
         ),
+        actions: [
+          BlocBuilder<FantasyRankingCubit, FantasyRankingState>(
+            buildWhen: (previous, current) => previous.config != current.config,
+            builder: (context, state) => IconButton(
+              key: const ValueKey('fantasy-open-rules'),
+              tooltip: l10n.fantasyRulesTitle,
+              icon: const Icon(Icons.menu_book_rounded),
+              onPressed: () => Navigator.pushNamed(context, AppRoutes.fantasyRulesPage, arguments: state.config),
+            ),
+          ),
+        ],
         bottom: TabBar(
           key: _tourTabs,
           controller: _tabs,

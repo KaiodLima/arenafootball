@@ -3689,6 +3689,59 @@
   "fantasyRuleConceded": "Gols sofridos",
   "fantasyRuleTeamGoals": "Gols da equipe",
   "fantasyRuleCleanSheet": "Sem sofrer gols",
+  "fantasyRulesTitle": "Regras e pontuação",
+  "fantasyRulesSeeRules": "Ver regras",
+  "fantasyRulesDefaultsNote": "Os minutos e o multiplicador do capitão abaixo são os padrões e podem variar por campeonato.",
+  "fantasyRulesHowToPlay": "Como jogar",
+  "fantasyRulesHowToPlayText": "Escale 5 atletas, um em cada vaga, e escolha 1 capitão. Só entram atletas inscritos no campeonato.",
+  "fantasyRulesSlotGoalkeeper": "Goleiro",
+  "fantasyRulesSlotDefender": "Zagueiro ou lateral",
+  "fantasyRulesSlotMidfielder": "Volante ou meia",
+  "fantasyRulesSlotForward": "Atacante",
+  "fantasyRulesSlotFlex": "Qualquer posição",
+  "fantasyRulesFlexNote": "Na vaga LIVRE, o atleta pontua pela posição dele no cadastro.",
+  "fantasyRulesRound": "Rodada e prazo",
+  "fantasyRulesRoundLock": "A escalação trava quando começa o 1º jogo da rodada.",
+  "fantasyRulesRoundCopy": "Não mexeu na escalação? Ela é copiada para a próxima rodada.",
+  "fantasyRulesRoundPoints": "Os pontos saem depois dos jogos, pela súmula oficial da partida.",
+  "fantasyRulesScoring": "Pontuação",
+  "fantasyRulesPlay": "Lance",
+  "fantasyRulesPoints": "Pontos",
+  "fantasyRulesScoringNote": "Gols e assistências contam cada um. O 2º amarelo vira o vermelho e o amarelo não conta de novo.",
+  "fantasyRulesByPosition": "Por posição",
+  "fantasyRulesPosition": "Posição",
+  "fantasyRulesConcededEach": "Gols sofridos (por gol)",
+  "fantasyRulesPositionNote": "Gols sofridos e gols da equipe contam só com o atleta em campo. Gols da equipe: só o MEI, por gol do time.",
+  "fantasyRulesMinutes": "Minutos em campo",
+  "fantasyRulesMinutesShort": "Com menos de {min} min, contam só gols, assistências e cartões.",
+  "@fantasyRulesMinutesShort": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
+  "fantasyRulesMinutesDefense": "Sem sofrer gols só com {min} min ou mais em campo.",
+  "@fantasyRulesMinutesDefense": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
+  "fantasyRulesCaptain": "Capitão",
+  "fantasyRulesCaptainText": "O capitão pontua {mult}, inclusive na pontuação negativa.",
+  "@fantasyRulesCaptainText": {
+    "placeholders": {
+      "mult": {
+        "type": "String"
+      }
+    }
+  },
+  "fantasyRulesRanking": "Ranking",
+  "fantasyRulesRankingText": "Há o ranking de cada rodada e o geral, com a soma das rodadas.",
+  "fantasyRulesRankingTies": "Mesmo total = mesma posição.",
+  "fantasyRulesRankingChampion": "Campeão: o maior total geral ao fim da competição; empate = todos campeões.",
   "fantasyReasonShort": "Não atingiu o mínimo de {min} minutos (jogou {played}): só valem gols, assistências e cartões.",
   "@fantasyReasonShort": {
     "placeholders": {
