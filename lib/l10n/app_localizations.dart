@@ -5123,6 +5123,138 @@ abstract class AppLocalizations {
   /// **'Convide amigos e ganhe pacotinhos extras do álbum.'**
   String get tourDrawerReferralBody;
 
+  /// No description provided for @tourFantasyRoundTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua rodada'**
+  String get tourFantasyRoundTitle;
+
+  /// No description provided for @tourFantasyRoundBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cada campeonato com Fantasy tem a rodada, o prazo para escalar e os seus pontos.'**
+  String get tourFantasyRoundBody;
+
+  /// No description provided for @tourFantasyPlayTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Monte seu time'**
+  String get tourFantasyPlayTitle;
+
+  /// No description provided for @tourFantasyPlayBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha 5 atletas do campeonato e um capitão. Eles pontuam pelo que fazem nos jogos de verdade.'**
+  String get tourFantasyPlayBody;
+
+  /// No description provided for @tourFantasyRankingTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ranking'**
+  String get tourFantasyRankingTitle;
+
+  /// No description provided for @tourFantasyRankingBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Veja quem está na frente na rodada e no geral.'**
+  String get tourFantasyRankingBody;
+
+  /// No description provided for @tourFantasyLineupDeadlineTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prazo da rodada'**
+  String get tourFantasyLineupDeadlineTitle;
+
+  /// No description provided for @tourFantasyLineupDeadlineBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dá para mudar até o 1º jogo da rodada começar. Depois, a escalação trava.'**
+  String get tourFantasyLineupDeadlineBody;
+
+  /// No description provided for @tourFantasyLineupPitchTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu campo'**
+  String get tourFantasyLineupPitchTitle;
+
+  /// No description provided for @tourFantasyLineupPitchBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Toque num espaço para escolher o atleta: goleiro, zagueiro, meio, ataque e um livre de qualquer posição.'**
+  String get tourFantasyLineupPitchBody;
+
+  /// No description provided for @tourFantasyLineupCaptainTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Capitão'**
+  String get tourFantasyLineupCaptainTitle;
+
+  /// No description provided for @tourFantasyLineupCaptainBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Toque no \"C\" de um atleta para torná-lo capitão: ele pontua {mult}.'**
+  String tourFantasyLineupCaptainBody(String mult);
+
+  /// No description provided for @tourFantasyLineupSaveTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confirme a escalação'**
+  String get tourFantasyLineupSaveTitle;
+
+  /// No description provided for @tourFantasyLineupSaveBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salve antes do prazo. Se não mudar nada, a escalação anterior vale para a próxima rodada.'**
+  String get tourFantasyLineupSaveBody;
+
+  /// No description provided for @tourFantasyRankTabsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quatro rankings'**
+  String get tourFantasyRankTabsTitle;
+
+  /// No description provided for @tourFantasyRankTabsBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rodada, os atletas que mais pontuaram, o geral e o histórico das suas escalações.'**
+  String get tourFantasyRankTabsBody;
+
+  /// No description provided for @tourFantasyRankRoundTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Troque de rodada'**
+  String get tourFantasyRankRoundTitle;
+
+  /// No description provided for @tourFantasyRankRoundBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Use as setas para ver as rodadas anteriores.'**
+  String get tourFantasyRankRoundBody;
+
+  /// No description provided for @tourFantasyRankMineTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua posição'**
+  String get tourFantasyRankMineTitle;
+
+  /// No description provided for @tourFantasyRankMineBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Onde você está e quantos pontos fez.'**
+  String get tourFantasyRankMineBody;
+
+  /// No description provided for @tourDrawerFantasyTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arena Fantasy'**
+  String get tourDrawerFantasyTitle;
+
+  /// No description provided for @tourDrawerFantasyBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Monte seu time com os atletas do campeonato e dispute com a região.'**
+  String get tourDrawerFantasyBody;
+
   /// No description provided for @settingsHelpSection.
   ///
   /// In pt, this message translates to:

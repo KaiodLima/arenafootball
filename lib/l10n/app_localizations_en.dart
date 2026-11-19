@@ -3032,6 +3032,84 @@ class AppLocalizationsEn extends AppLocalizations {
       'Invite friends and get extra album packs.';
 
   @override
+  String get tourFantasyRoundTitle => 'Your round';
+
+  @override
+  String get tourFantasyRoundBody =>
+      'Each championship with Fantasy shows the round, the lineup deadline and your points.';
+
+  @override
+  String get tourFantasyPlayTitle => 'Build your team';
+
+  @override
+  String get tourFantasyPlayBody =>
+      'Pick 5 athletes from the championship and a captain. They score for what they do in the real matches.';
+
+  @override
+  String get tourFantasyRankingTitle => 'Ranking';
+
+  @override
+  String get tourFantasyRankingBody =>
+      'See who\'s ahead in the round and overall.';
+
+  @override
+  String get tourFantasyLineupDeadlineTitle => 'Round deadline';
+
+  @override
+  String get tourFantasyLineupDeadlineBody =>
+      'You can change it until the round\'s first match starts. After that, the lineup is locked.';
+
+  @override
+  String get tourFantasyLineupPitchTitle => 'Your pitch';
+
+  @override
+  String get tourFantasyLineupPitchBody =>
+      'Tap a slot to pick the athlete: goalkeeper, defender, midfielder, forward and one free slot for any position.';
+
+  @override
+  String get tourFantasyLineupCaptainTitle => 'Captain';
+
+  @override
+  String tourFantasyLineupCaptainBody(String mult) {
+    return 'Tap an athlete\'s \"C\" to make them captain: they score $mult.';
+  }
+
+  @override
+  String get tourFantasyLineupSaveTitle => 'Confirm your lineup';
+
+  @override
+  String get tourFantasyLineupSaveBody =>
+      'Save before the deadline. If you don\'t change anything, your previous lineup carries over to the next round.';
+
+  @override
+  String get tourFantasyRankTabsTitle => 'Four rankings';
+
+  @override
+  String get tourFantasyRankTabsBody =>
+      'Round, the top-scoring athletes, overall and the history of your lineups.';
+
+  @override
+  String get tourFantasyRankRoundTitle => 'Change round';
+
+  @override
+  String get tourFantasyRankRoundBody =>
+      'Use the arrows to see previous rounds.';
+
+  @override
+  String get tourFantasyRankMineTitle => 'Your position';
+
+  @override
+  String get tourFantasyRankMineBody =>
+      'Where you are and how many points you scored.';
+
+  @override
+  String get tourDrawerFantasyTitle => 'Arena Fantasy';
+
+  @override
+  String get tourDrawerFantasyBody =>
+      'Build your team with the championship\'s athletes and compete with your region.';
+
+  @override
   String get settingsHelpSection => 'Help';
 
   @override

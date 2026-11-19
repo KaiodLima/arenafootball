@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/services/tour_service.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/fantasy/domain/fantasy_lineup.dart';
@@ -19,6 +20,7 @@ import 'package:arena_soccer/utils/components/arena_submit_bar.dart';
 import 'package:arena_soccer/utils/components/safe_bottom.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
+import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
@@ -38,6 +40,49 @@ class FantasyLineupPage extends StatefulWidget {
 
 class _FantasyLineupPageState extends State<FantasyLineupPage> {
   FantasyLineupCubit get _cubit => context.read<FantasyLineupCubit>();
+  final _tourDeadline = GlobalKey();
+  final _tourPitch = GlobalKey();
+  final _tourCaptain = GlobalKey();
+  final _tourSave = GlobalKey();
+  bool _tourRequested = false;
+
+  /// Tour da escalação na 1ª visita (com o campinho, a dica e o salvar na tela).
+  void _requestTour(FantasyLineupState state) {
+    if (_tourRequested) return;
+    _tourRequested = true;
+    final l10n = AppLocalizations.of(context);
+    final captain = FantasySettings.captainLabel(state.config!.captainMultiplier);
+    TourService.request(
+      context,
+      TourIds.fantasyLineup,
+      () => [
+        TourStep(
+          target: _tourDeadline,
+          icon: Icons.schedule_rounded,
+          title: l10n.tourFantasyLineupDeadlineTitle,
+          body: l10n.tourFantasyLineupDeadlineBody,
+        ),
+        TourStep(
+          target: _tourPitch,
+          icon: Icons.sports_soccer_rounded,
+          title: l10n.tourFantasyLineupPitchTitle,
+          body: l10n.tourFantasyLineupPitchBody,
+        ),
+        TourStep(
+          target: _tourCaptain,
+          icon: Icons.copyright_rounded,
+          title: l10n.tourFantasyLineupCaptainTitle,
+          body: l10n.tourFantasyLineupCaptainBody(captain),
+        ),
+        TourStep(
+          target: _tourSave,
+          icon: Icons.check_circle_rounded,
+          title: l10n.tourFantasyLineupSaveTitle,
+          body: l10n.tourFantasyLineupSaveBody,
+        ),
+      ],
+    );
+  }
 
   @override
   void initState() {
@@ -148,6 +193,8 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
         isSuccess: state.event != FantasyLineupEvent.failed,
       ),
       builder: (context, state) {
+        final showsLineup = !state.loading && state.editable && !state.showingLast;
+        if (showsLineup) _requestTour(state);
         return Scaffold(
           backgroundColor: AppColors.background,
           appBar: AppBar(
@@ -169,12 +216,15 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
             ],
           ),
           bottomNavigationBar: state.editable && !state.showingLast
-              ? ArenaSubmitBar(
-                  title: l10n.fantasyConfirmLineup,
-                  loading: state.busy,
-                  onPressed: () {
-                    if (state.canSave) _cubit.save();
-                  },
+              ? KeyedSubtree(
+                  key: _tourSave,
+                  child: ArenaSubmitBar(
+                    title: l10n.fantasyConfirmLineup,
+                    loading: state.busy,
+                    onPressed: () {
+                      if (state.canSave) _cubit.save();
+                    },
+                  ),
                 )
               : null,
           body: state.loading ? const Center(child: CircularProgressIndicator()) : _body(context, l10n, state),
@@ -197,7 +247,7 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
         state.editable ? AppSizes.s24 : safeBottom(context, AppSizes.s24),
       ),
       children: [
-        _Header(championship: widget.championship, state: state),
+        _Header(championship: widget.championship, state: state, statusKey: _tourDeadline),
         const SizedBox(height: AppSizes.s16),
         // Total geral da conta + atalho para os rankings.
         if (state.joined) ...[
@@ -265,6 +315,7 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
             const SizedBox(height: AppSizes.s12),
           ],
           FantasyPitch(
+            key: _tourPitch,
             lineup: state.draft,
             athletes: state.athleteById,
             teams: state.teams,
@@ -275,11 +326,14 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
           ),
           const SizedBox(height: AppSizes.s12),
           if (state.editable)
-            Text(
-              error ?? l10n.fantasyCaptainTip(FantasySettings.captainLabel(config.captainMultiplier)),
-              key: const ValueKey('fantasy-lineup-hint'),
-              style: AppTypography.label(color: error == null ? AppColors.textSecondary : AppColors.danger)
-                  .copyWith(fontSize: AppSizes.s12),
+            KeyedSubtree(
+              key: _tourCaptain,
+              child: Text(
+                error ?? l10n.fantasyCaptainTip(FantasySettings.captainLabel(config.captainMultiplier)),
+                key: const ValueKey('fantasy-lineup-hint'),
+                style: AppTypography.label(color: error == null ? AppColors.textSecondary : AppColors.danger)
+                    .copyWith(fontSize: AppSizes.s12),
+              ),
             ),
           if (state.editable && state.dirty && state.saved != null)
             Align(
@@ -321,7 +375,10 @@ class _Header extends StatelessWidget {
   final ChampionshipDTO championship;
   final FantasyLineupState state;
 
-  const _Header({required this.championship, required this.state});
+  /// Alvo do tour na pílula do prazo.
+  final Key? statusKey;
+
+  const _Header({required this.championship, required this.state, this.statusKey});
 
   @override
   Widget build(BuildContext context) {
@@ -362,17 +419,20 @@ class _Header extends StatelessWidget {
               ],
             ),
           ),
-          Container(
-            key: const ValueKey('fantasy-round-status'),
-            padding: const EdgeInsets.symmetric(horizontal: AppSizes.s10, vertical: AppSizes.s4),
-            decoration: BoxDecoration(
-              color: state.roundOpen ? AppColors.gold : AppColors.whiteMuted,
-              borderRadius: BorderRadius.circular(AppSizes.s20),
-            ),
-            child: Text(
-              status,
-              style: AppTypography.label(color: state.roundOpen ? AppColors.primaryDark : AppColors.white)
-                  .copyWith(fontSize: AppSizes.s12),
+          KeyedSubtree(
+            key: statusKey,
+            child: Container(
+              key: const ValueKey('fantasy-round-status'),
+              padding: const EdgeInsets.symmetric(horizontal: AppSizes.s10, vertical: AppSizes.s4),
+              decoration: BoxDecoration(
+                color: state.roundOpen ? AppColors.gold : AppColors.whiteMuted,
+                borderRadius: BorderRadius.circular(AppSizes.s20),
+              ),
+              child: Text(
+                status,
+                style: AppTypography.label(color: state.roundOpen ? AppColors.primaryDark : AppColors.white)
+                    .copyWith(fontSize: AppSizes.s12),
+              ),
             ),
           ),
         ],

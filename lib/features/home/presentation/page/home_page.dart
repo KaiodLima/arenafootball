@@ -155,9 +155,27 @@ class _HomePageState extends State<HomePage> {
     final tours = sl<TourService>();
     final loggedIn = BlocProvider.of<SessionCubit>(context).state.user != null;
     if (await tours.isSeen(TourIds.drawer)) {
-      // Convidado não tem carteirinha nem indicação: as novidades ficam para
-      // depois do login (senão o tour seria gasto só com a guerra das torcidas).
-      if (!mounted || !loggedIn) return;
+      // Um tour por abertura: novidades, depois o Fantasy. Convidado não tem
+      // carteirinha nem indicação: as novidades ficam para depois do login
+      // (senão o tour seria gasto só com a guerra das torcidas).
+      final newsPending = loggedIn && !await tours.isSeen(TourIds.drawerNews);
+      if (!mounted) return;
+      if (!newsPending) {
+        // Sem o atalho (Fantasy desligado na região), o tour não conta como visto.
+        return tours.show(
+          context,
+          TourIds.drawerFantasy,
+          () => [
+            TourStep(
+                target: _drawerTour.fantasy,
+                icon: Icons.stadium_rounded,
+                title: l10n.tourDrawerFantasyTitle,
+                body: l10n.tourDrawerFantasyBody,
+                padding: 2),
+          ],
+          delay: const Duration(milliseconds: 400),
+        );
+      }
       return tours.show(
         context,
         TourIds.drawerNews,

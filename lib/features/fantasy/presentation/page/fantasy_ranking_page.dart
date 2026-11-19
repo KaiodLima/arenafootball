@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/services/tour_service.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_ranking_dtos.dart';
@@ -8,6 +9,7 @@ import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_ranki
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/safe_bottom.dart';
+import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
@@ -45,6 +47,41 @@ class _FantasyRankingPageState extends State<FantasyRankingPage> with SingleTick
       TabController(length: FantasyRankingTab.values.length, vsync: this, initialIndex: widget.initialTab.index);
 
   FantasyRankingCubit get _cubit => context.read<FantasyRankingCubit>();
+  final _tourTabs = GlobalKey();
+  final _tourRound = GlobalKey();
+  final _tourMine = GlobalKey();
+  bool _tourRequested = false;
+
+  /// Tour dos rankings na 1ª visita (aba Rodada com as rodadas na tela).
+  void _requestTour() {
+    if (_tourRequested) return;
+    _tourRequested = true;
+    final l10n = AppLocalizations.of(context);
+    TourService.request(
+      context,
+      TourIds.fantasyRanking,
+      () => [
+        TourStep(
+          target: _tourTabs,
+          icon: Icons.view_week_rounded,
+          title: l10n.tourFantasyRankTabsTitle,
+          body: l10n.tourFantasyRankTabsBody,
+        ),
+        TourStep(
+          target: _tourRound,
+          icon: Icons.swap_horiz_rounded,
+          title: l10n.tourFantasyRankRoundTitle,
+          body: l10n.tourFantasyRankRoundBody,
+        ),
+        TourStep(
+          target: _tourMine,
+          icon: Icons.person_pin_rounded,
+          title: l10n.tourFantasyRankMineTitle,
+          body: l10n.tourFantasyRankMineBody,
+        ),
+      ],
+    );
+  }
 
   @override
   void initState() {
@@ -91,6 +128,7 @@ class _FantasyRankingPageState extends State<FantasyRankingPage> with SingleTick
           ],
         ),
         bottom: TabBar(
+          key: _tourTabs,
           controller: _tabs,
           indicatorColor: AppColors.gold,
           labelColor: AppColors.white,
@@ -105,15 +143,20 @@ class _FantasyRankingPageState extends State<FantasyRankingPage> with SingleTick
         ),
       ),
       body: BlocBuilder<FantasyRankingCubit, FantasyRankingState>(
-        builder: (context, state) => TabBarView(
-          controller: _tabs,
-          children: [
-            _RoundTab(state: state),
-            _AthletesTab(state: state, fantasyId: widget.championship.id),
-            _OverallTab(state: state),
-            _HistoryTab(state: state, fantasyId: widget.championship.id),
-          ],
-        ),
+        builder: (context, state) {
+          if (state.roundsLoaded && state.rounds.isNotEmpty && _tabs.index == FantasyRankingTab.round.index) {
+            _requestTour();
+          }
+          return TabBarView(
+            controller: _tabs,
+            children: [
+              _RoundTab(state: state, selectorKey: _tourRound, mineKey: _tourMine),
+              _AthletesTab(state: state, fantasyId: widget.championship.id),
+              _OverallTab(state: state),
+              _HistoryTab(state: state, fantasyId: widget.championship.id),
+            ],
+          );
+        },
       ),
     );
   }
@@ -152,7 +195,11 @@ class _RankingList extends StatelessWidget {
 class _RoundTab extends StatelessWidget {
   final FantasyRankingState state;
 
-  const _RoundTab({required this.state});
+  /// Alvos do tour (só nesta aba; a de Atletas usa o mesmo seletor sem chave).
+  final Key? selectorKey;
+  final Key? mineKey;
+
+  const _RoundTab({required this.state, this.selectorKey, this.mineKey});
 
   @override
   Widget build(BuildContext context) {
@@ -163,7 +210,7 @@ class _RoundTab extends StatelessWidget {
     }
     return Column(
       children: [
-        _RoundSelector(state: state),
+        _RoundSelector(key: selectorKey, state: state),
         Expanded(
           child: state.roundLoading
               ? const Center(child: CircularProgressIndicator())
@@ -172,10 +219,13 @@ class _RoundTab extends StatelessWidget {
                   : _RankingList(entries: state.roundEntries, uid: state.uid),
         ),
         if (state.uid.isNotEmpty)
-          FantasyMyPositionCard(
-            points: state.myRound.points,
-            position: state.myRound.position,
-            emptyText: l10n.fantasyNotPlayedRound,
+          KeyedSubtree(
+            key: mineKey,
+            child: FantasyMyPositionCard(
+              points: state.myRound.points,
+              position: state.myRound.position,
+              emptyText: l10n.fantasyNotPlayedRound,
+            ),
           ),
       ],
     );
@@ -186,7 +236,7 @@ class _RoundTab extends StatelessWidget {
 class _RoundSelector extends StatelessWidget {
   final FantasyRankingState state;
 
-  const _RoundSelector({required this.state});
+  const _RoundSelector({super.key, required this.state});
 
   @override
   Widget build(BuildContext context) {

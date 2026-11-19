@@ -53,6 +53,10 @@ void main() {
     TourIds.playerClaim,
     TourIds.profile,
     TourIds.drawerNews,
+    TourIds.fantasy,
+    TourIds.fantasyLineup,
+    TourIds.fantasyRanking,
+    TourIds.drawerFantasy,
   ];
 
   test('tours das telas novas: ids únicos e "Rever tutoriais" zera também', () async {

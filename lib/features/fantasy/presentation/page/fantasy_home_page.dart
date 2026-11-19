@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
+import 'package:arena_soccer/core/services/tour_service.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_ranking_dtos.dart';
 import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_home_cubit.dart';
@@ -11,6 +12,7 @@ import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/safe_bottom.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
+import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
@@ -28,6 +30,42 @@ class FantasyHomePage extends StatefulWidget {
 }
 
 class _FantasyHomePageState extends State<FantasyHomePage> {
+  final _tourHeader = GlobalKey();
+  final _tourPlay = GlobalKey();
+  final _tourRanking = GlobalKey();
+  bool _tourRequested = false;
+
+  /// Tour do Fantasy na 1ª visita (com os cartões na tela), no 1º cartão.
+  void _requestTour() {
+    if (_tourRequested) return;
+    _tourRequested = true;
+    final l10n = AppLocalizations.of(context);
+    TourService.request(
+      context,
+      TourIds.fantasy,
+      () => [
+        TourStep(
+          target: _tourHeader,
+          icon: Icons.calendar_month_rounded,
+          title: l10n.tourFantasyRoundTitle,
+          body: l10n.tourFantasyRoundBody,
+        ),
+        TourStep(
+          target: _tourPlay,
+          icon: Icons.sports_soccer_rounded,
+          title: l10n.tourFantasyPlayTitle,
+          body: l10n.tourFantasyPlayBody,
+        ),
+        TourStep(
+          target: _tourRanking,
+          icon: Icons.leaderboard_rounded,
+          title: l10n.tourFantasyRankingTitle,
+          body: l10n.tourFantasyRankingBody,
+        ),
+      ],
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -57,12 +95,22 @@ class _FantasyHomePageState extends State<FantasyHomePage> {
           if (!state.loaded) return const Center(child: CircularProgressIndicator());
           final items = state.forRegion(region);
           if (items.isEmpty) return ArenaEmptyState(message: l10n.fantasyHomeEmpty, icon: Icons.stadium_outlined);
+          _requestTour();
           return ListView(
             padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s24)),
             children: [
               Text(l10n.fantasyHomeIntro, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s14)),
               const SizedBox(height: AppSizes.s12),
-              for (final item in items) FantasyHomeCard(item: item, now: now),
+              for (final item in items)
+                item == items.first
+                    ? FantasyHomeCard(
+                        item: item,
+                        now: now,
+                        headerKey: _tourHeader,
+                        playKey: _tourPlay,
+                        rankingKey: _tourRanking,
+                      )
+                    : FantasyHomeCard(item: item, now: now),
             ],
           );
         },
@@ -77,7 +125,19 @@ class FantasyHomeCard extends StatelessWidget {
   final FantasyHomeItem item;
   final DateTime now;
 
-  const FantasyHomeCard({super.key, required this.item, required this.now});
+  /// Alvos do tour (só no 1º cartão da lista).
+  final Key? headerKey;
+  final Key? playKey;
+  final Key? rankingKey;
+
+  const FantasyHomeCard({
+    super.key,
+    required this.item,
+    required this.now,
+    this.headerKey,
+    this.playKey,
+    this.rankingKey,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -115,6 +175,7 @@ class FantasyHomeCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
+            key: headerKey,
             padding: const EdgeInsets.all(AppSizes.s16),
             decoration: const BoxDecoration(
               gradient: LinearGradient(colors: [AppColors.primaryDark, AppColors.primaryMedium]),
@@ -166,16 +227,23 @@ class FantasyHomeCard extends StatelessWidget {
                   child:
                       Text(statusText, style: AppTypography.label(color: statusColor).copyWith(fontSize: AppSizes.s14)),
                 ),
-                TextButton(
-                  key: ValueKey('fantasy-home-ranking-${config.championshipDocId}'),
-                  onPressed: () => Navigator.pushNamed(context, AppRoutes.fantasyRankingPage, arguments: championship),
-                  child: Text(l10n.fantasyTabOverall),
+                KeyedSubtree(
+                  key: rankingKey,
+                  child: TextButton(
+                    key: ValueKey('fantasy-home-ranking-${config.championshipDocId}'),
+                    onPressed: () =>
+                        Navigator.pushNamed(context, AppRoutes.fantasyRankingPage, arguments: championship),
+                    child: Text(l10n.fantasyTabOverall),
+                  ),
                 ),
-                FilledButton(
-                  key: ValueKey('fantasy-home-play-${config.championshipDocId}'),
-                  style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
-                  onPressed: () => Navigator.pushNamed(context, AppRoutes.fantasyLineupPage, arguments: championship),
-                  child: Text(item.joined ? l10n.fantasyHomePlay : l10n.fantasyHomeEnter),
+                KeyedSubtree(
+                  key: playKey,
+                  child: FilledButton(
+                    key: ValueKey('fantasy-home-play-${config.championshipDocId}'),
+                    style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
+                    onPressed: () => Navigator.pushNamed(context, AppRoutes.fantasyLineupPage, arguments: championship),
+                    child: Text(item.joined ? l10n.fantasyHomePlay : l10n.fantasyHomeEnter),
+                  ),
                 ),
               ],
             ),

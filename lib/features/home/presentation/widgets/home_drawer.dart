@@ -131,6 +131,7 @@ class HomeDrawer extends StatelessWidget {
       // Arena Fantasy: só com Fantasy ativo na região.
       if (_fantasyActive(context))
         _Shortcut(
+          key: tourKeys?.fantasy,
           icon: Icons.stadium_rounded,
           title: l10n.fantasyTitle,
           color: AppColors.primaryDark,
@@ -1065,4 +1066,5 @@ class HomeDrawerTourKeys {
   final fanCard = GlobalKey();
   final fanRanking = GlobalKey();
   final referral = GlobalKey();
+  final fantasy = GlobalKey();
 }

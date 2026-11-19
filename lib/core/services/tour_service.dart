@@ -26,8 +26,15 @@ class TourIds {
   static const String playerClaim = 'atleta_reivindicar';
   static const String profile = 'perfil';
 
+  static const String fantasy = 'fantasy';
+  static const String fantasyLineup = 'fantasy_escalacao';
+  static const String fantasyRanking = 'fantasy_ranking';
+
   /// Atalhos novos do menu (id próprio: quem já viu o `drawer` também vê).
   static const String drawerNews = 'menu_novidades';
+
+  /// Atalho do Arena Fantasy no menu (só aparece com Fantasy ativo na região).
+  static const String drawerFantasy = 'menu_fantasy';
 }
 
 /// Tutoriais no contexto: cada tour aparece uma vez, na primeira visita

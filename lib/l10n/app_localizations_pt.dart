@@ -3045,6 +3045,83 @@ class AppLocalizationsPt extends AppLocalizations {
       'Convide amigos e ganhe pacotinhos extras do álbum.';
 
   @override
+  String get tourFantasyRoundTitle => 'Sua rodada';
+
+  @override
+  String get tourFantasyRoundBody =>
+      'Cada campeonato com Fantasy tem a rodada, o prazo para escalar e os seus pontos.';
+
+  @override
+  String get tourFantasyPlayTitle => 'Monte seu time';
+
+  @override
+  String get tourFantasyPlayBody =>
+      'Escolha 5 atletas do campeonato e um capitão. Eles pontuam pelo que fazem nos jogos de verdade.';
+
+  @override
+  String get tourFantasyRankingTitle => 'Ranking';
+
+  @override
+  String get tourFantasyRankingBody =>
+      'Veja quem está na frente na rodada e no geral.';
+
+  @override
+  String get tourFantasyLineupDeadlineTitle => 'Prazo da rodada';
+
+  @override
+  String get tourFantasyLineupDeadlineBody =>
+      'Dá para mudar até o 1º jogo da rodada começar. Depois, a escalação trava.';
+
+  @override
+  String get tourFantasyLineupPitchTitle => 'Seu campo';
+
+  @override
+  String get tourFantasyLineupPitchBody =>
+      'Toque num espaço para escolher o atleta: goleiro, zagueiro, meio, ataque e um livre de qualquer posição.';
+
+  @override
+  String get tourFantasyLineupCaptainTitle => 'Capitão';
+
+  @override
+  String tourFantasyLineupCaptainBody(String mult) {
+    return 'Toque no \"C\" de um atleta para torná-lo capitão: ele pontua $mult.';
+  }
+
+  @override
+  String get tourFantasyLineupSaveTitle => 'Confirme a escalação';
+
+  @override
+  String get tourFantasyLineupSaveBody =>
+      'Salve antes do prazo. Se não mudar nada, a escalação anterior vale para a próxima rodada.';
+
+  @override
+  String get tourFantasyRankTabsTitle => 'Quatro rankings';
+
+  @override
+  String get tourFantasyRankTabsBody =>
+      'Rodada, os atletas que mais pontuaram, o geral e o histórico das suas escalações.';
+
+  @override
+  String get tourFantasyRankRoundTitle => 'Troque de rodada';
+
+  @override
+  String get tourFantasyRankRoundBody =>
+      'Use as setas para ver as rodadas anteriores.';
+
+  @override
+  String get tourFantasyRankMineTitle => 'Sua posição';
+
+  @override
+  String get tourFantasyRankMineBody => 'Onde você está e quantos pontos fez.';
+
+  @override
+  String get tourDrawerFantasyTitle => 'Arena Fantasy';
+
+  @override
+  String get tourDrawerFantasyBody =>
+      'Monte seu time com os atletas do campeonato e dispute com a região.';
+
+  @override
   String get settingsHelpSection => 'Ajuda';
 
   @override
