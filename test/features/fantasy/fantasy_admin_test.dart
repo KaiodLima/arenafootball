@@ -45,6 +45,14 @@ class _Repo implements IFantasyRepository {
   final pages = <DateTime?>[];
   var rescores = 0;
   var resets = 0;
+  final roundActions = <String>[];
+
+  @override
+  Future<Either<Failure, void>> requestRoundAction(String fantasyId, int round,
+      {required bool open, DateTime? deadline}) async {
+    roundActions.add('${open ? 'abrir' : 'fechar'}:$round');
+    return const Right(null);
+  }
 
   @override
   Future<Either<Failure, void>> requestReset(String fantasyId) async {
@@ -117,6 +125,7 @@ FantasyAdminCubit _cubit(_Repo repo) => FantasyAdminCubit(
       GetFantasyPositionUseCase(repo),
       GetFantasyAthletesCacheFirstUseCase(repo),
       reset: RequestFantasyResetUseCase(repo),
+      roundAction: RequestFantasyRoundActionUseCase(repo),
     );
 
 Future<void> _settle() async {
@@ -235,5 +244,37 @@ void main() {
     await tester.pumpAndSettle();
     expect(repo.resets, 1);
     expect(find.text('Pedido enviado: as pontuações serão zeradas em instantes.'), findsOneWidget);
+  });
+
+  testWidgets('rodada: "Fechar agora" na aberta (com confirmação) e "Reabrir" na fechada', (tester) async {
+    tester.view.physicalSize = const Size(420, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final repo = _Repo();
+    final cubit = _cubit(repo);
+    addTearDown(cubit.close);
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('pt'),
+      home: BlocProvider.value(value: cubit, child: const FantasyAdminPage(championship: _copa)),
+    ));
+    repo.rounds.add(Right(_rounds));
+    await tester.pumpAndSettle();
+    final open = _rounds.firstWhere((r) => r.status == 'aberta');
+    final closed = _rounds.firstWhere((r) => r.closed);
+    expect(find.byKey(ValueKey('fantasy-round-reopen-${closed.number}')), findsOneWidget);
+    expect(find.byKey(ValueKey('fantasy-round-close-${closed.number}')), findsNothing);
+    await tester.tap(find.byKey(ValueKey('fantasy-round-close-${open.number}')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('fantasy-round-close-confirm')));
+    await tester.pumpAndSettle();
+    expect(repo.roundActions, ['fechar:${open.number}']);
+    expect(find.text('Pedido enviado: a rodada será fechada em instantes.'), findsOneWidget);
+  });
+
+  test('rodada com prazo/fechamento do admin', () {
+    final round = FantasyRoundDTO.fromMap('3', {'status': 'aberta', 'prazoManual': true, 'fechadaManual': true});
+    expect((round.manualDeadline, round.manualClosed), (true, true));
   });
 }

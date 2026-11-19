@@ -122,6 +122,17 @@ export default async function run(env, check) {
     { zerarEm: 'agora', atualizadoEm: serverTimestamp() }, { merge: true })));
   await check('admin não grava zeradoEm (das functions)', assertFails(setDoc(doc(admin, 'fantasy/fx'),
     { zeradoEm: serverTimestamp(), atualizadoEm: serverTimestamp() }, { merge: true })));
+  const roundAction = (extra) => ({ acaoRodada: { em: serverTimestamp(), ...extra }, atualizadoEm: serverTimestamp() });
+  await check('admin reabre a rodada com prazo futuro', assertSucceeds(setDoc(doc(admin, 'fantasy/fx'),
+    roundAction({ numero: 1, acao: 'abrir', prazo: new Date(Date.now() + 86400000) }), { merge: true })));
+  await check('admin fecha a rodada agora', assertSucceeds(setDoc(doc(admin, 'fantasy/fx'),
+    roundAction({ numero: 1, acao: 'fechar' }), { merge: true })));
+  await check('reabrir com prazo no passado recusado', assertFails(setDoc(doc(admin, 'fantasy/fx'),
+    roundAction({ numero: 1, acao: 'abrir', prazo: new Date(Date.now() - 86400000) }), { merge: true })));
+  await check('ação de rodada inválida recusada', assertFails(setDoc(doc(admin, 'fantasy/fx'),
+    roundAction({ numero: 1, acao: 'apagar' }), { merge: true })));
+  await check('usuário comum não abre rodada', assertFails(setDoc(doc(user, 'fantasy/fx'),
+    roundAction({ numero: 1, acao: 'fechar' }), { merge: true })));
   await check('reapurarEm como texto recusado', assertFails(setDoc(doc(admin, 'fantasy/fx'),
     { reapurarEm: 'agora', atualizadoEm: serverTimestamp() }, { merge: true })));
 

@@ -93,6 +93,10 @@ export interface StoredRound {
   status?: string;
   fechaEm: Date | null;
   idsPartidas?: string[];
+  /** Prazo escolhido pelo admin ("Reabrir"): a sincronia não troca. */
+  prazoManual?: boolean;
+  /** Fechada pelo admin ("Fechar agora"): a sincronia não reabre sozinha. */
+  fechadaManual?: boolean;
 }
 
 /**
@@ -101,9 +105,27 @@ export interface StoredRound {
  * prazo não muda). Nulo = nada mudou. Rodada sem prazo (partida sem data)
  * não abre.
  */
-export function roundSync(existing: StoredRound | undefined, computed: ComputedRound): Doc | null {
+export function roundSync(
+  existing: StoredRound | undefined,
+  computed: ComputedRound,
+  now: Date = new Date(),
+): Doc | null {
   const sameIds = (a: string[] = [], b: string[] = []) => a.length === b.length && a.every((id, i) => id === b[i]);
   if (existing?.status === 'fechada') {
+    // Nenhuma partida que ela tem agora começou (a que fechou foi apagada ou
+    // mudou de rodada/horário) e não foi o admin que fechou: reabre.
+    if (!existing.fechadaManual && computed.fechaEm && computed.fechaEm > now) {
+      return {
+        numero: computed.numero,
+        idsPartidas: computed.idsPartidas,
+        fechaEm: computed.fechaEm,
+        status: 'aberta',
+      };
+    }
+    return sameIds(existing.idsPartidas, computed.idsPartidas) ? null : { idsPartidas: computed.idsPartidas };
+  }
+  // Prazo do admin: fica; só as partidas acompanham.
+  if (existing?.status === 'aberta' && existing.prazoManual) {
     return sameIds(existing.idsPartidas, computed.idsPartidas) ? null : { idsPartidas: computed.idsPartidas };
   }
   if (!computed.fechaEm) return null;
@@ -227,6 +249,28 @@ const stampMillis = (value: unknown): string =>
 
 export function rescoreRequested(before: Doc | undefined, after: Doc | undefined): boolean {
   return !!after && after.reapurarEm !== undefined && stampMillis(before?.reapurarEm) !== stampMillis(after.reapurarEm);
+}
+
+/** Abrir/fechar rodada pelo admin (`acaoRodada`), validada. */
+export interface RoundAction {
+  numero: number;
+  acao: 'abrir' | 'fechar';
+  prazo: Date | null;
+}
+
+/** "Abrir/Fechar rodada" do admin: `acaoRodada.em` novo ou trocado (nulo = nada a fazer). */
+export function roundActionRequested(before: Doc | undefined, after: Doc | undefined): RoundAction | null {
+  const action = after?.acaoRodada as Doc | undefined;
+  if (!action || typeof action !== 'object') return null;
+  const previous = before?.acaoRodada as Doc | undefined;
+  if (stampMillis(previous?.em) === stampMillis(action.em)) return null;
+  const numero = Number(action.numero);
+  const acao = action.acao;
+  if (!Number.isInteger(numero) || numero < 1 || (acao !== 'abrir' && acao !== 'fechar')) return null;
+  const raw = action.prazo as { toDate?: () => Date } | Date | undefined;
+  const prazo = raw instanceof Date ? raw : typeof raw?.toDate === 'function' ? raw.toDate() : null;
+  if (acao === 'abrir' && !prazo) return null;
+  return { numero, acao, prazo };
 }
 
 /** "Zerar pontuações (testes)" do admin: `zerarEm` novo ou trocado. */

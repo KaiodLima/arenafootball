@@ -36,4 +36,5 @@ void registerFantasyDependencies() {
   _sl.registerLazySingleton(() => GetFantasyParticipantsUseCase(_sl()));
   _sl.registerLazySingleton(() => RequestFantasyRescoreUseCase(_sl()));
   _sl.registerLazySingleton(() => RequestFantasyResetUseCase(_sl()));
+  _sl.registerLazySingleton(() => RequestFantasyRoundActionUseCase(_sl()));
 }

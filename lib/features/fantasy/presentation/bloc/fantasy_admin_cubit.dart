@@ -14,6 +14,9 @@ import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_ranking_us
 /// Resultado do "Reapurar rodadas" (snackbar).
 enum FantasyRescoreResult { none, requested, failed }
 
+/// Resultado do "Fechar agora"/"Reabrir" da rodada (snackbar).
+enum FantasyRoundActionResult { none, closeRequested, openRequested, failed }
+
 /// Resultado do "Zerar pontuações (testes)" (snackbar).
 enum FantasyResetResult { none, requested, failed }
 
@@ -36,6 +39,7 @@ class FantasyAdminState extends Equatable {
   final FantasyRescoreResult rescore;
   final bool resetting;
   final FantasyResetResult reset;
+  final FantasyRoundActionResult roundAction;
   final String? failure;
 
   const FantasyAdminState({
@@ -52,6 +56,7 @@ class FantasyAdminState extends Equatable {
     this.rescore = FantasyRescoreResult.none,
     this.resetting = false,
     this.reset = FantasyResetResult.none,
+    this.roundAction = FantasyRoundActionResult.none,
     this.failure,
   });
 
@@ -69,6 +74,7 @@ class FantasyAdminState extends Equatable {
     FantasyRescoreResult? rescore,
     bool? resetting,
     FantasyResetResult? reset,
+    FantasyRoundActionResult? roundAction,
     String? failure,
   }) =>
       FantasyAdminState(
@@ -85,6 +91,7 @@ class FantasyAdminState extends Equatable {
         rescore: rescore ?? FantasyRescoreResult.none,
         resetting: resetting ?? this.resetting,
         reset: reset ?? FantasyResetResult.none,
+        roundAction: roundAction ?? FantasyRoundActionResult.none,
         failure: failure,
       );
 
@@ -103,6 +110,7 @@ class FantasyAdminState extends Equatable {
         rescore,
         resetting,
         reset,
+        roundAction,
         failure,
       ];
 }
@@ -120,6 +128,9 @@ class FantasyAdminCubit extends Cubit<FantasyAdminState> {
   /// "Zerar pontuações (testes)"; nulo = sem a ação (testes antigos).
   final RequestFantasyResetUseCase? _reset;
 
+  /// "Fechar agora"/"Reabrir" a rodada; nulo = sem a ação (testes antigos).
+  final RequestFantasyRoundActionUseCase? _roundAction;
+
   FantasyAdminCubit(
     this._watchRounds,
     this._participants,
@@ -128,7 +139,9 @@ class FantasyAdminCubit extends Cubit<FantasyAdminState> {
     this._position,
     this._athletes, {
     RequestFantasyResetUseCase? reset,
+    RequestFantasyRoundActionUseCase? roundAction,
   })  : _reset = reset,
+        _roundAction = roundAction,
         super(const FantasyAdminState());
 
   StreamSubscription<Object?>? _roundsSub;
@@ -215,6 +228,19 @@ class FantasyAdminCubit extends Cubit<FantasyAdminState> {
       (failure) =>
           emit(state.copyWith(resetting: false, reset: FantasyResetResult.failed, failure: failure.toString())),
       (_) => emit(state.copyWith(resetting: false, reset: FantasyResetResult.requested)),
+    );
+  }
+
+  /// "Fechar agora" ([open] falso) ou "Reabrir" até [deadline] a rodada [round].
+  Future<void> setRoundOpen(int round, {required bool open, DateTime? deadline}) async {
+    final action = _roundAction;
+    if (action == null) return;
+    final response = await action(_fantasyId, round, open: open, deadline: deadline);
+    if (isClosed) return;
+    response.fold(
+      (failure) => emit(state.copyWith(roundAction: FantasyRoundActionResult.failed, failure: failure.toString())),
+      (_) => emit(state.copyWith(
+          roundAction: open ? FantasyRoundActionResult.openRequested : FantasyRoundActionResult.closeRequested)),
     );
   }
 

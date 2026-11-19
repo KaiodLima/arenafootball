@@ -12,6 +12,7 @@ import {
   previousClosedRound,
   orphanRoundUpdate,
   rescoreRequested,
+  roundActionRequested,
   roundFinalized,
   resetRequested,
   roundFieldsChanged,
@@ -66,10 +67,12 @@ test('sincronia: nova abre; aberta acompanha o prazo; fechada só as partidas', 
   assert.equal(roundSync({ status: 'aberta', fechaEm: computed.fechaEm, idsPartidas: ['c', 'e'] }, computed), null);
   const moved = roundSync({ status: 'aberta', fechaEm: new Date('2026-11-22T18:00:00Z'), idsPartidas: ['c', 'e'] }, computed);
   assert.equal((moved?.fechaEm as Date).toISOString(), '2026-11-21T18:00:00.000Z');
-  // Fechada: o prazo não muda (D1), só a lista de partidas.
-  assert.deepEqual(roundSync({ status: 'fechada', fechaEm: new Date('2026-11-20T18:00:00Z'), idsPartidas: ['c'] }, computed), {
-    idsPartidas: ['c', 'e'],
-  });
+  // Fechada com jogo já começado: o prazo não muda (D1), só a lista de partidas.
+  const later = new Date('2026-11-21T19:00:00Z');
+  assert.deepEqual(
+    roundSync({ status: 'fechada', fechaEm: new Date('2026-11-20T18:00:00Z'), idsPartidas: ['c'] }, computed, later),
+    { idsPartidas: ['c', 'e'] },
+  );
   assert.equal(roundSync(undefined, { ...computed, fechaEm: null }), null);
 });
 
@@ -176,4 +179,37 @@ test('rodada finalizada: só as partidas que ainda existem contam', () => {
   assert.equal(roundFinalized(2, 2), true);
   assert.equal(roundFinalized(2, 1), false);
   assert.equal(roundFinalized(0, 0), true);
+});
+
+test('fechada sem jogo começado (a partida que fechou saiu) reabre; fechada pelo admin não', () => {
+  const now = new Date('2026-11-19T12:00:00Z');
+  const computed = { numero: 1, idsPartidas: ['real1', 'real2'], fechaEm: new Date('2026-11-22T18:00:00Z') };
+  const stuck = { status: 'fechada', fechaEm: new Date('2026-11-18T20:00:00Z'), idsPartidas: ['fake', 'real1', 'real2'] };
+  assert.deepEqual(roundSync(stuck, computed, now), {
+    numero: 1,
+    idsPartidas: ['real1', 'real2'],
+    fechaEm: computed.fechaEm,
+    status: 'aberta',
+  });
+  assert.deepEqual(roundSync({ ...stuck, fechadaManual: true }, computed, now), { idsPartidas: ['real1', 'real2'] });
+  // Aberta com o prazo do admin: o prazo fica, só as partidas mudam.
+  const manual = { status: 'aberta', fechaEm: new Date('2026-11-20T12:00:00Z'), idsPartidas: ['real1'], prazoManual: true };
+  assert.deepEqual(roundSync(manual, computed, now), { idsPartidas: ['real1', 'real2'] });
+  assert.equal(roundSync({ ...manual, idsPartidas: ['real1', 'real2'] }, computed, now), null);
+});
+
+test('abrir/fechar rodada pelo admin: só com "em" novo e ação válida', () => {
+  const stamp = (ms: number) => ({ toMillis: () => ms });
+  const prazo = { toDate: () => new Date('2026-11-22T18:00:00Z') };
+  const open = { acaoRodada: { numero: 1, acao: 'abrir', em: stamp(1), prazo } };
+  assert.deepEqual(roundActionRequested({}, open), { numero: 1, acao: 'abrir', prazo: new Date('2026-11-22T18:00:00Z') });
+  assert.equal(roundActionRequested(open, open), null);
+  assert.deepEqual(roundActionRequested(open, { acaoRodada: { numero: 2, acao: 'fechar', em: stamp(2) } }), {
+    numero: 2,
+    acao: 'fechar',
+    prazo: null,
+  });
+  assert.equal(roundActionRequested({}, { acaoRodada: { numero: 1, acao: 'abrir', em: stamp(3) } }), null);
+  assert.equal(roundActionRequested({}, { acaoRodada: { numero: 0, acao: 'fechar', em: stamp(3) } }), null);
+  assert.equal(roundActionRequested({}, { acaoRodada: { numero: 1, acao: 'apagar', em: stamp(3) } }), null);
 });

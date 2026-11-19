@@ -1017,10 +1017,18 @@ service cloud.firestore {
     // parâmetros e as cópias do campeonato; `rodadaAtual`, `participantes` e
     // `campeao` são das functions e ele não mexe. Não se apaga (histórico).
     match /fantasy/{championshipDocId} {
+      function validRoundAction(a) {
+        return a is map && a.keys().hasOnly(['numero', 'acao', 'em', 'prazo'])
+          && a.numero is int && a.numero >= 1 && a.numero <= 99
+          && a.acao in ['abrir', 'fechar']
+          && a.em is timestamp
+          && (a.acao == 'fechar' || (a.get('prazo', null) is timestamp && a.prazo > request.time));
+      }
+
       function validFantasyConfig(d) {
         return d.keys().hasOnly(['idCampeonato', 'temporada', 'titulo', 'urlImagem', 'fk_competicao', 'idRegiao',
             'idsRegioes', 'ativo', 'minMinutos', 'minMinutosDefesa', 'capitao', 'atualizadoEm', 'reapurarEm',
-            'zerarEm', 'zeradoEm', 'rodadaAtual', 'participantes', 'campeao', 'campeaoEm'])
+            'zerarEm', 'zeradoEm', 'acaoRodada', 'rodadaAtual', 'participantes', 'campeao', 'campeaoEm'])
           && d.ativo is bool
           && d.minMinutos is int && d.minMinutos >= 0 && d.minMinutos <= 120
           && d.minMinutosDefesa is int && d.minMinutosDefesa >= d.minMinutos && d.minMinutosDefesa <= 120
@@ -1032,6 +1040,8 @@ service cloud.firestore {
           && (!('reapurarEm' in d) || d.reapurarEm is timestamp)
           // "Zerar pontuações (testes)": hora do pedido (as functions zeram).
           && (!('zerarEm' in d) || d.zerarEm is timestamp)
+          // "Abrir/Fechar rodada" do admin: rodada, ação e (abrir) o prazo no futuro.
+          && (!('acaoRodada' in d) || validRoundAction(d.acaoRodada))
           && d.atualizadoEm == request.time;
       }
 

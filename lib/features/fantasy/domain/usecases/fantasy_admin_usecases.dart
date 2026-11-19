@@ -31,6 +31,16 @@ class RequestFantasyResetUseCase {
   Future<Either<Failure, void>> call(String fantasyId) => _repository.requestReset(fantasyId);
 }
 
+/// "Fechar agora" / "Reabrir" a rodada (admin): as functions aplicam.
+class RequestFantasyRoundActionUseCase {
+  final IFantasyRepository _repository;
+
+  RequestFantasyRoundActionUseCase(this._repository);
+
+  Future<Either<Failure, void>> call(String fantasyId, int round, {required bool open, DateTime? deadline}) =>
+      _repository.requestRoundAction(fantasyId, round, open: open, deadline: deadline);
+}
+
 /// "Reapurar rodadas" (admin).
 class RequestFantasyRescoreUseCase {
   final IFantasyRepository _repository;

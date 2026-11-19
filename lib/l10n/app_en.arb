@@ -2523,5 +2523,16 @@
   "matchFormTestHint": "Only admins see it · pushes go to admins only · does not count in standings or player stats",
   "matchTestBadge": "TEST",
   "homeModeFan": "Fan mode",
-  "homeModeFanBanner": "Fan mode: you see the app as a regular user"
+  "homeModeFanBanner": "Fan mode: you see the app as a regular user",
+  "fantasyRoundClose": "Close now",
+  "fantasyRoundReopen": "Reopen",
+  "fantasyRoundCloseTitle": "Close round {round} now?",
+  "@fantasyRoundCloseTitle": {"placeholders": {"round": {"type": "int"}}},
+  "fantasyRoundCloseText": "Lineups lock right away (this round parameters are frozen) and are copied to the next round. To undo, use \"Reopen\".",
+  "fantasyRoundCloseRequested": "Request sent: the round will close in a moment.",
+  "fantasyRoundOpenRequested": "Request sent: the round will reopen in a moment.",
+  "fantasyRoundActionError": "Could not change the round.",
+  "fantasyRoundDeadlinePast": "Pick a deadline in the future.",
+  "fantasyRoundManualDeadline": "Deadline set by the admin",
+  "fantasyRoundManualClosed": "Closed by the admin"
 }

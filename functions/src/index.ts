@@ -164,6 +164,7 @@ import {
   FANTASY_LINEUPS,
   FANTASY_PARTICIPANTS,
   FANTASY_ROUNDS,
+  type RoundAction,
   type RoundState,
   currentRound,
   fantasyChampions,
@@ -175,6 +176,7 @@ import {
   previousClosedRound,
   orphanRoundUpdate,
   rescoreRequested,
+  roundActionRequested,
   roundFinalized,
   resetRequested,
   roundFieldsChanged,
@@ -937,6 +939,8 @@ function storedRoundOf(data: FantasyDoc) {
     fechaEm: dateOfValue(data.fechaEm),
     idsPartidas: Array.isArray(data.idsPartidas) ? data.idsPartidas.map(String) : [],
     finalizada: data.finalizada === true,
+    prazoManual: data.prazoManual === true,
+    fechadaManual: data.fechadaManual === true,
   };
 }
 
@@ -974,7 +978,7 @@ async function syncFantasyForMatches(...docs: (FantasyDoc | undefined)[]): Promi
  * `rodadaAtual` e copia as escalações para a rodada nova (D3).
  */
 async function syncFantasyRounds(fantasyRef: DocRef, config: FantasyDoc, season: string): Promise<void> {
-  const { db } = await admin();
+  const { db, FieldValue } = await admin();
   const championshipId = Number(config.idCampeonato ?? 0);
   if (!Number.isInteger(championshipId) || championshipId <= 0) return;
   const matches = await db
@@ -994,7 +998,13 @@ async function syncFantasyRounds(fantasyRef: DocRef, config: FantasyDoc, season:
     const key = String(round.numero);
     const change = roundSync(stored.get(key), round);
     if (!change) continue;
-    batch.set(roundsRef.doc(key), change, { merge: true });
+    // Fechada que reabriu sozinha: sai dos parâmetros congelados.
+    const reopened = stored.get(key)?.status === 'fechada' && change.status === 'aberta';
+    batch.set(
+      roundsRef.doc(key),
+      reopened ? { ...change, parametros: FieldValue.delete(), fechadaEm: FieldValue.delete() } : change,
+      { merge: true },
+    );
     writes++;
     if (!stored.has(key) || stored.get(key)?.status === 'vazia') created.push(round.numero);
     const previous = after.get(round.numero);
@@ -1327,6 +1337,40 @@ async function syncFantasyChampion(championshipDocId: string, before: FantasyDoc
 }
 
 /**
+ * "Fechar agora": fecha a rodada (parâmetros congelados, prazo = agora,
+ * escalações copiadas) e marca `fechadaManual` (a sincronia não reabre).
+ * "Reabrir": aberta até o prazo do admin (`prazoManual`: a sincronia não
+ * troca). Depois, a `rodadaAtual` é recalculada.
+ */
+async function applyRoundAction(fantasyRef: DocRef, action: RoundAction): Promise<void> {
+  const { FieldValue } = await admin();
+  const roundRef = fantasyRef.collection(FANTASY_ROUNDS).doc(String(action.numero));
+  const snap = await roundRef.get();
+  if (!snap.exists) return;
+  const now = new Date();
+  if (action.acao === 'fechar') {
+    if (snap.data()?.status === 'aberta') {
+      await roundRef.update({ fechaEm: now, prazoManual: FieldValue.delete() });
+      await closeFantasyRound(fantasyRef, roundRef, now);
+    }
+    await roundRef.update({ fechadaManual: true });
+  } else {
+    if (!action.prazo || action.prazo <= now) return;
+    await roundRef.update({
+      status: 'aberta',
+      fechaEm: action.prazo,
+      prazoManual: true,
+      fechadaManual: FieldValue.delete(),
+      parametros: FieldValue.delete(),
+      fechadaEm: FieldValue.delete(),
+      finalizada: FieldValue.delete(),
+    });
+  }
+  await refreshCurrentRound(fantasyRef, now);
+  logger.info('Fantasy: rodada mudada pelo admin', { fantasy: fantasyRef.id, round: action.numero, action: action.acao });
+}
+
+/**
  * "Zerar pontuações (testes)": participantes com 0, escalações sem os pontos,
  * rodadas sem a auditoria dos atletas e sem a `apuracao` (status, prazo,
  * partidas e `finalizada` ficam: o mercado não muda), sem campeão e sem os
@@ -1397,6 +1441,12 @@ export const onFantasyWritten = onDocumentWritten(`${FANTASY}/{fantasyId}`, asyn
   const ref = event.data?.after.ref;
   if (!after || !ref) return;
   const season = typeof after.temporada === 'string' && after.temporada ? after.temporada : await currentSeason();
+  // "Abrir/Fechar rodada" do admin.
+  const roundAction = roundActionRequested(before, after);
+  if (roundAction) {
+    await applyRoundAction(ref, roundAction);
+    return;
+  }
   // "Zerar pontuações (testes)" do admin: antes do reapurar (os dois no mesmo
   // pedido = zera e não reapura).
   if (resetRequested(before, after)) {

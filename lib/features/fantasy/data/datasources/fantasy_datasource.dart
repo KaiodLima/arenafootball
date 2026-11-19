@@ -253,6 +253,27 @@ class FantasyDataSource {
     }
   }
 
+  /// "Abrir/Fechar rodada" do admin: as functions aplicam (`acaoRodada`).
+  /// [deadline] é o novo prazo ao reabrir.
+  Future<Either<Failure, void>> requestRoundAction(String fantasyId, int round,
+      {required bool open, DateTime? deadline}) async {
+    try {
+      await _doc(fantasyId).update({
+        'acaoRodada': {
+          'numero': round,
+          'acao': open ? 'abrir' : 'fechar',
+          'em': FieldValue.serverTimestamp(),
+          if (open && deadline != null) 'prazo': Timestamp.fromDate(deadline),
+        },
+        'atualizadoEm': FieldValue.serverTimestamp(),
+      });
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('requestRoundAction $fantasyId/$round', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível mudar a rodada.'));
+    }
+  }
+
   /// "Zerar pontuações (testes)": as functions zeram os pontos do Fantasy.
   Future<Either<Failure, void>> requestReset(String fantasyId) async {
     try {

@@ -8238,4 +8238,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeModeFanBanner => 'Fan mode: you see the app as a regular user';
+
+  @override
+  String get fantasyRoundClose => 'Close now';
+
+  @override
+  String get fantasyRoundReopen => 'Reopen';
+
+  @override
+  String fantasyRoundCloseTitle(int round) {
+    return 'Close round $round now?';
+  }
+
+  @override
+  String get fantasyRoundCloseText =>
+      'Lineups lock right away (this round parameters are frozen) and are copied to the next round. To undo, use \"Reopen\".';
+
+  @override
+  String get fantasyRoundCloseRequested =>
+      'Request sent: the round will close in a moment.';
+
+  @override
+  String get fantasyRoundOpenRequested =>
+      'Request sent: the round will reopen in a moment.';
+
+  @override
+  String get fantasyRoundActionError => 'Could not change the round.';
+
+  @override
+  String get fantasyRoundDeadlinePast => 'Pick a deadline in the future.';
+
+  @override
+  String get fantasyRoundManualDeadline => 'Deadline set by the admin';
+
+  @override
+  String get fantasyRoundManualClosed => 'Closed by the admin';
 }

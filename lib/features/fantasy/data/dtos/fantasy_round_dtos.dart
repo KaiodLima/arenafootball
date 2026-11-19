@@ -26,6 +26,10 @@ class FantasyRoundDTO extends Equatable {
   final DateTime? processedAt;
   final ({int minMinutes, int minDefenseMinutes, double captain})? params;
 
+  /// Prazo escolhido pelo admin ("Reabrir") / fechada pelo admin ("Fechar agora").
+  final bool manualDeadline;
+  final bool manualClosed;
+
   const FantasyRoundDTO({
     required this.number,
     this.matchIds = const [],
@@ -37,6 +41,8 @@ class FantasyRoundDTO extends Equatable {
     this.lineups = 0,
     this.processedAt,
     this.params,
+    this.manualDeadline = false,
+    this.manualClosed = false,
   });
 
   bool get closed => status == 'fechada';
@@ -53,6 +59,8 @@ class FantasyRoundDTO extends Equatable {
       matchesFinished: ((map['apuracao'] as Map?)?['encerradas'] as num?)?.toInt() ?? 0,
       lineups: ((map['apuracao'] as Map?)?['escalacoes'] as num?)?.toInt() ?? 0,
       processedAt: _dateOf((map['apuracao'] as Map?)?['processadoEm']),
+      manualDeadline: map['prazoManual'] == true,
+      manualClosed: map['fechadaManual'] == true,
       params: map['parametros'] is Map
           ? (
               minMinutes: ((map['parametros'] as Map)['minMinutos'] as num?)?.toInt() ?? 20,
@@ -76,8 +84,20 @@ class FantasyRoundDTO extends Equatable {
       !finished;
 
   @override
-  List<Object?> get props =>
-      [number, matchIds, closesAt, status, scored, finished, matchesFinished, lineups, processedAt, params];
+  List<Object?> get props => [
+        number,
+        matchIds,
+        closesAt,
+        status,
+        scored,
+        finished,
+        matchesFinished,
+        lineups,
+        processedAt,
+        params,
+        manualDeadline,
+        manualClosed
+      ];
 }
 
 /// Participante do Fantasy (`fantasy/{id}/participantes/{uid}`).

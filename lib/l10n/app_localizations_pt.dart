@@ -8284,4 +8284,39 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get homeModeFanBanner =>
       'Modo torcedor: você vê o app como um usuário comum';
+
+  @override
+  String get fantasyRoundClose => 'Fechar agora';
+
+  @override
+  String get fantasyRoundReopen => 'Reabrir';
+
+  @override
+  String fantasyRoundCloseTitle(int round) {
+    return 'Fechar a rodada $round agora?';
+  }
+
+  @override
+  String get fantasyRoundCloseText =>
+      'As escalações travam na hora (os parâmetros desta rodada são congelados) e são copiadas para a próxima rodada. Para voltar, use \"Reabrir\".';
+
+  @override
+  String get fantasyRoundCloseRequested =>
+      'Pedido enviado: a rodada será fechada em instantes.';
+
+  @override
+  String get fantasyRoundOpenRequested =>
+      'Pedido enviado: a rodada será reaberta em instantes.';
+
+  @override
+  String get fantasyRoundActionError => 'Não foi possível mudar a rodada.';
+
+  @override
+  String get fantasyRoundDeadlinePast => 'Escolha um prazo no futuro.';
+
+  @override
+  String get fantasyRoundManualDeadline => 'Prazo definido pelo admin';
+
+  @override
+  String get fantasyRoundManualClosed => 'Fechada pelo admin';
 }

@@ -98,6 +98,49 @@ class _FantasyAdminPageState extends State<FantasyAdminPage> {
     if (mounted) await _cubit.resetScores();
   }
 
+  /// "Fechar agora": confirmação e o pedido.
+  Future<void> _closeRound(FantasyRoundDTO round) async {
+    final l10n = AppLocalizations.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.fantasyRoundCloseTitle(round.number)),
+        content: Text(l10n.fantasyRoundCloseText),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(l10n.fantasyCancel)),
+          TextButton(
+            key: const ValueKey('fantasy-round-close-confirm'),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.fantasyRoundClose),
+          ),
+        ],
+      ),
+    );
+    if (ok == true && mounted) await _cubit.setRoundOpen(round.number, open: false);
+  }
+
+  /// "Reabrir": data e hora do novo prazo (padrão: amanhã às 18:00) e o pedido.
+  Future<void> _reopenRound(FantasyRoundDTO round) async {
+    final now = DateTime.now();
+    final tomorrow = DateTime(now.year, now.month, now.day + 1, 18);
+    final date = await showDatePicker(
+      context: context,
+      initialDate: tomorrow,
+      firstDate: DateTime(now.year, now.month, now.day),
+      lastDate: now.add(const Duration(days: 120)),
+    );
+    if (date == null || !mounted) return;
+    final time = await showTimePicker(context: context, initialTime: const TimeOfDay(hour: 18, minute: 0));
+    if (time == null || !mounted) return;
+    final deadline = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+    final l10n = AppLocalizations.of(context);
+    if (!deadline.isAfter(DateTime.now())) {
+      showSnackBar(context: context, message: l10n.fantasyRoundDeadlinePast, isSuccess: false);
+      return;
+    }
+    await _cubit.setRoundOpen(round.number, open: true, deadline: deadline);
+  }
+
   Future<void> _openParticipant(FantasyParticipantDTO participant) async {
     _cubit.openParticipant(participant.uid);
     await showModalBottomSheet<void>(
@@ -126,8 +169,22 @@ class _FantasyAdminPageState extends State<FantasyAdminPage> {
       initialIndex: widget.initialTab,
       child: BlocListener<FantasyAdminCubit, FantasyAdminState>(
         listenWhen: (_, current) =>
-            current.rescore != FantasyRescoreResult.none || current.reset != FantasyResetResult.none,
+            current.rescore != FantasyRescoreResult.none ||
+            current.reset != FantasyResetResult.none ||
+            current.roundAction != FantasyRoundActionResult.none,
         listener: (context, state) {
+          if (state.roundAction != FantasyRoundActionResult.none) {
+            showSnackBar(
+              context: context,
+              message: switch (state.roundAction) {
+                FantasyRoundActionResult.closeRequested => l10n.fantasyRoundCloseRequested,
+                FantasyRoundActionResult.openRequested => l10n.fantasyRoundOpenRequested,
+                _ => state.failure ?? l10n.fantasyRoundActionError,
+              },
+              isSuccess: state.roundAction != FantasyRoundActionResult.failed,
+            );
+            return;
+          }
           if (state.reset != FantasyResetResult.none) {
             showSnackBar(
               context: context,
@@ -216,7 +273,7 @@ class _FantasyAdminPageState extends State<FantasyAdminPage> {
           body: BlocBuilder<FantasyAdminCubit, FantasyAdminState>(
             builder: (context, state) => TabBarView(
               children: [
-                _RoundsTab(state: state),
+                _RoundsTab(state: state, onClose: _closeRound, onReopen: _reopenRound),
                 _ParticipantsTab(state: state, onOpen: _openParticipant),
               ],
             ),
@@ -229,8 +286,10 @@ class _FantasyAdminPageState extends State<FantasyAdminPage> {
 
 class _RoundsTab extends StatelessWidget {
   final FantasyAdminState state;
+  final ValueChanged<FantasyRoundDTO>? onClose;
+  final ValueChanged<FantasyRoundDTO>? onReopen;
 
-  const _RoundsTab({required this.state});
+  const _RoundsTab({required this.state, this.onClose, this.onReopen});
 
   @override
   Widget build(BuildContext context) {
@@ -241,7 +300,14 @@ class _RoundsTab extends StatelessWidget {
     }
     return ListView(
       padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s24)),
-      children: [for (final round in state.rounds) FantasyAdminRoundCard(round: round)],
+      children: [
+        for (final round in state.rounds)
+          FantasyAdminRoundCard(
+            round: round,
+            onClose: onClose == null ? null : () => onClose!(round),
+            onReopen: onReopen == null ? null : () => onReopen!(round),
+          ),
+      ],
     );
   }
 }
@@ -251,7 +317,11 @@ class _RoundsTab extends StatelessWidget {
 class FantasyAdminRoundCard extends StatelessWidget {
   final FantasyRoundDTO round;
 
-  const FantasyAdminRoundCard({super.key, required this.round});
+  /// "Fechar agora" (rodada aberta) e "Reabrir" (fechada); nulos = sem as ações.
+  final VoidCallback? onClose;
+  final VoidCallback? onReopen;
+
+  const FantasyAdminRoundCard({super.key, required this.round, this.onClose, this.onReopen});
 
   @override
   Widget build(BuildContext context) {
@@ -330,6 +400,28 @@ class FantasyAdminRoundCard extends StatelessWidget {
                 FantasySettings.captainLabel(params.captain),
               ),
             ),
+          if (round.manualDeadline && round.status == 'aberta')
+            line(Icons.edit_calendar_rounded, l10n.fantasyRoundManualDeadline),
+          if (round.manualClosed && round.closed) line(Icons.lock_person_rounded, l10n.fantasyRoundManualClosed),
+          if ((round.status == 'aberta' && onClose != null) || (round.closed && onReopen != null)) ...[
+            const SizedBox(height: AppSizes.s8),
+            Align(
+              alignment: Alignment.centerRight,
+              child: round.status == 'aberta'
+                  ? OutlinedButton.icon(
+                      key: ValueKey('fantasy-round-close-${round.number}'),
+                      onPressed: onClose,
+                      icon: const Icon(Icons.lock_clock_rounded, size: AppSizes.s18),
+                      label: Text(l10n.fantasyRoundClose),
+                    )
+                  : OutlinedButton.icon(
+                      key: ValueKey('fantasy-round-reopen-${round.number}'),
+                      onPressed: onReopen,
+                      icon: const Icon(Icons.lock_open_rounded, size: AppSizes.s18),
+                      label: Text(l10n.fantasyRoundReopen),
+                    ),
+            ),
+          ],
         ],
       ),
     );

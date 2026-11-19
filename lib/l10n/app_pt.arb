@@ -4380,5 +4380,16 @@
   "matchFormTestHint": "Só o admin vê · pushes só para os admins · não conta na classificação nem nos números dos atletas",
   "matchTestBadge": "TESTE",
   "homeModeFan": "Modo torcedor",
-  "homeModeFanBanner": "Modo torcedor: você vê o app como um usuário comum"
+  "homeModeFanBanner": "Modo torcedor: você vê o app como um usuário comum",
+  "fantasyRoundClose": "Fechar agora",
+  "fantasyRoundReopen": "Reabrir",
+  "fantasyRoundCloseTitle": "Fechar a rodada {round} agora?",
+  "@fantasyRoundCloseTitle": {"placeholders": {"round": {"type": "int"}}},
+  "fantasyRoundCloseText": "As escalações travam na hora (os parâmetros desta rodada são congelados) e são copiadas para a próxima rodada. Para voltar, use \"Reabrir\".",
+  "fantasyRoundCloseRequested": "Pedido enviado: a rodada será fechada em instantes.",
+  "fantasyRoundOpenRequested": "Pedido enviado: a rodada será reaberta em instantes.",
+  "fantasyRoundActionError": "Não foi possível mudar a rodada.",
+  "fantasyRoundDeadlinePast": "Escolha um prazo no futuro.",
+  "fantasyRoundManualDeadline": "Prazo definido pelo admin",
+  "fantasyRoundManualClosed": "Fechada pelo admin"
 }

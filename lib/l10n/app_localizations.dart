@@ -13646,6 +13646,66 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Modo torcedor: você vê o app como um usuário comum'**
   String get homeModeFanBanner;
+
+  /// No description provided for @fantasyRoundClose.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fechar agora'**
+  String get fantasyRoundClose;
+
+  /// No description provided for @fantasyRoundReopen.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reabrir'**
+  String get fantasyRoundReopen;
+
+  /// No description provided for @fantasyRoundCloseTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fechar a rodada {round} agora?'**
+  String fantasyRoundCloseTitle(int round);
+
+  /// No description provided for @fantasyRoundCloseText.
+  ///
+  /// In pt, this message translates to:
+  /// **'As escalações travam na hora (os parâmetros desta rodada são congelados) e são copiadas para a próxima rodada. Para voltar, use \"Reabrir\".'**
+  String get fantasyRoundCloseText;
+
+  /// No description provided for @fantasyRoundCloseRequested.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedido enviado: a rodada será fechada em instantes.'**
+  String get fantasyRoundCloseRequested;
+
+  /// No description provided for @fantasyRoundOpenRequested.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pedido enviado: a rodada será reaberta em instantes.'**
+  String get fantasyRoundOpenRequested;
+
+  /// No description provided for @fantasyRoundActionError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível mudar a rodada.'**
+  String get fantasyRoundActionError;
+
+  /// No description provided for @fantasyRoundDeadlinePast.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha um prazo no futuro.'**
+  String get fantasyRoundDeadlinePast;
+
+  /// No description provided for @fantasyRoundManualDeadline.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prazo definido pelo admin'**
+  String get fantasyRoundManualDeadline;
+
+  /// No description provided for @fantasyRoundManualClosed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fechada pelo admin'**
+  String get fantasyRoundManualClosed;
 }
 
 class _AppLocalizationsDelegate
