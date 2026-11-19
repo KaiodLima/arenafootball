@@ -231,13 +231,17 @@ void main() {
       ),
     ));
     await tester.pumpAndSettle();
-    expect(find.text('Rodada 2'), findsOneWidget);
+    expect(find.text('RODADA 2'), findsOneWidget);
     expect(find.text('Você não escalou nesta rodada.'), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('fantasy-round-older')));
     await tester.pumpAndSettle();
-    expect(find.text('Rodada 1'), findsOneWidget);
+    expect(find.text('RODADA 1'), findsOneWidget);
     expect(find.text('1º'), findsNWidgets(2));
-    expect(find.text('8º'), findsOneWidget);
+    // 8º no cartão "Sua posição" (e no cabeçalho da rodada).
+    expect(
+      find.descendant(of: find.byKey(const ValueKey('fantasy-my-position')), matching: find.text('8º')),
+      findsOneWidget,
+    );
 
     await tester.tap(find.text('Geral'));
     await tester.pumpAndSettle();
@@ -273,9 +277,11 @@ void main() {
       ),
     ));
     await tester.pumpAndSettle();
-    expect(find.text('Rodada 2'), findsOneWidget);
+    expect(find.text('RODADA 2'), findsOneWidget);
     expect(find.text('Rafael Goleiro'), findsOneWidget);
-    expect(find.text('GOL · Leões'), findsOneWidget);
+    // Selo da vaga + time.
+    expect(find.text('GOL'), findsOneWidget);
+    expect(find.text('Leões'), findsOneWidget);
     expect(find.text('1º'), findsNWidgets(2));
     expect(find.text('3º'), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('fantasy-round-older')));

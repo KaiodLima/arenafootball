@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_ranking_dtos.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_score_dto.dart';
-import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_labels.dart';
+import 'package:arena_soccer/features/fantasy/domain/fantasy_lineup.dart';
+import 'package:arena_soccer/features/fantasy/domain/fantasy_ranking_view.dart';
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_ranking_widgets.dart';
-import 'package:arena_soccer/features/predictions/presentation/widgets/hub_widgets.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
@@ -26,59 +25,111 @@ List<int> fantasyAthletePositions(List<FantasyAthleteScoreDTO> athletes) {
   return positions;
 }
 
-/// Linha de um craque da rodada: posição (medalha no pódio), foto, nome,
-/// vaga e time, e os pontos. Toque = pontuação detalhada.
+/// Linha de um craque da rodada: posição (medalha no pódio, "empate" quando
+/// divide), foto, nome, selo da vaga e time, e os pontos. Toque = pontuação
+/// detalhada. [boxed] = cartão próprio (lista da aba Atletas).
 class FantasyTopAthleteRow extends StatelessWidget {
   final FantasyAthleteScoreDTO athlete;
   final int position;
+  final bool tied;
+  final bool boxed;
   final VoidCallback? onTap;
 
-  const FantasyTopAthleteRow({super.key, required this.athlete, required this.position, this.onTap});
+  const FantasyTopAthleteRow({
+    super.key,
+    required this.athlete,
+    required this.position,
+    this.tied = false,
+    this.boxed = false,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final medal = fantasyMedalColor(position);
-    final slot = athlete.position == null ? '' : fantasyPositionLabelOfKey(l10n, athlete.position!);
-    final subtitle = [if (slot.isNotEmpty) slot, if (athlete.team.isNotEmpty) athlete.team].join(' · ');
-    return InkWell(
-      key: ValueKey('fantasy-top-${athlete.athleteId}'),
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSizes.s12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: AppSizes.s6, horizontal: AppSizes.s4),
-        child: Row(
+    final ring = fantasyPodiumColor(position);
+    final slot = athlete.position == null ? null : FantasySlot.fromKey(athlete.position!);
+    final avatar = boxed ? AppSizes.s48 : AppSizes.s36;
+    final content = Row(
+      children: [
+        SizedBox(
+          width: AppSizes.s40,
+          child: FantasyPositionLabel(position: position, tied: tied, size: AppSizes.s18, color: medal),
+        ),
+        Stack(
+          clipBehavior: Clip.none,
           children: [
-            SizedBox(
-              width: AppSizes.s32,
-              child: Text('$positionº', style: hubDisplay(AppSizes.s16, medal ?? AppColors.textSecondary)),
-            ),
-            FantasyAvatar(name: athlete.name, photoUrl: athlete.photoUrl, size: AppSizes.s36, ring: medal),
-            const SizedBox(width: AppSizes.s10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    athlete.name.isEmpty ? l10n.fantasyUnknownAthlete : athlete.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.label(color: AppColors.textPrimary),
-                  ),
-                  if (subtitle.isNotEmpty)
-                    Text(
-                      subtitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
-                    ),
-                ],
+            FantasyAvatar(name: athlete.name, photoUrl: athlete.photoUrl, size: avatar, ring: ring),
+            if (ring != null && boxed)
+              Positioned(
+                right: -AppSizes.s4,
+                bottom: -AppSizes.s4,
+                child: Container(
+                  padding: const EdgeInsets.all(AppSizes.s2),
+                  decoration: BoxDecoration(
+                      color: ring, shape: BoxShape.circle, border: Border.all(color: AppColors.white, width: 1.5)),
+                  child: const Icon(Icons.workspace_premium_rounded, size: AppSizes.s14, color: AppColors.primaryDark),
+                ),
               ),
-            ),
-            Text(fantasyPointsLabel(athlete.total), style: hubDisplay(AppSizes.s20, AppColors.primaryDark)),
-            const SizedBox(width: AppSizes.s4),
-            Text('pts', style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s10)),
           ],
+        ),
+        const SizedBox(width: AppSizes.s12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                athlete.name.isEmpty ? l10n.fantasyUnknownAthlete : athlete.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTypography.label(color: AppColors.textPrimary),
+              ),
+              if (slot != null || athlete.team.isNotEmpty) ...[
+                const SizedBox(height: AppSizes.s4),
+                Row(
+                  children: [
+                    if (slot != null) ...[FantasySlotBadge(slot: slot), const SizedBox(width: AppSizes.s6)],
+                    if (athlete.team.isNotEmpty)
+                      Flexible(
+                        child: Text(
+                          athlete.team,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(width: AppSizes.s8),
+        FantasyPointsColumn(points: athlete.total, size: boxed ? AppSizes.s22 : AppSizes.s20),
+        if (onTap != null) const Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary, size: AppSizes.s20),
+      ],
+    );
+    return Padding(
+      padding: EdgeInsets.only(bottom: boxed ? AppSizes.s8 : 0),
+      child: Material(
+        color: boxed ? AppColors.surface : AppColors.transparent,
+        shape: boxed
+            ? RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppSizes.s16),
+                side: BorderSide(color: ring ?? AppColors.greyLight, width: ring == null ? 1 : 1.5),
+              )
+            : null,
+        child: InkWell(
+          key: ValueKey('fantasy-top-${athlete.athleteId}'),
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(boxed ? AppSizes.s16 : AppSizes.s12),
+          child: Padding(
+            padding: boxed
+                ? const EdgeInsets.fromLTRB(AppSizes.s12, AppSizes.s10, AppSizes.s6, AppSizes.s10)
+                : const EdgeInsets.symmetric(vertical: AppSizes.s6, horizontal: AppSizes.s4),
+            child: content,
+          ),
         ),
       ),
     );
@@ -134,7 +185,12 @@ class FantasyTopAthletesCard extends StatelessWidget {
             )
           else
             for (var i = 0; i < top.length; i++)
-              FantasyTopAthleteRow(athlete: top[i], position: positions[i], onTap: () => onAthleteTap(top[i])),
+              FantasyTopAthleteRow(
+                athlete: top[i],
+                position: positions[i],
+                tied: FantasyRankingView.isTied(positions, i),
+                onTap: () => onAthleteTap(top[i]),
+              ),
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(

@@ -14498,6 +14498,84 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Convidar atleta'**
   String get athleteInviteSheetTitle;
+
+  /// No description provided for @fantasyStatusPartial.
+  ///
+  /// In pt, this message translates to:
+  /// **'PARCIAL'**
+  String get fantasyStatusPartial;
+
+  /// No description provided for @fantasyStatusFinal.
+  ///
+  /// In pt, this message translates to:
+  /// **'FINAL'**
+  String get fantasyStatusFinal;
+
+  /// No description provided for @fantasyStatusAwaiting.
+  ///
+  /// In pt, this message translates to:
+  /// **'AGUARDANDO APURAÇÃO'**
+  String get fantasyStatusAwaiting;
+
+  /// No description provided for @fantasyYou.
+  ///
+  /// In pt, this message translates to:
+  /// **'VOCÊ'**
+  String get fantasyYou;
+
+  /// No description provided for @fantasyChase.
+  ///
+  /// In pt, this message translates to:
+  /// **'Faltam {points} pts para passar {name}'**
+  String fantasyChase(String points, String name);
+
+  /// No description provided for @fantasyLeading.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você lidera!'**
+  String get fantasyLeading;
+
+  /// No description provided for @fantasyHeroPoints.
+  ///
+  /// In pt, this message translates to:
+  /// **'seus pts'**
+  String get fantasyHeroPoints;
+
+  /// No description provided for @fantasyHeroPosition.
+  ///
+  /// In pt, this message translates to:
+  /// **'sua posição'**
+  String get fantasyHeroPosition;
+
+  /// No description provided for @fantasyHeroParticipants.
+  ///
+  /// In pt, this message translates to:
+  /// **'participantes'**
+  String get fantasyHeroParticipants;
+
+  /// No description provided for @fantasyOverallTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'CLASSIFICAÇÃO GERAL'**
+  String get fantasyOverallTitle;
+
+  /// No description provided for @fantasyTopAthletesHeader.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os que mais pontuaram'**
+  String get fantasyTopAthletesHeader;
+
+  /// No description provided for @fantasyTiedShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'empate'**
+  String get fantasyTiedShort;
+
+  /// No description provided for @fantasyGapBehind.
+  ///
+  /// In pt, this message translates to:
+  /// **'{points} pts atrás do {position}º'**
+  String fantasyGapBehind(String points, int position);
 }
 
 class _AppLocalizationsDelegate

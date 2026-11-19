@@ -8786,4 +8786,47 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get athleteInviteSheetTitle => 'Convidar atleta';
+
+  @override
+  String get fantasyStatusPartial => 'PARCIAL';
+
+  @override
+  String get fantasyStatusFinal => 'FINAL';
+
+  @override
+  String get fantasyStatusAwaiting => 'AGUARDANDO APURAÇÃO';
+
+  @override
+  String get fantasyYou => 'VOCÊ';
+
+  @override
+  String fantasyChase(String points, String name) {
+    return 'Faltam $points pts para passar $name';
+  }
+
+  @override
+  String get fantasyLeading => 'Você lidera!';
+
+  @override
+  String get fantasyHeroPoints => 'seus pts';
+
+  @override
+  String get fantasyHeroPosition => 'sua posição';
+
+  @override
+  String get fantasyHeroParticipants => 'participantes';
+
+  @override
+  String get fantasyOverallTitle => 'CLASSIFICAÇÃO GERAL';
+
+  @override
+  String get fantasyTopAthletesHeader => 'Os que mais pontuaram';
+
+  @override
+  String get fantasyTiedShort => 'empate';
+
+  @override
+  String fantasyGapBehind(String points, int position) {
+    return '$points pts atrás do $positionº';
+  }
 }

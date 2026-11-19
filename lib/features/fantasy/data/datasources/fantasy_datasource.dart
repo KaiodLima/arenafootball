@@ -13,6 +13,7 @@ import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_round_dtos.dart'
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_score_dto.dart';
+import 'package:arena_soccer/features/fantasy/domain/fantasy_ranking_view.dart';
 
 /// Arena Fantasy: a configuração por campeonato (`fantasy/{idDocCampeonato}`),
 /// as rodadas, o participante, a escalação e os atletas elegíveis.
@@ -151,7 +152,7 @@ class FantasyDataSource {
     }
   }
 
-  static const int rankingLimit = 50;
+  static const int rankingLimit = FantasyRankingView.rankingLimit;
 
   /// Ranking da rodada [round]: as escalações por `pontos` (top 50).
   Future<Either<Failure, List<FantasyRankingEntry>>> getRoundRanking(String fantasyId, int round) =>

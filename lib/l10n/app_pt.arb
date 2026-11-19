@@ -4550,5 +4550,20 @@
   "athleteInviteCardGoals": "GOLS",
   "athleteInviteCardAssists": "ASSISTÊNCIAS",
   "athleteInviteCardCta": "Crie sua conta e diga: \"Sou eu!\"",
-  "athleteInviteSheetTitle": "Convidar atleta"
+  "athleteInviteSheetTitle": "Convidar atleta",
+  "fantasyStatusPartial": "PARCIAL",
+  "fantasyStatusFinal": "FINAL",
+  "fantasyStatusAwaiting": "AGUARDANDO APURAÇÃO",
+  "fantasyYou": "VOCÊ",
+  "fantasyChase": "Faltam {points} pts para passar {name}",
+  "@fantasyChase": {"placeholders": {"points": {"type": "String"}, "name": {"type": "String"}}},
+  "fantasyLeading": "Você lidera!",
+  "fantasyHeroPoints": "seus pts",
+  "fantasyHeroPosition": "sua posição",
+  "fantasyHeroParticipants": "participantes",
+  "fantasyOverallTitle": "CLASSIFICAÇÃO GERAL",
+  "fantasyTopAthletesHeader": "Os que mais pontuaram",
+  "fantasyTiedShort": "empate",
+  "fantasyGapBehind": "{points} pts atrás do {position}º",
+  "@fantasyGapBehind": {"placeholders": {"points": {"type": "String"}, "position": {"type": "int"}}}
 }

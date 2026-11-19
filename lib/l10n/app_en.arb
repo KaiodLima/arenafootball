@@ -2671,5 +2671,18 @@
   "athleteInviteCardGoals": "GOALS",
   "athleteInviteCardAssists": "ASSISTS",
   "athleteInviteCardCta": "Create your account and say: \"That's me!\"",
-  "athleteInviteSheetTitle": "Invite player"
+  "athleteInviteSheetTitle": "Invite player",
+  "fantasyStatusPartial": "PARTIAL",
+  "fantasyStatusFinal": "FINAL",
+  "fantasyStatusAwaiting": "AWAITING SCORE",
+  "fantasyYou": "YOU",
+  "fantasyChase": "{points} pts to pass {name}",
+  "fantasyLeading": "You're leading!",
+  "fantasyHeroPoints": "your pts",
+  "fantasyHeroPosition": "your place",
+  "fantasyHeroParticipants": "players",
+  "fantasyOverallTitle": "OVERALL STANDINGS",
+  "fantasyTopAthletesHeader": "Top scorers of the round",
+  "fantasyTiedShort": "tie",
+  "fantasyGapBehind": "{points} pts behind #{position}"
 }
