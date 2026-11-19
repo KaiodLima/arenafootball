@@ -13,6 +13,8 @@ import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart'
 import 'package:arena_soccer/features/auth/presentation/bloc/session_state.dart';
 import 'package:arena_soccer/features/auth/presentation/page/choose_team_page.dart';
 import 'package:arena_soccer/features/auth/presentation/widgets/team_change_notice.dart';
+import 'package:arena_soccer/core/services/tour_service.dart';
+import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_gold_avatar.dart';
 import 'package:arena_soccer/utils/components/arena_hero_background.dart';
@@ -44,6 +46,42 @@ class _ProfilePageState extends State<ProfilePage> {
   late final TextEditingController _name;
   late final TextEditingController _email;
   bool _touched = false;
+
+  final _tourPhoto = GlobalKey();
+  final _tourName = GlobalKey();
+  final _tourTeam = GlobalKey();
+  bool _tourRequested = false;
+
+  /// Tour do "Meu perfil" na 1ª visita (com a conta na tela).
+  void _requestTour(AppLocalizations l10n) {
+    if (_tourRequested) return;
+    _tourRequested = true;
+    TourService.request(
+      context,
+      TourIds.profile,
+      () => [
+        TourStep(
+          target: _tourPhoto,
+          icon: Icons.photo_camera_rounded,
+          title: l10n.tourProfilePhotoTitle,
+          body: l10n.tourProfilePhotoBody,
+          shape: TourShape.circle,
+        ),
+        TourStep(
+          target: _tourName,
+          icon: Icons.edit_rounded,
+          title: l10n.tourProfileNameTitle,
+          body: l10n.tourProfileNameBody,
+        ),
+        TourStep(
+          target: _tourTeam,
+          icon: Icons.favorite_rounded,
+          title: l10n.tourProfileTeamTitle,
+          body: l10n.tourProfileTeamBody,
+        ),
+      ],
+    );
+  }
 
   @override
   void initState() {
@@ -123,6 +161,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return BlocBuilder<SessionCubit, SessionState>(
       builder: (context, session) {
         final user = session.user;
+        if (user != null) _requestTour(l10n);
         return BlocConsumer<ProfileCubit, ProfileState>(
           listener: _onState,
           builder: (context, state) {
@@ -149,6 +188,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       padding: EdgeInsets.only(bottom: changed ? AppSizes.s24 : safeBottom(context, AppSizes.s24)),
                       children: [
                         _ProfileHero(
+                          photoKey: _tourPhoto,
                           user: user,
                           saving: state.savingPhoto,
                           onPickPhoto: state.savingPhoto ? null : () => _pickPhoto(user.id),
@@ -163,17 +203,20 @@ class _ProfilePageState extends State<ProfilePage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [
-                                    TextField(
-                                      key: const ValueKey('profile-name'),
-                                      controller: _name,
-                                      maxLength: ProfileName.max,
-                                      textCapitalization: TextCapitalization.words,
-                                      onChanged: (_) => setState(() => _touched = true),
-                                      style: AppTypography.body().copyWith(fontWeight: FontWeight.w600),
-                                      decoration: arenaInputDecoration(
-                                        label: l10n.profileNameLabel,
-                                        icon: Icons.person_outline_rounded,
-                                        errorText: _nameError(l10n),
+                                    KeyedSubtree(
+                                      key: _tourName,
+                                      child: TextField(
+                                        key: const ValueKey('profile-name'),
+                                        controller: _name,
+                                        maxLength: ProfileName.max,
+                                        textCapitalization: TextCapitalization.words,
+                                        onChanged: (_) => setState(() => _touched = true),
+                                        style: AppTypography.body().copyWith(fontWeight: FontWeight.w600),
+                                        decoration: arenaInputDecoration(
+                                          label: l10n.profileNameLabel,
+                                          icon: Icons.person_outline_rounded,
+                                          errorText: _nameError(l10n),
+                                        ),
                                       ),
                                     ),
                                     if (user.email.isNotEmpty) ...[
@@ -202,10 +245,13 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               FormSection(
                                 title: l10n.profileFavoriteTeam,
-                                child: _FavoriteTeam(
-                                  user: user,
-                                  crestUrl: state.team?.imageUrl,
-                                  onChange: () => _changeTeam(user),
+                                child: KeyedSubtree(
+                                  key: _tourTeam,
+                                  child: _FavoriteTeam(
+                                    user: user,
+                                    crestUrl: state.team?.imageUrl,
+                                    onChange: () => _changeTeam(user),
+                                  ),
                                 ),
                               ),
                               Text(
@@ -233,7 +279,10 @@ class _ProfileHero extends StatelessWidget {
   final bool saving;
   final VoidCallback? onPickPhoto;
 
-  const _ProfileHero({required this.user, required this.saving, this.onPickPhoto});
+  /// Alvo do tour na foto.
+  final Key? photoKey;
+
+  const _ProfileHero({required this.user, required this.saving, this.onPickPhoto, this.photoKey});
 
   @override
   Widget build(BuildContext context) {
@@ -253,6 +302,7 @@ class _ProfileHero extends StatelessWidget {
               child: GestureDetector(
                 onTap: onPickPhoto,
                 child: Stack(
+                  key: photoKey,
                   clipBehavior: Clip.none,
                   children: [
                     ArenaGoldAvatar(

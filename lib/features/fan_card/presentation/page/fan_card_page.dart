@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:arena_soccer/app_routes.dart';
+import 'package:arena_soccer/core/services/tour_service.dart';
 import 'package:arena_soccer/core/utils/share_links.dart';
 import 'package:arena_soccer/features/achievements/domain/achievement_board.dart';
 import 'package:arena_soccer/features/achievements/domain/achievement_metric.dart';
@@ -32,6 +33,7 @@ import 'package:arena_soccer/utils/components/safe_bottom.dart';
 import 'package:arena_soccer/utils/components/share_image_frame.dart';
 import 'package:arena_soccer/utils/components/share_image_sheet.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
+import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
@@ -48,6 +50,41 @@ class FanCardPage extends StatefulWidget {
 
 class _FanCardPageState extends State<FanCardPage> {
   late final FanCardCubit _cubit;
+  final _tourCard = GlobalKey();
+  final _tourActions = GlobalKey();
+  final _tourLevel = GlobalKey();
+  bool _tourRequested = false;
+
+  /// Tour da carteirinha na 1ª visita (com o cartão na tela).
+  void _requestTour() {
+    if (_tourRequested) return;
+    _tourRequested = true;
+    final l10n = AppLocalizations.of(context);
+    TourService.request(
+      context,
+      TourIds.fanCard,
+      () => [
+        TourStep(
+          target: _tourCard,
+          icon: Icons.badge_rounded,
+          title: l10n.tourFanCardCardTitle,
+          body: l10n.tourFanCardCardBody,
+        ),
+        TourStep(
+          target: _tourActions,
+          icon: Icons.touch_app_rounded,
+          title: l10n.tourFanCardActionsTitle,
+          body: l10n.tourFanCardActionsBody,
+        ),
+        TourStep(
+          target: _tourLevel,
+          icon: Icons.trending_up_rounded,
+          title: l10n.tourFanCardLevelTitle,
+          body: l10n.tourFanCardLevelBody,
+        ),
+      ],
+    );
+  }
 
   @override
   void initState() {
@@ -176,20 +213,24 @@ class _FanCardPageState extends State<FanCardPage> {
               },
               builder: (context, state) {
                 final teamLocked = user.hasFavoriteTeam && !TeamChangePolicy.canChange(user, DateTime.now());
+                if (!state.loading) _requestTour();
                 return ListView(
                   padding: EdgeInsets.only(bottom: safeBottom(context, AppSizes.s32)),
                   children: [
                     _Showcase(
                       glow: FanCard.paletteFor(state.team).accent,
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        child: state.loading
-                            ? const _FanCardSkeleton(key: ValueKey('skeleton'))
-                            : FanCardTilt(
-                                key: const ValueKey('card'),
-                                front: (sheen) => _buildCard(state, sheen: sheen),
-                                back: (sheen) => _buildBack(state, sheen: sheen),
-                              ),
+                      child: KeyedSubtree(
+                        key: _tourCard,
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          child: state.loading
+                              ? const _FanCardSkeleton(key: ValueKey('skeleton'))
+                              : FanCardTilt(
+                                  key: const ValueKey('card'),
+                                  front: (sheen) => _buildCard(state, sheen: sheen),
+                                  back: (sheen) => _buildBack(state, sheen: sheen),
+                                ),
+                        ),
                       ),
                     ),
                     Padding(
@@ -201,6 +242,7 @@ class _FanCardPageState extends State<FanCardPage> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Row(
+                              key: _tourActions,
                               children: [
                                 Expanded(
                                   child: _QuickAction(
@@ -242,7 +284,11 @@ class _FanCardPageState extends State<FanCardPage> {
                             ],
                             const SizedBox(height: AppSizes.s24),
                             if (board.entries.isNotEmpty)
-                              FormSection(title: l10n.fanCardLevelSection, child: _LevelPanel(board: board)),
+                              FormSection(
+                                key: _tourLevel,
+                                title: l10n.fanCardLevelSection,
+                                child: _LevelPanel(board: board),
+                              ),
                             Text(
                               l10n.fanCardHint,
                               textAlign: TextAlign.center,

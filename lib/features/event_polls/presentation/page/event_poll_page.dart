@@ -23,6 +23,8 @@ import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/features/qr_codes/domain/qr_target.dart';
 import 'package:arena_soccer/features/qr_codes/presentation/page/qr_poster_page.dart';
+import 'package:arena_soccer/core/services/tour_service.dart';
+import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 
 /// Página do evento de votação: cabeçalho com capa, título e prazo; as
 /// opções com foto e o botão do vídeo; votar (escolhe e confirma, voto
@@ -41,6 +43,34 @@ class _EventPollPageState extends State<EventPollPage> {
   late final EventPollCubit _cubit;
   Timer? _clock;
   String? _selected;
+  final _tourHeader = GlobalKey();
+  final _tourOption = GlobalKey();
+  bool _tourRequested = false;
+
+  /// Tour do evento de votação na 1ª visita (evento aberto e ainda sem voto).
+  void _requestTour() {
+    if (_tourRequested) return;
+    _tourRequested = true;
+    final l10n = AppLocalizations.of(context);
+    TourService.request(
+      context,
+      TourIds.eventPoll,
+      () => [
+        TourStep(
+          target: _tourHeader,
+          icon: Icons.how_to_vote_rounded,
+          title: l10n.tourEventPollHeaderTitle,
+          body: l10n.tourEventPollHeaderBody,
+        ),
+        TourStep(
+          target: _tourOption,
+          icon: Icons.touch_app_rounded,
+          title: l10n.tourEventPollOptionTitle,
+          body: l10n.tourEventPollOptionBody,
+        ),
+      ],
+    );
+  }
 
   @override
   void initState() {
@@ -143,6 +173,7 @@ class _EventPollPageState extends State<EventPollPage> {
         final open = event.isOpenAt(now);
         final canVote = open && !state.hasVoted && session.user != null;
         final selected = canVote ? event.optionById(_selected ?? '') : null;
+        if (news != null && canVote) _requestTour();
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -236,7 +267,7 @@ class _EventPollPageState extends State<EventPollPage> {
     return ListView(
       padding: EdgeInsets.only(bottom: selected != null ? AppSizes.s24 : safeBottom(context, AppSizes.s32)),
       children: [
-        _Header(news: news, event: event, now: now),
+        KeyedSubtree(key: _tourHeader, child: _Header(news: news, event: event, now: now)),
         Padding(
           padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, 0),
           child: Column(
@@ -269,17 +300,21 @@ class _EventPollPageState extends State<EventPollPage> {
               ],
               const SizedBox(height: AppSizes.s10),
               for (var i = 0; i < event.options.length; i++)
-                _OptionTile(
-                  key: ValueKey('event-option-${event.options[i].id}'),
-                  option: event.options[i],
-                  number: i + 1,
-                  selectable: canVote,
-                  selected: selected?.id == event.options[i].id,
-                  mine: state.myVote == event.options[i].id,
-                  tally: showResult ? tally : null,
-                  winner: winners.contains(event.options[i].id),
-                  tie: winners.length > 1,
-                  onTap: canVote ? () => setState(() => _selected = event.options[i].id) : null,
+                KeyedSubtree(
+                  // Só a 1ª opção é alvo do tour.
+                  key: i == 0 ? _tourOption : null,
+                  child: _OptionTile(
+                    key: ValueKey('event-option-${event.options[i].id}'),
+                    option: event.options[i],
+                    number: i + 1,
+                    selectable: canVote,
+                    selected: selected?.id == event.options[i].id,
+                    mine: state.myVote == event.options[i].id,
+                    tally: showResult ? tally : null,
+                    winner: winners.contains(event.options[i].id),
+                    tie: winners.length > 1,
+                    onTap: canVote ? () => setState(() => _selected = event.options[i].id) : null,
+                  ),
                 ),
               if (_canShareResult(state, now)) ...[
                 const SizedBox(height: AppSizes.s6),

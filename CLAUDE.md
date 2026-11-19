@@ -71,8 +71,8 @@ UI (Page) -> Cubit -> UseCase -> Repository (impl) -> DataSource -> Firestore/Au
 
 ## Tutoriais (tours)
 
-- Boas-vindas no 1º login (`showWelcomeSheet`, na home) e **dicas no contexto**: spotlight que escurece a tela, destaca o elemento real e explica num cartão (`lib/utils/components/tour/`: `TourStep`, `showTourOverlay`, `TourLayout`). Cada tour aparece uma vez, na 1ª visita (home, menu, abas Tabelas/Times/Campeonatos, álbum); vistos guardados no aparelho (`PreferencesService`), "Rever tutoriais" em Configurações zera.
-- Tour novo: um id em `TourIds` (`lib/core/services/tour_service.dart`), `GlobalKey`s **do State da tela** nos alvos (nunca static: as abas da home convivem no `AnimatedSwitcher`) e `sl<TourService>().show(context, id, () => [TourStep(...)])` depois do 1º frame com o conteúdo na tela. Alvo fora da tela é pulado; tour sem alvo não conta como visto.
+- Boas-vindas no 1º login (`showWelcomeSheet`, na home) e **dicas no contexto**: spotlight que escurece a tela, destaca o elemento real e explica num cartão (`lib/utils/components/tour/`: `TourStep`, `showTourOverlay`, `TourLayout`). Cada tour aparece uma vez, na 1ª visita (home, menu, abas Tabelas/Times/Campeonatos, álbum, bolão, carteirinha, guerra das torcidas, conquistas, detalhe da partida, evento de votação, telas de arte — um id só para todas —, indique amigos, "É você?" do perfil do atleta (só quando o cartão aparece) e "Meu perfil"; no menu, quem já viu o tour `menu` vê o `menu_novidades` com carteirinha, torcidas e indique amigos); vistos guardados no aparelho (`PreferencesService`), "Rever tutoriais" em Configurações zera.
+- Tour novo: um id em `TourIds` (`lib/core/services/tour_service.dart`), `GlobalKey`s **do State da tela** nos alvos (nunca static: as abas da home convivem no `AnimatedSwitcher`) e `TourService.request(context, id, () => [TourStep(...)])` quando o conteúdo está na tela (já espera o frame; sem o serviço registrado — testes de widget das telas — não faz nada). Alvo fora da tela é pulado; tour sem alvo não conta como visto.
 
 ## Fluxo para feature ou tela nova
 

@@ -5,6 +5,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/services/share_service.dart';
+import 'package:arena_soccer/core/services/tour_service.dart';
+import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
 import 'package:arena_soccer/features/share_art/domain/art_format.dart';
 import 'package:arena_soccer/features/share_art/domain/art_palette.dart';
@@ -35,6 +37,47 @@ class ShareArtPage extends StatefulWidget {
 
 class _ShareArtPageState extends State<ShareArtPage> {
   final _artKey = GlobalKey();
+  final _tourTemplates = GlobalKey();
+  final _tourFormat = GlobalKey();
+  final _tourShare = GlobalKey();
+  bool _tourRequested = false;
+
+  /// Tour da arte na 1ª visita (com a arte pronta na tela).
+  void _requestTour() {
+    if (_tourRequested) return;
+    _tourRequested = true;
+    final l10n = AppLocalizations.of(context);
+    TourService.request(
+      context,
+      TourIds.shareArt,
+      () => [
+        TourStep(
+          target: _artKey,
+          icon: Icons.image_rounded,
+          title: l10n.tourArtPreviewTitle,
+          body: l10n.tourArtPreviewBody,
+        ),
+        TourStep(
+          target: _tourTemplates,
+          icon: Icons.style_rounded,
+          title: l10n.tourArtTemplatesTitle,
+          body: l10n.tourArtTemplatesBody,
+        ),
+        TourStep(
+          target: _tourFormat,
+          icon: Icons.aspect_ratio_rounded,
+          title: l10n.tourArtFormatTitle,
+          body: l10n.tourArtFormatBody,
+        ),
+        TourStep(
+          target: _tourShare,
+          icon: Icons.ios_share_rounded,
+          title: l10n.tourArtShareTitle,
+          body: l10n.tourArtShareBody,
+        ),
+      ],
+    );
+  }
 
   /// Escudos já carregados (antes disso, exportar sairia sem eles).
   bool _imagesReady = false;
@@ -146,6 +189,7 @@ class _ShareArtPageState extends State<ShareArtPage> {
         final cubit = BlocProvider.of<ShareArtCubit>(context);
         final data = state.data;
         if (data != null) unawaited(_precache(data));
+        if (data != null && _imagesReady) _requestTour();
         final ready = data != null && _imagesReady && !state.busy;
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -215,6 +259,7 @@ class _ShareArtPageState extends State<ShareArtPage> {
                             ),
                           ),
                         ArtChipRow(
+                          key: _tourTemplates,
                           label: l10n.shareArtTemplate,
                           children: [
                             if (state.preview)
@@ -251,6 +296,7 @@ class _ShareArtPageState extends State<ShareArtPage> {
                         ],
                         const SizedBox(height: AppSizes.s8),
                         ArtChipRow(
+                          key: _tourFormat,
                           label: l10n.shareArtFormat,
                           children: [
                             for (final f in ArtFormat.values)
@@ -269,6 +315,7 @@ class _ShareArtPageState extends State<ShareArtPage> {
                           title: Text(l10n.shareArtQr, style: AppTypography.label(color: AppColors.textPrimary)),
                         ),
                         Row(
+                          key: _tourShare,
                           children: [
                             ArtShareAction(
                               icon: Icons.download_rounded,

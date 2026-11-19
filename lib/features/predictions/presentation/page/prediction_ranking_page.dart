@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
+import 'package:arena_soccer/core/services/tour_service.dart';
 import 'package:arena_soccer/core/services/share_service.dart';
 import 'package:arena_soccer/core/utils/share_links.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
@@ -18,6 +19,7 @@ import 'package:arena_soccer/features/regions/presentation/widgets/region_picker
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/safe_bottom.dart';
+import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
@@ -45,6 +47,41 @@ class _PredictionHubPageState extends State<PredictionHubPage> with SingleTicker
       if (!_tabs.indexIsChanging && mounted) setState(() {});
     });
   Timer? _clock;
+  final _tourHero = GlobalKey();
+  final _tourMatch = GlobalKey();
+  final _tourTabs = GlobalKey();
+  bool _tourRequested = false;
+
+  /// Tour do bolão na 1ª visita (com a central carregada).
+  void _requestTour() {
+    if (_tourRequested) return;
+    _tourRequested = true;
+    final l10n = AppLocalizations.of(context);
+    TourService.request(
+      context,
+      TourIds.predictions,
+      () => [
+        TourStep(
+          target: _tourHero,
+          icon: Icons.emoji_events_rounded,
+          title: l10n.tourPredictionsHeroTitle,
+          body: l10n.tourPredictionsHeroBody,
+        ),
+        TourStep(
+          target: _tourMatch,
+          icon: Icons.sports_soccer_rounded,
+          title: l10n.tourPredictionsMatchTitle,
+          body: l10n.tourPredictionsMatchBody,
+        ),
+        TourStep(
+          target: _tourTabs,
+          icon: Icons.leaderboard_rounded,
+          title: l10n.tourPredictionsTabsTitle,
+          body: l10n.tourPredictionsTabsBody,
+        ),
+      ],
+    );
+  }
 
   @override
   void initState() {
@@ -126,6 +163,7 @@ class _PredictionHubPageState extends State<PredictionHubPage> with SingleTicker
         final myIndex = uid.isEmpty ? -1 : state.entries.indexWhere((e) => e.uid == uid);
         final myPosition = myIndex >= 0 ? state.positionAt(myIndex) : state.myPosition;
         final onRanking = _tabs.index == 1;
+        if (!state.loading) _requestTour();
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -161,17 +199,20 @@ class _PredictionHubPageState extends State<PredictionHubPage> with SingleTicker
           body: NestedScrollView(
             headerSliverBuilder: (context, _) => [
               SliverToBoxAdapter(
-                child: HubHero(
-                  region: state.region,
-                  loggedIn: uid.isNotEmpty,
-                  mine: state.mine,
-                  position: myPosition,
-                  chase: PredictionHub.chase(state.entries, state.mine),
-                  leader: PredictionHub.leads(state.entries, state.mine),
-                  onSignIn: () => Navigator.pushNamedAndRemoveUntil(context, AppRoutes.loginPage, (_) => false),
+                child: KeyedSubtree(
+                  key: _tourHero,
+                  child: HubHero(
+                    region: state.region,
+                    loggedIn: uid.isNotEmpty,
+                    mine: state.mine,
+                    position: myPosition,
+                    chase: PredictionHub.chase(state.entries, state.mine),
+                    leader: PredictionHub.leads(state.entries, state.mine),
+                    onSignIn: () => Navigator.pushNamedAndRemoveUntil(context, AppRoutes.loginPage, (_) => false),
+                  ),
                 ),
               ),
-              SliverPersistentHeader(pinned: true, delegate: _TabsHeader(_tabs, l10n)),
+              SliverPersistentHeader(pinned: true, delegate: _TabsHeader(_tabs, l10n, tourKey: _tourTabs)),
             ],
             body: TabBarView(
               controller: _tabs,
@@ -180,6 +221,7 @@ class _PredictionHubPageState extends State<PredictionHubPage> with SingleTicker
                   state: state,
                   loggedIn: uid.isNotEmpty,
                   now: now,
+                  featuredKey: _tourMatch,
                   onRefresh: () => _load(state.region),
                   onPredict: (match) => _predict(match, state),
                   onOpenMatch: (match) => _openMatch(match, state),
@@ -245,8 +287,9 @@ class _RegionPill extends StatelessWidget {
 class _TabsHeader extends SliverPersistentHeaderDelegate {
   final TabController controller;
   final AppLocalizations l10n;
+  final Key? tourKey;
 
-  _TabsHeader(this.controller, this.l10n);
+  _TabsHeader(this.controller, this.l10n, {this.tourKey});
 
   @override
   double get minExtent => kTextTabBarHeight;
@@ -260,6 +303,7 @@ class _TabsHeader extends SliverPersistentHeaderDelegate {
       color: AppColors.surface,
       elevation: overlapsContent ? 2 : 0,
       child: TabBar(
+        key: tourKey,
         controller: controller,
         labelColor: AppColors.primaryDark,
         unselectedLabelColor: AppColors.textSecondary,
@@ -284,6 +328,7 @@ class _PlayTab extends StatelessWidget {
   final PredictionHubState state;
   final bool loggedIn;
   final DateTime now;
+  final Key? featuredKey;
   final Future<void> Function() onRefresh;
   final ValueChanged<MatchDTO> onPredict;
   final ValueChanged<MatchDTO> onOpenMatch;
@@ -292,6 +337,7 @@ class _PlayTab extends StatelessWidget {
     required this.state,
     required this.loggedIn,
     required this.now,
+    this.featuredKey,
     required this.onRefresh,
     required this.onPredict,
     required this.onOpenMatch,
@@ -317,6 +363,7 @@ class _PlayTab extends StatelessWidget {
             ArenaEmptyState(message: l10n.predictionHubNoUpcoming, icon: Icons.event_busy_rounded)
           else ...[
             HubFeaturedMatch(
+              key: featuredKey,
               match: upcoming.first,
               teams: state.teams,
               prediction: state.predictions[upcoming.first.id],

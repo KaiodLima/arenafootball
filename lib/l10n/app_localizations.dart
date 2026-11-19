@@ -4739,6 +4739,390 @@ abstract class AppLocalizations {
   /// **'Veja suas repetidas e dispute o ranking de colecionadores.'**
   String get tourAlbumTabsBody;
 
+  /// No description provided for @tourPredictionsHeroTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu bolão'**
+  String get tourPredictionsHeroTitle;
+
+  /// No description provided for @tourPredictionsHeroBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua posição, pontos e quantos faltam para passar o próximo. Exato vale 10, vencedor e saldo 7, só o vencedor 5.'**
+  String get tourPredictionsHeroBody;
+
+  /// No description provided for @tourPredictionsMatchTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Palpite antes do jogo'**
+  String get tourPredictionsMatchTitle;
+
+  /// No description provided for @tourPredictionsMatchBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Toque em \"Palpitar\" e escolha o placar. Dá para mudar até a partida começar.'**
+  String get tourPredictionsMatchBody;
+
+  /// No description provided for @tourPredictionsTabsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Palpitar e ranking'**
+  String get tourPredictionsTabsTitle;
+
+  /// No description provided for @tourPredictionsTabsBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Troque de aba para ver o ranking da região e desafiar os amigos.'**
+  String get tourPredictionsTabsBody;
+
+  /// No description provided for @tourFanCardCardTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua carteirinha'**
+  String get tourFanCardCardTitle;
+
+  /// No description provided for @tourFanCardCardBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Incline o celular para ver o brilho e toque para virar o cartão.'**
+  String get tourFanCardCardBody;
+
+  /// No description provided for @tourFanCardActionsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compartilhar, foto e time'**
+  String get tourFanCardActionsTitle;
+
+  /// No description provided for @tourFanCardActionsBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mande a carteirinha para os amigos, troque a foto ou o time do coração.'**
+  String get tourFanCardActionsBody;
+
+  /// No description provided for @tourFanCardLevelTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu nível de torcedor'**
+  String get tourFanCardLevelTitle;
+
+  /// No description provided for @tourFanCardLevelBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Suba de nível ganhando conquistas no app.'**
+  String get tourFanCardLevelBody;
+
+  /// No description provided for @tourFanRankingScopeTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Região ou geral'**
+  String get tourFanRankingScopeTitle;
+
+  /// No description provided for @tourFanRankingScopeBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Veja as maiores torcidas da sua região ou do app inteiro.'**
+  String get tourFanRankingScopeBody;
+
+  /// No description provided for @tourFanRankingLeaderTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'A maior torcida'**
+  String get tourFanRankingLeaderTitle;
+
+  /// No description provided for @tourFanRankingLeaderBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem lidera, com quantos torcedores e a fatia de cada time.'**
+  String get tourFanRankingLeaderBody;
+
+  /// No description provided for @tourFanRankingMineTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua torcida'**
+  String get tourFanRankingMineTitle;
+
+  /// No description provided for @tourFanRankingMineBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Veja a posição do seu time e convoque mais torcedores para subir.'**
+  String get tourFanRankingMineBody;
+
+  /// No description provided for @tourAchievementsLevelTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nível e XP'**
+  String get tourAchievementsLevelTitle;
+
+  /// No description provided for @tourAchievementsLevelBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cada conquista dá XP e sobe o seu nível de torcedor.'**
+  String get tourAchievementsLevelBody;
+
+  /// No description provided for @tourAchievementsAlmostTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quase lá'**
+  String get tourAchievementsAlmostTitle;
+
+  /// No description provided for @tourAchievementsAlmostBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'A próxima medalha que você está perto de ganhar.'**
+  String get tourAchievementsAlmostBody;
+
+  /// No description provided for @tourAchievementsShelfTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Medalhas por categoria'**
+  String get tourAchievementsShelfTitle;
+
+  /// No description provided for @tourAchievementsShelfBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Toque numa medalha para ver como ganhar.'**
+  String get tourAchievementsShelfBody;
+
+  /// No description provided for @tourMatchArtTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gerar arte'**
+  String get tourMatchArtTitle;
+
+  /// No description provided for @tourMatchArtBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Monte uma arte do jogo para postar no Instagram ou mandar no WhatsApp.'**
+  String get tourMatchArtBody;
+
+  /// No description provided for @tourMatchBestPlayerTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Craque da partida'**
+  String get tourMatchBestPlayerTitle;
+
+  /// No description provided for @tourMatchBestPlayerBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quando a votação abrir, vote aqui no melhor jogador do jogo.'**
+  String get tourMatchBestPlayerBody;
+
+  /// No description provided for @tourMatchPredictionTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu palpite'**
+  String get tourMatchPredictionTitle;
+
+  /// No description provided for @tourMatchPredictionBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Palpite o placar antes do jogo e ganhe pontos no bolão.'**
+  String get tourMatchPredictionBody;
+
+  /// No description provided for @tourEventPollHeaderTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Evento de votação'**
+  String get tourEventPollHeaderTitle;
+
+  /// No description provided for @tourEventPollHeaderBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fica aberto até o prazo. O resultado sai no encerramento.'**
+  String get tourEventPollHeaderBody;
+
+  /// No description provided for @tourEventPollOptionTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha a sua'**
+  String get tourEventPollOptionTitle;
+
+  /// No description provided for @tourEventPollOptionBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Toque numa opção e confirme. Você vota uma vez só; o botão do vídeo abre o lance na rede.'**
+  String get tourEventPollOptionBody;
+
+  /// No description provided for @tourArtPreviewTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua arte'**
+  String get tourArtPreviewTitle;
+
+  /// No description provided for @tourArtPreviewBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'A prévia mostra a arte do jeito que vai ser salva.'**
+  String get tourArtPreviewBody;
+
+  /// No description provided for @tourArtFramingTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ajuste a foto'**
+  String get tourArtFramingTitle;
+
+  /// No description provided for @tourArtFramingBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arraste para mover e use a pinça para dar zoom. Também dá para usar uma foto da galeria.'**
+  String get tourArtFramingBody;
+
+  /// No description provided for @tourArtTemplatesTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Modelos'**
+  String get tourArtTemplatesTitle;
+
+  /// No description provided for @tourArtTemplatesBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Troque o modelo para mudar o visual da arte.'**
+  String get tourArtTemplatesBody;
+
+  /// No description provided for @tourArtFormatTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Formato'**
+  String get tourArtFormatTitle;
+
+  /// No description provided for @tourArtFormatBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Feed, story, quadrado ou paisagem: no tamanho certo de cada rede.'**
+  String get tourArtFormatBody;
+
+  /// No description provided for @tourArtShareTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salvar e compartilhar'**
+  String get tourArtShareTitle;
+
+  /// No description provided for @tourArtShareBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salve na galeria ou mande direto no Instagram e no WhatsApp.'**
+  String get tourArtShareBody;
+
+  /// No description provided for @tourReferralInviteTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu convite'**
+  String get tourReferralInviteTitle;
+
+  /// No description provided for @tourReferralInviteBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mande o seu link. Quando o amigo entrar e escolher o time, os dois ganham um pacotinho extra.'**
+  String get tourReferralInviteBody;
+
+  /// No description provided for @tourReferralStatsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Suas indicações'**
+  String get tourReferralStatsTitle;
+
+  /// No description provided for @tourReferralStatsBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quantos amigos entraram e os pacotinhos extras guardados.'**
+  String get tourReferralStatsBody;
+
+  /// No description provided for @tourReferralClaimTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Foi indicado?'**
+  String get tourReferralClaimTitle;
+
+  /// No description provided for @tourReferralClaimBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Coloque aqui o código de quem te convidou.'**
+  String get tourReferralClaimBody;
+
+  /// No description provided for @tourPlayerClaimTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'É você?'**
+  String get tourPlayerClaimTitle;
+
+  /// No description provided for @tourPlayerClaimBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Se esse atleta é você, peça para vincular à sua conta e tenha o seu perfil.'**
+  String get tourPlayerClaimBody;
+
+  /// No description provided for @tourProfilePhotoTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sua foto'**
+  String get tourProfilePhotoTitle;
+
+  /// No description provided for @tourProfilePhotoBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Toque para trocar a foto da conta. Ela aparece na carteirinha.'**
+  String get tourProfilePhotoBody;
+
+  /// No description provided for @tourProfileNameTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu nome'**
+  String get tourProfileNameTitle;
+
+  /// No description provided for @tourProfileNameBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'O nome que aparece nos rankings e votações.'**
+  String get tourProfileNameBody;
+
+  /// No description provided for @tourProfileTeamTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Time do coração'**
+  String get tourProfileTeamTitle;
+
+  /// No description provided for @tourProfileTeamBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dá para trocar uma vez a cada 15 dias.'**
+  String get tourProfileTeamBody;
+
+  /// No description provided for @tourDrawerFanCardTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Minha carteirinha'**
+  String get tourDrawerFanCardTitle;
+
+  /// No description provided for @tourDrawerFanCardBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu cartão de torcedor nas cores do seu time.'**
+  String get tourDrawerFanCardBody;
+
+  /// No description provided for @tourDrawerFanRankingTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Guerra das torcidas'**
+  String get tourDrawerFanRankingTitle;
+
+  /// No description provided for @tourDrawerFanRankingBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Qual time tem mais torcedores no app.'**
+  String get tourDrawerFanRankingBody;
+
+  /// No description provided for @tourDrawerReferralTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Indique amigos'**
+  String get tourDrawerReferralTitle;
+
+  /// No description provided for @tourDrawerReferralBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Convide amigos e ganhe pacotinhos extras do álbum.'**
+  String get tourDrawerReferralBody;
+
   /// No description provided for @settingsHelpSection.
   ///
   /// In pt, this message translates to:

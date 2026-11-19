@@ -145,6 +145,7 @@ class HomeDrawer extends StatelessWidget {
           onTap: () => _open(context, AppRoutes.achievementsPage),
         ),
       _Shortcut(
+        key: tourKeys?.fanRanking,
         icon: Icons.groups_rounded,
         title: l10n.fanRankingTitle,
         color: AppColors.teamOrange,
@@ -152,6 +153,7 @@ class HomeDrawer extends StatelessWidget {
       ),
       if (loggedIn)
         _Shortcut(
+          key: tourKeys?.fanCard,
           icon: Icons.badge_rounded,
           title: l10n.fanCardMenu,
           color: AppColors.teamBlue,
@@ -159,6 +161,7 @@ class HomeDrawer extends StatelessWidget {
         ),
       if (loggedIn && referrals)
         _Shortcut(
+          key: tourKeys?.referral,
           icon: Icons.group_add_rounded,
           title: l10n.referralTitle,
           color: AppColors.teamPurple,
@@ -1059,4 +1062,7 @@ class HomeDrawerTourKeys {
   final predictions = GlobalKey();
   final achievements = GlobalKey();
   final player = GlobalKey();
+  final fanCard = GlobalKey();
+  final fanRanking = GlobalKey();
+  final referral = GlobalKey();
 }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/services/share_service.dart';
+import 'package:arena_soccer/core/services/tour_service.dart';
+import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 import 'package:arena_soccer/core/utils/share_links.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/referrals/data/dtos/referral_dto.dart';
@@ -32,6 +34,41 @@ class ReferralPage extends StatefulWidget {
 class _ReferralPageState extends State<ReferralPage> {
   late final ReferralCubit _cubit;
   final _codeController = TextEditingController();
+  final _tourInvite = GlobalKey();
+  final _tourStats = GlobalKey();
+  final _tourClaim = GlobalKey();
+  bool _tourRequested = false;
+
+  /// Tour do "Indique amigos" na 1ª visita (com o conteúdo carregado).
+  void _requestTour() {
+    if (_tourRequested) return;
+    _tourRequested = true;
+    final l10n = AppLocalizations.of(context);
+    TourService.request(
+      context,
+      TourIds.referrals,
+      () => [
+        TourStep(
+          target: _tourInvite,
+          icon: Icons.card_giftcard_rounded,
+          title: l10n.tourReferralInviteTitle,
+          body: l10n.tourReferralInviteBody,
+        ),
+        TourStep(
+          target: _tourStats,
+          icon: Icons.groups_rounded,
+          title: l10n.tourReferralStatsTitle,
+          body: l10n.tourReferralStatsBody,
+        ),
+        TourStep(
+          target: _tourClaim,
+          icon: Icons.redeem_rounded,
+          title: l10n.tourReferralClaimTitle,
+          body: l10n.tourReferralClaimBody,
+        ),
+      ],
+    );
+  }
 
   @override
   void initState() {
@@ -117,22 +154,29 @@ class _ReferralPageState extends State<ReferralPage> {
           if (state.loading) {
             return const Center(child: CircularProgressIndicator(color: AppColors.primary));
           }
+          _requestTour();
           return ListView(
             padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s32)),
             children: [
-              _InviteCard(
-                code: state.code,
-                onCopy: state.code.isEmpty ? null : () => _copy(state.code),
-                onShare: state.code.isEmpty ? null : () => _share(state.code),
+              KeyedSubtree(
+                key: _tourInvite,
+                child: _InviteCard(
+                  code: state.code,
+                  onCopy: state.code.isEmpty ? null : () => _copy(state.code),
+                  onShare: state.code.isEmpty ? null : () => _share(state.code),
+                ),
               ),
               const SizedBox(height: AppSizes.s16),
-              _Stats(referral: state.referral),
+              KeyedSubtree(key: _tourStats, child: _Stats(referral: state.referral)),
               if (state.canClaim || state.claimedCode.isNotEmpty) ...[
                 const SizedBox(height: AppSizes.s16),
-                _ClaimCard(
-                  state: state,
-                  controller: _codeController,
-                  onClaim: () => _cubit.claim(_codeController.text),
+                KeyedSubtree(
+                  key: _tourClaim,
+                  child: _ClaimCard(
+                    state: state,
+                    controller: _codeController,
+                    onClaim: () => _cubit.claim(_codeController.text),
+                  ),
                 ),
               ],
               const SizedBox(height: AppSizes.s20),

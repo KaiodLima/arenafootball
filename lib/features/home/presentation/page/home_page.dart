@@ -148,10 +148,44 @@ class _HomePageState extends State<HomePage> {
       ];
 
   /// 1ª vez que abre o menu: o tour dele (quando o menu termina de abrir).
-  void _onDrawerChanged(bool open) {
+  /// Já visto, o das novidades do menu (carteirinha, torcidas, indicação).
+  Future<void> _onDrawerChanged(bool open) async {
     if (!open) return;
     final l10n = AppLocalizations.of(context);
-    sl<TourService>().show(
+    final tours = sl<TourService>();
+    final loggedIn = BlocProvider.of<SessionCubit>(context).state.user != null;
+    if (await tours.isSeen(TourIds.drawer)) {
+      // Convidado não tem carteirinha nem indicação: as novidades ficam para
+      // depois do login (senão o tour seria gasto só com a guerra das torcidas).
+      if (!mounted || !loggedIn) return;
+      return tours.show(
+        context,
+        TourIds.drawerNews,
+        () => [
+          TourStep(
+              target: _drawerTour.fanCard,
+              icon: Icons.badge_rounded,
+              title: l10n.tourDrawerFanCardTitle,
+              body: l10n.tourDrawerFanCardBody,
+              padding: 2),
+          TourStep(
+              target: _drawerTour.fanRanking,
+              icon: Icons.groups_rounded,
+              title: l10n.tourDrawerFanRankingTitle,
+              body: l10n.tourDrawerFanRankingBody,
+              padding: 2),
+          TourStep(
+              target: _drawerTour.referral,
+              icon: Icons.card_giftcard_rounded,
+              title: l10n.tourDrawerReferralTitle,
+              body: l10n.tourDrawerReferralBody,
+              padding: 2),
+        ],
+        delay: const Duration(milliseconds: 400),
+      );
+    }
+    if (!mounted) return;
+    await tours.show(
       context,
       TourIds.drawer,
       () => [

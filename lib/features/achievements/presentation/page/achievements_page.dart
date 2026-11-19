@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/services/tour_service.dart';
 import 'package:arena_soccer/features/achievements/domain/achievement_board.dart';
 import 'package:arena_soccer/features/achievements/domain/achievement_metric.dart';
 import 'package:arena_soccer/features/achievements/presentation/bloc/achievements_cubit.dart';
@@ -17,6 +18,7 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/components/safe_bottom.dart';
+import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 
 /// Tier do emblema de cada nível do torcedor.
 AchievementTier _levelTier(FanLevel level) => switch (level) {
@@ -39,6 +41,42 @@ class AchievementsPage extends StatefulWidget {
 class _AchievementsPageState extends State<AchievementsPage> with SingleTickerProviderStateMixin {
   late final AnimationController _reveal =
       AnimationController(vsync: this, duration: const Duration(milliseconds: 1400));
+  final _tourLevel = GlobalKey();
+  final _tourAlmost = GlobalKey();
+  final _tourShelf = GlobalKey();
+  bool _tourRequested = false;
+
+  /// Tour das conquistas na 1ª visita (depois da entrada das medalhas).
+  void _requestTour() {
+    if (_tourRequested) return;
+    _tourRequested = true;
+    final l10n = AppLocalizations.of(context);
+    TourService.request(
+      context,
+      TourIds.achievements,
+      () => [
+        TourStep(
+          target: _tourLevel,
+          icon: Icons.military_tech_rounded,
+          title: l10n.tourAchievementsLevelTitle,
+          body: l10n.tourAchievementsLevelBody,
+        ),
+        TourStep(
+          target: _tourAlmost,
+          icon: Icons.flag_rounded,
+          title: l10n.tourAchievementsAlmostTitle,
+          body: l10n.tourAchievementsAlmostBody,
+        ),
+        TourStep(
+          target: _tourShelf,
+          icon: Icons.workspace_premium_rounded,
+          title: l10n.tourAchievementsShelfTitle,
+          body: l10n.tourAchievementsShelfBody,
+        ),
+      ],
+      delay: const Duration(milliseconds: 900),
+    );
+  }
 
   @override
   void didChangeDependencies() {
@@ -70,6 +108,7 @@ class _AchievementsPageState extends State<AchievementsPage> with SingleTickerPr
             if (board.entries.any((e) => e.achievement.category == category)) category,
         ];
         var shelfIndex = 0;
+        if (!state.loading && board.entries.isNotEmpty) _requestTour();
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -87,7 +126,7 @@ class _AchievementsPageState extends State<AchievementsPage> with SingleTickerPr
                 ),
                 flexibleSpace: FlexibleSpaceBar(
                   collapseMode: CollapseMode.parallax,
-                  background: _TrophyHeader(board: board, name: name, reveal: _reveal),
+                  background: _TrophyHeader(board: board, name: name, reveal: _reveal, statsKey: _tourLevel),
                 ),
               ),
               if (state.loading && board.entries.isEmpty)
@@ -105,13 +144,17 @@ class _AchievementsPageState extends State<AchievementsPage> with SingleTickerPr
                   padding: const EdgeInsets.only(bottom: AppSizes.s32),
                   sliver: SliverList.list(
                     children: [
-                      if (almost != null) _AlmostThereCard(entry: almost),
+                      if (almost != null) KeyedSubtree(key: _tourAlmost, child: _AlmostThereCard(entry: almost)),
                       for (final category in categories)
-                        _CategoryShelf(
-                          category: category,
-                          entries: board.shelfOf(category),
-                          reveal: _reveal,
-                          order: shelfIndex++,
+                        KeyedSubtree(
+                          // Só a 1ª prateleira é alvo do tour.
+                          key: shelfIndex == 0 ? _tourShelf : null,
+                          child: _CategoryShelf(
+                            category: category,
+                            entries: board.shelfOf(category),
+                            reveal: _reveal,
+                            order: shelfIndex++,
+                          ),
                         ),
                     ],
                   ),
@@ -130,8 +173,9 @@ class _TrophyHeader extends StatelessWidget {
   final AchievementBoard board;
   final String name;
   final Animation<double> reveal;
+  final Key? statsKey;
 
-  const _TrophyHeader({required this.board, required this.name, required this.reveal});
+  const _TrophyHeader({required this.board, required this.name, required this.reveal, this.statsKey});
 
   @override
   Widget build(BuildContext context) {
@@ -197,6 +241,7 @@ class _TrophyHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSizes.s16),
                 Row(
+                  key: statsKey,
                   children: [
                     _StatCard(
                         icon: Icons.military_tech_rounded,

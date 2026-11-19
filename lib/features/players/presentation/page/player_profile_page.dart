@@ -44,6 +44,8 @@ import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
 import 'package:arena_soccer/features/player_requests/domain/player_claim_args.dart';
 import 'package:arena_soccer/features/player_requests/presentation/bloc/my_player_cubit.dart';
+import 'package:arena_soccer/core/services/tour_service.dart';
+import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 
 /// Tela do atleta: foto, nome e time no topo; gols e assistências com a
 /// posição nos rankings da região; os cards de gol em que participou. O
@@ -82,6 +84,27 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
 
   /// O seletor pedido pela rota já abriu (só uma vez).
   bool _pickerOpened = false;
+
+  final _tourClaim = GlobalKey();
+  bool _tourRequested = false;
+
+  /// Tour do "É você?": só quando o cartão aparece (sem ele, não gasta o tour).
+  void _requestTour(AppLocalizations l10n) {
+    if (_tourRequested) return;
+    _tourRequested = true;
+    TourService.request(
+      context,
+      TourIds.playerClaim,
+      () => [
+        TourStep(
+          target: _tourClaim,
+          icon: Icons.person_search_rounded,
+          title: l10n.tourPlayerClaimTitle,
+          body: l10n.tourPlayerClaimBody,
+        ),
+      ],
+    );
+  }
 
   /// O próprio atleta troca a foto: escolhe, confirma e grava só a foto.
   Future<void> _pickOwnPhoto(AppLocalizations l10n) async {
@@ -197,6 +220,7 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
             player.userId.isEmpty &&
             player.team.trim().isNotEmpty &&
             (widget.season == null || widget.season == SeasonCollection.currentSeason);
+        if (canClaim) _requestTour(l10n);
         if (self && widget.openPhotoPicker && !_pickerOpened) {
           _pickerOpened = true;
           WidgetsBinding.instance.addPostFrameCallback((_) => _pickOwnPhoto(l10n));
@@ -242,6 +266,7 @@ class _PlayerProfilePageState extends State<PlayerProfilePage> {
                 isAdmin: editor,
                 onChangeOwnPhoto: self ? () => _pickOwnPhoto(l10n) : null,
                 onClaim: canClaim ? () => _claim(state) : null,
+                claimKey: _tourClaim,
                 season: widget.season,
               ),
           },
@@ -314,6 +339,9 @@ class _Content extends StatelessWidget {
   /// "É você?": pedir o vínculo pelo "Sou jogador".
   final VoidCallback? onClaim;
 
+  /// Alvo do tour no cartão "É você?".
+  final Key? claimKey;
+
   const _Content({
     required this.state,
     required this.player,
@@ -321,6 +349,7 @@ class _Content extends StatelessWidget {
     required this.season,
     this.onChangeOwnPhoto,
     this.onClaim,
+    this.claimKey,
   });
 
   @override
@@ -331,7 +360,7 @@ class _Content extends StatelessWidget {
       padding: EdgeInsets.only(bottom: safeBottom(context, AppSizes.s32)),
       children: [
         _HeroBox(child: _Header(state: state, player: player, onChangeOwnPhoto: onChangeOwnPhoto)),
-        if (onClaim != null) _ClaimCallout(player: player, onTap: onClaim!),
+        if (onClaim != null) _ClaimCallout(key: claimKey, player: player, onTap: onClaim!),
         Padding(
           padding: const EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, 0),
           child: Row(
@@ -1145,7 +1174,7 @@ class _ClaimCallout extends StatelessWidget {
   final PlayerDTO player;
   final VoidCallback onTap;
 
-  const _ClaimCallout({required this.player, required this.onTap});
+  const _ClaimCallout({super.key, required this.player, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

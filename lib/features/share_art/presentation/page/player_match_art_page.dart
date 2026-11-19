@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:arena_soccer/core/services/share_service.dart';
+import 'package:arena_soccer/core/services/tour_service.dart';
+import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 import 'package:arena_soccer/core/utils/app_logger.dart';
 import 'package:arena_soccer/features/share_art/domain/art_format.dart';
 import 'package:arena_soccer/features/share_art/domain/art_palette.dart';
@@ -36,6 +38,54 @@ class PlayerMatchArtPage extends StatefulWidget {
 
 class _PlayerMatchArtPageState extends State<PlayerMatchArtPage> {
   final _artKey = GlobalKey();
+  final _tourTemplates = GlobalKey();
+  final _tourFormat = GlobalKey();
+  final _tourShare = GlobalKey();
+  final _tourFraming = GlobalKey();
+  bool _tourRequested = false;
+
+  /// Tour da arte na 1ª visita (com a arte pronta na tela).
+  void _requestTour() {
+    if (_tourRequested) return;
+    _tourRequested = true;
+    final l10n = AppLocalizations.of(context);
+    TourService.request(
+      context,
+      TourIds.shareArt,
+      () => [
+        TourStep(
+          target: _artKey,
+          icon: Icons.image_rounded,
+          title: l10n.tourArtPreviewTitle,
+          body: l10n.tourArtPreviewBody,
+        ),
+        TourStep(
+          target: _tourFraming,
+          icon: Icons.open_with_rounded,
+          title: l10n.tourArtFramingTitle,
+          body: l10n.tourArtFramingBody,
+        ),
+        TourStep(
+          target: _tourTemplates,
+          icon: Icons.style_rounded,
+          title: l10n.tourArtTemplatesTitle,
+          body: l10n.tourArtTemplatesBody,
+        ),
+        TourStep(
+          target: _tourFormat,
+          icon: Icons.aspect_ratio_rounded,
+          title: l10n.tourArtFormatTitle,
+          body: l10n.tourArtFormatBody,
+        ),
+        TourStep(
+          target: _tourShare,
+          icon: Icons.ios_share_rounded,
+          title: l10n.tourArtShareTitle,
+          body: l10n.tourArtShareBody,
+        ),
+      ],
+    );
+  }
   bool _imagesReady = false;
   bool _precacheStarted = false;
 
@@ -144,6 +194,7 @@ class _PlayerMatchArtPageState extends State<PlayerMatchArtPage> {
         final cubit = BlocProvider.of<PlayerMatchArtCubit>(context);
         final data = state.data;
         if (data != null) unawaited(_precache(data));
+        if (data != null && _imagesReady) _requestTour();
         final ready = data != null && _imagesReady && !state.busy;
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -195,6 +246,7 @@ class _PlayerMatchArtPageState extends State<PlayerMatchArtPage> {
                       ),
                     ),
                     ArtFramingHint(
+                      key: _tourFraming,
                       hint: data.player.photoUrl.isNotEmpty || state.localPhoto != null
                           ? l10n.shareArtFramingHint
                           : l10n.shareArtNoPhotoHint,
@@ -208,6 +260,7 @@ class _PlayerMatchArtPageState extends State<PlayerMatchArtPage> {
                     ArtControlsPanel(
                       children: [
                         ArtChipRow(
+                          key: _tourTemplates,
                           label: l10n.shareArtTemplate,
                           children: [
                             for (final t in PlayerMatchArtTemplate.values)
@@ -234,6 +287,7 @@ class _PlayerMatchArtPageState extends State<PlayerMatchArtPage> {
                         ),
                         const SizedBox(height: AppSizes.s8),
                         ArtChipRow(
+                          key: _tourFormat,
                           label: l10n.shareArtFormat,
                           children: [
                             for (final f in ArtFormat.values)
@@ -252,6 +306,7 @@ class _PlayerMatchArtPageState extends State<PlayerMatchArtPage> {
                           title: Text(l10n.shareArtQr, style: AppTypography.label(color: AppColors.textPrimary)),
                         ),
                         Row(
+                          key: _tourShare,
                           children: [
                             ArtShareAction(
                               icon: Icons.download_rounded,

@@ -26,12 +26,14 @@ import 'package:arena_soccer/utils/components/safe_bottom.dart';
 import 'package:arena_soccer/features/qr_codes/presentation/page/qr_poster_page.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_round_picker.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/matchday_widgets.dart';
+import 'package:arena_soccer/core/services/tour_service.dart';
+import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 
 /// Detalhes da partida: cabeçalho com as cores dos dois times, escudos e
 /// placar (antes do jogo, o horário), depois os gols em linha do tempo, o
 /// melhor da partida e os elencos. O admin edita o placar, lança o card de
 /// gol e abre/fecha a votação pelo menu ⋮.
-class MatchDetailsPage extends StatelessWidget {
+class MatchDetailsPage extends StatefulWidget {
   final String? season;
   final String? homeCrest;
   final String? awayCrest;
@@ -55,6 +57,55 @@ class MatchDetailsPage extends StatelessWidget {
   /// no verde escuro do app.
   static Color headerColor(Color? color) =>
       color == null || isLightColor(color) ? AppColors.primaryDark : Color.lerp(color, AppColors.black, 0.2)!;
+
+  @override
+  State<MatchDetailsPage> createState() => _MatchDetailsPageState();
+}
+
+class _MatchDetailsPageState extends State<MatchDetailsPage> {
+  final _tourArt = GlobalKey();
+  final _tourBestPlayer = GlobalKey();
+  final _tourPrediction = GlobalKey();
+  bool _tourRequested = false;
+
+  String? get season => widget.season;
+  String? get homeCrest => widget.homeCrest;
+  String? get awayCrest => widget.awayCrest;
+  Color? get homeColor => widget.homeColor;
+  Color? get awayColor => widget.awayColor;
+  String? get championshipLabel => widget.championshipLabel;
+
+  /// Tour do detalhe da partida na 1ª visita (arte, craque e palpite).
+  void _requestTour() {
+    if (_tourRequested) return;
+    _tourRequested = true;
+    final l10n = AppLocalizations.of(context);
+    TourService.request(
+      context,
+      TourIds.matchDetails,
+      () => [
+        TourStep(
+          target: _tourArt,
+          icon: Icons.auto_awesome_rounded,
+          title: l10n.tourMatchArtTitle,
+          body: l10n.tourMatchArtBody,
+          shape: TourShape.circle,
+        ),
+        TourStep(
+          target: _tourBestPlayer,
+          icon: Icons.star_rounded,
+          title: l10n.tourMatchBestPlayerTitle,
+          body: l10n.tourMatchBestPlayerBody,
+        ),
+        TourStep(
+          target: _tourPrediction,
+          icon: Icons.sports_soccer_rounded,
+          title: l10n.tourMatchPredictionTitle,
+          body: l10n.tourMatchPredictionBody,
+        ),
+      ],
+    );
+  }
 
   void _openVoting(BuildContext context, MatchDetailsState state) {
     Navigator.pushNamed(
@@ -82,8 +133,9 @@ class MatchDetailsPage extends StatelessWidget {
         ].join('  ·  ');
         final now = DateTime.now();
         final status = MatchCardStatus.of(match, now);
-        final home = headerColor(homeColor);
-        final away = headerColor(awayColor);
+        final home = MatchDetailsPage.headerColor(homeColor);
+        final away = MatchDetailsPage.headerColor(awayColor);
+        if (!state.deleted) _requestTour();
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -127,6 +179,7 @@ class MatchDetailsPage extends StatelessWidget {
                   // Arte do resultado para as redes (todos).
                   if (!state.deleted)
                     IconButton(
+                      key: _tourArt,
                       tooltip: l10n.shareArtTitle,
                       icon: const Icon(Icons.auto_awesome_rounded),
                       onPressed: () => Navigator.pushNamed(
@@ -258,16 +311,22 @@ class MatchDetailsPage extends StatelessWidget {
                   sliver: SliverList.list(
                     children: [
                       MatchGoalsTimeline(match: match),
-                      MatchBestPlayerCard(
-                        match: match,
-                        player: state.bestPlayer,
-                        onTap: () => _openVoting(context, state),
+                      KeyedSubtree(
+                        key: _tourBestPlayer,
+                        child: MatchBestPlayerCard(
+                          match: match,
+                          player: state.bestPlayer,
+                          onTap: () => _openVoting(context, state),
+                        ),
                       ),
-                      MatchPredictionCard(
-                        match: match,
-                        season: season,
-                        homeCrest: homeCrest,
-                        awayCrest: awayCrest,
+                      KeyedSubtree(
+                        key: _tourPrediction,
+                        child: MatchPredictionCard(
+                          match: match,
+                          season: season,
+                          homeCrest: homeCrest,
+                          awayCrest: awayCrest,
+                        ),
                       ),
                       MatchSquadsCard(
                         match: match,

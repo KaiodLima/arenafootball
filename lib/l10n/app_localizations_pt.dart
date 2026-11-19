@@ -2822,6 +2822,229 @@ class AppLocalizationsPt extends AppLocalizations {
       'Veja suas repetidas e dispute o ranking de colecionadores.';
 
   @override
+  String get tourPredictionsHeroTitle => 'Seu bolão';
+
+  @override
+  String get tourPredictionsHeroBody =>
+      'Sua posição, pontos e quantos faltam para passar o próximo. Exato vale 10, vencedor e saldo 7, só o vencedor 5.';
+
+  @override
+  String get tourPredictionsMatchTitle => 'Palpite antes do jogo';
+
+  @override
+  String get tourPredictionsMatchBody =>
+      'Toque em \"Palpitar\" e escolha o placar. Dá para mudar até a partida começar.';
+
+  @override
+  String get tourPredictionsTabsTitle => 'Palpitar e ranking';
+
+  @override
+  String get tourPredictionsTabsBody =>
+      'Troque de aba para ver o ranking da região e desafiar os amigos.';
+
+  @override
+  String get tourFanCardCardTitle => 'Sua carteirinha';
+
+  @override
+  String get tourFanCardCardBody =>
+      'Incline o celular para ver o brilho e toque para virar o cartão.';
+
+  @override
+  String get tourFanCardActionsTitle => 'Compartilhar, foto e time';
+
+  @override
+  String get tourFanCardActionsBody =>
+      'Mande a carteirinha para os amigos, troque a foto ou o time do coração.';
+
+  @override
+  String get tourFanCardLevelTitle => 'Seu nível de torcedor';
+
+  @override
+  String get tourFanCardLevelBody =>
+      'Suba de nível ganhando conquistas no app.';
+
+  @override
+  String get tourFanRankingScopeTitle => 'Região ou geral';
+
+  @override
+  String get tourFanRankingScopeBody =>
+      'Veja as maiores torcidas da sua região ou do app inteiro.';
+
+  @override
+  String get tourFanRankingLeaderTitle => 'A maior torcida';
+
+  @override
+  String get tourFanRankingLeaderBody =>
+      'Quem lidera, com quantos torcedores e a fatia de cada time.';
+
+  @override
+  String get tourFanRankingMineTitle => 'Sua torcida';
+
+  @override
+  String get tourFanRankingMineBody =>
+      'Veja a posição do seu time e convoque mais torcedores para subir.';
+
+  @override
+  String get tourAchievementsLevelTitle => 'Nível e XP';
+
+  @override
+  String get tourAchievementsLevelBody =>
+      'Cada conquista dá XP e sobe o seu nível de torcedor.';
+
+  @override
+  String get tourAchievementsAlmostTitle => 'Quase lá';
+
+  @override
+  String get tourAchievementsAlmostBody =>
+      'A próxima medalha que você está perto de ganhar.';
+
+  @override
+  String get tourAchievementsShelfTitle => 'Medalhas por categoria';
+
+  @override
+  String get tourAchievementsShelfBody =>
+      'Toque numa medalha para ver como ganhar.';
+
+  @override
+  String get tourMatchArtTitle => 'Gerar arte';
+
+  @override
+  String get tourMatchArtBody =>
+      'Monte uma arte do jogo para postar no Instagram ou mandar no WhatsApp.';
+
+  @override
+  String get tourMatchBestPlayerTitle => 'Craque da partida';
+
+  @override
+  String get tourMatchBestPlayerBody =>
+      'Quando a votação abrir, vote aqui no melhor jogador do jogo.';
+
+  @override
+  String get tourMatchPredictionTitle => 'Seu palpite';
+
+  @override
+  String get tourMatchPredictionBody =>
+      'Palpite o placar antes do jogo e ganhe pontos no bolão.';
+
+  @override
+  String get tourEventPollHeaderTitle => 'Evento de votação';
+
+  @override
+  String get tourEventPollHeaderBody =>
+      'Fica aberto até o prazo. O resultado sai no encerramento.';
+
+  @override
+  String get tourEventPollOptionTitle => 'Escolha a sua';
+
+  @override
+  String get tourEventPollOptionBody =>
+      'Toque numa opção e confirme. Você vota uma vez só; o botão do vídeo abre o lance na rede.';
+
+  @override
+  String get tourArtPreviewTitle => 'Sua arte';
+
+  @override
+  String get tourArtPreviewBody =>
+      'A prévia mostra a arte do jeito que vai ser salva.';
+
+  @override
+  String get tourArtFramingTitle => 'Ajuste a foto';
+
+  @override
+  String get tourArtFramingBody =>
+      'Arraste para mover e use a pinça para dar zoom. Também dá para usar uma foto da galeria.';
+
+  @override
+  String get tourArtTemplatesTitle => 'Modelos';
+
+  @override
+  String get tourArtTemplatesBody =>
+      'Troque o modelo para mudar o visual da arte.';
+
+  @override
+  String get tourArtFormatTitle => 'Formato';
+
+  @override
+  String get tourArtFormatBody =>
+      'Feed, story, quadrado ou paisagem: no tamanho certo de cada rede.';
+
+  @override
+  String get tourArtShareTitle => 'Salvar e compartilhar';
+
+  @override
+  String get tourArtShareBody =>
+      'Salve na galeria ou mande direto no Instagram e no WhatsApp.';
+
+  @override
+  String get tourReferralInviteTitle => 'Seu convite';
+
+  @override
+  String get tourReferralInviteBody =>
+      'Mande o seu link. Quando o amigo entrar e escolher o time, os dois ganham um pacotinho extra.';
+
+  @override
+  String get tourReferralStatsTitle => 'Suas indicações';
+
+  @override
+  String get tourReferralStatsBody =>
+      'Quantos amigos entraram e os pacotinhos extras guardados.';
+
+  @override
+  String get tourReferralClaimTitle => 'Foi indicado?';
+
+  @override
+  String get tourReferralClaimBody =>
+      'Coloque aqui o código de quem te convidou.';
+
+  @override
+  String get tourPlayerClaimTitle => 'É você?';
+
+  @override
+  String get tourPlayerClaimBody =>
+      'Se esse atleta é você, peça para vincular à sua conta e tenha o seu perfil.';
+
+  @override
+  String get tourProfilePhotoTitle => 'Sua foto';
+
+  @override
+  String get tourProfilePhotoBody =>
+      'Toque para trocar a foto da conta. Ela aparece na carteirinha.';
+
+  @override
+  String get tourProfileNameTitle => 'Seu nome';
+
+  @override
+  String get tourProfileNameBody =>
+      'O nome que aparece nos rankings e votações.';
+
+  @override
+  String get tourProfileTeamTitle => 'Time do coração';
+
+  @override
+  String get tourProfileTeamBody => 'Dá para trocar uma vez a cada 15 dias.';
+
+  @override
+  String get tourDrawerFanCardTitle => 'Minha carteirinha';
+
+  @override
+  String get tourDrawerFanCardBody =>
+      'Seu cartão de torcedor nas cores do seu time.';
+
+  @override
+  String get tourDrawerFanRankingTitle => 'Guerra das torcidas';
+
+  @override
+  String get tourDrawerFanRankingBody =>
+      'Qual time tem mais torcedores no app.';
+
+  @override
+  String get tourDrawerReferralTitle => 'Indique amigos';
+
+  @override
+  String get tourDrawerReferralBody =>
+      'Convide amigos e ganhe pacotinhos extras do álbum.';
+
+  @override
   String get settingsHelpSection => 'Ajuda';
 
   @override

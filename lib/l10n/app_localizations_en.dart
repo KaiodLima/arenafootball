@@ -2812,6 +2812,226 @@ class AppLocalizationsEn extends AppLocalizations {
       'See your duplicates and compete in the collectors\' ranking.';
 
   @override
+  String get tourPredictionsHeroTitle => 'Your pool';
+
+  @override
+  String get tourPredictionsHeroBody =>
+      'Your position, points and how many you need to pass the next one. Exact score is worth 10, winner and goal difference 7, winner only 5.';
+
+  @override
+  String get tourPredictionsMatchTitle => 'Predict before kickoff';
+
+  @override
+  String get tourPredictionsMatchBody =>
+      'Tap \"Predict\" and pick the score. You can change it until the match starts.';
+
+  @override
+  String get tourPredictionsTabsTitle => 'Predict and ranking';
+
+  @override
+  String get tourPredictionsTabsBody =>
+      'Switch tabs to see the region ranking and challenge your friends.';
+
+  @override
+  String get tourFanCardCardTitle => 'Your fan card';
+
+  @override
+  String get tourFanCardCardBody =>
+      'Tilt your phone to see it shine and tap to flip the card.';
+
+  @override
+  String get tourFanCardActionsTitle => 'Share, photo and team';
+
+  @override
+  String get tourFanCardActionsBody =>
+      'Send your card to friends, change your photo or your favorite team.';
+
+  @override
+  String get tourFanCardLevelTitle => 'Your fan level';
+
+  @override
+  String get tourFanCardLevelBody =>
+      'Level up by earning achievements in the app.';
+
+  @override
+  String get tourFanRankingScopeTitle => 'Region or overall';
+
+  @override
+  String get tourFanRankingScopeBody =>
+      'See the biggest crowds in your region or across the whole app.';
+
+  @override
+  String get tourFanRankingLeaderTitle => 'The biggest crowd';
+
+  @override
+  String get tourFanRankingLeaderBody =>
+      'Who leads, with how many fans and each team\'s share.';
+
+  @override
+  String get tourFanRankingMineTitle => 'Your crowd';
+
+  @override
+  String get tourFanRankingMineBody =>
+      'See your team\'s position and call more fans to climb.';
+
+  @override
+  String get tourAchievementsLevelTitle => 'Level and XP';
+
+  @override
+  String get tourAchievementsLevelBody =>
+      'Each achievement gives XP and raises your fan level.';
+
+  @override
+  String get tourAchievementsAlmostTitle => 'Almost there';
+
+  @override
+  String get tourAchievementsAlmostBody =>
+      'The next medal you are close to earning.';
+
+  @override
+  String get tourAchievementsShelfTitle => 'Medals by category';
+
+  @override
+  String get tourAchievementsShelfBody => 'Tap a medal to see how to earn it.';
+
+  @override
+  String get tourMatchArtTitle => 'Create artwork';
+
+  @override
+  String get tourMatchArtBody =>
+      'Make artwork of the match to post on Instagram or send on WhatsApp.';
+
+  @override
+  String get tourMatchBestPlayerTitle => 'Man of the match';
+
+  @override
+  String get tourMatchBestPlayerBody =>
+      'When voting opens, vote here for the best player of the match.';
+
+  @override
+  String get tourMatchPredictionTitle => 'Your prediction';
+
+  @override
+  String get tourMatchPredictionBody =>
+      'Predict the score before the match and earn pool points.';
+
+  @override
+  String get tourEventPollHeaderTitle => 'Voting event';
+
+  @override
+  String get tourEventPollHeaderBody =>
+      'It stays open until the deadline. The result comes out when it closes.';
+
+  @override
+  String get tourEventPollOptionTitle => 'Pick yours';
+
+  @override
+  String get tourEventPollOptionBody =>
+      'Tap an option and confirm. You vote only once; the video button opens the play on social media.';
+
+  @override
+  String get tourArtPreviewTitle => 'Your artwork';
+
+  @override
+  String get tourArtPreviewBody =>
+      'The preview shows the artwork exactly as it will be saved.';
+
+  @override
+  String get tourArtFramingTitle => 'Adjust the photo';
+
+  @override
+  String get tourArtFramingBody =>
+      'Drag to move and pinch to zoom. You can also use a photo from your gallery.';
+
+  @override
+  String get tourArtTemplatesTitle => 'Templates';
+
+  @override
+  String get tourArtTemplatesBody =>
+      'Change the template to switch the artwork\'s look.';
+
+  @override
+  String get tourArtFormatTitle => 'Format';
+
+  @override
+  String get tourArtFormatBody =>
+      'Feed, story, square or landscape: the right size for each network.';
+
+  @override
+  String get tourArtShareTitle => 'Save and share';
+
+  @override
+  String get tourArtShareBody =>
+      'Save to your gallery or send it straight to Instagram and WhatsApp.';
+
+  @override
+  String get tourReferralInviteTitle => 'Your invite';
+
+  @override
+  String get tourReferralInviteBody =>
+      'Send your link. When your friend joins and picks a team, you both get an extra pack.';
+
+  @override
+  String get tourReferralStatsTitle => 'Your referrals';
+
+  @override
+  String get tourReferralStatsBody =>
+      'How many friends joined and the extra packs you have saved.';
+
+  @override
+  String get tourReferralClaimTitle => 'Were you invited?';
+
+  @override
+  String get tourReferralClaimBody =>
+      'Enter the code of whoever invited you here.';
+
+  @override
+  String get tourPlayerClaimTitle => 'Is this you?';
+
+  @override
+  String get tourPlayerClaimBody =>
+      'If this athlete is you, ask to link it to your account and get your profile.';
+
+  @override
+  String get tourProfilePhotoTitle => 'Your photo';
+
+  @override
+  String get tourProfilePhotoBody =>
+      'Tap to change your account photo. It shows on your fan card.';
+
+  @override
+  String get tourProfileNameTitle => 'Your name';
+
+  @override
+  String get tourProfileNameBody => 'The name shown in rankings and votes.';
+
+  @override
+  String get tourProfileTeamTitle => 'Favorite team';
+
+  @override
+  String get tourProfileTeamBody => 'You can change it once every 15 days.';
+
+  @override
+  String get tourDrawerFanCardTitle => 'My fan card';
+
+  @override
+  String get tourDrawerFanCardBody => 'Your fan card in your team\'s colors.';
+
+  @override
+  String get tourDrawerFanRankingTitle => 'Battle of the crowds';
+
+  @override
+  String get tourDrawerFanRankingBody =>
+      'Which team has the most fans in the app.';
+
+  @override
+  String get tourDrawerReferralTitle => 'Invite friends';
+
+  @override
+  String get tourDrawerReferralBody =>
+      'Invite friends and get extra album packs.';
+
+  @override
   String get settingsHelpSection => 'Help';
 
   @override

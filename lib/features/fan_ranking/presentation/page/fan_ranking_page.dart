@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/core/services/share_service.dart';
+import 'package:arena_soccer/core/services/tour_service.dart';
 import 'package:arena_soccer/core/utils/share_links.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/auth/presentation/page/choose_team_page.dart';
@@ -17,6 +18,7 @@ import 'package:arena_soccer/features/regions/presentation/widgets/region_picker
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/safe_bottom.dart';
+import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
@@ -37,6 +39,41 @@ class FanRankingPage extends StatefulWidget {
 
 class _FanRankingPageState extends State<FanRankingPage> {
   late final FanRankingCubit _cubit;
+  final _tourScope = GlobalKey();
+  final _tourLeader = GlobalKey();
+  final _tourMine = GlobalKey();
+  bool _tourRequested = false;
+
+  /// Tour da guerra das torcidas na 1ª visita (com o ranking na tela).
+  void _requestTour() {
+    if (_tourRequested) return;
+    _tourRequested = true;
+    final l10n = AppLocalizations.of(context);
+    TourService.request(
+      context,
+      TourIds.fanRanking,
+      () => [
+        TourStep(
+          target: _tourScope,
+          icon: Icons.public_rounded,
+          title: l10n.tourFanRankingScopeTitle,
+          body: l10n.tourFanRankingScopeBody,
+        ),
+        TourStep(
+          target: _tourLeader,
+          icon: Icons.emoji_events_rounded,
+          title: l10n.tourFanRankingLeaderTitle,
+          body: l10n.tourFanRankingLeaderBody,
+        ),
+        TourStep(
+          target: _tourMine,
+          icon: Icons.groups_rounded,
+          title: l10n.tourFanRankingMineTitle,
+          body: l10n.tourFanRankingMineBody,
+        ),
+      ],
+    );
+  }
 
   @override
   void initState() {
@@ -91,6 +128,7 @@ class _FanRankingPageState extends State<FanRankingPage> {
         final mineIndex = entries.indexWhere(isMine);
         final leaders = FanRankingView.leaders(entries);
         final slices = FanRankingView.slices(entries);
+        if (!state.loading && entries.isNotEmpty) _requestTour();
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -117,7 +155,10 @@ class _FanRankingPageState extends State<FanRankingPage> {
               physics: const AlwaysScrollableScrollPhysics(),
               padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s12, AppSizes.s16, safeBottom(context, AppSizes.s32)),
               children: [
-                _ScopeToggle(scope: state.scope, region: state.region, onChanged: _cubit.selectScope),
+                KeyedSubtree(
+                  key: _tourScope,
+                  child: _ScopeToggle(scope: state.scope, region: state.region, onChanged: _cubit.selectScope),
+                ),
                 const SizedBox(height: AppSizes.s14),
                 if (state.loading && state.ranking == null)
                   const Padding(
@@ -132,19 +173,25 @@ class _FanRankingPageState extends State<FanRankingPage> {
                   ArenaEmptyState(message: l10n.fanRankingNoTeams, icon: Icons.shield_outlined)
                 else ...[
                   if (leaders.isNotEmpty) ...[
-                    FanLeaderHero(leaders: leaders, total: total, region: overall ? '' : state.region),
+                    KeyedSubtree(
+                      key: _tourLeader,
+                      child: FanLeaderHero(leaders: leaders, total: total, region: overall ? '' : state.region),
+                    ),
                     const SizedBox(height: AppSizes.s14),
                   ],
                   if (user != null && !user.hasFavoriteTeam) ...[
-                    FanChooseTeamCard(onChoose: _chooseTeam),
+                    KeyedSubtree(key: _tourMine, child: FanChooseTeamCard(onChoose: _chooseTeam)),
                     const SizedBox(height: AppSizes.s14),
                   ] else if (mineIndex >= 0) ...[
-                    FanMyCrowdCard(
-                      entry: entries[mineIndex],
-                      position: state.positionAt(mineIndex),
-                      total: total,
-                      next: FanRankingView.gapToNext(entries, entries[mineIndex]),
-                      onRally: () => _rally(entries[mineIndex]),
+                    KeyedSubtree(
+                      key: _tourMine,
+                      child: FanMyCrowdCard(
+                        entry: entries[mineIndex],
+                        position: state.positionAt(mineIndex),
+                        total: total,
+                        next: FanRankingView.gapToNext(entries, entries[mineIndex]),
+                        onRally: () => _rally(entries[mineIndex]),
+                      ),
                     ),
                     const SizedBox(height: AppSizes.s14),
                   ],

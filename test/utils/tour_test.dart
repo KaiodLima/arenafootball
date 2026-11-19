@@ -41,6 +41,60 @@ void main() {
     expect(await tours.isSeen(TourIds.album), isFalse);
   });
 
+  const newTours = [
+    TourIds.predictions,
+    TourIds.fanCard,
+    TourIds.fanRanking,
+    TourIds.achievements,
+    TourIds.matchDetails,
+    TourIds.eventPoll,
+    TourIds.shareArt,
+    TourIds.referrals,
+    TourIds.playerClaim,
+    TourIds.profile,
+    TourIds.drawerNews,
+  ];
+
+  test('tours das telas novas: ids únicos e "Rever tutoriais" zera também', () async {
+    const all = [
+      TourIds.welcome,
+      TourIds.home,
+      TourIds.tables,
+      TourIds.teams,
+      TourIds.championships,
+      TourIds.drawer,
+      TourIds.album,
+      ...newTours,
+    ];
+    expect(all.toSet(), hasLength(all.length));
+
+    SharedPreferences.setMockInitialValues({});
+    final tours = TourService(PreferencesService());
+    for (final id in newTours) {
+      await tours.markSeen(id);
+    }
+    expect(await tours.isSeen(TourIds.drawerNews), isTrue);
+    await tours.reset();
+    for (final id in newTours) {
+      expect(await tours.isSeen(id), isFalse, reason: id);
+    }
+  });
+
+  testWidgets('pedido de tour sem o serviço registrado não faz nada', (tester) async {
+    late BuildContext context;
+    await tester.pumpWidget(Builder(builder: (c) {
+      context = c;
+      return const SizedBox();
+    }));
+    var built = false;
+    TourService.request(context, TourIds.profile, () {
+      built = true;
+      return const [];
+    });
+    await tester.pump(const Duration(seconds: 1));
+    expect(built, isFalse);
+  });
+
   testWidgets('spotlight: passa os passos, pula alvo fora da tela e termina', (tester) async {
     final first = GlobalKey();
     final second = GlobalKey();
