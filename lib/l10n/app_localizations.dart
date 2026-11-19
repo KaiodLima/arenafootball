@@ -13706,6 +13706,90 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Fechada pelo admin'**
   String get fantasyRoundManualClosed;
+
+  /// No description provided for @athleteInviteAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conheço esse jogador'**
+  String get athleteInviteAction;
+
+  /// No description provided for @athleteInviteTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'⚽ {name}, você já está no Arena Football!'**
+  String athleteInviteTitle(String name);
+
+  /// No description provided for @athleteInviteTeam.
+  ///
+  /// In pt, this message translates to:
+  /// **'do {team}'**
+  String athleteInviteTeam(String team);
+
+  /// No description provided for @athleteInviteTeamIn.
+  ///
+  /// In pt, this message translates to:
+  /// **'do {team} na {championship}'**
+  String athleteInviteTeamIn(String team, String championship);
+
+  /// No description provided for @athleteInviteStats.
+  ///
+  /// In pt, this message translates to:
+  /// **'e seus números já estão lá: {goals} gols e {assists} assistências. 🔥'**
+  String athleteInviteStats(int goals, int assists);
+
+  /// No description provided for @athleteInviteNoStats.
+  ///
+  /// In pt, this message translates to:
+  /// **'e sua página de atleta já está esperando por você. 🔥'**
+  String get athleteInviteNoStats;
+
+  /// No description provided for @athleteInviteBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'O atleta {name} {where} parece ser você — {numbers}'**
+  String athleteInviteBody(String name, String where, String numbers);
+
+  /// No description provided for @athleteInviteBenefits.
+  ///
+  /// In pt, this message translates to:
+  /// **'Crie sua conta grátis, diga \"Sou eu\" e tenha sua carreira na palma da mão:\n📊 seus gols e assistências em cada competição\n🏆 concorra a craque da partida\n🎴 sua figurinha no álbum\n🖼️ artes de atleta pra postar'**
+  String get athleteInviteBenefits;
+
+  /// No description provided for @athleteInviteCta.
+  ///
+  /// In pt, this message translates to:
+  /// **'👉 Toque no link, baixe o app e confirme que é você:'**
+  String get athleteInviteCta;
+
+  /// No description provided for @athleteInviteCardTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você está no Arena Football!'**
+  String get athleteInviteCardTitle;
+
+  /// No description provided for @athleteInviteCardGoals.
+  ///
+  /// In pt, this message translates to:
+  /// **'GOLS'**
+  String get athleteInviteCardGoals;
+
+  /// No description provided for @athleteInviteCardAssists.
+  ///
+  /// In pt, this message translates to:
+  /// **'ASSISTÊNCIAS'**
+  String get athleteInviteCardAssists;
+
+  /// No description provided for @athleteInviteCardCta.
+  ///
+  /// In pt, this message translates to:
+  /// **'Crie sua conta e diga: \"Sou eu!\"'**
+  String get athleteInviteCardCta;
+
+  /// No description provided for @athleteInviteSheetTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Convidar atleta'**
+  String get athleteInviteSheetTitle;
 }
 
 class _AppLocalizationsDelegate

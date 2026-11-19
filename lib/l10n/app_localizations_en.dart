@@ -8273,4 +8273,60 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fantasyRoundManualClosed => 'Closed by the admin';
+
+  @override
+  String get athleteInviteAction => 'I know this player';
+
+  @override
+  String athleteInviteTitle(String name) {
+    return '⚽ $name, you are already on Arena Football!';
+  }
+
+  @override
+  String athleteInviteTeam(String team) {
+    return 'from $team';
+  }
+
+  @override
+  String athleteInviteTeamIn(String team, String championship) {
+    return 'from $team in $championship';
+  }
+
+  @override
+  String athleteInviteStats(int goals, int assists) {
+    return 'and your numbers are already there: $goals goals and $assists assists. 🔥';
+  }
+
+  @override
+  String get athleteInviteNoStats =>
+      'and your player page is already waiting for you. 🔥';
+
+  @override
+  String athleteInviteBody(String name, String where, String numbers) {
+    return 'The player $name $where looks like you — $numbers';
+  }
+
+  @override
+  String get athleteInviteBenefits =>
+      'Create your free account, tap \"That\'s me\" and carry your career in your pocket:\n📊 your goals and assists in every competition\n🏆 run for player of the match\n🎴 your sticker in the album\n🖼️ player artwork to post';
+
+  @override
+  String get athleteInviteCta =>
+      '👉 Tap the link, get the app and confirm it\'s you:';
+
+  @override
+  String get athleteInviteCardTitle => 'You are on Arena Football!';
+
+  @override
+  String get athleteInviteCardGoals => 'GOALS';
+
+  @override
+  String get athleteInviteCardAssists => 'ASSISTS';
+
+  @override
+  String get athleteInviteCardCta =>
+      'Create your account and say: \"That\'s me!\"';
+
+  @override
+  String get athleteInviteSheetTitle => 'Invite player';
 }

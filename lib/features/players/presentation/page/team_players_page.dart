@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/utils/components/share_image_sheet.dart';
+import 'package:arena_soccer/utils/components/share_image_frame.dart';
+import 'package:arena_soccer/features/players/presentation/widgets/athlete_invite_card.dart';
+import 'package:arena_soccer/features/players/domain/athlete_invite.dart';
+import 'package:arena_soccer/core/utils/share_links.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/championship_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -48,12 +53,16 @@ class TeamPlayersPage extends StatefulWidget {
   /// Temporada do elenco (campeonato do organizador); nula = a escolhida.
   final String? season;
 
+  /// Envio do convite "Conheço esse jogador"; nulo = o compartilhar do aparelho (teste injeta).
+  final Future<void> Function(String text)? onShareInvite;
+
   const TeamPlayersPage({
     super.key,
     required this.team,
     this.championshipId,
     this.onlyChampionship = false,
     this.season,
+    this.onShareInvite,
   });
 
   @override
@@ -185,6 +194,47 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
       tone: ArenaAlertTone.danger,
     );
     if (confirmed && mounted) await BlocProvider.of<TeamPlayersCubit>(context).deleteTeam(_team);
+  }
+
+  /// "Conheço esse jogador": o convite como imagem (logo do app + arte do
+  /// atleta) com o texto e o link de legenda; [TeamPlayersPage.onShareInvite]
+  /// troca o envio (teste: só o texto).
+  void _inviteAthlete(PlayerDTO player, TeamPlayersState state, AppLocalizations l10n) {
+    final championship =
+        state.view.championships.where((c) => c.championshipId == state.championshipId).firstOrNull?.title ?? '';
+    final goals = state.goalsOf(player);
+    final assists = state.assistsOf(player);
+    final text = athleteInviteText(
+      l10n,
+      name: player.name,
+      team: _team.name,
+      championship: championship,
+      goals: goals,
+      assists: assists,
+      link: athleteLink(_season, player.id),
+    );
+    final share = widget.onShareInvite;
+    if (share != null) {
+      share(text);
+      return;
+    }
+    showShareImageSheet(
+      context,
+      title: l10n.athleteInviteSheetTitle,
+      fileName: 'convite_${player.id}',
+      shareText: text,
+      preview: ShareImageFrame(
+        date: DateTime.now(),
+        card: AthleteInviteCard(
+          player: player,
+          team: _team.name,
+          teamCrest: _team.imageUrl,
+          championship: championship,
+          goals: goals,
+          assists: assists,
+        ),
+      ),
+    );
   }
 
   @override
@@ -388,12 +438,18 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
                 'player': player,
                 'team': _team,
                 'season': _season,
-                'championship': state.view.championships
-                    .where((c) => c.championshipId == state.championshipId)
-                    .firstOrNull,
+                'championship':
+                    state.view.championships.where((c) => c.championshipId == state.championshipId).firstOrNull,
               },
             ),
           ),
+          // Atleta sem conta: convite para a pessoa entrar no app ("É você?").
+          if (player.userId.isEmpty)
+            SquadRowAction(
+              icon: Icons.person_add_alt_1_rounded,
+              label: l10n.athleteInviteAction,
+              onSelected: () => _inviteAthlete(player, state, l10n),
+            ),
           if (canEnroll)
             SquadRowAction(
               icon: Icons.emoji_events_outlined,
