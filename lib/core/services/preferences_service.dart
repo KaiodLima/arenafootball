@@ -111,4 +111,18 @@ class PreferencesService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_fanModeKey(uid), value);
   }
+
+  /// Aviso de atualização sugerida: o build recomendado que o usuário dispensou
+  /// ("Depois"); só volta a avisar quando o admin subir a recomendada.
+  static const String _dismissedUpdateKey = 'atualizacaoDispensada';
+
+  Future<int> getDismissedUpdateBuild() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_dismissedUpdateKey) ?? 0;
+  }
+
+  Future<void> setDismissedUpdateBuild(int build) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_dismissedUpdateKey, build);
+  }
 }

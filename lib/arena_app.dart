@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/app_version/presentation/page/app_version_settings_page.dart';
+import 'package:arena_soccer/features/app_version/presentation/bloc/app_version_settings_cubit.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/features/share_art/presentation/page/share_art_page.dart';
 import 'package:arena_soccer/features/share_art/presentation/page/player_art_page.dart';
@@ -554,6 +556,11 @@ class ArenaApp extends StatelessWidget {
               child: const ReferralPage(),
             ),
         AppRoutes.referralSettingsPage: (_) => const ReferralSettingsPage(),
+        // Admin: versões mínima/recomendada do app (aviso de atualização).
+        AppRoutes.appVersionSettingsPage: (_) => BlocProvider<AppVersionSettingsCubit>(
+              create: (_) => AppVersionSettingsCubit(sl(), sl(), sl()),
+              child: const AppVersionSettingsPage(),
+            ),
         // Arena Fantasy do campeonato: entrar e montar a escalação da rodada.
         AppRoutes.fantasyLineupPage: (context) => BlocProvider<FantasyLineupCubit>(
               create: (_) =>

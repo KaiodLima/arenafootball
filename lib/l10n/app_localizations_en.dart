@@ -8782,4 +8782,81 @@ class AppLocalizationsEn extends AppLocalizations {
   String fantasyGapBehind(String points, int position) {
     return '$points pts behind #$position';
   }
+
+  @override
+  String get appUpdateRequiredTitle => 'Update Arena Football';
+
+  @override
+  String get appUpdateRequiredText =>
+      'This app version is no longer supported. Update to keep using it.';
+
+  @override
+  String get appUpdateRecommendedTitle => 'New version available!';
+
+  @override
+  String get appUpdateRecommendedText =>
+      'Update the app to get the latest features and fixes.';
+
+  @override
+  String get appUpdateNow => 'Update now';
+
+  @override
+  String get appUpdateAction => 'Update';
+
+  @override
+  String get appUpdateLater => 'Later';
+
+  @override
+  String get appVersionTitle => 'App version';
+
+  @override
+  String get appVersionIntro =>
+      'Users below the recommended build see \"New version available\" (they can postpone). Below the minimum, the app is blocked until they update.';
+
+  @override
+  String appVersionInstalled(String platform, String name, int build) {
+    return 'This device: $platform $name (build $build)';
+  }
+
+  @override
+  String get appVersionUseInstalled => 'Use as recommended';
+
+  @override
+  String get appVersionRecommended => 'Recommended build';
+
+  @override
+  String get appVersionRecommendedHint => 'Suggests updating (can postpone)';
+
+  @override
+  String get appVersionMinimum => 'Minimum build';
+
+  @override
+  String get appVersionMinimumHint => 'Below it, the app is blocked';
+
+  @override
+  String get appVersionMessage => 'Notice message (optional)';
+
+  @override
+  String get appVersionMessageHint => 'E.g.: Arena Fantasy is here!';
+
+  @override
+  String get appVersionHelp =>
+      'The build is the number after \"+\" in the pubspec (2.0.18+43 → 43), the same on Android and iOS. Android: shown in the Play Console as 43 (2.0.18). iOS: in App Store Connect/TestFlight as 1.0.18 (43) — the public App Store shows only the name. Publish the version in the store before raising these numbers.';
+
+  @override
+  String get appVersionSave => 'Save';
+
+  @override
+  String get appVersionSaved => 'Versions saved.';
+
+  @override
+  String get appVersionSaveError => 'Could not save the versions.';
+
+  @override
+  String get appVersionRaiseTitle => 'Raise the minimum version?';
+
+  @override
+  String appVersionRaiseText(int android, int ios) {
+    return 'Users below build $android (Android) or $ios (iOS) are blocked until they update the app.';
+  }
 }

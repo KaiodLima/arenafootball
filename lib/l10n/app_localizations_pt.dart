@@ -8829,4 +8829,81 @@ class AppLocalizationsPt extends AppLocalizations {
   String fantasyGapBehind(String points, int position) {
     return '$points pts atrás do $positionº';
   }
+
+  @override
+  String get appUpdateRequiredTitle => 'Atualize o Arena Football';
+
+  @override
+  String get appUpdateRequiredText =>
+      'Esta versão do app não é mais suportada. Atualize para continuar usando.';
+
+  @override
+  String get appUpdateRecommendedTitle => 'Nova versão disponível!';
+
+  @override
+  String get appUpdateRecommendedText =>
+      'Atualize o app para ter as novidades e as correções mais recentes.';
+
+  @override
+  String get appUpdateNow => 'Atualizar agora';
+
+  @override
+  String get appUpdateAction => 'Atualizar';
+
+  @override
+  String get appUpdateLater => 'Depois';
+
+  @override
+  String get appVersionTitle => 'Versão do app';
+
+  @override
+  String get appVersionIntro =>
+      'Quem estiver abaixo do build recomendado vê o aviso \"Nova versão disponível\" (pode adiar). Abaixo do mínimo, o app fica bloqueado até atualizar.';
+
+  @override
+  String appVersionInstalled(String platform, String name, int build) {
+    return 'Este aparelho: $platform $name (build $build)';
+  }
+
+  @override
+  String get appVersionUseInstalled => 'Usar como recomendado';
+
+  @override
+  String get appVersionRecommended => 'Build recomendado';
+
+  @override
+  String get appVersionRecommendedHint => 'Sugere atualizar (pode adiar)';
+
+  @override
+  String get appVersionMinimum => 'Build mínimo';
+
+  @override
+  String get appVersionMinimumHint => 'Abaixo dele, o app fica bloqueado';
+
+  @override
+  String get appVersionMessage => 'Mensagem do aviso (opcional)';
+
+  @override
+  String get appVersionMessageHint => 'Ex.: chegou o Arena Fantasy!';
+
+  @override
+  String get appVersionHelp =>
+      'O build é o número depois do \"+\" no pubspec (2.0.18+43 → 43), o mesmo no Android e no iOS. Android: aparece na Play Console como 43 (2.0.18). iOS: no App Store Connect/TestFlight como 1.0.18 (43) — a App Store pública mostra só o nome. Publique a versão na loja antes de subir estes números.';
+
+  @override
+  String get appVersionSave => 'Salvar';
+
+  @override
+  String get appVersionSaved => 'Versões salvas.';
+
+  @override
+  String get appVersionSaveError => 'Não foi possível salvar as versões.';
+
+  @override
+  String get appVersionRaiseTitle => 'Subir a versão mínima?';
+
+  @override
+  String appVersionRaiseText(int android, int ios) {
+    return 'Quem estiver abaixo do build $android (Android) ou $ios (iOS) fica bloqueado até atualizar o app.';
+  }
 }

@@ -1164,6 +1164,27 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Versão do app (aviso de atualização): builds mínimo (obriga) e
+    // recomendado (sugere) por plataforma; leitura pública, escrita do admin.
+    match /config/versao {
+      allow read: if true;
+      allow write: if isAdmin() && validAppVersion(request.resource.data);
+
+      function build(d, key) {
+        return d.get(key, 0) is int && d.get(key, 0) >= 0;
+      }
+
+      function validAppVersion(d) {
+        return d.keys().hasOnly(['minimoAndroid', 'recomendadoAndroid', 'minimoIos', 'recomendadoIos', 'mensagem',
+            'atualizadoEm'])
+          && build(d, 'minimoAndroid') && build(d, 'recomendadoAndroid')
+          && build(d, 'minimoIos') && build(d, 'recomendadoIos')
+          && d.get('minimoAndroid', 0) <= d.get('recomendadoAndroid', 0)
+          && d.get('minimoIos', 0) <= d.get('recomendadoIos', 0)
+          && d.get('mensagem', '') is string && d.get('mensagem', '').size() <= 300;
+      }
+    }
+
     // Notificações push (Cloud Functions em functions/).
     // Liga/desliga por ação: só o admin lê e altera.
     match /config/notificacoes {

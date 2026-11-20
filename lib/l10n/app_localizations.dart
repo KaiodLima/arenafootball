@@ -14576,6 +14576,144 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'{points} pts atrás do {position}º'**
   String fantasyGapBehind(String points, int position);
+
+  /// No description provided for @appUpdateRequiredTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atualize o Arena Football'**
+  String get appUpdateRequiredTitle;
+
+  /// No description provided for @appUpdateRequiredText.
+  ///
+  /// In pt, this message translates to:
+  /// **'Esta versão do app não é mais suportada. Atualize para continuar usando.'**
+  String get appUpdateRequiredText;
+
+  /// No description provided for @appUpdateRecommendedTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nova versão disponível!'**
+  String get appUpdateRecommendedTitle;
+
+  /// No description provided for @appUpdateRecommendedText.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atualize o app para ter as novidades e as correções mais recentes.'**
+  String get appUpdateRecommendedText;
+
+  /// No description provided for @appUpdateNow.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atualizar agora'**
+  String get appUpdateNow;
+
+  /// No description provided for @appUpdateAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atualizar'**
+  String get appUpdateAction;
+
+  /// No description provided for @appUpdateLater.
+  ///
+  /// In pt, this message translates to:
+  /// **'Depois'**
+  String get appUpdateLater;
+
+  /// No description provided for @appVersionTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Versão do app'**
+  String get appVersionTitle;
+
+  /// No description provided for @appVersionIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem estiver abaixo do build recomendado vê o aviso \"Nova versão disponível\" (pode adiar). Abaixo do mínimo, o app fica bloqueado até atualizar.'**
+  String get appVersionIntro;
+
+  /// No description provided for @appVersionInstalled.
+  ///
+  /// In pt, this message translates to:
+  /// **'Este aparelho: {platform} {name} (build {build})'**
+  String appVersionInstalled(String platform, String name, int build);
+
+  /// No description provided for @appVersionUseInstalled.
+  ///
+  /// In pt, this message translates to:
+  /// **'Usar como recomendado'**
+  String get appVersionUseInstalled;
+
+  /// No description provided for @appVersionRecommended.
+  ///
+  /// In pt, this message translates to:
+  /// **'Build recomendado'**
+  String get appVersionRecommended;
+
+  /// No description provided for @appVersionRecommendedHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sugere atualizar (pode adiar)'**
+  String get appVersionRecommendedHint;
+
+  /// No description provided for @appVersionMinimum.
+  ///
+  /// In pt, this message translates to:
+  /// **'Build mínimo'**
+  String get appVersionMinimum;
+
+  /// No description provided for @appVersionMinimumHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abaixo dele, o app fica bloqueado'**
+  String get appVersionMinimumHint;
+
+  /// No description provided for @appVersionMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mensagem do aviso (opcional)'**
+  String get appVersionMessage;
+
+  /// No description provided for @appVersionMessageHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ex.: chegou o Arena Fantasy!'**
+  String get appVersionMessageHint;
+
+  /// No description provided for @appVersionHelp.
+  ///
+  /// In pt, this message translates to:
+  /// **'O build é o número depois do \"+\" no pubspec (2.0.18+43 → 43), o mesmo no Android e no iOS. Android: aparece na Play Console como 43 (2.0.18). iOS: no App Store Connect/TestFlight como 1.0.18 (43) — a App Store pública mostra só o nome. Publique a versão na loja antes de subir estes números.'**
+  String get appVersionHelp;
+
+  /// No description provided for @appVersionSave.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salvar'**
+  String get appVersionSave;
+
+  /// No description provided for @appVersionSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Versões salvas.'**
+  String get appVersionSaved;
+
+  /// No description provided for @appVersionSaveError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível salvar as versões.'**
+  String get appVersionSaveError;
+
+  /// No description provided for @appVersionRaiseTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Subir a versão mínima?'**
+  String get appVersionRaiseTitle;
+
+  /// No description provided for @appVersionRaiseText.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem estiver abaixo do build {android} (Android) ou {ios} (iOS) fica bloqueado até atualizar o app.'**
+  String appVersionRaiseText(int android, int ios);
 }
 
 class _AppLocalizationsDelegate

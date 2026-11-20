@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/app_version/presentation/app_update_checker.dart';
 import 'package:arena_soccer/utils/themes/arena_palette.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_mode_cubit.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/widgets/organizer_teams_tab.dart';
@@ -100,6 +101,12 @@ class _HomePageState extends State<HomePage> {
   /// Primeiro login: a boas-vindas e, se aceitar, o tour da home; depois
   /// (ou sem login) o tour da home na 1ª visita.
   Future<void> _startTours() async {
+    // Aviso de atualização antes das boas-vindas e das dicas (obrigatório = trava aqui).
+    if (sl.isRegistered<AppUpdateChecker>()) {
+      final checker = sl<AppUpdateChecker>()..start();
+      await checker.check(context);
+      if (!mounted) return;
+    }
     final tours = sl<TourService>();
     final user = BlocProvider.of<SessionCubit>(context).state.user;
     if (user != null && !await tours.isSeen(TourIds.welcome)) {
