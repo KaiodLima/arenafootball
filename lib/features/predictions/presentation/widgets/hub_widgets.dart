@@ -326,6 +326,9 @@ class HubFeaturedMatch extends StatelessWidget {
   final TeamDirectory teams;
   final PredictionDTO? prediction;
   final DateTime now;
+
+  /// Aberto = palpitar; começado = travado até o fim (o toque abre a partida).
+  final HubMatchPhase phase;
   final VoidCallback onPredict;
 
   const HubFeaturedMatch({
@@ -334,8 +337,11 @@ class HubFeaturedMatch extends StatelessWidget {
     required this.teams,
     required this.prediction,
     required this.now,
+    this.phase = HubMatchPhase.open,
     required this.onPredict,
   });
+
+  bool get _locked => phase != HubMatchPhase.open;
 
   @override
   Widget build(BuildContext context) {
@@ -366,7 +372,7 @@ class HubFeaturedMatch extends StatelessWidget {
           ),
         );
 
-    return Container(
+    final card = Container(
       key: ValueKey('hub-featured-${match.id}'),
       decoration: BoxDecoration(
         borderRadius: radius,
@@ -411,7 +417,10 @@ class HubFeaturedMatch extends StatelessWidget {
                           style: AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s12),
                         ),
                       ),
-                      if (closes.isNotEmpty) _ClosesPill(text: l10n.predictionHubClosesIn(closes)),
+                      if (_locked)
+                        _PhasePill(phase: phase)
+                      else if (closes.isNotEmpty)
+                        _ClosesPill(text: l10n.predictionHubClosesIn(closes)),
                     ],
                   ),
                   const SizedBox(height: AppSizes.s12),
@@ -421,13 +430,19 @@ class HubFeaturedMatch extends StatelessWidget {
                       side(home, match.homeTeam),
                       Padding(
                         padding: const EdgeInsets.only(top: AppSizes.s20),
-                        child: Text('VS', style: hubDisplay(AppSizes.s28, AppColors.gold)),
+                        child: Text(
+                          phase == HubMatchPhase.live || phase == HubMatchPhase.halfTime
+                              ? '${match.homeGoals} × ${match.awayGoals}'
+                              : 'VS',
+                          key: const ValueKey('hub-featured-center'),
+                          style: hubDisplay(AppSizes.s28, AppColors.gold),
+                        ),
                       ),
                       side(away, match.awayTeam),
                     ],
                   ),
                   const SizedBox(height: AppSizes.s14),
-                  _PickAction(prediction: prediction, onPredict: onPredict, large: true),
+                  _PickAction(prediction: prediction, onPredict: onPredict, large: true, locked: _locked),
                 ],
               ),
             ),
@@ -435,6 +450,7 @@ class HubFeaturedMatch extends StatelessWidget {
         ),
       ),
     );
+    return _locked ? GestureDetector(onTap: onPredict, child: card) : card;
   }
 }
 
@@ -444,6 +460,9 @@ class HubMatchTile extends StatelessWidget {
   final TeamDirectory teams;
   final PredictionDTO? prediction;
   final DateTime now;
+
+  /// Aberto = palpitar; começado = travado até o fim (o toque abre a partida).
+  final HubMatchPhase phase;
   final VoidCallback onPredict;
 
   const HubMatchTile({
@@ -452,8 +471,11 @@ class HubMatchTile extends StatelessWidget {
     required this.teams,
     required this.prediction,
     required this.now,
+    this.phase = HubMatchPhase.open,
     required this.onPredict,
   });
+
+  bool get _locked => phase != HubMatchPhase.open;
 
   @override
   Widget build(BuildContext context) {
@@ -480,7 +502,7 @@ class HubMatchTile extends StatelessWidget {
           ],
         );
 
-    return Container(
+    final tile = Container(
       key: ValueKey('hub-match-${match.id}'),
       margin: const EdgeInsets.only(bottom: AppSizes.s8),
       padding: const EdgeInsets.all(AppSizes.s12),
@@ -500,15 +522,56 @@ class HubMatchTile extends StatelessWidget {
                 line(away, match.awayTeam),
                 const SizedBox(height: AppSizes.s6),
                 Text(
-                  [hubMatchWhen(match), if (closes.isNotEmpty) l10n.predictionHubClosesIn(closes)].join('  ·  '),
+                  [
+                    if (phase == HubMatchPhase.live || phase == HubMatchPhase.halfTime)
+                      '${match.homeGoals} × ${match.awayGoals}'
+                    else
+                      hubMatchWhen(match),
+                    if (_locked)
+                      hubPhaseLabel(l10n, phase)
+                    else if (closes.isNotEmpty)
+                      l10n.predictionHubClosesIn(closes),
+                  ].join('  ·  '),
                   style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
                 ),
               ],
             ),
           ),
           const SizedBox(width: AppSizes.s10),
-          _PickAction(prediction: prediction, onPredict: onPredict),
+          _PickAction(prediction: prediction, onPredict: onPredict, locked: _locked),
         ],
+      ),
+    );
+    return _locked ? GestureDetector(onTap: onPredict, child: tile) : tile;
+  }
+}
+
+/// "AO VIVO" / "INTERVALO" / "AGUARDANDO" do jogo já começado.
+String hubPhaseLabel(AppLocalizations l10n, HubMatchPhase phase) => switch (phase) {
+      HubMatchPhase.halfTime => l10n.predictionHubHalfTime,
+      HubMatchPhase.waiting => l10n.predictionHubWaiting,
+      _ => l10n.predictionHubLive,
+    };
+
+class _PhasePill extends StatelessWidget {
+  final HubMatchPhase phase;
+
+  const _PhasePill({required this.phase});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final live = phase == HubMatchPhase.live;
+    return Container(
+      key: const ValueKey('hub-phase-pill'),
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.s10, vertical: AppSizes.s4),
+      decoration: BoxDecoration(
+        color: live ? AppColors.danger : AppColors.black.withValues(alpha: 0.45),
+        borderRadius: BorderRadius.circular(AppSizes.s20),
+      ),
+      child: Text(
+        hubPhaseLabel(l10n, phase),
+        style: AppTypography.label(color: AppColors.white).copyWith(fontSize: AppSizes.s12, letterSpacing: 0.6),
       ),
     );
   }
@@ -543,12 +606,28 @@ class _PickAction extends StatelessWidget {
   final VoidCallback onPredict;
   final bool large;
 
-  const _PickAction({required this.prediction, required this.onPredict, this.large = false});
+  /// Jogo começado: sem palpitar nem alterar.
+  final bool locked;
+
+  const _PickAction({required this.prediction, required this.onPredict, this.large = false, this.locked = false});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final prediction = this.prediction;
+    if (prediction == null && locked) {
+      return Row(
+        key: const ValueKey('hub-predictions-closed'),
+        mainAxisSize: large ? MainAxisSize.max : MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.lock_rounded, size: AppSizes.s16, color: large ? AppColors.whiteSoft : AppColors.grey),
+          const SizedBox(width: AppSizes.s4),
+          Text(l10n.predictionHubClosed,
+              style: AppTypography.label(color: large ? AppColors.whiteSoft : AppColors.grey)),
+        ],
+      );
+    }
     if (prediction == null) {
       return SizedBox(
         width: large ? double.infinity : null,
@@ -587,7 +666,8 @@ class _PickAction extends StatelessWidget {
       child: Text(l10n.predictionHubChange),
     );
     if (!large) {
-      return Column(mainAxisSize: MainAxisSize.min, children: [pick, SizedBox(height: AppSizes.s24, child: change)]);
+      return Column(
+          mainAxisSize: MainAxisSize.min, children: [pick, if (!locked) SizedBox(height: AppSizes.s24, child: change)]);
     }
     return Container(
       padding: const EdgeInsets.fromLTRB(AppSizes.s14, AppSizes.s8, AppSizes.s6, AppSizes.s8),
@@ -600,7 +680,7 @@ class _PickAction extends StatelessWidget {
         const Icon(Icons.check_circle_rounded, color: AppColors.gold),
         const SizedBox(width: AppSizes.s10),
         Expanded(child: pick),
-        change
+        if (!locked) change else const Icon(Icons.lock_rounded, color: AppColors.whiteSoft),
       ]),
     );
   }

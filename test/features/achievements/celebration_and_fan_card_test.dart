@@ -48,6 +48,31 @@ void main() {
     expect(seeAll, isTrue);
   });
 
+  test('conquista com prêmio: lê e grava "pacotes" (0 a 5)', () {
+    final dto = AchievementDTO.fromMap('a', const {'titulo': 'Craque', 'metrica': 'votos', 'pacotes': 9});
+    expect(dto.packs, AchievementDTO.maxPacks);
+    expect(dto.copyWith(packs: 2).toMap()['pacotes'], 2);
+    expect(AchievementDTO.fromMap('b', const {'titulo': 'X'}).packs, 0);
+  });
+
+  testWidgets('comemoração com prêmio: selo 🎁 +2 e "Você ganhou 2 pacotinhos"', (tester) async {
+    await tester.pumpWidget(_app(Builder(
+      builder: (context) => Scaffold(
+        body: TextButton(
+          onPressed: () => showUnlockCelebration(context, _jury.copyWith(packs: 2)),
+          child: const Text('abrir'),
+        ),
+      ),
+    )));
+    await tester.tap(find.text('abrir'));
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump(const Duration(seconds: 2));
+    expect(find.text('🎁 +2'), findsOneWidget);
+    expect(find.text('🎁 Você ganhou 2 pacotinhos de figurinhas! Abra no álbum.'), findsOneWidget);
+    // Sem álbum ativo (sem o cubit do álbum), sem o atalho.
+    expect(find.byKey(const ValueKey('achievement-open-album')), findsNothing);
+  });
+
   FanCard card({String? level, List<({AchievementTier tier, String icon})> medals = const []}) => FanCard(
         name: 'Kaio Lima',
         photoUrl: '',

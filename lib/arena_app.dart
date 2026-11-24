@@ -590,7 +590,8 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.fantasyAdminPage: (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
           return BlocProvider<FantasyAdminCubit>(
-            create: (_) => FantasyAdminCubit(sl(), sl(), sl(), sl(), sl(), sl(), reset: sl(), roundAction: sl()),
+            create: (_) => FantasyAdminCubit(sl(), sl(), sl(), sl(), sl(), sl(),
+                reset: sl(), roundAction: sl(), teamsReset: sl()),
             child: FantasyAdminPage(
               championship: args['championship'] as ChampionshipDTO,
               initialTab: args['tab'] as int? ?? 0,

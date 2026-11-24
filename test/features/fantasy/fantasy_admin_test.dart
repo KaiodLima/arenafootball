@@ -46,6 +46,13 @@ class _Repo implements IFantasyRepository {
   var rescores = 0;
   var resets = 0;
   final roundActions = <String>[];
+  final teamResets = <List<String>>[];
+
+  @override
+  Future<Either<Failure, void>> requestTeamsReset(String fantasyId, List<String> teamIds) async {
+    teamResets.add(teamIds);
+    return const Right(null);
+  }
 
   @override
   Future<Either<Failure, void>> requestRoundAction(String fantasyId, int round,
@@ -126,6 +133,7 @@ FantasyAdminCubit _cubit(_Repo repo) => FantasyAdminCubit(
       GetFantasyAthletesCacheFirstUseCase(repo),
       reset: RequestFantasyResetUseCase(repo),
       roundAction: RequestFantasyRoundActionUseCase(repo),
+      teamsReset: RequestFantasyTeamsResetUseCase(repo),
     );
 
 Future<void> _settle() async {
@@ -276,5 +284,49 @@ void main() {
   test('rodada com prazo/fechamento do admin', () {
     final round = FantasyRoundDTO.fromMap('3', {'status': 'aberta', 'prazoManual': true, 'fechadaManual': true});
     expect((round.manualDeadline, round.manualClosed), (true, true));
+  });
+
+  testWidgets('zerar pontos de times: escolhe dois times do campeonato e pede às functions', (tester) async {
+    tester.view.physicalSize = const Size(420, 1400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final repo = _Repo();
+    final cubit = _cubit(repo);
+    addTearDown(cubit.close);
+    const copa = ChampionshipDTO(
+      id: 'doc1',
+      championshipId: 8,
+      title: 'Copa Verde',
+      region: 'Floresta',
+      season: '2026',
+      teams: ['Açaí no Gralle', 'Mulekada', 'Leões'],
+      teamIds: ['t1', 't2', 't3'],
+    );
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('pt'),
+      home: BlocProvider.value(value: cubit, child: const FantasyAdminPage(championship: copa)),
+    ));
+    repo.rounds.add(Right(_rounds));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('fantasy-admin-menu')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('fantasy-reset-teams')));
+    await tester.pumpAndSettle();
+    expect(find.text('Zerar pontos de times'), findsOneWidget);
+    for (final name in ['Açaí no Gralle', 'Mulekada']) {
+      await tester.tap(find.byKey(const ValueKey('fantasy-reset-teams-add')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(name).last);
+      await tester.pumpAndSettle();
+    }
+    expect(find.byKey(const ValueKey('fantasy-reset-team-t1')), findsOneWidget);
+    expect(find.byKey(const ValueKey('fantasy-reset-team-t2')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('fantasy-reset-teams-confirm')));
+    await tester.pumpAndSettle();
+    expect(repo.teamResets, [
+      ['t1', 't2'],
+    ]);
   });
 }

@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import {
   achievementFromDoc,
   achievementMessage,
+  achievementPackReward,
   athleteCounters,
   changedFields,
   countersChanged,
@@ -63,4 +64,16 @@ test('push da conquista para a própria conta', () => {
   assert.equal(message.aba, 'conquistas');
   assert.deepEqual(message.alvo, { topic: 'usuario_u1' });
   assert.deepEqual(message.abrir, { tela: 'conquista', id: catalog[1].id });
+});
+
+test('prêmio em pacotinhos: lido de 0 a 5, somado e citado no push', () => {
+  const a = achievementFromDoc('a', { titulo: 'Craque', metrica: 'votos', meta: 1, pontos: 10, pacotes: 2 });
+  const b = achievementFromDoc('b', { titulo: 'Lenda', metrica: 'votos', meta: 5, pacotes: 99 });
+  const c = achievementFromDoc('c', { titulo: 'Sem prêmio', metrica: 'votos', meta: 2 });
+  assert.equal(a.pacotes, 2);
+  assert.equal(b.pacotes, 5);
+  assert.equal(c.pacotes, 0);
+  assert.equal(achievementPackReward([a, b, c]), 7);
+  assert.equal(achievementMessage('u1', a).corpo, 'Craque · +10 XP · 🎁 +2 pacotinhos de figurinhas!');
+  assert.equal(achievementMessage('u1', c).corpo, 'Sem prêmio');
 });

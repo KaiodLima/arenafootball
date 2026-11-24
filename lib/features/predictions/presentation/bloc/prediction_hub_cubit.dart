@@ -23,7 +23,8 @@ class PredictionHubState extends Equatable {
   final PredictionRankingEntry? mine;
   final int? myPosition;
 
-  /// Próximas partidas abertas para palpite (as mais cedo primeiro).
+  /// Próximas partidas abertas para palpite e as já começadas que ainda não
+  /// terminaram (travadas), as mais cedo primeiro.
   final List<MatchDTO> upcoming;
 
   /// Partidas encerradas em que a conta palpitou (as mais recentes primeiro).
@@ -133,7 +134,7 @@ class PredictionHubCubit extends Cubit<PredictionHubState> {
     );
   }
 
-  /// Próximos abertos (até 6) e os encerrados mais recentes (até 8 candidatos,
+  /// Próximos abertos e os em andamento (até 6) e os encerrados mais recentes (até 8 candidatos,
   /// ficam até 5 com palpite); os palpites da conta numa leitura por partida.
   Future<void> _loadMatches(String region) async {
     final response = await getRegionMatchesUseCase(region: region, season: _season);
@@ -141,7 +142,7 @@ class PredictionHubCubit extends Cubit<PredictionHubState> {
     final clock = now();
     final matches = response.right;
     final upcoming = PredictionHub.byKickoff(
-      matches.where((m) => MatchCardStatus.of(m, clock).upcoming && PredictionHub.kickoffOf(m, clock) != null),
+      matches.where((m) => hubPhaseOf(m, clock) != null && PredictionHub.kickoffOf(m, clock) != null),
       clock,
     ).take(PredictionHub.upcomingLimit).toList();
     final finished = PredictionHub.byKickoff(
@@ -183,4 +184,15 @@ class PredictionHubCubit extends Cubit<PredictionHubState> {
       emit(state.copyWith(predictions: predictions));
     });
   }
+}
+
+/// Fase do jogo na aba Palpitar pelo status do card (nulo = fora da lista).
+HubMatchPhase? hubPhaseOf(MatchDTO match, DateTime now) {
+  final status = MatchCardStatus.of(match, now);
+  return PredictionHub.phaseOf(
+    upcoming: status.upcoming,
+    live: status.live,
+    halfTime: status.halfTime,
+    waiting: status.waiting,
+  );
 }

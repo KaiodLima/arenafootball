@@ -42,6 +42,16 @@ export interface Achievement {
   meta: number;
   pontos: number;
   ativa: boolean;
+  /** Prêmio: pacotinhos de figurinhas (0–5) somados ao saldo extra ao desbloquear. */
+  pacotes: number;
+}
+
+/** Prêmio máximo de pacotinhos por conquista. */
+export const MAX_ACHIEVEMENT_PACKS = 5;
+
+/** Pacotinhos de figurinhas que as conquistas [unlocks] dão juntas. */
+export function achievementPackReward(unlocks: Achievement[]): number {
+  return unlocks.reduce((sum, a) => sum + a.pacotes, 0);
 }
 
 export function achievementFromDoc(id: string, data: Doc): Achievement {
@@ -53,6 +63,7 @@ export function achievementFromDoc(id: string, data: Doc): Achievement {
     meta,
     pontos: Math.max(0, Math.trunc(num(Number(data.pontos)))),
     ativa: data.ativa !== false,
+    pacotes: Math.min(MAX_ACHIEVEMENT_PACKS, Math.max(0, Math.trunc(num(Number(data.pacotes))))),
   };
 }
 
@@ -113,7 +124,11 @@ export function achievementMessage(uid: string, achievement: Achievement): PushM
   return {
     tipo: 'conquista',
     titulo: '🏅 Conquista desbloqueada!',
-    corpo: achievement.pontos > 0 ? `${achievement.titulo} · +${achievement.pontos} XP` : achievement.titulo,
+    corpo:
+      (achievement.pontos > 0 ? `${achievement.titulo} · +${achievement.pontos} XP` : achievement.titulo) +
+      (achievement.pacotes > 0
+        ? ` · 🎁 +${achievement.pacotes} ${achievement.pacotes === 1 ? 'pacotinho' : 'pacotinhos'} de figurinhas!`
+        : ''),
     aba: 'conquistas',
     regiao: '',
     alvo: { topic: userTopic(uid) },

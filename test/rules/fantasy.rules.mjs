@@ -133,6 +133,12 @@ export default async function run(env, check) {
     roundAction({ numero: 1, acao: 'apagar' }), { merge: true })));
   await check('usuário comum não abre rodada', assertFails(setDoc(doc(user, 'fantasy/fx'),
     roundAction({ numero: 1, acao: 'fechar' }), { merge: true })));
+  const teamsReset = (ids) => ({ zerarTimes: { ids, em: serverTimestamp() }, atualizadoEm: serverTimestamp() });
+  await check('admin zera os pontos de dois times', assertSucceeds(updateDoc(doc(admin, 'fantasy/fx'), teamsReset(['t1', 't2']))));
+  await check('zerar times sem time recusado', assertFails(updateDoc(doc(admin, 'fantasy/fx'), teamsReset([]))));
+  await check('zerar mais de 10 times recusado', assertFails(updateDoc(doc(admin, 'fantasy/fx'),
+    teamsReset(Array.from({ length: 11 }, (_, i) => `t${i}`)))));
+  await check('usuário comum não zera times', assertFails(updateDoc(doc(user, 'fantasy/fx'), teamsReset(['t1']))));
   await check('reapurarEm como texto recusado', assertFails(setDoc(doc(admin, 'fantasy/fx'),
     { reapurarEm: 'agora', atualizadoEm: serverTimestamp() }, { merge: true })));
 

@@ -343,6 +343,11 @@ class _PlayTab extends StatelessWidget {
     required this.onOpenMatch,
   });
 
+  HubMatchPhase _phase(MatchDTO match) => hubPhaseOf(match, now) ?? HubMatchPhase.open;
+
+  /// Aberto = palpitar; começado (travado) = abrir a partida.
+  void _action(MatchDTO match) => _phase(match) == HubMatchPhase.open ? onPredict(match) : onOpenMatch(match);
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -368,7 +373,8 @@ class _PlayTab extends StatelessWidget {
               teams: state.teams,
               prediction: state.predictions[upcoming.first.id],
               now: now,
-              onPredict: () => onPredict(upcoming.first),
+              phase: _phase(upcoming.first),
+              onPredict: () => _action(upcoming.first),
             ),
             const SizedBox(height: AppSizes.s10),
             for (final match in upcoming.skip(1))
@@ -377,7 +383,8 @@ class _PlayTab extends StatelessWidget {
                 teams: state.teams,
                 prediction: state.predictions[match.id],
                 now: now,
-                onPredict: () => onPredict(match),
+                phase: _phase(match),
+                onPredict: () => _action(match),
               ),
           ],
           if (loggedIn) ...[

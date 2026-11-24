@@ -7050,6 +7050,30 @@ abstract class AppLocalizations {
   /// **'Alterar'**
   String get predictionHubChange;
 
+  /// No description provided for @predictionHubLive.
+  ///
+  /// In pt, this message translates to:
+  /// **'AO VIVO'**
+  String get predictionHubLive;
+
+  /// No description provided for @predictionHubHalfTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'INTERVALO'**
+  String get predictionHubHalfTime;
+
+  /// No description provided for @predictionHubWaiting.
+  ///
+  /// In pt, this message translates to:
+  /// **'AGUARDANDO'**
+  String get predictionHubWaiting;
+
+  /// No description provided for @predictionHubClosed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Palpites encerrados'**
+  String get predictionHubClosed;
+
   /// No description provided for @predictionHubRecent.
   ///
   /// In pt, this message translates to:
@@ -14714,6 +14738,66 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Quem estiver abaixo do build {android} (Android) ou {ios} (iOS) fica bloqueado até atualizar o app.'**
   String appVersionRaiseText(int android, int ios);
+
+  /// No description provided for @achievementFieldPacks.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prêmio: pacotinhos de figurinhas'**
+  String get achievementFieldPacks;
+
+  /// No description provided for @achievementPacksPill.
+  ///
+  /// In pt, this message translates to:
+  /// **'🎁 +{count}'**
+  String achievementPacksPill(int count);
+
+  /// No description provided for @achievementPacksWon.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{🎁 Você ganhou 1 pacotinho de figurinhas! Abra no álbum.} other{🎁 Você ganhou {count} pacotinhos de figurinhas! Abra no álbum.}}'**
+  String achievementPacksWon(int count);
+
+  /// No description provided for @achievementOpenAlbum.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abrir o álbum'**
+  String get achievementOpenAlbum;
+
+  /// No description provided for @fantasyResetTeamsMenu.
+  ///
+  /// In pt, this message translates to:
+  /// **'Zerar pontos de times…'**
+  String get fantasyResetTeamsMenu;
+
+  /// No description provided for @fantasyResetTeamsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Zerar pontos de times'**
+  String get fantasyResetTeamsTitle;
+
+  /// No description provided for @fantasyResetTeamsText.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os atletas destes times perdem os pontos em todas as rodadas deste Fantasy, e o total de quem os escalou é recalculado. Se as partidas de teste continuarem existindo, os pontos voltam na próxima apuração da rodada: apague-as (ou tire a rodada delas) antes.'**
+  String get fantasyResetTeamsText;
+
+  /// No description provided for @fantasyResetTeamsPick.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha o time'**
+  String get fantasyResetTeamsPick;
+
+  /// No description provided for @fantasyResetTeamsAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar time'**
+  String get fantasyResetTeamsAdd;
+
+  /// No description provided for @fantasyResetTeamsAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Zerar pontos'**
+  String get fantasyResetTeamsAction;
 }
 
 class _AppLocalizationsDelegate

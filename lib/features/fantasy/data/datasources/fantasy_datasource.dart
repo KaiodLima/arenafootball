@@ -275,6 +275,21 @@ class FantasyDataSource {
     }
   }
 
+  /// "Zerar pontos de times": as functions tiram os pontos dos atletas dos
+  /// times [teamIds] (1 a 10) em todas as rodadas (`zerarTimes`).
+  Future<Either<Failure, void>> requestTeamsReset(String fantasyId, List<String> teamIds) async {
+    try {
+      await _doc(fantasyId).update({
+        'zerarTimes': {'ids': teamIds, 'em': FieldValue.serverTimestamp()},
+        'atualizadoEm': FieldValue.serverTimestamp(),
+      });
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('requestTeamsReset $fantasyId', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível pedir para zerar os times.'));
+    }
+  }
+
   /// "Zerar pontuações (testes)": as functions zeram os pontos do Fantasy.
   Future<Either<Failure, void>> requestReset(String fantasyId) async {
     try {

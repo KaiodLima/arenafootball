@@ -3,6 +3,9 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/album/presentation/bloc/album_event_cubit.dart';
+import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/achievements/data/dtos/achievement_dto.dart';
 import 'package:arena_soccer/features/achievements/presentation/widgets/achievement_labels.dart';
 import 'package:arena_soccer/features/achievements/presentation/widgets/medal_badge.dart';
@@ -164,8 +167,22 @@ class _UnlockCelebrationState extends State<_UnlockCelebration> with TickerProvi
                             _Pill(text: achievementTierLabel(l10n, achievement.tier).toUpperCase(), color: dark),
                             const SizedBox(width: AppSizes.s8),
                             _Pill(text: l10n.achievementsPoints(achievement.points), color: AppColors.primaryDark),
+                            if (achievement.packs > 0) ...[
+                              const SizedBox(width: AppSizes.s8),
+                              _Pill(text: l10n.achievementPacksPill(achievement.packs), color: AppColors.medalGoldDark),
+                            ],
                           ],
                         ),
+                        // Prêmio em pacotinhos: já está no saldo extra do álbum.
+                        if (achievement.packs > 0) ...[
+                          const SizedBox(height: AppSizes.s12),
+                          Text(
+                            l10n.achievementPacksWon(achievement.packs),
+                            key: const ValueKey('achievement-packs-won'),
+                            textAlign: TextAlign.center,
+                            style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s14),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -174,6 +191,18 @@ class _UnlockCelebrationState extends State<_UnlockCelebration> with TickerProvi
                     title: l10n.achievementSeeAll,
                     function: () => Navigator.pop(context, true),
                   ),
+                  if (achievement.packs > 0 && _albumActive(context))
+                    TextButton.icon(
+                      key: const ValueKey('achievement-open-album'),
+                      onPressed: () {
+                        final navigator = Navigator.of(context);
+                        navigator.pop(false);
+                        navigator.pushNamed(AppRoutes.albumPage);
+                      },
+                      icon: const Icon(Icons.collections_bookmark_rounded, color: AppColors.medalGoldDark),
+                      label:
+                          Text(l10n.achievementOpenAlbum, style: AppTypography.label(color: AppColors.medalGoldDark)),
+                    ),
                   TextButton(
                     onPressed: () => Navigator.pop(context, false),
                     child: Text(
@@ -207,4 +236,13 @@ class _Pill extends StatelessWidget {
         ),
         child: Text(text, style: AppTypography.label(color: color).copyWith(fontSize: AppSizes.s12, letterSpacing: 1)),
       );
+}
+
+/// Há um álbum de figurinhas ativo para a conta (o atalho "Abrir álbum").
+bool _albumActive(BuildContext context) {
+  try {
+    return BlocProvider.of<AlbumEventCubit>(context, listen: false).state.event != null;
+  } catch (_) {
+    return false;
+  }
 }

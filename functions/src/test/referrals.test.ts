@@ -80,3 +80,9 @@ test('liga/desliga: sem a config = desligada; religar resolve as pendentes', () 
   assert.equal(referralJustEnabled({ ativo: true }, { ativo: true }), false);
   assert.equal(referralJustEnabled({ ativo: true }, { ativo: false }), false);
 });
+
+test('prêmio da indicação não diminui o saldo vindo de conquistas', () => {
+  assert.equal(addExtraPack({ pacotesExtras: 7 }), 7);
+  assert.equal(addExtraPack({ pacotesExtras: 4 }), 5);
+  assert.equal(addExtraPack({ pacotesExtras: 5 }), 5);
+});

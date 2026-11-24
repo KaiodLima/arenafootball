@@ -2,6 +2,10 @@ import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/match_time.dart';
 import 'package:arena_soccer/features/predictions/data/dtos/prediction_dto.dart';
 
+/// Momento de um jogo da aba Palpitar: aberto para palpite ou já começado
+/// (fica até terminar, travado).
+enum HubMatchPhase { open, live, halfTime, waiting }
+
 /// Contas da central do bolão (puras): início das partidas, "fecha em",
 /// quem a conta persegue no ranking e o aproveitamento.
 abstract final class PredictionHub {
@@ -12,6 +16,21 @@ abstract final class PredictionHub {
 
   /// Pontos de um placar exato (o máximo por palpite).
   static const int maxPointsPerPrediction = 10;
+
+  /// Fase do jogo na aba Palpitar pelo status do card; terminado (ou sem
+  /// data para saber) = nulo, fora da lista.
+  static HubMatchPhase? phaseOf({
+    required bool upcoming,
+    required bool live,
+    required bool halfTime,
+    required bool waiting,
+  }) {
+    if (halfTime) return HubMatchPhase.halfTime;
+    if (live) return HubMatchPhase.live;
+    if (waiting) return HubMatchPhase.waiting;
+    if (upcoming) return HubMatchPhase.open;
+    return null;
+  }
 
   /// Instante (UTC) do início pela data "dd/MM" e o horário "HH:mm" de
   /// Brasília; data sem ano = a mais perto de [now] (janeiro visto em

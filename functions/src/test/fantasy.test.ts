@@ -12,6 +12,9 @@ import {
   previousClosedRound,
   orphanRoundUpdate,
   rescoreRequested,
+  lineupWithoutAthletes,
+  staleAthleteDocs,
+  teamsResetRequested,
   roundActionRequested,
   roundFinalized,
   resetRequested,
@@ -212,4 +215,34 @@ test('abrir/fechar rodada pelo admin: só com "em" novo e ação válida', () =>
   assert.equal(roundActionRequested({}, { acaoRodada: { numero: 1, acao: 'abrir', em: stamp(3) } }), null);
   assert.equal(roundActionRequested({}, { acaoRodada: { numero: 0, acao: 'fechar', em: stamp(3) } }), null);
   assert.equal(roundActionRequested({}, { acaoRodada: { numero: 1, acao: 'apagar', em: stamp(3) } }), null);
+});
+
+test('zerar pontos de times: só com "em" novo e de 1 a 10 ids', () => {
+  const stamp = (ms: number) => ({ toMillis: () => ms });
+  const request = { zerarTimes: { ids: ['t1', 't2', 't1'], em: stamp(1) } };
+  assert.deepEqual(teamsResetRequested({}, request), ['t1', 't2']);
+  assert.equal(teamsResetRequested(request, request), null);
+  assert.equal(teamsResetRequested({}, { zerarTimes: { ids: [], em: stamp(2) } }), null);
+  assert.equal(
+    teamsResetRequested({}, { zerarTimes: { ids: Array.from({ length: 11 }, (_, i) => `t${i}`), em: stamp(3) } }),
+    null,
+  );
+});
+
+test('escalação sem os atletas zerados: pontos de novo e fora de "jogaram"', () => {
+  const lineup = {
+    pontosAtletas: { gk: 5, fw: 22.5, mf: -3 },
+    atletasJogaram: ['gk', 'fw', 'mf'],
+  };
+  assert.deepEqual(lineupWithoutAthletes(lineup, new Set(['fw'])), {
+    pontos: 2,
+    pontosAtletas: { gk: 5, fw: 0, mf: -3 },
+    atletasJogaram: ['gk', 'mf'],
+  });
+  assert.equal(lineupWithoutAthletes(lineup, new Set(['zz'])), null);
+});
+
+test('auditoria que sobrou: gravados que não foram apurados agora', () => {
+  assert.deepEqual(staleAthleteDocs(['a', 'b', 'c'], new Set(['a', 'c'])), ['b']);
+  assert.deepEqual(staleAthleteDocs([], new Set(['a'])), []);
 });

@@ -131,6 +131,7 @@ import {
   matchTeams,
 } from './standings';
 import {
+  achievementPackReward,
   Achievement,
   achievementFromDoc,
   achievementMessage,
@@ -176,6 +177,9 @@ import {
   previousClosedRound,
   orphanRoundUpdate,
   rescoreRequested,
+  lineupWithoutAthletes,
+  staleAthleteDocs,
+  teamsResetRequested,
   roundActionRequested,
   roundFinalized,
   resetRequested,
@@ -1196,6 +1200,7 @@ async function scoreFantasyRound(fantasyRef: DocRef, config: FantasyDoc, round: 
   const players = athleteIds.length ? await db.getAll(...athleteIds.map((id) => playersCol.doc(id))) : [];
   const enrollmentKey = `c${Number(config.idCampeonato ?? 0)}`;
   const totals: Record<string, number> = {};
+  const scored = new Set<string>();
   const played = new Set<string>();
   const cardAthletes: FantasyCardAthlete[] = [];
   let batch = db.batch();
@@ -1222,6 +1227,7 @@ async function scoreFantasyRound(fantasyRef: DocRef, config: FantasyDoc, round: 
       posicao: String(result.posicao ?? ''),
       pontos: result.total,
     });
+    scored.add(player.id);
     batch.set(roundRef.collection('atletas').doc(player.id), {
       ...result,
       nome: String(data.nome ?? ''),
@@ -1239,6 +1245,14 @@ async function scoreFantasyRound(fantasyRef: DocRef, config: FantasyDoc, round: 
     }
   }
   if (pending) await batch.commit();
+  // Auditoria que sobrou (atleta que só estava numa partida apagada/trocada): sai do ranking e dos craques.
+  const audit = await roundRef.collection('atletas').get();
+  const stale = staleAthleteDocs(audit.docs.map((d) => d.id), scored);
+  for (let n = 0; n < stale.length; n += 400) {
+    const cleanup = db.batch();
+    for (const id of stale.slice(n, n + 400)) cleanup.delete(roundRef.collection('atletas').doc(id));
+    await cleanup.commit();
+  }
 
   for (const lineup of lineups.docs) {
     const participantRef = fantasyRef.collection(FANTASY_PARTICIPANTS).doc(lineup.id);
@@ -1371,6 +1385,66 @@ async function applyRoundAction(fantasyRef: DocRef, action: RoundAction): Promis
 }
 
 /**
+ * "Zerar pontos de times": em cada rodada, apaga a auditoria dos atletas dos
+ * times [teamIds], tira os pontos deles das escalações (a diferença vai para o
+ * participante pelo `aplicado`, idempotente) e refaz o card "Craques da
+ * rodada" com quem sobrou (vazio = oculto). Sem push.
+ */
+async function resetFantasyTeams(fantasyRef: DocRef, config: FantasyDoc, teamIds: string[]): Promise<void> {
+  const { db, FieldValue } = await admin();
+  const teams = new Set(teamIds);
+  const rounds = await fantasyRef.collection(FANTASY_ROUNDS).get();
+  let athletesRemoved = 0;
+  for (const round of rounds.docs) {
+    const audit = await round.ref.collection('atletas').get();
+    const removed = new Set(audit.docs.filter((d) => teams.has(text(d.data().idTime))).map((d) => d.id));
+    if (!removed.size) continue;
+    athletesRemoved += removed.size;
+    const ids = [...removed];
+    for (let n = 0; n < ids.length; n += 400) {
+      const batch = db.batch();
+      for (const id of ids.slice(n, n + 400)) batch.delete(round.ref.collection('atletas').doc(id));
+      await batch.commit();
+    }
+    const lineups = await round.ref.collection(FANTASY_LINEUPS).get();
+    for (const lineup of lineups.docs) {
+      if (!lineupWithoutAthletes(lineup.data(), removed)) continue;
+      const participantRef = fantasyRef.collection(FANTASY_PARTICIPANTS).doc(lineup.id);
+      await db.runTransaction(async (tx) => {
+        const snap = await tx.get(lineup.ref);
+        const change = lineupWithoutAthletes(snap.data() ?? {}, removed);
+        if (!change) return;
+        const delta = pointsDelta(change.pontos, snap.data()?.aplicado);
+        tx.update(lineup.ref, { ...change, aplicado: change.pontos, processadoEm: FieldValue.serverTimestamp() });
+        if (delta !== 0) tx.set(participantRef, { pontos: FieldValue.increment(delta) }, { merge: true });
+      });
+    }
+    // Card "Craques da rodada": o top 3 com quem sobrou (só se o card existe).
+    const cardRef = db.collection('noticias').doc(fantasyRoundNewsId(fantasyRef.id, Number(round.id)));
+    const card = await cardRef.get();
+    if (!card.exists) continue;
+    const left: FantasyCardAthlete[] = audit.docs
+      .filter((d) => !removed.has(d.id))
+      .map((d) => {
+        const data = d.data();
+        return {
+          idJogador: d.id,
+          nome: text(data.nome),
+          time: text(data.time),
+          idTime: text(data.idTime),
+          urlImagem: text(data.urlImagem),
+          posicao: text(data.posicao),
+          pontos: Number(data.total) || 0,
+        };
+      });
+    const news = fantasyRoundNews(fantasyRef.id, config, Number(round.id), fantasyTopThree(left));
+    if (news) await cardRef.set(news, { merge: true });
+    else await cardRef.update({ exibir: 'false' });
+  }
+  logger.info('Fantasy: pontos de times zerados', { fantasy: fantasyRef.id, teams: teamIds, athletesRemoved });
+}
+
+/**
  * "Zerar pontuações (testes)": participantes com 0, escalações sem os pontos,
  * rodadas sem a auditoria dos atletas e sem a `apuracao` (status, prazo,
  * partidas e `finalizada` ficam: o mercado não muda), sem campeão e sem os
@@ -1445,6 +1519,12 @@ export const onFantasyWritten = onDocumentWritten(`${FANTASY}/{fantasyId}`, asyn
   const roundAction = roundActionRequested(before, after);
   if (roundAction) {
     await applyRoundAction(ref, roundAction);
+    return;
+  }
+  // "Zerar pontos de times" do admin (atletas que só jogaram partidas de teste).
+  const teamIds = teamsResetRequested(before, after);
+  if (teamIds) {
+    await resetFantasyTeams(ref, after, teamIds);
     return;
   }
   // "Zerar pontuações (testes)" do admin: antes do reapurar (os dois no mesmo
@@ -1929,17 +2009,36 @@ export const onProgressWritten = onDocumentWritten('usuarios/{uid}/progresso/con
     if (first) await ref.set({ [UNLOCKED_FIELD]: [] }, { merge: true });
     return;
   }
-  const batch = db.batch();
-  for (const achievement of unlocks) {
-    batch.set(db.collection('usuarios').doc(uid).collection('conquistas').doc(achievement.id), {
-      em: FieldValue.serverTimestamp(),
-      vista: first,
-    });
-  }
-  batch.set(ref, { [UNLOCKED_FIELD]: FieldValue.arrayUnion(...unlocks.map((a) => a.id)) }, { merge: true });
-  await batch.commit();
+  // Transação: relê as desbloqueadas (dois gatilhos juntos não pagam o prêmio duas vezes).
+  const granted = await db.runTransaction(async (tx) => {
+    const current = (await tx.get(ref)).data();
+    const done = new Set(Array.isArray(current?.[UNLOCKED_FIELD]) ? current[UNLOCKED_FIELD].map(String) : []);
+    const fresh = unlocks.filter((a) => !done.has(a.id));
+    if (!fresh.length) return [] as typeof unlocks;
+    for (const achievement of fresh) {
+      tx.set(db.collection('usuarios').doc(uid).collection('conquistas').doc(achievement.id), {
+        em: FieldValue.serverTimestamp(),
+        vista: first,
+      });
+    }
+    tx.set(ref, { [UNLOCKED_FIELD]: FieldValue.arrayUnion(...fresh.map((a) => a.id)) }, { merge: true });
+    // Prêmio em pacotinhos (saldo extra do álbum); a 1ª avaliação (retroativa) não paga.
+    const packs = first ? 0 : achievementPackReward(fresh);
+    if (packs > 0) {
+      tx.set(
+        db.collection('indicacoes').doc(uid),
+        {
+          pacotesExtras: FieldValue.increment(packs),
+          pacotesExtrasGanhos: FieldValue.increment(packs),
+          pacotesConquistas: FieldValue.increment(packs),
+        },
+        { merge: true },
+      );
+    }
+    return fresh;
+  });
   if (first) return;
-  for (const achievement of unlocks) {
+  for (const achievement of granted) {
     await deliver(
       `conquista_${uid}_${achievement.id}`,
       achievementMessage(uid, achievement),

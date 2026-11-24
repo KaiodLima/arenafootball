@@ -1028,7 +1028,7 @@ service cloud.firestore {
       function validFantasyConfig(d) {
         return d.keys().hasOnly(['idCampeonato', 'temporada', 'titulo', 'urlImagem', 'fk_competicao', 'idRegiao',
             'idsRegioes', 'ativo', 'minMinutos', 'minMinutosDefesa', 'capitao', 'atualizadoEm', 'reapurarEm',
-            'zerarEm', 'zeradoEm', 'acaoRodada', 'rodadaAtual', 'participantes', 'campeao', 'campeaoEm'])
+            'zerarEm', 'zeradoEm', 'zerarTimes', 'acaoRodada', 'rodadaAtual', 'participantes', 'campeao', 'campeaoEm'])
           && d.ativo is bool
           && d.minMinutos is int && d.minMinutos >= 0 && d.minMinutos <= 120
           && d.minMinutosDefesa is int && d.minMinutosDefesa >= d.minMinutos && d.minMinutosDefesa <= 120
@@ -1042,6 +1042,10 @@ service cloud.firestore {
           && (!('zerarEm' in d) || d.zerarEm is timestamp)
           // "Abrir/Fechar rodada" do admin: rodada, ação e (abrir) o prazo no futuro.
           && (!('acaoRodada' in d) || validRoundAction(d.acaoRodada))
+          // "Zerar pontos de times" do admin: 1 a 10 times e a hora do pedido.
+          && (!('zerarTimes' in d) || (d.zerarTimes is map && d.zerarTimes.keys().hasOnly(['ids', 'em'])
+            && d.zerarTimes.ids is list && d.zerarTimes.ids.size() >= 1 && d.zerarTimes.ids.size() <= 10
+            && d.zerarTimes.em is timestamp))
           && d.atualizadoEm == request.time;
       }
 

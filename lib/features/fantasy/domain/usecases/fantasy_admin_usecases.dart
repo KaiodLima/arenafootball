@@ -41,6 +41,16 @@ class RequestFantasyRoundActionUseCase {
       _repository.requestRoundAction(fantasyId, round, open: open, deadline: deadline);
 }
 
+/// "Zerar pontos de times" (admin): os atletas dos times perdem os pontos do Fantasy.
+class RequestFantasyTeamsResetUseCase {
+  final IFantasyRepository _repository;
+
+  RequestFantasyTeamsResetUseCase(this._repository);
+
+  Future<Either<Failure, void>> call(String fantasyId, List<String> teamIds) =>
+      _repository.requestTeamsReset(fantasyId, teamIds);
+}
+
 /// "Reapurar rodadas" (admin).
 class RequestFantasyRescoreUseCase {
   final IFantasyRepository _repository;

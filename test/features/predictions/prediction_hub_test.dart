@@ -20,6 +20,8 @@ import 'package:arena_soccer/features/predictions/domain/usecases/get_my_predict
 import 'package:arena_soccer/features/predictions/domain/usecases/get_prediction_ranking_usecase.dart';
 import 'package:arena_soccer/features/predictions/presentation/bloc/prediction_hub_cubit.dart';
 import 'package:arena_soccer/features/predictions/presentation/page/prediction_ranking_page.dart';
+import 'package:arena_soccer/features/predictions/presentation/widgets/hub_widgets.dart';
+import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dart';
 import 'package:arena_soccer/features/regions/presentation/bloc/region_state.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
@@ -190,6 +192,76 @@ void main() {
     expect(cubit.state.predictions.keys, containsAll(['m1', 'f1']));
     expect(mine.asked.single, ['m1', 'm2', 'm3', 'f1', 'f2']);
     await cubit.close();
+  });
+
+  test('fase na aba Palpitar: aberto, ao vivo, intervalo, aguardando; terminado sai', () {
+    HubMatchPhase? phase({bool upcoming = false, bool live = false, bool halfTime = false, bool waiting = false}) =>
+        PredictionHub.phaseOf(upcoming: upcoming, live: live, halfTime: halfTime, waiting: waiting);
+    expect(phase(upcoming: true), HubMatchPhase.open);
+    expect(phase(live: true), HubMatchPhase.live);
+    expect(phase(live: true, halfTime: true), HubMatchPhase.halfTime);
+    expect(phase(waiting: true), HubMatchPhase.waiting);
+    expect(phase(), isNull);
+  });
+
+  test('cubit: o jogo começado segue na lista até terminar', () async {
+    // 15/11 15:45 em Brasília: m1 (15:30) em andamento pelo horário.
+    final live = DateTime.utc(2026, 11, 15, 18, 45);
+    final cubit = PredictionHubCubit(_Ranking(), _Matches(), _Mine(), _Teams(), () => live);
+    await cubit.load(region: 'Floresta', uid: 'u1');
+    expect(cubit.state.upcoming.map((m) => m.id), ['m1', 'm2', 'm3']);
+    expect(hubPhaseOf(_matches.first, live), HubMatchPhase.live);
+    // Encerrada pelo admin: sai.
+    expect(
+      hubPhaseOf(
+          MatchDTO(
+              id: 'x',
+              homeTeam: 'A',
+              awayTeam: 'B',
+              date: '15/11',
+              time: '15:30',
+              manualStatus: MatchManualStatus.finished),
+          live),
+      isNull,
+    );
+    await cubit.close();
+  });
+
+  testWidgets('destaque travado: ao vivo com placar, palpite sem "Alterar", sem palpite = encerrados', (tester) async {
+    var taps = 0;
+    Future<void> show(PredictionDTO? prediction) => tester.pumpWidget(MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('pt'),
+          home: Scaffold(
+            body: HubFeaturedMatch(
+              match: const MatchDTO(
+                  id: 'm1',
+                  homeTeam: 'Lava Jato',
+                  awayTeam: 'Volta',
+                  date: '15/11',
+                  time: '15:30',
+                  homeGoals: 1,
+                  awayGoals: 0),
+              teams: TeamDirectory(const []),
+              prediction: prediction,
+              now: DateTime.utc(2026, 11, 15, 18, 45),
+              phase: HubMatchPhase.live,
+              onPredict: () => taps++,
+            ),
+          ),
+        ));
+    await show(const PredictionDTO(uid: 'u1', home: 2, away: 1));
+    expect(find.text('AO VIVO'), findsOneWidget);
+    expect(find.text('1 × 0'), findsOneWidget);
+    expect(find.text('2 × 1'), findsOneWidget);
+    expect(find.text('Alterar'), findsNothing);
+    expect(find.text('PALPITAR'), findsNothing);
+    await tester.tap(find.text('AO VIVO'));
+    expect(taps, 1);
+    await show(null);
+    expect(find.byKey(const ValueKey('hub-predictions-closed')), findsOneWidget);
+    expect(find.text('PALPITAR'), findsNothing);
   });
 
   Future<void> pump(WidgetTester tester, {bool guest = false, Key? boundary, Size size = const Size(400, 1300)}) async {

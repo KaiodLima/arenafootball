@@ -134,6 +134,10 @@ class _AchievementDetailsState extends State<_AchievementDetails> with SingleTic
                           _Pill(text: achievementTierLabel(l10n, achievement.tier).toUpperCase(), color: accent),
                           const SizedBox(width: AppSizes.s8),
                           _Pill(text: l10n.achievementsPoints(achievement.points), color: AppColors.primaryDark),
+                          if (achievement.packs > 0) ...[
+                            const SizedBox(width: AppSizes.s8),
+                            _Pill(text: l10n.achievementPacksPill(achievement.packs), color: AppColors.medalGoldDark),
+                          ],
                         ],
                       ),
                       const SizedBox(height: AppSizes.s24),

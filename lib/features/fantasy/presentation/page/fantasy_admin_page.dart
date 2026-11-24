@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/utils/components/team_picker_sheet.dart';
+import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_ranking_dtos.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_round_dtos.dart';
@@ -96,6 +98,74 @@ class _FantasyAdminPageState extends State<FantasyAdminPage> {
       return;
     }
     if (mounted) await _cubit.resetScores();
+  }
+
+  /// "Zerar pontos de times": escolhe 1 a 10 times do campeonato (um por vez,
+  /// pela folha de times), confirma e pede às functions.
+  Future<void> _resetTeams() async {
+    final l10n = AppLocalizations.of(context);
+    final championship = widget.championship;
+    final teams = [
+      for (var i = 0; i < championship.teams.length; i++)
+        if (i < championship.teamIds.length && championship.teamIds[i].isNotEmpty)
+          TeamDTO(id: championship.teamIds[i], name: championship.teams[i], region: ''),
+    ];
+    final picked = <TeamDTO>[];
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialog) => AlertDialog(
+          title: Text(l10n.fantasyResetTeamsTitle),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.fantasyResetTeamsText, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s14)),
+              const SizedBox(height: AppSizes.s12),
+              Wrap(
+                spacing: AppSizes.s6,
+                runSpacing: AppSizes.s6,
+                children: [
+                  for (final team in picked)
+                    InputChip(
+                      key: ValueKey('fantasy-reset-team-${team.id}'),
+                      label: Text(team.name),
+                      onDeleted: () => setDialog(() => picked.remove(team)),
+                    ),
+                ],
+              ),
+              if (picked.length < 10)
+                TextButton.icon(
+                  key: const ValueKey('fantasy-reset-teams-add'),
+                  onPressed: () async {
+                    final team = await showTeamPickerSheet(
+                      dialogContext,
+                      title: l10n.fantasyResetTeamsPick,
+                      teams: [
+                        for (final t in teams)
+                          if (!picked.any((p) => p.id == t.id)) t,
+                      ],
+                    );
+                    if (team != null) setDialog(() => picked.add(team));
+                  },
+                  icon: const Icon(Icons.add_rounded),
+                  label: Text(l10n.fantasyResetTeamsAdd),
+                ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.fantasyCancel)),
+            TextButton(
+              key: const ValueKey('fantasy-reset-teams-confirm'),
+              style: TextButton.styleFrom(foregroundColor: AppColors.danger),
+              onPressed: picked.isEmpty ? null : () => Navigator.pop(dialogContext, true),
+              child: Text(l10n.fantasyResetTeamsAction),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (ok == true && mounted) await _cubit.resetTeams([for (final t in picked) t.id]);
   }
 
   /// "Fechar agora": confirmação e o pedido.
@@ -243,8 +313,22 @@ class _FantasyAdminPageState extends State<FantasyAdminPage> {
                 builder: (context, state) => PopupMenuButton<String>(
                   key: const ValueKey('fantasy-admin-menu'),
                   enabled: !state.resetting,
-                  onSelected: (_) => _confirmReset(),
+                  onSelected: (value) => value == 'teams' ? _resetTeams() : _confirmReset(),
                   itemBuilder: (context) => [
+                    PopupMenuItem<String>(
+                      key: const ValueKey('fantasy-reset-teams'),
+                      value: 'teams',
+                      child: Row(
+                        children: [
+                          const Icon(Icons.group_remove_rounded, color: AppColors.danger),
+                          const SizedBox(width: AppSizes.s10),
+                          Flexible(
+                            child:
+                                Text(l10n.fantasyResetTeamsMenu, style: AppTypography.label(color: AppColors.danger)),
+                          ),
+                        ],
+                      ),
+                    ),
                     PopupMenuItem<String>(
                       key: const ValueKey('fantasy-reset'),
                       value: 'reset',

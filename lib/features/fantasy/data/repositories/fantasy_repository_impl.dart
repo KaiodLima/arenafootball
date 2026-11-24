@@ -119,6 +119,10 @@ class FantasyRepositoryImpl implements IFantasyRepository {
   Future<Either<Failure, void>> requestReset(String fantasyId) => _dataSource.requestReset(fantasyId);
 
   @override
+  Future<Either<Failure, void>> requestTeamsReset(String fantasyId, List<String> teamIds) =>
+      _dataSource.requestTeamsReset(fantasyId, teamIds);
+
+  @override
   Future<Either<Failure, void>> requestRoundAction(String fantasyId, int round,
           {required bool open, DateTime? deadline}) =>
       _dataSource.requestRoundAction(fantasyId, round, open: open, deadline: deadline);

@@ -4307,6 +4307,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get predictionHubChange => 'Change';
 
   @override
+  String get predictionHubLive => 'LIVE';
+
+  @override
+  String get predictionHubHalfTime => 'HALF-TIME';
+
+  @override
+  String get predictionHubWaiting => 'WAITING';
+
+  @override
+  String get predictionHubClosed => 'Predictions closed';
+
+  @override
   String get predictionHubRecent => 'Your latest predictions';
 
   @override
@@ -8859,4 +8871,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String appVersionRaiseText(int android, int ios) {
     return 'Users below build $android (Android) or $ios (iOS) are blocked until they update the app.';
   }
+
+  @override
+  String get achievementFieldPacks => 'Reward: sticker packs';
+
+  @override
+  String achievementPacksPill(int count) {
+    return '🎁 +$count';
+  }
+
+  @override
+  String achievementPacksWon(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '🎁 You won $count sticker packs! Open them in the album.',
+      one: '🎁 You won 1 sticker pack! Open it in the album.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get achievementOpenAlbum => 'Open the album';
+
+  @override
+  String get fantasyResetTeamsMenu => 'Reset team points…';
+
+  @override
+  String get fantasyResetTeamsTitle => 'Reset team points';
+
+  @override
+  String get fantasyResetTeamsText =>
+      'Players from these teams lose their points in every round of this Fantasy, and the totals of whoever picked them are recalculated. If the test matches still exist, the points come back on the next round scoring: delete them (or remove their round) first.';
+
+  @override
+  String get fantasyResetTeamsPick => 'Pick the team';
+
+  @override
+  String get fantasyResetTeamsAdd => 'Add team';
+
+  @override
+  String get fantasyResetTeamsAction => 'Reset points';
 }

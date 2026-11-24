@@ -75,9 +75,13 @@ export function referralDecision(input: {
   return { ok: true };
 }
 
-/** Saldo de pacotinhos extras com mais um (até [MAX_EXTRA_PACKS]). */
+/**
+ * Saldo de pacotinhos extras com mais um da indicação (até [MAX_EXTRA_PACKS]);
+ * nunca diminui um saldo maior vindo de prêmios de conquista.
+ */
 export function addExtraPack(referral: Doc | undefined): number {
-  return Math.min(MAX_EXTRA_PACKS, num(referral?.pacotesExtras) + 1);
+  const current = Math.max(0, num(referral?.pacotesExtras));
+  return Math.max(current, Math.min(MAX_EXTRA_PACKS, current + 1));
 }
 
 /** Saldo de pacotinhos extras guardado. */

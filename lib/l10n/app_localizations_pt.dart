@@ -4326,6 +4326,18 @@ class AppLocalizationsPt extends AppLocalizations {
   String get predictionHubChange => 'Alterar';
 
   @override
+  String get predictionHubLive => 'AO VIVO';
+
+  @override
+  String get predictionHubHalfTime => 'INTERVALO';
+
+  @override
+  String get predictionHubWaiting => 'AGUARDANDO';
+
+  @override
+  String get predictionHubClosed => 'Palpites encerrados';
+
+  @override
   String get predictionHubRecent => 'Seus últimos palpites';
 
   @override
@@ -8906,4 +8918,45 @@ class AppLocalizationsPt extends AppLocalizations {
   String appVersionRaiseText(int android, int ios) {
     return 'Quem estiver abaixo do build $android (Android) ou $ios (iOS) fica bloqueado até atualizar o app.';
   }
+
+  @override
+  String get achievementFieldPacks => 'Prêmio: pacotinhos de figurinhas';
+
+  @override
+  String achievementPacksPill(int count) {
+    return '🎁 +$count';
+  }
+
+  @override
+  String achievementPacksWon(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '🎁 Você ganhou $count pacotinhos de figurinhas! Abra no álbum.',
+      one: '🎁 Você ganhou 1 pacotinho de figurinhas! Abra no álbum.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get achievementOpenAlbum => 'Abrir o álbum';
+
+  @override
+  String get fantasyResetTeamsMenu => 'Zerar pontos de times…';
+
+  @override
+  String get fantasyResetTeamsTitle => 'Zerar pontos de times';
+
+  @override
+  String get fantasyResetTeamsText =>
+      'Os atletas destes times perdem os pontos em todas as rodadas deste Fantasy, e o total de quem os escalou é recalculado. Se as partidas de teste continuarem existindo, os pontos voltam na próxima apuração da rodada: apague-as (ou tire a rodada delas) antes.';
+
+  @override
+  String get fantasyResetTeamsPick => 'Escolha o time';
+
+  @override
+  String get fantasyResetTeamsAdd => 'Adicionar time';
+
+  @override
+  String get fantasyResetTeamsAction => 'Zerar pontos';
 }

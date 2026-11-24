@@ -22,6 +22,11 @@ class AchievementDTO extends Equatable {
   /// XP que a conquista dá.
   final int points;
 
+  /// Prêmio: pacotinhos de figurinhas (0–5) somados ao saldo extra do álbum
+  /// quando a conta desbloqueia (pago pelas functions).
+  final int packs;
+  static const int maxPacks = 5;
+
   /// Bloqueada aparece como "?" (não revela o que é).
   final bool secret;
 
@@ -39,6 +44,7 @@ class AchievementDTO extends Equatable {
     required this.metric,
     this.goal = 1,
     this.points = 10,
+    this.packs = 0,
     this.secret = false,
     this.active = true,
     this.order = 0,
@@ -57,6 +63,7 @@ class AchievementDTO extends Equatable {
         metric: AchievementMetric.fromKey(data['metrica']?.toString()),
         goal: _int(data['meta'], 1).clamp(1, 1000000),
         points: _int(data['pontos'], 0).clamp(0, 100000),
+        packs: _int(data['pacotes'], 0).clamp(0, maxPacks),
         secret: data['secreta'] == true,
         active: data['ativa'] != false,
         order: _int(data['ordem'], 0),
@@ -74,6 +81,7 @@ class AchievementDTO extends Equatable {
         'metrica': metric?.key ?? '',
         'meta': goal,
         'pontos': points,
+        'pacotes': packs,
         'secreta': secret,
         'ativa': active,
         'ordem': order,
@@ -89,6 +97,7 @@ class AchievementDTO extends Equatable {
     AchievementMetric? metric,
     int? goal,
     int? points,
+    int? packs,
     bool? secret,
     bool? active,
     int? order,
@@ -103,6 +112,7 @@ class AchievementDTO extends Equatable {
       metric: metric ?? this.metric,
       goal: goal ?? this.goal,
       points: points ?? this.points,
+      packs: packs ?? this.packs,
       secret: secret ?? this.secret,
       active: active ?? this.active,
       order: order ?? this.order,
@@ -111,5 +121,5 @@ class AchievementDTO extends Equatable {
 
   @override
   List<Object?> get props =>
-      [id, title, description, category, icon, tier, metric, goal, points, secret, active, order];
+      [id, title, description, category, icon, tier, metric, goal, points, packs, secret, active, order];
 }

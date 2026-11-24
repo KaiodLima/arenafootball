@@ -131,6 +131,9 @@ class FantasyAdminCubit extends Cubit<FantasyAdminState> {
   /// "Fechar agora"/"Reabrir" a rodada; nulo = sem a ação (testes antigos).
   final RequestFantasyRoundActionUseCase? _roundAction;
 
+  /// "Zerar pontos de times"; nulo = sem a ação (testes antigos).
+  final RequestFantasyTeamsResetUseCase? _teamsReset;
+
   FantasyAdminCubit(
     this._watchRounds,
     this._participants,
@@ -140,8 +143,10 @@ class FantasyAdminCubit extends Cubit<FantasyAdminState> {
     this._athletes, {
     RequestFantasyResetUseCase? reset,
     RequestFantasyRoundActionUseCase? roundAction,
+    RequestFantasyTeamsResetUseCase? teamsReset,
   })  : _reset = reset,
         _roundAction = roundAction,
+        _teamsReset = teamsReset,
         super(const FantasyAdminState());
 
   StreamSubscription<Object?>? _roundsSub;
@@ -223,6 +228,21 @@ class FantasyAdminCubit extends Cubit<FantasyAdminState> {
     if (reset == null || state.resetting) return;
     emit(state.copyWith(resetting: true));
     final response = await reset(_fantasyId);
+    if (isClosed) return;
+    response.fold(
+      (failure) =>
+          emit(state.copyWith(resetting: false, reset: FantasyResetResult.failed, failure: failure.toString())),
+      (_) => emit(state.copyWith(resetting: false, reset: FantasyResetResult.requested)),
+    );
+  }
+
+  /// "Zerar pontos de times": os atletas dos times [teamIds] perdem os pontos
+  /// em todas as rodadas (o snackbar usa o mesmo aviso do "Zerar pontuações").
+  Future<void> resetTeams(List<String> teamIds) async {
+    final reset = _teamsReset;
+    if (reset == null || teamIds.isEmpty || state.resetting) return;
+    emit(state.copyWith(resetting: true));
+    final response = await reset(_fantasyId, teamIds);
     if (isClosed) return;
     response.fold(
       (failure) =>

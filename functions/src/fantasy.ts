@@ -273,6 +273,42 @@ export function roundActionRequested(before: Doc | undefined, after: Doc | undef
   return { numero, acao, prazo };
 }
 
+/** "Zerar pontos de times" do admin: `zerarTimes.em` novo ou trocado → os ids (1 a 10); nulo = nada. */
+export function teamsResetRequested(before: Doc | undefined, after: Doc | undefined): string[] | null {
+  const request = after?.zerarTimes as Doc | undefined;
+  if (!request || typeof request !== 'object') return null;
+  const previous = before?.zerarTimes as Doc | undefined;
+  if (stampMillis(previous?.em) === stampMillis(request.em)) return null;
+  const ids = Array.isArray(request.ids) ? [...new Set(request.ids.map(String).filter(Boolean))] : [];
+  return ids.length > 0 && ids.length <= 10 ? ids : null;
+}
+
+/** Docs de auditoria da rodada que sobraram: gravados antes e não apurados agora (partida apagada ou trocada). */
+export function staleAthleteDocs(existing: string[], scored: Set<string>): string[] {
+  return existing.filter((id) => !scored.has(id));
+}
+
+/**
+ * Escalação sem os pontos dos atletas [removed]: zera os pontos deles,
+ * tira de `atletasJogaram` e soma de novo (o capitão já vem multiplicado no
+ * `pontosAtletas`). Nulo = nenhum desses atletas pontuou nela.
+ */
+export function lineupWithoutAthletes(
+  lineup: Doc,
+  removed: Set<string>,
+): { pontos: number; pontosAtletas: Record<string, number>; atletasJogaram: string[] } | null {
+  const points = (lineup.pontosAtletas ?? {}) as Record<string, unknown>;
+  const played = Array.isArray(lineup.atletasJogaram) ? lineup.atletasJogaram.map(String) : [];
+  const hit = Object.keys(points).some((id) => removed.has(id)) || played.some((id) => removed.has(id));
+  if (!hit) return null;
+  const pontosAtletas: Record<string, number> = {};
+  for (const [id, value] of Object.entries(points)) {
+    pontosAtletas[id] = removed.has(id) ? 0 : typeof value === 'number' && Number.isFinite(value) ? value : 0;
+  }
+  const pontos = Math.round(Object.values(pontosAtletas).reduce((sum, v) => sum + v, 0) * 100) / 100;
+  return { pontos, pontosAtletas, atletasJogaram: played.filter((id) => !removed.has(id)) };
+}
+
 /** "Zerar pontuações (testes)" do admin: `zerarEm` novo ou trocado. */
 export function resetRequested(before: Doc | undefined, after: Doc | undefined): boolean {
   return !!after && after.zerarEm !== undefined && stampMillis(before?.zerarEm) !== stampMillis(after.zerarEm);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/achievements/data/dtos/achievement_dto.dart';
 import 'package:arena_soccer/features/achievements/domain/achievement_metric.dart';
 import 'package:arena_soccer/features/achievements/presentation/bloc/achievement_form_cubit.dart';
 import 'package:arena_soccer/features/achievements/presentation/widgets/achievement_icons.dart';
@@ -68,7 +69,8 @@ class _AchievementFormPageState extends State<AchievementFormPage> {
             children: [
               Expanded(
                 child: ListView(
-                  padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s16)),
+                  padding:
+                      EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s16)),
                   children: [
                     // Prévia.
                     Center(
@@ -180,6 +182,14 @@ class _AchievementFormPageState extends State<AchievementFormPage> {
                       step: 5,
                       onChanged: (value) => _cubit.edit((d) => d.copyWith(points: value.clamp(0, 10000))),
                     ),
+                    // Prêmio: pacotinhos de figurinhas ao desbloquear (saldo extra do álbum).
+                    _Stepper(
+                      key: const ValueKey('achievement-packs'),
+                      label: l10n.achievementFieldPacks,
+                      value: draft.packs,
+                      onChanged: (value) =>
+                          _cubit.edit((d) => d.copyWith(packs: value.clamp(0, AchievementDTO.maxPacks))),
+                    ),
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       title: Text(l10n.achievementFieldSecret, style: AppTypography.body()),
@@ -232,7 +242,7 @@ class _Stepper extends StatelessWidget {
   final int step;
   final ValueChanged<int> onChanged;
 
-  const _Stepper({required this.label, required this.value, required this.onChanged, this.step = 1});
+  const _Stepper({super.key, required this.label, required this.value, required this.onChanged, this.step = 1});
 
   @override
   Widget build(BuildContext context) {
