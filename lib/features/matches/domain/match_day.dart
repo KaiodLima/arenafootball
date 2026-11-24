@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
+import 'package:arena_soccer/features/matches/domain/match_time.dart';
 
 /// Partidas de uma mesma data ("dd/MM"). [date] vazio = sem data válida.
 class MatchDay extends Equatable {
@@ -12,24 +13,30 @@ class MatchDay extends Equatable {
   List<Object?> get props => [date, matches];
 }
 
-/// Agrupa por data, da mais recente para a mais antiga; dentro do dia, pelo
-/// horário. A data é texto "dd/MM" (sem ano): só dá para ordenar por mês/dia
-/// dentro da temporada. Datas que não seguem o formato vão para um grupo
-/// final sem data.
-List<MatchDay> groupMatchesByDate(List<MatchDTO> matches) {
+/// Agrupa por data: primeiro hoje e os próximos dias (do mais perto ao mais
+/// longe), depois os que já passaram (do mais recente ao mais antigo);
+/// dentro do dia, pelo horário. A data é texto "dd/MM" (sem ano): só dá para
+/// ordenar por mês/dia dentro da temporada. "Hoje" é o de Brasília ([now] nos
+/// testes). Datas que não seguem o formato vão para um grupo final sem data.
+List<MatchDay> groupMatchesByDate(List<MatchDTO> matches, {DateTime? now}) {
   final byDate = <String, List<MatchDTO>>{};
   for (final match in matches) {
     final key = _sortKey(match.date) == null ? '' : match.date.trim();
     byDate.putIfAbsent(key, () => []).add(match);
   }
 
+  final today = MatchTime.today(now ?? DateTime.now());
+  final todayKey = today.month * 100 + today.day;
   final dates = byDate.keys.toList()
     ..sort((a, b) {
       final ka = _sortKey(a);
       final kb = _sortKey(b);
       if (ka == null) return kb == null ? 0 : 1;
       if (kb == null) return -1;
-      return kb.compareTo(ka);
+      final aUpcoming = ka >= todayKey;
+      final bUpcoming = kb >= todayKey;
+      if (aUpcoming != bUpcoming) return aUpcoming ? -1 : 1;
+      return aUpcoming ? ka.compareTo(kb) : kb.compareTo(ka);
     });
 
   return [

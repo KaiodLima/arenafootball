@@ -11,15 +11,19 @@ void main() {
       expect(groupMatchesByDate(const []), isEmpty);
     });
 
-    test('da data mais recente para a mais antiga, por mês/dia', () {
+    test('próximos primeiro (hoje na frente, do mais perto ao mais longe), depois os já jogados', () {
+      // Hoje: 03/06 (meio-dia em Brasília).
+      final now = DateTime.utc(2026, 6, 3, 15);
       final days = groupMatchesByDate([
         _match('1', '28/05', '15:00'),
         _match('2', '08/06', '15:45'),
         _match('3', '03/06', '15:45'),
         _match('4', '08/06', '16:45'),
-      ]);
-      expect(days.map((d) => d.date), ['08/06', '03/06', '28/05']);
-      expect(days.first.matches.map((m) => m.id), ['2', '4']);
+        _match('5', '20/06', '10:00'),
+        _match('6', '01/06', '10:00'),
+      ], now: now);
+      expect(days.map((d) => d.date), ['03/06', '08/06', '20/06', '01/06', '28/05']);
+      expect(days[1].matches.map((m) => m.id), ['2', '4']);
     });
 
     test('ordena pelo horário dentro do dia', () {
