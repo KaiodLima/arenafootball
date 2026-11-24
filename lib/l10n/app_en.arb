@@ -2288,7 +2288,7 @@
   "fantasyRulesByPosition": "By position",
   "fantasyRulesPosition": "Position",
   "fantasyRulesConcededEach": "Goals conceded (per goal)",
-  "fantasyRulesPositionNote": "Goals conceded and team goals only count while the athlete is on the pitch. Team goals: MID only, per team goal.",
+  "fantasyRulesPositionNote": "Goals conceded and team goals only count while the athlete is on the pitch. Team goals: +0.5 per team goal, for every position.",
   "fantasyRulesMinutes": "Minutes on the pitch",
   "fantasyRulesMinutesShort": "Under {min} min, only goals, assists and cards count.",
   "fantasyRulesMinutesDefense": "Clean sheet only with {min} min or more on the pitch.",

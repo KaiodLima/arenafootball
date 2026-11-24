@@ -66,11 +66,24 @@ test('base 10 + gol + assistência + vitória; atacante sem sofrer gols ganha o 
   assert.equal(rule(s, 'gol'), 5);
   assert.equal(rule(s, 'vitoria'), 3);
   assert.equal(rule(s, 'sem_sofrer_gols'), 2);
-  assert.equal(s.total, 20);
+  assert.equal(rule(s, 'gols_equipe'), 0.5);
+  assert.equal(s.total, 20.5);
   const m = score(match({ gols: [goal('g1', 'casa', 10, 'fw', 'mf')] }), 'mf', 'meia');
   assert.equal(rule(m, 'assistencia'), 5);
-  assert.equal(rule(m, 'gols_equipe'), 1);
-  assert.equal(m.total, 10 + 5 + 3 + 1 + 2);
+  assert.equal(rule(m, 'gols_equipe'), 0.5);
+  assert.equal(m.total, 10 + 5 + 3 + 0.5 + 2);
+});
+
+test('gol da equipe: +0,5 para todas as posições, só com o atleta em campo', () => {
+  const data = match({
+    substituicoes: [{ id: 's1', lado: 'casa', idSai: 'cb', idEntra: 'sub', minuto: 50 }],
+    gols: [goal('g1', 'casa', 10, 'fw', ''), goal('g2', 'casa', 70, 'fw', '')],
+  });
+  assert.equal(rule(score(data, 'gk', 'goleiro'), 'gols_equipe'), 1);
+  assert.equal(rule(score(data, 'mf', 'meia'), 'gols_equipe'), 1);
+  assert.equal(rule(score(data, 'fw', 'atacante'), 'gols_equipe'), 1);
+  // Zagueiro saiu aos 50: só o 1º gol.
+  assert.equal(rule(score(data, 'cb', 'zagueiro'), 'gols_equipe'), 0.5);
 });
 
 test('derrota, empate e gols sofridos por posição', () => {

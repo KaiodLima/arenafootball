@@ -7463,7 +7463,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get fantasyRulesPositionNote =>
-      'Gols sofridos e gols da equipe contam só com o atleta em campo. Gols da equipe: só o MEI, por gol do time.';
+      'Gols sofridos e gols da equipe contam só com o atleta em campo. Gols da equipe: +0,5 por gol do time, para todas as posições.';
 
   @override
   String get fantasyRulesMinutes => 'Minutos em campo';

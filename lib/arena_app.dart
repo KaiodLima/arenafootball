@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/services/preferences_service.dart';
 import 'package:arena_soccer/features/app_version/presentation/page/app_version_settings_page.dart';
 import 'package:arena_soccer/features/app_version/presentation/bloc/app_version_settings_cubit.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
@@ -457,7 +458,7 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.statsRankingPage: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
           return BlocProvider<StatsRankingCubit>(
-            create: (_) => StatsRankingCubit(sl(), sl()),
+            create: (_) => StatsRankingCubit(sl(), sl(), sl<PreferencesService>()),
             child: StatsRankingPage(
               type: args?['type'] as StatsRankingType? ?? StatsRankingType.goals,
               region: args?['region'] as String?,
@@ -495,7 +496,8 @@ class ArenaApp extends StatelessWidget {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
           final season = args['season'] as String?;
           return BlocProvider<MatchDetailsCubit>(
-            create: (_) => MatchDetailsCubit(sl(), sl(), sl(), sl(), sl(), match: args['match'] as MatchDTO, updateMatchInfoUseCase: sl())
+            create: (_) => MatchDetailsCubit(sl(), sl(), sl(), sl(), sl(),
+                match: args['match'] as MatchDTO, updateMatchInfoUseCase: sl())
               ..start(season: season),
             child: MatchDetailsPage(
               season: season,
@@ -563,8 +565,8 @@ class ArenaApp extends StatelessWidget {
             ),
         // Arena Fantasy do campeonato: entrar e montar a escalação da rodada.
         AppRoutes.fantasyLineupPage: (context) => BlocProvider<FantasyLineupCubit>(
-              create: (_) =>
-                  FantasyLineupCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(), teams: sl(), rounds: sl(), topAthletes: sl()),
+              create: (_) => FantasyLineupCubit(sl(), sl(), sl(), sl(), sl(), sl(), sl(),
+                  teams: sl(), rounds: sl(), topAthletes: sl()),
               child: FantasyLineupPage(
                 championship: ModalRoute.of(context)!.settings.arguments as ChampionshipDTO,
               ),
@@ -590,8 +592,8 @@ class ArenaApp extends StatelessWidget {
         AppRoutes.fantasyAdminPage: (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
           return BlocProvider<FantasyAdminCubit>(
-            create: (_) => FantasyAdminCubit(sl(), sl(), sl(), sl(), sl(), sl(),
-                reset: sl(), roundAction: sl(), teamsReset: sl()),
+            create: (_) =>
+                FantasyAdminCubit(sl(), sl(), sl(), sl(), sl(), sl(), reset: sl(), roundAction: sl(), teamsReset: sl()),
             child: FantasyAdminPage(
               championship: args['championship'] as ChampionshipDTO,
               initialTab: args['tab'] as int? ?? 0,

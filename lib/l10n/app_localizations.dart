@@ -12395,7 +12395,7 @@ abstract class AppLocalizations {
   /// No description provided for @fantasyRulesPositionNote.
   ///
   /// In pt, this message translates to:
-  /// **'Gols sofridos e gols da equipe contam só com o atleta em campo. Gols da equipe: só o MEI, por gol do time.'**
+  /// **'Gols sofridos e gols da equipe contam só com o atleta em campo. Gols da equipe: +0,5 por gol do time, para todas as posições.'**
   String get fantasyRulesPositionNote;
 
   /// No description provided for @fantasyRulesMinutes.

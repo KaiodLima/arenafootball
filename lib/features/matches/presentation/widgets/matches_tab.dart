@@ -17,6 +17,7 @@ import 'package:arena_soccer/features/regions/presentation/bloc/region_cubit.dar
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
 import 'package:arena_soccer/core/services/tour_service.dart';
 import 'package:arena_soccer/injection_container.dart';
+import 'package:arena_soccer/core/services/preferences_service.dart';
 import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
@@ -160,6 +161,22 @@ class _ChampionshipMatchesState extends State<_ChampionshipMatches> {
   /// Âncora do tour da aba (filtro de competição).
   final _filterKey = GlobalKey();
 
+  @override
+  void initState() {
+    super.initState();
+    _restore();
+  }
+
+  /// O último filtro guardado no aparelho (o mesmo da artilharia/assistências).
+  Future<void> _restore() async {
+    if (!sl.isRegistered<PreferencesService>()) return;
+    final region = BlocProvider.of<RegionCubit>(context).state;
+    final key = '${region.selectedRegion}|${region.selectedSeason}';
+    if (_remembered.containsKey(key)) return;
+    final saved = await sl<PreferencesService>().getChampionshipFilter(region.selectedRegion, region.selectedSeason);
+    if (mounted && !_remembered.containsKey(key)) setState(() => _remembered[key] = saved);
+  }
+
   Future<void> _pick(List<ChampionshipDTO> options, int? current, String key) async {
     final l10n = AppLocalizations.of(context);
     final picked = await showChampionshipPickerSheet(
@@ -169,7 +186,12 @@ class _ChampionshipMatchesState extends State<_ChampionshipMatches> {
       noneLabel: l10n.matchesAllChampionships,
       noneIcon: Icons.format_list_bulleted_rounded,
     );
-    if (picked != null && mounted) setState(() => _remembered[key] = picked.id);
+    if (picked == null || !mounted) return;
+    setState(() => _remembered[key] = picked.id);
+    if (sl.isRegistered<PreferencesService>()) {
+      final region = BlocProvider.of<RegionCubit>(context).state;
+      await sl<PreferencesService>().setChampionshipFilter(region.selectedRegion, region.selectedSeason, picked.id);
+    }
   }
 
   @override

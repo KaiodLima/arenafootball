@@ -10,11 +10,11 @@ import 'package:arena_soccer/l10n/app_localizations.dart';
 
 /// Lê um número do `POINTS` das functions (`chave: valor`, no 1º nível ou
 /// dentro de [group]).
-int _points(String source, String key, {String? group}) {
+num _points(String source, String key, {String? group}) {
   final block = RegExp(r'export const POINTS = \{([\s\S]*?)\} as const;').firstMatch(source)!.group(1)!;
   final scope = group == null ? block : RegExp('$group: \\{([^}]*)\\}').firstMatch(block)!.group(1)!;
-  final match = RegExp('(?:^|[\\s,{])$key: (-?\\d+)').firstMatch(scope)!;
-  return int.parse(match.group(1)!);
+  final match = RegExp('(?:^|[\\s,{])$key: (-?\\d+(?:\\.\\d+)?)').firstMatch(scope)!;
+  return num.parse(match.group(1)!);
 }
 
 Widget _app(FantasyConfigDTO? config) => MaterialApp(
@@ -35,19 +35,20 @@ void main() {
     expect(FantasyScoringRules.draw, 0); // as functions somam 'empate' com 0
     expect(FantasyScoringRules.yellow, _points(source, 'yellow'));
     expect(FantasyScoringRules.red, _points(source, 'red'));
-    expect(FantasyScoringRules.teamGoalMidfielder, _points(source, 'teamGoalMidfielder'));
     for (final slot in [FantasySlot.goalkeeper, FantasySlot.defender, FantasySlot.midfielder, FantasySlot.forward]) {
       expect(FantasyScoringRules.conceded[slot], _points(source, slot.key, group: 'conceded'), reason: slot.key);
       expect(FantasyScoringRules.cleanSheet[slot], _points(source, slot.key, group: 'cleanSheet'), reason: slot.key);
+      expect(FantasyScoringRules.teamGoalsFor(slot), _points(source, slot.key, group: 'teamGoal'), reason: slot.key);
     }
-    expect(FantasyScoringRules.teamGoalsFor(FantasySlot.midfielder), 1);
-    expect(FantasyScoringRules.teamGoalsFor(FantasySlot.forward), isNull);
+    expect(FantasyScoringRules.teamGoalsFor(FantasySlot.forward), 0.5);
   });
 
   test('sinal: +5, −3 (menos de verdade) e 0', () {
     expect(FantasyScoringRules.signed(5), '+5');
     expect(FantasyScoringRules.signed(-3), '−3');
     expect(FantasyScoringRules.signed(0), '0');
+    expect(FantasyScoringRules.signed(0.5), '+0,5');
+    expect(FantasyScoringRules.signed(-1.5, decimal: '.'), '−1.5');
   });
 
   testWidgets('com a config do campeonato: minutos e capitão dele', (tester) async {
@@ -68,10 +69,10 @@ void main() {
     expect(find.textContaining('menos de 30 min'), findsOneWidget);
     expect(find.textContaining('60 min ou mais'), findsOneWidget);
     expect(find.textContaining('pontua 2×'), findsOneWidget);
-    // Tabela: valores com sinal; "—" onde a posição não pontua gols da equipe.
+    // Tabela: valores com sinal; gols da equipe +0,5 em todas as posições.
     expect(find.text('+10'), findsOneWidget);
     expect(find.text('−5'), findsOneWidget);
-    expect(find.text('—'), findsNWidgets(3));
+    expect(find.text('+0,5'), findsNWidgets(4));
   });
 
   testWidgets('sem config: os padrões e o aviso', (tester) async {

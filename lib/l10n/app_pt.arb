@@ -3715,7 +3715,7 @@
   "fantasyRulesByPosition": "Por posição",
   "fantasyRulesPosition": "Posição",
   "fantasyRulesConcededEach": "Gols sofridos (por gol)",
-  "fantasyRulesPositionNote": "Gols sofridos e gols da equipe contam só com o atleta em campo. Gols da equipe: só o MEI, por gol do time.",
+  "fantasyRulesPositionNote": "Gols sofridos e gols da equipe contam só com o atleta em campo. Gols da equipe: +0,5 por gol do time, para todas as posições.",
   "fantasyRulesMinutes": "Minutos em campo",
   "fantasyRulesMinutesShort": "Com menos de {min} min, contam só gols, assistências e cartões.",
   "@fantasyRulesMinutesShort": {

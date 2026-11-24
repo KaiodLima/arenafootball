@@ -46,7 +46,7 @@ class _StatsRankingPageState extends State<StatsRankingPage> {
     _region = widget.region ?? selected.selectedRegion;
     _season = widget.season ?? selected.selectedSeason;
     BlocProvider.of<StatsRankingCubit>(context)
-        .load(type: widget.type, region: _region, season: _season, championshipId: widget.championshipId);
+        .open(type: widget.type, region: _region, season: _season, championshipId: widget.championshipId);
   }
 
   @override

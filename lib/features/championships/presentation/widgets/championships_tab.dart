@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/championships/domain/championship_order.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/championships_cubit.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/championships_state.dart';
 import 'package:arena_soccer/features/championships/presentation/widgets/championship_hero_card.dart';
@@ -93,6 +94,22 @@ class _ChampionshipsListState extends State<_ChampionshipsList> {
     });
   }
 
+  /// Ordem do carrossel da última montagem: mudou (ex.: uma competição
+  /// encerrou) = volta para a 1ª página, para não ficar presa no índice.
+  String _order = '';
+
+  void _resetPageIfOrderChanged(List<ChampionshipDTO> featured) {
+    final order = featured.map((c) => c.id).join('|');
+    if (order == _order) return;
+    final first = _order.isEmpty;
+    _order = order;
+    if (first || _page == 0) return;
+    _page = 0;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _pageController.hasClients) _pageController.jumpToPage(0);
+    });
+  }
+
   @override
   void dispose() {
     _pageController.dispose();
@@ -135,13 +152,12 @@ class _ChampionshipsListState extends State<_ChampionshipsList> {
   }
 
   Widget _content(List<ChampionshipDTO> championships, String selectedSeason, AppLocalizations l10n) {
-    // Destaque: todos os da temporada escolhida (podem ser vários ao mesmo
-    // tempo), num carrossel; sem nenhum, o mais recente. O resto em "Anteriores".
+    // Destaque: todos os da temporada escolhida num carrossel, os em andamento
+    // primeiro e os encerrados no fim; sem nenhum, o mais recente. O resto em "Anteriores".
     final sorted = [...championships]..sort((a, b) => b.season.compareTo(a.season));
-    final ofSeason = sorted.where((c) => c.season == selectedSeason).toList()
-      ..sort((a, b) => a.championshipId.compareTo(b.championshipId));
-    final featured = ofSeason.isNotEmpty ? ofSeason : [sorted.first];
+    final featured = featuredChampionships(championships, selectedSeason);
     final featuredIds = featured.map((c) => c.id).toSet();
+    _resetPageIfOrderChanged(featured);
     final previous = sorted.where((c) => !featuredIds.contains(c.id)).toList();
     final current = featured[_page.clamp(0, featured.length - 1)];
     _requestTour();

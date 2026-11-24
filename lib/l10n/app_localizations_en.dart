@@ -7419,7 +7419,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fantasyRulesPositionNote =>
-      'Goals conceded and team goals only count while the athlete is on the pitch. Team goals: MID only, per team goal.';
+      'Goals conceded and team goals only count while the athlete is on the pitch. Team goals: +0.5 per team goal, for every position.';
 
   @override
   String get fantasyRulesMinutes => 'Minutes on the pitch';

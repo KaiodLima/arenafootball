@@ -173,7 +173,7 @@ class FantasyRulesPage extends StatelessWidget {
 }
 
 /// Cor do valor: verde positivo, vermelho negativo, neutro no zero.
-Color _pointsColor(int value) => value > 0
+Color _pointsColor(num value) => value > 0
     ? AppColors.success
     : value < 0
         ? AppColors.danger
@@ -320,8 +320,9 @@ class _PositionTable extends StatelessWidget {
         );
     Widget header(String text, {bool first = false}) =>
         cell(Text(text, textAlign: first ? TextAlign.left : TextAlign.center, style: headerStyle), first: first);
-    Widget value(int? points) => cell(Text(
-          points == null ? '—' : FantasyScoringRules.signed(points),
+    final decimal = Localizations.localeOf(context).languageCode == 'pt' ? ',' : '.';
+    Widget value(num? points) => cell(Text(
+          points == null ? '—' : FantasyScoringRules.signed(points, decimal: decimal),
           style: AppTypography.label(color: points == null ? AppColors.textSecondary : _pointsColor(points))
               .copyWith(fontSize: AppSizes.s16),
         ));

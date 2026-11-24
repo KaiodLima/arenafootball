@@ -8,7 +8,7 @@ type Doc = Record<string, unknown>;
 export type Side = 'casa' | 'fora';
 export type FantasyPosition = 'gol' | 'zag' | 'mei' | 'ata';
 
-export const SCORING_VERSION = 1;
+export const SCORING_VERSION = 2;
 
 /** Parâmetros congelados na rodada. */
 export interface ScoringParams {
@@ -28,7 +28,8 @@ export const POINTS = {
   red: -5,
   conceded: { gol: -3, zag: -2, mei: -1, ata: -1 } as Record<FantasyPosition, number>,
   cleanSheet: { gol: 5, zag: 3, mei: 2, ata: 2 } as Record<FantasyPosition, number>,
-  teamGoalMidfielder: 1,
+  // Por gol do próprio time com o atleta em campo (v2: todas as posições).
+  teamGoal: { gol: 0.5, zag: 0.5, mei: 0.5, ata: 0.5 } as Record<FantasyPosition, number>,
 } as const;
 
 const text = (value: unknown): string => (value === undefined || value === null ? '' : String(value).trim());
@@ -344,10 +345,8 @@ export function scoreInMatch(
   // Gols sofridos e da equipe no tempo em campo.
   const conceded = match.goals.filter((g) => g.side === other(side) && inField(g, p));
   if (conceded.length) add('gols_sofridos', conceded.length, POINTS.conceded[position], conceded.map((g) => g.id));
-  if (position === 'mei') {
-    const teamGoals = match.goals.filter((g) => g.side === side && inField(g, p));
-    if (teamGoals.length) add('gols_equipe', teamGoals.length, POINTS.teamGoalMidfielder, teamGoals.map((g) => g.id));
-  }
+  const teamGoals = match.goals.filter((g) => g.side === side && inField(g, p));
+  if (teamGoals.length) add('gols_equipe', teamGoals.length, POINTS.teamGoal[position], teamGoals.map((g) => g.id));
   if (conceded.length === 0) {
     if (p.minutes >= params.minMinutosDefesa) add('sem_sofrer_gols', 1, POINTS.cleanSheet[position]);
     else motivos.push({ codigo: 'bonus_minutos_insuficientes', idPartida: matchId });

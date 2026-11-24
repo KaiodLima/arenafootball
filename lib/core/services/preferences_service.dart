@@ -125,4 +125,23 @@ class PreferencesService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_dismissedUpdateKey, build);
   }
+
+  /// Último filtro de competição (aba Tabelas e artilharia/assistências), por
+  /// região e temporada; sem a chave = todas as competições.
+  static String _championshipFilterKey(String region, String season) => 'filtroCompeticao_$region|$season';
+
+  Future<int?> getChampionshipFilter(String region, String season) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_championshipFilterKey(region, season));
+  }
+
+  Future<void> setChampionshipFilter(String region, String season, int? championshipId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = _championshipFilterKey(region, season);
+    if (championshipId == null) {
+      await prefs.remove(key);
+    } else {
+      await prefs.setInt(key, championshipId);
+    }
+  }
 }

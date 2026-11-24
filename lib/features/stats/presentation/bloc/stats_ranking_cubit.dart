@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/core/services/preferences_service.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_cache_first_usecase.dart';
 import 'package:arena_soccer/features/stats/domain/ranking_entry.dart';
@@ -22,8 +23,31 @@ class StatsRankingCubit extends Cubit<StatsRankingState> {
   int _request = 0;
   final Map<String, StatsRanking> _cache = {};
 
-  StatsRankingCubit(this.getStatsRankingCacheFirstUseCase, [this.getRegionChampionshipsCacheFirstUseCase])
+  /// Guarda o último filtro de competição (o mesmo da aba Tabelas); nulo = não guarda.
+  final PreferencesService? preferences;
+
+  /// A competição veio do filtro guardado: se não existir mais, volta ao geral.
+  bool _fromSaved = false;
+
+  StatsRankingCubit(this.getStatsRankingCacheFirstUseCase,
+      [this.getRegionChampionshipsCacheFirstUseCase, this.preferences])
       : super(const LoadingStatsRankingState());
+
+  /// Abre a tela: sem [championshipId], a competição do último filtro guardado.
+  Future<void> open({
+    required StatsRankingType type,
+    required String region,
+    required String season,
+    int? championshipId,
+  }) async {
+    var id = championshipId;
+    if (id == null) {
+      id = await preferences?.getChampionshipFilter(region, season);
+      _fromSaved = id != null;
+      if (isClosed) return;
+    }
+    await load(type: type, region: region, season: season, championshipId: id);
+  }
 
   static String _key(StatsRankingType type, int? championshipId) => '${type.name}_${championshipId ?? ''}';
 
@@ -101,6 +125,12 @@ class StatsRankingCubit extends Cubit<StatsRankingState> {
       if (isClosed || response.isLeft) return;
       final championships = [...response.right]..sort((a, b) => a.championshipId.compareTo(b.championshipId));
       emit(_withChampionships(championships));
+      // Filtro guardado de uma competição que não está mais na lista: geral.
+      final saved = state.championshipId;
+      if (_fromSaved && saved != null && !championships.any((c) => c.championshipId == saved)) {
+        _fromSaved = false;
+        unawaited(load(type: state.type, region: _region, season: _season));
+      }
     }
   }
 
@@ -142,6 +172,8 @@ class StatsRankingCubit extends Cubit<StatsRankingState> {
   /// Ranking da competição (nula = geral).
   void setChampionship(int? championshipId) {
     if (championshipId == state.championshipId && state is! ErrorStatsRankingState) return;
+    _fromSaved = false;
+    unawaited(preferences?.setChampionshipFilter(_region, _season, championshipId));
     load(type: state.type, region: _region, season: _season, championshipId: championshipId);
   }
 }
