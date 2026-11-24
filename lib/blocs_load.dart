@@ -12,6 +12,7 @@ import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organ
 import 'package:arena_soccer/features/partner_requests/presentation/bloc/partner_cubit.dart';
 import 'package:arena_soccer/features/player_requests/presentation/bloc/my_player_cubit.dart';
 import 'package:arena_soccer/features/team_requests/presentation/bloc/owned_team_cubit.dart';
+import 'package:arena_soccer/features/scoring/presentation/bloc/scoring_config_cubit.dart';
 import 'package:arena_soccer/injection_container.dart';
 
 // Cubits em route-level (lib/arena_app.dart):
@@ -61,6 +62,8 @@ class BlocsLoad extends StatelessWidget {
         // Álbum de figurinhas (evento do admin) — global: o selo flutuante da
         // home e o pacotinho do dia da conta.
         BlocProvider<AlbumEventCubit>(create: (_) => AlbumEventCubit(sl())),
+        // Pontuações em vigor (Fantasy padrão e bolão): criada na 1ª tela que usa.
+        BlocProvider<ScoringConfigCubit>(create: (_) => ScoringConfigCubit(sl(), sl())..follow()),
 
         // "Indique amigos" ligado/desligado pelo admin — global: menu, álbum e
         // o link de convite.

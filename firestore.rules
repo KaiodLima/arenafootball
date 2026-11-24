@@ -48,6 +48,30 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.admin == true;
     }
 
+    // Tabela de pontos do Fantasy (`config/pontuacao_fantasy` e
+    // `fantasy/{id}.pontuacao`): cada valor de −20 a 20 em passos de 0,5;
+    // campos faltando = padrões das functions.
+    function scoringValue(v) {
+      return v is number && v >= -20 && v <= 20 && v * 2 == math.floor(v * 2);
+    }
+
+    function scoringGroup(g) {
+      return g is map && g.keys().hasOnly(['gol', 'zag', 'mei', 'ata'])
+        && scoringValue(g.get('gol', 0)) && scoringValue(g.get('zag', 0))
+        && scoringValue(g.get('mei', 0)) && scoringValue(g.get('ata', 0));
+    }
+
+    function validScoringTable(t) {
+      return t is map
+        && t.keys().hasOnly(['base', 'gol', 'assistencia', 'vitoria', 'empate', 'derrota', 'amarelo', 'vermelho',
+            'golsSofridos', 'semSofrerGols', 'golEquipe'])
+        && scoringValue(t.get('base', 0)) && scoringValue(t.get('gol', 0)) && scoringValue(t.get('assistencia', 0))
+        && scoringValue(t.get('vitoria', 0)) && scoringValue(t.get('empate', 0)) && scoringValue(t.get('derrota', 0))
+        && scoringValue(t.get('amarelo', 0)) && scoringValue(t.get('vermelho', 0))
+        && scoringGroup(t.get('golsSofridos', {})) && scoringGroup(t.get('semSofrerGols', {}))
+        && scoringGroup(t.get('golEquipe', {}));
+    }
+
     // Perfil: só o dono (ou admin) lê. O dono cria e edita o próprio perfil,
     // mas nunca consegue se promover a admin nem trocar o idUsuario.
     match /usuarios/{userId} {
@@ -1028,7 +1052,8 @@ service cloud.firestore {
       function validFantasyConfig(d) {
         return d.keys().hasOnly(['idCampeonato', 'temporada', 'titulo', 'urlImagem', 'fk_competicao', 'idRegiao',
             'idsRegioes', 'ativo', 'minMinutos', 'minMinutosDefesa', 'capitao', 'atualizadoEm', 'reapurarEm',
-            'zerarEm', 'zeradoEm', 'zerarTimes', 'acaoRodada', 'rodadaAtual', 'participantes', 'campeao', 'campeaoEm'])
+            'zerarEm', 'zeradoEm', 'zerarTimes', 'acaoRodada', 'rodadaAtual', 'participantes', 'campeao', 'campeaoEm',
+            'pontuacao'])
           && d.ativo is bool
           && d.minMinutos is int && d.minMinutos >= 0 && d.minMinutos <= 120
           && d.minMinutosDefesa is int && d.minMinutosDefesa >= d.minMinutos && d.minMinutosDefesa <= 120
@@ -1036,6 +1061,8 @@ service cloud.firestore {
           && d.get('idCampeonato', 0) is int
           && d.get('temporada', '') is string && d.get('titulo', '') is string && d.get('urlImagem', '') is string
           && d.get('idsRegioes', []) is list
+          // Tabela de pontos própria do campeonato (sem o campo = a padrão).
+          && (!('pontuacao' in d) || validScoringTable(d.pontuacao))
           // "Reapurar rodadas": hora do pedido (as functions apuram de novo).
           && (!('reapurarEm' in d) || d.reapurarEm is timestamp)
           // "Zerar pontuações (testes)": hora do pedido (as functions zeram).
@@ -1186,6 +1213,31 @@ service cloud.firestore {
           && d.get('minimoAndroid', 0) <= d.get('recomendadoAndroid', 0)
           && d.get('minimoIos', 0) <= d.get('recomendadoIos', 0)
           && d.get('mensagem', '') is string && d.get('mensagem', '').size() <= 300;
+      }
+    }
+
+    // Tabela de pontos padrão do Arena Fantasy (painel "Pontuações"): leitura
+    // pública (tela de regras), escrita do admin validada.
+    match /config/pontuacao_fantasy {
+      allow read: if true;
+      allow write: if isAdmin()
+        && request.resource.data.keys().hasOnly(['tabela', 'atualizadoEm'])
+        && validScoringTable(request.resource.data.tabela)
+        && request.resource.data.atualizadoEm == request.time;
+    }
+
+    // Pontos do bolão (exato ≥ vencedor e saldo ≥ vencedor, 0 a 50): leitura
+    // pública, escrita do admin.
+    match /config/bolao {
+      allow read: if true;
+      allow write: if isAdmin() && validPredictionRules(request.resource.data);
+
+      function validPredictionRules(d) {
+        return d.keys().hasOnly(['exato', 'vencedorSaldo', 'vencedor', 'atualizadoEm'])
+          && d.exato is int && d.vencedorSaldo is int && d.vencedor is int
+          && d.vencedor >= 0 && d.exato <= 50
+          && d.exato >= d.vencedorSaldo && d.vencedorSaldo >= d.vencedor
+          && d.atualizadoEm == request.time;
       }
     }
 

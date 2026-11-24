@@ -94,6 +94,6 @@ abstract final class PredictionHub {
       mine != null && mine.points > 0 && top.every((e) => e.uid == mine.uid || e.points <= mine.points);
 
   /// Aproveitamento (0–1): pontos ÷ máximo possível pelos palpites.
-  static double hitRate(PredictionRankingEntry entry) =>
-      entry.count == 0 ? 0 : (entry.points / (entry.count * maxPointsPerPrediction)).clamp(0.0, 1.0);
+  static double hitRate(PredictionRankingEntry entry, {int maxPoints = maxPointsPerPrediction}) =>
+      entry.count == 0 || maxPoints <= 0 ? 0 : (entry.points / (entry.count * maxPoints)).clamp(0.0, 1.0);
 }

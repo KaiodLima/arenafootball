@@ -8,21 +8,39 @@ type Doc = Record<string, unknown>;
 export type Side = 'casa' | 'fora';
 export type FantasyPosition = 'gol' | 'zag' | 'mei' | 'ata';
 
-export const SCORING_VERSION = 2;
+export const SCORING_VERSION = 3;
 
 /** Parâmetros congelados na rodada. */
 export interface ScoringParams {
   minMinutos: number;
   minMinutosDefesa: number;
   capitao: number;
+  /** Tabela de pontos da rodada (sem ela, os padrões [POINTS]). */
+  table?: ScoringTable;
 }
 
-// Espelhado em lib/features/fantasy/domain/fantasy_scoring_rules.dart (tela de regras): mude junto.
+/** Tabela de pontos do Fantasy (padrão em [POINTS]; o admin edita, ver [scoringTable]). */
+export interface ScoringTable {
+  base: number;
+  goal: number;
+  assist: number;
+  win: number;
+  draw: number;
+  loss: number;
+  yellow: number;
+  red: number;
+  conceded: Record<FantasyPosition, number>;
+  cleanSheet: Record<FantasyPosition, number>;
+  teamGoal: Record<FantasyPosition, number>;
+}
+
+// Padrões. Espelhado em lib/features/fantasy/domain/fantasy_scoring_rules.dart (tela de regras): mude junto.
 export const POINTS = {
   base: 10,
   goal: 5,
   assist: 5,
   win: 3,
+  draw: 0,
   loss: -3,
   yellow: -3,
   red: -5,
@@ -31,6 +49,58 @@ export const POINTS = {
   // Por gol do próprio time com o atleta em campo (v2: todas as posições).
   teamGoal: { gol: 0.5, zag: 0.5, mei: 0.5, ata: 0.5 } as Record<FantasyPosition, number>,
 } as const;
+
+/** Faixa aceita na tabela editável: −20 a 20, em passos de 0,5. */
+export const TABLE_LIMIT = 20;
+
+const POSITIONS: FantasyPosition[] = ['gol', 'zag', 'mei', 'ata'];
+
+/** Chaves gravadas no Firestore (`config/pontuacao_fantasy`, `fantasy.pontuacao`, `parametros.pontos`). */
+const FLAT_KEYS: [keyof ScoringTable, string][] = [
+  ['base', 'base'],
+  ['goal', 'gol'],
+  ['assist', 'assistencia'],
+  ['win', 'vitoria'],
+  ['draw', 'empate'],
+  ['loss', 'derrota'],
+  ['yellow', 'amarelo'],
+  ['red', 'vermelho'],
+];
+const BY_POSITION_KEYS: [keyof ScoringTable, string][] = [
+  ['conceded', 'golsSofridos'],
+  ['cleanSheet', 'semSofrerGols'],
+  ['teamGoal', 'golEquipe'],
+];
+
+/** Valor aceito: número de −20 a 20 em passos de 0,5. */
+export const validTableValue = (value: unknown): value is number =>
+  typeof value === 'number' && Number.isFinite(value) && Math.abs(value) <= TABLE_LIMIT && Number.isInteger(value * 2);
+
+/** Tabela pelo doc [doc] (campos em português); o que falta ou é inválido = padrão. */
+export function scoringTable(doc: unknown): ScoringTable {
+  const data = doc && typeof doc === 'object' ? (doc as Doc) : {};
+  const pick = (value: unknown, fallback: number) => (validTableValue(value) ? value : fallback);
+  const table = { ...POINTS } as unknown as ScoringTable;
+  for (const [key, field] of FLAT_KEYS) {
+    (table as unknown as Record<string, number>)[key] = pick(data[field], POINTS[key as keyof typeof POINTS] as number);
+  }
+  for (const [key, field] of BY_POSITION_KEYS) {
+    const group = (data[field] && typeof data[field] === 'object' ? data[field] : {}) as Doc;
+    const defaults = POINTS[key as keyof typeof POINTS] as Record<FantasyPosition, number>;
+    (table as unknown as Record<string, Record<FantasyPosition, number>>)[key] = Object.fromEntries(
+      POSITIONS.map((pos) => [pos, pick(group[pos], defaults[pos])]),
+    ) as Record<FantasyPosition, number>;
+  }
+  return table;
+}
+
+/** A tabela no formato gravado (campos em português). */
+export function tableToDoc(table: ScoringTable): Doc {
+  const doc: Doc = {};
+  for (const [key, field] of FLAT_KEYS) doc[field] = table[key];
+  for (const [key, field] of BY_POSITION_KEYS) doc[field] = { ...(table[key] as Record<FantasyPosition, number>) };
+  return doc;
+}
 
 const text = (value: unknown): string => (value === undefined || value === null ? '' : String(value).trim());
 const minuteOf = (value: unknown): number | null => {
@@ -301,6 +371,7 @@ export function scoreInMatch(
   position: FantasyPosition,
   params: ScoringParams,
 ): { score: MatchScore; itens: ScoreItem[]; motivos: Reason[] } {
+  const P = params.table ?? (POINTS as unknown as ScoringTable);
   const p = participation(match, playerId, side);
   const score: MatchScore = {
     idPartida: matchId,
@@ -319,19 +390,19 @@ export function scoreInMatch(
   const add = (regra: string, qtd: number, each: number, ids?: string[]) => {
     itens.push({ regra, qtd, pontos: round2(qtd * each), idPartida: matchId, ...(ids && ids.length ? { ids } : {}) });
   };
-  if (!short) add('base', 1, POINTS.base);
+  if (!short) add('base', 1, P.base);
   const goals = match.goals.filter((g) => g.side === side && g.scorerId === playerId);
-  if (goals.length) add('gol', goals.length, POINTS.goal, goals.map((g) => g.id));
+  if (goals.length) add('gol', goals.length, P.goal, goals.map((g) => g.id));
   const assists = match.goals.filter((g) => g.side === side && g.assistId === playerId);
-  if (assists.length) add('assistencia', assists.length, POINTS.assist, assists.map((g) => g.id));
+  if (assists.length) add('assistencia', assists.length, P.assist, assists.map((g) => g.id));
   // Cartões: o 2º amarelo vira o vermelho (−5) e não soma o amarelo de novo.
   const cards = match.bookings.filter((b) => b.side === side && b.playerId === playerId);
   const reds = cards.filter((b) => b.red);
   const secondYellow = reds.some((b) => b.secondYellow);
   const yellows = cards.filter((b) => !b.red);
   const countedYellows = yellows.slice(0, Math.max(0, yellows.length - (secondYellow ? 1 : 0)));
-  if (countedYellows.length) add('amarelo', countedYellows.length, POINTS.yellow, countedYellows.map((b) => b.id));
-  if (reds.length) add('vermelho', reds.length, POINTS.red, reds.map((b) => b.id));
+  if (countedYellows.length) add('amarelo', countedYellows.length, P.yellow, countedYellows.map((b) => b.id));
+  if (reds.length) add('vermelho', reds.length, P.red, reds.map((b) => b.id));
   if (short) {
     if (p.estimated) motivos.push({ codigo: 'minutos_estimados', idPartida: matchId });
     score.pontos = round2(itens.reduce((sum, i) => sum + i.pontos, 0));
@@ -339,16 +410,16 @@ export function scoreInMatch(
   }
   const mine = match.score[side];
   const theirs = match.score[other(side)];
-  if (mine > theirs) add('vitoria', 1, POINTS.win);
-  else if (mine < theirs) add('derrota', 1, POINTS.loss);
-  else add('empate', 1, 0);
+  if (mine > theirs) add('vitoria', 1, P.win);
+  else if (mine < theirs) add('derrota', 1, P.loss);
+  else add('empate', 1, P.draw);
   // Gols sofridos e da equipe no tempo em campo.
   const conceded = match.goals.filter((g) => g.side === other(side) && inField(g, p));
-  if (conceded.length) add('gols_sofridos', conceded.length, POINTS.conceded[position], conceded.map((g) => g.id));
+  if (conceded.length) add('gols_sofridos', conceded.length, P.conceded[position], conceded.map((g) => g.id));
   const teamGoals = match.goals.filter((g) => g.side === side && inField(g, p));
-  if (teamGoals.length) add('gols_equipe', teamGoals.length, POINTS.teamGoal[position], teamGoals.map((g) => g.id));
+  if (teamGoals.length) add('gols_equipe', teamGoals.length, P.teamGoal[position], teamGoals.map((g) => g.id));
   if (conceded.length === 0) {
-    if (p.minutes >= params.minMinutosDefesa) add('sem_sofrer_gols', 1, POINTS.cleanSheet[position]);
+    if (p.minutes >= params.minMinutosDefesa) add('sem_sofrer_gols', 1, P.cleanSheet[position]);
     else motivos.push({ codigo: 'bonus_minutos_insuficientes', idPartida: matchId });
   }
   if (p.estimated) motivos.push({ codigo: 'minutos_estimados', idPartida: matchId });

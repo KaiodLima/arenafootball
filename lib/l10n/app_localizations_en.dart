@@ -4163,8 +4163,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get predictionSheetTitle => 'Your prediction';
 
   @override
-  String get predictionRules =>
-      'Exact score: 10 pts · winner and margin: 7 · winner: 5';
+  String predictionRules(int exact, int diff, int winner) {
+    return 'Exact score: $exact pts · winner and margin: $diff · winner: $winner';
+  }
 
   @override
   String get predictionDeadline => 'Open until kickoff.';
@@ -7419,7 +7420,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fantasyRulesPositionNote =>
-      'Goals conceded and team goals only count while the athlete is on the pitch. Team goals: +0.5 per team goal, for every position.';
+      'Goals conceded and team goals only count while the athlete is on the pitch.';
 
   @override
   String get fantasyRulesMinutes => 'Minutes on the pitch';
@@ -8912,4 +8913,68 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fantasyResetTeamsAction => 'Reset points';
+
+  @override
+  String get scoringTitle => 'Scoring';
+
+  @override
+  String get scoringMenu => 'Scoring (Fantasy and predictions)';
+
+  @override
+  String get scoringTabFantasy => 'Arena Fantasy';
+
+  @override
+  String get scoringTabBolao => 'Predictions';
+
+  @override
+  String get scoringFantasyIntro =>
+      'Default Arena Fantasy table: applies to every championship without its own table (set it in each championship Fantasy settings).';
+
+  @override
+  String get scoringFantasyNote =>
+      'Applies to rounds that close after saving. Closed rounds keep their own table (re-scoring uses the round table).';
+
+  @override
+  String get scoringBolaoIntro =>
+      'Points per prediction: exact ≥ winner and margin ≥ winner.';
+
+  @override
+  String get scoringBolaoNote =>
+      'Applies to matches that end after saving. Predictions already scored keep their points.';
+
+  @override
+  String get scoringBolaoExact => 'Exact score';
+
+  @override
+  String get scoringBolaoDiff =>
+      'Winner and margin (or a draw with another score)';
+
+  @override
+  String get scoringBolaoWinner => 'Winner only';
+
+  @override
+  String get scoringRestore => 'Restore defaults';
+
+  @override
+  String get scoringSave => 'Save';
+
+  @override
+  String get scoringSaved => 'Scoring saved.';
+
+  @override
+  String get scoringSaveError => 'Could not save the scoring.';
+
+  @override
+  String get fantasyScoringSection => 'Scoring';
+
+  @override
+  String get fantasyScoringOwn => 'Own table for this championship';
+
+  @override
+  String get fantasyScoringOwnOn =>
+      'The values below apply only to this championship, in rounds that close later.';
+
+  @override
+  String get fantasyScoringOwnOff =>
+      'Uses the default table (admin panel → Scoring).';
 }

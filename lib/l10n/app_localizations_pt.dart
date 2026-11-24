@@ -4182,8 +4182,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get predictionSheetTitle => 'Seu palpite';
 
   @override
-  String get predictionRules =>
-      'Placar exato: 10 pts · vencedor e saldo: 7 · vencedor: 5';
+  String predictionRules(int exact, int diff, int winner) {
+    return 'Placar exato: $exact pts · vencedor e saldo: $diff · vencedor: $winner';
+  }
 
   @override
   String get predictionDeadline => 'Vale até o início da partida.';
@@ -7463,7 +7464,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get fantasyRulesPositionNote =>
-      'Gols sofridos e gols da equipe contam só com o atleta em campo. Gols da equipe: +0,5 por gol do time, para todas as posições.';
+      'Gols sofridos e gols da equipe contam só com o atleta em campo.';
 
   @override
   String get fantasyRulesMinutes => 'Minutos em campo';
@@ -8959,4 +8960,68 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get fantasyResetTeamsAction => 'Zerar pontos';
+
+  @override
+  String get scoringTitle => 'Pontuações';
+
+  @override
+  String get scoringMenu => 'Pontuações (Fantasy e bolão)';
+
+  @override
+  String get scoringTabFantasy => 'Arena Fantasy';
+
+  @override
+  String get scoringTabBolao => 'Bolão';
+
+  @override
+  String get scoringFantasyIntro =>
+      'Tabela padrão do Arena Fantasy: vale para todo campeonato sem tabela própria (a própria fica na engrenagem do Fantasy de cada campeonato).';
+
+  @override
+  String get scoringFantasyNote =>
+      'Vale para as rodadas que fecharem depois de salvar. As rodadas já fechadas guardam a tabela delas (o \"Reapurar\" usa a da rodada).';
+
+  @override
+  String get scoringBolaoIntro =>
+      'Pontos de cada palpite: exato ≥ vencedor e saldo ≥ vencedor.';
+
+  @override
+  String get scoringBolaoNote =>
+      'Vale para as partidas que terminarem depois de salvar. Palpites já pontuados seguem com os pontos de quando foram contados.';
+
+  @override
+  String get scoringBolaoExact => 'Placar exato';
+
+  @override
+  String get scoringBolaoDiff =>
+      'Vencedor e saldo (ou empate com outro placar)';
+
+  @override
+  String get scoringBolaoWinner => 'Só o vencedor';
+
+  @override
+  String get scoringRestore => 'Restaurar padrões';
+
+  @override
+  String get scoringSave => 'Salvar';
+
+  @override
+  String get scoringSaved => 'Pontuação salva.';
+
+  @override
+  String get scoringSaveError => 'Não foi possível salvar a pontuação.';
+
+  @override
+  String get fantasyScoringSection => 'Pontuação';
+
+  @override
+  String get fantasyScoringOwn => 'Tabela própria deste campeonato';
+
+  @override
+  String get fantasyScoringOwnOn =>
+      'Os valores abaixo valem só para este campeonato, nas rodadas que fecharem depois.';
+
+  @override
+  String get fantasyScoringOwnOff =>
+      'Usa a tabela padrão (painel do admin → Pontuações).';
 }

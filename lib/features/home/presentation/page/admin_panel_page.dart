@@ -110,6 +110,11 @@ class AdminPanelPage extends StatelessWidget {
                     onTap: () => open(AppRoutes.votingRulesPage),
                   ),
                   ShortcutTile(
+                    title: l10n.scoringMenu,
+                    icon: Icons.scoreboard_outlined,
+                    onTap: () => open(AppRoutes.scoringSettingsPage),
+                  ),
+                  ShortcutTile(
                     title: l10n.appVersionTitle,
                     icon: Icons.system_update_rounded,
                     onTap: () => open(AppRoutes.appVersionSettingsPage),

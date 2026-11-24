@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/scoring/presentation/bloc/scoring_settings_cubit.dart';
+import 'package:arena_soccer/features/scoring/presentation/page/scoring_settings_page.dart';
 import 'package:arena_soccer/core/services/preferences_service.dart';
 import 'package:arena_soccer/features/app_version/presentation/page/app_version_settings_page.dart';
 import 'package:arena_soccer/features/app_version/presentation/bloc/app_version_settings_cubit.dart';
@@ -559,6 +561,11 @@ class ArenaApp extends StatelessWidget {
             ),
         AppRoutes.referralSettingsPage: (_) => const ReferralSettingsPage(),
         // Admin: versões mínima/recomendada do app (aviso de atualização).
+        // Painel do admin → "Pontuações" (Fantasy padrão e bolão).
+        AppRoutes.scoringSettingsPage: (_) => BlocProvider<ScoringSettingsCubit>(
+              create: (_) => ScoringSettingsCubit(sl(), sl(), sl(), sl()),
+              child: const ScoringSettingsPage(),
+            ),
         AppRoutes.appVersionSettingsPage: (_) => BlocProvider<AppVersionSettingsCubit>(
               create: (_) => AppVersionSettingsCubit(sl(), sl(), sl()),
               child: const AppVersionSettingsPage(),

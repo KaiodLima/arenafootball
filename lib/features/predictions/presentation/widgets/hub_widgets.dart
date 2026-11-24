@@ -3,6 +3,7 @@ import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/predictions/data/dtos/prediction_dto.dart';
 import 'package:arena_soccer/features/predictions/domain/prediction_hub.dart';
+import 'package:arena_soccer/features/scoring/presentation/bloc/scoring_config_cubit.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_hero_background.dart';
@@ -248,13 +249,14 @@ class _ChaseBar extends StatelessWidget {
   }
 }
 
-/// "Como pontua": 10 · 7 · 5 em fichas.
+/// "Como pontua": exato · vencedor + saldo · vencedor em fichas (`config/bolao`).
 class HubHowItScores extends StatelessWidget {
   const HubHowItScores({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final rules = ScoringConfigCubit.of(context).predictionRules;
     Widget chip(String points, String label, IconData icon) => Expanded(
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: AppSizes.s8, horizontal: AppSizes.s6),
@@ -282,11 +284,11 @@ class HubHowItScores extends StatelessWidget {
         );
     return Row(
       children: [
-        chip('10', l10n.predictionHubExact, Icons.gps_fixed_rounded),
+        chip('${rules.exact}', l10n.predictionHubExact, Icons.gps_fixed_rounded),
         const SizedBox(width: AppSizes.s6),
-        chip('7', l10n.predictionHubWinnerDiff, Icons.check_circle_rounded),
+        chip('${rules.winnerAndDiff}', l10n.predictionHubWinnerDiff, Icons.check_circle_rounded),
         const SizedBox(width: AppSizes.s6),
-        chip('5', l10n.predictionHubWinner, Icons.thumb_up_alt_rounded),
+        chip('${rules.winner}', l10n.predictionHubWinner, Icons.thumb_up_alt_rounded),
       ],
     );
   }
@@ -897,7 +899,7 @@ class HubRankingRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final rate = PredictionHub.hitRate(entry);
+    final rate = PredictionHub.hitRate(entry, maxPoints: ScoringConfigCubit.of(context).predictionRules.exact);
     return Container(
       margin: const EdgeInsets.only(bottom: AppSizes.s8),
       padding: const EdgeInsets.symmetric(horizontal: AppSizes.s12, vertical: AppSizes.s10),

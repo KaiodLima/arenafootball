@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_config_dto.dart';
 import 'package:arena_soccer/features/fantasy/domain/fantasy_lineup.dart';
 import 'package:arena_soccer/features/fantasy/domain/fantasy_scoring_rules.dart';
+import 'package:arena_soccer/features/fantasy/domain/fantasy_scoring_table.dart';
 import 'package:arena_soccer/features/fantasy/domain/fantasy_settings.dart';
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_labels.dart';
+import 'package:arena_soccer/features/scoring/presentation/bloc/scoring_config_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/form_section.dart';
 import 'package:arena_soccer/utils/components/safe_bottom.dart';
@@ -12,8 +14,9 @@ import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
 /// "Regras e pontuação" do Arena Fantasy: como jogar, prazo, tabela de pontos
-/// (de [FantasyScoringRules]) e os parâmetros do campeonato. Sem leitura nova:
-/// recebe a [config] de quem abriu; nula = padrões de [FantasyLimits].
+/// (a própria do campeonato ou a padrão do [ScoringConfigCubit]) e os
+/// parâmetros do campeonato. Recebe a [config] de quem abriu; nula = padrões
+/// de [FantasyLimits].
 class FantasyRulesPage extends StatelessWidget {
   final FantasyConfigDTO? config;
 
@@ -35,6 +38,7 @@ class FantasyRulesPage extends StatelessWidget {
     final minDefense = config?.minDefenseMinutes ?? FantasyLimits.defaultMinDefenseMinutes;
     final captain = config?.captainMultiplier ?? FantasyLimits.defaultCaptain;
     final title = config?.title ?? '';
+    final table = config?.scoringTable ?? ScoringConfigCubit.of(context).fantasyTable;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -95,14 +99,14 @@ class FantasyRulesPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _Row(label: l10n.fantasyRulesPlay, value: l10n.fantasyRulesPoints, header: true),
-                _Row(label: l10n.fantasyRuleBase, points: FantasyScoringRules.base),
-                _Row(label: l10n.fantasyRuleGoal, points: FantasyScoringRules.goal),
-                _Row(label: l10n.fantasyRuleAssist, points: FantasyScoringRules.assist),
-                _Row(label: l10n.fantasyRuleWin, points: FantasyScoringRules.win),
-                _Row(label: l10n.fantasyRuleDraw, points: FantasyScoringRules.draw),
-                _Row(label: l10n.fantasyRuleLoss, points: FantasyScoringRules.loss),
-                _Row(label: l10n.fantasyRuleYellow, points: FantasyScoringRules.yellow),
-                _Row(label: l10n.fantasyRuleRed, points: FantasyScoringRules.red),
+                _Row(label: l10n.fantasyRuleBase, points: table.base),
+                _Row(label: l10n.fantasyRuleGoal, points: table.goal),
+                _Row(label: l10n.fantasyRuleAssist, points: table.assist),
+                _Row(label: l10n.fantasyRuleWin, points: table.win),
+                _Row(label: l10n.fantasyRuleDraw, points: table.draw),
+                _Row(label: l10n.fantasyRuleLoss, points: table.loss),
+                _Row(label: l10n.fantasyRuleYellow, points: table.yellow),
+                _Row(label: l10n.fantasyRuleRed, points: table.red),
                 const SizedBox(height: AppSizes.s8),
                 _Paragraph(l10n.fantasyRulesScoringNote, muted: true),
               ],
@@ -113,7 +117,7 @@ class FantasyRulesPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _PositionTable(positions: _positions),
+                _PositionTable(positions: _positions, table: table),
                 const SizedBox(height: AppSizes.s8),
                 _Paragraph(l10n.fantasyRulesPositionNote, muted: true),
               ],
@@ -245,7 +249,7 @@ class _Bullet extends StatelessWidget {
 class _Row extends StatelessWidget {
   final String label;
   final String? value;
-  final int? points;
+  final num? points;
   final bool header;
   final bool badge;
 
@@ -274,7 +278,10 @@ class _Row extends StatelessWidget {
             Expanded(child: Text(value ?? '', style: AppTypography.body().copyWith(fontSize: AppSizes.s14)))
           else
             Text(
-              points == null ? (value ?? '') : FantasyScoringRules.signed(points),
+              points == null
+                  ? (value ?? '')
+                  : FantasyScoringRules.signed(points,
+                      decimal: Localizations.localeOf(context).languageCode == 'pt' ? ',' : '.'),
               style: header
                   ? headerStyle
                   : AppTypography.label(color: _pointsColor(points ?? 0)).copyWith(fontSize: AppSizes.s16),
@@ -307,8 +314,9 @@ class _SlotBadge extends StatelessWidget {
 /// GOL/ZAG/MEI/ATA × gols sofridos, sem sofrer gols e gols da equipe.
 class _PositionTable extends StatelessWidget {
   final List<FantasySlot> positions;
+  final FantasyScoringTable table;
 
-  const _PositionTable({required this.positions});
+  const _PositionTable({required this.positions, required this.table});
 
   @override
   Widget build(BuildContext context) {
@@ -342,9 +350,9 @@ class _PositionTable extends StatelessWidget {
             key: ValueKey('fantasy-rules-pos-${slot.key}'),
             children: [
               cell(_SlotBadge(label: fantasySlotLabel(l10n, slot)), first: true),
-              value(FantasyScoringRules.conceded[slot]),
-              value(FantasyScoringRules.cleanSheet[slot]),
-              value(FantasyScoringRules.teamGoalsFor(slot)),
+              value(table.positionValue(FantasyPositionRule.conceded, slot)),
+              value(table.positionValue(FantasyPositionRule.cleanSheet, slot)),
+              value(table.positionValue(FantasyPositionRule.teamGoal, slot)),
             ],
           ),
       ],

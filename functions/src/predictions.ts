@@ -14,6 +14,38 @@ const int = (value: unknown): number => {
 
 export const PREDICTION_POINTS = { exact: 10, winnerAndDiff: 7, winner: 5 } as const;
 
+/** Pontos do bolão (padrão [PREDICTION_POINTS]; o admin edita em `config/bolao`). */
+export interface PredictionRules {
+  exact: number;
+  winnerAndDiff: number;
+  winner: number;
+}
+
+const ruleValue = (value: unknown): value is number =>
+  typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= 50;
+
+/**
+ * Regras pelo doc (`config/bolao` ou `palpites.regras`: exato, vencedorSaldo,
+ * vencedor); inválidas ou fora de ordem (exato ≥ saldo ≥ vencedor) = padrão.
+ */
+export function predictionRules(doc: unknown): PredictionRules {
+  const data = doc && typeof doc === 'object' ? (doc as Doc) : {};
+  const rules = {
+    exact: ruleValue(data.exato) ? data.exato : PREDICTION_POINTS.exact,
+    winnerAndDiff: ruleValue(data.vencedorSaldo) ? data.vencedorSaldo : PREDICTION_POINTS.winnerAndDiff,
+    winner: ruleValue(data.vencedor) ? data.vencedor : PREDICTION_POINTS.winner,
+  };
+  if (rules.exact < rules.winnerAndDiff || rules.winnerAndDiff < rules.winner) return { ...PREDICTION_POINTS };
+  return rules;
+}
+
+/** As regras no formato gravado no palpite (`regras`). */
+export const rulesToDoc = (rules: PredictionRules): Doc => ({
+  exato: rules.exact,
+  vencedorSaldo: rules.winnerAndDiff,
+  vencedor: rules.winner,
+});
+
 /** Id do doc do palpiteiro no ranking da região. */
 export const rankingDocId = (regionId: string, uid: string): string => `${regionId}_${uid}`;
 
@@ -24,16 +56,17 @@ export const rankingDocId = (regionId: string, uid: string): string => `${region
 export function predictionPoints(
   prediction: { home: number; away: number },
   result: { home: number; away: number },
+  rules: PredictionRules = PREDICTION_POINTS,
 ): { points: number; exact: boolean } {
   if (prediction.home === result.home && prediction.away === result.away) {
-    return { points: PREDICTION_POINTS.exact, exact: true };
+    return { points: rules.exact, exact: true };
   }
   const sign = (n: number) => Math.sign(n);
   const predictedDiff = prediction.home - prediction.away;
   const resultDiff = result.home - result.away;
   if (sign(predictedDiff) !== sign(resultDiff)) return { points: 0, exact: false };
-  if (predictedDiff === resultDiff) return { points: PREDICTION_POINTS.winnerAndDiff, exact: false };
-  return { points: PREDICTION_POINTS.winner, exact: false };
+  if (predictedDiff === resultDiff) return { points: rules.winnerAndDiff, exact: false };
+  return { points: rules.winner, exact: false };
 }
 
 const dateOf = (value: unknown): Date | null => {
@@ -71,16 +104,26 @@ export function isOnTime(savedAt: unknown, deadline: Date | null): boolean {
   return at !== null && at.getTime() < deadline.getTime();
 }
 
-/** Pontuação de um palpite para a partida (com o prazo). */
-export function scorePrediction(prediction: Doc, match: Doc, season: string) {
+/**
+ * Pontuação de um palpite para a partida (com o prazo). Regras: as já
+ * gravadas no palpite (`regras`, 1ª pontuação) ou as atuais [current]
+ * (`config/bolao`; já pontuado sem `regras` = padrões); [rules] = as
+ * usadas, para gravar no palpite.
+ */
+export function scorePrediction(prediction: Doc, match: Doc, season: string, current: unknown = {}) {
+  const frozen = prediction.regras && typeof prediction.regras === 'object' ? prediction.regras : null;
+  // Pontuado antes das regras editáveis (sem `regras`): os padrões de então.
+  const scoredBefore = typeof prediction.valido === 'boolean';
+  const rules = predictionRules(frozen ?? (scoredBefore ? {} : current));
   const valid = isOnTime(prediction.atualizadoEm, predictionDeadline(match, season));
   const score = valid
     ? predictionPoints(
         { home: int(prediction.golsCasa), away: int(prediction.golsFora) },
         { home: int(match.golTimeCasa), away: int(match.golTimeFora) },
+        rules,
       )
     : { points: 0, exact: false };
-  return { valid, points: score.points, exact: score.exact };
+  return { valid, points: score.points, exact: score.exact, rules };
 }
 
 /**

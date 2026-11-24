@@ -116,7 +116,7 @@ import {
   LiveCardStatus,
 } from './match_result';
 import { shouldPostVoteCard, voteCardBestPlayerFields, voteCardNews, voteNewsId } from './vote_card';
-import { rankingDelta, rankingDocId, scorePrediction } from './predictions';
+import { rankingDelta, rankingDocId, rulesToDoc, scorePrediction } from './predictions';
 import {
   GroupTeam,
   computeTable,
@@ -171,6 +171,7 @@ import {
   fantasyChampions,
   fantasyRounds,
   frozenParams,
+  scoringParamsOf,
   lineupCopy,
   matchdayOf,
   nextOpenRound,
@@ -529,14 +530,21 @@ async function scorePredictions(collection: string, season: string, matchId: str
   if (predictions.empty) return;
   const regionId = typeof match.idRegiao === 'string' ? match.idRegiao.trim() : '';
   const ranking = db.collection(seasonCollection('palpites_ranking', season));
+  // Regras atuais do bolão (o palpite já pontuado segue com as dele, `regras`).
+  const currentRules = (await db.collection('config').doc('bolao').get()).data() ?? {};
   let batch = db.batch();
   let pending = 0;
   for (const doc of predictions.docs) {
     const data = doc.data();
-    const score = scorePrediction(data, match, season);
+    const score = scorePrediction(data, match, season, currentRules);
     const delta = rankingDelta(data, score);
     if (!delta) continue;
-    batch.update(doc.ref, { pontos: score.points, exato: score.exact, valido: score.valid });
+    batch.update(doc.ref, {
+      pontos: score.points,
+      exato: score.exact,
+      valido: score.valid,
+      ...(data.regras ? {} : { regras: rulesToDoc(score.rules) }),
+    });
     if (delta.points || delta.exact || delta.counted) {
       if (regionId) {
         batch.set(
@@ -1111,6 +1119,13 @@ async function closeFantasyRounds(now: Date): Promise<void> {
   }
 }
 
+/** Tabela de pontos padrão do Fantasy (`config/pontuacao_fantasy.tabela`); sem o doc, vazia (= padrões). */
+async function fantasyGlobalTable(): Promise<FantasyDoc> {
+  const { db } = await admin();
+  const table = (await db.collection('config').doc('pontuacao_fantasy').get()).data()?.tabela;
+  return table && typeof table === 'object' ? (table as FantasyDoc) : {};
+}
+
 /**
  * Fecha a rodada [roundRef] (se ainda aberta): parâmetros congelados, a
  * `rodadaAtual` recalculada (fica nela enquanto estiver em andamento) e as
@@ -1119,10 +1134,15 @@ async function closeFantasyRounds(now: Date): Promise<void> {
 async function closeFantasyRound(fantasyRef: DocRef, roundRef: DocRef, now: Date): Promise<void> {
   const { db, FieldValue } = await admin();
   const config = (await fantasyRef.get()).data() ?? {};
+  const globalTable = await fantasyGlobalTable();
   const closed = await db.runTransaction(async (tx) => {
     const snap = await tx.get(roundRef);
     if (snap.data()?.status !== 'aberta') return false;
-    tx.update(roundRef, { status: 'fechada', parametros: frozenParams(config), fechadaEm: FieldValue.serverTimestamp() });
+    tx.update(roundRef, {
+      status: 'fechada',
+      parametros: frozenParams(config, globalTable),
+      fechadaEm: FieldValue.serverTimestamp(),
+    });
     return true;
   });
   if (!closed) return;
@@ -1182,7 +1202,9 @@ async function scoreFantasyRound(fantasyRef: DocRef, config: FantasyDoc, round: 
   const roundSnap = await roundRef.get();
   if (!roundSnap.exists) return;
   const roundData = roundSnap.data() ?? {};
-  const params = frozenParams((roundData.parametros as FantasyDoc | undefined) ?? config);
+  // Rodada fechada: os parâmetros e a tabela congelados nela; senão, os atuais.
+  const frozen = roundData.parametros as FantasyDoc | undefined;
+  const params = scoringParamsOf(frozen ? frozenParams(frozen) : frozenParams(config, await fantasyGlobalTable()));
   const matchIds = Array.isArray(roundData.idsPartidas) ? roundData.idsPartidas.map(String) : [];
   const matchesCol = db.collection(seasonCollection('partidas', season));
   const matchDocs = matchIds.length ? await db.getAll(...matchIds.map((id) => matchesCol.doc(id))) : [];

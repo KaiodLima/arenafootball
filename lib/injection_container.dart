@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:arena_soccer/features/scoring/di/scoring_injection.dart';
 import 'package:arena_soccer/features/app_version/di/app_version_injection.dart';
 import 'package:arena_soccer/features/share_art/di/share_art_injection.dart';
 import 'package:arena_soccer/features/predictions/di/predictions_injection.dart';
@@ -68,6 +69,7 @@ Future<void> init() async {
   registerShareArtDependencies();
   registerAchievementsDependencies();
   registerPredictionsDependencies();
+  registerScoringDependencies();
 }
 
 /// A persistência do Firestore só pode ser configurada antes do primeiro uso.

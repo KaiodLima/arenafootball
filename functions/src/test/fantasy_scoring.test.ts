@@ -11,6 +11,9 @@ import {
   positionOf,
   scoreAthlete,
   scoringFieldsChanged,
+  scoringTable,
+  tableToDoc,
+  validTableValue,
 } from '../fantasy_scoring';
 
 const params = { minMinutos: 20, minMinutosDefesa: 45, capitao: 1.5 };
@@ -263,4 +266,30 @@ test('craques da rodada: titulares, quem entrou e quem tem lance, sem repetir', 
 test('quem já jogou: só os da escalação com partida apurada', () => {
   assert.deepEqual(playedAthletes(['gk', 'cb', 'mf', 'fw', 'dm'], new Set(['fw', 'gk', 'x'])), ['gk', 'fw']);
   assert.deepEqual(playedAthletes(['gk'], new Set()), []);
+});
+
+test('tabela editável: valida a faixa e o passo de 0,5; inválido = padrão', () => {
+  assert.equal(validTableValue(0.5), true);
+  assert.equal(validTableValue(-20), true);
+  assert.equal(validTableValue(20.5), false);
+  assert.equal(validTableValue(0.3), false);
+  assert.equal(validTableValue('5'), false);
+  const table = scoringTable({ base: 12, gol: 0.3, golsSofridos: { gol: -4, zag: 'x' }, empate: 1 });
+  assert.equal(table.base, 12);
+  assert.equal(table.goal, 5);
+  assert.equal(table.draw, 1);
+  assert.deepEqual(table.conceded, { gol: -4, zag: -2, mei: -1, ata: -1 });
+  assert.deepEqual(scoringTable(tableToDoc(table)), table);
+});
+
+test('apuração com a tabela da rodada: base, gol, empate e por posição', () => {
+  const data = match({ gols: [goal('g1', 'casa', 10, 'fw', ''), goal('g2', 'fora', 60)] });
+  const table = scoringTable({ base: 2, gol: 10, empate: 4, golEquipe: { ata: 1 }, golsSofridos: { ata: -2 } });
+  const s = scoreAthlete([{ id: 'm1', data }], { id: 'fw', posicao: 'atacante', teamId: '' }, { ...params, table });
+  assert.equal(rule(s, 'base'), 2);
+  assert.equal(rule(s, 'gol'), 10);
+  assert.equal(rule(s, 'empate'), 4);
+  assert.equal(rule(s, 'gols_equipe'), 1);
+  assert.equal(rule(s, 'gols_sofridos'), -2);
+  assert.equal(s.total, 2 + 10 + 4 + 1 - 2);
 });

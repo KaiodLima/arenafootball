@@ -7,6 +7,8 @@ import 'package:arena_soccer/features/matches/presentation/widgets/match_card.da
 import 'package:arena_soccer/features/predictions/presentation/bloc/prediction_cubit.dart';
 import 'package:arena_soccer/injection_container.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/features/scoring/presentation/bloc/scoring_config_cubit.dart';
+import 'package:arena_soccer/features/predictions/presentation/widgets/prediction_rules_text.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
@@ -149,7 +151,7 @@ class _PredictionSheet extends StatelessWidget {
                 ),
               const SizedBox(height: AppSizes.s16),
               Text(
-                l10n.predictionRules,
+                predictionRulesText(l10n, ScoringConfigCubit.of(context).predictionRules),
                 textAlign: TextAlign.center,
                 style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
               ),

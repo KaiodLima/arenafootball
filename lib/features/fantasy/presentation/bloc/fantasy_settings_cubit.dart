@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_config_dto.dart';
+import 'package:arena_soccer/features/fantasy/domain/fantasy_scoring_table.dart';
 import 'package:arena_soccer/features/fantasy/domain/fantasy_settings.dart';
 import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_config_usecases.dart';
 
@@ -109,6 +110,13 @@ class FantasySettingsCubit extends Cubit<FantasySettingsState> {
       ));
 
   void restoreDefaults() => _edit((d) => d.withDefaults());
+
+  /// Tabela própria do campeonato: ligada começa pela [base] (a padrão em
+  /// vigor); desligada volta à padrão.
+  void setOwnTable(bool own, FantasyScoringTable base) =>
+      _edit((d) => d.withScoringTable(own ? (d.scoringTable ?? base) : null));
+
+  void editTable(FantasyScoringTable table) => _edit((d) => d.withScoringTable(table));
 
   Future<void> save() async {
     final draft = state.draft;

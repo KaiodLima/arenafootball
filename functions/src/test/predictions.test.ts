@@ -1,6 +1,13 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { isOnTime, predictionDeadline, predictionPoints, rankingDelta, scorePrediction } from '../predictions';
+import {
+  isOnTime,
+  predictionDeadline,
+  predictionPoints,
+  predictionRules,
+  rankingDelta,
+  scorePrediction,
+} from '../predictions';
 
 const ts = (iso: string) => ({ toDate: () => new Date(iso) });
 
@@ -28,9 +35,10 @@ test('prazo: horário marcado (Brasília) ou início manual antes dele', () => {
 test('palpite atrasado não vale', () => {
   const match = { data: '24/10', horario: '21:00', golTimeCasa: 2, golTimeFora: 1 };
   const late = { golsCasa: 2, golsFora: 1, atualizadoEm: ts('2026-10-25T00:10:00Z') };
-  assert.deepEqual(scorePrediction(late, match, '2026'), { valid: false, points: 0, exact: false });
+  const pick = ({ valid, points, exact }: { valid: boolean; points: number; exact: boolean }) => ({ valid, points, exact });
+  assert.deepEqual(pick(scorePrediction(late, match, '2026')), { valid: false, points: 0, exact: false });
   const onTime = { ...late, atualizadoEm: ts('2026-10-24T20:00:00Z') };
-  assert.deepEqual(scorePrediction(onTime, match, '2026'), { valid: true, points: 10, exact: true });
+  assert.deepEqual(pick(scorePrediction(onTime, match, '2026')), { valid: true, points: 10, exact: true });
 });
 
 test('ranking soma só a diferença (placar corrigido) e nada quando não muda', () => {
@@ -46,4 +54,23 @@ test('ranking soma só a diferença (placar corrigido) e nada quando não muda',
   assert.equal(rankingDelta({ valido: true, pontos: 7, exato: false }, { valid: true, points: 7, exact: false }), null);
   // Atrasado: conta 0 e não entra em "palpites".
   assert.deepEqual(rankingDelta({}, { valid: false, points: 0, exact: false }), { points: 0, exact: 0, counted: 0 });
+});
+
+test('regras do bolão: config do admin, inválidas = padrão, congeladas no palpite', () => {
+  assert.deepEqual(predictionRules({ exato: 15, vencedorSaldo: 8, vencedor: 4 }), { exact: 15, winnerAndDiff: 8, winner: 4 });
+  assert.deepEqual(predictionRules({ exato: 3, vencedorSaldo: 8, vencedor: 4 }), { exact: 10, winnerAndDiff: 7, winner: 5 });
+  assert.deepEqual(predictionRules({ exato: 51 }), { exact: 10, winnerAndDiff: 7, winner: 5 });
+  assert.deepEqual(predictionPoints({ home: 2, away: 1 }, { home: 2, away: 1 }, { exact: 15, winnerAndDiff: 8, winner: 4 }), {
+    points: 15,
+    exact: true,
+  });
+  const match = { golTimeCasa: 2, golTimeFora: 1 };
+  const config = { exato: 15, vencedorSaldo: 8, vencedor: 4 };
+  // Palpite novo: as regras atuais.
+  assert.equal(scorePrediction({ golsCasa: 2, golsFora: 1 }, match, '2026', config).points, 15);
+  // Já pontuado com as dele: segue com elas.
+  const frozen = { golsCasa: 2, golsFora: 1, valido: true, regras: { exato: 12, vencedorSaldo: 6, vencedor: 3 } };
+  assert.equal(scorePrediction(frozen, match, '2026', config).points, 12);
+  // Pontuado antes das regras editáveis (sem `regras`): os padrões.
+  assert.equal(scorePrediction({ golsCasa: 2, golsFora: 1, valido: true }, match, '2026', config).points, 10);
 });

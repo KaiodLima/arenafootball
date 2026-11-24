@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/fantasy/domain/fantasy_settings.dart';
 import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_settings_cubit.dart';
+import 'package:arena_soccer/features/scoring/presentation/bloc/scoring_config_cubit.dart';
+import 'package:arena_soccer/features/scoring/presentation/widgets/scoring_table_editor.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_submit_bar.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
@@ -176,6 +178,37 @@ class _FantasySettingsPageState extends State<FantasySettingsPage> {
                         ),
                       ],
                     ),
+                    // Pontuação: a tabela padrão ou uma própria do campeonato.
+                    const SizedBox(height: AppSizes.s24),
+                    Text(l10n.fantasyScoringSection, style: AppTypography.title().copyWith(fontSize: AppSizes.s16)),
+                    const SizedBox(height: AppSizes.s8),
+                    _Panel(
+                      child: SwitchListTile(
+                        key: const ValueKey('fantasy-own-table'),
+                        value: draft.scoringTable != null,
+                        onChanged: state.saving
+                            ? null
+                            : (own) => cubit.setOwnTable(own, ScoringConfigCubit.of(context).fantasyTable),
+                        activeThumbColor: AppColors.primary,
+                        title: Text(l10n.fantasyScoringOwn, style: AppTypography.label(color: AppColors.textPrimary)),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: AppSizes.s4),
+                          child: Text(
+                            draft.scoringTable != null ? l10n.fantasyScoringOwnOn : l10n.fantasyScoringOwnOff,
+                            style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (draft.scoringTable != null) ...[
+                      const SizedBox(height: AppSizes.s12),
+                      ScoringTableEditor(
+                        keyPrefix: 'fantasy-table',
+                        table: draft.scoringTable!,
+                        enabled: !state.saving,
+                        onChanged: cubit.editTable,
+                      ),
+                    ],
                     // Acompanhar: rodadas/apuração, participantes e o ranking.
                     const SizedBox(height: AppSizes.s24),
                     Text(l10n.fantasyFollowTitle, style: AppTypography.title().copyWith(fontSize: AppSizes.s16)),

@@ -57,7 +57,12 @@ class FantasyDataSource {
   Future<Either<Failure, void>> saveConfig(FantasyConfigDTO config) async {
     try {
       await _doc(config.championshipDocId).set(
-        {...config.toAdminMap(), 'atualizadoEm': FieldValue.serverTimestamp()},
+        {
+          ...config.toAdminMap(),
+          // Sem tabela própria: a padrão (apaga a que existia).
+          if (config.scoringTable == null) 'pontuacao': FieldValue.delete(),
+          'atualizadoEm': FieldValue.serverTimestamp(),
+        },
         SetOptions(merge: true),
       );
       return const Right(null);

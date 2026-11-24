@@ -6,6 +6,7 @@ import {
   fantasyChampions,
   fantasyRounds,
   frozenParams,
+  scoringParamsOf,
   lineupCopy,
   matchdayOf,
   nextOpenRound,
@@ -86,7 +87,25 @@ test('campos que mexem nas rodadas', () => {
 });
 
 test('parâmetros congelados (padrões quando faltam)', () => {
-  assert.deepEqual(frozenParams({ minMinutos: 30, capitao: 2 }), { minMinutos: 30, minMinutosDefesa: 45, capitao: 2 });
+  const frozen = frozenParams({ minMinutos: 30, capitao: 2 });
+  assert.deepEqual(
+    { minMinutos: frozen.minMinutos, minMinutosDefesa: frozen.minMinutosDefesa, capitao: frozen.capitao },
+    { minMinutos: 30, minMinutosDefesa: 45, capitao: 2 },
+  );
+  assert.equal(frozen.pontos.base, 10);
+});
+
+test('tabela congelada: a da rodada > a própria do campeonato > a padrão > os padrões', () => {
+  const global = { base: 8, gol: 6 };
+  assert.equal(frozenParams({}, global).pontos.base, 8);
+  assert.equal(frozenParams({}, global).pontos.assistencia, 5, 'campo que falta = padrão');
+  assert.equal(frozenParams({ pontuacao: { base: 12 } }, global).pontos.base, 12);
+  assert.equal(frozenParams({ pontuacao: { base: 12 } }, global).pontos.gol, 5, 'a própria não herda da padrão');
+  const round = frozenParams({ pontos: { base: 7 }, pontuacao: { base: 12 } }, global);
+  assert.equal(round.pontos.base, 7);
+  const params = scoringParamsOf(round);
+  assert.equal(params.table?.base, 7);
+  assert.equal(params.table?.conceded.gol, -3);
 });
 
 test('cópia da escalação: mesmos atletas e capitão, marcada copiada; sem os 5, nula', () => {

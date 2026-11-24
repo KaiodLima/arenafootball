@@ -6807,8 +6807,8 @@ abstract class AppLocalizations {
   /// No description provided for @predictionRules.
   ///
   /// In pt, this message translates to:
-  /// **'Placar exato: 10 pts · vencedor e saldo: 7 · vencedor: 5'**
-  String get predictionRules;
+  /// **'Placar exato: {exact} pts · vencedor e saldo: {diff} · vencedor: {winner}'**
+  String predictionRules(int exact, int diff, int winner);
 
   /// No description provided for @predictionDeadline.
   ///
@@ -12395,7 +12395,7 @@ abstract class AppLocalizations {
   /// No description provided for @fantasyRulesPositionNote.
   ///
   /// In pt, this message translates to:
-  /// **'Gols sofridos e gols da equipe contam só com o atleta em campo. Gols da equipe: +0,5 por gol do time, para todas as posições.'**
+  /// **'Gols sofridos e gols da equipe contam só com o atleta em campo.'**
   String get fantasyRulesPositionNote;
 
   /// No description provided for @fantasyRulesMinutes.
@@ -14798,6 +14798,120 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Zerar pontos'**
   String get fantasyResetTeamsAction;
+
+  /// No description provided for @scoringTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pontuações'**
+  String get scoringTitle;
+
+  /// No description provided for @scoringMenu.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pontuações (Fantasy e bolão)'**
+  String get scoringMenu;
+
+  /// No description provided for @scoringTabFantasy.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arena Fantasy'**
+  String get scoringTabFantasy;
+
+  /// No description provided for @scoringTabBolao.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bolão'**
+  String get scoringTabBolao;
+
+  /// No description provided for @scoringFantasyIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tabela padrão do Arena Fantasy: vale para todo campeonato sem tabela própria (a própria fica na engrenagem do Fantasy de cada campeonato).'**
+  String get scoringFantasyIntro;
+
+  /// No description provided for @scoringFantasyNote.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vale para as rodadas que fecharem depois de salvar. As rodadas já fechadas guardam a tabela delas (o \"Reapurar\" usa a da rodada).'**
+  String get scoringFantasyNote;
+
+  /// No description provided for @scoringBolaoIntro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pontos de cada palpite: exato ≥ vencedor e saldo ≥ vencedor.'**
+  String get scoringBolaoIntro;
+
+  /// No description provided for @scoringBolaoNote.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vale para as partidas que terminarem depois de salvar. Palpites já pontuados seguem com os pontos de quando foram contados.'**
+  String get scoringBolaoNote;
+
+  /// No description provided for @scoringBolaoExact.
+  ///
+  /// In pt, this message translates to:
+  /// **'Placar exato'**
+  String get scoringBolaoExact;
+
+  /// No description provided for @scoringBolaoDiff.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vencedor e saldo (ou empate com outro placar)'**
+  String get scoringBolaoDiff;
+
+  /// No description provided for @scoringBolaoWinner.
+  ///
+  /// In pt, this message translates to:
+  /// **'Só o vencedor'**
+  String get scoringBolaoWinner;
+
+  /// No description provided for @scoringRestore.
+  ///
+  /// In pt, this message translates to:
+  /// **'Restaurar padrões'**
+  String get scoringRestore;
+
+  /// No description provided for @scoringSave.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salvar'**
+  String get scoringSave;
+
+  /// No description provided for @scoringSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pontuação salva.'**
+  String get scoringSaved;
+
+  /// No description provided for @scoringSaveError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível salvar a pontuação.'**
+  String get scoringSaveError;
+
+  /// No description provided for @fantasyScoringSection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pontuação'**
+  String get fantasyScoringSection;
+
+  /// No description provided for @fantasyScoringOwn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tabela própria deste campeonato'**
+  String get fantasyScoringOwn;
+
+  /// No description provided for @fantasyScoringOwnOn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os valores abaixo valem só para este campeonato, nas rodadas que fecharem depois.'**
+  String get fantasyScoringOwnOn;
+
+  /// No description provided for @fantasyScoringOwnOff.
+  ///
+  /// In pt, this message translates to:
+  /// **'Usa a tabela padrão (painel do admin → Pontuações).'**
+  String get fantasyScoringOwnOff;
 }
 
 class _AppLocalizationsDelegate

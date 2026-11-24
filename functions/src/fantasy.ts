@@ -4,6 +4,7 @@
  * test/fantasy.test.ts); quem lê e grava é o index.ts.
  */
 import { predictionDeadline } from './predictions';
+import { scoringTable, tableToDoc, type ScoringParams } from './fantasy_scoring';
 
 type Doc = Record<string, unknown>;
 
@@ -160,13 +161,34 @@ export function orphanRoundUpdate(round: { status?: string; idsPartidas?: string
  */
 export const roundFinalized = (existing: number, finished: number): boolean => finished >= existing;
 
-/** Parâmetros congelados na rodada ao fechar (os da configuração naquele momento). */
-export function frozenParams(config: Doc): { minMinutos: number; minMinutosDefesa: number; capitao: number } {
+/**
+ * Parâmetros congelados na rodada ao fechar (os da configuração naquele
+ * momento), com a tabela de pontos (`pontos`): a já congelada em [source]
+ * (`parametros` da rodada), a própria do campeonato (`pontuacao`) ou a
+ * padrão [globalTable] (`config/pontuacao_fantasy`); sem nenhuma, os padrões.
+ */
+export function frozenParams(
+  source: Doc,
+  globalTable?: Doc,
+): { minMinutos: number; minMinutosDefesa: number; capitao: number; pontos: Doc } {
   const num = (value: unknown, fallback: number) => (typeof value === 'number' && Number.isFinite(value) ? value : fallback);
+  const isMap = (value: unknown): value is Doc => !!value && typeof value === 'object';
+  const table = isMap(source.pontos) ? source.pontos : isMap(source.pontuacao) ? source.pontuacao : globalTable;
   return {
-    minMinutos: num(config.minMinutos, 20),
-    minMinutosDefesa: num(config.minMinutosDefesa, 45),
-    capitao: num(config.capitao, 1.5),
+    minMinutos: num(source.minMinutos, 20),
+    minMinutosDefesa: num(source.minMinutosDefesa, 45),
+    capitao: num(source.capitao, 1.5),
+    pontos: tableToDoc(scoringTable(table)),
+  };
+}
+
+/** Parâmetros congelados ([frozenParams]) para a apuração. */
+export function scoringParamsOf(frozen: ReturnType<typeof frozenParams>): ScoringParams {
+  return {
+    minMinutos: frozen.minMinutos,
+    minMinutosDefesa: frozen.minMinutosDefesa,
+    capitao: frozen.capitao,
+    table: scoringTable(frozen.pontos),
   };
 }
 

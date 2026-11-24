@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/fantasy/domain/fantasy_scoring_table.dart';
 import 'package:arena_soccer/features/fantasy/domain/fantasy_settings.dart';
 
 /// Configuração do Arena Fantasy de um campeonato (`fantasy/{idDocCampeonato}`).
@@ -41,6 +42,10 @@ class FantasyConfigDTO extends Equatable {
   final int minDefenseMinutes;
   final double captainMultiplier;
 
+  /// Tabela de pontos própria do campeonato (`pontuacao`); nula = a padrão
+  /// (`config/pontuacao_fantasy`).
+  final FantasyScoringTable? scoringTable;
+
   /// Gravados pelas functions (só leitura no app).
   final int currentRound;
   final int participants;
@@ -62,6 +67,7 @@ class FantasyConfigDTO extends Equatable {
     this.minMinutes = FantasyLimits.defaultMinMinutes,
     this.minDefenseMinutes = FantasyLimits.defaultMinDefenseMinutes,
     this.captainMultiplier = FantasyLimits.defaultCaptain,
+    this.scoringTable,
     this.currentRound = 0,
     this.participants = 0,
     this.champions = const [],
@@ -88,6 +94,9 @@ class FantasyConfigDTO extends Equatable {
       minMinutes: asInt(map['minMinutos'], FantasyLimits.defaultMinMinutes),
       minDefenseMinutes: asInt(map['minMinutosDefesa'], FantasyLimits.defaultMinDefenseMinutes),
       captainMultiplier: (map['capitao'] as num?)?.toDouble() ?? FantasyLimits.defaultCaptain,
+      scoringTable: map['pontuacao'] is Map
+          ? FantasyScoringTable.fromMap(Map<String, dynamic>.from(map['pontuacao'] as Map))
+          : null,
       currentRound: asInt(map['rodadaAtual'], 0),
       participants: asInt(map['participantes'], 0),
       champions: [
@@ -137,7 +146,27 @@ class FantasyConfigDTO extends Equatable {
         captainMultiplier: FantasyLimits.defaultCaptain,
       );
 
-  /// O que o admin grava (sem `atualizadoEm`, posto pelo data source).
+  /// A mesma config com a tabela própria [table] (nula = volta à padrão).
+  FantasyConfigDTO withScoringTable(FantasyScoringTable? table) => FantasyConfigDTO(
+        championshipDocId: championshipDocId,
+        championshipId: championshipId,
+        season: season,
+        title: title,
+        imageUrl: imageUrl,
+        region: region,
+        regionIds: regionIds,
+        active: active,
+        minMinutes: minMinutes,
+        minDefenseMinutes: minDefenseMinutes,
+        captainMultiplier: captainMultiplier,
+        scoringTable: table,
+        currentRound: currentRound,
+        participants: participants,
+        champions: champions,
+      );
+
+  /// O que o admin grava (sem `atualizadoEm`, posto pelo data source; a
+  /// tabela própria nula o data source apaga do doc).
   Map<String, dynamic> toAdminMap() => {
         'idCampeonato': championshipId,
         'temporada': season,
@@ -149,6 +178,7 @@ class FantasyConfigDTO extends Equatable {
         'minMinutos': minMinutes,
         'minMinutosDefesa': minDefenseMinutes,
         'capitao': captainMultiplier,
+        if (scoringTable != null) 'pontuacao': scoringTable!.toMap(),
       };
 
   FantasyConfigDTO copyWith({
@@ -176,6 +206,7 @@ class FantasyConfigDTO extends Equatable {
       minMinutes: minMinutes ?? this.minMinutes,
       minDefenseMinutes: minDefenseMinutes ?? this.minDefenseMinutes,
       captainMultiplier: captainMultiplier ?? this.captainMultiplier,
+      scoringTable: scoringTable,
       currentRound: currentRound,
       participants: participants,
       champions: champions,
@@ -195,6 +226,7 @@ class FantasyConfigDTO extends Equatable {
         minMinutes,
         minDefenseMinutes,
         captainMultiplier,
+        scoringTable,
         currentRound,
         participants,
         champions,

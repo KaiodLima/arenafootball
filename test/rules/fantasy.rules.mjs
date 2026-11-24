@@ -1,5 +1,5 @@
 import { assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
-import { deleteDoc, doc, getDoc, serverTimestamp, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
+import { deleteDoc, doc, getDoc, serverTimestamp, setDoc, updateDoc, writeBatch, deleteField } from 'firebase/firestore';
 
 /** Arena Fantasy: configuração por campeonato (`fantasy/{idDocCampeonato}`). */
 export default async function run(env, check) {
@@ -34,6 +34,14 @@ export default async function run(env, check) {
     config({ participantes: 99 }), { merge: true })));
   await check('admin não cria com rodada atual', assertFails(setDoc(doc(admin, 'fantasy/fc3'), config({ rodadaAtual: 1 }))));
   await check('não se apaga', assertFails(deleteDoc(doc(admin, 'fantasy/fc1'))));
+  await check('admin grava a tabela própria', assertSucceeds(setDoc(doc(admin, 'fantasy/fc1'),
+    config({ pontuacao: { base: 8, gol: 6.5, golsSofridos: { gol: -4, zag: -2, mei: -1, ata: -1 } } }), { merge: true })));
+  await check('tabela própria fora da faixa recusada', assertFails(setDoc(doc(admin, 'fantasy/fc1'),
+    config({ pontuacao: { base: 30 } }), { merge: true })));
+  await check('tabela própria com regra estranha recusada', assertFails(setDoc(doc(admin, 'fantasy/fc1'),
+    config({ pontuacao: { penalti: 2 } }), { merge: true })));
+  await check('admin volta à tabela padrão (apaga o campo)', assertSucceeds(updateDoc(doc(admin, 'fantasy/fc1'),
+    { pontuacao: deleteField(), atualizadoEm: serverTimestamp() })));
 
   // Campos das functions já gravados: o admin segue editando sem mexer neles.
   await env.withSecurityRulesDisabled((ctx) => updateDoc(doc(ctx.firestore(), 'fantasy/fc1'), { participantes: 3, rodadaAtual: 2 }));

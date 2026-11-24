@@ -7,6 +7,9 @@ import 'package:arena_soccer/features/predictions/data/dtos/prediction_dto.dart'
 import 'package:arena_soccer/features/predictions/presentation/bloc/prediction_cubit.dart';
 import 'package:arena_soccer/features/predictions/presentation/widgets/prediction_sheet.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/features/scoring/presentation/bloc/scoring_config_cubit.dart';
+import 'package:arena_soccer/features/predictions/presentation/widgets/prediction_rules_text.dart';
+import 'package:arena_soccer/features/predictions/domain/prediction_rules.dart';
 import 'package:arena_soccer/utils/components/arena_button.dart';
 import 'package:arena_soccer/utils/components/arena_card.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
@@ -99,7 +102,7 @@ class _PredictionBody extends StatelessWidget {
               else ...[
                 if (prediction != null) _Score(prediction: prediction),
                 Text(
-                  _message(l10n, status, prediction, loggedIn),
+                  _message(l10n, status, prediction, loggedIn, ScoringConfigCubit.of(context).predictionRules),
                   textAlign: TextAlign.center,
                   style: AppTypography.subtitle(),
                 ),
@@ -126,14 +129,15 @@ class _PredictionBody extends StatelessWidget {
     );
   }
 
-  String _message(AppLocalizations l10n, MatchCardStatus status, PredictionDTO? prediction, bool loggedIn) {
+  String _message(
+      AppLocalizations l10n, MatchCardStatus status, PredictionDTO? prediction, bool loggedIn, PredictionRules rules) {
     if (!loggedIn) return status.upcoming ? l10n.predictionLoginRequired : l10n.predictionLocked;
     if (status.upcoming) return prediction == null ? l10n.predictionNone : l10n.predictionDeadline;
     if (prediction == null) return l10n.predictionMissed;
     if (!prediction.scored) return status.finished ? l10n.predictionPending : l10n.predictionLocked;
     if (prediction.valid == false) return l10n.predictionLate;
     if (prediction.exact) return l10n.predictionExact;
-    return (prediction.points ?? 0) > 0 ? l10n.predictionRules : l10n.predictionMiss;
+    return (prediction.points ?? 0) > 0 ? predictionRulesText(l10n, rules) : l10n.predictionMiss;
   }
 }
 
