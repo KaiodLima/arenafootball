@@ -121,10 +121,15 @@ class TeamPlayersState extends Equatable {
     return players.where((p) => p.playsIn(id, teamId: view.teamId, teamName: view.teamName)).toList();
   }
 
-  /// Números de cada atleta na lista escolhida (total ou da competição).
-  int goalsOf(PlayerDTO player) => player.statIn(PlayerDTO.goalsField, championshipId);
+  /// Números de cada atleta na lista escolhida: no elenco geral, só o que fez
+  /// por este time ([PlayerDTO.statForTeam]); senão, os da competição.
+  int goalsOf(PlayerDTO player) => _stat(player, PlayerDTO.goalsField);
 
-  int assistsOf(PlayerDTO player) => player.statIn(PlayerDTO.assistsField, championshipId);
+  int assistsOf(PlayerDTO player) => _stat(player, PlayerDTO.assistsField);
+
+  int _stat(PlayerDTO player, String field) => championshipId == null
+      ? player.statForTeam(field, teamId: view.teamId, teamName: view.teamName)
+      : player.statIn(field, championshipId);
 
   /// Lista filtrada pela busca e ordenada (empate pelo nome).
   List<PlayerDTO> get visiblePlayers {

@@ -214,6 +214,21 @@ class PlayerDTO extends Equatable {
   /// Valor do quesito [field] ([goalsField] ou [assistsField]).
   int statOf(String field) => field == goalsField ? goals : assists;
 
+  /// O que o atleta fez **pelo time** (elenco geral do time): as inscrições
+  /// por ele e, se ele é o principal, os números sem competição (não se sabe
+  /// por qual time foram). Atleta antigo: o Geral, só no time principal.
+  int statForTeam(String field, {String teamId = '', String teamName = ''}) {
+    bool same(String id, String name) => sameTeam(idA: id, nameA: name, idB: teamId, nameB: teamName);
+    final main = same(this.teamId, team);
+    if (isLegacy) return main ? statOf(field) : 0;
+    final goalsField = field == PlayerDTO.goalsField;
+    final ofTeam = enrollments
+        .where((e) => same(e.teamId, e.team))
+        .fold<int>(0, (acc, e) => acc + (goalsField ? e.goals : e.assists));
+    if (!main) return ofTeam;
+    return ofTeam + (goalsField ? unassignedGoals : unassignedAssists);
+  }
+
   /// Valor do quesito na competição [championshipId] (nulo = Geral;
   /// [friendlyId] = amistosos).
   int statIn(String field, int? championshipId) {

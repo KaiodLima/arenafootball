@@ -102,7 +102,10 @@ void main() {
 
     expect(cubit.state.view.championships.map((c) => c.championshipId), [7, 9]);
     expect(cubit.state.squad.length, 3);
-    expect(cubit.state.totalGoals, 10);
+    // Só o que fizeram pelo Lava Jato: Dudu 3 (os 2 pelo Volta ficam de fora), Ana 1, Rafa (antigo) 4.
+    expect(cubit.state.totalGoals, 8);
+    expect(cubit.state.goalsOf(_players.first), 3);
+    expect(cubit.state.topScorerId, 'rafa');
 
     cubit.selectChampionship(7);
     // Dudu (3 na Copa) e Rafa (antigo: conta, com 0); Ana não joga a Copa.
