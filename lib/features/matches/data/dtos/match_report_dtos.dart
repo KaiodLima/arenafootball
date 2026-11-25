@@ -224,13 +224,25 @@ class LineupEntry extends Equatable {
   /// Número da camisa (nulo = sem número).
   final int? number;
 
-  const LineupEntry({required this.playerId, required this.playerName, this.starter = true, this.number});
+  /// `vaga`: lugar do titular na formação do time (0 = goleiro, depois da
+  /// defesa para o ataque, cada linha da esquerda para a direita); nulo =
+  /// sem vaga (reserva, formação Livre ou súmula antiga).
+  final int? slot;
+
+  const LineupEntry({
+    required this.playerId,
+    required this.playerName,
+    this.starter = true,
+    this.number,
+    this.slot,
+  });
 
   factory LineupEntry.fromMap(Map<String, dynamic> data) => LineupEntry(
         playerId: data['idJogador']?.toString() ?? '',
         playerName: data['jogador']?.toString() ?? '',
         starter: data['titular'] != false,
         number: (data['numero'] as num?)?.toInt(),
+        slot: (data['vaga'] as num?)?.toInt(),
       );
 
   Map<String, dynamic> toMap() => {
@@ -238,17 +250,19 @@ class LineupEntry extends Equatable {
         'jogador': playerName,
         'titular': starter,
         if (number != null) 'numero': number,
+        if (slot != null) 'vaga': slot,
       };
 
-  LineupEntry copyWith({bool? starter, int? Function()? number}) => LineupEntry(
+  LineupEntry copyWith({bool? starter, int? Function()? number, int? Function()? slot}) => LineupEntry(
         playerId: playerId,
         playerName: playerName,
         starter: starter ?? this.starter,
         number: number != null ? number() : this.number,
+        slot: slot != null ? slot() : this.slot,
       );
 
   @override
-  List<Object?> get props => [playerId, playerName, starter, number];
+  List<Object?> get props => [playerId, playerName, starter, number, slot];
 }
 
 /// Escalação dos dois lados (vazia = não lançada: o detalhe mostra o elenco).

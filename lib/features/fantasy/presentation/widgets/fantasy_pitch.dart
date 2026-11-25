@@ -7,6 +7,7 @@ import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_label
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_score_sheet.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/utils/components/pitch_painter.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
@@ -84,7 +85,7 @@ class FantasyPitch extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Positioned.fill(child: CustomPaint(painter: _PitchPainter())),
+                const Positioned.fill(child: CustomPaint(painter: PitchPainter())),
                 for (final slot in FantasySlot.values)
                   AnimatedAlign(
                     key: ValueKey('fantasy-pos-${slot.key}'),
@@ -266,37 +267,4 @@ class _PointsPill extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Linhas do campo: contorno, meio-campo, círculo central e as áreas.
-class _PitchPainter extends CustomPainter {
-  const _PitchPainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final stripe = Paint()..color = AppColors.white.withValues(alpha: 0.04);
-    const stripes = 8;
-    for (var i = 0; i < stripes; i += 2) {
-      canvas.drawRect(Rect.fromLTWH(0, size.height * i / stripes, size.width, size.height / stripes), stripe);
-    }
-    final line = Paint()
-      ..color = AppColors.white.withValues(alpha: 0.35)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
-    const m = 10.0;
-    final field = Rect.fromLTWH(m, m, size.width - 2 * m, size.height - 2 * m);
-    canvas.drawRect(field, line);
-    canvas.drawLine(Offset(field.left, field.center.dy), Offset(field.right, field.center.dy), line);
-    canvas.drawCircle(field.center, size.width * 0.14, line);
-    final areaWidth = field.width * 0.56;
-    final areaHeight = field.height * 0.14;
-    canvas.drawRect(Rect.fromLTWH(field.center.dx - areaWidth / 2, field.top, areaWidth, areaHeight), line);
-    canvas.drawRect(
-      Rect.fromLTWH(field.center.dx - areaWidth / 2, field.bottom - areaHeight, areaWidth, areaHeight),
-      line,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

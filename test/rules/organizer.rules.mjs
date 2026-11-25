@@ -150,6 +150,29 @@ export default async function run(env, check) {
     gols: [{ id: 'g1', lado: 'casa', idJogador: 'p7', jogador: 'Ana', idAssistencia: '', assistencia: '', minuto: 12, penalti: true }],
     penaltisPerdidos: [{ id: 'p1', lado: 'fora', idJogador: 'p9', jogador: 'Caio', minuto: 70, motivo: 'defendido', idGoleiro: 'p8', goleiro: 'Bia' }],
   })));
+  await check('súmula: confirma as escalações', assertSucceeds(updateDoc(doc(org, 'partidas2026/m1'), {
+    escalacao: { casa: [{ idJogador: 'p7', jogador: 'Ana', titular: true }], fora: [{ idJogador: 'p9', jogador: 'Caio', titular: true }] },
+    escalacaoConfirmada: true, escalacaoConfirmadaEm: serverTimestamp(),
+  })));
+  await check('súmula: desfaz a confirmação das escalações', assertSucceeds(updateDoc(doc(org, 'partidas2026/m1'),
+    { escalacaoConfirmada: deleteField(), escalacaoConfirmadaEm: deleteField() })));
+  await check('súmula: confirmação das escalações só booleana', assertFails(updateDoc(doc(org, 'partidas2026/m1'),
+    { escalacaoConfirmada: 'sim' })));
+  await check('usuário comum não confirma as escalações', assertFails(updateDoc(doc(other, 'partidas2026/m1'),
+    { escalacaoConfirmada: true, escalacaoConfirmadaEm: serverTimestamp() })));
+  await check('súmula: formação e vaga de cada titular', assertSucceeds(updateDoc(doc(org, 'partidas2026/m1'), {
+    escalacao: { casa: [{ idJogador: 'p7', jogador: 'Ana', titular: true, numero: 9, vaga: 10 }],
+      fora: [{ idJogador: 'p9', jogador: 'Caio', titular: true, vaga: 0 }] },
+    formacoes: { casa: '4-3-3', fora: '4-4-2' },
+  })));
+  await check('súmula: volta para Livre (apaga as formações)', assertSucceeds(updateDoc(doc(org, 'partidas2026/m1'),
+    { formacoes: deleteField() })));
+  await check('súmula: formação só casa/fora', assertFails(updateDoc(doc(org, 'partidas2026/m1'),
+    { formacoes: { casa: '4-3-3', outro: '4-4-2' } })));
+  await check('súmula: formação é texto', assertFails(updateDoc(doc(org, 'partidas2026/m1'),
+    { formacoes: { casa: 433 } })));
+  await check('usuário comum não muda a formação', assertFails(updateDoc(doc(other, 'partidas2026/m1'),
+    { formacoes: { casa: '4-3-3' } })));
   await check('súmula: abre a votação', assertSucceeds(updateDoc(doc(org, 'partidas2026/m1'), { votacao: 'true' })));
   await check('súmula: atrasou', assertSucceeds(updateDoc(doc(org, 'partidas2026/m1'),
     { horario: '16:20', horarioOriginal: '16:00', status: deleteField(), statusEm: deleteField(), inicioEm: deleteField() })));

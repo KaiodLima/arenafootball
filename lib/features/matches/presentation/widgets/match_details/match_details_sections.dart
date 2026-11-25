@@ -19,11 +19,11 @@ import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 
 /// Título das seções dos detalhes: ícone num quadradinho verde + texto.
-class _SectionTitle extends StatelessWidget {
+class MatchDetailsSectionTitle extends StatelessWidget {
   final IconData icon;
   final String title;
 
-  const _SectionTitle({required this.icon, required this.title});
+  const MatchDetailsSectionTitle({super.key, required this.icon, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +100,7 @@ class MatchGoalsTimeline extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _SectionTitle(
+          MatchDetailsSectionTitle(
             icon: Icons.sports_soccer_rounded,
             title: match.bookings.isEmpty && match.missedPenalties.isEmpty
                 ? l10n.matchCardGoals
@@ -341,7 +341,7 @@ class MatchBestPlayerCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _SectionTitle(icon: Icons.workspace_premium_rounded, title: l10n.matchDetailsBestPlayer),
+          MatchDetailsSectionTitle(icon: Icons.workspace_premium_rounded, title: l10n.matchDetailsBestPlayer),
           Row(
             children: [
               Stack(
@@ -437,7 +437,7 @@ class MatchSquadsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _SectionTitle(icon: Icons.groups_rounded, title: l10n.matchDetailsSquads),
+          MatchDetailsSectionTitle(icon: Icons.groups_rounded, title: l10n.matchDetailsSquads),
           Container(
             padding: const EdgeInsets.all(AppSizes.s4),
             decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(AppSizes.s16)),

@@ -130,6 +130,16 @@ class MatchDTO extends Equatable {
   /// com `penalti` na lista [goals].
   final List<MatchMissedPenalty> missedPenalties;
   final MatchLineup lineup;
+
+  /// `escalacaoConfirmada`: o admin/organizador confirmou as escalações na
+  /// súmula (o detalhe mostra o campinho). `escalacaoConfirmadaEm`: hora do
+  /// servidor da confirmação.
+  final bool lineupConfirmed;
+  final DateTime? lineupConfirmedAt;
+
+  /// `formacoes` ({casa: '4-3-3', fora: '4-4-2'}): formação escolhida na
+  /// súmula por time; lado ausente = Livre (o campinho arruma pela posição).
+  final Map<MatchSide, String> formations;
   final String referee;
   final String notes;
 
@@ -169,12 +179,30 @@ class MatchDTO extends Equatable {
     this.substitutions = const [],
     this.missedPenalties = const [],
     this.lineup = const MatchLineup(),
+    this.lineupConfirmed = false,
+    this.lineupConfirmedAt,
+    this.formations = const {},
     this.referee = '',
     this.notes = '',
   });
 
   static const String bookingsField = 'cartoes';
   static const String lineupField = 'escalacao';
+  static const String lineupConfirmedField = 'escalacaoConfirmada';
+  static const String lineupConfirmedAtField = 'escalacaoConfirmadaEm';
+  static const String formationsField = 'formacoes';
+
+  /// `formacoes` lido: só os lados com código.
+  static Map<MatchSide, String> formationsOf(Object? raw) => raw is Map
+      ? {
+          for (final side in MatchSide.values)
+            if ((raw[side.key]?.toString() ?? '').trim().isNotEmpty) side: raw[side.key].toString().trim(),
+        }
+      : const {};
+
+  /// `formacoes` para gravar ({casa, fora}).
+  static Map<String, String> formationsMap(Map<MatchSide, String> formations) =>
+      {for (final e in formations.entries) e.key.key: e.value};
   static const String substitutionsField = 'substituicoes';
   static const String missedPenaltiesField = 'penaltisPerdidos';
 
@@ -237,6 +265,9 @@ class MatchDTO extends Equatable {
       substitutions: MatchSubstitution.listFrom(data[substitutionsField]),
       missedPenalties: MatchMissedPenalty.listFrom(data[missedPenaltiesField]),
       lineup: MatchLineup.fromMap(data[lineupField]),
+      lineupConfirmed: data[lineupConfirmedField] == true,
+      lineupConfirmedAt: timeOf(data[lineupConfirmedAtField]),
+      formations: formationsOf(data[formationsField]),
       referee: data['arbitro']?.toString() ?? '',
       notes: data['observacoes']?.toString() ?? '',
     );
@@ -274,6 +305,9 @@ class MatchDTO extends Equatable {
         if (substitutions.isNotEmpty) substitutionsField: [for (final s in substitutions) s.toMap()],
         if (missedPenalties.isNotEmpty) missedPenaltiesField: [for (final p in missedPenalties) p.toMap()],
         if (!lineup.isEmpty) lineupField: lineup.toMap(),
+        if (lineupConfirmed) lineupConfirmedField: true,
+        if (lineupConfirmed && lineupConfirmedAt != null) lineupConfirmedAtField: Timestamp.fromDate(lineupConfirmedAt!),
+        if (formations.isNotEmpty) formationsField: formationsMap(formations),
         if (referee.isNotEmpty) 'arbitro': referee,
         if (notes.isNotEmpty) 'observacoes': notes,
       };
@@ -290,6 +324,7 @@ class MatchDTO extends Equatable {
       'intervaloEm': ms(halfTimeAt),
       'segundoTempoEm': ms(secondHalfAt),
       'statusEm': ms(statusAt),
+      lineupConfirmedAtField: ms(lineupConfirmedAt),
       if (electedPlayerId.isNotEmpty || electedPlayerName.isNotEmpty)
         electedField: {'idJogador': electedPlayerId, 'nome': electedPlayerName},
     };
@@ -329,6 +364,9 @@ class MatchDTO extends Equatable {
     List<MatchSubstitution>? substitutions,
     List<MatchMissedPenalty>? missedPenalties,
     MatchLineup? lineup,
+    bool? lineupConfirmed,
+    DateTime? Function()? lineupConfirmedAt,
+    Map<MatchSide, String>? formations,
     String? referee,
     String? notes,
   }) {
@@ -368,6 +406,9 @@ class MatchDTO extends Equatable {
       substitutions: substitutions ?? this.substitutions,
       missedPenalties: missedPenalties ?? this.missedPenalties,
       lineup: lineup ?? this.lineup,
+      lineupConfirmed: lineupConfirmed ?? this.lineupConfirmed,
+      lineupConfirmedAt: lineupConfirmedAt != null ? lineupConfirmedAt() : this.lineupConfirmedAt,
+      formations: formations ?? this.formations,
       referee: referee ?? this.referee,
       notes: notes ?? this.notes,
     );
@@ -409,6 +450,9 @@ class MatchDTO extends Equatable {
         substitutions: substitutions,
         missedPenalties: missedPenalties,
         lineup: lineup,
+        lineupConfirmed: lineupConfirmed,
+        lineupConfirmedAt: lineupConfirmedAt,
+        formations: formations,
         referee: referee,
         notes: notes,
       );
@@ -451,6 +495,9 @@ class MatchDTO extends Equatable {
         substitutions: substitutions,
         missedPenalties: missedPenalties,
         lineup: lineup,
+        lineupConfirmed: lineupConfirmed,
+        lineupConfirmedAt: lineupConfirmedAt,
+        formations: formations,
         referee: referee,
         notes: notes,
       );
@@ -495,6 +542,9 @@ class MatchDTO extends Equatable {
         substitutions,
         missedPenalties,
         lineup,
+        lineupConfirmed,
+        lineupConfirmedAt,
+        formations,
         referee,
         notes,
       ];

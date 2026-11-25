@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_report_dtos.dart';
+import 'package:arena_soccer/features/matches/domain/formation.dart';
 import 'package:arena_soccer/features/matches/domain/match_report.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/match_report/report_formation.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/match_report_cubit.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
 import 'package:arena_soccer/features/player_requests/presentation/widgets/player_request_labels.dart';
@@ -17,6 +19,8 @@ import 'package:arena_soccer/utils/constants/app_typography.dart';
 /// placar de vagas (titulares x/11, reservas) e os atletas em três grupos
 /// (Titulares, Reservas, Não relacionados) com a camisa, a foto e a pílula
 /// Titular | Reserva; no fim, o espaço tracejado "+ Adicionar atleta".
+/// No alto, o "Confirmar escalações" (o campinho do detalhe da partida);
+/// depois dos titulares, a formação e o editor de vagas.
 class ReportLineup extends StatefulWidget {
   final MatchReportState state;
   final String? homeCrest;
@@ -26,6 +30,15 @@ class ReportLineup extends StatefulWidget {
   final void Function(MatchSide side, PlayerDTO player, LineupRole role) onRole;
   final void Function(MatchSide side, LineupEntry entry) onNumber;
   final ValueChanged<MatchSide> onAddPlayer;
+
+  /// "Confirmar escalações" e o "Desfazer" da faixa de confirmadas.
+  final VoidCallback onConfirmLineups;
+  final VoidCallback onUndoConfirmation;
+
+  /// Formação do time (nula = Livre), vaga de um titular e "Sugerir pela posição".
+  final void Function(MatchSide side, Formation? formation) onFormation;
+  final void Function(MatchSide side, int slot, String playerId) onSlot;
+  final ValueChanged<MatchSide> onSuggestSlots;
 
   const ReportLineup({
     super.key,
@@ -37,6 +50,11 @@ class ReportLineup extends StatefulWidget {
     required this.onRole,
     required this.onNumber,
     required this.onAddPlayer,
+    required this.onConfirmLineups,
+    required this.onUndoConfirmation,
+    required this.onFormation,
+    required this.onSlot,
+    required this.onSuggestSlots,
   });
 
   @override
@@ -81,6 +99,13 @@ class _ReportLineupState extends State<ReportLineup> {
         const SizedBox(height: AppSizes.s12),
         _Counter(starters: count.starters, subs: count.subs, color: color),
         const SizedBox(height: AppSizes.s8),
+        ConfirmLineupsPanel(
+          confirmed: match.lineupConfirmed,
+          canConfirm: MatchReport.canConfirmLineup(match.lineup),
+          onConfirm: widget.onConfirmLineups,
+          onUndo: widget.onUndoConfirmation,
+        ),
+        const SizedBox(height: AppSizes.s8),
         if (state.loadingSquads)
           const Padding(padding: EdgeInsets.all(AppSizes.s24), child: Center(child: CircularProgressIndicator()))
         else ...[
@@ -106,10 +131,105 @@ class _ReportLineupState extends State<ReportLineup> {
                     if (entry != null) widget.onNumber(_side, entry);
                   },
                 ),
+              // Depois dos titulares: a formação e o editor de vagas.
+              if (role == LineupRole.starter)
+                ReportFormationSection(
+                  key: ValueKey('report-formation-${_side.key}'),
+                  side: _side,
+                  teamName: _side == MatchSide.home ? match.homeTeam : match.awayTeam,
+                  lineup: match.lineup.of(_side),
+                  formationCode: match.formations[_side],
+                  squad: squad,
+                  color: color,
+                  onFormation: (formation) => widget.onFormation(_side, formation),
+                  onSlot: (slot, playerId) => widget.onSlot(_side, slot, playerId),
+                  onSuggest: () => widget.onSuggestSlots(_side),
+                ),
             ],
           const SizedBox(height: AppSizes.s8),
           _AddTile(onTap: state.busy ? null : () => widget.onAddPlayer(_side)),
         ],
+      ],
+    );
+  }
+}
+
+/// "Confirmar escalações" (com pelo menos um titular em cada time) ou, já
+/// confirmadas, a faixa "Escalações confirmadas · Desfazer".
+class ConfirmLineupsPanel extends StatelessWidget {
+  final bool confirmed;
+  final bool canConfirm;
+  final VoidCallback onConfirm;
+  final VoidCallback onUndo;
+
+  const ConfirmLineupsPanel({
+    super.key,
+    required this.confirmed,
+    required this.canConfirm,
+    required this.onConfirm,
+    required this.onUndo,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    if (confirmed) {
+      return Container(
+        key: const ValueKey('report-lineups-confirmed'),
+        padding: const EdgeInsets.fromLTRB(AppSizes.s12, AppSizes.s4, AppSizes.s4, AppSizes.s4),
+        decoration: BoxDecoration(
+          color: AppColors.primarySoft,
+          borderRadius: BorderRadius.circular(AppSizes.s14),
+          border: Border.all(color: AppColors.primary),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.verified_rounded, color: AppColors.primaryDark, size: AppSizes.s20),
+            const SizedBox(width: AppSizes.s8),
+            Expanded(
+              child: Text(
+                l10n.reportLineupsConfirmed,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTypography.label(color: AppColors.primaryDark).copyWith(fontSize: AppSizes.s14),
+              ),
+            ),
+            TextButton(
+              key: const ValueKey('report-lineups-undo'),
+              onPressed: onUndo,
+              child: Text(l10n.reportUndo, style: AppTypography.label(color: AppColors.primaryDark)),
+            ),
+          ],
+        ),
+      );
+    }
+    // Botão compacto (a lista de atletas logo abaixo); sem titular num dos
+    // times, travado com o aviso.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        OutlinedButton.icon(
+          key: const ValueKey('report-lineups-confirm'),
+          onPressed: canConfirm ? onConfirm : null,
+          icon: const Icon(Icons.how_to_reg_rounded, size: AppSizes.s20),
+          label: Text(l10n.reportConfirmLineups),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.primaryDark,
+            backgroundColor: AppColors.surface,
+            minimumSize: const Size.fromHeight(AppSizes.s44),
+            side: BorderSide(color: canConfirm ? AppColors.primary : AppColors.greyLight),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSizes.s14)),
+            textStyle: AppTypography.label().copyWith(fontSize: AppSizes.s14),
+          ),
+        ),
+        if (!canConfirm)
+          Padding(
+            padding: const EdgeInsets.only(top: AppSizes.s4, left: AppSizes.s4),
+            child: Text(
+              l10n.reportConfirmLineupsNeedStarters,
+              style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+            ),
+          ),
       ],
     );
   }

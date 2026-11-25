@@ -214,6 +214,20 @@ class MatchReport {
   static bool canAddStarter(List<LineupEntry> entries, String playerId) =>
       entries.any((e) => e.starter && e.playerId == playerId) || entries.where((e) => e.starter).length < maxStarters;
 
+  /// Dá para confirmar as escalações: pelo menos um titular em cada time.
+  static bool canConfirmLineup(MatchLineup lineup) =>
+      lineup.home.any((e) => e.starter) && lineup.away.any((e) => e.starter);
+
+  /// A confirmação das escalações vale: marcada e com titular nos dois times
+  /// (sem titulares num lado, a confirmação cai e o campinho some).
+  static bool lineupConfirmedValid(MatchDTO match) => match.lineupConfirmed && canConfirmLineup(match.lineup);
+
+  /// A partida [match] com a confirmação acertada pela escalação: sem titular
+  /// num dos times, deixa de estar confirmada.
+  static MatchDTO keepLineupConfirmation(MatchDTO match) => match.lineupConfirmed && !canConfirmLineup(match.lineup)
+      ? match.copyWith(lineupConfirmed: false, lineupConfirmedAt: () => null)
+      : match;
+
   /// Titulares e reservas de um lado.
   static ({int starters, int subs}) lineupCount(List<LineupEntry> entries) =>
       (starters: entries.where((e) => e.starter).length, subs: entries.where((e) => !e.starter).length);

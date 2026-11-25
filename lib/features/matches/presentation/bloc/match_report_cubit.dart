@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_report_dtos.dart';
+import 'package:arena_soccer/features/matches/domain/formation.dart';
 import 'package:arena_soccer/features/matches/domain/match_report.dart';
 import 'package:arena_soccer/features/matches/domain/match_squads.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/save_match_report_usecase.dart';
@@ -20,7 +22,7 @@ import 'package:arena_soccer/features/matches/domain/usecases/delay_match_usecas
 enum LineupRole { none, starter, sub }
 
 /// Aviso de ação concluída na súmula.
-enum MatchReportNotice { saved, playerAdded, phaseChanged, eventAdded, startersFull }
+enum MatchReportNotice { saved, playerAdded, phaseChanged, eventAdded, startersFull, lineupConfirmed }
 
 class MatchReportState extends Equatable {
   /// A partida como está gravada (base do "tem mudança") e a em edição.
@@ -112,6 +114,8 @@ class MatchReportState extends Equatable {
         [for (var i = 0; i < b.missedPenalties.length; i++) a.missedPenalties[i] == b.missedPenalties[i]]
             .contains(false) ||
         a.lineup != b.lineup ||
+        a.lineupConfirmed != b.lineupConfirmed ||
+        !mapEquals(a.formations, b.formations) ||
         a.referee != b.referee ||
         a.notes != b.notes ||
         a.date != b.date ||
@@ -140,6 +144,8 @@ class MatchReportState extends Equatable {
       count += diff<LineupEntry>(a.lineup.of(side), b.lineup.of(side), (e) => e.playerId);
     }
     count += [
+      a.lineupConfirmed != b.lineupConfirmed,
+      for (final side in MatchSide.values) a.formations[side] != b.formations[side],
       a.referee != b.referee,
       a.notes != b.notes,
       a.date != b.date,
@@ -265,7 +271,9 @@ class MatchReportCubit extends Cubit<MatchReportState> {
     ));
   }
 
-  void _edit(MatchDTO match) => emit(state.copyWith(match: match));
+  /// Edição da súmula; sem titular num dos times, a confirmação das
+  /// escalações cai sozinha.
+  void _edit(MatchDTO match) => emit(state.copyWith(match: MatchReport.keepLineupConfirmation(match)));
 
   // ------------------------------------------------------------------ lances
 
@@ -464,10 +472,93 @@ class MatchReportCubit extends Cubit<MatchReportState> {
         ? rest
         : [
             ...rest,
-            (existing ?? LineupEntry(playerId: player.id, playerName: player.name))
-                .copyWith(starter: role == LineupRole.starter),
+            (existing ?? LineupEntry(playerId: player.id, playerName: player.name)).copyWith(
+              starter: role == LineupRole.starter,
+              // Reserva não tem vaga: virar reserva libera a vaga.
+              slot: role == LineupRole.starter ? null : () => null,
+            ),
           ];
+    _edit(match.copyWith(lineup: match.lineup.withSide(side, _withSlots(match, side, entries))));
+  }
+
+  /// Posições do elenco do [side] (id → `posicao`), para sugerir as vagas.
+  Map<String, String> _positions(MatchSide side) => {for (final p in state.squadOf(side)) p.id: p.position};
+
+  /// Com formação no [side], o titular sem vaga vai para a 1ª vaga livre
+  /// compatível (quem já tem vaga fica); Livre, ninguém tem vaga.
+  List<LineupEntry> _withSlots(MatchDTO match, MatchSide side, List<LineupEntry> entries) {
+    final formation = Formation.parse(match.formations[side]);
+    if (formation == null) return [for (final e in entries) e.slot == null ? e : e.copyWith(slot: () => null)];
+    return formation.suggestSlots(entries, _positions(side));
+  }
+
+  // ---------------------------------------------------------------- formação
+
+  /// Formação do [side] ([formation] nula = Livre, sem vagas). Trocando de
+  /// formação, quem está numa vaga da mesma função continua nela; o resto é
+  /// sugerido pela posição.
+  void setFormation(MatchSide side, Formation? formation) {
+    final match = state.match;
+    if (match == null) return;
+    final previous = Formation.parse(match.formations[side]);
+    if (formation?.code == previous?.code) return;
+    final formations = {...match.formations};
+    var entries = match.lineup.of(side);
+    if (formation == null) {
+      formations.remove(side);
+      entries = [for (final e in entries) e.copyWith(slot: () => null)];
+    } else {
+      formations[side] = formation.code;
+      entries = [
+        for (final e in entries)
+          e.slot != null &&
+                  previous != null &&
+                  formation.seatOf(e.slot!) != null &&
+                  formation.roleOf(e.slot!) == previous.roleOf(e.slot!)
+              ? e
+              : e.copyWith(slot: () => null),
+      ];
+      entries = formation.suggestSlots(entries, _positions(side));
+    }
+    _edit(match.copyWith(formations: formations, lineup: match.lineup.withSide(side, entries)));
+  }
+
+  /// Põe o titular [playerId] na vaga [slot] (quem estava nela troca de lugar com ele).
+  void assignSlot(MatchSide side, int slot, String playerId) {
+    final match = state.match;
+    if (match == null || Formation.parse(match.formations[side]) == null) return;
+    final entries = Formation.swapSlot(match.lineup.of(side), playerId, slot);
     _edit(match.copyWith(lineup: match.lineup.withSide(side, entries)));
+  }
+
+  /// "Sugerir pela posição": refaz todas as vagas do [side].
+  void suggestSlots(MatchSide side) {
+    final match = state.match;
+    final formation = Formation.parse(match?.formations[side]);
+    if (match == null || formation == null) return;
+    final entries = formation.suggestSlots(match.lineup.of(side), _positions(side), keep: false);
+    _edit(match.copyWith(lineup: match.lineup.withSide(side, entries)));
+  }
+
+  /// "Confirmar escalações": o campinho aparece no detalhe depois do
+  /// "Salvar súmula". Precisa de pelo menos um titular em cada time.
+  void confirmLineup() {
+    final match = state.match;
+    if (match == null || match.lineupConfirmed || !MatchReport.canConfirmLineup(match.lineup)) return;
+    // Reconfirmar antes de salvar mantém a hora já gravada.
+    final original = state.original;
+    final at = original != null && original.lineupConfirmed ? original.lineupConfirmedAt : null;
+    emit(state.copyWith(
+      match: match.copyWith(lineupConfirmed: true, lineupConfirmedAt: () => at),
+      notice: () => MatchReportNotice.lineupConfirmed,
+    ));
+  }
+
+  /// "Desfazer" da confirmação (o campinho some depois do "Salvar súmula").
+  void undoLineupConfirmation() {
+    final match = state.match;
+    if (match == null || !match.lineupConfirmed) return;
+    _edit(match.copyWith(lineupConfirmed: false, lineupConfirmedAt: () => null));
   }
 
   void setNumber(MatchSide side, String playerId, int? number) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:arena_soccer/features/matches/domain/match_pitch.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
 import 'package:arena_soccer/features/share_art/presentation/templates/player_match/player_match_art.dart';
 import 'package:arena_soccer/features/share_art/presentation/templates/player_match/player_match_parts.dart';
@@ -8,16 +9,6 @@ import 'package:arena_soccer/utils/constants/app_colors.dart';
 
 const _board = Color(0xFF123A22);
 const _boardDark = Color(0xFF0E2F1B);
-
-/// Profundidade da posição no campo (0 = área do ataque, 1 = o próprio gol).
-double lineupDepth(String positionKey) => switch (PlayerPosition.fromKey(positionKey)) {
-      PlayerPosition.forward => 0.18,
-      PlayerPosition.midfielder => 0.4,
-      PlayerPosition.defensiveMidfielder => 0.52,
-      PlayerPosition.fullBack || PlayerPosition.defender => 0.7,
-      PlayerPosition.goalkeeper => 0.88,
-      null => 0.45,
-    };
 
 /// Lado no campo (0 = esquerda, 1 = direita): o lateral na ponta, o resto no meio.
 double _lineupSide(String positionKey) => PlayerPosition.fromKey(positionKey) == PlayerPosition.fullBack ? 0.16 : 0.5;

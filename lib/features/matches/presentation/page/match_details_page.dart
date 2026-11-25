@@ -8,6 +8,8 @@ import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart'
 import 'package:arena_soccer/features/matches/presentation/bloc/match_details_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_details/match_details_header.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_details/match_details_sections.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/match_details/match_lineup_pitch.dart';
+import 'package:arena_soccer/features/matches/domain/match_pitch.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/edit_match_info_sheet.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_card.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_goals_sheet.dart';
@@ -66,6 +68,7 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
   final _tourArt = GlobalKey();
   final _tourBestPlayer = GlobalKey();
   final _tourPrediction = GlobalKey();
+  final _tourPitch = GlobalKey();
   bool _tourRequested = false;
 
   String? get season => widget.season;
@@ -75,7 +78,8 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
   Color? get awayColor => widget.awayColor;
   String? get championshipLabel => widget.championshipLabel;
 
-  /// Tour do detalhe da partida na 1ª visita (arte, craque e palpite).
+  /// Tour do detalhe da partida na 1ª visita (arte, craque, palpite e o
+  /// campinho das escalações, quando confirmadas).
   void _requestTour() {
     if (_tourRequested) return;
     _tourRequested = true;
@@ -102,6 +106,12 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
           icon: Icons.sports_soccer_rounded,
           title: l10n.tourMatchPredictionTitle,
           body: l10n.tourMatchPredictionBody,
+        ),
+        TourStep(
+          target: _tourPitch,
+          icon: Icons.stadium_rounded,
+          title: l10n.tourMatchPitchTitle,
+          body: l10n.tourMatchPitchBody,
         ),
       ],
     );
@@ -135,7 +145,8 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
         final status = MatchCardStatus.of(match, now);
         final home = MatchDetailsPage.headerColor(homeColor);
         final away = MatchDetailsPage.headerColor(awayColor);
-        if (!state.deleted) _requestTour();
+        // Depois dos elencos: o campinho (alvo do tour) já pode estar na tela.
+        if (!state.deleted && !state.squadsLoading) _requestTour();
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -328,6 +339,29 @@ class _MatchDetailsPageState extends State<MatchDetailsPage> {
                           awayCrest: awayCrest,
                         ),
                       ),
+                      if (MatchPitch.visible(match) && !state.squadsLoading)
+                        KeyedSubtree(
+                          key: _tourPitch,
+                          child: MatchLineupPitchCard(
+                            match: match,
+                            homeSquad: state.homeSquad,
+                            awaySquad: state.awaySquad,
+                            homeCrest: homeCrest,
+                            awayCrest: awayCrest,
+                            homeColor: homeColor,
+                            awayColor: awayColor,
+                            onPlayerTap: (spot, player) => Navigator.pushNamed(
+                              context,
+                              AppRoutes.playerProfilePage,
+                              arguments: {
+                                'playerId': spot.playerId,
+                                'season': season,
+                                'name': player?.name ?? spot.entry.playerName,
+                                'player': player,
+                              },
+                            ),
+                          ),
+                        ),
                       MatchSquadsCard(
                         match: match,
                         selectedSide: state.selectedSide,

@@ -2960,6 +2960,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Predict the score before the match and earn pool points.';
 
   @override
+  String get tourMatchPitchTitle => 'Lineups on the pitch';
+
+  @override
+  String get tourMatchPitchBody =>
+      'Who is on the field now, with shirt number, goals and cards. Tap a player to see the profile.';
+
+  @override
   String get tourEventPollHeaderTitle => 'Voting event';
 
   @override
@@ -4916,6 +4923,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get matchDetailsSquads => 'Squads';
+
+  @override
+  String get matchPitchTitle => 'Lineups';
+
+  @override
+  String get matchPitchSubbedIn => 'Came on';
 
   @override
   String get matchDetailsNoSquad => 'No players registered';
@@ -8652,6 +8665,93 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get reportStartersFull =>
       'There are already 11 starters. Remove one to add another.';
+
+  @override
+  String get reportConfirmLineups => 'Confirm lineups';
+
+  @override
+  String get reportLineupsConfirmed => 'Lineups confirmed';
+
+  @override
+  String get reportConfirmLineupsNeedStarters =>
+      'Confirm with at least one starter on each team';
+
+  @override
+  String get reportLineupsConfirmedSaveHint =>
+      'Lineups confirmed. Save the match report to show the pitch.';
+
+  @override
+  String get reportFormation => 'Formation';
+
+  @override
+  String get reportFormationFree => 'Free';
+
+  @override
+  String get reportFormationFreeHint =>
+      'No formation: the pitch arranges players by their registered position';
+
+  @override
+  String get reportFormationSuggest => 'Suggest by position';
+
+  @override
+  String get reportFormationNeedStarters =>
+      'Pick 11, 7 or 5 starters to use a formation';
+
+  @override
+  String reportFormationSheetTitle(String team) {
+    return '$team formation';
+  }
+
+  @override
+  String reportFormationEmptySlots(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count empty slots in the formation',
+      one: '1 empty slot in the formation',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reportFormationUnplaced(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count starters without a slot',
+      one: '1 starter without a slot',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reportSlotPickTitle(String slot) {
+    return 'Who plays in this slot ($slot)?';
+  }
+
+  @override
+  String get reportSlotEmpty => 'Empty slot';
+
+  @override
+  String get reportSlotNone => 'No slot';
+
+  @override
+  String get formationSlotGoalkeeper => 'GK';
+
+  @override
+  String get formationSlotFullBack => 'FB';
+
+  @override
+  String get formationSlotCenterBack => 'CB';
+
+  @override
+  String get formationSlotDefensiveMid => 'DM';
+
+  @override
+  String get formationSlotMidfielder => 'MF';
+
+  @override
+  String get formationSlotForward => 'FW';
 
   @override
   String fantasyRoundInProgress(int round) {

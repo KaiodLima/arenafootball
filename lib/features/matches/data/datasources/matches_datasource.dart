@@ -123,14 +123,20 @@ class MatchesDataSource {
         season: season,
       );
 
-  /// Súmula: cartões, escalação, árbitro, observações e os dados do jogo
-  /// (data, horário, duração, local), numa gravação.
+  /// Súmula: cartões, escalação (com a confirmação, as vagas e as
+  /// formações [formations]), árbitro, observações e
+  /// os dados do jogo (data, horário, duração, local), numa gravação.
+  /// [lineupConfirmed]: grava `escalacaoConfirmada` (com a hora do servidor
+  /// quando [stampConfirmation], a 1ª confirmação); falso apaga os dois campos.
   Future<Either<Failure, void>> updateReport({
     required String matchId,
     required List<MatchBooking> bookings,
     List<MatchSubstitution> substitutions = const [],
     List<MatchMissedPenalty> missedPenalties = const [],
     required MatchLineup lineup,
+    bool lineupConfirmed = false,
+    bool stampConfirmation = false,
+    Map<MatchSide, String> formations = const {},
     required String referee,
     required String notes,
     required String date,
@@ -146,6 +152,16 @@ class MatchesDataSource {
           MatchDTO.substitutionsField: [for (final s in substitutions) s.toMap()],
           MatchDTO.missedPenaltiesField: [for (final p in missedPenalties) p.toMap()],
           MatchDTO.lineupField: lineup.toMap(),
+          if (lineupConfirmed) ...{
+            MatchDTO.lineupConfirmedField: true,
+            if (stampConfirmation) MatchDTO.lineupConfirmedAtField: FieldValue.serverTimestamp(),
+          } else ...{
+            MatchDTO.lineupConfirmedField: FieldValue.delete(),
+            MatchDTO.lineupConfirmedAtField: FieldValue.delete(),
+          },
+          // Formação por time (`formacoes`); sem nenhuma = Livre nos dois.
+          MatchDTO.formationsField:
+              formations.isEmpty ? FieldValue.delete() : MatchDTO.formationsMap(formations),
           'arbitro': referee.trim(),
           'observacoes': notes.trim(),
           'data': date,

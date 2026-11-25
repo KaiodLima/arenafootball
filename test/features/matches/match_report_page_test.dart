@@ -149,7 +149,13 @@ void main() {
       expect(find.text('Titulares 11/11'), findsOneWidget);
       // O atleta fora da escalação fica por último.
       await tester.scrollUntilVisible(find.text('Atleta Alfa'), 200, scrollable: find.byType(Scrollable).last);
-      await tester.tap(find.byKey(const ValueKey('report-role-starter')).last);
+      final alfaStarter = find.descendant(
+        of: find.ancestor(of: find.text('Atleta Alfa'), matching: find.byType(Container)).first,
+        matching: find.byKey(const ValueKey('report-role-starter')),
+      );
+      await tester.ensureVisible(alfaStarter);
+      await tester.pumpAndSettle();
+      await tester.tap(alfaStarter);
       await tester.pump();
       expect(find.text('Já há 11 titulares. Tire um titular para escalar outro.'), findsOneWidget);
       // O contador pode ter rolado para fora da tela: confere pelo estado.

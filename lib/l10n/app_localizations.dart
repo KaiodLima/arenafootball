@@ -5003,6 +5003,18 @@ abstract class AppLocalizations {
   /// **'Palpite o placar antes do jogo e ganhe pontos no bolão.'**
   String get tourMatchPredictionBody;
 
+  /// No description provided for @tourMatchPitchTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escalações em campo'**
+  String get tourMatchPitchTitle;
+
+  /// No description provided for @tourMatchPitchBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem está em campo agora, com o número, os gols e os cartões. Toque num jogador para ver o perfil.'**
+  String get tourMatchPitchBody;
+
   /// No description provided for @tourEventPollHeaderTitle.
   ///
   /// In pt, this message translates to:
@@ -8129,6 +8141,18 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Elencos'**
   String get matchDetailsSquads;
+
+  /// No description provided for @matchPitchTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escalações'**
+  String get matchPitchTitle;
+
+  /// No description provided for @matchPitchSubbedIn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entrou'**
+  String get matchPitchSubbedIn;
 
   /// No description provided for @matchDetailsNoSquad.
   ///
@@ -14354,6 +14378,132 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Já há 11 titulares. Tire um titular para escalar outro.'**
   String get reportStartersFull;
+
+  /// No description provided for @reportConfirmLineups.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confirmar escalações'**
+  String get reportConfirmLineups;
+
+  /// No description provided for @reportLineupsConfirmed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escalações confirmadas'**
+  String get reportLineupsConfirmed;
+
+  /// No description provided for @reportConfirmLineupsNeedStarters.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confirme com pelo menos um titular em cada time'**
+  String get reportConfirmLineupsNeedStarters;
+
+  /// No description provided for @reportLineupsConfirmedSaveHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escalações confirmadas. Salve a súmula para mostrar o campinho.'**
+  String get reportLineupsConfirmedSaveHint;
+
+  /// No description provided for @reportFormation.
+  ///
+  /// In pt, this message translates to:
+  /// **'Formação'**
+  String get reportFormation;
+
+  /// No description provided for @reportFormationFree.
+  ///
+  /// In pt, this message translates to:
+  /// **'Livre'**
+  String get reportFormationFree;
+
+  /// No description provided for @reportFormationFreeHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem formação: o campinho arruma pela posição do cadastro'**
+  String get reportFormationFreeHint;
+
+  /// No description provided for @reportFormationSuggest.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sugerir pela posição'**
+  String get reportFormationSuggest;
+
+  /// No description provided for @reportFormationNeedStarters.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha 11, 7 ou 5 titulares para usar uma formação'**
+  String get reportFormationNeedStarters;
+
+  /// No description provided for @reportFormationSheetTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Formação do {team}'**
+  String reportFormationSheetTitle(String team);
+
+  /// No description provided for @reportFormationEmptySlots.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 vaga vazia na formação} other{{count} vagas vazias na formação}}'**
+  String reportFormationEmptySlots(int count);
+
+  /// No description provided for @reportFormationUnplaced.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 titular sem vaga} other{{count} titulares sem vaga}}'**
+  String reportFormationUnplaced(int count);
+
+  /// No description provided for @reportSlotPickTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem joga nesta vaga ({slot})?'**
+  String reportSlotPickTitle(String slot);
+
+  /// No description provided for @reportSlotEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vaga livre'**
+  String get reportSlotEmpty;
+
+  /// No description provided for @reportSlotNone.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem vaga'**
+  String get reportSlotNone;
+
+  /// No description provided for @formationSlotGoalkeeper.
+  ///
+  /// In pt, this message translates to:
+  /// **'GOL'**
+  String get formationSlotGoalkeeper;
+
+  /// No description provided for @formationSlotFullBack.
+  ///
+  /// In pt, this message translates to:
+  /// **'LAT'**
+  String get formationSlotFullBack;
+
+  /// No description provided for @formationSlotCenterBack.
+  ///
+  /// In pt, this message translates to:
+  /// **'ZAG'**
+  String get formationSlotCenterBack;
+
+  /// No description provided for @formationSlotDefensiveMid.
+  ///
+  /// In pt, this message translates to:
+  /// **'VOL'**
+  String get formationSlotDefensiveMid;
+
+  /// No description provided for @formationSlotMidfielder.
+  ///
+  /// In pt, this message translates to:
+  /// **'MEI'**
+  String get formationSlotMidfielder;
+
+  /// No description provided for @formationSlotForward.
+  ///
+  /// In pt, this message translates to:
+  /// **'ATA'**
+  String get formationSlotForward;
 
   /// No description provided for @fantasyRoundInProgress.
   ///

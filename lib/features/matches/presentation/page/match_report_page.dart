@@ -305,6 +305,8 @@ class MatchReportPage extends StatelessWidget {
             showSnackBar(context: context, message: l10n.matchReportPlayerAdded);
           case MatchReportNotice.startersFull:
             showSnackBar(context: context, message: l10n.reportStartersFull, isSuccess: false);
+          case MatchReportNotice.lineupConfirmed:
+            showSnackBar(context: context, message: l10n.reportLineupsConfirmedSaveHint);
           case MatchReportNotice.phaseChanged:
           case null:
             break;
@@ -401,6 +403,11 @@ class MatchReportPage extends StatelessWidget {
                       onRole: cubit.setRole,
                       onNumber: (side, entry) => _editNumber(context, side, entry),
                       onAddPlayer: (side) => _addPlayer(context, side),
+                      onConfirmLineups: cubit.confirmLineup,
+                      onUndoConfirmation: cubit.undoLineupConfirmation,
+                      onFormation: cubit.setFormation,
+                      onSlot: cubit.assignSlot,
+                      onSuggestSlots: cubit.suggestSlots,
                     ),
                     ReportGameInfo(
                       match: match,

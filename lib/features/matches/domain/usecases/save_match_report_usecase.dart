@@ -9,8 +9,8 @@ import 'package:arena_soccer/features/matches/domain/usecases/update_match_goals
 
 /// "Salvar súmula": os gols (se mudaram) pelo [UpdateMatchGoalsUseCase], que
 /// acerta os números dos atletas pela diferença; depois os cards de gol dos
-/// gols novos ([publishCards]); e, numa gravação, cartões, escalação,
-/// árbitro, observações e os dados do jogo. Devolve a partida salva e
+/// gols novos ([publishCards]); e, numa gravação, cartões, escalação (e a
+/// confirmação dela), árbitro, observações e os dados do jogo. Devolve a partida salva e
 /// quantos cards saíram (−1 = o card falhou; o resto ficou salvo).
 class SaveMatchReportUseCase {
   final UpdateMatchGoalsUseCase _goals;
@@ -44,6 +44,11 @@ class SaveMatchReportUseCase {
     }
     final report = await _matches.updateReport(saved, season: season);
     if (report.isLeft) return Left(report.left);
+    // 1ª confirmação das escalações: o servidor grava a hora; aqui fica a do
+    // aparelho (o próximo salvar não regrava a hora).
+    if (saved.lineupConfirmed && saved.lineupConfirmedAt == null) {
+      saved = saved.copyWith(lineupConfirmedAt: () => DateTime.now());
+    }
     // Card ao vivo: o lance novo (gol, cartão ou substituição) em destaque e
     // no topo do feed. A súmula já foi salva: a falha do card só avisa.
     final live = _live;

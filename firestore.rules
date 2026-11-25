@@ -491,18 +491,32 @@ service cloud.firestore {
 
       // Súmula do organizador (a mesma do admin) nas partidas da competição
       // dele: etapas, "Atrasou", gols/placar, cartões, pênaltis perdidos,
-      // escalação, dados do jogo
+      // escalação (com a vaga de cada titular, a confirmação que mostra o
+      // campinho e a formação de cada time), dados do jogo
       // e votação. Times, competição, região e o que as functions gravam não
       // mudam; apagar segue com o admin.
       function organizerMatchUpdate() {
         return collection.matches('partidas([0-9]{4})?')
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['gols', 'golTimeCasa', 'golTimeFora',
-            'cartoes', 'substituicoes', 'penaltisPerdidos', 'escalacao', 'arbitro', 'observacoes', 'data', 'horario', 'horarioOriginal',
-            'duracao', 'local',
+            'cartoes', 'substituicoes', 'penaltisPerdidos', 'escalacao', 'escalacaoConfirmada', 'escalacaoConfirmadaEm', 'formacoes',
+            'arbitro', 'observacoes', 'data', 'horario', 'horarioOriginal', 'duracao', 'local',
             'votacao', 'status', 'statusEm', 'inicioEm', 'intervaloEm', 'segundoTempoEm',
             'idGrupo', 'grupo', 'foraDosGrupos', 'fase', 'rodada'])
           && validMatchRound(request.resource.data)
+          && validLineupConfirmation(request.resource.data)
           && organizerOwnsKey('c' + string(resource.data.get('id_campeonato', -1)));
+      }
+
+      // Confirmação das escalações (súmula): `escalacaoConfirmada` booleano e
+      // `escalacaoConfirmadaEm` hora (a do servidor ao confirmar). Formações:
+      // `formacoes` mapa só com `casa`/`fora`, códigos curtos ("4-3-3").
+      function validLineupConfirmation(d) {
+        return (!('escalacaoConfirmada' in d) || d.escalacaoConfirmada is bool)
+          && (!('escalacaoConfirmadaEm' in d) || d.escalacaoConfirmadaEm is timestamp)
+          && (!('formacoes' in d) || (d.formacoes is map
+            && d.formacoes.keys().hasOnly(['casa', 'fora'])
+            && (!('casa' in d.formacoes) || (d.formacoes.casa is string && d.formacoes.casa.size() <= 12))
+            && (!('fora' in d.formacoes) || (d.formacoes.fora is string && d.formacoes.fora.size() <= 12))));
       }
 
       // Fase da partida: grupo (`idGrupo`/`grupo`, textos) ou mata-mata

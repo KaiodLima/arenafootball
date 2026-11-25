@@ -2971,6 +2971,13 @@ class AppLocalizationsPt extends AppLocalizations {
       'Palpite o placar antes do jogo e ganhe pontos no bolão.';
 
   @override
+  String get tourMatchPitchTitle => 'Escalações em campo';
+
+  @override
+  String get tourMatchPitchBody =>
+      'Quem está em campo agora, com o número, os gols e os cartões. Toque num jogador para ver o perfil.';
+
+  @override
   String get tourEventPollHeaderTitle => 'Evento de votação';
 
   @override
@@ -4938,6 +4945,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get matchDetailsSquads => 'Elencos';
+
+  @override
+  String get matchPitchTitle => 'Escalações';
+
+  @override
+  String get matchPitchSubbedIn => 'Entrou';
 
   @override
   String get matchDetailsNoSquad => 'Nenhum atleta inscrito';
@@ -8698,6 +8711,93 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get reportStartersFull =>
       'Já há 11 titulares. Tire um titular para escalar outro.';
+
+  @override
+  String get reportConfirmLineups => 'Confirmar escalações';
+
+  @override
+  String get reportLineupsConfirmed => 'Escalações confirmadas';
+
+  @override
+  String get reportConfirmLineupsNeedStarters =>
+      'Confirme com pelo menos um titular em cada time';
+
+  @override
+  String get reportLineupsConfirmedSaveHint =>
+      'Escalações confirmadas. Salve a súmula para mostrar o campinho.';
+
+  @override
+  String get reportFormation => 'Formação';
+
+  @override
+  String get reportFormationFree => 'Livre';
+
+  @override
+  String get reportFormationFreeHint =>
+      'Sem formação: o campinho arruma pela posição do cadastro';
+
+  @override
+  String get reportFormationSuggest => 'Sugerir pela posição';
+
+  @override
+  String get reportFormationNeedStarters =>
+      'Escolha 11, 7 ou 5 titulares para usar uma formação';
+
+  @override
+  String reportFormationSheetTitle(String team) {
+    return 'Formação do $team';
+  }
+
+  @override
+  String reportFormationEmptySlots(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count vagas vazias na formação',
+      one: '1 vaga vazia na formação',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reportFormationUnplaced(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count titulares sem vaga',
+      one: '1 titular sem vaga',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reportSlotPickTitle(String slot) {
+    return 'Quem joga nesta vaga ($slot)?';
+  }
+
+  @override
+  String get reportSlotEmpty => 'Vaga livre';
+
+  @override
+  String get reportSlotNone => 'Sem vaga';
+
+  @override
+  String get formationSlotGoalkeeper => 'GOL';
+
+  @override
+  String get formationSlotFullBack => 'LAT';
+
+  @override
+  String get formationSlotCenterBack => 'ZAG';
+
+  @override
+  String get formationSlotDefensiveMid => 'VOL';
+
+  @override
+  String get formationSlotMidfielder => 'MEI';
+
+  @override
+  String get formationSlotForward => 'ATA';
 
   @override
   String fantasyRoundInProgress(int round) {
