@@ -161,6 +161,52 @@ export function orphanRoundUpdate(round: { status?: string; idsPartidas?: string
  */
 export const roundFinalized = (existing: number, finished: number): boolean => finished >= existing;
 
+/** Posições das vagas da escalação, na ordem, e o máximo de cada (iguais às regras e ao app). */
+export const FORMATION_SLOTS: ReadonlyArray<[string, number]> = [
+  ['gol', 1],
+  ['zag', 4],
+  ['mei', 4],
+  ['ata', 4],
+  ['livre', 3],
+];
+export const FORMATION_MIN = 3;
+export const FORMATION_MAX = 7;
+
+/** Quantas vagas de cada posição (`vagas`): gol, zag, mei, ata, livre. */
+export type Formation = Record<string, number>;
+
+export const DEFAULT_FORMATION: Formation = { gol: 1, zag: 1, mei: 1, ata: 1, livre: 1 };
+
+/**
+ * Formato da escalação lido de `vagas` (do Fantasy ou dos `parametros` da
+ * rodada): cada posição inteira na faixa dela e o total de 3 a 7; inválido ou
+ * sem o campo = uma vaga de cada (o formato de sempre).
+ */
+export function fantasyFormation(value: unknown): Formation {
+  if (!value || typeof value !== 'object') return { ...DEFAULT_FORMATION };
+  const doc = value as Doc;
+  const formation: Formation = {};
+  let total = 0;
+  for (const [key, max] of FORMATION_SLOTS) {
+    const count = doc[key];
+    if (typeof count !== 'number' || !Number.isInteger(count) || count < 0 || count > max) {
+      return { ...DEFAULT_FORMATION };
+    }
+    formation[key] = count;
+    total += count;
+  }
+  return total >= FORMATION_MIN && total <= FORMATION_MAX ? formation : { ...DEFAULT_FORMATION };
+}
+
+/** Chaves das vagas em `atletas`, na ordem: `zag`, `zag2`, `zag3`... */
+export function formationKeys(formation: Formation): string[] {
+  const keys: string[] = [];
+  for (const [slot] of FORMATION_SLOTS) {
+    for (let i = 0; i < (formation[slot] ?? 0); i++) keys.push(i === 0 ? slot : `${slot}${i + 1}`);
+  }
+  return keys;
+}
+
 /**
  * Parâmetros congelados na rodada ao fechar (os da configuração naquele
  * momento), com a tabela de pontos (`pontos`): a já congelada em [source]
@@ -170,7 +216,7 @@ export const roundFinalized = (existing: number, finished: number): boolean => f
 export function frozenParams(
   source: Doc,
   globalTable?: Doc,
-): { minMinutos: number; minMinutosDefesa: number; capitao: number; pontos: Doc } {
+): { minMinutos: number; minMinutosDefesa: number; capitao: number; pontos: Doc; vagas: Formation } {
   const num = (value: unknown, fallback: number) => (typeof value === 'number' && Number.isFinite(value) ? value : fallback);
   const isMap = (value: unknown): value is Doc => !!value && typeof value === 'object';
   const table = isMap(source.pontos) ? source.pontos : isMap(source.pontuacao) ? source.pontuacao : globalTable;
@@ -179,6 +225,7 @@ export function frozenParams(
     minMinutosDefesa: num(source.minMinutosDefesa, 45),
     capitao: num(source.capitao, 1.5),
     pontos: tableToDoc(scoringTable(table)),
+    vagas: fantasyFormation(source.vagas),
   };
 }
 
@@ -193,22 +240,36 @@ export function scoringParamsOf(frozen: ReturnType<typeof frozenParams>): Scorin
 }
 
 /**
- * Cópia da escalação [lineup] para a rodada seguinte (decisão D3): os mesmos
- * atletas e capitão, marcada `copiada` (o dono troca até o prazo). Sem as 5
- * vagas ou sem capitão, nula.
+ * Cópia da escalação [lineup] para a rodada seguinte (decisão D3), no formato
+ * [formation] da rodada que abre (padrão = uma vaga de cada): os atletas das
+ * vagas que existem nele e o capitão, marcada `copiada` (o dono troca até o
+ * prazo). Formato mudado: vagas novas vazias (''), as que sumiram saem e o
+ * capitão que saiu fica vazio; a escalação pontua com quem sobrou. Sem
+ * nenhum atleta, nula.
  */
-export function lineupCopy(lineup: Doc): Doc | null {
-  const athletes = lineup.atletas as Record<string, unknown> | undefined;
-  const ids = Array.isArray(lineup.idsAtletas) ? lineup.idsAtletas.map(String) : [];
+export function lineupCopy(lineup: Doc, formation: Formation = DEFAULT_FORMATION): Doc | null {
+  const raw = lineup.atletas;
+  if (!raw || typeof raw !== 'object') return null;
+  const athletes = raw as Record<string, unknown>;
+  const keys = formationKeys(formation);
+  const copied: Record<string, string> = {};
+  const seen = new Set<string>();
+  for (const key of keys) {
+    const id = typeof athletes[key] === 'string' ? (athletes[key] as string) : '';
+    const unique = id !== '' && !seen.has(id);
+    if (unique) seen.add(id);
+    copied[key] = unique ? id : '';
+  }
+  const ids = keys.map((key) => copied[key]).filter((id) => id !== '');
+  if (ids.length === 0) return null;
   const captain = String(lineup.capitao ?? '');
-  if (!athletes || ids.length !== 5 || !ids.includes(captain)) return null;
   return {
     uid: String(lineup.uid ?? ''),
     nome: String(lineup.nome ?? ''),
     urlImagem: String(lineup.urlImagem ?? ''),
-    atletas: { ...athletes },
+    atletas: copied,
     idsAtletas: ids,
-    capitao: captain,
+    capitao: ids.includes(captain) ? captain : '',
     copiada: true,
   };
 }

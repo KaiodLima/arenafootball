@@ -145,7 +145,7 @@ class _PastRepo extends _Repo {
 
   @override
   Stream<Either<Failure, FantasyLineupDTO?>> watchLineup(String fantasyId, int round, String uid) => round == 1
-      ? Stream.value(const Right(FantasyLineupDTO(
+      ? Stream.value(Right(FantasyLineupDTO(
           uid: 'u1',
           lineup: _full,
           points: 20,
@@ -187,13 +187,13 @@ final _openRound = FantasyRoundDTO(number: 2, status: 'aberta', closesAt: DateTi
 
 Future<void> _tick() => Future<void>.delayed(Duration.zero);
 
-const _full = FantasyLineup(
+final _full = FantasyLineup(
   athletes: {
-    FantasySlot.goalkeeper: 'gk',
-    FantasySlot.defender: 'lb',
-    FantasySlot.midfielder: 'mf',
-    FantasySlot.forward: 'fw',
-    FantasySlot.flex: 'dm',
+    FantasySpot(FantasySlot.goalkeeper): 'gk',
+    FantasySpot(FantasySlot.defender): 'lb',
+    FantasySpot(FantasySlot.midfielder): 'mf',
+    FantasySpot(FantasySlot.forward): 'fw',
+    FantasySpot(FantasySlot.flex): 'dm',
   },
   captainId: 'fw',
 );
@@ -212,20 +212,26 @@ void main() {
 
   test('escalação: vagas, troca de vaga, capitão e validação', () {
     String position(String id) => _athletes.firstWhere((a) => a.id == id).position;
-    var lineup = const FantasyLineup().place(FantasySlot.goalkeeper, 'gk');
+    var lineup = const FantasyLineup().place(const FantasySpot(FantasySlot.goalkeeper), 'gk');
     expect(lineup.validate(position), FantasyLineupError.incomplete);
     lineup = _full.withCaptain('mf');
     expect(lineup.validate(position), isNull);
     // O mesmo atleta em outra vaga sai da anterior (não repete).
-    final moved = lineup.place(FantasySlot.flex, 'mf');
-    expect(moved.idAt(FantasySlot.midfielder), isNull);
+    final moved = lineup.place(const FantasySpot(FantasySlot.flex), 'mf');
+    expect(moved.idAt(const FantasySpot(FantasySlot.midfielder)), isNull);
     expect(moved.captainId, 'mf');
     // Tirar o capitão tira a braçadeira.
-    expect(lineup.remove(FantasySlot.midfielder).captainId, '');
+    expect(lineup.remove(const FantasySpot(FantasySlot.midfielder)).captainId, '');
     expect(_full.withCaptain('zz').captainId, 'fw');
     expect(
-        const FantasyLineup(athletes: {FantasySlot.goalkeeper: 'fw'}).place(FantasySlot.defender, 'lb').ids.length, 5);
-    final wrong = _full.place(FantasySlot.goalkeeper, 'dm').place(FantasySlot.flex, 'gk');
+        FantasyLineup(athletes: const {})
+            .place(const FantasySpot(FantasySlot.goalkeeper), 'fw')
+            .place(const FantasySpot(FantasySlot.defender), 'lb')
+            .ids
+            .length,
+        5);
+    final wrong =
+        _full.place(const FantasySpot(FantasySlot.goalkeeper), 'dm').place(const FantasySpot(FantasySlot.flex), 'gk');
     expect(wrong.validate(position), FantasyLineupError.position);
     expect(_full.withCaptain('').copyWithNoCaptain().validate(position), FantasyLineupError.noCaptain);
   });
@@ -311,7 +317,7 @@ void main() {
       await _tick();
       repo.participant.add(const Right(FantasyParticipantDTO(uid: 'u1')));
       repo.round.add(Right(_openRound));
-      repo.lineup.add(const Right(FantasyLineupDTO(uid: 'u1', lineup: _full, copied: true)));
+      repo.lineup.add(Right(FantasyLineupDTO(uid: 'u1', lineup: _full, copied: true)));
       await _tick();
       expect(cubit.state.dirty, isFalse);
       expect(cubit.state.canSave, isTrue);
@@ -321,10 +327,43 @@ void main() {
       repo.round.add(Right(FantasyRoundDTO(number: 2, status: 'aberta', closesAt: DateTime(2026, 11, 18, 11))));
       await _tick();
       expect(cubit.state.editable, isFalse);
-      cubit.place(FantasySlot.flex, 'mf');
-      expect(cubit.state.draft.idAt(FantasySlot.flex), 'dm');
+      cubit.place(const FantasySpot(FantasySlot.flex), 'mf');
+      expect(cubit.state.draft.idAt(const FantasySpot(FantasySlot.flex)), 'dm');
       await cubit.save();
       expect(repo.saved, isEmpty);
+    });
+
+    test('admin muda o formato com a rodada aberta: a escalação gravada fica; o rascunho vai ao formato novo',
+        () async {
+      final repo = _Repo();
+      final cubit = _cubit(repo);
+      addTearDown(cubit.close);
+      cubit.load(_copa, uid: 'u1');
+      repo.config.add(Right(_config));
+      await _tick();
+      repo.participant.add(const Right(FantasyParticipantDTO(uid: 'u1')));
+      repo.round.add(Right(_openRound));
+      repo.lineup.add(Right(FantasyLineupDTO(uid: 'u1', lineup: _full)));
+      await _tick();
+      expect(cubit.state.formationChanged, isFalse);
+      expect(cubit.state.draft, _full);
+
+      const f1222 = FantasyFormation({
+        FantasySlot.goalkeeper: 1,
+        FantasySlot.defender: 2,
+        FantasySlot.midfielder: 2,
+        FantasySlot.forward: 2,
+        FantasySlot.flex: 0,
+      });
+      repo.config.add(Right(_config.copyWith(formation: f1222)));
+      await _tick();
+      expect(cubit.state.formationChanged, isTrue);
+      expect(cubit.state.saved!.lineup, _full, reason: 'a gravada segue valendo');
+      expect(cubit.state.draft.ids, ['gk', 'lb', '', 'mf', '', 'fw', '']);
+      expect(cubit.state.error, FantasyLineupError.incomplete);
+      expect(cubit.state.canSave, isFalse);
+      cubit.discard();
+      expect(cubit.state.draft.formation, f1222, reason: 'descartar volta ao rascunho no formato novo');
     });
   });
 
@@ -353,7 +392,7 @@ void main() {
     repo.round.add(Right(_openRound));
     repo.lineup.add(Right(FantasyLineupDTO(
       uid: 'u1',
-      lineup: _full.remove(FantasySlot.goalkeeper),
+      lineup: _full.remove(const FantasySpot(FantasySlot.goalkeeper)),
     )));
     await tester.pump();
     await tester.pump();
@@ -371,7 +410,7 @@ void main() {
 
     await tester.tap(find.text('Confirmar escalação'));
     await tester.pump();
-    expect(repo.saved.single.$2.lineup.idAt(FantasySlot.goalkeeper), 'gk');
+    expect(repo.saved.single.$2.lineup.idAt(const FantasySpot(FantasySlot.goalkeeper)), 'gk');
     expect(repo.saved.single.$2.lineup.captainId, 'fw');
   });
 
@@ -388,7 +427,7 @@ void main() {
       home: Scaffold(
         body: SingleChildScrollView(
           child: FantasyPitch(
-            lineup: _full.remove(FantasySlot.goalkeeper),
+            lineup: _full.remove(const FantasySpot(FantasySlot.goalkeeper)),
             athletes: {for (final a in _athletes) a.id: a},
             teams: const {'t1': TeamDTO(id: 't1', name: 'Leões', region: '', primaryColor: '#C62828')},
             editable: true,
@@ -473,10 +512,76 @@ void main() {
     expect(fantasyFlexLine('volante'), FantasySlot.midfielder);
     expect(fantasyFlexLine('goleiro'), FantasySlot.goalkeeper);
     expect(fantasyFlexLine(null), FantasySlot.midfielder);
-    final f = FantasyPitch.formation(FantasySlot.forward);
-    expect(f[FantasySlot.flex], const Alignment(0.5, -0.9));
-    expect(f[FantasySlot.forward], const Alignment(-0.5, -0.9));
-    expect(f[FantasySlot.midfielder]!.x, 0);
+    // Padrão (uma de cada): a LIVRE ao lado da fixa da linha dela, as outras no centro.
+    final f = FantasyPitch.formation(FantasyPitch.rows(FantasyFormation.defaults.spots, (_) => FantasySlot.forward));
+    expect(f[const FantasySpot(FantasySlot.flex)], const Alignment(0.5, -0.9));
+    expect(f[const FantasySpot(FantasySlot.forward)], const Alignment(-0.5, -0.9));
+    expect(f[const FantasySpot(FantasySlot.midfielder)]!.x, 0);
+  });
+
+  group('formato da escalação', () {
+    const f1222 = FantasyFormation({
+      FantasySlot.goalkeeper: 1,
+      FantasySlot.defender: 2,
+      FantasySlot.midfielder: 2,
+      FantasySlot.forward: 2,
+      FantasySlot.flex: 0,
+    });
+
+    test('faixas, total de 3 a 7, chaves numeradas e leitura do doc', () {
+      expect(FantasyFormation.defaults.total, 5);
+      expect(f1222.total, 7);
+      expect(f1222.isValid, isTrue);
+      expect(f1222.withCount(FantasySlot.flex, 1).isValid, isFalse, reason: '8 atletas');
+      expect(f1222.withCount(FantasySlot.goalkeeper, 3).countOf(FantasySlot.goalkeeper), 1, reason: 'GOL vai até 1');
+      expect(f1222.spots.map((s) => s.key), ['gol', 'zag', 'zag2', 'mei', 'mei2', 'ata', 'ata2']);
+      expect(FantasyFormation.fromMap(f1222.toMap()), f1222);
+      expect(FantasyFormation.fromMap({'gol': 1, 'zag': 4, 'mei': 4, 'ata': 0, 'livre': 0}), FantasyFormation.defaults);
+      expect(FantasyFormation.fromMap(null), FantasyFormation.defaults);
+      expect(FantasySpot.parse('zag2'), const FantasySpot(FantasySlot.defender, 1));
+      expect(FantasySpot.parse('livre'), const FantasySpot(FantasySlot.flex));
+      expect(FantasySpot.parse('gol2'), isNull);
+      expect(FantasySpot.parse('xyz'), isNull);
+    });
+
+    test('mudar o formato: a escalação antiga fica igual; o rascunho mantém as vagas que existem', () {
+      expect(_full.fitsFormation(FantasyFormation.defaults), isTrue);
+      expect(_full.fitsFormation(f1222), isFalse);
+      final adapted = _full.adaptTo(f1222);
+      expect(adapted.ids, ['gk', 'lb', '', 'mf', '', 'fw', '']);
+      expect(adapted.captainId, 'fw');
+      expect(adapted.validate((_) => 'atacante'), FantasyLineupError.incomplete);
+      expect(_full.withCaptain('dm').adaptTo(f1222).captainId, '', reason: 'a LIVRE saiu do formato');
+      expect(_full.ids, ['gk', 'lb', 'mf', 'fw', 'dm'], reason: 'nada muda na escalação gravada');
+    });
+
+    test('DTO: chaves numeradas e o formato pelas chaves gravadas (rodada antiga segue com 5)', () {
+      final dto = FantasyLineupDTO.fromMap('u1', {
+        'atletas': {'gol': 'gk', 'zag': 'lb', 'zag2': 'cb', 'mei': 'mf', 'mei2': '', 'ata': 'fw', 'ata2': 'fw2'},
+        'capitao': 'cb',
+      });
+      expect(dto.lineup.formation, f1222);
+      expect(dto.lineup.idAt(const FantasySpot(FantasySlot.defender, 1)), 'cb');
+      expect(dto.lineup.filledSpots.length, 6);
+      expect(dto.toOwnerMap()['atletas'],
+          {'gol': 'gk', 'zag': 'lb', 'zag2': 'cb', 'mei': 'mf', 'mei2': '', 'ata': 'fw', 'ata2': 'fw2'});
+      final old = FantasyLineupDTO.fromMap('u1', {
+        'atletas': {'gol': 'gk', 'zag': 'lb', 'mei': 'mf', 'ata': 'fw', 'livre': 'dm'},
+        'capitao': 'fw',
+      });
+      expect(old.lineup.formation, FantasyFormation.defaults);
+      expect(old.toOwnerMap()['idsAtletas'], ['gk', 'lb', 'mf', 'fw', 'dm']);
+    });
+
+    test('campinho 1-2-2-2: as vagas da linha espalhadas por igual, figurinha menor com 4 na linha', () {
+      final rows = FantasyPitch.rows(f1222.spots, (_) => FantasySlot.midfielder);
+      final f = FantasyPitch.formation(rows);
+      expect(f[const FantasySpot(FantasySlot.defender)], const Alignment(-0.5, 0.4));
+      expect(f[const FantasySpot(FantasySlot.defender, 1)], const Alignment(0.5, 0.4));
+      expect(f[const FantasySpot(FantasySlot.goalkeeper)], const Alignment(0, 0.95));
+      expect(FantasyPitch.cardFraction(2), 0.22);
+      expect(FantasyPitch.cardFraction(5), lessThan(0.22));
+    });
   });
 
   testWidgets('campinho: LIVRE com atacante sobe para o ataque; com volante, volta ao meio', (tester) async {
@@ -490,7 +595,7 @@ void main() {
           home: Scaffold(
             body: SingleChildScrollView(
               child: FantasyPitch(
-                lineup: _full.place(FantasySlot.flex, flexId),
+                lineup: _full.place(const FantasySpot(FantasySlot.flex), flexId),
                 athletes: {
                   for (final a in _athletes) a.id: a,
                   'fw2': const FantasyAthleteDTO(id: 'fw2', name: 'Beto Ponta', position: 'atacante', teamId: 't2'),
@@ -603,7 +708,7 @@ void main() {
     repo.participant.add(const Right(FantasyParticipantDTO(uid: 'u1', name: 'Ana')));
     repo.round.add(Right(
         FantasyRoundDTO(number: 2, status: 'aberta', closesAt: DateTime(2026, 11, 18, 11), matchIds: const ['m1'])));
-    repo.lineup.add(const Right(FantasyLineupDTO(uid: 'u1', lineup: _full)));
+    repo.lineup.add(Right(FantasyLineupDTO(uid: 'u1', lineup: _full)));
     await tester.pump();
     await tester.pump();
     expect(find.text('Rodada 2 em andamento. A próxima rodada abre quando todos os jogos terminarem.'), findsOneWidget);
@@ -653,7 +758,7 @@ void main() {
       matchIds: const ['m1', 'm2'],
       matchesFinished: 1,
     )));
-    repo.lineup.add(const Right(FantasyLineupDTO(
+    repo.lineup.add(Right(FantasyLineupDTO(
       uid: 'u1',
       lineup: _full,
       points: 23.5,
@@ -710,7 +815,7 @@ void main() {
     await tester.pump();
     repo.participant.add(const Right(FantasyParticipantDTO(uid: 'u1', name: 'Ana', points: 20)));
     repo.round.add(Right(_openRound));
-    repo.lineup.add(const Right(FantasyLineupDTO(uid: 'u1', lineup: _full, copied: true)));
+    repo.lineup.add(Right(FantasyLineupDTO(uid: 'u1', lineup: _full, copied: true)));
     for (var i = 0; i < 5; i++) {
       await tester.pump();
     }
@@ -759,8 +864,7 @@ void main() {
         child: const FantasyLineupPage(championship: _copa),
       ),
     ));
-    final config = FantasyConfigDTO.fromMap(
-        'doc1', {'ativo': true, 'rodadaAtual': 2, 'minMinutos': 30, 'capitao': 2.0},
+    final config = FantasyConfigDTO.fromMap('doc1', {'ativo': true, 'rodadaAtual': 2, 'minMinutos': 30, 'capitao': 2.0},
         championship: _copa);
     repo.config.add(Right(config));
     await tester.pump();

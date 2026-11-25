@@ -54,6 +54,7 @@ Future<String?> showFantasyAthletePicker(
   required FantasySlot slot,
   required List<FantasyAthleteDTO> athletes,
   required FantasyLineup lineup,
+  String? current,
 }) {
   return showModalBottomSheet<String>(
     context: context,
@@ -63,7 +64,7 @@ Future<String?> showFantasyAthletePicker(
       top: false,
       child: SizedBox(
         height: MediaQuery.of(context).size.height * 0.85,
-        child: _Picker(slot: slot, athletes: athletes, lineup: lineup),
+        child: _Picker(slot: slot, athletes: athletes, lineup: lineup, current: current),
       ),
     ),
   );
@@ -74,7 +75,10 @@ class _Picker extends StatefulWidget {
   final List<FantasyAthleteDTO> athletes;
   final FantasyLineup lineup;
 
-  const _Picker({required this.slot, required this.athletes, required this.lineup});
+  /// Atleta que já está na vaga tocada (nulo = vaga vazia).
+  final String? current;
+
+  const _Picker({required this.slot, required this.athletes, required this.lineup, this.current});
 
   @override
   State<_Picker> createState() => _PickerState();
@@ -185,7 +189,7 @@ class _PickerState extends State<_Picker> {
                   separatorBuilder: (_, __) => const Divider(height: 1, indent: AppSizes.s72),
                   itemBuilder: (context, index) {
                     final a = list[index];
-                    final current = widget.lineup.idAt(widget.slot) == a.id;
+                    final current = widget.current == a.id;
                     final elsewhere = !current && widget.lineup.contains(a.id);
                     return ListTile(
                       key: ValueKey('fantasy-athlete-${a.id}'),

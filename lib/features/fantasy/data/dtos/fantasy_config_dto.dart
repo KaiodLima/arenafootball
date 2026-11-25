@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/fantasy/domain/fantasy_lineup.dart';
 import 'package:arena_soccer/features/fantasy/domain/fantasy_scoring_table.dart';
 import 'package:arena_soccer/features/fantasy/domain/fantasy_settings.dart';
 
@@ -46,6 +47,10 @@ class FantasyConfigDTO extends Equatable {
   /// (`config/pontuacao_fantasy`).
   final FantasyScoringTable? scoringTable;
 
+  /// Quantas vagas de cada posição a escalação tem (`vagas`; sem o campo =
+  /// uma de cada). Vale para a rodada aberta; a rodada congela ao fechar.
+  final FantasyFormation formation;
+
   /// Gravados pelas functions (só leitura no app).
   final int currentRound;
   final int participants;
@@ -68,6 +73,7 @@ class FantasyConfigDTO extends Equatable {
     this.minDefenseMinutes = FantasyLimits.defaultMinDefenseMinutes,
     this.captainMultiplier = FantasyLimits.defaultCaptain,
     this.scoringTable,
+    this.formation = FantasyFormation.defaults,
     this.currentRound = 0,
     this.participants = 0,
     this.champions = const [],
@@ -97,6 +103,7 @@ class FantasyConfigDTO extends Equatable {
       scoringTable: map['pontuacao'] is Map
           ? FantasyScoringTable.fromMap(Map<String, dynamic>.from(map['pontuacao'] as Map))
           : null,
+      formation: FantasyFormation.fromMap(map['vagas']),
       currentRound: asInt(map['rodadaAtual'], 0),
       participants: asInt(map['participantes'], 0),
       champions: [
@@ -160,6 +167,7 @@ class FantasyConfigDTO extends Equatable {
         minDefenseMinutes: minDefenseMinutes,
         captainMultiplier: captainMultiplier,
         scoringTable: table,
+        formation: formation,
         currentRound: currentRound,
         participants: participants,
         champions: champions,
@@ -178,6 +186,7 @@ class FantasyConfigDTO extends Equatable {
         'minMinutos': minMinutes,
         'minMinutosDefesa': minDefenseMinutes,
         'capitao': captainMultiplier,
+        'vagas': formation.toMap(),
         if (scoringTable != null) 'pontuacao': scoringTable!.toMap(),
       };
 
@@ -193,6 +202,7 @@ class FantasyConfigDTO extends Equatable {
     int? minMinutes,
     int? minDefenseMinutes,
     double? captainMultiplier,
+    FantasyFormation? formation,
   }) {
     return FantasyConfigDTO(
       championshipDocId: championshipDocId ?? this.championshipDocId,
@@ -207,6 +217,7 @@ class FantasyConfigDTO extends Equatable {
       minDefenseMinutes: minDefenseMinutes ?? this.minDefenseMinutes,
       captainMultiplier: captainMultiplier ?? this.captainMultiplier,
       scoringTable: scoringTable,
+      formation: formation ?? this.formation,
       currentRound: currentRound,
       participants: participants,
       champions: champions,
@@ -227,6 +238,7 @@ class FantasyConfigDTO extends Equatable {
         minDefenseMinutes,
         captainMultiplier,
         scoringTable,
+        formation,
         currentRound,
         participants,
         champions,

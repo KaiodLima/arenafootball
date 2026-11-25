@@ -221,16 +221,22 @@ class FantasyLineupDTO extends Equatable {
 
   factory FantasyLineupDTO.fromMap(String id, Map<String, dynamic> data) {
     final raw = (data['atletas'] as Map?)?.map((k, v) => MapEntry(k.toString(), v.toString())) ?? const {};
-    final athletes = <FantasySlot, String>{
-      for (final entry in raw.entries)
-        if (FantasySlot.fromKey(entry.key) != null && entry.value.isNotEmpty)
-          FantasySlot.fromKey(entry.key)!: entry.value,
+    // O formato vem das chaves gravadas (vazias contam): uma rodada antiga de
+    // 5 vagas segue com 5 mesmo depois que o admin muda o formato.
+    final spots = {
+      for (final key in raw.keys)
+        if (FantasySpot.parse(key) != null) key: FantasySpot.parse(key)!,
     };
+    final athletes = <FantasySpot, String>{
+      for (final entry in spots.entries)
+        if (raw[entry.key]!.isNotEmpty) entry.value: raw[entry.key]!,
+    };
+    final formation = spots.isEmpty ? FantasyFormation.defaults : FantasyFormation.ofSpots(spots.values);
     return FantasyLineupDTO(
       uid: id,
       name: data['nome']?.toString() ?? '',
       photoUrl: data['urlImagem']?.toString() ?? '',
-      lineup: FantasyLineup(athletes: athletes, captainId: data['capitao']?.toString() ?? ''),
+      lineup: FantasyLineup(athletes: athletes, captainId: data['capitao']?.toString() ?? '', formation: formation),
       copied: data['copiada'] == true,
       points: (data['pontos'] as num?)?.toDouble(),
       athletePoints: {
@@ -247,7 +253,7 @@ class FantasyLineupDTO extends Equatable {
         'uid': uid,
         'nome': name,
         'urlImagem': photoUrl,
-        'atletas': {for (final slot in FantasySlot.values) slot.key: lineup.idAt(slot) ?? ''},
+        'atletas': lineup.toAthletesMap(),
         'idsAtletas': lineup.ids,
         'capitao': lineup.captainId,
         'copiada': false,
@@ -259,7 +265,7 @@ class FantasyLineupDTO extends Equatable {
         'uid': uid,
         'nome': name,
         'urlImagem': photoUrl,
-        'atletas': {for (final slot in FantasySlot.values) slot.key: lineup.idAt(slot) ?? ''},
+        'atletas': lineup.toAthletesMap(),
         'capitao': lineup.captainId,
         'copiada': copied,
         'pontos': points,

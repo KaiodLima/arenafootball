@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_config_dto.dart';
+import 'package:arena_soccer/features/fantasy/domain/fantasy_lineup.dart';
 import 'package:arena_soccer/features/fantasy/domain/fantasy_scoring_table.dart';
 import 'package:arena_soccer/features/fantasy/domain/fantasy_settings.dart';
 import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_config_usecases.dart';
@@ -39,7 +40,11 @@ class FantasySettingsState extends Equatable {
           minMinutes: draft!.minMinutes,
           minDefenseMinutes: draft!.minDefenseMinutes,
           captainMultiplier: draft!.captainMultiplier,
+          formation: draft!.formation,
         );
+
+  /// O rascunho muda o formato da escalação (pede confirmação ao salvar).
+  bool get formationChanged => saved != null && draft != null && draft!.formation != saved!.formation;
 
   FantasySettingsState copyWith({
     FantasyConfigDTO? saved,
@@ -108,6 +113,10 @@ class FantasySettingsCubit extends Cubit<FantasySettingsState> {
         captainMultiplier:
             FantasySettings.roundCaptain(value).clamp(FantasyLimits.minCaptain, FantasyLimits.maxCaptain).toDouble(),
       ));
+
+  /// Quantas vagas da posição [slot] a escalação tem (presa à faixa dela).
+  void setFormationCount(FantasySlot slot, int count) =>
+      _edit((d) => d.copyWith(formation: d.formation.withCount(slot, count)));
 
   void restoreDefaults() => _edit((d) => d.withDefaults());
 

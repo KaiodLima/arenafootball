@@ -109,6 +109,50 @@ export default async function run(env, check) {
   await check('cliente não grava rodada', assertFails(updateDoc(doc(admin, 'fantasy/fx/rodadas/1'), { status: 'fechada' })));
   await check('não apaga a escalação', assertFails(deleteDoc(mine())));
 
+  // --- Formato da escalação configurável (`vagas`) ---
+  await check('admin grava o formato 1-2-2-2', assertSucceeds(setDoc(doc(admin, 'fantasy/fc1'),
+    config({ vagas: { gol: 1, zag: 2, mei: 2, ata: 2, livre: 0 } }), { merge: true })));
+  await check('formato com 8 atletas recusado', assertFails(setDoc(doc(admin, 'fantasy/fc1'),
+    config({ vagas: { gol: 1, zag: 2, mei: 2, ata: 2, livre: 1 } }), { merge: true })));
+  await check('formato com 2 goleiros recusado', assertFails(setDoc(doc(admin, 'fantasy/fc1'),
+    config({ vagas: { gol: 2, zag: 1, mei: 1, ata: 1, livre: 0 } }), { merge: true })));
+  await check('formato com 2 atletas recusado', assertFails(setDoc(doc(admin, 'fantasy/fc1'),
+    config({ vagas: { gol: 0, zag: 0, mei: 1, ata: 1, livre: 0 } }), { merge: true })));
+  await check('formato com posição estranha recusado', assertFails(setDoc(doc(admin, 'fantasy/fc1'),
+    config({ vagas: { gol: 1, zag: 1, mei: 1, ata: 1, livre: 1, tec: 1 } }), { merge: true })));
+
+  await seed('fantasy/fy', { idCampeonato: 8, temporada: '2026', ativo: true, minMinutos: 20, minMinutosDefesa: 45, capitao: 1.5,
+    rodadaAtual: 1, vagas: { gol: 1, zag: 2, mei: 2, ata: 2, livre: 0 } });
+  await seed('fantasy/fy/rodadas/1', { numero: 1, status: 'aberta', fechaEm: future, idsPartidas: ['m1'] });
+  await seed('fantasy/fy/participantes/u1', { uid: 'u1', nome: 'Ana', rodadaInicial: 1 });
+  await seed('jogadores2026/cb', athlete('zagueiro'));
+  const seven = { gol: 'gk', zag: 'lb', zag2: 'cb', mei: 'mf', mei2: 'dm', ata: 'fw', ata2: 'fw2' };
+  const lineupOf = (atletas, extra = {}) => ({
+    uid: 'u1', nome: 'Ana', urlImagem: '', atletas, idsAtletas: Object.values(atletas),
+    capitao: atletas.ata, atualizadoEm: serverTimestamp(), copiada: false, ...extra,
+  });
+  const mineY = doc(user, 'fantasy/fy/rodadas/1/escalacoes/u1');
+  await seed('fantasy/fz', { idCampeonato: 8, temporada: '2026', ativo: true, rodadaAtual: 1, vagas: { gol: 1, zag: 2, mei: 1, ata: 1, livre: 0 } });
+  await seed('fantasy/fz/rodadas/1', { numero: 1, status: 'aberta', fechaEm: future, idsPartidas: ['m1'] });
+  await seed('fantasy/fz/participantes/u1', { uid: 'u1', nome: 'Ana', rodadaInicial: 1 });
+  await check('formato 1-2-1-1 sem livre (5 com 2 zagueiros)', assertSucceeds(setDoc(doc(user, 'fantasy/fz/rodadas/1/escalacoes/u1'),
+    lineupOf({ gol: 'gk', zag: 'lb', zag2: 'cb', mei: 'mf', ata: 'fw' }))));
+  await seed('fantasy/fw', { idCampeonato: 8, temporada: '2026', ativo: true, rodadaAtual: 1, vagas: { gol: 1, zag: 2, mei: 2, ata: 1, livre: 0 } });
+  await seed('fantasy/fw/rodadas/1', { numero: 1, status: 'aberta', fechaEm: future, idsPartidas: ['m1'] });
+  await seed('fantasy/fw/participantes/u1', { uid: 'u1', nome: 'Ana', rodadaInicial: 1 });
+  await check('formato 1-2-2-1 (6 atletas)', assertSucceeds(setDoc(doc(user, 'fantasy/fw/rodadas/1/escalacoes/u1'),
+    lineupOf({ gol: 'gk', zag: 'lb', zag2: 'cb', mei: 'mf', mei2: 'dm', ata: 'fw' }))));
+  await check('escalação de 7 no formato 1-2-2-2 (7 leituras de atleta)', assertSucceeds(setDoc(mineY, lineupOf(seven))));
+  await check('formato antigo de 5 recusado no 1-2-2-2', assertFails(setDoc(mineY, lineup())));
+  await check('vaga a mais (livre) recusada', assertFails(setDoc(mineY, lineupOf({ ...seven, livre: 'nopos' }))));
+  const { zag2: _drop, ...six } = seven;
+  await check('vaga faltando (zag2) recusada', assertFails(setDoc(mineY, lineupOf(six))));
+  await check('posição errada na 2ª vaga recusada', assertFails(setDoc(mineY, lineupOf({ ...seven, zag2: 'other' }))));
+  await check('atacante na zag2 recusado', assertFails(setDoc(mineY, lineupOf({ ...seven, zag2: 'fw2', ata2: 'cb' }))));
+  await check('idsAtletas sem bater com as vagas recusado', assertFails(setDoc(mineY,
+    { ...lineupOf(seven), idsAtletas: ['gk', 'lb', 'cb', 'mf', 'dm', 'fw', 'nopos'] })));
+  await check('repetido entre as vagas recusado', assertFails(setDoc(mineY, lineupOf({ ...seven, ata2: 'fw' }))));
+
   // Mercado fechado: com a rodada 1 em andamento (rodadaAtual 1), a 2 aberta não aceita escalação.
   await seed('fantasy/fx/rodadas/2', { numero: 2, status: 'aberta', fechaEm: future, idsPartidas: ['m2'] });
   await check('rodada seguinte com a atual em andamento recusada', assertFails(setDoc(mine(2), lineup())));

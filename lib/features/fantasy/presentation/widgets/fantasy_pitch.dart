@@ -13,12 +13,13 @@ import 'package:arena_soccer/utils/constants/app_sizes.dart';
 import 'package:arena_soccer/utils/constants/app_typography.dart';
 import 'package:arena_soccer/utils/constants/team_colors.dart';
 
-/// Campinho da escalação: gramado com as linhas e as 5 vagas (ATA no alto,
-/// MEI e LIVRE lado a lado, ZAG e GOL embaixo). Cada vaga é uma figurinha
-/// (`StickerCard` do álbum, nas cores do time, com a vaga no selo do canto);
-/// vazia = espaço tracejado com "+". Braçadeira "C" (toque escolhe o capitão).
-/// A formação acompanha a LIVRE: ela joga na linha da posição do atleta
-/// escolhido, ao lado da vaga fixa dessa linha (animado).
+/// Campinho da escalação: gramado com as linhas e as vagas do formato (ATA no
+/// alto, MEI, ZAG e GOL embaixo; no padrão, MEI e LIVRE lado a lado). Cada
+/// vaga é uma figurinha (`StickerCard` do álbum, nas cores do time, com a vaga
+/// no selo do canto); vazia = espaço tracejado com "+". Braçadeira "C" (toque
+/// escolhe o capitão). A formação acompanha cada LIVRE: ela joga na linha da
+/// posição do atleta escolhido, depois das vagas fixas dessa linha (animado);
+/// as vagas de uma linha ficam espalhadas por igual.
 class FantasyPitch extends StatelessWidget {
   final FantasyLineup lineup;
   final Map<String, FantasyAthleteDTO> athletes;
@@ -29,7 +30,7 @@ class FantasyPitch extends StatelessWidget {
   /// Pontos na rodada dos atletas que já jogaram (id → pontos); vazio = sem pílulas.
   final Map<String, double> points;
   final bool editable;
-  final ValueChanged<FantasySlot> onSlotTap;
+  final ValueChanged<FantasySpot> onSlotTap;
   final ValueChanged<String> onCaptainTap;
 
   const FantasyPitch({
@@ -51,12 +52,39 @@ class FantasyPitch extends StatelessWidget {
     FantasySlot.goalkeeper: 0.95,
   };
 
-  /// Posição de cada vaga com a LIVRE na linha [flexLine]: a fixa dessa linha
-  /// vai para a esquerda e a LIVRE para a direita; as outras no centro.
-  static Map<FantasySlot, Alignment> formation(FantasySlot flexLine) => {
-        for (final entry in _lineY.entries) entry.key: Alignment(entry.key == flexLine ? -0.5 : 0, entry.value),
-        FantasySlot.flex: Alignment(0.5, _lineY[flexLine]!),
-      };
+  /// Linha de cada vaga: a fixa na dela; a LIVRE na de [flexLineOf] (a
+  /// posição do atleta escolhido nela).
+  static Map<FantasySlot, List<FantasySpot>> rows(
+    List<FantasySpot> spots,
+    FantasySlot Function(FantasySpot flex) flexLineOf,
+  ) {
+    final rows = {for (final line in _lineY.keys) line: <FantasySpot>[]};
+    for (final spot in spots) {
+      if (spot.slot != FantasySlot.flex) rows[spot.slot]!.add(spot);
+    }
+    for (final spot in spots) {
+      if (spot.slot == FantasySlot.flex) rows[flexLineOf(spot)]!.add(spot);
+    }
+    return rows;
+  }
+
+  /// Posição de cada vaga: as de uma linha espalhadas por igual (1 = centro;
+  /// 2 = ±0,5, como a fixa e a LIVRE do padrão; 3 = ±0,8; mais = a largura toda).
+  static Map<FantasySpot, Alignment> formation(Map<FantasySlot, List<FantasySpot>> rows) {
+    final positions = <FantasySpot, Alignment>{};
+    for (final entry in rows.entries) {
+      final row = entry.value;
+      final span = row.length <= 2 ? 0.5 : (row.length == 3 ? 0.8 : 1.0);
+      for (var i = 0; i < row.length; i++) {
+        final x = row.length == 1 ? 0.0 : -span + 2 * span * i / (row.length - 1);
+        positions[row[i]] = Alignment(x, _lineY[entry.key]!);
+      }
+    }
+    return positions;
+  }
+
+  /// Largura da figurinha (fração do campinho) para a maior linha [widest].
+  static double cardFraction(int widest) => widest <= 3 ? 0.22 : (1 / (widest + 0.2)).clamp(0.1, 0.22);
 
   static const Duration _move = Duration(milliseconds: 450);
 
@@ -69,9 +97,11 @@ class FantasyPitch extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, box) {
             // Figurinha proporcional ao campinho (3:4).
-            final cardWidth = (box.maxWidth * 0.22).clamp(AppSizes.s64, AppSizes.s100).toDouble();
-            final flexId = lineup.idAt(FantasySlot.flex);
-            final positions = formation(fantasyFlexLine(athletes[flexId ?? '']?.position));
+            final spots = lineup.spots;
+            final lines = rows(spots, (flex) => fantasyFlexLine(athletes[lineup.idAt(flex) ?? '']?.position));
+            final widest = lines.values.fold(0, (acc, row) => row.length > acc ? row.length : acc);
+            final cardWidth = (box.maxWidth * cardFraction(widest)).clamp(AppSizes.s40, AppSizes.s100).toDouble();
+            final positions = formation(lines);
             return Stack(
               children: [
                 const Positioned.fill(
@@ -86,22 +116,22 @@ class FantasyPitch extends StatelessWidget {
                   ),
                 ),
                 const Positioned.fill(child: CustomPaint(painter: PitchPainter())),
-                for (final slot in FantasySlot.values)
+                for (final spot in spots)
                   AnimatedAlign(
-                    key: ValueKey('fantasy-pos-${slot.key}'),
-                    alignment: positions[slot]!,
+                    key: ValueKey('fantasy-pos-${spot.key}'),
+                    alignment: positions[spot]!,
                     duration: _move,
                     curve: Curves.easeOutBack,
                     child: _PitchSlot(
-                      slot: slot,
+                      spot: spot,
                       width: cardWidth,
-                      athlete: athletes[lineup.idAt(slot) ?? ''],
-                      team: teams[athletes[lineup.idAt(slot) ?? '']?.teamId ?? ''],
-                      athleteId: lineup.idAt(slot),
-                      points: points[lineup.idAt(slot) ?? ''],
-                      captain: lineup.idAt(slot) != null && lineup.idAt(slot) == lineup.captainId,
+                      athlete: athletes[lineup.idAt(spot) ?? ''],
+                      team: teams[athletes[lineup.idAt(spot) ?? '']?.teamId ?? ''],
+                      athleteId: lineup.idAt(spot),
+                      points: points[lineup.idAt(spot) ?? ''],
+                      captain: lineup.idAt(spot) != null && lineup.idAt(spot) == lineup.captainId,
                       editable: editable,
-                      onTap: () => onSlotTap(slot),
+                      onTap: () => onSlotTap(spot),
                       onCaptainTap: onCaptainTap,
                     ),
                   ),
@@ -115,7 +145,7 @@ class FantasyPitch extends StatelessWidget {
 }
 
 class _PitchSlot extends StatelessWidget {
-  final FantasySlot slot;
+  final FantasySpot spot;
   final double width;
   final FantasyAthleteDTO? athlete;
   final TeamDTO? team;
@@ -129,7 +159,7 @@ class _PitchSlot extends StatelessWidget {
   final ValueChanged<String> onCaptainTap;
 
   const _PitchSlot({
-    required this.slot,
+    required this.spot,
     required this.width,
     required this.athlete,
     required this.team,
@@ -145,6 +175,7 @@ class _PitchSlot extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final filled = athleteId != null;
+    final slot = spot.slot;
     final label = fantasySlotLabel(l10n, slot);
     Widget card;
     if (filled) {
@@ -193,7 +224,7 @@ class _PitchSlot extends StatelessWidget {
     return SizedBox(
       width: width,
       child: GestureDetector(
-        key: ValueKey('fantasy-slot-${slot.key}'),
+        key: ValueKey('fantasy-slot-${spot.key}'),
         onTap: editable || filled ? onTap : null,
         behavior: HitTestBehavior.opaque,
         child: Stack(
@@ -205,14 +236,14 @@ class _PitchSlot extends StatelessWidget {
                 left: 0,
                 right: 0,
                 bottom: -AppSizes.s8,
-                child: Center(child: _PointsPill(key: ValueKey('fantasy-points-${slot.key}'), points: points!)),
+                child: Center(child: _PointsPill(key: ValueKey('fantasy-points-${spot.key}'), points: points!)),
               ),
             if (filled)
               Positioned(
                 right: -AppSizes.s6,
                 top: -AppSizes.s6,
                 child: GestureDetector(
-                  key: ValueKey('fantasy-captain-${slot.key}'),
+                  key: ValueKey('fantasy-captain-${spot.key}'),
                   onTap: editable ? () => onCaptainTap(athleteId!) : null,
                   child: Container(
                     width: AppSizes.s24,

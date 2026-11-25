@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/fantasy/domain/fantasy_lineup.dart';
 import 'package:arena_soccer/features/fantasy/domain/fantasy_settings.dart';
+import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_labels.dart';
 import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_settings_cubit.dart';
 import 'package:arena_soccer/features/scoring/presentation/bloc/scoring_config_cubit.dart';
 import 'package:arena_soccer/features/scoring/presentation/widgets/scoring_table_editor.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 import 'package:arena_soccer/utils/components/arena_submit_bar.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
@@ -37,6 +40,31 @@ class _FantasySettingsPageState extends State<FantasySettingsPage> {
         FantasySettingsError.minMinutesRange || FantasySettingsError.defenseRange => l10n.fantasyErrorRange,
         FantasySettingsError.defenseBelowMin => l10n.fantasyErrorDefenseBelowMin,
         FantasySettingsError.captainRange => l10n.fantasyErrorCaptain,
+        FantasySettingsError.formationTotal => l10n.fantasyErrorFormationTotal,
+      };
+
+  /// Mudou o formato da escalação: confirma (nada do que já foi feito se perde).
+  Future<void> _save(FantasySettingsCubit cubit, FantasySettingsState state) async {
+    if (state.formationChanged) {
+      final l10n = AppLocalizations.of(context);
+      final ok = await showArenaConfirm(
+        context,
+        title: l10n.fantasyFormationConfirmTitle,
+        message: l10n.fantasyFormationConfirmBody(state.draft!.formation.total),
+        confirmLabel: l10n.fantasyFormationConfirm,
+        icon: Icons.groups_rounded,
+      );
+      if (!ok || !mounted) return;
+    }
+    await cubit.save();
+  }
+
+  String _slotHint(AppLocalizations l10n, FantasySlot slot) => switch (slot) {
+        FantasySlot.goalkeeper => l10n.fantasyRulesSlotGoalkeeper,
+        FantasySlot.defender => l10n.fantasyRulesSlotDefender,
+        FantasySlot.midfielder => l10n.fantasyRulesSlotMidfielder,
+        FantasySlot.forward => l10n.fantasyRulesSlotForward,
+        FantasySlot.flex => l10n.fantasyRulesSlotFlex,
       };
 
   @override
@@ -71,7 +99,7 @@ class _FantasySettingsPageState extends State<FantasySettingsPage> {
                   title: l10n.fantasySave,
                   loading: state.saving,
                   onPressed: () {
-                    if (error == null) cubit.save();
+                    if (error == null) _save(cubit, state);
                   },
                 ),
           body: draft == null
@@ -173,6 +201,55 @@ class _FantasySettingsPageState extends State<FantasySettingsPage> {
                         Expanded(
                           child: Text(
                             l10n.fantasyParamsNote,
+                            style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Escalação: quantos atletas de cada posição (vale da rodada aberta em diante).
+                    const SizedBox(height: AppSizes.s24),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(l10n.fantasyFormationSection,
+                              style: AppTypography.title().copyWith(fontSize: AppSizes.s16)),
+                        ),
+                        Text(
+                          l10n.fantasyFormationTotal(draft.formation.total),
+                          key: const ValueKey('fantasy-formation-total'),
+                          style: AppTypography.label(
+                            color: draft.formation.isValid ? AppColors.primary : AppColors.danger,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSizes.s8),
+                    _Panel(
+                      child: Column(
+                        children: [
+                          for (final slot in FantasySlot.values) ...[
+                            if (slot != FantasySlot.values.first) const Divider(height: 1, color: AppColors.greyLight),
+                            _Stepper(
+                              keyName: 'fantasy-formation-${slot.key}',
+                              title: fantasySlotLabel(l10n, slot),
+                              hint: _slotHint(l10n, slot),
+                              value: '${draft.formation.countOf(slot)}',
+                              onLess: () => cubit.setFormationCount(slot, draft.formation.countOf(slot) - 1),
+                              onMore: () => cubit.setFormationCount(slot, draft.formation.countOf(slot) + 1),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSizes.s8),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.info_outline_rounded, color: AppColors.textSecondary, size: AppSizes.s20),
+                        const SizedBox(width: AppSizes.s8),
+                        Expanded(
+                          child: Text(
+                            l10n.fantasyFormationHint,
                             style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
                           ),
                         ),

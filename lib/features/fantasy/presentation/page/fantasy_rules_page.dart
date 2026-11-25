@@ -39,6 +39,7 @@ class FantasyRulesPage extends StatelessWidget {
     final captain = config?.captainMultiplier ?? FantasyLimits.defaultCaptain;
     final title = config?.title ?? '';
     final table = config?.scoringTable ?? ScoringConfigCubit.of(context).fantasyTable;
+    final formation = config?.formation ?? FantasyFormation.defaults;
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -73,12 +74,22 @@ class FantasyRulesPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _Paragraph(l10n.fantasyRulesHowToPlayText),
+                _Paragraph(l10n.fantasyRulesHowToPlayText(formation.total)),
                 const SizedBox(height: AppSizes.s12),
+                // As vagas do formato do campeonato ("ZAG ×2"; posição sem vaga não aparece).
                 for (final slot in FantasySlot.values)
-                  _Row(label: fantasySlotLabel(l10n, slot), value: _slotText(l10n, slot), badge: true),
-                const SizedBox(height: AppSizes.s8),
-                _Paragraph(l10n.fantasyRulesFlexNote, muted: true),
+                  if (formation.countOf(slot) > 0)
+                    _Row(
+                      label: formation.countOf(slot) > 1
+                          ? '${fantasySlotLabel(l10n, slot)} ×${formation.countOf(slot)}'
+                          : fantasySlotLabel(l10n, slot),
+                      value: _slotText(l10n, slot),
+                      badge: true,
+                    ),
+                if (formation.countOf(FantasySlot.flex) > 0) ...[
+                  const SizedBox(height: AppSizes.s8),
+                  _Paragraph(l10n.fantasyRulesFlexNote, muted: true),
+                ],
               ],
             ),
           ),

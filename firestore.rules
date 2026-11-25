@@ -1064,11 +1064,25 @@ service cloud.firestore {
           && (a.acao == 'fechar' || (a.get('prazo', null) is timestamp && a.prazo > request.time));
       }
 
+      // Quantas vagas de cada posição a escalação tem: GOL 0-1, ZAG/MEI/ATA
+      // 0-4, LIVRE 0-3, total de 3 a 7 (o máximo cabe nos `get` da escalação).
+      function validFantasyFormation(v) {
+        return v is map && v.keys().hasOnly(['gol', 'zag', 'mei', 'ata', 'livre'])
+          && v.keys().hasAll(['gol', 'zag', 'mei', 'ata', 'livre'])
+          && v.gol is int && v.gol >= 0 && v.gol <= 1
+          && v.zag is int && v.zag >= 0 && v.zag <= 4
+          && v.mei is int && v.mei >= 0 && v.mei <= 4
+          && v.ata is int && v.ata >= 0 && v.ata <= 4
+          && v.livre is int && v.livre >= 0 && v.livre <= 3
+          && v.gol + v.zag + v.mei + v.ata + v.livre >= 3
+          && v.gol + v.zag + v.mei + v.ata + v.livre <= 7;
+      }
+
       function validFantasyConfig(d) {
         return d.keys().hasOnly(['idCampeonato', 'temporada', 'titulo', 'urlImagem', 'fk_competicao', 'idRegiao',
             'idsRegioes', 'ativo', 'minMinutos', 'minMinutosDefesa', 'capitao', 'atualizadoEm', 'reapurarEm',
             'zerarEm', 'zeradoEm', 'zerarTimes', 'acaoRodada', 'rodadaAtual', 'participantes', 'campeao', 'campeaoEm',
-            'pontuacao'])
+            'pontuacao', 'vagas'])
           && d.ativo is bool
           && d.minMinutos is int && d.minMinutos >= 0 && d.minMinutos <= 120
           && d.minMinutosDefesa is int && d.minMinutosDefesa >= d.minMinutos && d.minMinutosDefesa <= 120
@@ -1078,6 +1092,8 @@ service cloud.firestore {
           && d.get('idsRegioes', []) is list
           // Tabela de pontos própria do campeonato (sem o campo = a padrão).
           && (!('pontuacao' in d) || validScoringTable(d.pontuacao))
+          // Formato da escalação (sem o campo = uma vaga de cada).
+          && (!('vagas' in d) || validFantasyFormation(d.vagas))
           // "Reapurar rodadas": hora do pedido (as functions apuram de novo).
           && (!('reapurarEm' in d) || d.reapurarEm is timestamp)
           // "Zerar pontuações (testes)": hora do pedido (as functions zeram).
@@ -1127,11 +1143,11 @@ service cloud.firestore {
         allow read: if true;
         allow write: if false;
 
-        // Escalação do dono na rodada aberta, até o prazo (`fechaEm`): as 5
-        // vagas com atletas inscritos na competição na posição da vaga
-        // (gol: goleiro; zag: zagueiro/lateral; mei: volante/meia; ata:
-        // atacante; livre: qualquer) e o capitão entre eles. Pontos são das
-        // functions.
+        // Escalação do dono na rodada aberta, até o prazo (`fechaEm`): as
+        // vagas do formato do campeonato (`vagas`; `zag`, `zag2`...) com
+        // atletas inscritos na competição na posição da vaga (gol: goleiro;
+        // zag: zagueiro/lateral; mei: volante/meia; ata: atacante; livre:
+        // qualquer) e o capitão entre eles. Pontos são das functions.
         // Pontos de cada atleta na rodada (auditoria; só as functions gravam).
         match /atletas/{athleteId} {
           allow read: if true;
@@ -1158,6 +1174,26 @@ service cloud.firestore {
           && p.get('posicao', '') in positions;
       }
 
+      // Chaves das vagas do formato [v], na ordem (gol…, zag…, mei…, ata…, livre…).
+      function fantasySpotKeys(v) {
+        return firstKeys(['gol'], v.gol)
+          .concat(firstKeys(['zag', 'zag2', 'zag3', 'zag4'], v.zag))
+          .concat(firstKeys(['mei', 'mei2', 'mei3', 'mei4'], v.mei))
+          .concat(firstKeys(['ata', 'ata2', 'ata3', 'ata4'], v.ata))
+          .concat(firstKeys(['livre', 'livre2', 'livre3'], v.livre));
+      }
+
+      // As [n] primeiras chaves de [list] (n = 0: nenhuma).
+      function firstKeys(list, n) {
+        return n == 0 ? [] : list[0:n];
+      }
+
+      // Vaga [spot] fora do formato ou com atleta elegível (só lê quem está na
+      // escalação: no máximo 7 `get`).
+      function spotOk(col, key, a, spot, positions) {
+        return !(spot in a) || eligibleAthlete(col, key, a[spot], positions);
+      }
+
       function validFantasyLineup(uid, round) {
         let d = request.resource.data;
         let f = fantasyConfig();
@@ -1178,16 +1214,33 @@ service cloud.firestore {
           && d.get('urlImagem', '') is string && d.get('urlImagem', '').size() <= 1000
           && d.atualizadoEm == request.time
           && d.get('copiada', false) == false
-          && a is map && a.keys().hasOnly(['gol', 'zag', 'mei', 'ata', 'livre'])
-          && a.keys().hasAll(['gol', 'zag', 'mei', 'ata', 'livre'])
-          && d.idsAtletas == [a.gol, a.zag, a.mei, a.ata, a.livre]
-          && d.idsAtletas.toSet().size() == 5
-          && d.capitao in d.idsAtletas
-          && eligibleAthlete(col, key, a.gol, ['goleiro'])
-          && eligibleAthlete(col, key, a.zag, ['zagueiro', 'lateral'])
-          && eligibleAthlete(col, key, a.mei, ['volante', 'meia'])
-          && eligibleAthlete(col, key, a.ata, ['atacante'])
-          && eligibleAthlete(col, key, a.livre, ['goleiro', 'zagueiro', 'lateral', 'volante', 'meia', 'atacante']);
+          && validLineupSpots(d, a, fantasySpotKeys(f.get('vagas', {'gol': 1, 'zag': 1, 'mei': 1, 'ata': 1, 'livre': 1})))
+          && spotOk(col, key, a, 'gol', ['goleiro'])
+          && spotOk(col, key, a, 'zag', ['zagueiro', 'lateral'])
+          && spotOk(col, key, a, 'zag2', ['zagueiro', 'lateral'])
+          && spotOk(col, key, a, 'zag3', ['zagueiro', 'lateral'])
+          && spotOk(col, key, a, 'zag4', ['zagueiro', 'lateral'])
+          && spotOk(col, key, a, 'mei', ['volante', 'meia'])
+          && spotOk(col, key, a, 'mei2', ['volante', 'meia'])
+          && spotOk(col, key, a, 'mei3', ['volante', 'meia'])
+          && spotOk(col, key, a, 'mei4', ['volante', 'meia'])
+          && spotOk(col, key, a, 'ata', ['atacante'])
+          && spotOk(col, key, a, 'ata2', ['atacante'])
+          && spotOk(col, key, a, 'ata3', ['atacante'])
+          && spotOk(col, key, a, 'ata4', ['atacante'])
+          && spotOk(col, key, a, 'livre', ['goleiro', 'zagueiro', 'lateral', 'volante', 'meia', 'atacante'])
+          && spotOk(col, key, a, 'livre2', ['goleiro', 'zagueiro', 'lateral', 'volante', 'meia', 'atacante'])
+          && spotOk(col, key, a, 'livre3', ['goleiro', 'zagueiro', 'lateral', 'volante', 'meia', 'atacante']);
+      }
+
+      // `atletas` com exatamente as vagas [keys] e `idsAtletas` = esses ids,
+      // sem repetir; o capitão entre eles.
+      function validLineupSpots(d, a, keys) {
+        return a is map && a.keys().hasOnly(keys) && a.keys().hasAll(keys)
+          && d.idsAtletas is list && d.idsAtletas.size() == keys.size()
+          && d.idsAtletas.toSet().size() == keys.size()
+          && d.idsAtletas.toSet() == a.values().toSet()
+          && d.capitao in d.idsAtletas;
       }
     }
 

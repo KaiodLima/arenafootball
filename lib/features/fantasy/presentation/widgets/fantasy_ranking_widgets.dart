@@ -718,7 +718,8 @@ class _CaptainBadge extends StatelessWidget {
 }
 
 /// Cartão de uma rodada do histórico: pílula da rodada, estado, posição em
-/// medalha e o total; os 5 atletas com a vaga, o capitão e os pontos de cada
+/// medalha e o total; os atletas (as vagas da escalação gravada, no formato
+/// daquela rodada) com a vaga, o capitão e os pontos de cada
 /// um. Sem apuração, só os atletas em fichas.
 class FantasyHistoryCard extends StatelessWidget {
   final FantasyHistoryItem item;
@@ -744,10 +745,7 @@ class FantasyHistoryCard extends StatelessWidget {
     final lineup = item.lineup;
     final points = lineup.points;
     final round = item.round;
-    final slots = [
-      for (final slot in FantasySlot.values)
-        if (lineup.lineup.idAt(slot) != null) slot
-    ];
+    final slots = lineup.lineup.filledSpots;
     final medal = fantasyPodiumColor(item.position ?? 0);
     return Container(
       key: ValueKey('fantasy-history-${round.number}'),
@@ -843,9 +841,9 @@ class FantasyHistoryCard extends StatelessWidget {
     );
   }
 
-  Widget _athleteChip(BuildContext context, FantasySlot slot) {
+  Widget _athleteChip(BuildContext context, FantasySpot spot) {
     final l10n = AppLocalizations.of(context);
-    final id = item.lineup.lineup.idAt(slot)!;
+    final id = item.lineup.lineup.idAt(spot)!;
     final captain = id == item.lineup.lineup.captainId;
     return InkWell(
       key: ValueKey('fantasy-history-athlete-${item.round.number}-$id'),
@@ -857,7 +855,7 @@ class FantasyHistoryCard extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            FantasySlotBadge(slot: slot),
+            FantasySlotBadge(slot: spot.slot),
             const SizedBox(width: AppSizes.s6),
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: AppSizes.s150),
@@ -878,9 +876,9 @@ class FantasyHistoryCard extends StatelessWidget {
     );
   }
 
-  Widget _athleteRow(BuildContext context, FantasySlot slot) {
+  Widget _athleteRow(BuildContext context, FantasySpot spot) {
     final l10n = AppLocalizations.of(context);
-    final id = item.lineup.lineup.idAt(slot)!;
+    final id = item.lineup.lineup.idAt(spot)!;
     final captain = id == item.lineup.lineup.captainId;
     final athlete = athletes[id];
     final name = athlete?.name ?? l10n.fantasyUnknownAthlete;
@@ -893,7 +891,7 @@ class FantasyHistoryCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: AppSizes.s4),
         child: Row(
           children: [
-            FantasySlotBadge(slot: slot, width: AppSizes.s44),
+            FantasySlotBadge(slot: spot.slot, width: AppSizes.s44),
             const SizedBox(width: AppSizes.s8),
             FantasyAvatar(name: name, photoUrl: athlete?.photoUrl ?? '', size: AppSizes.s24),
             const SizedBox(width: AppSizes.s8),

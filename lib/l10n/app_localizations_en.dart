@@ -3094,7 +3094,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tourFantasyPlayBody =>
-      'Pick 5 athletes from the championship and a captain. They score for what they do in the real matches.';
+      'Pick your athletes from the championship and a captain. They score for what they do in the real matches.';
 
   @override
   String get tourFantasyRankingTitle => 'Ranking';
@@ -3115,7 +3115,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tourFantasyLineupPitchBody =>
-      'Tap a slot to pick the athlete: goalkeeper, defender, midfielder, forward and one free slot for any position.';
+      'Tap a slot to pick the athlete for that position. The free slot takes any position.';
 
   @override
   String get tourFantasyLineupCaptainTitle => 'Captain';
@@ -7135,7 +7135,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fantasyRemoveAthlete => 'Remove from lineup';
 
   @override
-  String get fantasyErrorIncomplete => 'Fill the 5 spots.';
+  String fantasyErrorIncomplete(int count) {
+    return 'Fill the $count spots.';
+  }
 
   @override
   String get fantasyErrorCaptainMissing =>
@@ -7197,8 +7199,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fantasyJoinTitle => 'Build your Arena Fantasy team';
 
   @override
-  String get fantasyJoinText =>
-      'Pick 5 players of the championship and a captain. They score by their real performance. You play from the next open matchday.';
+  String fantasyJoinText(int count) {
+    return 'Pick $count players of the championship and a captain. They score by their real performance. You play from the next open matchday.';
+  }
 
   @override
   String get fantasyJoin => 'Join Arena Fantasy';
@@ -7435,8 +7438,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fantasyRulesHowToPlay => 'How to play';
 
   @override
-  String get fantasyRulesHowToPlayText =>
-      'Pick 5 athletes, one per slot, and choose 1 captain. Only athletes registered in the championship can be picked.';
+  String fantasyRulesHowToPlayText(int count) {
+    return 'Pick $count athletes, one per slot, and choose 1 captain. Only athletes registered in the championship can be picked.';
+  }
 
   @override
   String get fantasyRulesSlotGoalkeeper => 'Goalkeeper';
@@ -9140,4 +9144,41 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get fantasyScoringOwnOff =>
       'Uses the default table (admin panel → Scoring).';
+
+  @override
+  String get fantasyFormationSection => 'Lineup';
+
+  @override
+  String fantasyFormationTotal(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count athletes',
+      one: '1 athlete',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fantasyFormationHint =>
+      'How many athletes of each position fans pick (3 to 7 in total). It applies to the open matchday and the next ones; lineups and points already made are kept.';
+
+  @override
+  String get fantasyErrorFormationTotal => 'The lineup has 3 to 7 athletes.';
+
+  @override
+  String get fantasyFormationConfirmTitle => 'Change the lineup?';
+
+  @override
+  String fantasyFormationConfirmBody(int count) {
+    return 'Lineups and points already made are kept. The new format ($count athletes) applies to lineups from now on.';
+  }
+
+  @override
+  String get fantasyFormationConfirm => 'Change';
+
+  @override
+  String fantasyFormationChanged(int count) {
+    return 'The lineup format changed to $count athletes. Your previous lineup still counts; adjust your team and confirm to use the new format.';
+  }
 }

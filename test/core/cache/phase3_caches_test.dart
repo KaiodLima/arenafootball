@@ -94,7 +94,7 @@ class _FantasySource implements FantasyDataSource {
     return Right(FantasyLineupDTO(
       uid: uid,
       name: 'Ana',
-      lineup: const FantasyLineup(athletes: {FantasySlot.forward: 'fw'}, captainId: 'fw'),
+      lineup: FantasyLineup(athletes: {const FantasySpot(FantasySlot.forward): 'fw'}, captainId: 'fw'),
       points: 12.5,
       athletePoints: const {'fw': 12.5},
       playedIds: const ['fw'],
@@ -102,7 +102,8 @@ class _FantasySource implements FantasyDataSource {
   }
 
   @override
-  Future<Either<Failure, FantasyAthleteScoreDTO?>> getAthleteScore(String fantasyId, int round, String athleteId) async {
+  Future<Either<Failure, FantasyAthleteScoreDTO?>> getAthleteScore(
+      String fantasyId, int round, String athleteId) async {
     scoreCalls++;
     return Right(FantasyAthleteScoreDTO.fromMap(athleteId, const {
       'nome': 'Ângelo',
@@ -462,17 +463,19 @@ void main() {
         manualClosed: true,
       );
       expect(FantasyRoundDTO.fromCache(round.toCache()), round);
-      const lineup = FantasyLineupDTO(
+      final lineup = FantasyLineupDTO(
         uid: 'u1',
         name: 'Ana',
-        lineup: FantasyLineup(athletes: {FantasySlot.goalkeeper: 'gk', FantasySlot.forward: 'fw'}, captainId: 'fw'),
+        lineup: FantasyLineup(
+            athletes: {FantasySpot(FantasySlot.goalkeeper): 'gk', FantasySpot(FantasySlot.forward): 'fw'},
+            captainId: 'fw'),
         copied: true,
         points: 7,
         athletePoints: {'fw': 7},
         playedIds: ['fw'],
       );
       expect(FantasyLineupDTO.fromCache(lineup.toCache()), lineup);
-      const record = FantasyRoundRecord(version: 5, lineup: lineup, position: 3);
+      final record = FantasyRoundRecord(version: 5, lineup: lineup, position: 3);
       expect(FantasyRoundRecord.fromCache(record.toCache()), record);
     });
   });
@@ -516,8 +519,8 @@ void main() {
   test('formulários: nomes das regiões pelo cache (GetRegionsCacheFirstUseCase.names)', () async {
     final source = _RegionsSource();
     final repository = RegionsRepositoryImpl(source, _Prefs(), cache());
-    final useCase =
-        GetRegionsCacheFirstUseCase(repository, GetCachedRegionsUseCase(repository), SaveRegionsCacheUseCase(repository));
+    final useCase = GetRegionsCacheFirstUseCase(
+        repository, GetCachedRegionsUseCase(repository), SaveRegionsCacheUseCase(repository));
     expect((await useCase.names()).right, ['Floresta', 'Riacho']);
     expect((await useCase.names()).right, ['Floresta', 'Riacho']);
     expect(source.calls, 1);
@@ -549,8 +552,8 @@ void main() {
     test('"Meu time" pelo cache do time; editar o time apaga', () async {
       final source = _TeamsSource();
       final repository = TeamsRepositoryImpl(source, cache());
-      final useCase =
-          GetTeamCacheFirstUseCase(GetTeamUseCase(repository), GetCachedTeamUseCase(repository), SaveTeamCacheUseCase(repository));
+      final useCase = GetTeamCacheFirstUseCase(
+          GetTeamUseCase(repository), GetCachedTeamUseCase(repository), SaveTeamCacheUseCase(repository));
       expect((await useCase.latest('1')).right?.name, 'Lava Jato');
       await useCase.latest('1');
       expect(source.teamCalls, 1);

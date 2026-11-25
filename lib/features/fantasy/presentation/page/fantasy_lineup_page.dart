@@ -92,13 +92,13 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
     _cubit.load(widget.championship, uid: user?.id ?? '', name: user?.name ?? '', photoUrl: user?.photoUrl ?? '');
   }
 
-  Future<void> _onSlotTap(FantasyLineupState state, FantasySlot slot) async {
+  Future<void> _onSlotTap(FantasyLineupState state, FantasySpot spot) async {
     if (!state.editable || state.showingLast) {
       // Rodada travada (ou o resultado da anterior): o atleta que já jogou
       // abre a pontuação detalhada.
       final lineup = state.showingLast ? state.lastLineup : state.saved;
       final round = state.showingLast ? state.lastRound : state.round;
-      final id = lineup?.lineup.idAt(slot);
+      final id = lineup?.lineup.idAt(spot);
       if (id == null || round == null || !lineup!.playedIds.contains(id)) return;
       await showFantasyAthleteScore(
         context,
@@ -112,24 +112,25 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
       );
       return;
     }
-    final current = state.draft.idAt(slot);
+    final current = state.draft.idAt(spot);
     if (current != null) {
-      final action = await _slotActions(state, slot, current);
+      final action = await _slotActions(state, current);
       if (!mounted || action == null) return;
-      if (action == _SlotAction.remove) return _cubit.remove(slot);
+      if (action == _SlotAction.remove) return _cubit.remove(spot);
       if (action == _SlotAction.captain) return _cubit.setCaptain(current);
     }
     if (!mounted) return;
     final picked = await showFantasyAthletePicker(
       context,
-      slot: slot,
+      slot: spot.slot,
       athletes: state.athletes,
       lineup: state.draft,
+      current: state.draft.idAt(spot),
     );
-    if (picked != null && mounted) _cubit.place(slot, picked);
+    if (picked != null && mounted) _cubit.place(spot, picked);
   }
 
-  Future<_SlotAction?> _slotActions(FantasyLineupState state, FantasySlot slot, String athleteId) {
+  Future<_SlotAction?> _slotActions(FantasyLineupState state, String athleteId) {
     final l10n = AppLocalizations.of(context);
     final name = state.athleteById[athleteId]?.name ?? '';
     return showModalBottomSheet<_SlotAction>(
@@ -177,7 +178,7 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
       Navigator.pushNamed(context, AppRoutes.fantasyRulesPage, arguments: config);
 
   String? _errorText(AppLocalizations l10n, FantasyLineupState state) => switch (state.error) {
-        FantasyLineupError.incomplete => l10n.fantasyErrorIncomplete,
+        FantasyLineupError.incomplete => l10n.fantasyErrorIncomplete(state.formation.total),
         FantasyLineupError.noCaptain => l10n.fantasyErrorCaptainMissing,
         FantasyLineupError.duplicate => l10n.fantasyErrorDuplicate,
         FantasyLineupError.position => l10n.fantasyErrorPosition,
@@ -283,7 +284,8 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
         if (state.isGuest)
           _Notice(icon: Icons.login_rounded, text: l10n.fantasyGuest)
         else if (!state.joined)
-          _JoinCard(busy: state.busy, onJoin: _cubit.join, onRules: () => _openRules(config))
+          _JoinCard(
+              busy: state.busy, formation: state.formation, onJoin: _cubit.join, onRules: () => _openRules(config))
         else if (state.hasLastResult) ...[
           _RoundSwitch(state: state, onChanged: _cubit.showLast),
           const SizedBox(height: AppSizes.s12),
@@ -309,6 +311,10 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
         ] else if (state.round == null)
           _Notice(icon: Icons.event_busy_rounded, text: l10n.fantasyNoOpenRound)
         else ...[
+          if (state.formationChanged && state.editable) ...[
+            _Notice(icon: Icons.groups_rounded, text: l10n.fantasyFormationChanged(state.formation.total)),
+            const SizedBox(height: AppSizes.s12),
+          ],
           if (state.saved?.copied == true && !state.dirty) ...[
             _Notice(icon: Icons.content_copy_rounded, text: l10n.fantasyCopiedLineup),
             const SizedBox(height: AppSizes.s12),
@@ -455,10 +461,11 @@ class _Header extends StatelessWidget {
 
 class _JoinCard extends StatelessWidget {
   final bool busy;
+  final FantasyFormation formation;
   final VoidCallback onJoin;
   final VoidCallback onRules;
 
-  const _JoinCard({required this.busy, required this.onJoin, required this.onRules});
+  const _JoinCard({required this.busy, required this.formation, required this.onJoin, required this.onRules});
 
   @override
   Widget build(BuildContext context) {
@@ -475,7 +482,7 @@ class _JoinCard extends StatelessWidget {
         children: [
           Text(l10n.fantasyJoinTitle, style: AppTypography.title().copyWith(fontSize: AppSizes.s18)),
           const SizedBox(height: AppSizes.s6),
-          Text(l10n.fantasyJoinText, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s14)),
+          Text(l10n.fantasyJoinText(formation.total), style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s14)),
           const SizedBox(height: AppSizes.s16),
           ArenaButton.primary(
             key: const ValueKey('fantasy-join'),

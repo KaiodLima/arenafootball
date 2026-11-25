@@ -94,7 +94,22 @@ class FantasyLineupState extends Equatable {
 
   FantasyLineupError? get error => draft.validate((id) => athleteById[id]?.position ?? '');
 
-  bool get dirty => draft != (saved?.lineup ?? const FantasyLineup());
+  /// Formato da escalação da rodada aberta (o do campeonato).
+  FantasyFormation get formation => config?.formation ?? FantasyFormation.defaults;
+
+  /// A escalação gravada é de outro formato (o admin mudou com a rodada
+  /// aberta): ela segue valendo, mas a tela pede para ajustar.
+  bool get formationChanged => roundOpen && saved != null && !saved!.lineup.fitsFormation(formation);
+
+  /// O rascunho sem edição da conta: a escalação gravada (levada ao formato
+  /// atual com a rodada aberta) ou vazia no formato atual.
+  FantasyLineup get baseDraft {
+    final lineup = saved?.lineup;
+    if (lineup == null) return FantasyLineup(formation: formation);
+    return formationChanged ? lineup.adaptTo(formation) : lineup;
+  }
+
+  bool get dirty => draft != (saved?.lineup ?? FantasyLineup(formation: formation));
 
   bool get canSave => editable && !busy && error == null && (dirty || (saved?.copied ?? false));
 
@@ -165,8 +180,8 @@ class FantasyLineupState extends Equatable {
       ];
 }
 
-/// "Montar meu time" no Arena Fantasy do campeonato: entra, escolhe os 5
-/// atletas e o capitão da rodada aberta e confirma até o prazo.
+/// "Montar meu time" no Arena Fantasy do campeonato: entra, escolhe os
+/// atletas (as vagas do formato do campeonato) e o capitão da rodada aberta e confirma até o prazo.
 class FantasyLineupCubit extends Cubit<FantasyLineupState> {
   final WatchFantasyConfigUseCase _watchConfig;
   final WatchFantasyRoundUseCase _watchRound;
@@ -240,7 +255,7 @@ class FantasyLineupCubit extends Cubit<FantasyLineupState> {
     final tick = _tick;
     if (tick != null) {
       _ticker = Timer.periodic(tick, (_) {
-        if (!isClosed) emit(state.copyWith(now: _clock()));
+        if (!isClosed) _emitSynced(state.copyWith(now: _clock()));
       });
     }
   }
@@ -312,9 +327,16 @@ class FantasyLineupCubit extends Cubit<FantasyLineupState> {
   /// Seletor: resultado da rodada anterior ([last] = true) ou a atual.
   void showLast(bool last) => emit(state.copyWith(viewingLast: last));
 
+  /// Emite [next]; sem edição da conta, o rascunho acompanha o [baseDraft]
+  /// (escalação gravada, formato do campeonato, prazo).
+  void _emitSynced(FantasyLineupState next) {
+    final edited = state.draft != state.baseDraft;
+    emit(edited ? next : next.copyWith(draft: next.baseDraft, event: next.event, failure: next.failure));
+  }
+
   void _onConfig(FantasyConfigDTO config) {
     final first = state.config == null;
-    emit(state.copyWith(config: config));
+    _emitSynced(state.copyWith(config: config));
     if (first) {
       _loadAthletes(config);
       if (state.uid.isNotEmpty) {
@@ -337,12 +359,12 @@ class FantasyLineupCubit extends Cubit<FantasyLineupState> {
     _watchedRound = config.currentRound;
     _roundSub?.cancel();
     _lineupSub?.cancel();
-    emit(state.copyWith(round: () => null, saved: () => null, draft: const FantasyLineup()));
+    emit(state.copyWith(round: () => null, saved: () => null, draft: FantasyLineup(formation: config.formation)));
     if (config.currentRound <= 0) return;
     _roundSub = _watchRound(config.championshipDocId, config.currentRound).listen((response) {
       if (isClosed) return;
       response.fold((failure) => emit(state.copyWith(failure: failure.toString())), (round) {
-        emit(state.copyWith(round: () => round, now: _clock()));
+        _emitSynced(state.copyWith(round: () => round, now: _clock()));
       });
     });
     if (state.uid.isEmpty) return;
@@ -350,9 +372,7 @@ class FantasyLineupCubit extends Cubit<FantasyLineupState> {
       if (isClosed) return;
       response.fold((failure) => emit(state.copyWith(failure: failure.toString())), (lineup) {
         // Edição em andamento não é atropelada pelo servidor.
-        final keep = state.dirty && state.saved != null;
-        emit(
-            state.copyWith(saved: () => lineup, draft: keep ? state.draft : (lineup?.lineup ?? const FantasyLineup())));
+        _emitSynced(state.copyWith(saved: () => lineup));
       });
     });
   }
@@ -385,14 +405,14 @@ class FantasyLineupCubit extends Cubit<FantasyLineupState> {
     );
   }
 
-  void place(FantasySlot slot, String athleteId) {
+  void place(FantasySpot spot, String athleteId) {
     if (!state.editable) return;
-    emit(state.copyWith(draft: state.draft.place(slot, athleteId)));
+    emit(state.copyWith(draft: state.draft.place(spot, athleteId)));
   }
 
-  void remove(FantasySlot slot) {
+  void remove(FantasySpot spot) {
     if (!state.editable) return;
-    emit(state.copyWith(draft: state.draft.remove(slot)));
+    emit(state.copyWith(draft: state.draft.remove(spot)));
   }
 
   void setCaptain(String athleteId) {
@@ -401,7 +421,7 @@ class FantasyLineupCubit extends Cubit<FantasyLineupState> {
   }
 
   /// Volta para a escalação gravada.
-  void discard() => emit(state.copyWith(draft: state.saved?.lineup ?? const FantasyLineup()));
+  void discard() => emit(state.copyWith(draft: state.baseDraft));
 
   Future<void> save() async {
     final config = state.config;

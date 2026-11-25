@@ -1,3 +1,5 @@
+import 'package:arena_soccer/features/fantasy/domain/fantasy_lineup.dart';
+
 /// Padrões e faixas dos parâmetros do Arena Fantasy (as mesmas das regras do
 /// Firestore).
 class FantasyLimits {
@@ -15,7 +17,7 @@ class FantasyLimits {
 }
 
 /// Problema nos parâmetros do Fantasy.
-enum FantasySettingsError { minMinutesRange, defenseBelowMin, defenseRange, captainRange }
+enum FantasySettingsError { minMinutesRange, defenseBelowMin, defenseRange, captainRange, formationTotal }
 
 /// Regras puras da configuração do Fantasy.
 class FantasySettings {
@@ -26,6 +28,7 @@ class FantasySettings {
     required int minMinutes,
     required int minDefenseMinutes,
     required double captainMultiplier,
+    FantasyFormation formation = FantasyFormation.defaults,
   }) {
     if (minMinutes < 0 || minMinutes > FantasyLimits.maxMinutes) return FantasySettingsError.minMinutesRange;
     if (minDefenseMinutes > FantasyLimits.maxMinutes) return FantasySettingsError.defenseRange;
@@ -33,6 +36,7 @@ class FantasySettings {
     if (captainMultiplier < FantasyLimits.minCaptain || captainMultiplier > FantasyLimits.maxCaptain) {
       return FantasySettingsError.captainRange;
     }
+    if (!formation.isValid) return FantasySettingsError.formationTotal;
     return null;
   }
 

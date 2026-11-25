@@ -5240,7 +5240,7 @@ abstract class AppLocalizations {
   /// No description provided for @tourFantasyPlayBody.
   ///
   /// In pt, this message translates to:
-  /// **'Escolha 5 atletas do campeonato e um capitão. Eles pontuam pelo que fazem nos jogos de verdade.'**
+  /// **'Escolha seus atletas do campeonato e um capitão. Eles pontuam pelo que fazem nos jogos de verdade.'**
   String get tourFantasyPlayBody;
 
   /// No description provided for @tourFantasyRankingTitle.
@@ -5276,7 +5276,7 @@ abstract class AppLocalizations {
   /// No description provided for @tourFantasyLineupPitchBody.
   ///
   /// In pt, this message translates to:
-  /// **'Toque num espaço para escolher o atleta: goleiro, zagueiro, meio, ataque e um livre de qualquer posição.'**
+  /// **'Toque num espaço para escolher o atleta da posição. A vaga livre aceita qualquer posição.'**
   String get tourFantasyLineupPitchBody;
 
   /// No description provided for @tourFantasyLineupCaptainTitle.
@@ -11891,8 +11891,8 @@ abstract class AppLocalizations {
   /// No description provided for @fantasyErrorIncomplete.
   ///
   /// In pt, this message translates to:
-  /// **'Preencha as 5 vagas.'**
-  String get fantasyErrorIncomplete;
+  /// **'Preencha as {count} vagas.'**
+  String fantasyErrorIncomplete(int count);
 
   /// No description provided for @fantasyErrorCaptainMissing.
   ///
@@ -11999,8 +11999,8 @@ abstract class AppLocalizations {
   /// No description provided for @fantasyJoinText.
   ///
   /// In pt, this message translates to:
-  /// **'Escolha 5 atletas do campeonato e um capitão. Eles pontuam pelo desempenho real nas partidas. Você joga a partir da próxima rodada aberta.'**
-  String get fantasyJoinText;
+  /// **'Escolha {count} atletas do campeonato e um capitão. Eles pontuam pelo desempenho real nas partidas. Você joga a partir da próxima rodada aberta.'**
+  String fantasyJoinText(int count);
 
   /// No description provided for @fantasyJoin.
   ///
@@ -12413,8 +12413,8 @@ abstract class AppLocalizations {
   /// No description provided for @fantasyRulesHowToPlayText.
   ///
   /// In pt, this message translates to:
-  /// **'Escale 5 atletas, um em cada vaga, e escolha 1 capitão. Só entram atletas inscritos no campeonato.'**
-  String get fantasyRulesHowToPlayText;
+  /// **'Escale {count} atletas, um em cada vaga, e escolha 1 capitão. Só entram atletas inscritos no campeonato.'**
+  String fantasyRulesHowToPlayText(int count);
 
   /// No description provided for @fantasyRulesSlotGoalkeeper.
   ///
@@ -15164,6 +15164,54 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Usa a tabela padrão (painel do admin → Pontuações).'**
   String get fantasyScoringOwnOff;
+
+  /// No description provided for @fantasyFormationSection.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escalação'**
+  String get fantasyFormationSection;
+
+  /// No description provided for @fantasyFormationTotal.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 atleta} other{{count} atletas}}'**
+  String fantasyFormationTotal(int count);
+
+  /// No description provided for @fantasyFormationHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quantos atletas de cada posição o torcedor escala (de 3 a 7 no total). Vale para a rodada aberta e as próximas; as escalações e pontuações já feitas são mantidas.'**
+  String get fantasyFormationHint;
+
+  /// No description provided for @fantasyErrorFormationTotal.
+  ///
+  /// In pt, this message translates to:
+  /// **'A escalação tem de 3 a 7 atletas.'**
+  String get fantasyErrorFormationTotal;
+
+  /// No description provided for @fantasyFormationConfirmTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mudar a escalação?'**
+  String get fantasyFormationConfirmTitle;
+
+  /// No description provided for @fantasyFormationConfirmBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'As escalações e pontuações já feitas são mantidas. O novo formato ({count} atletas) vale para as escalações a partir de agora.'**
+  String fantasyFormationConfirmBody(int count);
+
+  /// No description provided for @fantasyFormationConfirm.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mudar'**
+  String get fantasyFormationConfirm;
+
+  /// No description provided for @fantasyFormationChanged.
+  ///
+  /// In pt, this message translates to:
+  /// **'O formato da escalação mudou para {count} atletas. Sua escalação anterior continua valendo; ajuste o time e confirme para usar o novo formato.'**
+  String fantasyFormationChanged(int count);
 }
 
 class _AppLocalizationsDelegate

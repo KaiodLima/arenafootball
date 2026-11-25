@@ -174,6 +174,7 @@ import {
   frozenParams,
   scoringParamsOf,
   lineupCopy,
+  fantasyFormation,
   matchdayOf,
   nextOpenRound,
   previousClosedRound,
@@ -1068,21 +1069,27 @@ async function refreshCurrentRound(fantasyRef: DocRef, now = new Date()): Promis
   if (current !== Number(config.data()?.rodadaAtual ?? 0)) await fantasyRef.update({ rodadaAtual: current });
 }
 
-/** Copia as escalações da rodada [from] para a [to] de quem ainda não tem escalação nela (D3). */
+/**
+ * Copia as escalações da rodada [from] para a [to] de quem ainda não tem
+ * escalação nela (D3), no formato atual do campeonato (`vagas`: a [to] está
+ * abrindo e usa o formato vigente).
+ */
 async function copyFantasyLineups(fantasyRef: DocRef, from: number, to: number): Promise<number> {
   const { db, FieldValue } = await admin();
   const rounds = fantasyRef.collection(FANTASY_ROUNDS);
-  const [source, target] = await Promise.all([
+  const [source, target, config] = await Promise.all([
     rounds.doc(String(from)).collection(FANTASY_LINEUPS).get(),
     rounds.doc(String(to)).collection(FANTASY_LINEUPS).get(),
+    fantasyRef.get(),
   ]);
+  const formation = fantasyFormation(config.data()?.vagas);
   const taken = new Set(target.docs.map((d) => d.id));
   let batch = db.batch();
   let pending = 0;
   let copied = 0;
   for (const doc of source.docs) {
     if (taken.has(doc.id)) continue;
-    const copy = lineupCopy(doc.data());
+    const copy = lineupCopy(doc.data(), formation);
     if (!copy) continue;
     batch.set(rounds.doc(String(to)).collection(FANTASY_LINEUPS).doc(doc.id), {
       ...copy,

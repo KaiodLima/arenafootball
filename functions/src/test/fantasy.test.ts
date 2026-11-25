@@ -8,6 +8,9 @@ import {
   frozenParams,
   scoringParamsOf,
   lineupCopy,
+  fantasyFormation,
+  formationKeys,
+  DEFAULT_FORMATION,
   matchdayOf,
   nextOpenRound,
   previousClosedRound,
@@ -108,7 +111,7 @@ test('tabela congelada: a da rodada > a própria do campeonato > a padrão > os 
   assert.equal(params.table?.conceded.gol, -3);
 });
 
-test('cópia da escalação: mesmos atletas e capitão, marcada copiada; sem os 5, nula', () => {
+test('cópia da escalação: mesmos atletas e capitão, marcada copiada; sem atletas, nula', () => {
   const lineup = {
     uid: 'u1',
     nome: 'Ana',
@@ -123,8 +126,39 @@ test('cópia da escalação: mesmos atletas e capitão, marcada copiada; sem os 
   assert.equal(copy?.copiada, true);
   assert.equal(copy?.capitao, 'p4');
   assert.equal('pontos' in (copy ?? {}), false);
-  assert.equal(lineupCopy({ ...lineup, idsAtletas: ['p1'] }), null);
-  assert.equal(lineupCopy({ ...lineup, capitao: 'p9' }), null);
+  assert.deepEqual(copy?.idsAtletas, ['p1', 'p2', 'p3', 'p4', 'p5']);
+  assert.equal(lineupCopy({ ...lineup, atletas: {} }), null);
+  assert.equal(lineupCopy({ ...lineup, atletas: undefined }), null);
+  assert.equal(lineupCopy({ ...lineup, capitao: 'p9' })?.capitao, '', 'capitão fora da escalação fica vazio');
+});
+
+test('cópia da escalação no formato novo: vagas que existem ficam, novas vazias, capitão que saiu fica vazio', () => {
+  const lineup = {
+    uid: 'u1',
+    atletas: { gol: 'p1', zag: 'p2', mei: 'p3', ata: 'p4', livre: 'p5' },
+    idsAtletas: ['p1', 'p2', 'p3', 'p4', 'p5'],
+    capitao: 'p5',
+  };
+  const copy = lineupCopy(lineup, { gol: 1, zag: 2, mei: 2, ata: 2, livre: 0 });
+  assert.deepEqual(copy?.atletas, { gol: 'p1', zag: 'p2', zag2: '', mei: 'p3', mei2: '', ata: 'p4', ata2: '' });
+  assert.deepEqual(copy?.idsAtletas, ['p1', 'p2', 'p3', 'p4']);
+  assert.equal(copy?.capitao, '');
+  const bigger = { uid: 'u2', atletas: { gol: 'p1', zag: 'p2', zag2: 'p6', mei: 'p3', ata: 'p4' }, capitao: 'p6' };
+  const back = lineupCopy(bigger, { gol: 1, zag: 1, mei: 1, ata: 1, livre: 1 });
+  assert.deepEqual(back?.atletas, { gol: 'p1', zag: 'p2', mei: 'p3', ata: 'p4', livre: '' });
+  assert.equal(back?.capitao, '');
+});
+
+test('formato da escalação: faixas por posição, total de 3 a 7, inválido = uma de cada', () => {
+  assert.deepEqual(fantasyFormation(undefined), { gol: 1, zag: 1, mei: 1, ata: 1, livre: 1 });
+  assert.deepEqual(fantasyFormation({ gol: 1, zag: 2, mei: 2, ata: 2, livre: 0 }), { gol: 1, zag: 2, mei: 2, ata: 2, livre: 0 });
+  assert.deepEqual(fantasyFormation({ gol: 1, zag: 2, mei: 2, ata: 2, livre: 1 }), DEFAULT_FORMATION, 'total 8');
+  assert.deepEqual(fantasyFormation({ gol: 2, zag: 1, mei: 1, ata: 1, livre: 0 }), DEFAULT_FORMATION, 'dois goleiros');
+  assert.deepEqual(fantasyFormation({ gol: 0, zag: 0, mei: 1, ata: 1, livre: 0 }), DEFAULT_FORMATION, 'total 2');
+  assert.deepEqual(fantasyFormation({ gol: 1, zag: 1.5, mei: 1, ata: 1, livre: 1 }), DEFAULT_FORMATION);
+  assert.deepEqual(formationKeys({ gol: 1, zag: 3, mei: 0, ata: 1, livre: 2 }), ['gol', 'zag', 'zag2', 'zag3', 'ata', 'livre', 'livre2']);
+  assert.deepEqual(frozenParams({ vagas: { gol: 0, zag: 1, mei: 1, ata: 1, livre: 0 } }).vagas, { gol: 0, zag: 1, mei: 1, ata: 1, livre: 0 });
+  assert.deepEqual(frozenParams({}).vagas, DEFAULT_FORMATION);
 });
 
 test('próxima aberta e última fechada', () => {

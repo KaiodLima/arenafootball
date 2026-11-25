@@ -227,4 +227,46 @@ void main() {
     expect(repo.saved.last.scoringTable, isNull);
     expect(repo.saved.last.toAdminMap().containsKey('pontuacao'), isFalse);
   });
+
+  testWidgets('Fantasy do campeonato: o admin muda o número de atletas e confirma ao salvar', (tester) async {
+    tester.view.physicalSize = const Size(420, 4000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final repo = _FantasyRepo();
+    final cubit = FantasySettingsCubit(WatchFantasyConfigUseCase(repo), SaveFantasyConfigUseCase(repo));
+    addTearDown(cubit.close);
+    await tester
+        .pumpWidget(_app(BlocProvider.value(value: cubit, child: const FantasySettingsPage(championship: _copa))));
+    repo.controller.add(Right(FantasyConfigDTO.fromMap('doc1', {'ativo': true}, championship: _copa)));
+    await tester.pumpAndSettle();
+    expect(find.text('5 atletas'), findsOneWidget);
+
+    // Sem goleiro e sem livre: 3 atletas; tirar mais um não deixa salvar.
+    await tester.tap(find.byKey(const ValueKey('fantasy-formation-gol-less')));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('fantasy-formation-livre-less')));
+    await tester.pump();
+    expect(find.text('3 atletas'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('fantasy-formation-ata-less')));
+    await tester.pump();
+    expect(find.text('A escalação tem de 3 a 7 atletas.'), findsOneWidget);
+    await tester.tap(find.text('Salvar'));
+    await tester.pumpAndSettle();
+    expect(repo.saved, isEmpty);
+
+    // 1-2-2-2 (7): pede confirmação e grava `vagas`.
+    await tester.tap(find.byKey(const ValueKey('fantasy-formation-gol-more')));
+    for (final slot in ['zag', 'mei', 'ata', 'ata']) {
+      await tester.pump();
+      await tester.tap(find.byKey(ValueKey('fantasy-formation-$slot-more')));
+    }
+    await tester.pump();
+    expect(find.text('7 atletas'), findsOneWidget);
+    await tester.tap(find.text('Salvar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Mudar a escalação?'), findsOneWidget);
+    await tester.tap(find.text('Mudar'));
+    await tester.pumpAndSettle();
+    expect(repo.saved.single.toAdminMap()['vagas'], {'gol': 1, 'zag': 2, 'mei': 2, 'ata': 2, 'livre': 0});
+  });
 }

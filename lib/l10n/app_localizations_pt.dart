@@ -3107,7 +3107,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get tourFantasyPlayBody =>
-      'Escolha 5 atletas do campeonato e um capitão. Eles pontuam pelo que fazem nos jogos de verdade.';
+      'Escolha seus atletas do campeonato e um capitão. Eles pontuam pelo que fazem nos jogos de verdade.';
 
   @override
   String get tourFantasyRankingTitle => 'Ranking';
@@ -3128,7 +3128,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get tourFantasyLineupPitchBody =>
-      'Toque num espaço para escolher o atleta: goleiro, zagueiro, meio, ataque e um livre de qualquer posição.';
+      'Toque num espaço para escolher o atleta da posição. A vaga livre aceita qualquer posição.';
 
   @override
   String get tourFantasyLineupCaptainTitle => 'Capitão';
@@ -7175,7 +7175,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get fantasyRemoveAthlete => 'Tirar da escalação';
 
   @override
-  String get fantasyErrorIncomplete => 'Preencha as 5 vagas.';
+  String fantasyErrorIncomplete(int count) {
+    return 'Preencha as $count vagas.';
+  }
 
   @override
   String get fantasyErrorCaptainMissing =>
@@ -7240,8 +7242,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get fantasyJoinTitle => 'Monte seu time no Arena Fantasy';
 
   @override
-  String get fantasyJoinText =>
-      'Escolha 5 atletas do campeonato e um capitão. Eles pontuam pelo desempenho real nas partidas. Você joga a partir da próxima rodada aberta.';
+  String fantasyJoinText(int count) {
+    return 'Escolha $count atletas do campeonato e um capitão. Eles pontuam pelo desempenho real nas partidas. Você joga a partir da próxima rodada aberta.';
+  }
 
   @override
   String get fantasyJoin => 'Entrar no Arena Fantasy';
@@ -7479,8 +7482,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get fantasyRulesHowToPlay => 'Como jogar';
 
   @override
-  String get fantasyRulesHowToPlayText =>
-      'Escale 5 atletas, um em cada vaga, e escolha 1 capitão. Só entram atletas inscritos no campeonato.';
+  String fantasyRulesHowToPlayText(int count) {
+    return 'Escale $count atletas, um em cada vaga, e escolha 1 capitão. Só entram atletas inscritos no campeonato.';
+  }
 
   @override
   String get fantasyRulesSlotGoalkeeper => 'Goleiro';
@@ -9187,4 +9191,41 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get fantasyScoringOwnOff =>
       'Usa a tabela padrão (painel do admin → Pontuações).';
+
+  @override
+  String get fantasyFormationSection => 'Escalação';
+
+  @override
+  String fantasyFormationTotal(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count atletas',
+      one: '1 atleta',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fantasyFormationHint =>
+      'Quantos atletas de cada posição o torcedor escala (de 3 a 7 no total). Vale para a rodada aberta e as próximas; as escalações e pontuações já feitas são mantidas.';
+
+  @override
+  String get fantasyErrorFormationTotal => 'A escalação tem de 3 a 7 atletas.';
+
+  @override
+  String get fantasyFormationConfirmTitle => 'Mudar a escalação?';
+
+  @override
+  String fantasyFormationConfirmBody(int count) {
+    return 'As escalações e pontuações já feitas são mantidas. O novo formato ($count atletas) vale para as escalações a partir de agora.';
+  }
+
+  @override
+  String get fantasyFormationConfirm => 'Mudar';
+
+  @override
+  String fantasyFormationChanged(int count) {
+    return 'O formato da escalação mudou para $count atletas. Sua escalação anterior continua valendo; ajuste o time e confirme para usar o novo formato.';
+  }
 }
