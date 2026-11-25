@@ -164,6 +164,7 @@ import {
   matchPageData,
   votePageData,
   nowPageData,
+  fantasyPageData,
 } from './share_page';
 import {
   FANTASY,
@@ -1678,6 +1679,11 @@ export const sharePage = onRequest({ maxInstances: 3 }, async (req, res) => {
       const { db } = await admin();
       const region = (await db.collection('competicao').doc(share.regionId).get()).data();
       data = region ? nowPageData(text(region.nome)) : null;
+    } else if (share.kind === 'fantasy') {
+      // Arena Fantasy do campeonato (sem o doc = 404).
+      const { db } = await admin();
+      const fantasy = (await db.collection('fantasy').doc(share.id).get()).data();
+      data = fantasy ? fantasyPageData(fantasy) : null;
     } else if (share.kind === 'votacao' || share.kind === 'partida') {
       // A partida da temporada do link (coleção conferida pelo padrão da temporada).
       const { db } = await admin();

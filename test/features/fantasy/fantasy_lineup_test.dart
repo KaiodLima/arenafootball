@@ -164,6 +164,9 @@ class _PastRepo extends _Repo {
 class _Session extends Cubit<SessionState> implements SessionCubit {
   _Session() : super(const SessionState(user: UserDTO(id: 'u1', name: 'Ana', email: 'a@x.com', isAdmin: false)));
 
+  /// Convidado (sem conta): ex. quem chegou pelo link `/fantasy/<id>`.
+  _Session.guest() : super(const SessionState());
+
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -365,6 +368,33 @@ void main() {
       cubit.discard();
       expect(cubit.state.draft.formation, f1222, reason: 'descartar volta ao rascunho no formato novo');
     });
+  });
+
+  testWidgets('convidado (link da arte): aviso com "Entrar" que leva ao login', (tester) async {
+    final repo = _Repo();
+    final cubit = _cubit(repo);
+    addTearDown(cubit.close);
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('pt'),
+      routes: {AppRoutes.loginPage: (_) => const Scaffold(body: Text('LOGIN'))},
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider<SessionCubit>.value(value: _Session.guest()),
+          BlocProvider<FantasyLineupCubit>.value(value: cubit),
+        ],
+        child: const FantasyLineupPage(championship: _copa),
+      ),
+    ));
+    repo.config.add(Right(_config));
+    await tester.pump();
+    repo.round.add(Right(_openRound));
+    await tester.pump();
+    expect(find.byKey(const ValueKey('fantasy-guest-login')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('fantasy-guest-login')));
+    await tester.pumpAndSettle();
+    expect(find.text('LOGIN'), findsOneWidget);
   });
 
   testWidgets('tela: campinho, folha da vaga e confirmar', (tester) async {

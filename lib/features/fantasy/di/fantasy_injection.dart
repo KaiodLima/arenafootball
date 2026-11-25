@@ -18,6 +18,7 @@ void registerFantasyDependencies() {
 
   // UseCases
   _sl.registerLazySingleton(() => WatchFantasyConfigUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetFantasyConfigUseCase(_sl()));
   _sl.registerLazySingleton(() => SaveFantasyConfigUseCase(_sl()));
   _sl.registerLazySingleton(() => WatchActiveFantasiesUseCase(_sl()));
   _sl.registerLazySingleton(() => WatchFantasyRoundUseCase(_sl()));

@@ -56,4 +56,12 @@ void main() {
       expect(parse('arenafootball://app/extra'), isNull);
     });
   });
+
+  test('Arena Fantasy: /fantasy/<idDocCampeonato> nos dois esquemas', () {
+    expect(fantasyLink('c1'), 'https://arenasoccerflutter.web.app/fantasy/c1');
+    expect(parseDeepLink(Uri.parse(fantasyLink('c1'))), const FantasyLinkTarget('c1'));
+    expect(parseDeepLink(Uri.parse('arenafootball://fantasy/c1')), const FantasyLinkTarget('c1'));
+    expect(parseDeepLink(Uri.parse('https://arenasoccerflutter.web.app/fantasy')), isNull);
+    expect(parseDeepLink(Uri.parse('https://arenasoccerflutter.web.app/fantasy/c1/x')), isNull);
+  });
 }

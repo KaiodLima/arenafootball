@@ -2819,5 +2819,13 @@
   "albumTradeSizeHint": "Different duplicates a fan gives for 1 pack (each loses 1 copy).",
   "albumTradeOffValue": "Off",
   "albumTradesPerDay": "Trades per day",
-  "albumTradesPerDayHint": "How many trades each fan can make per day."
+  "albumTradesPerDayHint": "How many trades each fan can make per day.",
+  "fantasyCardShare": "Share",
+  "fantasyArtTitle": "Share matchday stars",
+  "fantasyArtTemplateMvp": "Star",
+  "fantasyArtCta": "Build your free team on Arena Fantasy",
+  "fantasyArtPoints": "{points} pts",
+  "fantasyArtShareText": "⚽ Matchday {round} stars on Arena Fantasy · {championship}: {podium}. Build your free team and join the ranking: {link}",
+  "fantasyGuestLogin": "Sign in",
+  "deepLinkFantasyClosed": "This Arena Fantasy is not available right now."
 }

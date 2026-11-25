@@ -85,6 +85,7 @@ class _PlayerArtPageState extends State<PlayerArtPage> {
       ],
     );
   }
+
   bool _imagesReady = false;
   bool _precacheStarted = false;
 

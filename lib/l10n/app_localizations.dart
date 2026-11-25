@@ -15332,6 +15332,55 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Quantas trocas cada pessoa faz por dia.'**
   String get albumTradesPerDayHint;
+
+  /// No description provided for @fantasyCardShare.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compartilhar'**
+  String get fantasyCardShare;
+
+  /// No description provided for @fantasyArtTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Compartilhar craques da rodada'**
+  String get fantasyArtTitle;
+
+  /// No description provided for @fantasyArtTemplateMvp.
+  ///
+  /// In pt, this message translates to:
+  /// **'Craque'**
+  String get fantasyArtTemplateMvp;
+
+  /// No description provided for @fantasyArtCta.
+  ///
+  /// In pt, this message translates to:
+  /// **'Monte seu time grátis no Arena Fantasy'**
+  String get fantasyArtCta;
+
+  /// No description provided for @fantasyArtPoints.
+  ///
+  /// In pt, this message translates to:
+  /// **'{points} pts'**
+  String fantasyArtPoints(String points);
+
+  /// No description provided for @fantasyArtShareText.
+  ///
+  /// In pt, this message translates to:
+  /// **'⚽ Craques da rodada {round} do Arena Fantasy · {championship}: {podium}. Monte seu time grátis e dispute o ranking: {link}'**
+  String fantasyArtShareText(
+      int round, String championship, String podium, String link);
+
+  /// No description provided for @fantasyGuestLogin.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entrar'**
+  String get fantasyGuestLogin;
+
+  /// No description provided for @deepLinkFantasyClosed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Esse Arena Fantasy não está disponível agora.'**
+  String get deepLinkFantasyClosed;
 }
 
 class _AppLocalizationsDelegate

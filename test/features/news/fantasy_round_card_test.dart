@@ -105,6 +105,24 @@ void main() {
     expect(opened, isTrue);
   });
 
+  testWidgets('card: "Compartilhar" chama o onShare (sem ele, o botão não aparece)', (tester) async {
+    tester.view.physicalSize = const Size(420, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    var shared = false;
+    var opened = false;
+    await tester.pumpWidget(_app(FantasyRoundCard(
+      news: _news(),
+      onTap: () => opened = true,
+      onShare: () => shared = true,
+    )));
+    await tester.tap(find.byKey(const ValueKey('fantasy-card-share-fantasy_doc1_r3')));
+    expect(shared, isTrue);
+    expect(opened, isFalse, reason: 'compartilhar não abre a escalação');
+    await tester.pumpWidget(_app(FantasyRoundCard(news: _news(), onTap: () {})));
+    expect(find.text('Compartilhar'), findsNothing);
+  });
+
   testWidgets('prévias do card do Fantasy', (tester) async {
     await tester.runAsync(() async {
       await _font('Anton', ['lib/assets/fonts/anton/Anton-Regular.ttf']);

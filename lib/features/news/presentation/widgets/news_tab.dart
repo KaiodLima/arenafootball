@@ -6,6 +6,7 @@ import 'package:arena_soccer/features/news/presentation/widgets/live_match_card.
 import 'package:arena_soccer/features/event_polls/presentation/widgets/event_poll_feed_card.dart';
 import 'package:arena_soccer/features/partner_requests/presentation/bloc/partner_cubit.dart';
 import 'package:arena_soccer/app_routes.dart';
+import 'package:arena_soccer/features/share_art/domain/fantasy_round_art_data.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/features/news/presentation/bloc/news_feed_cubit.dart';
@@ -412,6 +413,11 @@ class _NewsItem extends StatelessWidget {
         trailing: _adminMenu(context, onImage: true, canEdit: false),
         onTap: news.championshipDocId.isEmpty ? null : () => _openFantasy(context),
         onAthleteTap: (athlete) => _openAthlete(context, athlete.id, athlete.name),
+        // Arte dos craques para as redes, com o link que leva ao Fantasy do campeonato.
+        onShare: news.fantasyAthletes.isEmpty
+            ? null
+            : () => Navigator.pushNamed(context, AppRoutes.fantasyRoundArtPage,
+                arguments: {'data': FantasyRoundArtData.of(news)}),
       );
     }
     if (news.isChampion) {

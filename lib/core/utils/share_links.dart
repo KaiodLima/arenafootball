@@ -28,6 +28,9 @@ class ShareLinks {
 
   /// QR fixo da região: "Acontecendo agora" (`/agora/<idRegiao>`).
   static const String nowPath = 'agora';
+
+  /// Arena Fantasy do campeonato (`/fantasy/<idDocCampeonato>`).
+  static const String fantasyPath = 'fantasy';
 }
 
 final RegExp _idPattern = RegExp(r'^[A-Za-z0-9_-]{1,128}$');
@@ -60,6 +63,9 @@ const String albumLink = '${ShareLinks.baseUrl}/${ShareLinks.albumPath}';
 
 /// QR fixo da região [regionId] (id do doc de `competicao`): "Acontecendo agora".
 String nowLink(String regionId) => '${ShareLinks.baseUrl}/${ShareLinks.nowPath}/$regionId';
+
+/// Arena Fantasy do campeonato [championshipDocId] (abre a escalação).
+String fantasyLink(String championshipDocId) => '${ShareLinks.baseUrl}/${ShareLinks.fantasyPath}/$championshipDocId';
 
 /// Página genérica do app (carteirinha, craque da partida).
 const String appLink = '${ShareLinks.baseUrl}/${ShareLinks.appPath}';
@@ -182,6 +188,19 @@ class NowLinkTarget extends DeepLinkTarget {
   int get hashCode => Object.hash('now', regionId);
 }
 
+/// Arena Fantasy de um campeonato (id do doc do campeonato = do Fantasy).
+class FantasyLinkTarget extends DeepLinkTarget {
+  final String championshipDocId;
+
+  const FantasyLinkTarget(this.championshipDocId);
+
+  @override
+  bool operator ==(Object other) => other is FantasyLinkTarget && other.championshipDocId == championshipDocId;
+
+  @override
+  int get hashCode => Object.hash('fantasy', championshipDocId);
+}
+
 class AppLinkTarget extends DeepLinkTarget {
   const AppLinkTarget();
 
@@ -220,11 +239,9 @@ DeepLinkTarget? parseDeepLink(Uri uri) {
       return HighlightLinkTarget(segments[1]);
     case ShareLinks.invitePath when segments.length == 2 && _invitePattern.hasMatch(segments[1]):
       return InviteLinkTarget(segments[1].toUpperCase());
-    case ShareLinks.votePath
-        when segments.length == 3 && _seasonPattern.hasMatch(segments[1]) && validId(segments[2]):
+    case ShareLinks.votePath when segments.length == 3 && _seasonPattern.hasMatch(segments[1]) && validId(segments[2]):
       return VoteLinkTarget(season: segments[1], matchId: segments[2]);
-    case ShareLinks.matchPath
-        when segments.length == 3 && _seasonPattern.hasMatch(segments[1]) && validId(segments[2]):
+    case ShareLinks.matchPath when segments.length == 3 && _seasonPattern.hasMatch(segments[1]) && validId(segments[2]):
       return MatchLinkTarget(season: segments[1], matchId: segments[2]);
     case ShareLinks.poolPath when segments.length == 1:
       return const PoolLinkTarget();
@@ -232,6 +249,8 @@ DeepLinkTarget? parseDeepLink(Uri uri) {
       return const AlbumLinkTarget();
     case ShareLinks.nowPath when segments.length == 2 && validId(segments[1]):
       return NowLinkTarget(segments[1]);
+    case ShareLinks.fantasyPath when segments.length == 2 && validId(segments[1]):
+      return FantasyLinkTarget(segments[1]);
     case ShareLinks.appPath when segments.length == 1:
       return const AppLinkTarget();
     default:

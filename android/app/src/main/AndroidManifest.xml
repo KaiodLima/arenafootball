@@ -46,6 +46,7 @@
                 <data android:pathPrefix="/bolao"/>
                 <data android:pathPrefix="/album"/>
                 <data android:pathPrefix="/agora"/>
+                <data android:pathPrefix="/fantasy"/>
             </intent-filter>
             <!-- Botão "Abrir no app" da página web (arenafootball://...). -->
             <intent-filter>

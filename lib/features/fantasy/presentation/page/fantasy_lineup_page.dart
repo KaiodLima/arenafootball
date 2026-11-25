@@ -282,7 +282,16 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
           const SizedBox(height: AppSizes.s16),
         ],
         if (state.isGuest)
-          _Notice(icon: Icons.login_rounded, text: l10n.fantasyGuest)
+          // Convidado (ex.: chegou pelo link da arte): o "Entrar" leva ao login.
+          _Notice(
+            icon: Icons.login_rounded,
+            text: l10n.fantasyGuest,
+            action: TextButton(
+              key: const ValueKey('fantasy-guest-login'),
+              onPressed: () => Navigator.pushNamedAndRemoveUntil(context, AppRoutes.loginPage, (_) => false),
+              child: Text(l10n.fantasyGuestLogin),
+            ),
+          )
         else if (!state.joined)
           _JoinCard(
               busy: state.busy, formation: state.formation, onJoin: _cubit.join, onRules: () => _openRules(config))
@@ -618,8 +627,9 @@ class _RoundScoreCard extends StatelessWidget {
 class _Notice extends StatelessWidget {
   final IconData icon;
   final String text;
+  final Widget? action;
 
-  const _Notice({required this.icon, required this.text});
+  const _Notice({required this.icon, required this.text, this.action});
 
   @override
   Widget build(BuildContext context) {
@@ -634,6 +644,7 @@ class _Notice extends StatelessWidget {
             child:
                 Text(text, style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s14)),
           ),
+          if (action != null) action!,
         ],
       ),
     );

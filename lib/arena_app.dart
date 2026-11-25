@@ -153,6 +153,9 @@ import 'package:arena_soccer/features/event_polls/presentation/page/event_poll_p
 import 'package:arena_soccer/features/share_art/domain/event_result_art_data.dart';
 import 'package:arena_soccer/features/share_art/presentation/bloc/event_result_art_cubit.dart';
 import 'package:arena_soccer/features/share_art/presentation/page/event_result_art_page.dart';
+import 'package:arena_soccer/features/share_art/domain/fantasy_round_art_data.dart';
+import 'package:arena_soccer/features/share_art/presentation/bloc/fantasy_round_art_cubit.dart';
+import 'package:arena_soccer/features/share_art/presentation/page/fantasy_round_art_page.dart';
 import 'package:arena_soccer/features/qr_codes/presentation/bloc/qr_codes_cubit.dart';
 import 'package:arena_soccer/features/qr_codes/presentation/page/qr_codes_page.dart';
 import 'package:arena_soccer/features/qr_codes/presentation/bloc/now_cubit.dart';
@@ -233,6 +236,13 @@ class ArenaApp extends StatelessWidget {
           return BlocProvider<EventResultArtCubit>(
             create: (_) => EventResultArtCubit(args['data'] as EventResultArtData),
             child: const EventResultArtPage(),
+          );
+        },
+        AppRoutes.fantasyRoundArtPage: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+          return BlocProvider<FantasyRoundArtCubit>(
+            create: (_) => FantasyRoundArtCubit(args['data'] as FantasyRoundArtData),
+            child: const FantasyRoundArtPage(),
           );
         },
         AppRoutes.eventPollFormPage: (context) {

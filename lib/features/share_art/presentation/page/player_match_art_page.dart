@@ -86,6 +86,7 @@ class _PlayerMatchArtPageState extends State<PlayerMatchArtPage> {
       ],
     );
   }
+
   bool _imagesReady = false;
   bool _precacheStarted = false;
 

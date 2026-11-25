@@ -22,6 +22,10 @@ class FantasyRepositoryImpl implements IFantasyRepository {
       _dataSource.watchConfig(championship);
 
   @override
+  Future<Either<Failure, FantasyConfigDTO?>> getConfig(String championshipDocId) =>
+      _dataSource.getConfig(championshipDocId);
+
+  @override
   Future<Either<Failure, void>> saveConfig(FantasyConfigDTO config) => _dataSource.saveConfig(config);
 
   @override

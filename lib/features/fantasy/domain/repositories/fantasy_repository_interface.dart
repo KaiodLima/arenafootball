@@ -11,6 +11,9 @@ import 'package:arena_soccer/features/fantasy/data/dtos/fantasy_score_dto.dart';
 abstract class IFantasyRepository {
   Stream<Either<Failure, FantasyConfigDTO>> watchConfig(ChampionshipDTO championship);
 
+  /// Configuração pelo id do doc (nula = sem o doc).
+  Future<Either<Failure, FantasyConfigDTO?>> getConfig(String championshipDocId);
+
   Future<Either<Failure, void>> saveConfig(FantasyConfigDTO config);
 
   Stream<Either<Failure, List<FantasyConfigDTO>>> watchActive(String season);

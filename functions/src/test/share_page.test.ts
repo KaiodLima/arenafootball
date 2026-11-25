@@ -11,6 +11,7 @@ import {
   matchPageData,
   appPath,
   nowPageData,
+  fantasyPageData,
 } from '../share_page';
 
 test('caminhos válidos e inválidos', () => {
@@ -89,4 +90,15 @@ test('QR fixo da região: /agora/<idRegiao>', () => {
   assert.equal(appPath({ kind: 'agora', regionId: 'fl' }), 'agora/fl');
   assert.equal(nowPageData('Floresta').title, 'Acontecendo agora em Floresta');
   assert.equal(nowPageData('').title, 'Acontecendo agora');
+});
+
+test('Arena Fantasy do campeonato: /fantasy/<idDocCampeonato>', () => {
+  assert.deepEqual(parseSharePath('/fantasy/c1'), { kind: 'fantasy', id: 'c1' });
+  assert.equal(parseSharePath('/fantasy'), null);
+  assert.equal(parseSharePath('/fantasy/c1/x'), null);
+  assert.equal(appPath({ kind: 'fantasy', id: 'c1' }), 'fantasy/c1');
+  const page = fantasyPageData({ titulo: 'Copa Verde', urlImagem: 'https://x/logo.png' });
+  assert.equal(page.title, 'Arena Fantasy · Copa Verde');
+  assert.equal(page.image, 'https://x/logo.png');
+  assert.equal(fantasyPageData({}).title, 'Arena Fantasy');
 });

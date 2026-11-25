@@ -14,6 +14,15 @@ class WatchFantasyConfigUseCase {
   Stream<Either<Failure, FantasyConfigDTO>> call(ChampionshipDTO championship) => _repository.watchConfig(championship);
 }
 
+/// Configuração pelo id do doc do campeonato (link `/fantasy/<id>`; uma leitura).
+class GetFantasyConfigUseCase {
+  final IFantasyRepository _repository;
+
+  GetFantasyConfigUseCase(this._repository);
+
+  Future<Either<Failure, FantasyConfigDTO?>> call(String championshipDocId) => _repository.getConfig(championshipDocId);
+}
+
 /// Admin salva a configuração; parâmetros inválidos não vão ao servidor.
 class SaveFantasyConfigUseCase {
   final IFantasyRepository _repository;

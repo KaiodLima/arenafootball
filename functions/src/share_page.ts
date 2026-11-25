@@ -24,6 +24,7 @@ export type SharePath =
   | { kind: 'bolao' }
   | { kind: 'album' }
   | { kind: 'agora'; regionId: string }
+  | { kind: 'fantasy'; id: string }
   | { kind: 'app' };
 
 const SAFE_ID = /^[A-Za-z0-9_-]{1,128}$/;
@@ -36,6 +37,7 @@ export function parseSharePath(path: string): SharePath | null {
   if (kind === 'bolao' && parts.length === 1) return { kind: 'bolao' };
   if (kind === 'album' && parts.length === 1) return { kind: 'album' };
   if (kind === 'agora' && parts.length === 2 && SAFE_ID.test(a)) return { kind: 'agora', regionId: a };
+  if (kind === 'fantasy' && parts.length === 2 && SAFE_ID.test(a)) return { kind: 'fantasy', id: a };
   if ((kind === 'votacao' || kind === 'partida') && parts.length === 3 && /^\d{4}$/.test(a) && SAFE_ID.test(b)) {
     return { kind, season: a, id: b };
   }
@@ -71,6 +73,8 @@ export function appPath(share: SharePath): string {
       return 'album';
     case 'agora':
       return `agora/${share.regionId}`;
+    case 'fantasy':
+      return `fantasy/${share.id}`;
     case 'app':
       return 'app';
   }
@@ -212,6 +216,17 @@ export function nowPageData(regionName: string): PageData {
     description: 'Vote no craque, dê o seu palpite e participe dos eventos da sua região no app Arena Football.',
     image: '',
     kicker: ['Ao vivo', region].filter(Boolean).join(' · '),
+  };
+}
+
+/** Arena Fantasy do campeonato ([doc] = `fantasy/{id}`, com as cópias do campeonato). */
+export function fantasyPageData(doc: Record<string, unknown>): PageData {
+  const title = text(doc.titulo);
+  return {
+    title: title ? `Arena Fantasy · ${title}` : 'Arena Fantasy',
+    description: 'Monte seu time com os atletas do campeonato, escolha o capitão e dispute o ranking. É grátis!',
+    image: text(doc.urlImagem),
+    kicker: 'Arena Fantasy',
   };
 }
 

@@ -34,7 +34,17 @@ class FantasyRoundCard extends StatelessWidget {
   final VoidCallback? onTap;
   final ValueChanged<FantasyNewsAthlete>? onAthleteTap;
 
-  const FantasyRoundCard({super.key, required this.news, this.trailing, this.onTap, this.onAthleteTap});
+  /// "Compartilhar": a arte dos craques com o link do Fantasy (nulo = sem o botão).
+  final VoidCallback? onShare;
+
+  const FantasyRoundCard({
+    super.key,
+    required this.news,
+    this.trailing,
+    this.onTap,
+    this.onAthleteTap,
+    this.onShare,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -152,9 +162,22 @@ class FantasyRoundCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                      if (onTap != null) ...[
+                      if (onTap != null || onShare != null) ...[
                         const SizedBox(height: AppSizes.s14),
-                        FeedActionPill(label: l10n.fantasyCardAction, icon: Icons.sports_soccer_rounded),
+                        Wrap(
+                          spacing: AppSizes.s8,
+                          runSpacing: AppSizes.s8,
+                          children: [
+                            if (onTap != null)
+                              FeedActionPill(label: l10n.fantasyCardAction, icon: Icons.sports_soccer_rounded),
+                            if (onShare != null)
+                              GestureDetector(
+                                key: ValueKey('fantasy-card-share-${news.id}'),
+                                onTap: onShare,
+                                child: FeedActionPill(label: l10n.fantasyCardShare, icon: Icons.ios_share_rounded),
+                              ),
+                          ],
+                        ),
                       ],
                     ],
                   ),

@@ -39,6 +39,7 @@ import 'package:arena_soccer/features/regions/presentation/bloc/region_state.dar
 import 'package:arena_soccer/features/team_requests/presentation/bloc/owned_team_cubit.dart';
 import 'package:arena_soccer/features/teams/presentation/widgets/teams_tab.dart';
 import 'package:arena_soccer/injection_container.dart';
+import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_config_usecases.dart';
 import 'package:arena_soccer/core/services/tour_service.dart';
 import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 import 'package:arena_soccer/utils/components/tour/welcome_sheet.dart';
@@ -386,10 +387,26 @@ class _HomePageState extends State<HomePage> {
           } else {
             showSnackBar(context: context, message: AppLocalizations.of(context).deepLinkAlbumClosed, isSuccess: false);
           }
+        case FantasyLinkTarget(:final championshipDocId):
+          _openFantasyLink(championshipDocId);
         case AppLinkTarget():
           break;
       }
     });
+  }
+
+  /// Link `/fantasy/<id>` (arte dos "Craques da rodada"): uma leitura do
+  /// Fantasy e a escalação dele (convidado também abre: lá tem o "Entrar");
+  /// desligado ou apagado = o aviso.
+  Future<void> _openFantasyLink(String championshipDocId) async {
+    final response = await sl<GetFantasyConfigUseCase>()(championshipDocId);
+    if (!mounted) return;
+    final config = response.fold((_) => null, (value) => value);
+    if (config == null || !config.active) {
+      showSnackBar(context: context, message: AppLocalizations.of(context).deepLinkFantasyClosed, isSuccess: false);
+      return;
+    }
+    Navigator.pushNamed(context, AppRoutes.fantasyLineupPage, arguments: config.toChampionship());
   }
 
   /// QR/link da votação ou da partida: votar no craque (aberta) ou o eleito

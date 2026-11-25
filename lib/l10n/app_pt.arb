@@ -4792,5 +4792,36 @@
   "albumTradeSizeHint": "Repetidas diferentes que a pessoa entrega por 1 pacotinho (cada uma perde 1 cópia).",
   "albumTradeOffValue": "Desligada",
   "albumTradesPerDay": "Trocas por dia",
-  "albumTradesPerDayHint": "Quantas trocas cada pessoa faz por dia."
+  "albumTradesPerDayHint": "Quantas trocas cada pessoa faz por dia.",
+  "fantasyCardShare": "Compartilhar",
+  "fantasyArtTitle": "Compartilhar craques da rodada",
+  "fantasyArtTemplateMvp": "Craque",
+  "fantasyArtCta": "Monte seu time grátis no Arena Fantasy",
+  "fantasyArtPoints": "{points} pts",
+  "@fantasyArtPoints": {
+    "placeholders": {
+      "points": {
+        "type": "String"
+      }
+    }
+  },
+  "fantasyArtShareText": "⚽ Craques da rodada {round} do Arena Fantasy · {championship}: {podium}. Monte seu time grátis e dispute o ranking: {link}",
+  "@fantasyArtShareText": {
+    "placeholders": {
+      "round": {
+        "type": "int"
+      },
+      "championship": {
+        "type": "String"
+      },
+      "podium": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      }
+    }
+  },
+  "fantasyGuestLogin": "Entrar",
+  "deepLinkFantasyClosed": "Esse Arena Fantasy não está disponível agora."
 }

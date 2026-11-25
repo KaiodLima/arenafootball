@@ -9264,4 +9264,34 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get albumTradesPerDayHint =>
       'How many trades each fan can make per day.';
+
+  @override
+  String get fantasyCardShare => 'Share';
+
+  @override
+  String get fantasyArtTitle => 'Share matchday stars';
+
+  @override
+  String get fantasyArtTemplateMvp => 'Star';
+
+  @override
+  String get fantasyArtCta => 'Build your free team on Arena Fantasy';
+
+  @override
+  String fantasyArtPoints(String points) {
+    return '$points pts';
+  }
+
+  @override
+  String fantasyArtShareText(
+      int round, String championship, String podium, String link) {
+    return '⚽ Matchday $round stars on Arena Fantasy · $championship: $podium. Build your free team and join the ranking: $link';
+  }
+
+  @override
+  String get fantasyGuestLogin => 'Sign in';
+
+  @override
+  String get deepLinkFantasyClosed =>
+      'This Arena Fantasy is not available right now.';
 }

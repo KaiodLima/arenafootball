@@ -10,6 +10,7 @@ class AppRoutes {
   static const String eventPollPage = '/event_poll_page';
   static const String eventPollFormPage = '/event_poll_form_page';
   static const String eventResultArtPage = '/event_result_art_page';
+  static const String fantasyRoundArtPage = '/fantasy_round_art_page';
   static const String qrCodesPage = '/qr_codes_page';
   static const String nowPage = '/now_page';
   static const String home = '/home';

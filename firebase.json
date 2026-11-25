@@ -78,6 +78,13 @@
         }
       },
       {
+        "source": "/fantasy/**",
+        "function": {
+          "functionId": "sharePage",
+          "region": "us-central1"
+        }
+      },
+      {
         "source": "/app",
         "function": {
           "functionId": "sharePage",

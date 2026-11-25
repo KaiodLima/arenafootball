@@ -39,6 +39,18 @@ class FantasyDataSource {
         );
   }
 
+  /// Configuração pelo id do doc (link `/fantasy/<id>`), com as cópias do
+  /// campeonato gravadas nela; nula = sem o doc.
+  Future<Either<Failure, FantasyConfigDTO?>> getConfig(String championshipDocId) async {
+    try {
+      final doc = await _doc(championshipDocId).get();
+      return Right(doc.exists ? FantasyConfigDTO.fromMap(doc.id, doc.data()) : null);
+    } catch (e) {
+      AppLogger.e('getConfig $championshipDocId', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível carregar o Arena Fantasy.'));
+    }
+  }
+
   /// Fantasy ativos da temporada [season] (selo da home; poucos docs).
   Stream<Either<Failure, List<FantasyConfigDTO>>> watchActive(String season) {
     return _firestore
