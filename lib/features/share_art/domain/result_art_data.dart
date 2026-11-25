@@ -79,7 +79,10 @@ class ResultArtData extends Equatable {
   final String championship;
 
   /// Logo do campeonato (`campeonatos.urlImagem`); vazio = sem logo/amistoso.
-  final String championshipLogoUrl;
+  final List<String> championshipLogos;
+
+  /// A 1ª logo (marca d'água, selo único); vazio = sem logo.
+  String get championshipLogoUrl => championshipLogos.isEmpty ? '' : championshipLogos.first;
   final String date;
   final String time;
 
@@ -102,7 +105,7 @@ class ResultArtData extends Equatable {
     required this.homeGoals,
     required this.awayGoals,
     this.championship = '',
-    this.championshipLogoUrl = '',
+    this.championshipLogos = const [],
     this.date = '',
     this.time = '',
     this.matchDay,
@@ -150,7 +153,7 @@ class ResultArtData extends Equatable {
     TeamDTO? homeTeam,
     TeamDTO? awayTeam,
     String championship = '',
-    String championshipLogoUrl = '',
+    List<String> championshipLogos = const [],
     String link = '',
     DateTime? now,
   }) {
@@ -179,7 +182,12 @@ class ResultArtData extends Equatable {
       homeGoals: hasList ? goals.where((g) => g.side == ArtSide.home).length : match.homeGoals,
       awayGoals: hasList ? goals.where((g) => g.side == ArtSide.away).length : match.awayGoals,
       championship: match.championshipId > 0 ? championship : '',
-      championshipLogoUrl: match.championshipId > 0 ? championshipLogoUrl.trim() : '',
+      championshipLogos: match.championshipId > 0
+          ? [
+              for (final url in championshipLogos)
+                if (url.trim().isNotEmpty) url.trim(),
+            ]
+          : const [],
       date: match.date.trim(),
       time: match.time.trim(),
       matchDay: dayOf(match.date, now ?? DateTime.now()),
@@ -212,7 +220,7 @@ class ResultArtData extends Equatable {
         homeGoals,
         awayGoals,
         championship,
-        championshipLogoUrl,
+        championshipLogos,
         date,
         time,
         matchDay,

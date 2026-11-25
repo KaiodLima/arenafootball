@@ -15381,6 +15381,24 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Esse Arena Fantasy não está disponível agora.'**
   String get deepLinkFantasyClosed;
+
+  /// No description provided for @championshipArtLogos.
+  ///
+  /// In pt, this message translates to:
+  /// **'Logos das artes'**
+  String get championshipArtLogos;
+
+  /// No description provided for @championshipArtLogosHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Até 2 logos do campeonato, em destaque nas artes dos jogos. Use PNG com fundo transparente. Sem logo, as artes usam a imagem do campeonato.'**
+  String get championshipArtLogosHint;
+
+  /// No description provided for @championshipArtLogoAdd.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar logo'**
+  String get championshipArtLogoAdd;
 }
 
 class _AppLocalizationsDelegate

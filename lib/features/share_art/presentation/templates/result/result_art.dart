@@ -70,6 +70,9 @@ class ResultArtArgs {
   bool get square => format == ArtFormat.square;
   bool get wide => format == ArtFormat.landscape;
   String get logoUrl => data.championshipLogoUrl;
+
+  /// Logos do campeonato em destaque (1 ou 2).
+  List<String> get logos => data.championshipLogos;
 }
 
 /// Textos prontos da arte (idioma do app).

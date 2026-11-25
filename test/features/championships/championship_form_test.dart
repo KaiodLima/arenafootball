@@ -5,6 +5,7 @@ import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/championships/domain/championship_art_logo.dart';
 import 'package:arena_soccer/features/championships/domain/championship_rules_file.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/save_championship_usecase.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/championship_form_cubit.dart';
@@ -40,15 +41,18 @@ class _FakeTeams implements GetTeamsCacheFirstUseCase {
 class _FakeSave implements SaveChampionshipUseCase {
   ChampionshipDTO? saved;
   ChampionshipRulesFile? rules;
+  List<ChampionshipArtLogo>? artLogos;
 
   @override
   Future<Either<Failure, ChampionshipDTO>> call(
     ChampionshipDTO championship, {
     File? banner,
     ChampionshipRulesFile? rules,
+    List<ChampionshipArtLogo>? artLogos,
   }) async {
     saved = championship;
     this.rules = rules;
+    this.artLogos = artLogos;
     return Right(championship.copyWith(id: championship.id.isEmpty ? 'novo' : championship.id));
   }
 }
@@ -89,6 +93,34 @@ void main() {
     await cubit.selectRegion('Santo inacio');
     expect(cubit.state.form.selectedTeams, isEmpty);
     expect(cubit.state.form.visibleTeams.single.name, 'Parceiros');
+  });
+
+  test('logos das artes: até 2, troca, tira e vão para o salvar', () async {
+    expect(cubit.state.form.artLogos, isEmpty);
+    cubit
+      ..changeTitle('Copa Floresta')
+      ..toggleTeam('Volta')
+      ..setArtLogo(0, File('a.png'))
+      ..setArtLogo(1, File('b.png'))
+      ..setArtLogo(2, File('c.png'));
+    expect(cubit.state.form.artLogos.map((l) => l.file!.path), ['a.png', 'b.png'], reason: 'no máximo 2');
+    cubit.setArtLogo(0, File('a2.png'));
+    cubit.removeArtLogo(1);
+    expect(cubit.state.form.artLogos.map((l) => l.file!.path), ['a2.png']);
+    await cubit.submit();
+    expect(save.artLogos!.single.file!.path, 'a2.png');
+  });
+
+  test('DTO: logos das artes (até 2), cache e a imagem do campeonato como reserva', () {
+    const old = ChampionshipDTO(id: 'c', imageUrl: 'https://x/banner.jpg');
+    expect(old.artLogoUrls, ['https://x/banner.jpg']);
+    const own =
+        ChampionshipDTO(id: 'c', imageUrl: 'https://x/banner.jpg', artLogos: ['https://x/1.png', 'https://x/2.png']);
+    expect(own.artLogoUrls, ['https://x/1.png', 'https://x/2.png']);
+    expect(own.toMap()['logosArte'], ['https://x/1.png', 'https://x/2.png']);
+    expect(ChampionshipDTO.fromCache(own.toCache()).artLogos, own.artLogos);
+    expect(const ChampionshipDTO(id: 'c').artLogoUrls, isEmpty);
+    expect(const ChampionshipArtLogo(url: 'u').isNew, isFalse);
   });
 
   test('salvar envia os times marcados e o PDF escolhido', () async {

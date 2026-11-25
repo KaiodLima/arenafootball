@@ -107,7 +107,9 @@ void main() {
             colors: ArtPalette.arena.resolve(_theme),
           )));
           final error = tester.takeException();
-          if (error != null) failures.add('${template.name} ${format.name} ${data.entries.length}${data.tie ? ' empate' : ''}: $error');
+          if (error != null) {
+            failures.add('${template.name} ${format.name} ${data.entries.length}${data.tie ? ' empate' : ''}: $error');
+          }
         }
       }
     }

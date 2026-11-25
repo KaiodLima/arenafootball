@@ -4823,5 +4823,8 @@
     }
   },
   "fantasyGuestLogin": "Entrar",
-  "deepLinkFantasyClosed": "Esse Arena Fantasy não está disponível agora."
+  "deepLinkFantasyClosed": "Esse Arena Fantasy não está disponível agora.",
+  "championshipArtLogos": "Logos das artes",
+  "championshipArtLogosHint": "Até 2 logos do campeonato, em destaque nas artes dos jogos. Use PNG com fundo transparente. Sem logo, as artes usam a imagem do campeonato.",
+  "championshipArtLogoAdd": "Adicionar logo"
 }

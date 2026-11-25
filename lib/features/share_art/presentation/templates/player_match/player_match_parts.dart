@@ -58,11 +58,12 @@ class PlayerMatchCompetition extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final logo = args.data.match.championshipLogoUrl;
+    final logos = args.data.match.championshipLogos;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         if (logo.isNotEmpty) ...[
-          ArtChampionshipLogo(url: logo, height: 20 * scale),
+          ArtChampionshipLogos(urls: logos, height: 32 * scale),
           SizedBox(width: 7 * scale),
         ],
         Flexible(
@@ -118,23 +119,29 @@ class PlayerMatchSeal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final logo = args.data.match.championshipLogoUrl;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 40 * scale,
-          height: 40 * scale,
-          padding: EdgeInsets.all(5 * scale),
+    final logos = args.data.match.championshipLogos;
+    // Um círculo por logo do campeonato (até 2, mesmo peso); sem logo, o escudo do time.
+    Widget circle(Widget child) => Container(
+          width: 48 * scale,
+          height: 48 * scale,
+          padding: EdgeInsets.all(6 * scale),
           decoration: BoxDecoration(
             color: AppColors.white,
             shape: BoxShape.circle,
             boxShadow: [BoxShadow(color: AppColors.black.withValues(alpha: 0.35), blurRadius: 8 * scale)],
           ),
-          child: logo.isNotEmpty
-              ? ArtChampionshipLogo(url: logo, height: 30 * scale)
-              : ArtTeamCrest(team: args.data.team, size: 30 * scale, color: args.teamColor, plain: true),
-        ),
+          child: child,
+        );
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (logos.isEmpty)
+          circle(ArtTeamCrest(team: args.data.team, size: 36 * scale, color: args.teamColor, plain: true))
+        else
+          for (var i = 0; i < logos.length && i < 2; i++) ...[
+            if (i > 0) SizedBox(width: 6 * scale),
+            circle(ArtChampionshipLogo(url: logos[i], height: 36 * scale, plain: true)),
+          ],
         SizedBox(width: 8 * scale),
         Flexible(
           child: Column(

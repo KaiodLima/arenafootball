@@ -49,7 +49,7 @@ class _Headline extends StatelessWidget {
         Row(
           children: [
             if (args.logoUrl.isNotEmpty) ...[
-              ArtChampionshipLogo(url: args.logoUrl, height: 24 * scale),
+              ArtChampionshipLogos(urls: args.logos, height: 38 * scale),
               SizedBox(width: 8 * scale),
             ],
             Flexible(

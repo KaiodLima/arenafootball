@@ -35,7 +35,7 @@ ResultArtData _data({MatchDTO match = _match}) => ResultArtData.of(
       homeTeam: const TeamDTO(id: 't1', name: 'Leões', primaryColor: '#D32F2F'),
       awayTeam: const TeamDTO(id: 't2', name: 'Tigres', primaryColor: '#FFFFFF'),
       championship: 'Copa Sol',
-      championshipLogoUrl: 'https://x/logo.png',
+      championshipLogos: const ['https://x/logo.png', 'https://x/logo2.png'],
       link: 'https://arenasoccerflutter.web.app/noticia/resultado_m1',
       now: DateTime(2026, 12, 11),
     );
@@ -67,6 +67,7 @@ void main() {
     expect(data.status, ArtMatchStatus.finished);
     expect(data.championship, 'Copa Sol');
     expect(data.championshipLogoUrl, 'https://x/logo.png');
+    expect(data.championshipLogos, ['https://x/logo.png', 'https://x/logo2.png']);
     // Sem escudos cadastrados: o aviso da prévia.
     expect(data.missing, [ArtMissing.homeCrest, ArtMissing.awayCrest]);
   });
@@ -83,7 +84,7 @@ void main() {
 
     final friendly = _data(match: _match.copyWith(championshipId: 0));
     expect(friendly.championship, '');
-    expect(friendly.championshipLogoUrl, '', reason: 'amistoso não tem logo de campeonato');
+    expect(friendly.championshipLogos, isEmpty, reason: 'amistoso não tem logo de campeonato');
 
     final future = ResultArtData.of(
       const MatchDTO(homeTeam: 'A', awayTeam: 'B', date: '20/12/2026', time: '16:00'),

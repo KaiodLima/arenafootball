@@ -275,7 +275,7 @@ class _Competition extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (d.championshipLogoUrl.isNotEmpty) ...[
-          ArtChampionshipLogo(url: d.championshipLogoUrl, height: 22 * scale),
+          ArtChampionshipLogos(urls: d.championshipLogos, height: 35 * scale),
           SizedBox(width: 8 * scale),
         ],
         Flexible(

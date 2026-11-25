@@ -118,7 +118,7 @@ class _Header extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (args.logoUrl.isNotEmpty) ...[
-              ArtChampionshipLogo(url: args.logoUrl, height: 38 * scale),
+              ArtChampionshipLogos(urls: args.logos, height: 48 * scale),
               SizedBox(width: 10 * scale),
             ],
             Flexible(

@@ -237,7 +237,7 @@ class _PosterTall extends StatelessWidget {
           Row(
             children: [
               if (args.logoUrl.isNotEmpty) ...[
-                ArtChampionshipLogo(url: args.logoUrl, height: 26 * s),
+                ArtChampionshipLogos(urls: args.logos, height: 42 * s),
                 SizedBox(width: 8 * s),
               ],
               Expanded(
@@ -338,7 +338,7 @@ class _PosterWide extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (args.logoUrl.isNotEmpty) ...[
-                  ArtChampionshipLogo(url: args.logoUrl, height: 24),
+                  ArtChampionshipLogos(urls: args.logos, height: 34),
                   const SizedBox(height: 5),
                 ],
                 Text(

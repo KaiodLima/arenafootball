@@ -166,6 +166,7 @@ class _Header extends StatelessWidget {
     final accent = args.colors.accent;
     final m = args.texts.match;
     final logo = args.data.match.championshipLogoUrl;
+    final logos = args.data.match.championshipLogos;
     final when = [m.headline, m.time].where((p) => p.isNotEmpty).join('  ·  ');
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -181,7 +182,7 @@ class _Header extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (logo.isNotEmpty) ...[
-                ArtChampionshipLogo(url: logo, height: 32 * scale),
+                ArtChampionshipLogos(urls: logos, height: 40 * scale),
                 SizedBox(width: 10 * scale),
               ],
               Flexible(

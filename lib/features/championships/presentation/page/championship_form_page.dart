@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:arena_soccer/features/championships/presentation/widgets/championship_art_logos_field.dart';
 import 'package:flutter/material.dart';
 import 'package:arena_soccer/features/regions/presentation/widgets/region_select_tile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -201,6 +205,13 @@ class _ChampionshipFormPageState extends State<ChampionshipFormPage> {
     );
   }
 
+  /// Logo das artes da galeria, sem recompressão aqui (PNG mantém a
+  /// transparência; o envio redimensiona para 1024 px).
+  Future<void> _pickArtLogo(int index) async {
+    final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (picked != null && mounted) _cubit.setArtLogo(index, File(picked.path));
+  }
+
   Widget _buildForm(ChampionshipFormData form, AppLocalizations l10n) {
     final error = _showErrors ? form.error : null;
     final base = form.base;
@@ -211,6 +222,17 @@ class _ChampionshipFormPageState extends State<ChampionshipFormPage> {
       children: [
         // Banner
         PickedImageField(file: form.banner, currentUrl: base.imageUrl, onPicked: _cubit.setBanner),
+        const SizedBox(height: AppSizes.s16),
+
+        // Logos das artes dos jogos (até 2, em destaque nas artes do campeonato).
+        FormSection(
+          title: l10n.championshipArtLogos,
+          child: ChampionshipArtLogosField(
+            logos: form.artLogos,
+            onPick: _pickArtLogo,
+            onRemove: _cubit.removeArtLogo,
+          ),
+        ),
         const SizedBox(height: AppSizes.s16),
 
         // Dados

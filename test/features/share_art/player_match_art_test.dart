@@ -120,7 +120,8 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     final cases = [
-      PlayerMatchArtData.of(player: _enrolled, match: _prepared(), side: MatchSide.away, championshipId: 11, season: '2026'),
+      PlayerMatchArtData.of(
+          player: _enrolled, match: _prepared(), side: MatchSide.away, championshipId: 11, season: '2026'),
       PlayerMatchArtData.of(
         player: const PlayerDTO(name: 'Maximiliano Bartolomeu Constantino Fernandes de Albuquerque', team: ''),
         match: ResultArtData.of(

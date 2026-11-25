@@ -52,7 +52,7 @@ class _Masthead extends StatelessWidget {
             Text('ARENA', style: ArtFonts.displayStyle(16 * scale, _ink, spacing: 1)),
             SizedBox(width: 6 * scale),
             if (args.logoUrl.isNotEmpty) ...[
-              ArtChampionshipLogo(url: args.logoUrl, height: 20 * scale),
+              ArtChampionshipLogos(urls: args.logos, height: 32 * scale),
               SizedBox(width: 6 * scale),
             ],
             Expanded(

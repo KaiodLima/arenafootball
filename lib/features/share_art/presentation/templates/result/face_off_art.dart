@@ -298,7 +298,7 @@ class _FaceOffTall extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (args.logoUrl.isNotEmpty) ...[
-                      ArtChampionshipLogo(url: args.logoUrl, height: 20 * s),
+                      ArtChampionshipLogos(urls: args.logos, height: 32 * s),
                       SizedBox(width: 8 * s),
                     ],
                     Flexible(
@@ -364,7 +364,7 @@ class _FaceOffWide extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (args.logoUrl.isNotEmpty) ...[
-                    ArtChampionshipLogo(url: args.logoUrl, height: 18),
+                    ArtChampionshipLogos(urls: args.logos, height: 29),
                     const SizedBox(width: 6),
                   ],
                   Flexible(

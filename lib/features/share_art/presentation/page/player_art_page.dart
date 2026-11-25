@@ -94,7 +94,7 @@ class _PlayerArtPageState extends State<PlayerArtPage> {
   Future<void> _precache(PlayerArtData data) async {
     if (_precacheStarted) return;
     _precacheStarted = true;
-    final urls = [data.photoUrl, data.team.crestUrl, data.championshipLogoUrl].where((u) => u.isNotEmpty);
+    final urls = [data.photoUrl, data.team.crestUrl, ...data.championshipLogos].where((u) => u.isNotEmpty);
     await Future.wait([
       for (final url in urls)
         precacheImage(CachedNetworkImageProvider(url), context, onError: (_, __) {})

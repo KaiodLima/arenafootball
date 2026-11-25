@@ -146,7 +146,7 @@ class _Details extends StatelessWidget {
           Row(
             children: [
               if (d.championshipLogoUrl.isNotEmpty) ...[
-                ArtChampionshipLogo(url: d.championshipLogoUrl, height: 20 * scale),
+                ArtChampionshipLogos(urls: d.championshipLogos, height: 32 * scale),
                 SizedBox(width: 6 * scale),
               ],
               Expanded(

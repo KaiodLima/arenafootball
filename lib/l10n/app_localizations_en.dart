@@ -9294,4 +9294,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get deepLinkFantasyClosed =>
       'This Arena Fantasy is not available right now.';
+
+  @override
+  String get championshipArtLogos => 'Art logos';
+
+  @override
+  String get championshipArtLogosHint =>
+      'Up to 2 championship logos, featured in the match arts. Use PNG with a transparent background. Without a logo, the arts use the championship image.';
+
+  @override
+  String get championshipArtLogoAdd => 'Add logo';
 }

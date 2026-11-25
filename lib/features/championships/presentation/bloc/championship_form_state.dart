@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:equatable/equatable.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/championships/domain/championship_art_logo.dart';
 import 'package:arena_soccer/features/championships/domain/championship_rules_file.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 
@@ -27,6 +28,9 @@ class ChampionshipFormData extends Equatable {
   final File? banner;
   final ChampionshipRulesFile? rulesFile;
 
+  /// Logos das artes editadas (nulo = as gravadas no campeonato, sem mexer).
+  final List<ChampionshipArtLogo>? artLogoEdits;
+
   /// Algo mudou desde que abriu (sair pede confirmação).
   final bool dirty;
 
@@ -39,8 +43,13 @@ class ChampionshipFormData extends Equatable {
     this.selectedTeams = const [],
     this.banner,
     this.rulesFile,
+    this.artLogoEdits,
     this.dirty = false,
   });
+
+  /// As logos das artes na tela (até [ChampionshipDTO.maxArtLogos]).
+  List<ChampionshipArtLogo> get artLogos =>
+      artLogoEdits ?? [for (final url in base.artLogos) ChampionshipArtLogo(url: url)];
 
   bool get isEditing => base.id.isNotEmpty;
 
@@ -105,6 +114,7 @@ class ChampionshipFormData extends Equatable {
     List<String>? selectedTeams,
     File? Function()? banner,
     ChampionshipRulesFile? Function()? rulesFile,
+    List<ChampionshipArtLogo>? artLogoEdits,
     bool? dirty,
   }) {
     return ChampionshipFormData(
@@ -116,12 +126,14 @@ class ChampionshipFormData extends Equatable {
       selectedTeams: selectedTeams ?? this.selectedTeams,
       banner: banner != null ? banner() : this.banner,
       rulesFile: rulesFile != null ? rulesFile() : this.rulesFile,
+      artLogoEdits: artLogoEdits ?? this.artLogoEdits,
       dirty: dirty ?? this.dirty,
     );
   }
 
   @override
-  List<Object?> get props => [base, regions, seasons, teams, loadingTeams, selectedTeams, banner, rulesFile, dirty];
+  List<Object?> get props =>
+      [base, regions, seasons, teams, loadingTeams, selectedTeams, banner, rulesFile, artLogoEdits, dirty];
 }
 
 class ChampionshipFormState extends Equatable {

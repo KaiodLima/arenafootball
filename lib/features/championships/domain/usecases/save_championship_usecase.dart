@@ -4,6 +4,7 @@ import 'package:either_dart/either.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/services/storage_upload_service.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
+import 'package:arena_soccer/features/championships/domain/championship_art_logo.dart';
 import 'package:arena_soccer/features/championships/domain/championship_rules_file.dart';
 import 'package:arena_soccer/features/championships/domain/repositories/championships_repository_interface.dart';
 
@@ -20,6 +21,7 @@ class SaveChampionshipUseCase {
     ChampionshipDTO championship, {
     File? banner,
     ChampionshipRulesFile? rules,
+    List<ChampionshipArtLogo>? artLogos,
   }) async {
     var data = championship.copyWith(
       title: championship.title.trim(),
@@ -30,6 +32,20 @@ class SaveChampionshipUseCase {
       final upload = await _storage.uploadImage(file: banner, folder: StorageFolder.championships);
       if (upload.isLeft) return Left(upload.left);
       data = data.copyWith(imageUrl: upload.right);
+    }
+    // Logos das artes: envia as novas (PNG continua PNG) e grava na ordem.
+    if (artLogos != null) {
+      final urls = <String>[];
+      for (final logo in artLogos.take(ChampionshipDTO.maxArtLogos)) {
+        if (logo.file != null) {
+          final upload = await _storage.uploadImage(file: logo.file!, folder: StorageFolder.championships);
+          if (upload.isLeft) return Left(upload.left);
+          urls.add(upload.right);
+        } else if (logo.url.isNotEmpty) {
+          urls.add(logo.url);
+        }
+      }
+      data = data.copyWith(artLogos: urls);
     }
     if (rules != null) {
       final upload = await _storage.uploadData(

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:arena_soccer/features/championships/domain/championship_art_logo.dart';
 import 'package:arena_soccer/features/championships/domain/standings_criterion.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
 import 'package:arena_soccer/core/utils/team_key.dart';
@@ -136,6 +137,24 @@ class ChampionshipFormCubit extends Cubit<ChampionshipFormState> {
 
   void setBanner(File file) => _edit(_form.copyWith(banner: () => file));
 
+  /// Logo das artes na posição [index] (troca a que estava; depois da última = acrescenta).
+  void setArtLogo(int index, File file) {
+    final logos = [..._form.artLogos];
+    if (index < logos.length) {
+      logos[index] = ChampionshipArtLogo(file: file);
+    } else if (logos.length < ChampionshipDTO.maxArtLogos) {
+      logos.add(ChampionshipArtLogo(file: file));
+    }
+    _edit(_form.copyWith(artLogoEdits: logos));
+  }
+
+  void removeArtLogo(int index) {
+    final logos = [..._form.artLogos];
+    if (index < 0 || index >= logos.length) return;
+    logos.removeAt(index);
+    _edit(_form.copyWith(artLogoEdits: logos));
+  }
+
   void setRulesFile(ChampionshipRulesFile file) => _edit(_form.copyWith(rulesFile: () => file));
 
   /// Tira o regulamento (o novo escolhido e o que já estava gravado).
@@ -160,11 +179,22 @@ class ChampionshipFormCubit extends Cubit<ChampionshipFormState> {
       ),
       banner: form.banner,
       rules: form.rulesFile,
+      artLogos: form.artLogoEdits,
     );
     if (isClosed) return;
     response.fold(
       (failure) => emit(ErrorChampionshipFormState(form, errorMessage: failure.toString())),
-      (saved) => emit(SavedChampionshipFormState(form.copyWith(base: saved, dirty: false), created: !form.isEditing)),
+      (saved) => emit(SavedChampionshipFormState(
+          ChampionshipFormData(
+            base: saved,
+            regions: form.regions,
+            seasons: form.seasons,
+            teams: form.teams,
+            loadingTeams: form.loadingTeams,
+            selectedTeams: form.selectedTeams,
+            rulesFile: form.rulesFile,
+          ),
+          created: !form.isEditing)),
     );
   }
 }

@@ -97,7 +97,7 @@ class _PlayerMatchArtPageState extends State<PlayerMatchArtPage> {
     _precacheStarted = true;
     final m = data.match;
     final urls =
-        [data.player.photoUrl, m.home.crestUrl, m.away.crestUrl, m.championshipLogoUrl].where((u) => u.isNotEmpty);
+        [data.player.photoUrl, m.home.crestUrl, m.away.crestUrl, ...m.championshipLogos].where((u) => u.isNotEmpty);
     await Future.wait([
       for (final url in urls)
         precacheImage(CachedNetworkImageProvider(url), context, onError: (_, __) {})

@@ -157,7 +157,7 @@ class _Titles extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (args.data.championshipLogoUrl.isNotEmpty) ...[
-                    ArtChampionshipLogo(url: args.data.championshipLogoUrl, height: 22 * scale),
+                    ArtChampionshipLogos(urls: args.data.championshipLogos, height: 35 * scale),
                     SizedBox(width: 6 * scale),
                   ],
                   Flexible(

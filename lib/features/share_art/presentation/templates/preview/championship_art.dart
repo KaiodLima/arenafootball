@@ -114,21 +114,33 @@ class _Competition extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Uma logo = medalhão redondo; duas = placa larga com as duas lado a lado.
         Container(
-          width: size,
+          width: args.logos.length > 1 ? size * 2.2 : size,
           height: size,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: args.logoUrl.isEmpty ? AppColors.transparent : AppColors.white,
+            shape: args.logos.length > 1 ? BoxShape.rectangle : BoxShape.circle,
+            borderRadius: args.logos.length > 1 ? BorderRadius.circular(size * 0.3) : null,
+            color: args.logos.isEmpty ? AppColors.transparent : AppColors.white,
             border: Border.all(color: accent.withValues(alpha: 0.8), width: 1.5 * scale),
             boxShadow: [BoxShadow(color: accent.withValues(alpha: 0.25), blurRadius: 24 * scale)],
           ),
-          child: args.logoUrl.isEmpty
+          child: args.logos.isEmpty
               ? Icon(Icons.emoji_events_outlined, color: accent, size: size * 0.55)
               : Padding(
                   padding: EdgeInsets.all(size * 0.16),
-                  child: ArtChampionshipLogo(url: args.logoUrl, height: size * 0.68, plain: true),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (var i = 0; i < args.logos.length && i < 2; i++) ...[
+                        if (i > 0) SizedBox(width: size * 0.16),
+                        Flexible(
+                          child: ArtChampionshipLogo(url: args.logos[i], height: size * 0.68, plain: true),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
         ),
         SizedBox(height: 14 * scale),

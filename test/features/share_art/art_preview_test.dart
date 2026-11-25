@@ -108,7 +108,7 @@ void main() {
       homeTeam: const TeamDTO(id: 't1', name: 'Lava Jato FC', primaryColor: '#D32F2F', secondaryColor: '#FFFFFF'),
       awayTeam: const TeamDTO(id: 't2', name: 'Volta Redonda', primaryColor: '#1E88E5', secondaryColor: '#FFFFFF'),
       championship: 'Copa da Floresta 2026',
-      championshipLogoUrl: 'memoria://logo',
+      championshipLogos: const ['memoria://logo', 'memoria://logo2'],
       link: 'https://arenasoccerflutter.web.app/noticia/resultado_m1',
       now: DateTime(2026, 12, 11),
     );
@@ -169,7 +169,7 @@ void main() {
       }
     }
     // Divulgação (antes do jogo): sábado 15/11, vista na quinta 13/11.
-    ResultArtData upcomingWith(String logo) => ResultArtData.of(
+    ResultArtData upcomingWith(List<String> logos) => ResultArtData.of(
           const MatchDTO(
             id: 'm3',
             homeTeam: 'Mulekada',
@@ -184,12 +184,13 @@ void main() {
           homeTeam: const TeamDTO(id: 't1', name: 'Mulekada', primaryColor: '#111111', secondaryColor: '#FFFFFF'),
           awayTeam: const TeamDTO(id: 't2', name: 'Açaí No Gralle', primaryColor: '#6A1B9A', secondaryColor: '#FFFFFF'),
           championship: 'Copa Açaí de Futsal',
-          championshipLogoUrl: logo,
+          championshipLogos: logos,
           link: 'https://arenasoccerflutter.web.app/app',
           now: DateTime.utc(2026, 11, 13, 15),
         );
     final previewCases = [
-      for (final template in PreviewArtTemplate.values) (template, upcomingWith('memoria://logo'), ''),
+      for (final template in PreviewArtTemplate.values)
+        (template, upcomingWith(const ['memoria://logo', 'memoria://logo2']), ''),
       // Os modelos que mais usam a logo, também sem ela.
       for (final template in [
         PreviewArtTemplate.championship,
@@ -197,7 +198,7 @@ void main() {
         PreviewArtTemplate.versus,
         PreviewArtTemplate.scoreboard
       ])
-        (template, upcomingWith(''), '_semlogo'),
+        (template, upcomingWith(const []), '_semlogo'),
     ];
     // Paletas fixas em alguns modelos.
     final paletteCases = [
@@ -209,7 +210,8 @@ void main() {
     ];
     final allCases = [
       for (final (t, d, suffix) in previewCases) (t, d, suffix, ArtPalette.teams),
-      for (final (t, p) in paletteCases) (t, upcomingWith('memoria://logo'), '_${p.name}', p),
+      for (final (t, p) in paletteCases)
+        (t, upcomingWith(const ['memoria://logo', 'memoria://logo2']), '_${p.name}', p),
     ];
     for (final (template, upcoming, suffix, palette) in allCases) {
       for (final format in ArtFormat.values.where((f) => formats.contains(f.name))) {
@@ -249,10 +251,21 @@ void main() {
     const team = TeamDTO(id: 't1', name: 'Lava Jato FC', primaryColor: '#D32F2F', secondaryColor: '#FFFFFF');
     final withPhoto = PlayerArtData.of(
       player: const PlayerDTO(
-          id: 'p1', name: 'Ronaldo Nazário', team: 'Lava Jato FC', imageUrl: 'memoria://foto', goals: 12, assists: 5, position: 'atacante'),
+          id: 'p1',
+          name: 'Ronaldo Nazário',
+          team: 'Lava Jato FC',
+          imageUrl: 'memoria://foto',
+          goals: 12,
+          assists: 5,
+          position: 'atacante'),
       team: team,
       season: '2026',
-      championship: const ChampionshipDTO(id: 'c', championshipId: 11, title: 'Copa da Floresta', imageUrl: 'memoria://logo'),
+      championship: const ChampionshipDTO(
+          id: 'c',
+          championshipId: 11,
+          title: 'Copa da Floresta',
+          imageUrl: 'memoria://logo',
+          artLogos: ['memoria://logo', 'memoria://logo2']),
     );
     final noPhoto = PlayerArtData.of(
       player: const PlayerDTO(id: 'p2', name: 'Dudu Silva', team: '', position: 'goleiro'),
@@ -296,16 +309,30 @@ void main() {
     // Atleta na partida (antes do jogo): com foto e logo, e sem foto.
     PlayerMatchArtData matchArt(PlayerDTO player) => PlayerMatchArtData.of(
           player: player,
-          match: upcomingWith('memoria://logo'),
+          match: upcomingWith(const ['memoria://logo', 'memoria://logo2']),
           side: MatchSide.away,
           championshipId: 11,
           season: '2026',
         );
     final pmCases = [
       for (final t in PlayerMatchArtTemplate.values)
-        (t, matchArt(const PlayerDTO(id: 'p1', name: 'Ronaldo Nazário', team: 'Açaí No Gralle', teamId: 't2', imageUrl: 'memoria://foto', position: 'atacante')), ''),
+        (
+          t,
+          matchArt(const PlayerDTO(
+              id: 'p1',
+              name: 'Ronaldo Nazário',
+              team: 'Açaí No Gralle',
+              teamId: 't2',
+              imageUrl: 'memoria://foto',
+              position: 'atacante')),
+          ''
+        ),
       for (final t in PlayerMatchArtTemplate.values)
-        (t, matchArt(const PlayerDTO(id: 'p2', name: 'Dudu', team: 'Açaí No Gralle', teamId: 't2', position: 'goleiro')), '_semfoto'),
+        (
+          t,
+          matchArt(const PlayerDTO(id: 'p2', name: 'Dudu', team: 'Açaí No Gralle', teamId: 't2', position: 'goleiro')),
+          '_semfoto'
+        ),
     ];
     for (final (template, pdata, suffix) in pmCases) {
       for (final format in ArtFormat.values.where((f) => formats.contains(f.name))) {

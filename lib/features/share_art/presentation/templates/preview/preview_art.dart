@@ -104,6 +104,9 @@ class PreviewArtArgs {
   bool get wide => format == ArtFormat.landscape;
   String get logoUrl => data.championshipLogoUrl;
 
+  /// Logos do campeonato em destaque (1 ou 2).
+  List<String> get logos => data.championshipLogos;
+
   /// Paleta das cores dos times (os modelos de metades usam as cores deles).
   bool get teamColors => palette == ArtPalette.teams;
 }

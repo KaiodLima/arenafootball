@@ -95,9 +95,11 @@ void main() {
         ),
         team: const TeamDTO(id: 't2', name: 'Associação Atlética Floresta do Vale Unidos', primaryColor: '#FFFFFF'),
         season: '2026',
-        championship: const ChampionshipDTO(id: 'c2', championshipId: 3, title: 'Campeonato Intermunicipal de Futebol Amador'),
+        championship:
+            const ChampionshipDTO(id: 'c2', championshipId: 3, title: 'Campeonato Intermunicipal de Futebol Amador'),
       ),
-      PlayerArtData.of(player: const PlayerDTO(name: 'Dudu', team: ''), team: const TeamDTO(id: '', name: 'X'), season: '2026'),
+      PlayerArtData.of(
+          player: const PlayerDTO(name: 'Dudu', team: ''), team: const TeamDTO(id: '', name: 'X'), season: '2026'),
     ];
     for (final data in cases) {
       for (final template in PlayerArtTemplate.values) {
@@ -113,7 +115,8 @@ void main() {
                 ),
               ),
             ));
-            expect(tester.takeException(), isNull, reason: '${data.name}/${template.name}/${format.name}/${palette.name}');
+            expect(tester.takeException(), isNull,
+                reason: '${data.name}/${template.name}/${format.name}/${palette.name}');
           }
         }
       }

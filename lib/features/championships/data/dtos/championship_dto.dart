@@ -34,6 +34,12 @@ class ChampionshipDTO extends Equatable {
   final String title;
   final String description;
   final String imageUrl;
+
+  /// Logos próprias do campeonato para as artes dos jogos (`logosArte`, 0 a
+  /// 2; PNG com fundo transparente). Vazio = as artes usam o [imageUrl].
+  final List<String> artLogos;
+
+  static const int maxArtLogos = 2;
   final String firstPrize;
   final String secondPrize;
   final String thirdPrize;
@@ -94,6 +100,7 @@ class ChampionshipDTO extends Equatable {
     this.title = '',
     this.description = '',
     this.imageUrl = '',
+    this.artLogos = const [],
     this.firstPrize = '',
     this.secondPrize = '',
     this.thirdPrize = '',
@@ -125,6 +132,7 @@ class ChampionshipDTO extends Equatable {
       title: data['titulo']?.toString() ?? '',
       description: data['descricao']?.toString() ?? '',
       imageUrl: data['urlImagem']?.toString() ?? '',
+      artLogos: _logosOf(data['logosArte']),
       firstPrize: data['premio1']?.toString() ?? '',
       secondPrize: data['premio2']?.toString() ?? '',
       thirdPrize: data['premio3']?.toString() ?? '',
@@ -158,6 +166,7 @@ class ChampionshipDTO extends Equatable {
       title: json['title']?.toString() ?? '',
       description: json['description']?.toString() ?? '',
       imageUrl: json['imageUrl']?.toString() ?? '',
+      artLogos: _logosOf(json['artLogos']),
       firstPrize: json['firstPrize']?.toString() ?? '',
       secondPrize: json['secondPrize']?.toString() ?? '',
       thirdPrize: json['thirdPrize']?.toString() ?? '',
@@ -184,12 +193,26 @@ class ChampionshipDTO extends Equatable {
     );
   }
 
+  /// Logos das artes dos jogos: as próprias ou, sem elas, a imagem do
+  /// campeonato (o comportamento antigo); vazio = sem logo.
+  List<String> get artLogoUrls {
+    if (artLogos.isNotEmpty) return artLogos;
+    final image = imageUrl.trim();
+    return image.isEmpty ? const [] : [image];
+  }
+
+  static List<String> _logosOf(Object? value) => [
+        for (final item in (value is List ? value : const []))
+          if (item is String && item.trim().isNotEmpty) item.trim(),
+      ].take(maxArtLogos).toList();
+
   Map<String, dynamic> toCache() => {
         'id': id,
         'championshipId': championshipId,
         'title': title,
         'description': description,
         'imageUrl': imageUrl,
+        'artLogos': artLogos,
         'firstPrize': firstPrize,
         'secondPrize': secondPrize,
         'thirdPrize': thirdPrize,
@@ -218,6 +241,7 @@ class ChampionshipDTO extends Equatable {
         'titulo': title,
         'descricao': description,
         'urlImagem': imageUrl,
+        'logosArte': artLogos,
         'premio1': firstPrize,
         'premio2': secondPrize,
         'premio3': thirdPrize,
@@ -242,6 +266,7 @@ class ChampionshipDTO extends Equatable {
     String? title,
     String? description,
     String? imageUrl,
+    List<String>? artLogos,
     String? firstPrize,
     String? secondPrize,
     String? thirdPrize,
@@ -269,6 +294,7 @@ class ChampionshipDTO extends Equatable {
       title: title ?? this.title,
       description: description ?? this.description,
       imageUrl: imageUrl ?? this.imageUrl,
+      artLogos: artLogos ?? this.artLogos,
       firstPrize: firstPrize ?? this.firstPrize,
       secondPrize: secondPrize ?? this.secondPrize,
       thirdPrize: thirdPrize ?? this.thirdPrize,
@@ -299,6 +325,7 @@ class ChampionshipDTO extends Equatable {
         title,
         description,
         imageUrl,
+        artLogos,
         firstPrize,
         secondPrize,
         thirdPrize,

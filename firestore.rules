@@ -414,10 +414,18 @@ service cloud.firestore {
           && (organizerDetailsUpdate(changed, sede) || organizerClose(changed) || organizerReopen(changed));
       }
 
+      function validArtLogos(l) {
+        return l is list && l.size() <= 2
+          && (l.size() < 1 || (l[0] is string && l[0].matches('https://.+')))
+          && (l.size() < 2 || (l[1] is string && l[1].matches('https://.+')));
+      }
+
       function organizerDetailsUpdate(changed, sede) {
         return changed.hasOnly(['descricao', 'urlImagem', 'premio1', 'premio2', 'premio3', 'premioArtilheiro',
             'premioGoleiro', 'regras', 'times', 'ids_times', 'regulamentoUrl', 'regulamentoNome', 'idsRegioes',
-            'desempate'])
+            'desempate', 'logosArte'])
+          // Logos das artes dos jogos: até 2 URLs https.
+          && validArtLogos(request.resource.data.get('logosArte', []))
           // Encerrada: os times ficam como estão.
           && (resource.data.get('encerrado', false) != true || !changed.hasAny(['times', 'ids_times']))
           && (resource.data.get('abrangencia', 'municipal') == 'intermunicipal'

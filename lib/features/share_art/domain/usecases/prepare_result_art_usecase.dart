@@ -23,13 +23,13 @@ class PrepareResultArtUseCase {
     final teams = await _getTeams(season: season).last;
     final directory = teams.isRight ? TeamDirectory(teams.right) : TeamDirectory.empty;
     var championship = '';
-    var logoUrl = '';
+    var logos = const <String>[];
     if (match.championshipId > 0 && match.region.isNotEmpty) {
       final response = await _getChampionships(region: match.region, season: season).last;
       final found =
           response.isRight ? response.right.where((c) => c.championshipId == match.championshipId).firstOrNull : null;
       championship = found?.title ?? '';
-      logoUrl = found?.imageUrl ?? '';
+      logos = found?.artLogoUrls ?? const [];
     }
     final at = now ?? DateTime.now();
     final finished = ResultArtData.statusOf(match, at) == ArtMatchStatus.finished;
@@ -38,7 +38,7 @@ class PrepareResultArtUseCase {
       homeTeam: directory.resolve(id: match.homeTeamId, name: match.homeTeam),
       awayTeam: directory.resolve(id: match.awayTeamId, name: match.awayTeam),
       championship: championship,
-      championshipLogoUrl: logoUrl,
+      championshipLogos: logos,
       link: finished && match.id.isNotEmpty ? newsLink(resultNewsId(match.id)) : appLink,
       now: at,
     );

@@ -2827,5 +2827,8 @@
   "fantasyArtPoints": "{points} pts",
   "fantasyArtShareText": "⚽ Matchday {round} stars on Arena Fantasy · {championship}: {podium}. Build your free team and join the ranking: {link}",
   "fantasyGuestLogin": "Sign in",
-  "deepLinkFantasyClosed": "This Arena Fantasy is not available right now."
+  "deepLinkFantasyClosed": "This Arena Fantasy is not available right now.",
+  "championshipArtLogos": "Art logos",
+  "championshipArtLogosHint": "Up to 2 championship logos, featured in the match arts. Use PNG with a transparent background. Without a logo, the arts use the championship image.",
+  "championshipArtLogoAdd": "Add logo"
 }

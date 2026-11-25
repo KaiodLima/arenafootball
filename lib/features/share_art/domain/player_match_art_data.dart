@@ -43,7 +43,7 @@ class PlayerMatchArtData extends Equatable {
         positionKey: player.position,
         team: team,
         championship: match.championship,
-        championshipLogoUrl: match.championshipLogoUrl,
+        championshipLogos: match.championshipLogos,
         goals: goals,
         assists: assists,
         link: player.id.isEmpty ? appLink : athleteLink(season, player.id),

@@ -88,7 +88,7 @@ class _ShareArtPageState extends State<ShareArtPage> {
   Future<void> _precache(ResultArtData data) async {
     if (_precacheStarted) return;
     _precacheStarted = true;
-    final urls = [data.home.crestUrl, data.away.crestUrl, data.championshipLogoUrl].where((u) => u.isNotEmpty);
+    final urls = [data.home.crestUrl, data.away.crestUrl, ...data.championshipLogos].where((u) => u.isNotEmpty);
     await Future.wait([
       for (final url in urls)
         precacheImage(CachedNetworkImageProvider(url), context, onError: (_, __) {})

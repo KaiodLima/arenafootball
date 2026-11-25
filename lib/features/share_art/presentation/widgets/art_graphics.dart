@@ -103,6 +103,30 @@ class ArtChampionshipLogo extends StatelessWidget {
   }
 }
 
+/// Logos do campeonato em destaque (1 ou 2, as `logosArte`): cada uma no seu
+/// selo branco, lado a lado e com o mesmo peso. Sem nenhuma, não ocupa nada.
+class ArtChampionshipLogos extends StatelessWidget {
+  final List<String> urls;
+  final double height;
+
+  const ArtChampionshipLogos({super.key, required this.urls, required this.height});
+
+  @override
+  Widget build(BuildContext context) {
+    final logos = urls.where((u) => u.isNotEmpty).take(2).toList();
+    if (logos.isEmpty) return const SizedBox.shrink();
+    if (logos.length == 1) return ArtChampionshipLogo(url: logos.first, height: height);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ArtChampionshipLogo(url: logos[0], height: height),
+        SizedBox(width: height * 0.16),
+        ArtChampionshipLogo(url: logos[1], height: height),
+      ],
+    );
+  }
+}
+
 /// Retícula (meio-tom): pontos que crescem na direção [from] → [to].
 class ArtHalftone extends StatelessWidget {
   final Color color;

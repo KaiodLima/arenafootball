@@ -225,7 +225,7 @@ class _Plate extends StatelessWidget {
             Row(
               children: [
                 if (d.championshipLogoUrl.isNotEmpty) ...[
-                  ArtChampionshipLogo(url: d.championshipLogoUrl, height: 18 * scale),
+                  ArtChampionshipLogos(urls: d.championshipLogos, height: 29 * scale),
                   SizedBox(width: 6 * scale),
                 ],
                 Expanded(

@@ -17,7 +17,11 @@ class PlayerArtData extends Equatable {
 
   /// Competição escolhida no elenco (vazio = geral).
   final String championship;
-  final String championshipLogoUrl;
+
+  /// Logos do campeonato nas artes (`ChampionshipDTO.artLogoUrls`).
+  final List<String> championshipLogos;
+
+  String get championshipLogoUrl => championshipLogos.isEmpty ? '' : championshipLogos.first;
 
   /// Números na competição escolhida (ou no geral); 0 = não aparece.
   final int goals;
@@ -32,7 +36,7 @@ class PlayerArtData extends Equatable {
     this.photoUrl = '',
     this.positionKey = '',
     this.championship = '',
-    this.championshipLogoUrl = '',
+    this.championshipLogos = const [],
     this.goals = 0,
     this.assists = 0,
     this.link = '',
@@ -73,7 +77,7 @@ class PlayerArtData extends Equatable {
         secondaryColor: team.secondaryColor,
       ),
       championship: championship?.title ?? '',
-      championshipLogoUrl: championship?.imageUrl.trim() ?? '',
+      championshipLogos: championship?.artLogoUrls ?? const [],
       goals: enrollment?.goals ?? (championship == null ? player.goals : 0),
       assists: enrollment?.assists ?? (championship == null ? player.assists : 0),
       link: player.id.isEmpty ? appLink : athleteLink(season, player.id),
@@ -81,6 +85,5 @@ class PlayerArtData extends Equatable {
   }
 
   @override
-  List<Object?> get props =>
-      [name, photoUrl, positionKey, team, championship, championshipLogoUrl, goals, assists, link];
+  List<Object?> get props => [name, photoUrl, positionKey, team, championship, championshipLogos, goals, assists, link];
 }

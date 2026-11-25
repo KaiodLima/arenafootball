@@ -59,7 +59,7 @@ class _Header extends StatelessWidget {
       child: Row(
         children: [
           if (args.logoUrl.isNotEmpty) ...[
-            ArtChampionshipLogo(url: args.logoUrl, height: 44 * scale),
+            ArtChampionshipLogos(urls: args.logos, height: 48 * scale),
             SizedBox(width: 12 * scale),
           ],
           Expanded(

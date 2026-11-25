@@ -36,6 +36,12 @@ export default async function run(env, check) {
 
   await check('organizador edita os detalhes', assertSucceeds(updateDoc(doc(org, 'campeonatos/c1'), { descricao: 'Final em dezembro', premio1: 'Troféu' })));
   await check('organizador não troca o nome', assertFails(updateDoc(doc(org, 'campeonatos/c1'), { titulo: 'Outro' })));
+  await check('organizador envia as 2 logos das artes', assertSucceeds(updateDoc(doc(org, 'campeonatos/c1'),
+    { logosArte: ['https://x/logo1.png', 'https://x/logo2.png'] })));
+  await check('organizador tira as logos das artes', assertSucceeds(updateDoc(doc(org, 'campeonatos/c1'), { logosArte: [] })));
+  await check('3 logos das artes recusado', assertFails(updateDoc(doc(org, 'campeonatos/c1'),
+    { logosArte: ['https://x/1.png', 'https://x/2.png', 'https://x/3.png'] })));
+  await check('logo das artes que não é URL recusada', assertFails(updateDoc(doc(org, 'campeonatos/c1'), { logosArte: [42] })));
   await check('organizador não troca a sede', assertFails(updateDoc(doc(org, 'campeonatos/c1'), { idRegiao: 'fl' })));
   await check('organizador não troca o organizador', assertFails(updateDoc(doc(org, 'campeonatos/c1'), { idOrganizador: 'u2' })));
   await check('municipal: regiões só a sede', assertFails(updateDoc(doc(org, 'campeonatos/c1'), { idsRegioes: ['co', 'fl'] })));
