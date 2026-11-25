@@ -1533,6 +1533,50 @@ class AppLocalizationsPt extends AppLocalizations {
   String get reportSubstitution => 'Substituição';
 
   @override
+  String get reportPenalty => 'Pênalti';
+
+  @override
+  String get reportPenaltyScored => 'Convertido (gol)';
+
+  @override
+  String get reportPenaltySavedOption => 'Perdido · defendido';
+
+  @override
+  String get reportPenaltyWideOption => 'Perdido · para fora/trave';
+
+  @override
+  String get reportPenaltyTaker => 'Quem cobrou';
+
+  @override
+  String get reportPenaltyWhoSaved => 'Quem defendeu? (opcional)';
+
+  @override
+  String get reportPenaltyNoKeeper => 'Sem goleiro';
+
+  @override
+  String get reportPenaltyGoal => 'De pênalti';
+
+  @override
+  String get reportPenaltyShort => 'pên.';
+
+  @override
+  String get reportPenaltyMissed => 'Pênalti perdido';
+
+  @override
+  String get reportPenaltySaved => 'defendido';
+
+  @override
+  String reportPenaltySavedBy(String name) {
+    return 'defendido por $name';
+  }
+
+  @override
+  String get reportPenaltyWide => 'para fora';
+
+  @override
+  String get reportPenaltiesMissed => 'Pênaltis perdidos';
+
+  @override
   String get reportWhoLeaves => 'Quem sai?';
 
   @override
@@ -3610,6 +3654,25 @@ class AppLocalizationsPt extends AppLocalizations {
       locale: localeName,
       other: '$count figurinhas excluídas.',
       one: '1 figurinha excluída.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get albumAdminSyncPhotos => 'Atualizar fotos dos atletas';
+
+  @override
+  String get albumAdminSyncPhotosMessage =>
+      'Copia a foto atual de cada atleta para as figurinhas dele. Fotos enviadas só para a figurinha serão substituídas.';
+
+  @override
+  String albumAdminPhotosSynced(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count figurinhas atualizadas.',
+      one: '1 figurinha atualizada.',
+      zero: 'As fotos já estão em dia.',
     );
     return '$_temp0';
   }

@@ -10,9 +10,9 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/utils/share_links.dart';
 import 'package:arena_soccer/features/event_polls/domain/event_poll.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
-import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_cache_first_usecase.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
-import 'package:arena_soccer/features/news/domain/usecases/watch_news_by_tag_usecase.dart';
+import 'package:arena_soccer/features/news/domain/usecases/open_events_cache_usecases.dart';
 import 'package:arena_soccer/features/qr_codes/domain/qr_target.dart';
 import 'package:arena_soccer/features/qr_codes/presentation/bloc/qr_codes_cubit.dart';
 import 'package:arena_soccer/features/qr_codes/presentation/page/qr_poster_page.dart';
@@ -42,15 +42,22 @@ const _voting = MatchDTO(
 const _upcoming =
     MatchDTO(id: 'm2', homeTeam: 'Açaí', awayTeam: 'Gralha', date: '16/11', time: '09:00', region: 'Floresta');
 
-class _Matches implements GetRegionMatchesUseCase {
+class _Matches implements GetRegionMatchesCacheFirstUseCase {
   @override
-  Future<Either<Failure, List<MatchDTO>>> call({required String region, String? season}) async =>
-      const Right([_voting, _upcoming]);
+  Stream<Either<Failure, List<MatchDTO>>> call({required String region, String? season, bool force = false}) =>
+      Stream.value(const Right([_voting, _upcoming]));
+
+  @override
+  Future<Either<Failure, List<MatchDTO>>> latest({required String region, String? season, bool force = false}) =>
+      call(region: region, season: season).last;
 }
 
-class _Events implements WatchNewsByTagUseCase {
+class _Events implements GetOpenEventsCacheFirstUseCase {
   @override
-  Stream<Either<Failure, List<NewsDTO>>> call(String tag) => Stream.value(Right([
+  Future<Either<Failure, List<NewsDTO>>> latest({bool force = false}) => call(force: force).last;
+
+  @override
+  Stream<Either<Failure, List<NewsDTO>>> call({bool force = false}) => Stream.value(Right([
         NewsDTO(
           id: 'ev1',
           tag: NewsDTO.eventTag,

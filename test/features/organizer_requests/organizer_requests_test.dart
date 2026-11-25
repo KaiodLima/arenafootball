@@ -10,7 +10,7 @@ import 'package:arena_soccer/features/organizer_requests/domain/usecases/organiz
 import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_request_cubit.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_request_state.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
-import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
 
 class _Repo implements IOrganizerRequestsRepository {
   final submitted = <OrganizerRequestDTO>[];
@@ -43,9 +43,9 @@ class _Repo implements IOrganizerRequestsRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _Regions implements GetRegionsUseCase {
+class _Regions implements GetRegionsCacheFirstUseCase {
   @override
-  Future<Either<Failure, List<String>>> call() async => const Right(['Colônia', 'Floresta']);
+  Future<Either<Failure, List<String>>> names({bool force = false}) async => const Right(['Colônia', 'Floresta']);
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

@@ -146,9 +146,12 @@ class FantasyRankingState extends Equatable {
 class FantasyRankingCubit extends Cubit<FantasyRankingState> {
   final WatchFantasyConfigUseCase _watchConfig;
   final GetFantasyRankingCacheFirstUseCase _ranking;
-  final GetFantasyPositionUseCase _position;
-  final GetFantasyRoundsUseCase _rounds;
-  final GetFantasyLineupUseCase _lineup;
+  final GetFantasyPositionCacheFirstUseCase _position;
+  final GetFantasyRoundsCacheFirstUseCase _rounds;
+
+  /// Escalação + posição da conta numa rodada fechada (com cache por versão
+  /// da apuração).
+  final GetFantasyRoundRecordUseCase _record;
   final WatchFantasyParticipantUseCase _participant;
   final GetFantasyAthletesCacheFirstUseCase _athletes;
 
@@ -160,7 +163,7 @@ class FantasyRankingCubit extends Cubit<FantasyRankingState> {
     this._ranking,
     this._position,
     this._rounds,
-    this._lineup,
+    this._record,
     this._participant,
     this._athletes, {
     GetFantasyTopAthletesCacheFirstUseCase? topAthletes,
@@ -189,12 +192,19 @@ class FantasyRankingCubit extends Cubit<FantasyRankingState> {
       });
     });
     _loadOverall();
-    final rounds = await _rounds(_fantasyId);
+    await _loadRounds();
+  }
+
+  /// Rodadas fechadas (cache de 10 min; [force] relê). Sem rodada escolhida,
+  /// escolhe a mais recente.
+  Future<void> _loadRounds({bool force = false}) async {
+    final rounds = await _rounds.latest(_fantasyId, force: force);
     if (isClosed) return;
+    if (rounds.isLeft && state.roundsLoaded) return;
     final closed = rounds.fold((_) => const <FantasyRoundDTO>[], (list) => list.where((r) => r.closed).toList())
       ..sort((a, b) => b.number.compareTo(a.number));
     emit(state.copyWith(rounds: closed, roundsLoaded: true, failure: rounds.isLeft ? rounds.left.toString() : null));
-    if (closed.isNotEmpty) selectRound(closed.first.number);
+    if (closed.isNotEmpty && state.selectedRound == null) selectRound(closed.first.number);
   }
 
   void _loadAthletes(FantasyConfigDTO config) {
@@ -211,19 +221,19 @@ class FantasyRankingCubit extends Cubit<FantasyRankingState> {
       if (isClosed) return;
       final entries = sortFantasyRanking(response.fold((_) => const [], (list) => list));
       emit(state.copyWith(overallEntries: entries, overallLoading: false));
-      final mine = await _myOverall(entries);
+      final mine = await _myOverall(entries, force: force);
       if (!isClosed) emit(state.copyWith(myOverall: mine));
     });
   }
 
-  Future<FantasyMyPosition> _myOverall(List<FantasyRankingEntry> entries) async {
+  Future<FantasyMyPosition> _myOverall(List<FantasyRankingEntry> entries, {bool force = false}) async {
     if (state.uid.isEmpty) return const FantasyMyPosition();
     final index = entries.indexWhere((e) => e.uid == state.uid);
     if (index >= 0) return FantasyMyPosition(points: entries[index].points, position: fantasyPositions(entries)[index]);
     final participant = await _participant(_fantasyId, state.uid).first;
     final points = participant.fold((_) => null, (p) => p?.points);
     if (points == null) return const FantasyMyPosition();
-    final position = await _position(_fantasyId, points);
+    final position = await _position(_fantasyId, points, uid: state.uid, force: force);
     return FantasyMyPosition(points: points, position: position.fold((_) => null, (p) => p));
   }
 
@@ -235,7 +245,7 @@ class FantasyRankingCubit extends Cubit<FantasyRankingState> {
       if (isClosed || state.selectedRound != round) return;
       final entries = sortFantasyRanking(response.fold((_) => const [], (list) => list));
       emit(state.copyWith(roundEntries: entries, roundLoading: false));
-      final mine = await _myRound(round, entries);
+      final mine = await _myRound(round, entries, force: force);
       if (!isClosed && state.selectedRound == round) emit(state.copyWith(myRound: mine));
     });
     if (_topWanted) _loadTop(round, force: force);
@@ -260,15 +270,17 @@ class FantasyRankingCubit extends Cubit<FantasyRankingState> {
     });
   }
 
-  Future<FantasyMyPosition> _myRound(int round, List<FantasyRankingEntry> entries) async {
+  Future<FantasyMyPosition> _myRound(int round, List<FantasyRankingEntry> entries, {bool force = false}) async {
     if (state.uid.isEmpty) return const FantasyMyPosition();
     final index = entries.indexWhere((e) => e.uid == state.uid);
     if (index >= 0) return FantasyMyPosition(points: entries[index].points, position: fantasyPositions(entries)[index]);
-    final lineup = await _lineup(_fantasyId, round, state.uid);
-    final points = lineup.fold((_) => null, (l) => l?.points);
+    final dto = state.rounds.where((r) => r.number == round).firstOrNull;
+    if (dto == null) return const FantasyMyPosition();
+    final record = await _record(_fantasyId, dto, state.uid, force: force);
+    final value = record.fold((_) => null, (r) => r);
+    final points = value?.lineup?.points;
     if (points == null) return const FantasyMyPosition();
-    final position = await _position(_fantasyId, points, round: round);
-    return FantasyMyPosition(points: points, position: position.fold((_) => null, (p) => p));
+    return FantasyMyPosition(points: points, position: value?.position);
   }
 
   /// Setas: rodada mais antiga / mais nova.
@@ -283,29 +295,30 @@ class FantasyRankingCubit extends Cubit<FantasyRankingState> {
   }
 
   /// Puxar para atualizar (ignora a validade do cache).
-  void refresh() {
+  Future<void> refresh() async {
     _loadOverall(force: true);
+    await _loadRounds(force: true);
+    if (isClosed) return;
     final round = state.selectedRound;
     if (round != null) selectRound(round, force: true);
   }
 
   /// Histórico da conta: a escalação de cada rodada fechada e a posição nela
-  /// (uma leitura por rodada; carregado ao abrir a aba).
+  /// (carregado ao abrir a aba). Cada rodada fica no cache até ser reapurada;
+  /// [force] (puxar para atualizar) relê as rodadas e o histórico.
   Future<void> loadHistory({bool force = false}) async {
     if (state.uid.isEmpty || state.historyLoading || (state.historyLoaded && !force)) return;
     emit(state.copyWith(historyLoading: true));
+    if (force) await _loadRounds(force: true);
+    if (isClosed) return;
     final items = <FantasyHistoryItem>[];
     for (final round in state.rounds) {
-      final response = await _lineup(_fantasyId, round.number, state.uid);
+      final response = await _record(_fantasyId, round, state.uid, force: force);
       if (isClosed) return;
-      final lineup = response.fold((_) => null, (l) => l);
+      final record = response.fold((_) => null, (r) => r);
+      final lineup = record?.lineup;
       if (lineup == null) continue;
-      int? position;
-      if (lineup.points != null) {
-        final result = await _position(_fantasyId, lineup.points!, round: round.number);
-        position = result.fold((_) => null, (p) => p);
-      }
-      items.add(FantasyHistoryItem(round: round, lineup: lineup, position: position));
+      items.add(FantasyHistoryItem(round: round, lineup: lineup, position: record?.position));
     }
     if (!isClosed) emit(state.copyWith(history: items, historyLoading: false, historyLoaded: true));
   }

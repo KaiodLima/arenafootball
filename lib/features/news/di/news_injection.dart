@@ -13,6 +13,7 @@ import 'package:arena_soccer/features/news/domain/usecases/get_cached_news_useca
 import 'package:arena_soccer/features/news/domain/usecases/get_news_by_id_cache_first_usecase.dart';
 import 'package:arena_soccer/features/news/domain/usecases/get_news_by_id_usecase.dart';
 import 'package:arena_soccer/features/news/domain/usecases/get_news_page_usecase.dart';
+import 'package:arena_soccer/features/news/domain/usecases/open_events_cache_usecases.dart';
 import 'package:arena_soccer/features/news/domain/usecases/get_player_goal_cards_cache_first_usecase.dart';
 import 'package:arena_soccer/features/news/domain/usecases/get_player_goal_cards_usecase.dart';
 import 'package:arena_soccer/features/news/domain/usecases/save_goal_cards_cache_usecase.dart';
@@ -34,6 +35,10 @@ void registerNewsDependencies() {
   _sl.registerLazySingleton(() => WatchNewsFeedUseCase(_sl()));
   _sl.registerLazySingleton(() => GetNewsPageUseCase(_sl()));
   _sl.registerLazySingleton(() => WatchNewsByTagUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetOpenEventsUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetCachedOpenEventsUseCase(_sl()));
+  _sl.registerLazySingleton(() => SaveOpenEventsCacheUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetOpenEventsCacheFirstUseCase(_sl(), _sl(), _sl()));
   _sl.registerLazySingleton(() => CreateNewsUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => UpdateNewsUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => DeleteNewsUseCase(_sl()));

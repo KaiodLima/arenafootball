@@ -33,6 +33,18 @@ class AchievementsDataSource {
         logName: _logName,
       );
 
+  /// Catálogo numa leitura só (o app guarda no cache; o painel do admin ouve
+  /// ao vivo pelo [watchCatalog]).
+  Future<Either<Failure, List<AchievementDTO>>> getCatalog() async {
+    try {
+      final snapshot = await _catalog.get();
+      return Right(snapshot.docs.map(AchievementDTO.fromFirestore).toList());
+    } catch (e) {
+      AppLogger.e('getCatalog', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: 'Não foi possível carregar as conquistas.'));
+    }
+  }
+
   Stream<Either<Failure, AchievementProgressDTO>> watchProgress(String uid) => _progress(uid).snapshots().toEither(
         (doc) => AchievementProgressDTO.fromMap(doc.data()),
         fallbackMessage: 'Não foi possível carregar o seu progresso.',

@@ -224,7 +224,7 @@ class AlbumCubit extends Cubit<AlbumState> {
     final event = state.event;
     if (event == null || state.rankingLoading || (state.ranking != null && !force)) return;
     emit(state.copyWith(rankingLoading: true));
-    final response = await albumUseCase.getRanking(eventId: event.id, userId: _userId);
+    final response = await albumUseCase.getRankingCacheFirst(eventId: event.id, userId: _userId, force: force);
     if (isClosed) return;
     response.fold(
       (failure) => emit(ErrorAlbumState(state.copyWith(rankingLoading: false), failure.toString())),

@@ -25,4 +25,11 @@ class GetRegionsCacheFirstUseCase {
         force: force,
         logName: 'GetRegionsCacheFirstUseCase',
       );
+
+  /// Só os nomes, no valor mais novo numa leitura (formulários e pedidos):
+  /// cache válido = sem ler o Firestore.
+  Future<Either<Failure, List<String>>> names({bool force = false}) async {
+    final response = await call(force: force).last;
+    return response.map((regions) => [for (final region in regions) region.name]);
+  }
 }

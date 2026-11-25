@@ -15,7 +15,7 @@ import 'package:arena_soccer/features/partner_requests/domain/usecases/partner_h
 import 'package:arena_soccer/features/partner_requests/domain/usecases/submit_partner_request_usecase.dart';
 import 'package:arena_soccer/features/partner_requests/domain/usecases/watch_my_partner_request_usecase.dart';
 import 'package:arena_soccer/features/partner_requests/presentation/bloc/partner_request_state.dart';
-import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
 
 /// "Sou parceiro": acompanha o pedido em tempo real e cuida do formulário
 /// (enviar, editar enquanto pendente, reenviar após rejeição ou remoção).
@@ -25,7 +25,7 @@ class PartnerRequestCubit extends Cubit<PartnerRequestState> {
   final WatchMyPartnerRequestUseCase watchMyPartnerRequestUseCase;
   final SubmitPartnerRequestUseCase submitPartnerRequestUseCase;
   final CancelPartnerRequestUseCase cancelPartnerRequestUseCase;
-  final GetRegionsUseCase getRegionsUseCase;
+  final GetRegionsCacheFirstUseCase getRegionsUseCase;
   final GetPartnerSlotsUseCase getPartnerSlotsUseCase;
   final WatchAllHighlightsUseCase watchAllHighlightsUseCase;
   final DeleteHighlightUseCase deleteHighlightUseCase;
@@ -69,7 +69,7 @@ class PartnerRequestCubit extends Cubit<PartnerRequestState> {
 
   Future<void> _load() async {
     emit(const LoadingPartnerRequestState());
-    final regions = await getRegionsUseCase();
+    final regions = await getRegionsUseCase.names();
     if (isClosed) return;
     if (regions.isLeft || regions.right.isEmpty) {
       emit(LoadErrorPartnerRequestState(errorMessage: regions.isLeft ? regions.left.toString() : ''));

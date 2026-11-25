@@ -30,8 +30,24 @@ class SheetGoalRow {
   final bool home;
   final String scorer;
   final String assistant;
+  final bool penalty;
 
-  const SheetGoalRow({required this.minute, required this.home, required this.scorer, required this.assistant});
+  const SheetGoalRow({
+    required this.minute,
+    required this.home,
+    required this.scorer,
+    required this.assistant,
+    this.penalty = false,
+  });
+}
+
+/// Pênalti perdido no documento: cobrador e como perdeu.
+class SheetMissedPenaltyRow {
+  final int? minute;
+  final bool home;
+  final MatchMissedPenalty penalty;
+
+  const SheetMissedPenaltyRow({required this.minute, required this.home, required this.penalty});
 }
 
 class SheetBookingRow {
@@ -61,8 +77,8 @@ class SheetSubstitutionRow {
 }
 
 /// Conteúdo do documento da súmula (PDF), montado da partida: escalações
-/// (titulares e reservas, por número, com quem entrou/saiu), gols, cartões e
-/// substituições em ordem de minuto (sem minuto no fim) e o placar pela lista
+/// (titulares e reservas, por número, com quem entrou/saiu), gols (os de
+/// pênalti marcados), cartões, substituições e pênaltis perdidos em ordem de minuto (sem minuto no fim) e o placar pela lista
 /// de gols. Puro: o PDF só desenha.
 class MatchReportSheet {
   final MatchDTO match;
@@ -73,6 +89,7 @@ class MatchReportSheet {
   final List<SheetGoalRow> goals;
   final List<SheetBookingRow> bookings;
   final List<SheetSubstitutionRow> substitutions;
+  final List<SheetMissedPenaltyRow> missedPenalties;
 
   const MatchReportSheet._({
     required this.match,
@@ -83,6 +100,7 @@ class MatchReportSheet {
     required this.goals,
     required this.bookings,
     required this.substitutions,
+    required this.missedPenalties,
   });
 
   static int _byMinute(int? a, int? b) => (a ?? 1 << 20).compareTo(b ?? 1 << 20);
@@ -119,6 +137,7 @@ class MatchReportSheet {
     final goals = [...match.goals]..sort((a, b) => _byMinute(a.minute, b.minute));
     final bookings = [...match.bookings]..sort((a, b) => _byMinute(a.minute, b.minute));
     final subs = [...match.substitutions]..sort((a, b) => _byMinute(a.minute, b.minute));
+    final missed = [...match.missedPenalties]..sort((a, b) => _byMinute(a.minute, b.minute));
     return MatchReportSheet._(
       match: match,
       homeGoals: match.goals.isEmpty ? match.homeGoals : match.goals.where((g) => g.side == MatchSide.home).length,
@@ -132,6 +151,7 @@ class MatchReportSheet {
             home: g.side == MatchSide.home,
             scorer: g.hasScorer ? g.scorerName : '',
             assistant: g.hasAssistant ? g.assistantName : '',
+            penalty: g.penalty,
           ),
       ],
       bookings: [
@@ -148,6 +168,9 @@ class MatchReportSheet {
         for (final s in subs)
           SheetSubstitutionRow(
               minute: s.minute, home: s.side == MatchSide.home, playerIn: s.inName, playerOut: s.outName),
+      ],
+      missedPenalties: [
+        for (final p in missed) SheetMissedPenaltyRow(minute: p.minute, home: p.side == MatchSide.home, penalty: p),
       ],
     );
   }

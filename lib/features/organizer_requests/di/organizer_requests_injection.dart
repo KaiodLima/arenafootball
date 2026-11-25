@@ -11,7 +11,7 @@ void registerOrganizerRequestsDependencies() {
   _sl.registerLazySingleton<OrganizerRequestsDataSource>(() => OrganizerRequestsDataSource(_sl()));
 
   // Repository (interface -> impl)
-  _sl.registerLazySingleton<IOrganizerRequestsRepository>(() => OrganizerRequestsRepositoryImpl(_sl(), _sl()));
+  _sl.registerLazySingleton<IOrganizerRequestsRepository>(() => OrganizerRequestsRepositoryImpl(_sl(), _sl(), _sl()));
 
   // UseCases
   _sl.registerLazySingleton(() => WatchMyOrganizerRequestUseCase(_sl()));

@@ -127,6 +127,23 @@ class FantasyAthleteScoreDTO extends Equatable {
         'posicao': position,
       };
 
+  /// A pontuação inteira (folha "Pontuação detalhada"), no formato do
+  /// Firestore; lida pelo mesmo [FantasyAthleteScoreDTO.fromCache].
+  Map<String, dynamic> toDetailCache() => {
+        ...toCache(),
+        'partidas': [
+          for (final m in matches)
+            {'idPartida': m.matchId, 'minutos': m.minutes, 'minutosEstimados': m.estimated, 'pontos': m.points},
+        ],
+        'itens': [
+          for (final i in items) {'regra': i.rule, 'qtd': i.qty, 'pontos': i.points, 'idPartida': i.matchId},
+        ],
+        'motivos': [
+          for (final r in reasons) {'codigo': r.code, 'idPartida': r.matchId},
+        ],
+        'parametros': {'minMinutos': minMinutes, 'minMinutosDefesa': minDefenseMinutes, 'capitao': captain},
+      };
+
   factory FantasyAthleteScoreDTO.fromCache(Map<String, dynamic> json) =>
       FantasyAthleteScoreDTO.fromMap(json['id']?.toString() ?? '', json);
 

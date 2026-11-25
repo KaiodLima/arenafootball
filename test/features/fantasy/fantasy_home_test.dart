@@ -16,6 +16,8 @@ import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_home_pag
 import 'package:arena_soccer/features/fantasy/presentation/widgets/fantasy_score_sheet.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 
+import 'fantasy_no_cache.dart';
+
 /// Doc gravado pela function (`rodadas/{n}/atletas/{id}`).
 final _scoreDoc = <String, dynamic>{
   'nome': 'Ângelo Atacante',
@@ -45,7 +47,7 @@ Widget _app(Widget child) => MaterialApp(
       home: Scaffold(body: child),
     );
 
-class _Repo implements IFantasyRepository {
+class _Repo with FantasyNoCache implements IFantasyRepository {
   final active = StreamController<Either<Failure, List<FantasyConfigDTO>>>.broadcast();
   final rounds = <String, FantasyRoundDTO?>{};
   final participants = <String, FantasyParticipantDTO?>{};
@@ -131,7 +133,7 @@ void main() {
       WatchFantasyRoundUseCase(repo),
       WatchFantasyParticipantUseCase(repo),
       WatchFantasyLineupUseCase(repo),
-      GetFantasyPositionUseCase(repo),
+      GetFantasyPositionCacheFirstUseCase(repo),
     );
     addTearDown(cubit.close);
     cubit.load(season: '2026', uid: 'u1');

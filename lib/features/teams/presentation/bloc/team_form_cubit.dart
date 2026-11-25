@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/create_team_usecase.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_next_team_number_usecase.dart';
@@ -13,7 +13,7 @@ import 'package:arena_soccer/features/teams/presentation/bloc/team_form_state.da
 class TeamFormCubit extends Cubit<TeamFormState> {
   final CreateTeamUseCase createTeamUseCase;
   final GetNextTeamNumberUseCase getNextTeamNumberUseCase;
-  final GetRegionsUseCase getRegionsUseCase;
+  final GetRegionsCacheFirstUseCase getRegionsUseCase;
   final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
 
   TeamFormCubit(
@@ -32,7 +32,7 @@ class TeamFormCubit extends Cubit<TeamFormState> {
     final loadTeams = _loadTeams(initialRegion);
     await _loadNextNumber();
 
-    final response = await getRegionsUseCase();
+    final response = await getRegionsUseCase.names();
     if (isClosed) return;
     final regions = response.fold((_) => <String>[], (list) => list);
     if (regions.isNotEmpty) {

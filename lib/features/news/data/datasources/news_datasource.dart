@@ -95,6 +95,25 @@ class NewsDataSource {
         );
   }
 
+  /// Eventos de votação não encerrados na mão (`encerrado == false`), os
+  /// [limit] mais recentes, numa leitura (QR codes e "Acontecendo agora"; o
+  /// prazo e a região são conferidos no app). Índice `tag` + `encerrado` +
+  /// `data` desc.
+  Future<Either<Failure, List<NewsDTO>>> getOpenEvents({int limit = 20}) async {
+    try {
+      final snapshot = await _news
+          .where('tag', isEqualTo: NewsDTO.eventTag)
+          .where('encerrado', isEqualTo: false)
+          .orderBy('data', descending: true)
+          .limit(limit)
+          .get();
+      return Right(snapshot.docs.map(NewsDTO.fromFirestore).toList());
+    } catch (e) {
+      AppLogger.e('getOpenEvents', name: 'NewsDataSource', error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _loadFallback));
+    }
+  }
+
   /// Uma notícia pelo id (link compartilhado). Nulo se não existe mais.
   Future<Either<Failure, NewsDTO?>> getNewsById(String id) async {
     try {

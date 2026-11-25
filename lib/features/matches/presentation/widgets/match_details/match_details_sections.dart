@@ -10,6 +10,7 @@ import 'package:arena_soccer/features/players/presentation/widgets/player_card.d
 import 'package:arena_soccer/features/matches/domain/match_report.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_report_dtos.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/booking_icon.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/penalty_labels.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_card.dart';
 import 'package:arena_soccer/utils/components/team_crest.dart';
@@ -80,7 +81,7 @@ class MatchGoalsTimeline extends StatelessWidget {
     final hasScorers = goals.any((g) => g.hasScorer);
 
     // Gols e cartões da súmula em ordem de minuto; os gols levam o placar.
-    final events = MatchReport.timeline(goals, match.bookings, match.substitutions);
+    final events = MatchReport.timeline(goals, match.bookings, match.substitutions, match.missedPenalties);
     var home = 0;
     var away = 0;
     final rows = <Widget>[];
@@ -101,7 +102,9 @@ class MatchGoalsTimeline extends StatelessWidget {
         children: [
           _SectionTitle(
             icon: Icons.sports_soccer_rounded,
-            title: match.bookings.isEmpty ? l10n.matchCardGoals : l10n.matchReportTabEvents,
+            title: match.bookings.isEmpty && match.missedPenalties.isEmpty
+                ? l10n.matchCardGoals
+                : l10n.matchReportTabEvents,
           ),
           if (events.isEmpty)
             _Hint(upcoming ? l10n.matchDetailsNotStarted : l10n.matchDetailsNoGoals)
@@ -131,11 +134,14 @@ class _TimelineRow extends StatelessWidget {
     final score = this.score;
     final booking = event.booking;
     final sub = event.substitution;
+    final missed = event.missedPenalty;
     Widget text(bool alignEnd) => sub != null
         ? _SubstitutionText(substitution: sub, alignEnd: alignEnd)
-        : booking == null
-            ? _GoalText(goal: event.goal!, alignEnd: alignEnd)
-            : _BookingText(booking: booking, alignEnd: alignEnd);
+        : missed != null
+            ? _MissedPenaltyText(penalty: missed, alignEnd: alignEnd)
+            : booking == null
+                ? _GoalText(goal: event.goal!, alignEnd: alignEnd)
+                : _BookingText(booking: booking, alignEnd: alignEnd);
     Widget line(bool visible) => Expanded(
           child: Container(width: AppSizes.s2, color: visible ? AppColors.greyLight : AppColors.transparent),
         );
@@ -150,6 +156,8 @@ class _TimelineRow extends StatelessWidget {
                 line(!isFirst),
                 if (sub != null)
                   const Icon(Icons.swap_vert_rounded, size: AppSizes.s20, color: AppColors.primaryDark)
+                else if (missed != null)
+                  const Icon(Icons.block_rounded, size: AppSizes.s20, color: AppColors.danger)
                 else if (score == null)
                   BookingIcon(type: booking!.type, size: AppSizes.s20)
                 else
@@ -210,12 +218,52 @@ class _GoalText extends StatelessWidget {
             mainAxisAlignment: alignEnd ? MainAxisAlignment.end : MainAxisAlignment.start,
             children: alignEnd ? [name, gap, ball] : [ball, gap, name],
           ),
-          if (goal.hasAssistant)
+          if (goal.penalty)
+            Text(
+              l10n.reportPenaltyGoal,
+              textAlign: textAlign,
+              style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+            )
+          else if (goal.hasAssistant)
             Text(
               l10n.matchGoalsAssist(goal.assistantName),
               textAlign: textAlign,
               style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
             ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Pênalti perdido na linha do tempo: "34' Fulano" e como perdeu.
+class _MissedPenaltyText extends StatelessWidget {
+  final MatchMissedPenalty penalty;
+  final bool alignEnd;
+
+  const _MissedPenaltyText({required this.penalty, required this.alignEnd});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final minute = penalty.minute == null ? '' : "${penalty.minute}' ";
+    final textAlign = alignEnd ? TextAlign.right : TextAlign.left;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSizes.s10),
+      child: Column(
+        crossAxisAlignment: alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            '$minute${penalty.playerName.isEmpty ? l10n.matchDetailsUnknownScorer : penalty.playerName}',
+            textAlign: textAlign,
+            style: AppTypography.label(color: AppColors.textPrimary).copyWith(fontSize: AppSizes.s14),
+          ),
+          Text(
+            penaltyMissLabel(l10n, penalty),
+            textAlign: textAlign,
+            style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12),
+          ),
         ],
       ),
     );

@@ -423,7 +423,8 @@ class _Highlight extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final label = switch (event.type) {
-      LiveEventType.goal => '${l10n.newsGoalLabel}!',
+      LiveEventType.goal =>
+        event.penalty ? '${l10n.newsGoalLabel}! · ${l10n.reportPenaltyGoal}' : '${l10n.newsGoalLabel}!',
       LiveEventType.yellow => l10n.liveYellowCard,
       LiveEventType.red =>
         event.secondYellow ? '${l10n.liveSentOff} · ${l10n.matchReportSecondYellow}' : l10n.liveSentOff,
@@ -567,7 +568,8 @@ class _MiniTimelineRow extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final text = switch (event.type) {
       LiveEventType.substitution => '${event.playerIn} ↔ ${event.playerOut}',
-      LiveEventType.goal => event.player.isEmpty ? l10n.reportGoalNoScorer : event.player,
+      LiveEventType.goal => '${event.player.isEmpty ? l10n.reportGoalNoScorer : event.player}'
+          '${event.penalty ? ' (${l10n.reportPenaltyShort})' : ''}',
       _ => event.player,
     };
     final content = Row(

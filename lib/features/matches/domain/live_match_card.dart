@@ -13,7 +13,8 @@ import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 class LiveMatchCard {
   const LiveMatchCard._();
 
-  /// O lance da súmula no formato do card.
+  /// O lance da súmula no formato do card. O pênalti perdido não vai para o
+  /// card: o app antigo lê tipo desconhecido como gol.
   static LiveEvent eventOf(ReportEvent event) {
     final home = event.side == MatchSide.home;
     final goal = event.goal;
@@ -26,6 +27,7 @@ class LiveMatchCard {
         player: goal.hasScorer ? goal.scorerName : '',
         playerId: goal.hasScorer ? goal.scorerId : '',
         assistant: goal.hasAssistant ? goal.assistantName : '',
+        penalty: goal.penalty,
       );
     }
     final sub = event.substitution;

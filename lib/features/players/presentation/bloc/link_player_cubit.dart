@@ -52,7 +52,7 @@ class LinkPlayerState extends Equatable {
 class LinkPlayerCubit extends Cubit<LinkPlayerState> {
   final LinkPlayerUseCase linkPlayerUseCase;
   final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
-  final GetSeasonChampionshipsUseCase getSeasonChampionshipsUseCase;
+  final GetSeasonChampionshipsCacheFirstUseCase getSeasonChampionshipsUseCase;
 
   LinkPlayerCubit(this.linkPlayerUseCase, this.getTeamsCacheFirstUseCase, this.getSeasonChampionshipsUseCase)
       : super(const LinkPlayerState());
@@ -67,7 +67,7 @@ class LinkPlayerCubit extends Cubit<LinkPlayerState> {
     final teams = (await getTeamsCacheFirstUseCase(region: region, season: season).first)
         .fold((_) => const <TeamDTO>[], (t) => t);
     final championships =
-        (await getSeasonChampionshipsUseCase(season)).fold((_) => const <ChampionshipDTO>[], (c) => c);
+        (await getSeasonChampionshipsUseCase.latest(season)).fold((_) => const <ChampionshipDTO>[], (c) => c);
     var candidates = const <PlayerDTO>[];
     String? error;
     if (withCandidates) {

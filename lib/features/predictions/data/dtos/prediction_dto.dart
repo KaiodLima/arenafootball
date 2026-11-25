@@ -43,6 +43,27 @@ class PredictionDTO extends Equatable {
     );
   }
 
+  /// Cache local (ver `CacheStore`).
+  factory PredictionDTO.fromCache(Map<String, dynamic> json) => PredictionDTO(
+        uid: json['uid']?.toString() ?? '',
+        home: _int(json['home']),
+        away: _int(json['away']),
+        name: json['name']?.toString() ?? '',
+        points: json['points'] is num ? (json['points'] as num).toInt() : null,
+        exact: json['exact'] == true,
+        valid: json['valid'] is bool ? json['valid'] as bool : null,
+      );
+
+  Map<String, dynamic> toCache() => {
+        'uid': uid,
+        'home': home,
+        'away': away,
+        'name': name,
+        'points': points,
+        'exact': exact,
+        'valid': valid,
+      };
+
   @override
   List<Object?> get props => [uid, home, away, name, points, exact, valid];
 }
@@ -75,6 +96,20 @@ class PredictionRankingEntry extends Equatable {
     );
   }
 
+  /// Cache local (ver `CacheStore`).
+  factory PredictionRankingEntry.fromCache(Map<String, dynamic> json) {
+    int number(String key) => json[key] is num ? (json[key] as num).toInt() : 0;
+    return PredictionRankingEntry(
+      uid: json['uid']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      points: number('points'),
+      exact: number('exact'),
+      count: number('count'),
+    );
+  }
+
+  Map<String, dynamic> toCache() => {'uid': uid, 'name': name, 'points': points, 'exact': exact, 'count': count};
+
   /// Ordem do ranking: pontos, depois placares exatos, depois mais palpites.
   static int compare(PredictionRankingEntry a, PredictionRankingEntry b) {
     final byPoints = b.points.compareTo(a.points);
@@ -85,4 +120,26 @@ class PredictionRankingEntry extends Equatable {
 
   @override
   List<Object?> get props => [uid, name, points, exact, count];
+}
+
+/// Linha e posição da conta no bolão da região quando ela está fora do top 50
+/// (nulas = ainda sem pontos ou a contagem falhou).
+class PredictionStanding extends Equatable {
+  final PredictionRankingEntry? entry;
+  final int? position;
+
+  const PredictionStanding({this.entry, this.position});
+
+  /// Cache local (ver `CacheStore`).
+  factory PredictionStanding.fromCache(Map<String, dynamic> json) => PredictionStanding(
+        entry: json['entry'] is Map
+            ? PredictionRankingEntry.fromCache(Map<String, dynamic>.from(json['entry'] as Map))
+            : null,
+        position: json['position'] is num ? (json['position'] as num).toInt() : null,
+      );
+
+  Map<String, dynamic> toCache() => {'entry': entry?.toCache(), 'position': position};
+
+  @override
+  List<Object?> get props => [entry, position];
 }

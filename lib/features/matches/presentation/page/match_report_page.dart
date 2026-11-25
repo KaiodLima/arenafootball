@@ -6,6 +6,7 @@ import 'package:arena_soccer/features/matches/data/dtos/match_report_dtos.dart';
 import 'package:arena_soccer/features/matches/domain/match_report.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/match_report_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/booking_icon.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/match_report/penalty_outcome_sheet.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_report/player_grid_sheet.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_report/report_action_pad.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_report/report_game_info.dart';
@@ -14,6 +15,7 @@ import 'package:arena_soccer/features/matches/presentation/widgets/match_report/
 import 'package:arena_soccer/features/matches/presentation/widgets/match_report/report_save_bar.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_report/report_timeline.dart';
 import 'package:arena_soccer/features/players/presentation/widgets/quick_player_sheet.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/penalty_labels.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 import 'package:arena_soccer/utils/components/arena_text_field.dart';
@@ -69,6 +71,10 @@ class MatchReportPage extends StatelessWidget {
     final team = action.side == MatchSide.home ? match.homeTeam : match.awayTeam;
     final booking = action.booking;
     final onField = state.onFieldOf(action.side);
+    if (action.penalty) {
+      await _launchPenalty(context, state, action.side, team);
+      return;
+    }
     if (action.substitution) {
       final sub = await showPlayerGridSheet(
         context,
@@ -109,6 +115,60 @@ class MatchReportPage extends StatelessWidget {
     }
   }
 
+  /// "Pênalti": como terminou → o cobrador (com o minuto) → defendido, o
+  /// goleiro do outro time (opcional, "Sem goleiro").
+  Future<void> _launchPenalty(BuildContext context, MatchReportState state, MatchSide side, String team) async {
+    final l10n = AppLocalizations.of(context);
+    final cubit = BlocProvider.of<MatchReportCubit>(context);
+    final match = state.match!;
+    final outcome = await showPenaltyOutcomeSheet(context, title: '${l10n.reportPenalty} · $team');
+    if (outcome == null || !context.mounted) return;
+    final scored = outcome is PenaltyScored;
+    final taker = await showPlayerGridSheet(
+      context,
+      title: '${l10n.reportPenaltyTaker} · $team',
+      icon: Icon(
+        scored ? Icons.sports_soccer_rounded : Icons.block_rounded,
+        color: scored ? AppColors.primary : AppColors.danger,
+        size: AppSizes.s28,
+      ),
+      color: side == MatchSide.home ? _home : _away,
+      squad: state.squadOf(side),
+      lineup: match.lineup.of(side),
+      onField: state.onFieldOf(side),
+      minute: MatchReport.suggestedMinute(match, DateTime.now()),
+      emptyLabel: l10n.reportGoalNoScorer,
+    );
+    if (taker == null || !context.mounted) return;
+    if (outcome is PenaltyMissed) {
+      PickedEvent? keeper;
+      if (outcome.miss == PenaltyMiss.saved) {
+        final other = side == MatchSide.home ? MatchSide.away : MatchSide.home;
+        keeper = await showPlayerGridSheet(
+          context,
+          title: l10n.reportPenaltyWhoSaved,
+          icon: const Icon(Icons.back_hand_rounded, color: AppColors.primary, size: AppSizes.s28),
+          color: other == MatchSide.home ? _home : _away,
+          squad: state.squadOf(other),
+          lineup: match.lineup.of(other),
+          onField: state.onFieldOf(other),
+          minute: taker.minute,
+          emptyLabel: l10n.reportPenaltyNoKeeper,
+        );
+        if (!context.mounted) return;
+      }
+      cubit.addMissedPenalty(
+        side,
+        taker: taker.player,
+        miss: outcome.miss,
+        keeper: keeper?.player,
+        minute: taker.minute,
+      );
+      return;
+    }
+    cubit.addGoal(side, scorer: taker.player, minute: taker.minute, penalty: true);
+  }
+
   /// Toque num lance: editar (gol) ou apagar.
   Future<void> _eventMenu(BuildContext context, MatchReportState state, ReportEvent event) async {
     final l10n = AppLocalizations.of(context);
@@ -145,14 +205,16 @@ class MatchReportPage extends StatelessWidget {
     final team = goal.side == MatchSide.home ? match.homeTeam : match.awayTeam;
     final picked = await showPlayerGridSheet(
       context,
-      title: l10n.reportGoalOf(team),
+      title: goal.penalty ? '${l10n.reportPenaltyTaker} · $team' : l10n.reportGoalOf(team),
       icon: const Icon(Icons.sports_soccer_rounded, color: AppColors.primary, size: AppSizes.s28),
       color: goal.side == MatchSide.home ? _home : _away,
       squad: state.squadOf(goal.side),
       lineup: match.lineup.of(goal.side),
       onField: state.onFieldOf(goal.side),
       minute: goal.minute,
-      goal: true,
+      // Pênalti: um passo só (sem garçom).
+      goal: !goal.penalty,
+      emptyLabel: goal.penalty ? l10n.reportGoalNoScorer : null,
     );
     if (picked != null) {
       cubit.updateGoal(goal.id, scorer: picked.player, assistant: picked.assistant, minute: picked.minute);
@@ -193,7 +255,15 @@ class MatchReportPage extends StatelessWidget {
   String _eventLabel(AppLocalizations l10n, ReportEvent event) {
     final minute = event.minute == null ? '' : "${event.minute}' ";
     final goal = event.goal;
-    if (goal != null) return '⚽ $minute${goal.hasScorer ? goal.scorerName : l10n.reportGoalNoScorer}';
+    if (goal != null) {
+      final penalty = goal.penalty ? ' (${l10n.reportPenaltyShort})' : '';
+      return '⚽ $minute${goal.hasScorer ? goal.scorerName : l10n.reportGoalNoScorer}$penalty';
+    }
+    final missed = event.missedPenalty;
+    if (missed != null) {
+      final taker = missed.playerName.isEmpty ? '' : ' · ${missed.playerName}';
+      return '❌ $minute${penaltyMissLabel(l10n, missed)}$taker';
+    }
     final sub = event.substitution;
     if (sub != null) return '🔁 $minute${l10n.reportEntering(sub.inName)} · ${l10n.reportLeaving(sub.outName)}';
     final booking = event.booking!;

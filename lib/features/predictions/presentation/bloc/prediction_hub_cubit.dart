@@ -3,12 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
-import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_cache_first_usecase.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_card.dart';
 import 'package:arena_soccer/features/predictions/data/dtos/prediction_dto.dart';
 import 'package:arena_soccer/features/predictions/domain/prediction_hub.dart';
-import 'package:arena_soccer/features/predictions/domain/usecases/get_my_predictions_usecase.dart';
-import 'package:arena_soccer/features/predictions/domain/usecases/get_prediction_ranking_usecase.dart';
+import 'package:arena_soccer/features/predictions/domain/usecases/my_predictions_cache_usecases.dart';
+import 'package:arena_soccer/features/predictions/domain/usecases/prediction_ranking_cache_usecases.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
 /// Central do bolão da região: o ranking (top 50 + a conta), os próximos
@@ -87,9 +87,9 @@ class PredictionHubState extends Equatable {
 }
 
 class PredictionHubCubit extends Cubit<PredictionHubState> {
-  final GetPredictionRankingUseCase getPredictionRankingUseCase;
-  final GetRegionMatchesUseCase getRegionMatchesUseCase;
-  final GetMyPredictionsUseCase getMyPredictionsUseCase;
+  final GetPredictionRankingCacheFirstUseCase getPredictionRankingUseCase;
+  final GetRegionMatchesCacheFirstUseCase getRegionMatchesUseCase;
+  final GetMyPredictionsCacheFirstUseCase getMyPredictionsUseCase;
   final GetTeamsCacheFirstUseCase? getTeamsCacheFirstUseCase;
 
   /// Relógio (teste).
@@ -107,7 +107,9 @@ class PredictionHubCubit extends Cubit<PredictionHubState> {
   String _uid = '';
   String? _season;
 
-  Future<void> load({required String region, String uid = '', String? season}) async {
+  /// Ranking, partidas e palpites pelo cache local (validade de cada um);
+  /// [force] (puxar para atualizar) relê tudo do Firestore.
+  Future<void> load({required String region, String uid = '', String? season, bool force = false}) async {
     _uid = uid;
     _season = season;
     emit(PredictionHubState(region: region));
@@ -116,28 +118,32 @@ class PredictionHubCubit extends Cubit<PredictionHubState> {
       emit(PredictionHubState(region: region, loading: false));
       return;
     }
-    await Future.wait([_loadRanking(region, regionId), _loadMatches(region), _loadTeams(region)]);
+    await Future.wait([_loadRanking(region, regionId, force), _loadMatches(region, force), _loadTeams(region)]);
     if (isClosed || state.region != region) return;
     emit(state.copyWith(loading: false));
   }
 
-  Future<void> _loadRanking(String region, String regionId) async {
-    final response = await getPredictionRankingUseCase(regionId: regionId, uid: _uid, season: _season);
-    if (isClosed || state.region != region) return;
-    response.fold(
-      (failure) => emit(state.copyWith(errorMessage: () => failure.toString())),
-      (ranking) => emit(state.copyWith(
-        entries: ranking.top,
-        mine: () => ranking.mine,
-        myPosition: () => ranking.myPosition,
-      )),
-    );
+  Future<void> _loadRanking(String region, String regionId, bool force) async {
+    await for (final response
+        in getPredictionRankingUseCase(regionId: regionId, uid: _uid, season: _season, force: force)) {
+      if (isClosed || state.region != region) return;
+      response.fold(
+        (failure) => emit(state.copyWith(errorMessage: () => failure.toString())),
+        (ranking) => emit(state.copyWith(
+          errorMessage: () => null,
+          entries: ranking.top,
+          mine: () => ranking.mine,
+          myPosition: () => ranking.myPosition,
+        )),
+      );
+    }
   }
 
   /// Próximos abertos e os em andamento (até 6) e os encerrados mais recentes (até 8 candidatos,
-  /// ficam até 5 com palpite); os palpites da conta numa leitura por partida.
-  Future<void> _loadMatches(String region) async {
-    final response = await getRegionMatchesUseCase(region: region, season: _season);
+  /// ficam até 5 com palpite); os palpites da conta pelo cache (uma leitura
+  /// por partida sem cache válido).
+  Future<void> _loadMatches(String region, bool force) async {
+    final response = await getRegionMatchesUseCase.latest(region: region, season: _season, force: force);
     if (isClosed || state.region != region || response.isLeft) return;
     final clock = now();
     final matches = response.right;
@@ -151,17 +157,19 @@ class PredictionHubCubit extends Cubit<PredictionHubState> {
       descending: true,
     ).take(PredictionHub.recentCandidates).toList();
     emit(state.copyWith(upcoming: upcoming));
-    final mine = await getMyPredictionsUseCase(
+    await for (final mine in getMyPredictionsUseCase(
       matchIds: [...upcoming, ...finished].map((m) => m.id).toList(),
       uid: _uid,
       season: _season,
-    );
-    if (isClosed || state.region != region) return;
-    final predictions = mine.fold((_) => const <String, PredictionDTO>{}, (value) => value);
-    emit(state.copyWith(
-      predictions: predictions,
-      recent: finished.where((m) => predictions.containsKey(m.id)).take(PredictionHub.recentLimit).toList(),
-    ));
+      force: force,
+    )) {
+      if (isClosed || state.region != region) return;
+      final predictions = mine.fold((_) => const <String, PredictionDTO>{}, (value) => value);
+      emit(state.copyWith(
+        predictions: predictions,
+        recent: finished.where((m) => predictions.containsKey(m.id)).take(PredictionHub.recentLimit).toList(),
+      ));
+    }
   }
 
   Future<void> _loadTeams(String region) async {
@@ -173,10 +181,11 @@ class PredictionHubCubit extends Cubit<PredictionHubState> {
     }
   }
 
-  /// Depois da folha de palpite: relê o palpite daquela partida (1 leitura).
+  /// Depois da folha de palpite: o palpite daquela partida. Palpitar apagou o
+  /// cache dela (1 leitura, o novo na hora); fechou sem palpitar = o cache.
   Future<void> refreshPrediction(String matchId) async {
     final region = state.region;
-    final response = await getMyPredictionsUseCase(matchIds: [matchId], uid: _uid, season: _season);
+    final response = await getMyPredictionsUseCase.latest(matchIds: [matchId], uid: _uid, season: _season);
     if (isClosed || state.region != region) return;
     response.fold((_) {}, (found) {
       final predictions = {...state.predictions}..remove(matchId);

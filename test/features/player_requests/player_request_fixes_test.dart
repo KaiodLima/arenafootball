@@ -14,7 +14,7 @@ import 'package:arena_soccer/features/player_requests/presentation/bloc/player_r
 import 'package:arena_soccer/features/player_requests/presentation/bloc/player_request_state.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
-import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
@@ -55,9 +55,12 @@ class _Cancel implements CancelPlayerRequestUseCase {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _Regions implements GetRegionsUseCase {
+class _Regions implements GetRegionsCacheFirstUseCase {
   @override
-  Future<Either<Failure, List<String>>> call() async => const Right(['Floresta', 'Riacho']);
+  Future<Either<Failure, List<String>>> names({bool force = false}) async => const Right(['Floresta', 'Riacho']);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 class _Teams implements GetTeamsCacheFirstUseCase {

@@ -1,5 +1,6 @@
 import 'package:arena_soccer/core/firebase/region_registry.dart';
 import 'package:arena_soccer/core/firebase/season_collection.dart';
+import 'package:arena_soccer/core/firebase/test_content.dart';
 
 /// Chaves do cache local. Temporada nula = a atual (pelo ano, para a troca de
 /// temporada não reaproveitar o cache da anterior); região pelo id (o nome
@@ -8,6 +9,12 @@ abstract final class CacheKeys {
   static const String regions = 'regions_cache';
   static const String seasonsConfig = 'seasons_config_cache';
   static const String votingRules = 'voting_rules_cache';
+
+  /// Versões exigidas pelo admin (`config/versao`).
+  static const String appVersion = 'app_version_cache';
+
+  /// Catálogo de conquistas (`conquistas`).
+  static const String achievementsCatalog = 'achievements_catalog_cache';
 
   static const String _teamsPrefix = 'teams_';
   static const String _teamPrefix = 'team_';
@@ -18,6 +25,12 @@ abstract final class CacheKeys {
   /// Um time da [season] pelo id (ou, sem id, pelo nome).
   static String team({required String idOrName, String? season}) =>
       '$_teamPrefix${_season(season)}_${idOrName.trim()}_cache';
+
+  /// Código de convite (já conferido/criado) da conta [uid].
+  static String referralCode(String uid) => 'referral_code_${uid}_cache';
+
+  /// Índices `campeonatos_org` já conferidos do organizador [uid].
+  static String organizerIndexes(String uid) => 'organizer_indexes_${uid}_cache';
 
   /// Usuário da sessão.
   static String user(String uid) => 'user_${uid}_cache';
@@ -37,6 +50,9 @@ abstract final class CacheKeys {
   /// O campeonato "da região" na [season] (o usado ao cadastrar partida).
   static String championship({required String region, String? season}) =>
       '${_championshipPrefix}_${_season(season)}_${_region(region)}_cache';
+
+  /// Competições da [season] de todas as regiões.
+  static String seasonChampionships({String? season}) => '${_championshipPrefix}s_season_${_season(season)}_cache';
 
   /// Chaves de campeonatos (lista e avulso): apagar depois de gravar um.
   static bool isChampionshipKey(String key) => key.startsWith(_championshipPrefix);
@@ -58,6 +74,10 @@ abstract final class CacheKeys {
 
   /// Chaves dos cards de gol por jogador: apagar depois de criar/apagar notícia.
   static bool isGoalCardsKey(String key) => key.startsWith(_goalCardsPrefix);
+
+  /// Eventos de votação abertos (a mesma consulta para todas as regiões; a
+  /// região é filtrada no app).
+  static const String openEvents = 'open_events_cache';
 
   /// Uma notícia pelo id (deep link).
   static String news(String id) => 'news_${id}_cache';
@@ -96,6 +116,79 @@ abstract final class CacheKeys {
   /// Ranking do Arena Fantasy [fantasyId]: da rodada [round] ou geral (nula).
   static String fantasyRanking({required String fantasyId, int? round}) =>
       'fantasy_ranking_${fantasyId}_${round ?? 'geral'}_cache';
+
+  /// Rodadas do Arena Fantasy [fantasyId].
+  static String fantasyRounds(String fantasyId) => 'fantasy_rounds_${fantasyId}_cache';
+
+  /// Posição da conta [uid] no Fantasy [fantasyId]: na rodada [round] ou no
+  /// geral (nula), com os pontos de quando foi calculada.
+  static String fantasyPosition({required String fantasyId, int? round, required String uid}) =>
+      'fantasy_position_${fantasyId}_${round ?? 'geral'}_${uid}_cache';
+
+  /// Histórico da conta [uid] numa rodada fechada (escalação + posição).
+  static String fantasyHistory({required String fantasyId, required int round, required String uid}) =>
+      'fantasy_history_${fantasyId}_${round}_${uid}_cache';
+
+  /// Pontuação detalhada do atleta [athleteId] na rodada apurada [round].
+  static String fantasyAthleteScore({required String fantasyId, required int round, required String athleteId}) =>
+      'fantasy_score_${fantasyId}_${round}_${athleteId}_cache';
+
+  /// Chaves de rodadas, posições, histórico e pontuação do Fantasy
+  /// [fantasyId]: apagar depois de pedir reapuração/reinício.
+  static bool isFantasyScoringKey(String key, String fantasyId) =>
+      key == fantasyRounds(fantasyId) ||
+      key.startsWith('fantasy_position_${fantasyId}_') ||
+      key.startsWith('fantasy_history_${fantasyId}_') ||
+      key.startsWith('fantasy_score_${fantasyId}_');
+
+  static const String _albumRankingPrefix = 'album_ranking_';
+
+  /// Ranking de colecionadores do evento [eventId] visto pela conta [uid]
+  /// (top 50 + a linha e a posição dela).
+  static String albumRanking({required String eventId, required String uid}) =>
+      '$_albumRankingPrefix${eventId}_${uid}_cache';
+
+  /// Chaves do ranking do álbum do evento [eventId].
+  static bool isAlbumRankingKey(String key, String eventId) => key.startsWith('$_albumRankingPrefix${eventId}_');
+
+  static const String _regionMatchesPrefix = 'region_matches_';
+
+  /// Partidas da [region] na [season] (leitura única). A conta admin (que vê
+  /// as partidas de teste) tem a chave dela, para não mostrar teste a outro.
+  static String regionMatches({required String region, String? season}) =>
+      '$_regionMatchesPrefix${_season(season)}_${_region(region)}${TestContent.visible ? '_t' : ''}_cache';
+
+  /// Chaves das partidas por região: apagar depois de gravar uma partida.
+  static bool isRegionMatchesKey(String key) => key.startsWith(_regionMatchesPrefix);
+
+  /// Top 50 do bolão da região [regionId] na [season] (todas as contas).
+  static String predictionRanking({required String regionId, String? season}) =>
+      'prediction_ranking_${_season(season)}_${regionId}_cache';
+
+  /// Linha e posição da conta [uid] no bolão da região (fora do top 50).
+  static String predictionStanding({required String regionId, required String uid, String? season}) =>
+      'prediction_standing_${_season(season)}_${regionId}_${uid}_cache';
+
+  /// Palpite da conta [uid] na partida [matchId] (nulo salvo = sem palpite).
+  static String myPrediction({required String matchId, required String uid, String? season}) =>
+      'my_prediction_${_season(season)}_${matchId}_${uid}_cache';
+
+  /// Quantas pessoas palpitaram na partida [matchId].
+  static String predictionCount({required String matchId, String? season}) =>
+      'prediction_count_${_season(season)}_${matchId}_cache';
+
+  /// Partidas em que o atleta [playerId] foi o craque na [season] (troféus).
+  static String electedMatches({required String playerId, String? season}) =>
+      'elected_matches_${_season(season)}_${playerId}_cache';
+
+  static const String _playerSeasonPrefix = 'player_season_';
+
+  /// Histórico do atleta da conta [userId] na [season] (cadastro + troféus).
+  static String playerSeason({required String userId, String? season}) =>
+      '$_playerSeasonPrefix${_season(season)}_${userId}_cache';
+
+  /// Chaves do histórico por temporada: apagar depois de gravar um jogador.
+  static bool isPlayerSeasonKey(String key) => key.startsWith(_playerSeasonPrefix);
 
   static String _season(String? season) => (season == null || season.isEmpty) ? SeasonCollection.currentSeason : season;
 

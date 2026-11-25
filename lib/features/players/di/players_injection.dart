@@ -1,6 +1,8 @@
 import 'package:get_it/get_it.dart';
 import 'package:arena_soccer/features/players/domain/usecases/get_player_awards_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/get_player_season_history_usecase.dart';
+import 'package:arena_soccer/features/players/domain/usecases/player_awards_cache_usecases.dart';
+import 'package:arena_soccer/features/players/domain/usecases/player_season_history_cache_usecases.dart';
 import 'package:arena_soccer/features/players/domain/usecases/assign_unassigned_stats_usecase.dart';
 import 'package:arena_soccer/features/players/data/datasources/players_datasource.dart';
 import 'package:arena_soccer/features/players/data/repositories/players_repository_impl.dart';
@@ -53,4 +55,12 @@ void registerPlayersDependencies() {
   _sl.registerLazySingleton(() => WatchUserPlayerUseCase(_sl()));
   _sl.registerLazySingleton(() => SetPlayerChampionshipsUseCase(_sl()));
   _sl.registerLazySingleton(() => GetTopPlayersInChampionshipUseCase(_sl()));
+
+  // Cache local (ver `cacheFirst`)
+  _sl.registerLazySingleton(() => GetCachedPlayerAwardsUseCase(_sl()));
+  _sl.registerLazySingleton(() => SavePlayerAwardsCacheUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetPlayerAwardsCacheFirstUseCase(_sl(), _sl(), _sl()));
+  _sl.registerLazySingleton(() => GetCachedPlayerSeasonSummaryUseCase(_sl()));
+  _sl.registerLazySingleton(() => SavePlayerSeasonSummaryCacheUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetPlayerSeasonHistoryCacheFirstUseCase(_sl(), _sl(), _sl()));
 }

@@ -101,10 +101,12 @@ class _PredictionHubPageState extends State<PredictionHubPage> with SingleTicker
     super.dispose();
   }
 
-  Future<void> _load(String region) => _cubit.load(
+  /// [force] = puxar para atualizar (ignora a validade do cache).
+  Future<void> _load(String region, {bool force = false}) => _cubit.load(
         region: region,
         uid: BlocProvider.of<SessionCubit>(context).state.user?.id ?? '',
         season: SeasonCollection.currentSeason,
+        force: force,
       );
 
   Future<void> _pickRegion(String current) async {
@@ -222,14 +224,14 @@ class _PredictionHubPageState extends State<PredictionHubPage> with SingleTicker
                   loggedIn: uid.isNotEmpty,
                   now: now,
                   featuredKey: _tourMatch,
-                  onRefresh: () => _load(state.region),
+                  onRefresh: () => _load(state.region, force: true),
                   onPredict: (match) => _predict(match, state),
                   onOpenMatch: (match) => _openMatch(match, state),
                 ),
                 _RankingTab(
                   state: state,
                   uid: uid,
-                  onRefresh: () => _load(state.region),
+                  onRefresh: () => _load(state.region, force: true),
                   onChallenge: () => _challenge(state, myPosition),
                 ),
               ],

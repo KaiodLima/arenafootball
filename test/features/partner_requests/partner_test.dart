@@ -18,7 +18,7 @@ import 'package:arena_soccer/features/partner_requests/domain/usecases/get_partn
 import 'package:arena_soccer/features/partner_requests/presentation/bloc/partner_request_cubit.dart';
 import 'package:arena_soccer/features/partner_requests/presentation/bloc/partner_state.dart';
 import 'package:arena_soccer/features/player_requests/data/dtos/player_request_dto.dart';
-import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
 
 const _partner = PartnerRequestDTO(
   userId: 'p1',
@@ -62,7 +62,7 @@ class _Highlights implements WatchHighlightsUseCase {
 }
 
 /// O parceiro não carrega a lista de regiões (fica na dele).
-class _NoRegions implements GetRegionsUseCase {
+class _NoRegions implements GetRegionsCacheFirstUseCase {
   @override
   dynamic noSuchMethod(Invocation invocation) => fail('parceiro não escolhe região');
 }

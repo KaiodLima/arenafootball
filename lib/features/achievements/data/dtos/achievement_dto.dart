@@ -87,6 +87,12 @@ class AchievementDTO extends Equatable {
         'ordem': order,
       };
 
+  /// Para o cache local: os campos do doc + o id.
+  Map<String, dynamic> toCache() => {'id': id, ...toMap()};
+
+  factory AchievementDTO.fromCache(Map<String, dynamic> json) =>
+      AchievementDTO.fromMap(json['id']?.toString() ?? '', json);
+
   AchievementDTO copyWith({
     String? id,
     String? title,

@@ -49,11 +49,11 @@ class TeamsDataSource {
   }
 
   /// Total de times da temporada, de todas as regiões (base do número
-  /// sequencial do id de um time novo).
+  /// sequencial do id de um time novo). `count()`: uma leitura a cada mil.
   Future<Either<Failure, int>> countTeams({String? season}) async {
     try {
-      final result = await _firestore.collection(SeasonCollection.name('times', season)).get();
-      return Right(result.docs.length);
+      final result = await _firestore.collection(SeasonCollection.name('times', season)).count().get();
+      return Right(result.count ?? 0);
     } catch (e) {
       AppLogger.e('countTeams season=$season', name: 'TeamsDataSource', error: e);
       return Left(mapFirebaseError(e, fallbackMessage: _fallback));

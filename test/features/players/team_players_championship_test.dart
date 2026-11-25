@@ -1,4 +1,5 @@
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
@@ -65,6 +66,15 @@ class _ChampionshipsRepo implements IChampionshipsRepository {
       ]);
 
   @override
+  Future<Either<Failure, CachedValue<List<ChampionshipDTO>>?>> getCachedSeasonChampionships(String season) async =>
+      const Right(null);
+
+  @override
+  Future<Either<Failure, void>> saveSeasonChampionshipsCache(
+          List<ChampionshipDTO> championships, String season) async =>
+      const Right(null);
+
+  @override
   Future<Either<Failure, ChampionshipDTO>> setTeamEnrollment({
     required String championshipDocId,
     required TeamDTO team,
@@ -126,7 +136,11 @@ void main() {
       _Watch(),
       _Delete(),
       championships,
-      GetSeasonChampionshipsUseCase(repo),
+      GetSeasonChampionshipsCacheFirstUseCase(
+        GetSeasonChampionshipsUseCase(repo),
+        GetCachedSeasonChampionshipsUseCase(repo),
+        SaveSeasonChampionshipsCacheUseCase(repo),
+      ),
       SetTeamChampionshipsUseCase(repo),
     )..watch(teamId: '1', teamName: 'Lava Jato', season: '2026', region: 'Floresta');
     await Future<void>.delayed(Duration.zero);

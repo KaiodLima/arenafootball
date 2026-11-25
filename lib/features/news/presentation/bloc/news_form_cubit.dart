@@ -8,7 +8,7 @@ import 'package:arena_soccer/features/news/domain/usecases/update_news_usecase.d
 import 'package:arena_soccer/features/news/presentation/bloc/news_form_state.dart';
 import 'package:arena_soccer/features/partner_requests/data/dtos/partner_request_dto.dart';
 import 'package:arena_soccer/features/partner_requests/domain/usecases/get_partner_slots_usecase.dart';
-import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
 
 /// Formulário de notícia (criar/editar) e de anúncio (tag "publicidade").
 /// O parceiro publica só na região dele, e o anúncio dele vai numa vaga do
@@ -16,7 +16,7 @@ import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecas
 class NewsFormCubit extends Cubit<NewsFormState> {
   final CreateNewsUseCase createNewsUseCase;
   final UpdateNewsUseCase updateNewsUseCase;
-  final GetRegionsUseCase getRegionsUseCase;
+  final GetRegionsCacheFirstUseCase getRegionsUseCase;
   final WatchHighlightsUseCase watchHighlightsUseCase;
   final GetPartnerSlotsUseCase getPartnerSlotsUseCase;
   PartnerRequestDTO? _partner;
@@ -65,7 +65,7 @@ class NewsFormCubit extends Cubit<NewsFormState> {
   }
 
   Future<void> _loadRegions(String region) async {
-    final response = await getRegionsUseCase();
+    final response = await getRegionsUseCase.names();
     if (isClosed) return;
     final regions = response.fold((_) => <String>[], (list) => list);
     if (regions.isEmpty) return;

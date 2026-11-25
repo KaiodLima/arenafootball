@@ -152,7 +152,8 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('report-role-starter')).last);
       await tester.pump();
       expect(find.text('Já há 11 titulares. Tire um titular para escalar outro.'), findsOneWidget);
-      expect(find.text('Titulares 11/11'), findsOneWidget);
+      // O contador pode ter rolado para fora da tela: confere pelo estado.
+      expect(MatchReport.lineupCount(cubit.state.match!.lineup.home).starters, 11);
       await cubit.close();
     });
   });

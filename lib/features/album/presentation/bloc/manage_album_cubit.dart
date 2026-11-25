@@ -26,6 +26,7 @@ enum ManageAlbumNotice {
   stickerSaved,
   stickerDeleted,
   stickersDeleted,
+  photosSynced,
 }
 
 class ManageAlbumState extends Equatable {
@@ -128,7 +129,7 @@ class ManageAlbumCubit extends Cubit<ManageAlbumState> {
   final ManageAlbumUseCase manageAlbumUseCase;
   final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
   final WatchTeamPlayersUseCase watchTeamPlayersUseCase;
-  final GetSeasonChampionshipsUseCase getSeasonChampionshipsUseCase;
+  final GetSeasonChampionshipsCacheFirstUseCase getSeasonChampionshipsUseCase;
   StreamSubscription<Either<Failure, List<AlbumEventDTO>>>? _events;
   StreamSubscription<Either<Failure, List<StickerDTO>>>? _stickers;
 
@@ -158,7 +159,7 @@ class ManageAlbumCubit extends Cubit<ManageAlbumState> {
 
   /// Competições da temporada atual. Falha: "Gerar do elenco" usa o geral.
   Future<void> _loadChampionships() async {
-    final response = await getSeasonChampionshipsUseCase(SeasonCollection.currentSeason);
+    final response = await getSeasonChampionshipsUseCase.latest(SeasonCollection.currentSeason);
     if (isClosed || response.isLeft) return;
     emit(state.copyWith(championships: response.right));
   }
@@ -275,6 +276,49 @@ class ManageAlbumCubit extends Cubit<ManageAlbumState> {
       (failure) => emit(ErrorManageAlbumState(state.copyWith(busy: false), failure.toString())),
       (_) => emit(NoticeManageAlbumState(state.copyWith(busy: false), ManageAlbumNotice.stickersDeleted,
           count: stickers.length)),
+    );
+  }
+
+  /// "Atualizar fotos dos atletas": copia a foto atual de cada atleta (elenco
+  /// geral dos times do evento) para as figurinhas dele que estão diferentes.
+  /// Aviso com quantas mudaram (0 = tudo em dia).
+  Future<void> syncAthletePhotos() async {
+    final event = state.editing;
+    if (event == null || event.id.isEmpty) return;
+    emit(state.copyWith(busy: true));
+    final teamIds = {
+      ...event.teamIds,
+      for (final s in state.stickers)
+        if (s.kind == StickerKind.athlete && s.teamId.isNotEmpty) s.teamId,
+    };
+    final photoOf = <String, String>{};
+    for (final teamId in teamIds) {
+      final team = state.teams.where((t) => t.id == teamId).firstOrNull;
+      final players =
+          await watchTeamPlayersUseCase(teamId: teamId, teamName: team?.name ?? event.teamName(teamId)).first;
+      if (isClosed) return;
+      if (players.isLeft) {
+        emit(ErrorManageAlbumState(state.copyWith(busy: false), players.left.toString()));
+        return;
+      }
+      for (final player in players.right) {
+        if (player.imageUrl.isNotEmpty) photoOf[player.id] = player.imageUrl;
+      }
+    }
+    final changes = {
+      for (final s in state.stickers)
+        if (s.kind == StickerKind.athlete &&
+            s.id.isNotEmpty &&
+            photoOf[s.playerId] != null &&
+            photoOf[s.playerId] != s.imageUrl)
+          s.id: photoOf[s.playerId]!,
+    };
+    final response = await manageAlbumUseCase.updateStickerPhotos(event, changes);
+    if (isClosed) return;
+    response.fold(
+      (failure) => emit(ErrorManageAlbumState(state.copyWith(busy: false), failure.toString())),
+      (_) => emit(
+          NoticeManageAlbumState(state.copyWith(busy: false), ManageAlbumNotice.photosSynced, count: changes.length)),
     );
   }
 

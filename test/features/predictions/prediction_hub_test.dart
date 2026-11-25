@@ -13,11 +13,12 @@ import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_cubit.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_state.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
-import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_cache_first_usecase.dart';
 import 'package:arena_soccer/features/predictions/data/dtos/prediction_dto.dart';
 import 'package:arena_soccer/features/predictions/domain/prediction_hub.dart';
-import 'package:arena_soccer/features/predictions/domain/usecases/get_my_predictions_usecase.dart';
+import 'package:arena_soccer/features/predictions/domain/usecases/my_predictions_cache_usecases.dart';
 import 'package:arena_soccer/features/predictions/domain/usecases/get_prediction_ranking_usecase.dart';
+import 'package:arena_soccer/features/predictions/domain/usecases/prediction_ranking_cache_usecases.dart';
 import 'package:arena_soccer/features/predictions/presentation/bloc/prediction_hub_cubit.dart';
 import 'package:arena_soccer/features/predictions/presentation/page/prediction_ranking_page.dart';
 import 'package:arena_soccer/features/predictions/presentation/widgets/hub_widgets.dart';
@@ -77,44 +78,63 @@ final _matches = [
   ),
 ];
 
-class _Ranking implements GetPredictionRankingUseCase {
+class _Ranking implements GetPredictionRankingCacheFirstUseCase {
   @override
-  Future<Either<Failure, ({List<PredictionRankingEntry> top, PredictionRankingEntry? mine, int? myPosition})>> call({
+  Stream<Either<Failure, PredictionRanking>> call({
     required String regionId,
     String uid = '',
     String? season,
-  }) async =>
-      Right((top: _ranking, mine: uid.isEmpty ? null : _ranking[3], myPosition: uid.isEmpty ? null : 4));
+    bool force = false,
+  }) =>
+      Stream.value(Right((top: _ranking, mine: uid.isEmpty ? null : _ranking[3], myPosition: uid.isEmpty ? null : 4)));
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _Matches implements GetRegionMatchesUseCase {
+class _Matches implements GetRegionMatchesCacheFirstUseCase {
   @override
-  Future<Either<Failure, List<MatchDTO>>> call({required String region, String? season}) async => Right(_matches);
+  Stream<Either<Failure, List<MatchDTO>>> call({required String region, String? season, bool force = false}) =>
+      Stream.value(Right(_matches));
+
+  @override
+  Future<Either<Failure, List<MatchDTO>>> latest({required String region, String? season, bool force = false}) =>
+      call(region: region, season: season).last;
 }
 
-class _Mine implements GetMyPredictionsUseCase {
+class _Mine implements GetMyPredictionsCacheFirstUseCase {
   final asked = <List<String>>[];
 
   @override
-  Future<Either<Failure, Map<String, PredictionDTO>>> call({
+  Stream<Either<Failure, Map<String, PredictionDTO>>> call({
     required List<String> matchIds,
     required String uid,
     String? season,
-  }) async {
+    bool force = false,
+  }) async* {
     asked.add(matchIds);
-    if (uid.isEmpty) return const Right({});
+    if (uid.isEmpty) {
+      yield const Right({});
+      return;
+    }
     const all = {
       'm1': PredictionDTO(uid: 'u1', home: 2, away: 1),
       'f1': PredictionDTO(uid: 'u1', home: 2, away: 1, points: 10, exact: true, valid: true),
     };
-    return Right({
+    yield Right({
       for (final id in matchIds)
         if (all.containsKey(id)) id: all[id]!
     });
   }
+
+  @override
+  Future<Either<Failure, Map<String, PredictionDTO>>> latest({
+    required List<String> matchIds,
+    required String uid,
+    String? season,
+    bool force = false,
+  }) =>
+      call(matchIds: matchIds, uid: uid, season: season, force: force).last;
 }
 
 class _Teams implements GetTeamsCacheFirstUseCase {

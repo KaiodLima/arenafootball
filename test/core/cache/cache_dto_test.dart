@@ -2,12 +2,21 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:arena_soccer/core/firebase/region_registry.dart';
+import 'package:arena_soccer/features/achievements/data/dtos/achievement_dto.dart';
+import 'package:arena_soccer/features/achievements/domain/achievement_metric.dart';
+import 'package:arena_soccer/features/app_version/domain/app_update.dart';
 import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
+import 'package:arena_soccer/features/matches/data/dtos/match_report_dtos.dart';
+import 'package:arena_soccer/features/matches/domain/match_round.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/global_results/data/dtos/scraped_match_dto.dart';
 import 'package:arena_soccer/features/highlights/data/dtos/highlight_dto.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
+import 'package:arena_soccer/features/players/domain/player_season_summary.dart';
+import 'package:arena_soccer/features/predictions/data/dtos/prediction_dto.dart';
 import 'package:arena_soccer/features/seasons/data/dtos/seasons_config_dto.dart';
 import 'package:arena_soccer/features/stats/domain/ranking_entry.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
@@ -132,6 +141,29 @@ void main() {
     expect(StatsRanking.fromCache(_roundTrip(ranking.toCache())), ranking);
   });
 
+  test('PlayerSeasonSummary (histórico do atleta)', () {
+    const summary = PlayerSeasonSummary(
+      season: '2025',
+      player: PlayerDTO(id: 'p1', name: 'Dudu', team: 'Lava Jato', teamId: '1', goals: 3, userId: 'u1'),
+      awards: 2,
+    );
+    expect(PlayerSeasonSummary.fromCache(_roundTrip(summary.toCache())), summary);
+  });
+
+  test('bolão: PredictionDTO (pontuado e não), PredictionRankingEntry e PredictionStanding', () {
+    const scored = PredictionDTO(uid: 'u1', home: 2, away: 1, name: 'Kaio', points: 10, exact: true, valid: true);
+    const open = PredictionDTO(uid: 'u1', home: 0, away: 0);
+    expect(PredictionDTO.fromCache(_roundTrip(scored.toCache())), scored);
+    expect(PredictionDTO.fromCache(_roundTrip(open.toCache())), open);
+
+    const entry = PredictionRankingEntry(uid: 'u1', name: 'Kaio', points: 22, exact: 1, count: 4);
+    expect(PredictionRankingEntry.fromCache(_roundTrip(entry.toCache())), entry);
+
+    const standing = PredictionStanding(entry: entry, position: 64);
+    expect(PredictionStanding.fromCache(_roundTrip(standing.toCache())), standing);
+    expect(PredictionStanding.fromCache(_roundTrip(const PredictionStanding().toCache())), const PredictionStanding());
+  });
+
   test('NewsDTO: card de gol com todos os campos (data em ms; região pelo id)', () {
     RegionRegistry.configure(const [RegionRef(id: 'fl', name: 'Floresta')]);
     final news = NewsDTO(
@@ -197,5 +229,94 @@ void main() {
   test('VoteDTO', () {
     const vote = VoteDTO(voterId: 'u1', playerName: 'Dudu', team: 'Lava Jato', teamId: '1');
     expect(VoteDTO.fromCache(_roundTrip(vote.toCache())), vote);
+  });
+
+  test('MatchDTO: todos os campos (horas em ms, craque, súmula); região pelo id', () {
+    RegionRegistry.configure(const [RegionRef(id: 'fl', name: 'Floresta')]);
+    final match = MatchDTO(
+      id: 'm1',
+      homeTeam: 'Lava Jato',
+      awayTeam: 'Volta',
+      homeTeamId: '1',
+      awayTeamId: '2',
+      date: '18/10',
+      time: '16:30',
+      originalTime: '16:00',
+      venue: 'Campo',
+      championshipId: 7,
+      round: const MatchRound.group(groupId: 'g1', groupName: 'A'),
+      matchday: 3,
+      isTest: true,
+      region: 'Floresta',
+      homeGoals: 2,
+      awayGoals: 1,
+      isVotingOpen: true,
+      votingTitle: 'Craque',
+      bestPlayer: 'Dudu',
+      electedPlayerId: 'p1',
+      electedPlayerName: 'Dudu',
+      votesCount: '12',
+      registeredAt: DateTime(2026, 10, 1, 9, 30, 1, 250),
+      regionIds: const ['fl', 'si'],
+      goals: const [
+        MatchGoal(id: 'g1', side: MatchSide.home, scorerId: 'p1', scorerName: 'Dudu', minute: 12),
+        MatchGoal(
+            id: 'g2',
+            side: MatchSide.away,
+            scorerId: 'p2',
+            scorerName: 'Léo',
+            assistantId: 'p3',
+            assistantName: 'Rafa'),
+      ],
+      durationMinutes: 60,
+      manualStatus: MatchManualStatus.halfTime,
+      startedAt: DateTime(2026, 10, 18, 16, 31),
+      halfTimeAt: DateTime(2026, 10, 18, 17, 2),
+      statusAt: DateTime(2026, 10, 18, 17, 2, 5),
+      bookings: const [MatchBooking(id: 'b1', side: MatchSide.away, type: BookingType.red, playerId: 'p2', minute: 20)],
+      substitutions: const [
+        MatchSubstitution(id: 's1', side: MatchSide.home, outId: 'p1', outName: 'Dudu', inId: 'p4', inName: 'Gui'),
+      ],
+      lineup: const MatchLineup(home: [LineupEntry(playerId: 'p1', playerName: 'Dudu', number: 9)]),
+      referee: 'Juiz',
+      notes: 'obs',
+    );
+    final json = _roundTrip(match.toCache());
+    expect(MatchDTO.fromCache(json), match);
+    expect(
+        MatchDTO.fromCache(_roundTrip(
+                const MatchDTO(id: 'k', homeTeam: 'A', awayTeam: 'B', round: MatchRound.knockout(MatchStage.finalMatch))
+                    .toCache()))
+            .round,
+        const MatchRound.knockout(MatchStage.finalMatch));
+
+    // Região renomeada depois de salvar: mostra o nome novo.
+    RegionRegistry.configure(const [RegionRef(id: 'fl', name: 'Floresta Sul')]);
+    expect(MatchDTO.fromCache(json).region, 'Floresta Sul');
+  });
+
+  test('AppVersionConfig', () {
+    const config =
+        AppVersionConfig(minAndroid: 40, recommendedAndroid: 44, minIos: 1, recommendedIos: 2, message: 'Novo');
+    expect(AppVersionConfig.fromCache(_roundTrip(config.toCache())), config);
+  });
+
+  test('AchievementDTO', () {
+    const achievement = AchievementDTO(
+      id: 'a1',
+      title: 'Torcedor',
+      description: 'desc',
+      category: AchievementCategory.fan,
+      icon: 'heart',
+      tier: AchievementTier.gold,
+      metric: AchievementMetric.votes,
+      goal: 10,
+      points: 50,
+      packs: 2,
+      secret: true,
+      active: false,
+      order: 3,
+    );
+    expect(AchievementDTO.fromCache(_roundTrip(achievement.toCache())), achievement);
   });
 }

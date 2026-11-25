@@ -12,7 +12,7 @@ void registerEventPollsDependencies() {
   _sl.registerLazySingleton<EventPollsDataSource>(() => EventPollsDataSource(_sl()));
 
   // Repository (interface -> impl)
-  _sl.registerLazySingleton<IEventPollsRepository>(() => EventPollsRepositoryImpl(_sl()));
+  _sl.registerLazySingleton<IEventPollsRepository>(() => EventPollsRepositoryImpl(_sl(), _sl()));
 
   // UseCases
   _sl.registerLazySingleton(() => EventPollUseCase(_sl()));

@@ -115,6 +115,24 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
+          "fieldPath": "tag",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "encerrado",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "data",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "noticias",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
           "fieldPath": "idRegiao",
           "order": "ASCENDING"
         },

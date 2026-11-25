@@ -8,10 +8,10 @@ import 'package:arena_soccer/features/championships/data/dtos/championship_dto.d
 import 'package:arena_soccer/features/championships/domain/usecases/get_region_championships_cache_first_usecase.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/create_match_usecase.dart';
-import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_cache_first_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/watch_matches_usecase.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/match_form_state.dart';
-import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/match_time.dart';
@@ -23,9 +23,9 @@ import 'package:arena_soccer/features/matches/domain/match_round.dart';
 /// alimentam as sugestões (horários e locais) e o aviso de conflito.
 class MatchFormCubit extends Cubit<MatchFormState> {
   final CreateMatchUseCase createMatchUseCase;
-  final GetRegionsUseCase getRegionsUseCase;
+  final GetRegionsCacheFirstUseCase getRegionsUseCase;
   final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
-  final GetRegionMatchesUseCase getRegionMatchesUseCase;
+  final GetRegionMatchesCacheFirstUseCase getRegionMatchesUseCase;
   final GetRegionChampionshipsCacheFirstUseCase getRegionChampionshipsCacheFirstUseCase;
 
   /// Grupos do campeonato (campo "Fase"); nulo = sem o campo (testes antigos).
@@ -93,7 +93,7 @@ class MatchFormCubit extends Cubit<MatchFormState> {
     ));
     final loadRegion = _loadRegionData(initialRegion);
 
-    final response = await getRegionsUseCase();
+    final response = await getRegionsUseCase.names();
     final regions = response.fold((_) => <String>[], (list) => list);
     if (regions.isNotEmpty) {
       final current = state.form.selectedRegion ?? initialRegion;
@@ -148,7 +148,7 @@ class MatchFormCubit extends Cubit<MatchFormState> {
     final teamsFuture = getTeamsCacheFirstUseCase(region: region).last;
     // Todos da temporada (cache): os de fora da região, para intermunicipal.
     final seasonTeamsFuture = getTeamsCacheFirstUseCase().last;
-    final matchesFuture = getRegionMatchesUseCase(region: region);
+    final matchesFuture = getRegionMatchesUseCase.latest(region: region);
     final championshipsFuture =
         getRegionChampionshipsCacheFirstUseCase(region: region, season: SeasonCollection.currentSeason).last;
     final teamsResponse = await teamsFuture;
@@ -273,7 +273,7 @@ class MatchFormCubit extends Cubit<MatchFormState> {
 
   Future<void> _refreshExisting(String? region, {required MatchDTO pending}) async {
     if (region == null) return;
-    final response = await getRegionMatchesUseCase(region: region);
+    final response = await getRegionMatchesUseCase.latest(region: region);
     if (isClosed || state.form.selectedRegion != region || response.isLeft) return;
     bool same(MatchDTO a, MatchDTO b) =>
         a.homeTeam == b.homeTeam && a.awayTeam == b.awayTeam && a.date == b.date && a.time == b.time;

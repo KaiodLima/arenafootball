@@ -20,6 +20,8 @@ String fantasySignedPoints(double points) => points > 0 ? '+${fantasyPointsLabel
 /// Folha "Pontuação detalhada" do atleta na rodada: cada regra com os
 /// pontos, o total individual, o capitão multiplicado e os motivos (por que
 /// não pontuou / observações). Uma leitura (`rodadas/{n}/atletas/{id}`).
+/// [scoringVersion]: a [FantasyRoundDTO.scoringVersion] da rodada apurada
+/// (com ela, a pontuação fica no cache até a reapuração; 0 = lê sempre).
 /// [load]: só para teste (padrão: o use case do DI).
 Future<void> showFantasyAthleteScore(
   BuildContext context, {
@@ -28,9 +30,11 @@ Future<void> showFantasyAthleteScore(
   required String athleteId,
   bool captain = false,
   FantasyAthleteDTO? athlete,
+  int scoringVersion = 0,
   Future<Either<Failure, FantasyAthleteScoreDTO?>> Function()? load,
 }) {
-  final future = load?.call() ?? sl<GetFantasyAthleteScoreUseCase>()(fantasyId, round, athleteId);
+  final future = load?.call() ??
+      sl<GetFantasyAthleteScoreCacheFirstUseCase>()(fantasyId, round, athleteId, version: scoringVersion);
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,

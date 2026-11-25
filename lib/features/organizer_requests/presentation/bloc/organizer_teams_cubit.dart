@@ -6,7 +6,7 @@ import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:either_dart/either.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/set_team_championships_usecase.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_teams_by_ids_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_by_ids_cache_first_usecase.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
 /// Times de cada campeonato do organizador (aba Times do modo organizador).
@@ -27,7 +27,7 @@ class OrganizerTeamsState extends Equatable {
 /// campeonatos dela; cada campeonato resolve os seus pelo [TeamDirectory].
 /// Time não encontrado aparece só com o nome.
 class OrganizerTeamsCubit extends Cubit<OrganizerTeamsState> {
-  final GetTeamsByIdsUseCase getTeamsByIdsUseCase;
+  final GetTeamsByIdsCacheFirstUseCase getTeamsByIdsUseCase;
   final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
   final SetTeamChampionshipsUseCase setTeamChampionshipsUseCase;
 

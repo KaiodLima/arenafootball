@@ -21,10 +21,10 @@ import 'package:arena_soccer/features/team_requests/presentation/bloc/owned_team
 import 'package:arena_soccer/features/team_requests/presentation/bloc/owned_team_state.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
-import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_cache_first_usecase.dart';
 import 'package:arena_soccer/features/players/domain/player_season_summary.dart';
-import 'package:arena_soccer/features/players/domain/usecases/get_player_awards_usecase.dart';
-import 'package:arena_soccer/features/players/domain/usecases/get_player_season_history_usecase.dart';
+import 'package:arena_soccer/features/players/domain/usecases/player_awards_cache_usecases.dart';
+import 'package:arena_soccer/features/players/domain/usecases/player_season_history_cache_usecases.dart';
 import 'package:arena_soccer/features/players/domain/usecases/assign_unassigned_stats_usecase.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/services/storage_upload_service.dart';
@@ -531,19 +531,25 @@ void main() {
   });
 }
 
-class _NoRegionMatches implements GetRegionMatchesUseCase {
+class _NoRegionMatches implements GetRegionMatchesCacheFirstUseCase {
   @override
-  Future<Either<Failure, List<MatchDTO>>> call({required String region, String? season}) async => const Right([]);
+  Stream<Either<Failure, List<MatchDTO>>> call({required String region, String? season, bool force = false}) =>
+      Stream.value(const Right([]));
+
+  @override
+  Future<Either<Failure, List<MatchDTO>>> latest({required String region, String? season, bool force = false}) =>
+      call(region: region, season: season).last;
 }
 
-class _NoAwards implements GetPlayerAwardsUseCase {
+class _NoAwards implements GetPlayerAwardsCacheFirstUseCase {
   @override
-  Future<Either<Failure, List<MatchDTO>>> call({required String playerId, String? season}) async => const Right([]);
+  Stream<Either<Failure, List<MatchDTO>>> call({required String playerId, String? season, bool force = false}) =>
+      Stream.value(const Right([]));
 }
 
-class _NoHistory implements GetPlayerSeasonHistoryUseCase {
+class _NoHistory implements GetPlayerSeasonHistoryCacheFirstUseCase {
   @override
   Future<Either<Failure, List<PlayerSeasonSummary>>> call(
-          {required String userId, required List<String> seasons}) async =>
+          {required String userId, required List<String> seasons, bool force = false}) async =>
       const Right([]);
 }

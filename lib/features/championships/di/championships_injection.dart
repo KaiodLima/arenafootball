@@ -54,6 +54,9 @@ void registerChampionshipsDependencies() {
   _sl.registerLazySingleton(() => GetRegionChampionshipsCacheFirstUseCase(_sl(), _sl(), _sl()));
   _sl.registerLazySingleton(() => GetRegionChampionshipCacheFirstUseCase(_sl(), _sl(), _sl()));
   _sl.registerLazySingleton(() => GetSeasonChampionshipsUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetCachedSeasonChampionshipsUseCase(_sl()));
+  _sl.registerLazySingleton(() => SaveSeasonChampionshipsCacheUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetSeasonChampionshipsCacheFirstUseCase(_sl(), _sl(), _sl()));
   _sl.registerLazySingleton(() => SetTeamChampionshipsUseCase(_sl()));
   _sl.registerLazySingleton(() => WatchChampionshipGroupsUseCase(_sl()));
   _sl.registerLazySingleton(() => SaveGroupUseCase(_sl()));

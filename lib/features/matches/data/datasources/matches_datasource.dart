@@ -129,6 +129,7 @@ class MatchesDataSource {
     required String matchId,
     required List<MatchBooking> bookings,
     List<MatchSubstitution> substitutions = const [],
+    List<MatchMissedPenalty> missedPenalties = const [],
     required MatchLineup lineup,
     required String referee,
     required String notes,
@@ -143,6 +144,7 @@ class MatchesDataSource {
         {
           MatchDTO.bookingsField: [for (final b in bookings) b.toMap()],
           MatchDTO.substitutionsField: [for (final s in substitutions) s.toMap()],
+          MatchDTO.missedPenaltiesField: [for (final p in missedPenalties) p.toMap()],
           MatchDTO.lineupField: lineup.toMap(),
           'arbitro': referee.trim(),
           'observacoes': notes.trim(),

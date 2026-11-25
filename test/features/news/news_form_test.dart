@@ -12,7 +12,7 @@ import 'package:arena_soccer/features/highlights/domain/usecases/watch_highlight
 import 'package:arena_soccer/features/news/domain/usecases/create_news_usecase.dart';
 import 'package:arena_soccer/features/news/domain/usecases/update_news_usecase.dart';
 import 'package:arena_soccer/features/news/presentation/bloc/news_form_cubit.dart';
-import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
 import 'package:arena_soccer/features/news/presentation/bloc/news_form_state.dart';
 
 class _FakeStorage implements StorageUploadService {
@@ -194,9 +194,12 @@ void main() {
   });
 }
 
-class _FakeRegions implements GetRegionsUseCase {
+class _FakeRegions implements GetRegionsCacheFirstUseCase {
   @override
-  Future<Either<Failure, List<String>>> call() async => const Right(['Floresta']);
+  Future<Either<Failure, List<String>>> names({bool force = false}) async => const Right(['Floresta']);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 class _FakeHighlights implements WatchHighlightsUseCase {

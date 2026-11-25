@@ -71,4 +71,26 @@ abstract class IFantasyRepository {
   Future<Either<Failure, CachedValue<List<FantasyAthleteScoreDTO>>?>> getCachedTopAthletes(String fantasyId, int round);
 
   Future<Either<Failure, void>> saveTopAthletesCache(String fantasyId, int round, List<FantasyAthleteScoreDTO> list);
+
+  Future<Either<Failure, CachedValue<List<FantasyRoundDTO>>?>> getCachedRounds(String fantasyId);
+
+  Future<Either<Failure, void>> saveRoundsCache(String fantasyId, List<FantasyRoundDTO> rounds);
+
+  Future<Either<Failure, CachedValue<FantasyPositionRecord>?>> getCachedPosition(String fantasyId,
+      {int? round, required String uid});
+
+  Future<Either<Failure, void>> savePositionCache(String fantasyId, FantasyPositionRecord record,
+      {int? round, required String uid});
+
+  Future<Either<Failure, CachedValue<FantasyRoundRecord>?>> getCachedRoundRecord(
+      String fantasyId, int round, String uid);
+
+  Future<Either<Failure, void>> saveRoundRecordCache(
+      String fantasyId, int round, String uid, FantasyRoundRecord record);
+
+  Future<Either<Failure, CachedValue<FantasyAthleteScoreRecord>?>> getCachedAthleteScore(
+      String fantasyId, int round, String athleteId);
+
+  Future<Either<Failure, void>> saveAthleteScoreCache(
+      String fantasyId, int round, String athleteId, FantasyAthleteScoreRecord record);
 }

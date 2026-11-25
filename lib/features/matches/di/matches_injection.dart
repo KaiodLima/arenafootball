@@ -10,6 +10,9 @@ import 'package:arena_soccer/features/matches/domain/usecases/delete_match_useca
 import 'package:arena_soccer/features/matches/domain/usecases/set_match_phase_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/toggle_match_voting_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/get_cached_region_matches_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_cache_first_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/save_region_matches_cache_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/get_today_matches_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/publish_goal_cards_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/save_match_report_usecase.dart';
@@ -26,7 +29,7 @@ void registerMatchesDependencies() {
   _sl.registerLazySingleton<MatchesDataSource>(() => MatchesDataSource(_sl()));
 
   // Repository (interface -> impl)
-  _sl.registerLazySingleton<IMatchesRepository>(() => MatchesRepositoryImpl(_sl()));
+  _sl.registerLazySingleton<IMatchesRepository>(() => MatchesRepositoryImpl(_sl(), _sl()));
 
   // UseCases
   _sl.registerLazySingleton(() => WatchMatchesUseCase(_sl()));
@@ -45,4 +48,9 @@ void registerMatchesDependencies() {
   _sl.registerLazySingleton(() => SetMatchPhaseUseCase(_sl()));
   _sl.registerLazySingleton(() => DelayMatchUseCase(_sl()));
   _sl.registerLazySingleton(() => UpdateMatchInfoUseCase(_sl()));
+
+  // Cache local (ver `cacheFirst`)
+  _sl.registerLazySingleton(() => GetCachedRegionMatchesUseCase(_sl()));
+  _sl.registerLazySingleton(() => SaveRegionMatchesCacheUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetRegionMatchesCacheFirstUseCase(_sl(), _sl(), _sl()));
 }

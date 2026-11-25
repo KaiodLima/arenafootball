@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/features/predictions/data/dtos/prediction_dto.dart';
-import 'package:arena_soccer/features/predictions/domain/usecases/count_predictions_usecase.dart';
+import 'package:arena_soccer/features/predictions/domain/usecases/prediction_count_cache_usecases.dart';
 import 'package:arena_soccer/features/predictions/domain/usecases/save_prediction_usecase.dart';
 import 'package:arena_soccer/features/predictions/domain/usecases/watch_my_prediction_usecase.dart';
 
@@ -64,7 +64,7 @@ class PredictionState extends Equatable {
 class PredictionCubit extends Cubit<PredictionState> {
   final WatchMyPredictionUseCase watchMyPredictionUseCase;
   final SavePredictionUseCase savePredictionUseCase;
-  final CountPredictionsUseCase countPredictionsUseCase;
+  final CountPredictionsCacheFirstUseCase countPredictionsUseCase;
 
   PredictionCubit(this.watchMyPredictionUseCase, this.savePredictionUseCase, this.countPredictionsUseCase)
       : super(const PredictionState());
@@ -101,10 +101,13 @@ class PredictionCubit extends Cubit<PredictionState> {
     });
   }
 
+  /// Quantas pessoas palpitaram (cache primeiro: o salvo na hora e, vencido,
+  /// o atualizado).
   Future<void> loadCount() async {
-    final response = await countPredictionsUseCase(matchId: _matchId, season: _season);
-    if (isClosed) return;
-    response.fold((_) {}, (count) => emit(state.copyWith(count: count)));
+    await for (final response in countPredictionsUseCase(matchId: _matchId, season: _season)) {
+      if (isClosed) return;
+      response.fold((_) {}, (count) => emit(state.copyWith(count: count)));
+    }
   }
 
   void changeHome(int delta) => _setDraft(home: state.home + delta);

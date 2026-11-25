@@ -135,6 +135,86 @@ class MatchSubstitution extends Equatable {
   List<Object?> get props => [id, side, outId, outName, inId, inName, minute];
 }
 
+/// Como o pênalti foi perdido.
+enum PenaltyMiss {
+  saved('defendido'),
+  wide('fora');
+
+  final String key;
+
+  const PenaltyMiss(this.key);
+
+  static PenaltyMiss fromKey(String? key) => key == wide.key ? wide : saved;
+}
+
+/// Pênalti perdido da súmula (`partidas{ano}.penaltisPerdidos[]`): lado e
+/// cobrador, minuto, como perdeu e o goleiro que defendeu (opcional, do
+/// outro time). Não conta no placar; o convertido é um gol com `penalti`.
+class MatchMissedPenalty extends Equatable {
+  final String id;
+  final MatchSide side;
+  final String playerId;
+  final String playerName;
+  final int? minute;
+  final PenaltyMiss miss;
+  final String keeperId;
+  final String keeperName;
+
+  const MatchMissedPenalty({
+    required this.id,
+    required this.side,
+    this.playerId = '',
+    this.playerName = '',
+    this.minute,
+    this.miss = PenaltyMiss.saved,
+    this.keeperId = '',
+    this.keeperName = '',
+  });
+
+  static final Random _random = Random();
+
+  static String newId() =>
+      'p${DateTime.now().microsecondsSinceEpoch.toRadixString(36)}${_random.nextInt(1 << 20).toRadixString(36)}';
+
+  /// Defendido com o goleiro informado.
+  bool get hasKeeper => miss == PenaltyMiss.saved && (keeperId.isNotEmpty || keeperName.isNotEmpty);
+
+  factory MatchMissedPenalty.fromMap(Map<String, dynamic> data) {
+    String text(String key) => data[key]?.toString() ?? '';
+    return MatchMissedPenalty(
+      id: text('id'),
+      side: MatchSide.fromKey(text('lado')),
+      playerId: text('idJogador'),
+      playerName: text('jogador'),
+      minute: (data['minuto'] as num?)?.toInt(),
+      miss: PenaltyMiss.fromKey(text('motivo')),
+      keeperId: text('idGoleiro'),
+      keeperName: text('goleiro'),
+    );
+  }
+
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'lado': side.key,
+        'idJogador': playerId,
+        'jogador': playerName,
+        if (minute != null) 'minuto': minute,
+        'motivo': miss.key,
+        if (miss == PenaltyMiss.saved && keeperId.isNotEmpty) 'idGoleiro': keeperId,
+        if (miss == PenaltyMiss.saved && keeperName.isNotEmpty) 'goleiro': keeperName,
+      };
+
+  static List<MatchMissedPenalty> listFrom(Object? raw) => raw is List
+      ? [
+          for (final item in raw)
+            if (item is Map) MatchMissedPenalty.fromMap(Map<String, dynamic>.from(item)),
+        ]
+      : const [];
+
+  @override
+  List<Object?> get props => [id, side, playerId, playerName, minute, miss, keeperId, keeperName];
+}
+
 /// Atleta relacionado para a partida (`partidas{ano}.escalacao.casa|fora[]`).
 class LineupEntry extends Equatable {
   final String playerId;

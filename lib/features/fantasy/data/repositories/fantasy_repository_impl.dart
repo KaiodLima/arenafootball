@@ -113,19 +113,33 @@ class FantasyRepositoryImpl implements IFantasyRepository {
       _dataSource.getParticipants(fantasyId, before: before);
 
   @override
-  Future<Either<Failure, void>> requestRescore(String fantasyId) => _dataSource.requestRescore(fantasyId);
+  Future<Either<Failure, void>> requestRescore(String fantasyId) async {
+    final result = await _dataSource.requestRescore(fantasyId);
+    if (result.isRight) await _clearScoring(fantasyId);
+    return result;
+  }
 
   @override
-  Future<Either<Failure, void>> requestReset(String fantasyId) => _dataSource.requestReset(fantasyId);
+  Future<Either<Failure, void>> requestReset(String fantasyId) async {
+    final result = await _dataSource.requestReset(fantasyId);
+    if (result.isRight) await _clearScoring(fantasyId);
+    return result;
+  }
 
   @override
-  Future<Either<Failure, void>> requestTeamsReset(String fantasyId, List<String> teamIds) =>
-      _dataSource.requestTeamsReset(fantasyId, teamIds);
+  Future<Either<Failure, void>> requestTeamsReset(String fantasyId, List<String> teamIds) async {
+    final result = await _dataSource.requestTeamsReset(fantasyId, teamIds);
+    if (result.isRight) await _clearScoring(fantasyId);
+    return result;
+  }
 
   @override
   Future<Either<Failure, void>> requestRoundAction(String fantasyId, int round,
-          {required bool open, DateTime? deadline}) =>
-      _dataSource.requestRoundAction(fantasyId, round, open: open, deadline: deadline);
+      {required bool open, DateTime? deadline}) async {
+    final result = await _dataSource.requestRoundAction(fantasyId, round, open: open, deadline: deadline);
+    if (result.isRight) await _cache.delete(CacheKeys.fantasyRounds(fantasyId));
+    return result;
+  }
 
   @override
   Future<Either<Failure, FantasyAthleteScoreDTO?>> getAthleteScore(String fantasyId, int round, String athleteId) =>
@@ -149,4 +163,60 @@ class FantasyRepositoryImpl implements IFantasyRepository {
   Future<Either<Failure, void>> saveTopAthletesCache(String fantasyId, int round, List<FantasyAthleteScoreDTO> list) =>
       _cache
           .save(CacheKeys.fantasyTopAthletes(fantasyId: fantasyId, round: round), [for (final a in list) a.toCache()]);
+
+  /// Pedido de reapuração/reinício: rodadas, posições, histórico e pontuações
+  /// do Fantasy saem do cache (as rodadas reapuradas também mudam de versão).
+  Future<void> _clearScoring(String fantasyId) =>
+      _cache.deleteWhere((key) => CacheKeys.isFantasyScoringKey(key, fantasyId));
+
+  @override
+  Future<Either<Failure, CachedValue<List<FantasyRoundDTO>>?>> getCachedRounds(String fantasyId) =>
+      _cache.read<List<FantasyRoundDTO>>(
+        CacheKeys.fantasyRounds(fantasyId),
+        (json) => [for (final item in json as List) FantasyRoundDTO.fromCache(Map<String, dynamic>.from(item as Map))],
+      );
+
+  @override
+  Future<Either<Failure, void>> saveRoundsCache(String fantasyId, List<FantasyRoundDTO> rounds) =>
+      _cache.save(CacheKeys.fantasyRounds(fantasyId), [for (final r in rounds) r.toCache()]);
+
+  @override
+  Future<Either<Failure, CachedValue<FantasyPositionRecord>?>> getCachedPosition(String fantasyId,
+          {int? round, required String uid}) =>
+      _cache.read<FantasyPositionRecord>(
+        CacheKeys.fantasyPosition(fantasyId: fantasyId, round: round, uid: uid),
+        (json) => FantasyPositionRecord.fromCache(Map<String, dynamic>.from(json as Map)),
+      );
+
+  @override
+  Future<Either<Failure, void>> savePositionCache(String fantasyId, FantasyPositionRecord record,
+          {int? round, required String uid}) =>
+      _cache.save(CacheKeys.fantasyPosition(fantasyId: fantasyId, round: round, uid: uid), record.toCache());
+
+  @override
+  Future<Either<Failure, CachedValue<FantasyRoundRecord>?>> getCachedRoundRecord(
+          String fantasyId, int round, String uid) =>
+      _cache.read<FantasyRoundRecord>(
+        CacheKeys.fantasyHistory(fantasyId: fantasyId, round: round, uid: uid),
+        (json) => FantasyRoundRecord.fromCache(Map<String, dynamic>.from(json as Map)),
+      );
+
+  @override
+  Future<Either<Failure, void>> saveRoundRecordCache(
+          String fantasyId, int round, String uid, FantasyRoundRecord record) =>
+      _cache.save(CacheKeys.fantasyHistory(fantasyId: fantasyId, round: round, uid: uid), record.toCache());
+
+  @override
+  Future<Either<Failure, CachedValue<FantasyAthleteScoreRecord>?>> getCachedAthleteScore(
+          String fantasyId, int round, String athleteId) =>
+      _cache.read<FantasyAthleteScoreRecord>(
+        CacheKeys.fantasyAthleteScore(fantasyId: fantasyId, round: round, athleteId: athleteId),
+        (json) => FantasyAthleteScoreRecord.fromCache(Map<String, dynamic>.from(json as Map)),
+      );
+
+  @override
+  Future<Either<Failure, void>> saveAthleteScoreCache(
+          String fantasyId, int round, String athleteId, FantasyAthleteScoreRecord record) =>
+      _cache.save(
+          CacheKeys.fantasyAthleteScore(fantasyId: fantasyId, round: round, athleteId: athleteId), record.toCache());
 }

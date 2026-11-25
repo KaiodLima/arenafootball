@@ -1,4 +1,5 @@
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
@@ -73,4 +74,21 @@ abstract class IMatchesRepository {
   Future<Either<Failure, List<MatchDTO>>> getElectedMatches({required String playerId, String? season});
 
   Future<Either<Failure, int>> countElectedMatches({required String playerId, String? season});
+
+  /// Partidas da região salvas no cache local (nunca falha: sem cache = `Right(null)`).
+  Future<Either<Failure, CachedValue<List<MatchDTO>>?>> getCachedRegionMatches(
+      {required String region, String? season});
+
+  Future<Either<Failure, void>> saveRegionMatchesCache(List<MatchDTO> matches,
+      {required String region, String? season});
+
+  /// Apaga o cache das partidas por região (as gravações já fazem isso).
+  Future<void> deleteRegionMatchesCache();
+
+  /// Troféus de craque do atleta na temporada, do cache local.
+  Future<Either<Failure, CachedValue<List<MatchDTO>>?>> getCachedElectedMatches(
+      {required String playerId, String? season});
+
+  Future<Either<Failure, void>> saveElectedMatchesCache(List<MatchDTO> matches,
+      {required String playerId, String? season});
 }

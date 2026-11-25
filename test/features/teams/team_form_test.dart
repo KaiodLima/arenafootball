@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
-import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/create_team_usecase.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_next_team_number_usecase.dart';
@@ -31,9 +31,12 @@ class _FakeNextNumber implements GetNextTeamNumberUseCase {
   Future<Either<Failure, int>> call() async => const Right(14);
 }
 
-class _FakeRegions implements GetRegionsUseCase {
+class _FakeRegions implements GetRegionsCacheFirstUseCase {
   @override
-  Future<Either<Failure, List<String>>> call() async => const Right(['Floresta', 'Santo inacio']);
+  Future<Either<Failure, List<String>>> names({bool force = false}) async => const Right(['Floresta', 'Santo inacio']);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 class _FakeTeams implements GetTeamsCacheFirstUseCase {

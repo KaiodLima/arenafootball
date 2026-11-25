@@ -23,8 +23,9 @@ class ReferralCubit extends Cubit<ReferralState> {
   ) : super(const ReferralState());
 
   /// Carrega o código (cria na 1ª vez), o "Fui indicado" e acompanha o saldo
-  /// e os indicados da conta [userId].
-  Future<void> load(String userId) async {
+  /// e os indicados da conta [userId]. [referredBy] = o `indicadoPor` do
+  /// usuário da sessão (nulo = não se sabe: lê do Firestore).
+  Future<void> load(String userId, {String? referredBy}) async {
     _userId = userId;
     _subscriptions
       ..add(watchReferralUseCase(userId).listen((response) {
@@ -39,7 +40,7 @@ class ReferralCubit extends Cubit<ReferralState> {
         emit(state.copyWith(friends: response.right));
       }));
     final codeRequest = ensureReferralCodeUseCase(userId);
-    final claim = await getReferralClaimUseCase(userId);
+    final claim = await getReferralClaimUseCase(userId, knownCode: referredBy);
     final code = await codeRequest;
     if (isClosed) return;
     var next = state.copyWith(loading: false);

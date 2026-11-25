@@ -1,8 +1,10 @@
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
 import 'package:arena_soccer/features/players/domain/player_link.dart';
+import 'package:arena_soccer/features/players/domain/player_season_summary.dart';
 
 abstract class IPlayersRepository {
   Stream<Either<Failure, List<PlayerDTO>>> watchTeamPlayers(
@@ -95,4 +97,12 @@ abstract class IPlayersRepository {
     required String team,
     String? season,
   });
+
+  /// Histórico da conta [userId] na [season], do cache local (`data` nulo =
+  /// sem cadastro naquela temporada).
+  Future<Either<Failure, CachedValue<PlayerSeasonSummary?>?>> getCachedSeasonSummary(
+      {required String userId, required String season});
+
+  Future<Either<Failure, void>> saveSeasonSummaryCache(PlayerSeasonSummary? summary,
+      {required String userId, required String season});
 }

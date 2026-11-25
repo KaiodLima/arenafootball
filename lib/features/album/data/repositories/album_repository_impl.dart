@@ -1,4 +1,6 @@
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/cache/cache_keys.dart';
+import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/album/data/datasources/album_datasource.dart';
 import 'package:arena_soccer/features/album/data/dtos/album_dtos.dart';
@@ -6,8 +8,22 @@ import 'package:arena_soccer/features/album/domain/repositories/album_repository
 
 class AlbumRepositoryImpl implements IAlbumRepository {
   final AlbumDataSource _dataSource;
+  final CacheStore _cache;
 
-  AlbumRepositoryImpl(this._dataSource);
+  AlbumRepositoryImpl(this._dataSource, this._cache);
+
+  @override
+  Future<Either<Failure, CachedValue<AlbumRankingView>?>> getCachedRanking(
+          {required String eventId, required String userId}) =>
+      _cache.read(
+        CacheKeys.albumRanking(eventId: eventId, uid: userId),
+        (json) => AlbumRankingView.fromCache(Map<String, dynamic>.from(json as Map)),
+      );
+
+  @override
+  Future<Either<Failure, void>> saveRankingCache(AlbumRankingView view,
+          {required String eventId, required String userId}) =>
+      _cache.save(CacheKeys.albumRanking(eventId: eventId, uid: userId), view.toCache());
 
   @override
   Stream<Either<Failure, AlbumEventDTO?>> watchActiveEvent() => _dataSource.watchActiveEvent();
@@ -43,8 +59,12 @@ class AlbumRepositoryImpl implements IAlbumRepository {
     required String userId,
     required String eventId,
     bool extra = false,
-  }) =>
-      _dataSource.requestPack(packId: packId, userId: userId, eventId: eventId, extra: extra);
+  }) async {
+    final response = await _dataSource.requestPack(packId: packId, userId: userId, eventId: eventId, extra: extra);
+    // As functions colam as figurinhas e mudam o ranking da conta.
+    if (response.isRight) await _cache.deleteWhere((key) => CacheKeys.isAlbumRankingKey(key, eventId));
+    return response;
+  }
 
   @override
   Future<Either<Failure, String>> saveEvent(AlbumEventDTO event) => _dataSource.saveEvent(event);
@@ -67,4 +87,8 @@ class AlbumRepositoryImpl implements IAlbumRepository {
   @override
   Future<Either<Failure, void>> deleteStickers({required String eventId, required List<String> stickerIds}) =>
       _dataSource.deleteStickers(eventId: eventId, stickerIds: stickerIds);
+
+  @override
+  Future<Either<Failure, void>> updateStickerPhotos({required String eventId, required Map<String, String> photos}) =>
+      _dataSource.updateStickerPhotos(eventId: eventId, photos: photos);
 }

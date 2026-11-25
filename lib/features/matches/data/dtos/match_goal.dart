@@ -28,6 +28,9 @@ class MatchGoal extends Equatable {
   /// Minuto do gol (`minuto`, súmula); nulo em gols sem minuto.
   final int? minute;
 
+  /// Gol de pênalti (`penalti`, súmula): conta como gol normal, sem garçom.
+  final bool penalty;
+
   const MatchGoal({
     required this.id,
     required this.side,
@@ -36,6 +39,7 @@ class MatchGoal extends Equatable {
     this.assistantId = '',
     this.assistantName = '',
     this.minute,
+    this.penalty = false,
   });
 
   static final Random _random = Random();
@@ -47,7 +51,7 @@ class MatchGoal extends Equatable {
   bool get hasScorer => scorerId.isNotEmpty;
 
   /// Assistência que vale (outro atleta que não o autor).
-  bool get hasAssistant => assistantId.isNotEmpty && assistantId != scorerId;
+  bool get hasAssistant => !penalty && assistantId.isNotEmpty && assistantId != scorerId;
 
   factory MatchGoal.fromMap(Map<String, dynamic> data) {
     String text(String key) => data[key]?.toString() ?? '';
@@ -59,6 +63,7 @@ class MatchGoal extends Equatable {
       assistantId: text('idAssistencia'),
       assistantName: text('assistencia'),
       minute: (data['minuto'] as num?)?.toInt(),
+      penalty: data['penalti'] == true,
     );
   }
 
@@ -70,6 +75,7 @@ class MatchGoal extends Equatable {
         'idAssistencia': hasAssistant ? assistantId : '',
         'assistencia': hasAssistant ? assistantName : '',
         if (minute != null) 'minuto': minute,
+        if (penalty) 'penalti': true,
       };
 
   static List<MatchGoal> listFrom(Object? raw) => raw is List
@@ -170,9 +176,10 @@ class MatchGoal extends Equatable {
       assistantId: assistantId ?? this.assistantId,
       assistantName: assistantName ?? this.assistantName,
       minute: minute != null ? minute() : this.minute,
+      penalty: penalty,
     );
   }
 
   @override
-  List<Object?> get props => [id, side, scorerId, scorerName, assistantId, assistantName, minute];
+  List<Object?> get props => [id, side, scorerId, scorerName, assistantId, assistantName, minute, penalty];
 }

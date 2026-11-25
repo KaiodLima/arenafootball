@@ -4,13 +4,22 @@ import 'package:arena_soccer/features/referrals/data/dtos/referral_dto.dart';
 import 'package:arena_soccer/features/referrals/domain/referral_code.dart';
 import 'package:arena_soccer/features/referrals/domain/repositories/referrals_repository_interface.dart';
 
-/// Código de convite da conta (cria na 1ª vez).
+/// Código de convite da conta (cria na 1ª vez). O código conferido fica no
+/// cache local (o código de uma conta nunca muda): abrir a tela de novo não
+/// lê `codigos_indicacao`. Falha não vai para o cache.
 class EnsureReferralCodeUseCase {
   final IReferralsRepository _repository;
 
   EnsureReferralCodeUseCase(this._repository);
 
-  Future<Either<Failure, String>> call(String uid) => _repository.ensureCode(uid);
+  Future<Either<Failure, String>> call(String uid) async {
+    final cached = await _repository.getCachedCode(uid);
+    final code = cached.isRight ? cached.right?.data ?? '' : '';
+    if (ReferralCode.isValid(code) && ReferralCode.isOwn(uid, code)) return Right(code);
+    final response = await _repository.ensureCode(uid);
+    if (response.isRight) await _repository.saveCodeCache(uid, response.right);
+    return response;
+  }
 }
 
 /// Saldo de pacotinhos extras, indicados e a situação da indicação da conta.
@@ -32,13 +41,15 @@ class WatchReferredFriendsUseCase {
 }
 
 /// Situação do "Fui indicado": o código já usado e se a conta ainda pode usar um.
+/// [knownCode] = o `indicadoPor` do usuário da sessão (já em cache): com ele
+/// não lê o perfil de novo; nulo (não se sabe) = lê do Firestore.
 class GetReferralClaimUseCase {
   final IReferralsRepository _repository;
 
   GetReferralClaimUseCase(this._repository);
 
-  Future<Either<Failure, ({String code, bool newAccount})>> call(String uid, {DateTime? now}) async {
-    final claim = await _repository.getClaim(uid);
+  Future<Either<Failure, ({String code, bool newAccount})>> call(String uid, {String? knownCode, DateTime? now}) async {
+    final claim = knownCode != null ? Right<Failure, String>(knownCode) : await _repository.getClaim(uid);
     final newAccount = ReferralCode.isNewAccount(_repository.accountCreatedAt(), now ?? DateTime.now());
     return claim.map((code) => (code: code, newAccount: newAccount));
   }

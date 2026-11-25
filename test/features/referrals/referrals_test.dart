@@ -2,6 +2,7 @@ import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/utils/share_links.dart';
 import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
@@ -28,6 +29,12 @@ class _Repo implements IReferralsRepository {
 
   @override
   Future<Either<Failure, String>> ensureCode(String uid) async => Right(ReferralCode.of(uid));
+
+  @override
+  Future<Either<Failure, CachedValue<String>?>> getCachedCode(String uid) async => const Right(null);
+
+  @override
+  Future<Either<Failure, void>> saveCodeCache(String uid, String code) async => const Right(null);
 
   @override
   Stream<Either<Failure, ReferralDTO>> watchReferral(String uid) =>

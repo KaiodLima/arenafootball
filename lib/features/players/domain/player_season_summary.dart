@@ -10,6 +10,15 @@ class PlayerSeasonSummary extends Equatable {
 
   const PlayerSeasonSummary({required this.season, required this.player, this.awards = 0});
 
+  /// Cache local (ver `CacheStore`).
+  factory PlayerSeasonSummary.fromCache(Map<String, dynamic> json) => PlayerSeasonSummary(
+        season: json['season']?.toString() ?? '',
+        player: PlayerDTO.fromCache(Map<String, dynamic>.from(json['player'] as Map)),
+        awards: json['awards'] is num ? (json['awards'] as num).toInt() : 0,
+      );
+
+  Map<String, dynamic> toCache() => {'season': season, 'player': player.toCache(), 'awards': awards};
+
   @override
   List<Object?> get props => [season, player, awards];
 }

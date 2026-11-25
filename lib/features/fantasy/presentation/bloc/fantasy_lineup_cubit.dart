@@ -12,7 +12,7 @@ import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_config_use
 import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_lineup_usecases.dart';
 import 'package:arena_soccer/features/fantasy/domain/usecases/fantasy_ranking_usecases.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_teams_by_ids_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_by_ids_cache_first_usecase.dart';
 
 /// Resultado da última ação (para o snackbar).
 enum FantasyLineupEvent { none, joined, saved, failed }
@@ -178,7 +178,7 @@ class FantasyLineupCubit extends Cubit<FantasyLineupState> {
   final DateTime Function() _clock;
 
   /// Times do campeonato (cores das figurinhas); nulo = sem as cores (testes).
-  final GetTeamsByIdsUseCase? _teams;
+  final GetTeamsByIdsCacheFirstUseCase? _teams;
 
   /// "Craques da rodada"; nulos = sem o card (testes).
   final GetFantasyRoundsUseCase? _rounds;
@@ -197,7 +197,7 @@ class FantasyLineupCubit extends Cubit<FantasyLineupState> {
     this._athletes, {
     DateTime Function()? clock,
     Duration? tick = const Duration(seconds: 30),
-    GetTeamsByIdsUseCase? teams,
+    GetTeamsByIdsCacheFirstUseCase? teams,
     GetFantasyRoundsUseCase? rounds,
     GetFantasyTopAthletesCacheFirstUseCase? topAthletes,
   })  : _clock = clock ?? DateTime.now,

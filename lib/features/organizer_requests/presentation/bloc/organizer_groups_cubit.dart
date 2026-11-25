@@ -12,7 +12,7 @@ import 'package:arena_soccer/features/championships/data/dtos/group_rules.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/championship_groups_usecases.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_teams_cubit.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
-import 'package:arena_soccer/features/teams/domain/usecases/get_teams_by_ids_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_by_ids_cache_first_usecase.dart';
 
 class OrganizerGroupsState extends Equatable {
   final bool loading;
@@ -88,7 +88,7 @@ class OrganizerGroupsCubit extends Cubit<OrganizerGroupsState> {
   final SaveGroupUseCase saveGroupUseCase;
   final DeleteGroupUseCase deleteGroupUseCase;
   final ReplaceGroupsUseCase replaceGroupsUseCase;
-  final GetTeamsByIdsUseCase getTeamsByIdsUseCase;
+  final GetTeamsByIdsCacheFirstUseCase getTeamsByIdsUseCase;
 
   StreamSubscription<Either<Failure, List<GroupDTO>>>? _subscription;
   late ChampionshipDTO _championship;

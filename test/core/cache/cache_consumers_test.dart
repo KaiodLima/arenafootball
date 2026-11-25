@@ -32,7 +32,7 @@ import 'package:arena_soccer/features/global_results/presentation/bloc/global_re
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/repositories/matches_repository_interface.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/create_match_usecase.dart';
-import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_cache_first_usecase.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/match_form_cubit.dart';
 import 'package:arena_soccer/features/news/data/datasources/news_datasource.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
@@ -46,7 +46,7 @@ import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/data/repositories/players_repository_impl.dart';
 import 'package:arena_soccer/features/players/domain/usecases/get_top_players_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
-import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
 import 'package:arena_soccer/features/stats/data/repositories/stats_repository_impl.dart';
 import 'package:arena_soccer/features/stats/domain/stats_ranking_type.dart';
 import 'package:arena_soccer/features/stats/domain/usecases/get_cached_stats_ranking_usecase.dart';
@@ -126,17 +126,22 @@ class _MatchesRepository implements IMatchesRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _RegionMatches implements GetRegionMatchesUseCase {
+class _RegionMatches implements GetRegionMatchesCacheFirstUseCase {
   @override
-  Future<Either<Failure, List<MatchDTO>>> call({required String region, String? season}) async => const Right([]);
+  Stream<Either<Failure, List<MatchDTO>>> call({required String region, String? season, bool force = false}) =>
+      Stream.value(const Right([]));
+
+  @override
+  Future<Either<Failure, List<MatchDTO>>> latest({required String region, String? season, bool force = false}) =>
+      call(region: region, season: season).last;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _Regions implements GetRegionsUseCase {
+class _Regions implements GetRegionsCacheFirstUseCase {
   @override
-  Future<Either<Failure, List<String>>> call() async => const Right(['Floresta']);
+  Future<Either<Failure, List<String>>> names({bool force = false}) async => const Right(['Floresta']);
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

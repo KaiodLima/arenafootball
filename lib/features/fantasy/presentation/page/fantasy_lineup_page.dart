@@ -107,6 +107,8 @@ class _FantasyLineupPageState extends State<FantasyLineupPage> {
         athleteId: id,
         captain: lineup.lineup.captainId == id,
         athlete: state.athleteById[id],
+        // Rodada fechada e apurada: a pontuação fica no cache até reapurar.
+        scoringVersion: round.closed ? round.scoringVersion : 0,
       );
       return;
     }

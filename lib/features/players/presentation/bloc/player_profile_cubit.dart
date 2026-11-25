@@ -4,9 +4,9 @@ import 'dart:math';
 
 import 'package:either_dart/either.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_usecase.dart';
-import 'package:arena_soccer/features/players/domain/usecases/get_player_awards_usecase.dart';
-import 'package:arena_soccer/features/players/domain/usecases/get_player_season_history_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_cache_first_usecase.dart';
+import 'package:arena_soccer/features/players/domain/usecases/player_awards_cache_usecases.dart';
+import 'package:arena_soccer/features/players/domain/usecases/player_season_history_cache_usecases.dart';
 import 'package:arena_soccer/features/players/domain/usecases/assign_unassigned_stats_usecase.dart';
 import 'package:arena_soccer/core/utils/team_key.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
@@ -42,9 +42,9 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
   final AdjustPlayerStatsUseCase adjustPlayerStatsUseCase;
   final AssignUnassignedStatsUseCase assignUnassignedStatsUseCase;
   final GetRegionChampionshipsCacheFirstUseCase getRegionChampionshipsCacheFirstUseCase;
-  final GetRegionMatchesUseCase getRegionMatchesUseCase;
-  final GetPlayerAwardsUseCase getPlayerAwardsUseCase;
-  final GetPlayerSeasonHistoryUseCase getPlayerSeasonHistoryUseCase;
+  final GetRegionMatchesCacheFirstUseCase getRegionMatchesUseCase;
+  final GetPlayerAwardsCacheFirstUseCase getPlayerAwardsUseCase;
+  final GetPlayerSeasonHistoryCacheFirstUseCase getPlayerSeasonHistoryUseCase;
 
   /// O próprio atleta troca a foto (grava só ela).
   final UpdatePlayerPhotoUseCase? updatePlayerPhotoUseCase;
@@ -103,14 +103,17 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
     _loadAwards(playerId);
   }
 
-  /// Troféus de craque da partida na temporada. Falha só esconde a seção.
+  /// Troféus de craque da partida na temporada (cache primeiro). Falha só
+  /// esconde a seção.
   Future<void> _loadAwards(String playerId) async {
-    final response = await getPlayerAwardsUseCase(playerId: playerId, season: _season);
-    if (isClosed || response.isLeft) return;
-    emit(state.copyWith(awards: response.right));
+    await for (final response in getPlayerAwardsUseCase(playerId: playerId, season: _season)) {
+      if (isClosed) return;
+      if (response.isRight) emit(state.copyWith(awards: response.right));
+    }
   }
 
-  /// Histórico por temporada (só com conta vinculada), uma vez por conta.
+  /// Histórico por temporada (só com conta vinculada), uma vez por conta,
+  /// pelo cache local.
   Future<void> _loadHistory(PlayerDTO player) async {
     if (player.userId.isEmpty || _seasons.isEmpty || _historyFor == player.userId) return;
     _historyFor = player.userId;
@@ -121,9 +124,11 @@ class PlayerProfileCubit extends Cubit<PlayerProfileState> {
 
   /// Partidas da região do time (gráfico), uma vez por região.
   Future<void> _loadRegionMatches(String region) async {
-    final response = await getRegionMatchesUseCase(region: region, season: _season);
-    if (isClosed || response.isLeft) return;
-    emit(state.copyWith(regionMatches: response.right));
+    // Cache primeiro: mostra o salvo na hora e, vencido, atualiza.
+    await for (final response in getRegionMatchesUseCase(region: region, season: _season)) {
+      if (isClosed) return;
+      if (response.isRight) emit(state.copyWith(regionMatches: response.right));
+    }
   }
 
   Future<void> _loadParticipations(String playerId) async {

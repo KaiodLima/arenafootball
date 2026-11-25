@@ -5,37 +5,51 @@ import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_report_dtos.dart';
 import 'package:arena_soccer/features/matches/domain/match_clock.dart';
 
-/// Um lance da linha do tempo da súmula: gol, cartão ou substituição.
+/// Um lance da linha do tempo da súmula: gol, cartão, substituição ou
+/// pênalti perdido.
 class ReportEvent {
   final MatchSide side;
   final int? minute;
   final MatchGoal? goal;
   final MatchBooking? booking;
   final MatchSubstitution? substitution;
+  final MatchMissedPenalty? missedPenalty;
 
   ReportEvent.goal(MatchGoal this.goal)
       : side = goal.side,
         minute = goal.minute,
         booking = null,
-        substitution = null;
+        substitution = null,
+        missedPenalty = null;
 
   ReportEvent.booking(MatchBooking this.booking)
       : side = booking.side,
         minute = booking.minute,
         goal = null,
-        substitution = null;
+        substitution = null,
+        missedPenalty = null;
 
   ReportEvent.substitution(MatchSubstitution this.substitution)
       : side = substitution.side,
         minute = substitution.minute,
         goal = null,
-        booking = null;
+        booking = null,
+        missedPenalty = null;
+
+  ReportEvent.missedPenalty(MatchMissedPenalty this.missedPenalty)
+      : side = missedPenalty.side,
+        minute = missedPenalty.minute,
+        goal = null,
+        booking = null,
+        substitution = null;
 
   bool get isGoal => goal != null;
 
   bool get isSubstitution => substitution != null;
 
-  String get id => goal?.id ?? booking?.id ?? substitution!.id;
+  bool get isMissedPenalty => missedPenalty != null;
+
+  String get id => goal?.id ?? booking?.id ?? substitution?.id ?? missedPenalty!.id;
 }
 
 /// Regras da súmula (funções puras).
@@ -51,17 +65,20 @@ class MatchReport {
     return String.fromCharCodes(List.generate(20, (_) => chars.codeUnitAt(_random.nextInt(chars.length))));
   }
 
-  /// Gols, cartões e substituições em ordem de minuto; sem minuto ficam no
-  /// fim, na ordem em que foram lançados. Empate de minuto: gol antes do resto.
+  /// Gols, cartões, substituições e pênaltis perdidos em ordem de minuto;
+  /// sem minuto ficam no fim, na ordem em que foram lançados. Empate de
+  /// minuto: gol antes do resto.
   static List<ReportEvent> timeline(
     List<MatchGoal> goals,
     List<MatchBooking> bookings, [
     List<MatchSubstitution> substitutions = const [],
+    List<MatchMissedPenalty> missedPenalties = const [],
   ]) {
     final events = [
       for (final g in goals) ReportEvent.goal(g),
       for (final b in bookings) ReportEvent.booking(b),
       for (final s in substitutions) ReportEvent.substitution(s),
+      for (final p in missedPenalties) ReportEvent.missedPenalty(p),
     ];
     final order = {for (var i = 0; i < events.length; i++) events[i]: i};
     events.sort((a, b) {
@@ -160,6 +177,8 @@ class MatchReport {
         if (g.side == side) ...[g.scorerId, g.assistantId],
       for (final b in match.bookings)
         if (b.side == side) b.playerId,
+      for (final p in match.missedPenalties)
+        if (p.side == side) p.playerId else if (p.hasKeeper) p.keeperId,
     }..remove('');
   }
 
@@ -177,6 +196,8 @@ class MatchReport {
         if (g.side == side) ...[key(g.scorerName), key(g.assistantName)],
       for (final b in match.bookings)
         if (b.side == side) key(b.playerName),
+      for (final p in match.missedPenalties)
+        if (p.side == side) key(p.playerName) else if (p.hasKeeper) key(p.keeperName),
     }..remove('');
   }
 

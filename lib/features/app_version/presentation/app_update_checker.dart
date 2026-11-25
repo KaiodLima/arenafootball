@@ -10,7 +10,7 @@ import 'package:arena_soccer/features/app_version/presentation/widgets/app_updat
 /// (no máximo a cada [interval]; o obrigatório, sempre). Sugerido + "Depois"
 /// guarda o build recomendado dispensado: só volta quando o admin subir de novo.
 class AppUpdateChecker with WidgetsBindingObserver {
-  final GetAppVersionConfigUseCase _config;
+  final AppVersionCacheFirstUseCase _config;
   final GetInstalledBuildUseCase _installed;
   final PreferencesService _prefs;
 
@@ -47,7 +47,8 @@ class AppUpdateChecker with WidgetsBindingObserver {
     if (_showing) return;
     _lastCheck = DateTime.now();
     final installed = await _installed();
-    final response = await _config();
+    // Cache primeiro (6 h); vencido, o valor do Firestore (o último emitido).
+    final response = await _config().last;
     if (response.isLeft) return;
     final config = response.right;
     final ios = appUpdateIsIos;

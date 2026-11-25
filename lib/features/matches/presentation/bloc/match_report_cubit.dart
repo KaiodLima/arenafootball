@@ -74,8 +74,9 @@ class MatchReportState extends Equatable {
     return squad.where((p) => ids.contains(p.id)).toList();
   }
 
-  List<ReportEvent> get timeline =>
-      match == null ? const [] : MatchReport.timeline(match!.goals, match!.bookings, match!.substitutions);
+  List<ReportEvent> get timeline => match == null
+      ? const []
+      : MatchReport.timeline(match!.goals, match!.bookings, match!.substitutions, match!.missedPenalties);
 
   /// Ids de quem está em campo do [side] (nulo = sem escalação: elenco todo).
   Set<String>? onFieldOf(MatchSide side) {
@@ -107,6 +108,9 @@ class MatchReportState extends Equatable {
         [for (var i = 0; i < b.bookings.length; i++) a.bookings[i] == b.bookings[i]].contains(false) ||
         a.substitutions.length != b.substitutions.length ||
         [for (var i = 0; i < b.substitutions.length; i++) a.substitutions[i] == b.substitutions[i]].contains(false) ||
+        a.missedPenalties.length != b.missedPenalties.length ||
+        [for (var i = 0; i < b.missedPenalties.length; i++) a.missedPenalties[i] == b.missedPenalties[i]]
+            .contains(false) ||
         a.lineup != b.lineup ||
         a.referee != b.referee ||
         a.notes != b.notes ||
@@ -130,7 +134,8 @@ class MatchReportState extends Equatable {
 
     var count = diff<MatchGoal>(goalsBefore, b.goals, (g) => g.id) +
         diff<MatchBooking>(a.bookings, b.bookings, (c) => c.id) +
-        diff<MatchSubstitution>(a.substitutions, b.substitutions, (s) => s.id);
+        diff<MatchSubstitution>(a.substitutions, b.substitutions, (s) => s.id) +
+        diff<MatchMissedPenalty>(a.missedPenalties, b.missedPenalties, (p) => p.id);
     for (final side in MatchSide.values) {
       count += diff<LineupEntry>(a.lineup.of(side), b.lineup.of(side), (e) => e.playerId);
     }
@@ -264,10 +269,18 @@ class MatchReportCubit extends Cubit<MatchReportState> {
 
   // ------------------------------------------------------------------ lances
 
-  void addGoal(MatchSide side, {PlayerDTO? scorer, PlayerDTO? assistant, int? minute, String Function()? newId}) {
+  /// Gol do [side]; [penalty] = gol de pênalti (sem garçom).
+  void addGoal(
+    MatchSide side, {
+    PlayerDTO? scorer,
+    PlayerDTO? assistant,
+    int? minute,
+    bool penalty = false,
+    String Function()? newId,
+  }) {
     final match = state.match;
     if (match == null) return;
-    final validAssist = assistant != null && assistant.id != scorer?.id ? assistant : null;
+    final validAssist = !penalty && assistant != null && assistant.id != scorer?.id ? assistant : null;
     final goal = MatchGoal(
       id: (newId ?? MatchGoal.newId)(),
       side: side,
@@ -276,6 +289,7 @@ class MatchReportCubit extends Cubit<MatchReportState> {
       assistantId: validAssist?.id ?? '',
       assistantName: validAssist?.name ?? '',
       minute: minute,
+      penalty: penalty,
     );
     emit(state.copyWith(
       match: match.copyWith(goals: [...match.goals, goal]),
@@ -287,7 +301,6 @@ class MatchReportCubit extends Cubit<MatchReportState> {
   void updateGoal(String id, {PlayerDTO? scorer, PlayerDTO? assistant, int? minute}) {
     final match = state.match;
     if (match == null) return;
-    final validAssist = assistant != null && assistant.id != scorer?.id ? assistant : null;
     _edit(match.copyWith(goals: [
       for (final g in match.goals)
         if (g.id != id)
@@ -298,9 +311,10 @@ class MatchReportCubit extends Cubit<MatchReportState> {
             side: g.side,
             scorerId: scorer?.id ?? '',
             scorerName: scorer?.name ?? '',
-            assistantId: validAssist?.id ?? '',
-            assistantName: validAssist?.name ?? '',
+            assistantId: !g.penalty && assistant != null && assistant.id != scorer?.id ? assistant.id : '',
+            assistantName: !g.penalty && assistant != null && assistant.id != scorer?.id ? assistant.name : '',
             minute: minute,
+            penalty: g.penalty,
           ),
     ]));
   }
@@ -369,10 +383,48 @@ class MatchReportCubit extends Cubit<MatchReportState> {
     _edit(match.copyWith(substitutions: match.substitutions.where((s) => s.id != id).toList()));
   }
 
-  /// Apaga o lance [event] (gol, cartão ou substituição).
+  /// Pênalti perdido do [side]: o cobrador [taker], como perdeu ([miss]) e,
+  /// defendido, o goleiro [keeper] do outro time (opcional). Não muda o placar.
+  void addMissedPenalty(
+    MatchSide side, {
+    PlayerDTO? taker,
+    required PenaltyMiss miss,
+    PlayerDTO? keeper,
+    int? minute,
+    String Function()? newId,
+  }) {
+    final match = state.match;
+    if (match == null) return;
+    final saved = miss == PenaltyMiss.saved;
+    final penalty = MatchMissedPenalty(
+      id: (newId ?? MatchMissedPenalty.newId)(),
+      side: side,
+      playerId: taker?.id ?? '',
+      playerName: taker?.name ?? '',
+      minute: minute,
+      miss: miss,
+      keeperId: saved ? keeper?.id ?? '' : '',
+      keeperName: saved ? keeper?.name ?? '' : '',
+    );
+    emit(state.copyWith(
+      match: match.copyWith(missedPenalties: [...match.missedPenalties, penalty]),
+      lastEvent: () => ReportEvent.missedPenalty(penalty),
+      notice: () => MatchReportNotice.eventAdded,
+    ));
+  }
+
+  void removeMissedPenalty(String id) {
+    final match = state.match;
+    if (match == null) return;
+    _edit(match.copyWith(missedPenalties: match.missedPenalties.where((p) => p.id != id).toList()));
+  }
+
+  /// Apaga o lance [event] (gol, cartão, substituição ou pênalti perdido).
   void removeEvent(ReportEvent event) {
     if (event.isGoal) {
       removeGoal(event.id);
+    } else if (event.isMissedPenalty) {
+      removeMissedPenalty(event.id);
     } else if (event.isSubstitution) {
       removeSubstitution(event.id);
     } else {

@@ -28,6 +28,24 @@ class NewsRepositoryImpl implements INewsRepository {
   Future<Either<Failure, NewsDTO?>> getNewsById(String id) => _dataSource.getNewsById(id);
 
   @override
+  Future<Either<Failure, List<NewsDTO>>> getOpenEvents() => _dataSource.getOpenEvents();
+
+  @override
+  Future<Either<Failure, CachedValue<List<NewsDTO>>?>> getCachedOpenEvents() => _cache.read(
+        CacheKeys.openEvents,
+        (json) => [for (final item in json as List) NewsDTO.fromCache(Map<String, dynamic>.from(item as Map))],
+      );
+
+  @override
+  Future<Either<Failure, void>> saveOpenEventsCache(List<NewsDTO> events) =>
+      _cache.save(CacheKeys.openEvents, [for (final event in events) event.toCache()]);
+
+  @override
+  Future<void> deleteOpenEventsCache() async {
+    await _cache.delete(CacheKeys.openEvents);
+  }
+
+  @override
   Future<Either<Failure, void>> createNews(NewsDTO news) async => _invalidate(await _dataSource.createNews(news));
 
   @override
@@ -103,11 +121,12 @@ class NewsRepositoryImpl implements INewsRepository {
     await _cache.delete(CacheKeys.news(id));
   }
 
-  /// Depois de gravar uma notícia: os cards de gol por jogador (e a própria
-  /// notícia, em edição/exclusão) ficam velhos no cache.
+  /// Depois de gravar uma notícia: os cards de gol por jogador, os eventos
+  /// abertos (e a própria notícia, em edição/exclusão) ficam velhos no cache.
   Future<Either<Failure, void>> _invalidate(Either<Failure, void> response, {String newsId = ''}) async {
     if (response.isRight) {
       await deleteGoalCardsCache();
+      await deleteOpenEventsCache();
       if (newsId.isNotEmpty) await deleteNewsCache(newsId);
     }
     return response;

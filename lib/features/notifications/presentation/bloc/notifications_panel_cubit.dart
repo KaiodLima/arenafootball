@@ -7,7 +7,7 @@ import 'package:arena_soccer/features/notifications/domain/usecases/set_push_act
 import 'package:arena_soccer/features/notifications/domain/usecases/watch_push_config_usecase.dart';
 import 'package:arena_soccer/features/notifications/domain/usecases/watch_push_history_usecase.dart';
 import 'package:arena_soccer/features/notifications/presentation/bloc/notifications_panel_state.dart';
-import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
 
 /// Painel de notificações (admin): quais ações enviam push, o histórico de
 /// envios e o aviso manual.
@@ -16,7 +16,7 @@ class NotificationsPanelCubit extends Cubit<NotificationsPanelState> {
   final SetPushActionUseCase setPushActionUseCase;
   final WatchPushHistoryUseCase watchPushHistoryUseCase;
   final SendManualPushUseCase sendManualPushUseCase;
-  final GetRegionsUseCase getRegionsUseCase;
+  final GetRegionsCacheFirstUseCase getRegionsUseCase;
   final _subscriptions = <StreamSubscription<dynamic>>[];
 
   NotificationsPanelCubit(
@@ -40,7 +40,7 @@ class NotificationsPanelCubit extends Cubit<NotificationsPanelState> {
           (failure) => _emit(ErrorNotificationsPanelState(state.copyWith(historyLoaded: true), failure.toString())),
           (history) => _emit(state.copyWith(history: history, historyLoaded: true)),
         )));
-    final regions = await getRegionsUseCase();
+    final regions = await getRegionsUseCase.names();
     if (regions.isRight) _emit(state.copyWith(regions: regions.right));
   }
 

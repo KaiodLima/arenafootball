@@ -1,4 +1,5 @@
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/album/data/dtos/album_dtos.dart';
 
@@ -19,6 +20,13 @@ abstract class IAlbumRepository {
 
   Future<Either<Failure, int>> collectorsAhead(String eventId, int collected);
 
+  /// Ranking de colecionadores do evento visto pela conta [userId] (cache).
+  Future<Either<Failure, CachedValue<AlbumRankingView>?>> getCachedRanking(
+      {required String eventId, required String userId});
+
+  Future<Either<Failure, void>> saveRankingCache(AlbumRankingView view,
+      {required String eventId, required String userId});
+
   Future<Either<Failure, void>> requestPack({
     required String packId,
     required String userId,
@@ -38,4 +46,6 @@ abstract class IAlbumRepository {
 
   /// Várias de uma vez (em lotes).
   Future<Either<Failure, void>> deleteStickers({required String eventId, required List<String> stickerIds});
+
+  Future<Either<Failure, void>> updateStickerPhotos({required String eventId, required Map<String, String> photos});
 }

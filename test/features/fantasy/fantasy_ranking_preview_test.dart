@@ -26,6 +26,8 @@ import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_ranking_
 import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_ranking_page.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 
+import 'fantasy_no_cache.dart';
+
 // Prévia em PNG fora do CI: FANTASY_RANKING_PREVIEW=1 flutter test test/features/fantasy/fantasy_ranking_preview_test.dart
 // → build/fantasy_ranking_previews/<aba>_<largura>x<altura>.png
 //
@@ -107,7 +109,7 @@ final _lineups = <int, FantasyLineupDTO>{
   }),
 };
 
-class _Repo implements IFantasyRepository {
+class _Repo with FantasyNoCache implements IFantasyRepository {
   final rounds = [
     FantasyRoundDTO.fromMap('3', {'status': 'fechada', 'apuracao': {}, 'finalizada': true}),
     FantasyRoundDTO.fromMap('4', {'status': 'fechada', 'apuracao': {}, 'finalizada': true}),
@@ -204,9 +206,9 @@ class _Session extends Cubit<SessionState> implements SessionCubit {
 FantasyRankingCubit _cubit(_Repo repo) => FantasyRankingCubit(
       WatchFantasyConfigUseCase(repo),
       GetFantasyRankingCacheFirstUseCase(repo),
-      GetFantasyPositionUseCase(repo),
-      GetFantasyRoundsUseCase(repo),
-      GetFantasyLineupUseCase(repo),
+      GetFantasyPositionCacheFirstUseCase(repo),
+      GetFantasyRoundsCacheFirstUseCase(repo),
+      GetFantasyRoundRecordUseCase(repo),
       WatchFantasyParticipantUseCase(repo),
       GetFantasyAthletesCacheFirstUseCase(repo),
       topAthletes: GetFantasyTopAthletesCacheFirstUseCase(repo),

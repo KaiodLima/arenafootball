@@ -227,6 +227,28 @@ class AlbumDataSource {
     }
   }
 
+  /// Troca só a foto (`urlImagem`) de várias figurinhas ([photos]: id → URL),
+  /// em lotes de até 450.
+  Future<Either<Failure, void>> updateStickerPhotos({
+    required String eventId,
+    required Map<String, String> photos,
+  }) async {
+    try {
+      final entries = photos.entries.toList();
+      for (var start = 0; start < entries.length; start += 450) {
+        final batch = _firestore.batch();
+        for (final entry in entries.skip(start).take(450)) {
+          batch.update(_stickers(eventId).doc(entry.key), {'urlImagem': entry.value});
+        }
+        await batch.commit();
+      }
+      return const Right(null);
+    } catch (e) {
+      AppLogger.e('updateStickerPhotos $eventId (${photos.length})', name: _logName, error: e);
+      return Left(mapFirebaseError(e, fallbackMessage: _saveFallback));
+    }
+  }
+
   /// `total` do evento = figurinhas do catálogo (`count()`, uma leitura).
   Future<void> _syncTotal(String eventId) async {
     final count = await _stickers(eventId).count().get();

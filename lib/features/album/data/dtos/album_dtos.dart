@@ -343,6 +343,55 @@ class AlbumRankingEntryDTO extends Equatable {
       return a.name.toLowerCase().compareTo(b.name.toLowerCase());
     });
 
+  Map<String, dynamic> toCache() => {
+        'userId': userId,
+        'name': name,
+        'imageUrl': imageUrl,
+        'collected': collected,
+        'rares': rares,
+        'complete': complete,
+        'reachedAt': reachedAt?.millisecondsSinceEpoch,
+      };
+
+  factory AlbumRankingEntryDTO.fromCache(Map<String, dynamic> json) => AlbumRankingEntryDTO(
+        userId: json['userId']?.toString() ?? '',
+        name: json['name']?.toString() ?? '',
+        imageUrl: json['imageUrl']?.toString() ?? '',
+        collected: (json['collected'] as num?)?.toInt() ?? 0,
+        rares: (json['rares'] as num?)?.toInt() ?? 0,
+        complete: json['complete'] == true,
+        reachedAt: json['reachedAt'] is num
+            ? DateTime.fromMillisecondsSinceEpoch((json['reachedAt'] as num).toInt())
+            : null,
+      );
+
   @override
   List<Object?> get props => [userId, name, imageUrl, collected, rares, complete, reachedAt];
+}
+
+/// Ranking pronto para a tela: o top e a conta (nula = ainda não coleciona).
+class AlbumRankingView extends Equatable {
+  final List<AlbumRankingEntryDTO> top;
+  final AlbumRankingEntryDTO? me;
+  final int? myPosition;
+
+  const AlbumRankingView({this.top = const [], this.me, this.myPosition});
+
+  Map<String, dynamic> toCache() => {
+        'top': [for (final entry in top) entry.toCache()],
+        'me': me?.toCache(),
+        'myPosition': myPosition,
+      };
+
+  factory AlbumRankingView.fromCache(Map<String, dynamic> json) => AlbumRankingView(
+        top: [
+          for (final item in (json['top'] as List?) ?? const [])
+            AlbumRankingEntryDTO.fromCache(Map<String, dynamic>.from(item as Map)),
+        ],
+        me: json['me'] is Map ? AlbumRankingEntryDTO.fromCache(Map<String, dynamic>.from(json['me'] as Map)) : null,
+        myPosition: (json['myPosition'] as num?)?.toInt(),
+      );
+
+  @override
+  List<Object?> get props => [top, me, myPosition];
 }

@@ -71,6 +71,56 @@ class FantasyRoundDTO extends Equatable {
     );
   }
 
+  /// Versão da apuração (`apuracao.processadoEm`, em ms; 0 = sem apuração):
+  /// muda a cada apuração/reapuração, o que vence o cache da rodada.
+  int get scoringVersion => processedAt?.millisecondsSinceEpoch ?? 0;
+
+  Map<String, dynamic> toCache() => {
+        'number': number,
+        'matchIds': matchIds,
+        'closesAt': closesAt?.millisecondsSinceEpoch,
+        'status': status,
+        'scored': scored,
+        'finished': finished,
+        'matchesFinished': matchesFinished,
+        'lineups': lineups,
+        'processedAt': processedAt?.millisecondsSinceEpoch,
+        'params': params == null
+            ? null
+            : {
+                'minMinutes': params!.minMinutes,
+                'minDefenseMinutes': params!.minDefenseMinutes,
+                'captain': params!.captain,
+              },
+        'manualDeadline': manualDeadline,
+        'manualClosed': manualClosed,
+      };
+
+  factory FantasyRoundDTO.fromCache(Map<String, dynamic> json) {
+    DateTime? date(Object? value) => value is num ? DateTime.fromMillisecondsSinceEpoch(value.toInt()) : null;
+    final params = json['params'] as Map?;
+    return FantasyRoundDTO(
+      number: (json['number'] as num?)?.toInt() ?? 0,
+      matchIds: [for (final id in (json['matchIds'] as List?) ?? const []) id.toString()],
+      closesAt: date(json['closesAt']),
+      status: json['status']?.toString() ?? '',
+      scored: json['scored'] == true,
+      finished: json['finished'] == true,
+      matchesFinished: (json['matchesFinished'] as num?)?.toInt() ?? 0,
+      lineups: (json['lineups'] as num?)?.toInt() ?? 0,
+      processedAt: date(json['processedAt']),
+      params: params == null
+          ? null
+          : (
+              minMinutes: (params['minMinutes'] as num?)?.toInt() ?? 20,
+              minDefenseMinutes: (params['minDefenseMinutes'] as num?)?.toInt() ?? 45,
+              captain: (params['captain'] as num?)?.toDouble() ?? 1.5,
+            ),
+      manualDeadline: json['manualDeadline'] == true,
+      manualClosed: json['manualClosed'] == true,
+    );
+  }
+
   /// Ainda dá para montar/trocar a escalação.
   bool isOpenAt(DateTime now) => status == 'aberta' && closesAt != null && now.isBefore(closesAt!);
 
@@ -202,6 +252,23 @@ class FantasyLineupDTO extends Equatable {
         'capitao': lineup.captainId,
         'copiada': false,
       };
+
+  /// No formato do Firestore (o [FantasyLineupDTO.fromCache] reaproveita o
+  /// `fromMap`).
+  Map<String, dynamic> toCache() => {
+        'uid': uid,
+        'nome': name,
+        'urlImagem': photoUrl,
+        'atletas': {for (final slot in FantasySlot.values) slot.key: lineup.idAt(slot) ?? ''},
+        'capitao': lineup.captainId,
+        'copiada': copied,
+        'pontos': points,
+        'pontosAtletas': athletePoints,
+        'atletasJogaram': playedIds,
+      };
+
+  factory FantasyLineupDTO.fromCache(Map<String, dynamic> json) =>
+      FantasyLineupDTO.fromMap(json['uid']?.toString() ?? '', json);
 
   @override
   List<Object?> get props => [uid, name, photoUrl, lineup, copied, points, athletePoints, playedIds];

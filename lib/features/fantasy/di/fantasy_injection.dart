@@ -30,6 +30,10 @@ void registerFantasyDependencies() {
   _sl.registerLazySingleton(() => GetFantasyTopAthletesCacheFirstUseCase(_sl()));
   _sl.registerLazySingleton(() => GetFantasyPositionUseCase(_sl()));
   _sl.registerLazySingleton(() => GetFantasyRoundsUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetFantasyRoundsCacheFirstUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetFantasyPositionCacheFirstUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetFantasyRoundRecordUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetFantasyAthleteScoreCacheFirstUseCase(_sl()));
   _sl.registerLazySingleton(() => GetFantasyLineupUseCase(_sl()));
   _sl.registerLazySingleton(() => GetFantasyAthleteScoreUseCase(_sl()));
   _sl.registerLazySingleton(() => WatchFantasyRoundsUseCase(_sl()));

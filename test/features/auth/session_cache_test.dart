@@ -11,6 +11,7 @@ import 'package:arena_soccer/features/auth/domain/usecases/clear_cache_usecase.d
 import 'package:arena_soccer/features/auth/domain/usecases/delete_account_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/delete_user_cache_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/get_cached_user_usecase.dart';
+import 'package:arena_soccer/features/auth/domain/usecases/get_current_user_cache_first_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/get_current_user_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/save_user_cache_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/sign_out_usecase.dart';
@@ -19,17 +20,22 @@ import 'package:arena_soccer/features/auth/presentation/bloc/session_state.dart'
 
 class _FakeAuth implements IAuthRepository {
   UserDTO? cached;
+
+  /// Quando o cache foi gravado (padrão: agora, dentro da validade).
+  DateTime? cachedAt;
   Either<Failure, UserDTO?> remote = const Right(null);
+  int remoteCalls = 0;
   bool cleared = false;
   bool signedOut = false;
 
   @override
   Future<Either<Failure, CachedValue<UserDTO>?>> getCachedUser() async =>
-      Right(cached == null ? null : CachedValue(cached!, DateTime.now()));
+      Right(cached == null ? null : CachedValue(cached!, cachedAt ?? DateTime.now()));
 
   @override
   Future<Either<Failure, void>> saveUserCache(UserDTO user) async {
     cached = user;
+    cachedAt = DateTime.now();
     return const Right(null);
   }
 
@@ -46,7 +52,10 @@ class _FakeAuth implements IAuthRepository {
   }
 
   @override
-  Future<Either<Failure, UserDTO?>> getCurrentUser() async => remote;
+  Future<Either<Failure, UserDTO?>> getCurrentUser() async {
+    remoteCalls++;
+    return remote;
+  }
 
   @override
   Future<Either<Failure, void>> signOut() async {
@@ -63,12 +72,15 @@ void main() {
   late _FakeAuth auth;
 
   SessionCubit build([PreferencesService? preferences]) => SessionCubit(
-        GetCurrentUserUseCase(auth),
+        GetCurrentUserCacheFirstUseCase(
+          GetCurrentUserUseCase(auth),
+          GetCachedUserUseCase(auth),
+          SaveUserCacheUseCase(auth),
+          DeleteUserCacheUseCase(auth),
+        ),
         SignOutUseCase(auth),
         DeleteAccountUseCase(auth),
-        GetCachedUserUseCase(auth),
         SaveUserCacheUseCase(auth),
-        DeleteUserCacheUseCase(auth),
         ClearCacheUseCase(auth),
         preferences,
       );
@@ -137,9 +149,10 @@ void main() {
 
   setUp(() => auth = _FakeAuth());
 
-  test('com a conta no cache: entra na hora e revalida (mudou = atualiza)', () async {
+  test('cache vencido: entra na hora com o cache e revalida (mudou = atualiza)', () async {
     auth
       ..cached = user
+      ..cachedAt = DateTime.now().subtract(const Duration(hours: 1))
       ..remote = Right(user.copyWith(favoriteTeam: 'Volta'));
     final cubit = build();
     final states = <SessionState>[];
@@ -152,8 +165,34 @@ void main() {
     await cubit.close();
   });
 
+  test('cache válido (30 min): entra com o cache sem ler o Firestore; force relê', () async {
+    auth
+      ..cached = user
+      ..remote =
+          const Right(UserDTO(id: 'u1', name: 'Kaio', email: 'k@x.com', favoriteTeam: 'Lava Jato', isAdmin: true));
+    final cubit = build();
+    await cubit.restore();
+    expect(auth.remoteCalls, 0);
+    expect(cubit.state.user, user);
+
+    await cubit.restore(force: true);
+    expect(auth.remoteCalls, 1);
+    expect(cubit.state.user?.isAdmin, isTrue);
+    expect(auth.cached?.isAdmin, isTrue);
+    await cubit.close();
+  });
+
+  test('sessão encerrada no FirebaseAuth: convidado e sem o cache da conta', () async {
+    final cubit = build();
+    await cubit.restore();
+    expect(auth.remoteCalls, 1);
+    expect(cubit.state, isA<GuestSessionState>());
+    await cubit.close();
+  });
+
   test('sem rede com cache: fica logado com a conta do cache', () async {
     auth
+      ..cachedAt = DateTime.now().subtract(const Duration(hours: 1))
       ..cached = user
       ..remote = Left(ErrorWithMessage('offline'));
     final cubit = build();

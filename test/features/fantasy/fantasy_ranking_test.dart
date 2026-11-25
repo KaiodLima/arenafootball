@@ -21,6 +21,8 @@ import 'package:arena_soccer/features/fantasy/presentation/bloc/fantasy_ranking_
 import 'package:arena_soccer/features/fantasy/presentation/page/fantasy_ranking_page.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 
+import 'fantasy_no_cache.dart';
+
 const _copa = ChampionshipDTO(id: 'doc1', championshipId: 8, title: 'Copa Verde', region: 'Floresta', season: '2026');
 
 FantasyRankingEntry _e(String uid, double points) =>
@@ -33,7 +35,7 @@ final _lineupU1 = FantasyLineupDTO.fromMap('u1', {
   'pontosAtletas': {'gk': 5, 'cb': 7, 'mf': 6, 'fw': 22.5, 'dm': 1},
 });
 
-class _Repo implements IFantasyRepository {
+class _Repo with FantasyNoCache implements IFantasyRepository {
   final rounds = [
     FantasyRoundDTO.fromMap('1', {'status': 'fechada', 'apuracao': {}, 'finalizada': true}),
     FantasyRoundDTO.fromMap('2', {'status': 'fechada'}),
@@ -148,9 +150,9 @@ class _Session extends Cubit<SessionState> implements SessionCubit {
 FantasyRankingCubit _cubit(_Repo repo) => FantasyRankingCubit(
       WatchFantasyConfigUseCase(repo),
       GetFantasyRankingCacheFirstUseCase(repo),
-      GetFantasyPositionUseCase(repo),
-      GetFantasyRoundsUseCase(repo),
-      GetFantasyLineupUseCase(repo),
+      GetFantasyPositionCacheFirstUseCase(repo),
+      GetFantasyRoundsCacheFirstUseCase(repo),
+      GetFantasyRoundRecordUseCase(repo),
       WatchFantasyParticipantUseCase(repo),
       GetFantasyAthletesCacheFirstUseCase(repo),
       topAthletes: GetFantasyTopAthletesCacheFirstUseCase(repo),

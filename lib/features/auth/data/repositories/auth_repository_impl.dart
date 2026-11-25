@@ -43,8 +43,9 @@ class AuthRepositoryImpl implements IAuthRepository {
     required String team,
     required String teamId,
     bool stampChange = false,
-  }) =>
-      _dataSource.updateFavoriteTeam(userId: userId, team: team, teamId: teamId, stampChange: stampChange);
+  }) async =>
+      _invalidate(
+          await _dataSource.updateFavoriteTeam(userId: userId, team: team, teamId: teamId, stampChange: stampChange));
 
   @override
   Future<Either<Failure, void>> signOut() => _dataSource.signOut();
@@ -61,12 +62,12 @@ class AuthRepositoryImpl implements IAuthRepository {
   }
 
   @override
-  Future<Either<Failure, void>> updateName({required String userId, required String name}) =>
-      _dataSource.updateName(userId: userId, name: name);
+  Future<Either<Failure, void>> updateName({required String userId, required String name}) async =>
+      _invalidate(await _dataSource.updateName(userId: userId, name: name));
 
   @override
-  Future<Either<Failure, void>> updatePhoto({required String userId, required String photoUrl}) =>
-      _dataSource.updatePhoto(userId: userId, photoUrl: photoUrl);
+  Future<Either<Failure, void>> updatePhoto({required String userId, required String photoUrl}) async =>
+      _invalidate(await _dataSource.updatePhoto(userId: userId, photoUrl: photoUrl));
 
   @override
   DateTime? get accountCreatedAt => _dataSource.accountCreatedAt;
@@ -94,4 +95,11 @@ class AuthRepositoryImpl implements IAuthRepository {
 
   @override
   Future<void> clearCache() => _cache.clear();
+
+  /// Depois de gravar o perfil: a conta do cache fica velha (a tela grava a
+  /// nova pelo `SessionCubit.updateUser`; sem ela, a próxima abertura relê).
+  Future<Either<Failure, void>> _invalidate(Either<Failure, void> response) async {
+    if (response.isRight) await deleteUserCache();
+    return response;
+  }
 }

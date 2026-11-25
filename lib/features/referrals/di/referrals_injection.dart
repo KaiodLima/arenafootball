@@ -11,7 +11,7 @@ void registerReferralsDependencies() {
   _sl.registerLazySingleton<ReferralsDataSource>(() => ReferralsDataSource(_sl(), _sl()));
 
   // Repository (interface -> impl)
-  _sl.registerLazySingleton<IReferralsRepository>(() => ReferralsRepositoryImpl(_sl()));
+  _sl.registerLazySingleton<IReferralsRepository>(() => ReferralsRepositoryImpl(_sl(), _sl()));
 
   // UseCases
   _sl.registerLazySingleton(() => EnsureReferralCodeUseCase(_sl()));

@@ -25,6 +25,7 @@ import {
   perPackOf,
   rankingEntry,
   stickerOf,
+  stickerPhotoUpdate,
 } from './album';
 import {
   addExtraPack,
@@ -1968,6 +1969,12 @@ export const onPlayerWritten = onDocumentWritten('{colecao}/{playerId}', async (
   if (collection !== seasonCollection('jogadores', await currentSeason())) return;
   const before = event.data?.before.data();
   const after = event.data?.after.data();
+  // Foto nova: as figurinhas do atleta que ainda têm a antiga acompanham.
+  const oldPhoto = typeof before?.urlImagem === 'string' ? before.urlImagem.trim() : '';
+  const newPhoto = typeof after?.urlImagem === 'string' ? after.urlImagem.trim() : '';
+  if (after && newPhoto && newPhoto !== oldPhoto) {
+    await syncStickerPhotos(event.params.playerId, oldPhoto, newPhoto);
+  }
   const beforeUid = typeof before?.idUsuario === 'string' ? before.idUsuario : '';
   const afterUid = typeof after?.idUsuario === 'string' ? after.idUsuario : '';
   const relevant =
@@ -1979,6 +1986,33 @@ export const onPlayerWritten = onDocumentWritten('{colecao}/{playerId}', async (
     await (await progressRef(beforeUid)).set(athleteCounters(undefined), { merge: true });
   }
 });
+
+/**
+ * Copia a foto nova do atleta para as figurinhas dele em todos os eventos do
+ * álbum, só nas que ainda têm a foto antiga (ou nenhuma): a foto que o admin
+ * enviou para a figurinha fica (`stickerPhotoUpdate`).
+ */
+async function syncStickerPhotos(playerId: string, oldUrl: string, newUrl: string): Promise<void> {
+  try {
+    const { db } = await admin();
+    const events = await db.collection('album_eventos').get();
+    const batch = db.batch();
+    let updates = 0;
+    for (const eventDoc of events.docs) {
+      const stickers = await eventDoc.ref.collection('figurinhas').where('idJogador', '==', playerId).get();
+      for (const sticker of stickers.docs) {
+        const url = stickerPhotoUpdate(sticker.data(), oldUrl, newUrl);
+        if (url === null) continue;
+        batch.update(sticker.ref, { urlImagem: url });
+        updates++;
+      }
+    }
+    if (updates > 0) await batch.commit();
+    logger.info('syncStickerPhotos', { playerId, updates });
+  } catch (error) {
+    logger.error('syncStickerPhotos', { playerId, error });
+  }
+}
 
 let achievementCatalogCache: { list: Achievement[]; at: number } | undefined;
 

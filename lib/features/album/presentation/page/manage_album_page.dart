@@ -97,6 +97,7 @@ class _ManageAlbumPageState extends State<ManageAlbumPage> {
         ManageAlbumNotice.stickerSaved => l10n.albumAdminStickerSaved,
         ManageAlbumNotice.stickerDeleted => l10n.albumAdminStickerDeleted,
         ManageAlbumNotice.stickersDeleted => l10n.albumAdminStickersDeleted(state.count),
+        ManageAlbumNotice.photosSynced => l10n.albumAdminPhotosSynced(state.count),
       };
 
   @override
@@ -152,7 +153,8 @@ class _ManageAlbumPageState extends State<ManageAlbumPage> {
                     : state.events.isEmpty
                         ? ArenaEmptyState(message: l10n.albumAdminEmpty, icon: Icons.collections_bookmark_outlined)
                         : ListView(
-                            padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s100)),
+                            padding: EdgeInsets.fromLTRB(
+                                AppSizes.s16, AppSizes.s16, AppSizes.s16, safeBottom(context, AppSizes.s100)),
                             children: [
                               Text(l10n.albumAdminIntro, style: AppTypography.subtitle()),
                               const SizedBox(height: AppSizes.s12),
@@ -278,6 +280,19 @@ class _EventEditorState extends State<_EventEditor> {
     if (!confirmed || !mounted) return;
     _clearSelection();
     await widget.cubit.deleteStickers(stickers);
+  }
+
+  /// "Atualizar fotos dos atletas" (confirmando no modal padrão).
+  Future<void> _syncPhotos(AppLocalizations l10n) async {
+    final confirmed = await showArenaConfirm(
+      context,
+      title: l10n.albumAdminSyncPhotos,
+      message: l10n.albumAdminSyncPhotosMessage,
+      confirmLabel: l10n.albumAdminSyncPhotos,
+      icon: Icons.sync_rounded,
+    );
+    if (!confirmed || !mounted) return;
+    await widget.cubit.syncAthletePhotos();
   }
 
   @override
@@ -423,6 +438,15 @@ class _EventEditorState extends State<_EventEditor> {
           title: l10n.albumAdminTeams,
           child: _teamChoices(context, state),
         ),
+        if (state.stickers.any((s) => s.kind == StickerKind.athlete))
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: state.busy ? null : () => _syncPhotos(l10n),
+              icon: const Icon(Icons.sync_rounded, size: AppSizes.s18),
+              label: Text(l10n.albumAdminSyncPhotos),
+            ),
+          ),
         const SizedBox(height: AppSizes.s16),
         for (final page in pages)
           _TeamStickers(

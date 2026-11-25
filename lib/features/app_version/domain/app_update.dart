@@ -46,6 +46,11 @@ class AppVersionConfig extends Equatable {
         'mensagem': message.trim(),
       };
 
+  /// Para o cache local (mesmos campos do doc, todos JSON).
+  Map<String, dynamic> toCache() => toMap();
+
+  factory AppVersionConfig.fromCache(Map<String, dynamic> json) => AppVersionConfig.fromMap(json);
+
   int minFor({required bool ios}) => ios ? minIos : minAndroid;
 
   int recommendedFor({required bool ios}) => ios ? recommendedIos : recommendedAndroid;

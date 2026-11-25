@@ -8,7 +8,7 @@ import 'package:arena_soccer/features/championships/data/dtos/championship_dto.d
 import 'package:arena_soccer/features/organizer_requests/data/dtos/organizer_request_dto.dart';
 import 'package:arena_soccer/features/organizer_requests/domain/usecases/organizer_request_usecases.dart';
 import 'package:arena_soccer/features/organizer_requests/presentation/bloc/organizer_request_state.dart';
-import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
 
 /// "Sou organizador de campeonato": acompanha o pedido e os campeonatos da
 /// conta em tempo real e cuida do formulário (enviar, corrigir o pendente,
@@ -18,7 +18,7 @@ class OrganizerRequestCubit extends Cubit<OrganizerRequestState> {
   final WatchMyChampionshipsUseCase watchMyChampionshipsUseCase;
   final SubmitOrganizerRequestUseCase submitOrganizerRequestUseCase;
   final CancelOrganizerRequestUseCase cancelOrganizerRequestUseCase;
-  final GetRegionsUseCase getRegionsUseCase;
+  final GetRegionsCacheFirstUseCase getRegionsUseCase;
 
   StreamSubscription<Either<Failure, OrganizerRequestDTO?>>? _request;
   StreamSubscription<Either<Failure, List<ChampionshipDTO>>>? _championships;
@@ -52,7 +52,7 @@ class OrganizerRequestCubit extends Cubit<OrganizerRequestState> {
 
   Future<void> _load() async {
     emit(const LoadingOrganizerRequestState());
-    final regions = await getRegionsUseCase();
+    final regions = await getRegionsUseCase.names();
     if (isClosed) return;
     if (regions.isLeft || regions.right.isEmpty) {
       emit(LoadErrorOrganizerRequestState(errorMessage: regions.isLeft ? regions.left.toString() : ''));

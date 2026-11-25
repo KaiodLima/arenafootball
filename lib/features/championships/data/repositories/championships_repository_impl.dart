@@ -58,6 +58,20 @@ class ChampionshipsRepositoryImpl implements IChampionshipsRepository {
       _dataSource.getSeasonChampionships(season);
 
   @override
+  Future<Either<Failure, CachedValue<List<ChampionshipDTO>>?>> getCachedSeasonChampionships(String season) =>
+      _cache.read(
+        CacheKeys.seasonChampionships(season: season),
+        (json) => [for (final item in json as List) ChampionshipDTO.fromCache(Map<String, dynamic>.from(item as Map))],
+      );
+
+  @override
+  Future<Either<Failure, void>> saveSeasonChampionshipsCache(List<ChampionshipDTO> championships, String season) =>
+      _cache.save(
+        CacheKeys.seasonChampionships(season: season),
+        [for (final championship in championships) championship.toCache()],
+      );
+
+  @override
   Stream<Either<Failure, List<GroupDTO>>> watchChampionshipGroups({required int championshipId, String? season}) =>
       _dataSource.watchChampionshipGroups(championshipId: championshipId, season: season);
 

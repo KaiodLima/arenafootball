@@ -13,12 +13,16 @@ import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/domain/match_form_hints.dart';
 import 'package:arena_soccer/features/matches/domain/repositories/matches_repository_interface.dart';
 import 'package:arena_soccer/features/matches/domain/usecases/create_match_usecase.dart';
-import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_usecase.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/match_form_cubit.dart';
 import 'package:arena_soccer/features/matches/presentation/bloc/match_form_state.dart';
-import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
+import 'package:arena_soccer/core/cache/cache_store.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/get_cached_region_matches_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_cache_first_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/save_region_matches_cache_usecase.dart';
 
 const _existing = [
   MatchDTO(
@@ -45,7 +49,27 @@ const _existing = [
   MatchDTO(homeTeam: 'A', awayTeam: 'B', date: '19/10', time: '17:45', venue: 'Arena Orlandão', region: 'Santo inacio'),
 ];
 
+/// Partidas da região sem cache (o fake não guarda nada): sempre lê o repositório.
+GetRegionMatchesCacheFirstUseCase _regionMatches(IMatchesRepository repository) => GetRegionMatchesCacheFirstUseCase(
+      GetRegionMatchesUseCase(repository),
+      GetCachedRegionMatchesUseCase(repository),
+      SaveRegionMatchesCacheUseCase(repository),
+    );
+
 class _FakeRepository implements IMatchesRepository {
+  @override
+  Future<Either<Failure, CachedValue<List<MatchDTO>>?>> getCachedRegionMatches(
+          {required String region, String? season}) async =>
+      const Right(null);
+
+  @override
+  Future<Either<Failure, void>> saveRegionMatchesCache(List<MatchDTO> matches,
+          {required String region, String? season}) async =>
+      const Right(null);
+
+  @override
+  Future<void> deleteRegionMatchesCache() async {}
+
   final created = <MatchDTO>[];
   final seasons = <String?>[];
 
@@ -94,9 +118,12 @@ class _FakeChampionship implements GetRegionChampionshipCacheFirstUseCase {
       Stream.value(Right(registered));
 }
 
-class _FakeRegions implements GetRegionsUseCase {
+class _FakeRegions implements GetRegionsCacheFirstUseCase {
   @override
-  Future<Either<Failure, List<String>>> call() async => const Right(['Floresta', 'Santo inacio']);
+  Future<Either<Failure, List<String>>> names({bool force = false}) async => const Right(['Floresta', 'Santo inacio']);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 class _FakeChampionships implements GetRegionChampionshipsCacheFirstUseCase {
@@ -205,7 +232,7 @@ void main() {
         CreateMatchUseCase(repository, championship),
         _FakeRegions(),
         _FakeTeams(),
-        GetRegionMatchesUseCase(repository),
+        _regionMatches(repository),
         _FakeChampionships(),
       );
       await cubit.load(initialRegion: 'Floresta', now: DateTime(2026, 10, 18));
@@ -219,7 +246,7 @@ void main() {
         CreateMatchUseCase(repository, championship),
         _FakeRegions(),
         _FakeTeams(),
-        GetRegionMatchesUseCase(repository),
+        _regionMatches(repository),
         championships,
       );
       const mine = ChampionshipDTO(
@@ -284,7 +311,7 @@ void main() {
         CreateMatchUseCase(repository, championship),
         _FakeRegions(),
         _FakeTeams(),
-        GetRegionMatchesUseCase(repository),
+        _regionMatches(repository),
         championships,
       );
       await multi.load(initialRegion: 'Floresta', now: DateTime(2026, 10, 18));
@@ -464,7 +491,7 @@ void main() {
         CreateMatchUseCase(repository, championship),
         _FakeRegions(),
         _FakeTeams(),
-        GetRegionMatchesUseCase(repository),
+        _regionMatches(repository),
         championships,
       );
       await cubit.load(initialRegion: 'Floresta', now: DateTime(2026, 10, 18));
@@ -505,7 +532,7 @@ void main() {
         CreateMatchUseCase(repository, _FakeChampionship()),
         _FakeRegions(),
         _FakeTeams(),
-        GetRegionMatchesUseCase(repository),
+        _regionMatches(repository),
         championships,
         _FakeGroups(),
       );

@@ -8,13 +8,13 @@ import 'package:arena_soccer/features/championships/data/dtos/championship_dto.d
 import 'package:arena_soccer/features/championships/domain/championship_rules_file.dart';
 import 'package:arena_soccer/features/championships/domain/usecases/save_championship_usecase.dart';
 import 'package:arena_soccer/features/championships/presentation/bloc/championship_form_state.dart';
-import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
 /// Cadastro/edição de campeonato (admin): dados, times participantes da
 /// região, banner, regulamento em PDF e premiação.
 class ChampionshipFormCubit extends Cubit<ChampionshipFormState> {
-  final GetRegionsUseCase getRegionsUseCase;
+  final GetRegionsCacheFirstUseCase getRegionsUseCase;
   final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
   final SaveChampionshipUseCase saveChampionshipUseCase;
 
@@ -30,7 +30,7 @@ class ChampionshipFormCubit extends Cubit<ChampionshipFormState> {
     final form = ChampionshipFormData(base: base, seasons: seasons, selectedTeams: [...base.teams]);
     emit(LoadingChampionshipFormState(form));
 
-    final regions = await getRegionsUseCase();
+    final regions = await getRegionsUseCase.names();
     if (isClosed) return;
     if (regions.isLeft || regions.right.isEmpty) {
       emit(LoadErrorChampionshipFormState(form));

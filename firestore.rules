@@ -490,13 +490,14 @@ service cloud.firestore {
       }
 
       // Súmula do organizador (a mesma do admin) nas partidas da competição
-      // dele: etapas, "Atrasou", gols/placar, cartões, escalação, dados do jogo
+      // dele: etapas, "Atrasou", gols/placar, cartões, pênaltis perdidos,
+      // escalação, dados do jogo
       // e votação. Times, competição, região e o que as functions gravam não
       // mudam; apagar segue com o admin.
       function organizerMatchUpdate() {
         return collection.matches('partidas([0-9]{4})?')
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['gols', 'golTimeCasa', 'golTimeFora',
-            'cartoes', 'substituicoes', 'escalacao', 'arbitro', 'observacoes', 'data', 'horario', 'horarioOriginal',
+            'cartoes', 'substituicoes', 'penaltisPerdidos', 'escalacao', 'arbitro', 'observacoes', 'data', 'horario', 'horarioOriginal',
             'duracao', 'local',
             'votacao', 'status', 'statusEm', 'inicioEm', 'intervaloEm', 'segundoTempoEm',
             'idGrupo', 'grupo', 'foraDosGrupos', 'fase', 'rodada'])

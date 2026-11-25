@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/match_card.dart';
@@ -10,6 +11,7 @@ import 'package:arena_soccer/features/predictions/data/dtos/prediction_dto.dart'
 import 'package:arena_soccer/features/predictions/domain/repositories/predictions_repository_interface.dart';
 import 'package:arena_soccer/features/predictions/domain/usecases/count_predictions_usecase.dart';
 import 'package:arena_soccer/features/predictions/domain/usecases/get_prediction_ranking_usecase.dart';
+import 'package:arena_soccer/features/predictions/domain/usecases/prediction_count_cache_usecases.dart';
 import 'package:arena_soccer/features/predictions/domain/usecases/save_prediction_usecase.dart';
 import 'package:arena_soccer/features/predictions/domain/usecases/watch_my_prediction_usecase.dart';
 import 'package:arena_soccer/features/predictions/presentation/bloc/prediction_cubit.dart';
@@ -62,6 +64,18 @@ class _FakeRepository implements IPredictionsRepository {
   @override
   Future<Either<Failure, int>> aheadOf({required String regionId, required int points, String? season}) async =>
       Right(ahead);
+
+  // Cache local da contagem: sem cache (os testes de cache estão em test/core/cache).
+  @override
+  Future<Either<Failure, CachedValue<int>?>> getCachedCount({required String matchId, String? season}) async =>
+      const Right(null);
+
+  @override
+  Future<Either<Failure, void>> saveCountCache(int count, {required String matchId, String? season}) async =>
+      const Right(null);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 void main() {
@@ -108,7 +122,11 @@ void main() {
     final cubit = PredictionCubit(
       WatchMyPredictionUseCase(repository),
       SavePredictionUseCase(repository),
-      CountPredictionsUseCase(repository),
+      CountPredictionsCacheFirstUseCase(
+        CountPredictionsUseCase(repository),
+        GetCachedPredictionCountUseCase(repository),
+        SavePredictionCountCacheUseCase(repository),
+      ),
     )..watch(matchId: 'm1', uid: 'me', season: '2026');
     repository.mineController.add(const Right(PredictionDTO(uid: 'me', home: 2, away: 1)));
     await Future<void>.delayed(Duration.zero);

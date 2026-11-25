@@ -4,6 +4,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:arena_soccer/features/matches/data/dtos/match_report_dtos.dart';
 import 'package:arena_soccer/features/matches/domain/match_report_sheet.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/penalty_labels.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 
 /// Textos do documento (no idioma do app), separados do `BuildContext` para
@@ -51,6 +52,9 @@ class MatchReportPdfTexts {
   final String Function(String season) season;
   final String Function(int? minute) cameIn;
   final String Function(int? minute) wentOut;
+  final String penaltyShort;
+  final String missedPenalties;
+  final String Function(MatchMissedPenalty penalty) penaltyHow;
 
   const MatchReportPdfTexts({
     required this.title,
@@ -95,6 +99,9 @@ class MatchReportPdfTexts {
     required this.season,
     required this.cameIn,
     required this.wentOut,
+    required this.penaltyShort,
+    required this.missedPenalties,
+    required this.penaltyHow,
   });
 
   factory MatchReportPdfTexts.of(AppLocalizations l10n) => MatchReportPdfTexts(
@@ -140,6 +147,9 @@ class MatchReportPdfTexts {
         season: l10n.homeSeasonChip,
         cameIn: (m) => l10n.pdfCameIn(m == null ? '' : " $m'"),
         wentOut: (m) => l10n.pdfWentOut(m == null ? '' : " $m'"),
+        penaltyShort: l10n.reportPenaltyShort,
+        missedPenalties: l10n.reportPenaltiesMissed,
+        penaltyHow: (p) => penaltyMissHow(l10n, p),
       );
 }
 
@@ -393,7 +403,12 @@ Future<Uint8List> buildMatchReportPdf({
           [texts.minute, texts.team, texts.scorer, texts.assist],
           [
             for (final g in sheet.goals)
-              [minute(g.minute), teamOf(g.home), g.scorer.isEmpty ? '-' : g.scorer, g.assistant]
+              [
+                minute(g.minute),
+                teamOf(g.home),
+                '${g.scorer.isEmpty ? '-' : g.scorer}${g.penalty ? ' (${texts.penaltyShort})' : ''}',
+                g.assistant,
+              ]
           ],
           const {
             0: pw.FixedColumnWidth(36),
@@ -436,6 +451,27 @@ Future<Uint8List> buildMatchReportPdf({
             3: pw.FlexColumnWidth(3)
           },
         ),
+        if (sheet.missedPenalties.isNotEmpty) ...[
+          sectionTitle(texts.missedPenalties),
+          table(
+            [texts.minute, texts.team, texts.player, texts.type],
+            [
+              for (final p in sheet.missedPenalties)
+                [
+                  minute(p.minute),
+                  teamOf(p.home),
+                  p.penalty.playerName.isEmpty ? '-' : p.penalty.playerName,
+                  texts.penaltyHow(p.penalty),
+                ],
+            ],
+            const {
+              0: pw.FixedColumnWidth(36),
+              1: pw.FlexColumnWidth(2),
+              2: pw.FlexColumnWidth(3),
+              3: pw.FlexColumnWidth(3)
+            },
+          ),
+        ],
         if (match.electedPlayerName.isNotEmpty) ...[
           sectionTitle(texts.bestPlayer),
           pw.Text(match.electedPlayerName, style: bold),

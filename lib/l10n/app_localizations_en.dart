@@ -1530,6 +1530,50 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportSubstitution => 'Substitution';
 
   @override
+  String get reportPenalty => 'Penalty';
+
+  @override
+  String get reportPenaltyScored => 'Scored (goal)';
+
+  @override
+  String get reportPenaltySavedOption => 'Missed · saved';
+
+  @override
+  String get reportPenaltyWideOption => 'Missed · wide/post';
+
+  @override
+  String get reportPenaltyTaker => 'Penalty taker';
+
+  @override
+  String get reportPenaltyWhoSaved => 'Who saved it? (optional)';
+
+  @override
+  String get reportPenaltyNoKeeper => 'No goalkeeper';
+
+  @override
+  String get reportPenaltyGoal => 'Penalty';
+
+  @override
+  String get reportPenaltyShort => 'pen.';
+
+  @override
+  String get reportPenaltyMissed => 'Missed penalty';
+
+  @override
+  String get reportPenaltySaved => 'saved';
+
+  @override
+  String reportPenaltySavedBy(String name) {
+    return 'saved by $name';
+  }
+
+  @override
+  String get reportPenaltyWide => 'wide';
+
+  @override
+  String get reportPenaltiesMissed => 'Missed penalties';
+
+  @override
   String get reportWhoLeaves => 'Who comes off?';
 
   @override
@@ -3593,6 +3637,25 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other: '$count stickers deleted.',
       one: '1 sticker deleted.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get albumAdminSyncPhotos => 'Update athlete photos';
+
+  @override
+  String get albumAdminSyncPhotosMessage =>
+      'Copies each athlete\'s current photo to their stickers. Photos uploaded only for the sticker will be replaced.';
+
+  @override
+  String albumAdminPhotosSynced(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stickers updated.',
+      one: '1 sticker updated.',
+      zero: 'Photos are already up to date.',
     );
     return '$_temp0';
   }

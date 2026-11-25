@@ -69,9 +69,9 @@ class _Squads implements WatchTeamPlayersUseCase {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _Championships implements GetSeasonChampionshipsUseCase {
+class _Championships implements GetSeasonChampionshipsCacheFirstUseCase {
   @override
-  Future<Either<Failure, List<ChampionshipDTO>>> call(String season) async => const Right([]);
+  Future<Either<Failure, List<ChampionshipDTO>>> latest(String season, {bool force = false}) async => const Right([]);
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

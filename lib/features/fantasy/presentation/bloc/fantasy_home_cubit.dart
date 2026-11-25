@@ -80,7 +80,7 @@ class FantasyHomeCubit extends Cubit<FantasyHomeState> {
   final WatchFantasyRoundUseCase _round;
   final WatchFantasyParticipantUseCase _participant;
   final WatchFantasyLineupUseCase _lineup;
-  final GetFantasyPositionUseCase _position;
+  final GetFantasyPositionCacheFirstUseCase _position;
 
   FantasyHomeCubit(this._active, this._round, this._participant, this._lineup, this._position)
       : super(const FantasyHomeState());
@@ -145,11 +145,12 @@ class FantasyHomeCubit extends Cubit<FantasyHomeState> {
     _subs[id] = subs;
   }
 
-  /// Posição no geral (os que têm mais + 1; uma leitura, só quando os pontos mudam).
+  /// Posição no geral (os que têm mais + 1; uma leitura só quando os pontos
+  /// mudam, com cache de 10 min por Fantasy e conta).
   Future<void> _askPosition(String id, double points) async {
     if (_pointsAsked[id] == points) return;
     _pointsAsked[id] = points;
-    final response = await _position(id, points);
+    final response = await _position(id, points, uid: _uid);
     _update(id, (i) => i.copyWith(position: () => response.fold((_) => null, (p) => p)));
   }
 

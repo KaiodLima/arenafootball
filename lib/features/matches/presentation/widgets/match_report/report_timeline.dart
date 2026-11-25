@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_goal.dart';
 import 'package:arena_soccer/features/matches/domain/match_report.dart';
 import 'package:arena_soccer/features/matches/presentation/widgets/booking_icon.dart';
+import 'package:arena_soccer/features/matches/presentation/widgets/penalty_labels.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
 import 'package:arena_soccer/utils/constants/app_colors.dart';
 import 'package:arena_soccer/utils/constants/app_sizes.dart';
@@ -171,21 +172,32 @@ class _EventContent extends StatelessWidget {
     final goal = event.goal;
     final booking = event.booking;
     final sub = event.substitution;
+    final missed = event.missedPenalty;
     final Widget icon = goal != null
         ? const Icon(Icons.sports_soccer_rounded, size: AppSizes.s18, color: AppColors.primaryDark)
         : sub != null
             ? const Icon(Icons.swap_vert_rounded, size: AppSizes.s18, color: AppColors.primaryDark)
-            : BookingIcon(type: booking!.type, size: AppSizes.s16);
+            : missed != null
+                ? const Icon(Icons.block_rounded, size: AppSizes.s18, color: AppColors.danger)
+                : BookingIcon(type: booking!.type, size: AppSizes.s16);
     final title = goal != null
         ? (goal.hasScorer ? goal.scorerName : l10n.reportGoalNoScorer)
         : sub != null
             ? l10n.reportEntering(sub.inName)
-            : booking!.playerName;
+            : missed != null
+                ? (missed.playerName.isEmpty ? l10n.reportPenaltyMissed : missed.playerName)
+                : booking!.playerName;
     final subtitle = goal != null
-        ? (goal.hasAssistant ? l10n.matchReportAssist(goal.assistantName) : '')
+        ? (goal.penalty
+            ? l10n.reportPenaltyGoal
+            : goal.hasAssistant
+                ? l10n.matchReportAssist(goal.assistantName)
+                : '')
         : sub != null
             ? l10n.reportLeaving(sub.outName)
-            : (booking!.secondYellow ? l10n.matchReportSecondYellow : '');
+            : missed != null
+                ? penaltyMissLabel(l10n, missed)
+                : (booking!.secondYellow ? l10n.matchReportSecondYellow : '');
     final align = alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start;
     final titleRow = <Widget>[
       icon,

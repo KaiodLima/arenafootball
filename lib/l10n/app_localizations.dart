@@ -2638,6 +2638,90 @@ abstract class AppLocalizations {
   /// **'Substituição'**
   String get reportSubstitution;
 
+  /// No description provided for @reportPenalty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pênalti'**
+  String get reportPenalty;
+
+  /// No description provided for @reportPenaltyScored.
+  ///
+  /// In pt, this message translates to:
+  /// **'Convertido (gol)'**
+  String get reportPenaltyScored;
+
+  /// No description provided for @reportPenaltySavedOption.
+  ///
+  /// In pt, this message translates to:
+  /// **'Perdido · defendido'**
+  String get reportPenaltySavedOption;
+
+  /// No description provided for @reportPenaltyWideOption.
+  ///
+  /// In pt, this message translates to:
+  /// **'Perdido · para fora/trave'**
+  String get reportPenaltyWideOption;
+
+  /// No description provided for @reportPenaltyTaker.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem cobrou'**
+  String get reportPenaltyTaker;
+
+  /// No description provided for @reportPenaltyWhoSaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem defendeu? (opcional)'**
+  String get reportPenaltyWhoSaved;
+
+  /// No description provided for @reportPenaltyNoKeeper.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem goleiro'**
+  String get reportPenaltyNoKeeper;
+
+  /// No description provided for @reportPenaltyGoal.
+  ///
+  /// In pt, this message translates to:
+  /// **'De pênalti'**
+  String get reportPenaltyGoal;
+
+  /// No description provided for @reportPenaltyShort.
+  ///
+  /// In pt, this message translates to:
+  /// **'pên.'**
+  String get reportPenaltyShort;
+
+  /// No description provided for @reportPenaltyMissed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pênalti perdido'**
+  String get reportPenaltyMissed;
+
+  /// No description provided for @reportPenaltySaved.
+  ///
+  /// In pt, this message translates to:
+  /// **'defendido'**
+  String get reportPenaltySaved;
+
+  /// No description provided for @reportPenaltySavedBy.
+  ///
+  /// In pt, this message translates to:
+  /// **'defendido por {name}'**
+  String reportPenaltySavedBy(String name);
+
+  /// No description provided for @reportPenaltyWide.
+  ///
+  /// In pt, this message translates to:
+  /// **'para fora'**
+  String get reportPenaltyWide;
+
+  /// No description provided for @reportPenaltiesMissed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pênaltis perdidos'**
+  String get reportPenaltiesMissed;
+
   /// No description provided for @reportWhoLeaves.
   ///
   /// In pt, this message translates to:
@@ -5969,6 +6053,24 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'{count, plural, =1{1 figurinha excluída.} other{{count} figurinhas excluídas.}}'**
   String albumAdminStickersDeleted(int count);
+
+  /// No description provided for @albumAdminSyncPhotos.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atualizar fotos dos atletas'**
+  String get albumAdminSyncPhotos;
+
+  /// No description provided for @albumAdminSyncPhotosMessage.
+  ///
+  /// In pt, this message translates to:
+  /// **'Copia a foto atual de cada atleta para as figurinhas dele. Fotos enviadas só para a figurinha serão substituídas.'**
+  String get albumAdminSyncPhotosMessage;
+
+  /// No description provided for @albumAdminPhotosSynced.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{As fotos já estão em dia.} =1{1 figurinha atualizada.} other{{count} figurinhas atualizadas.}}'**
+  String albumAdminPhotosSynced(int count);
 
   /// No description provided for @albumAdminDeleteTitle.
   ///

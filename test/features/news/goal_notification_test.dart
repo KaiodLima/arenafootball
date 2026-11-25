@@ -19,10 +19,15 @@ import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
 import 'package:arena_soccer/features/players/domain/repositories/players_repository_interface.dart';
 import 'package:arena_soccer/features/players/domain/usecases/add_player_stats_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
-import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 import 'package:arena_soccer/features/matches/domain/match_round.dart';
+import 'package:arena_soccer/core/cache/cache_store.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/get_cached_region_matches_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_cache_first_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/save_region_matches_cache_usecase.dart';
 
 const _today = MatchDTO(
   id: 'm1',
@@ -35,7 +40,37 @@ const _today = MatchDTO(
   awayGoals: 0,
 );
 
+/// Partidas da região sem cache (o fake não guarda nada): sempre lê o repositório.
+GetRegionMatchesCacheFirstUseCase _regionMatches(IMatchesRepository repository) => GetRegionMatchesCacheFirstUseCase(
+      GetRegionMatchesUseCase(repository),
+      GetCachedRegionMatchesUseCase(repository),
+      SaveRegionMatchesCacheUseCase(repository),
+    );
+
 class _FakeMatchesRepository implements IMatchesRepository {
+  @override
+  Future<Either<Failure, CachedValue<List<MatchDTO>>?>> getCachedRegionMatches(
+          {required String region, String? season}) async =>
+      const Right(null);
+
+  @override
+  Future<Either<Failure, void>> saveRegionMatchesCache(List<MatchDTO> matches,
+          {required String region, String? season}) async =>
+      const Right(null);
+
+  @override
+  Future<void> deleteRegionMatchesCache() async {}
+
+  @override
+  Future<Either<Failure, CachedValue<List<MatchDTO>>?>> getCachedElectedMatches(
+          {required String playerId, String? season}) async =>
+      const Right(null);
+
+  @override
+  Future<Either<Failure, void>> saveElectedMatchesCache(List<MatchDTO> matches,
+          {required String playerId, String? season}) async =>
+      const Right(null);
+
   @override
   Future<Either<Failure, List<MatchDTO>>> getElectedMatches({required String playerId, String? season}) async =>
       const Right([]);
@@ -151,9 +186,12 @@ class _FakeCreateNews implements CreateNewsUseCase {
   }
 }
 
-class _FakeRegions implements GetRegionsUseCase {
+class _FakeRegions implements GetRegionsCacheFirstUseCase {
   @override
-  Future<Either<Failure, List<String>>> call() async => const Right(['Floresta', 'Santo inacio']);
+  Future<Either<Failure, List<String>>> names({bool force = false}) async => const Right(['Floresta', 'Santo inacio']);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 class _FakeTeams implements GetTeamsCacheFirstUseCase {
@@ -175,7 +213,7 @@ class _FakeTeams implements GetTeamsCacheFirstUseCase {
 
 /// Hoje = 11/10 para as partidas do fake.
 class _TodayMatches extends GetTodayMatchesUseCase {
-  _TodayMatches(super.repository);
+  _TodayMatches(IMatchesRepository repository) : super(_regionMatches(repository));
 
   @override
   Future<Either<Failure, List<MatchDTO>>> call({required String region, String? season, DateTime? now}) =>
@@ -330,7 +368,7 @@ class _EnrolledPlayers extends _FakePlayersRepository {
 void main() {
   group('GetTodayMatchesUseCase', () {
     test('só os jogos de hoje da região, por horário', () async {
-      final result = await GetTodayMatchesUseCase(_FakeMatchesRepository())(
+      final result = await GetTodayMatchesUseCase(_regionMatches(_FakeMatchesRepository()))(
         region: 'Floresta',
         now: DateTime(2026, 10, 11),
       );

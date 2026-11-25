@@ -8,14 +8,14 @@ import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/domain/usecases/create_player_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
 import 'package:arena_soccer/features/players/presentation/bloc/player_form_state.dart';
-import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
 /// Cadastro de jogador (admin). O elenco atual do time escolhido alimenta a
 /// lista da tela e o aviso de nome duplicado.
 class PlayerFormCubit extends Cubit<PlayerFormState> {
   final CreatePlayerUseCase createPlayerUseCase;
-  final GetRegionsUseCase getRegionsUseCase;
+  final GetRegionsCacheFirstUseCase getRegionsUseCase;
   final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
   final WatchTeamPlayersUseCase watchTeamPlayersUseCase;
   final GetRegionChampionshipsCacheFirstUseCase? getRegionChampionshipsCacheFirstUseCase;
@@ -36,7 +36,7 @@ class PlayerFormCubit extends Cubit<PlayerFormState> {
     _edit(PlayerFormData(regions: [initialRegion], selectedRegion: initialRegion));
     final loadTeams = _loadTeams(initialRegion);
 
-    final response = await getRegionsUseCase();
+    final response = await getRegionsUseCase.names();
     if (isClosed) return;
     final regions = response.fold((_) => <String>[], (list) => list);
     if (regions.isNotEmpty) {

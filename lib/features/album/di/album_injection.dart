@@ -12,7 +12,7 @@ void registerAlbumDependencies() {
   _sl.registerLazySingleton<AlbumDataSource>(() => AlbumDataSource(_sl()));
 
   // Repository (interface -> impl)
-  _sl.registerLazySingleton<IAlbumRepository>(() => AlbumRepositoryImpl(_sl()));
+  _sl.registerLazySingleton<IAlbumRepository>(() => AlbumRepositoryImpl(_sl(), _sl()));
 
   // UseCases
   _sl.registerLazySingleton(() => AlbumUseCase(_sl()));

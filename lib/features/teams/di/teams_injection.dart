@@ -17,6 +17,7 @@ import 'package:arena_soccer/features/teams/domain/usecases/get_next_team_number
 import 'package:arena_soccer/features/teams/domain/usecases/get_team_by_name_usecase.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_usecase.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_by_ids_usecase.dart';
+import 'package:arena_soccer/features/teams/domain/usecases/get_teams_by_ids_cache_first_usecase.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/watch_teams_usecase.dart';
 
 final _sl = GetIt.instance;
@@ -46,5 +47,7 @@ void registerTeamsDependencies() {
   _sl.registerLazySingleton(() => SaveTeamCacheUseCase(_sl()));
   _sl.registerLazySingleton(() => DeleteTeamsCacheUseCase(_sl()));
   _sl.registerLazySingleton(() => GetTeamsCacheFirstUseCase(_sl(), _sl(), _sl()));
+  _sl.registerLazySingleton(() => GetTeamCacheFirstUseCase(_sl(), _sl(), _sl()));
+  _sl.registerLazySingleton(() => GetTeamsByIdsCacheFirstUseCase(_sl(), _sl()));
   _sl.registerLazySingleton(() => GetTeamByNameCacheFirstUseCase(_sl(), _sl(), _sl()));
 }

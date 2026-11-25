@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(zsh -ic 'node -v && npm -v')"
+    ]
+  }
+}

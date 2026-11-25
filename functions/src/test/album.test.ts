@@ -10,6 +10,7 @@ import {
   nextPackAt,
   packId,
   parsePackId,
+  stickerPhotoUpdate,
   perPackOf,
   rankingEntry,
   stickerOf,
@@ -114,3 +115,13 @@ test('ranking: coladas, raras e desempate por quem chegou primeiro', () => {
   assert.equal(done.alcancadoEm, t2);
 });
 
+
+test('stickerPhotoUpdate: só a figurinha de atleta com a foto antiga ou vazia', () => {
+  assert.equal(stickerPhotoUpdate({ tipo: 'atleta', urlImagem: 'old' }, 'old', 'new'), 'new');
+  assert.equal(stickerPhotoUpdate({ tipo: 'atleta', urlImagem: '' }, 'old', 'new'), 'new');
+  assert.equal(stickerPhotoUpdate({ tipo: 'atleta' }, '', 'new'), 'new');
+  assert.equal(stickerPhotoUpdate({ tipo: 'atleta', urlImagem: 'admin' }, 'old', 'new'), null);
+  assert.equal(stickerPhotoUpdate({ tipo: 'atleta', urlImagem: 'new' }, 'old', 'new'), null);
+  assert.equal(stickerPhotoUpdate({ tipo: 'escudo', urlImagem: 'old' }, 'old', 'new'), null);
+  assert.equal(stickerPhotoUpdate({ tipo: 'atleta', urlImagem: 'old' }, 'old', ''), null);
+});

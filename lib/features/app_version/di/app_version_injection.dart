@@ -12,12 +12,17 @@ void registerAppVersionDependencies() {
   _sl.registerLazySingleton<AppVersionDataSource>(() => AppVersionDataSource(_sl()));
 
   // Repository (interface -> impl)
-  _sl.registerLazySingleton<IAppVersionRepository>(() => AppVersionRepositoryImpl(_sl()));
+  _sl.registerLazySingleton<IAppVersionRepository>(() => AppVersionRepositoryImpl(_sl(), _sl()));
 
   // UseCases
   _sl.registerLazySingleton(() => GetAppVersionConfigUseCase(_sl()));
   _sl.registerLazySingleton(() => SaveAppVersionConfigUseCase(_sl()));
   _sl.registerLazySingleton(() => GetInstalledBuildUseCase(_sl()));
+
+  // Cache local (ver `cacheFirst`)
+  _sl.registerLazySingleton(() => GetCachedAppVersionConfigUseCase(_sl()));
+  _sl.registerLazySingleton(() => SaveAppVersionConfigCacheUseCase(_sl()));
+  _sl.registerLazySingleton(() => AppVersionCacheFirstUseCase(_sl(), _sl(), _sl()));
 
   // Aviso de atualização (home + volta do segundo plano).
   _sl.registerLazySingleton(() => AppUpdateChecker(_sl(), _sl(), _sl()));

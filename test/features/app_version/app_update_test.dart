@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/core/services/preferences_service.dart';
 import 'package:arena_soccer/features/app_version/domain/app_update.dart';
@@ -35,7 +36,23 @@ class _Repo implements IAppVersionRepository {
 
   @override
   Future<String> installedVersionName() async => '2.0.18';
+
+  // Sem cache: o aviso sempre lê a config (o cache tem teste próprio).
+  @override
+  Future<Either<Failure, CachedValue<AppVersionConfig>?>> getCachedConfig() async => const Right(null);
+
+  @override
+  Future<Either<Failure, void>> saveConfigCache(AppVersionConfig config) async => const Right(null);
+
+  @override
+  Future<void> deleteConfigCache() async {}
 }
+
+AppVersionCacheFirstUseCase _cacheFirst(IAppVersionRepository repo) => AppVersionCacheFirstUseCase(
+      GetAppVersionConfigUseCase(repo),
+      GetCachedAppVersionConfigUseCase(repo),
+      SaveAppVersionConfigCacheUseCase(repo),
+    );
 
 Widget _app(Widget home) => MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -108,8 +125,7 @@ void main() {
   testWidgets('sugerido: "Depois" guarda o build e não avisa de novo o mesmo', (tester) async {
     SharedPreferences.setMockInitialValues({});
     final repo = _Repo(config: const AppVersionConfig(recommendedAndroid: 44, recommendedIos: 44));
-    final checker =
-        AppUpdateChecker(GetAppVersionConfigUseCase(repo), GetInstalledBuildUseCase(repo), PreferencesService());
+    final checker = AppUpdateChecker(_cacheFirst(repo), GetInstalledBuildUseCase(repo), PreferencesService());
     late BuildContext ctx;
     await tester.pumpWidget(_app(Builder(builder: (context) {
       ctx = context;

@@ -36,6 +36,9 @@ class LiveEvent extends Equatable {
   /// Vermelho que veio do 2º amarelo.
   final bool secondYellow;
 
+  /// Gol de pênalti (`penalti`).
+  final bool penalty;
+
   const LiveEvent({
     required this.id,
     required this.type,
@@ -48,6 +51,7 @@ class LiveEvent extends Equatable {
     this.playerInId = '',
     this.playerOut = '',
     this.secondYellow = false,
+    this.penalty = false,
   });
 
   factory LiveEvent.fromMap(Map<String, dynamic> data) {
@@ -64,6 +68,7 @@ class LiveEvent extends Equatable {
       playerInId: text('entra_id'),
       playerOut: text('sai'),
       secondYellow: data['segundo_amarelo'] == true,
+      penalty: data['penalti'] == true,
     );
   }
 
@@ -79,6 +84,7 @@ class LiveEvent extends Equatable {
         if (playerInId.isNotEmpty) 'entra_id': playerInId,
         if (playerOut.isNotEmpty) 'sai': playerOut,
         if (secondYellow) 'segundo_amarelo': true,
+        if (penalty) 'penalti': true,
       };
 
   static List<LiveEvent> listFrom(Object? raw) => raw is List
@@ -90,5 +96,5 @@ class LiveEvent extends Equatable {
 
   @override
   List<Object?> get props =>
-      [id, type, home, minute, player, playerId, assistant, playerIn, playerInId, playerOut, secondYellow];
+      [id, type, home, minute, player, playerId, assistant, playerIn, playerInId, playerOut, secondYellow, penalty];
 }

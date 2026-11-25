@@ -125,6 +125,10 @@ class MatchDTO extends Equatable {
 
   /// Substituições da súmula (`substituicoes`).
   final List<MatchSubstitution> substitutions;
+
+  /// Pênaltis perdidos da súmula (`penaltisPerdidos`); o convertido é um gol
+  /// com `penalti` na lista [goals].
+  final List<MatchMissedPenalty> missedPenalties;
   final MatchLineup lineup;
   final String referee;
   final String notes;
@@ -163,6 +167,7 @@ class MatchDTO extends Equatable {
     this.statusAt,
     this.bookings = const [],
     this.substitutions = const [],
+    this.missedPenalties = const [],
     this.lineup = const MatchLineup(),
     this.referee = '',
     this.notes = '',
@@ -171,6 +176,7 @@ class MatchDTO extends Equatable {
   static const String bookingsField = 'cartoes';
   static const String lineupField = 'escalacao';
   static const String substitutionsField = 'substituicoes';
+  static const String missedPenaltiesField = 'penaltisPerdidos';
 
   static DateTime? _time(Object? value) => value is Timestamp ? value.toDate() : null;
 
@@ -182,12 +188,21 @@ class MatchDTO extends Equatable {
 
   static int _int(Object? value) => value is num ? value.toInt() : int.tryParse(value?.toString() ?? '') ?? 0;
 
-  factory MatchDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
-    final data = doc.data() ?? const {};
-    final registeredAt = data['dataRegistro'];
+  // Edição e exclusão sempre pelo id do documento.
+  factory MatchDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) =>
+      MatchDTO._fromData(doc.id, doc.data() ?? const {}, _time);
+
+  /// Hora guardada no cache (milissegundos).
+  static DateTime? _cacheTime(Object? value) =>
+      value is num ? DateTime.fromMillisecondsSinceEpoch(value.toInt()) : null;
+
+  /// Partida do cache local ([toCache]): região pelo id, com o nome atual.
+  factory MatchDTO.fromCache(Map<String, dynamic> json) =>
+      MatchDTO._fromData(json['id']?.toString() ?? '', json, _cacheTime);
+
+  factory MatchDTO._fromData(String id, Map<String, dynamic> data, DateTime? Function(Object?) timeOf) {
     return MatchDTO(
-      // Edição e exclusão sempre pelo id do documento.
-      id: doc.id,
+      id: id,
       homeTeam: data['timeC']?.toString() ?? '',
       awayTeam: data['timeF']?.toString() ?? '',
       homeTeamId: data['idTimeC']?.toString() ?? '',
@@ -209,17 +224,18 @@ class MatchDTO extends Equatable {
       electedPlayerId: (data[electedField] as Map?)?['idJogador']?.toString() ?? '',
       electedPlayerName: (data[electedField] as Map?)?['nome']?.toString() ?? '',
       votesCount: data['quantidadeVotos']?.toString() ?? '',
-      registeredAt: registeredAt is Timestamp ? registeredAt.toDate() : null,
+      registeredAt: timeOf(data['dataRegistro']),
       regionIds: (data[regionIdsField] as List?)?.map((id) => id.toString()).toList() ?? const [],
       goals: MatchGoal.listFrom(data[goalsField]),
       durationMinutes: _int(data['duracao']) > 0 ? _int(data['duracao']) : defaultDurationMinutes,
       manualStatus: MatchManualStatus.fromKey(data['status']?.toString()),
-      startedAt: _time(data['inicioEm']),
-      halfTimeAt: _time(data['intervaloEm']),
-      secondHalfAt: _time(data['segundoTempoEm']),
-      statusAt: _time(data['statusEm']),
+      startedAt: timeOf(data['inicioEm']),
+      halfTimeAt: timeOf(data['intervaloEm']),
+      secondHalfAt: timeOf(data['segundoTempoEm']),
+      statusAt: timeOf(data['statusEm']),
       bookings: MatchBooking.listFrom(data[bookingsField]),
       substitutions: MatchSubstitution.listFrom(data[substitutionsField]),
+      missedPenalties: MatchMissedPenalty.listFrom(data[missedPenaltiesField]),
       lineup: MatchLineup.fromMap(data[lineupField]),
       referee: data['arbitro']?.toString() ?? '',
       notes: data['observacoes']?.toString() ?? '',
@@ -256,10 +272,28 @@ class MatchDTO extends Equatable {
         if (manualStatus != MatchManualStatus.none) 'status': manualStatus.key,
         if (bookings.isNotEmpty) bookingsField: [for (final b in bookings) b.toMap()],
         if (substitutions.isNotEmpty) substitutionsField: [for (final s in substitutions) s.toMap()],
+        if (missedPenalties.isNotEmpty) missedPenaltiesField: [for (final p in missedPenalties) p.toMap()],
         if (!lineup.isEmpty) lineupField: lineup.toMap(),
         if (referee.isNotEmpty) 'arbitro': referee,
         if (notes.isNotEmpty) 'observacoes': notes,
       };
+
+  /// Para o cache local (JSON): os campos do doc com as horas em
+  /// milissegundos, o craque eleito e a região pelo id ([fromCache]).
+  Map<String, dynamic> toCache() {
+    int? ms(DateTime? value) => value?.millisecondsSinceEpoch;
+    return {
+      ...toMap(),
+      'id': id,
+      'dataRegistro': ms(registeredAt),
+      'inicioEm': ms(startedAt),
+      'intervaloEm': ms(halfTimeAt),
+      'segundoTempoEm': ms(secondHalfAt),
+      'statusEm': ms(statusAt),
+      if (electedPlayerId.isNotEmpty || electedPlayerName.isNotEmpty)
+        electedField: {'idJogador': electedPlayerId, 'nome': electedPlayerName},
+    };
+  }
 
   MatchDTO copyWith({
     String? id,
@@ -293,6 +327,7 @@ class MatchDTO extends Equatable {
     DateTime? statusAt,
     List<MatchBooking>? bookings,
     List<MatchSubstitution>? substitutions,
+    List<MatchMissedPenalty>? missedPenalties,
     MatchLineup? lineup,
     String? referee,
     String? notes,
@@ -331,6 +366,7 @@ class MatchDTO extends Equatable {
       statusAt: statusAt ?? this.statusAt,
       bookings: bookings ?? this.bookings,
       substitutions: substitutions ?? this.substitutions,
+      missedPenalties: missedPenalties ?? this.missedPenalties,
       lineup: lineup ?? this.lineup,
       referee: referee ?? this.referee,
       notes: notes ?? this.notes,
@@ -371,6 +407,7 @@ class MatchDTO extends Equatable {
         statusAt: statusAt,
         bookings: bookings,
         substitutions: substitutions,
+        missedPenalties: missedPenalties,
         lineup: lineup,
         referee: referee,
         notes: notes,
@@ -412,6 +449,7 @@ class MatchDTO extends Equatable {
         statusAt: resetClock ? null : statusAt,
         bookings: bookings,
         substitutions: substitutions,
+        missedPenalties: missedPenalties,
         lineup: lineup,
         referee: referee,
         notes: notes,
@@ -455,6 +493,7 @@ class MatchDTO extends Equatable {
         statusAt,
         bookings,
         substitutions,
+        missedPenalties,
         lineup,
         referee,
         notes,

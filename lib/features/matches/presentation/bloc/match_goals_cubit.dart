@@ -161,6 +161,7 @@ class MatchGoalsCubit extends Cubit<MatchGoalsState> {
               scorerName: scorer?.name ?? '',
               assistantId: assistant != null && assistant.id != scorer?.id ? assistant.id : '',
               assistantName: assistant != null && assistant.id != scorer?.id ? assistant.name : '',
+              penalty: g.penalty,
             ),
       ],
       errorMessage: () => null,

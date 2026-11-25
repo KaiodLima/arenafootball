@@ -22,6 +22,11 @@ class UserDTO extends Equatable {
   /// conta); nulo = pode trocar. Ver `TeamChangePolicy`.
   final DateTime? teamChangedAt;
 
+  /// `indicadoPor`: código de quem indicou a conta ('' = ninguém). Nulo =
+  /// não se sabe (cache antigo, conta montada no app): o "Indique amigos" lê
+  /// do Firestore. O app grava só pelo "Fui indicado", nunca pelo [toMap].
+  final String? referredBy;
+
   const UserDTO({
     required this.id,
     required this.name,
@@ -31,6 +36,7 @@ class UserDTO extends Equatable {
     this.isAdmin = false,
     this.photoUrl = '',
     this.teamChangedAt,
+    this.referredBy,
   });
 
   factory UserDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -44,6 +50,7 @@ class UserDTO extends Equatable {
       isAdmin: data['admin'] == true,
       photoUrl: data['urlImagem']?.toString() ?? '',
       teamChangedAt: (data['trocaTimeEm'] as Timestamp?)?.toDate(),
+      referredBy: data['indicadoPor']?.toString() ?? '',
     );
   }
 
@@ -71,6 +78,7 @@ class UserDTO extends Equatable {
       photoUrl: json['photoUrl']?.toString() ?? '',
       teamChangedAt:
           json['teamChangedAt'] is int ? DateTime.fromMillisecondsSinceEpoch(json['teamChangedAt'] as int) : null,
+      referredBy: json['referredBy']?.toString(),
     );
   }
 
@@ -83,6 +91,7 @@ class UserDTO extends Equatable {
         'isAdmin': isAdmin,
         'photoUrl': photoUrl,
         if (teamChangedAt != null) 'teamChangedAt': teamChangedAt!.millisecondsSinceEpoch,
+        if (referredBy != null) 'referredBy': referredBy,
       };
 
   /// Contas antigas e quem pulou a etapa 2 do cadastro ficam com `time` vazio.
@@ -98,7 +107,8 @@ class UserDTO extends Equatable {
       String? favoriteTeam,
       String? favoriteTeamId,
       String? photoUrl,
-      DateTime? teamChangedAt}) {
+      DateTime? teamChangedAt,
+      String? referredBy}) {
     return UserDTO(
       id: id,
       name: name ?? this.name,
@@ -108,9 +118,11 @@ class UserDTO extends Equatable {
       isAdmin: isAdmin,
       photoUrl: photoUrl ?? this.photoUrl,
       teamChangedAt: teamChangedAt ?? this.teamChangedAt,
+      referredBy: referredBy ?? this.referredBy,
     );
   }
 
   @override
-  List<Object?> get props => [id, name, email, favoriteTeam, favoriteTeamId, isAdmin, photoUrl, teamChangedAt];
+  List<Object?> get props =>
+      [id, name, email, favoriteTeam, favoriteTeamId, isAdmin, photoUrl, teamChangedAt, referredBy];
 }

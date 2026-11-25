@@ -13,7 +13,7 @@ import 'package:arena_soccer/features/notifications/domain/usecases/watch_push_c
 import 'package:arena_soccer/features/notifications/domain/usecases/watch_push_history_usecase.dart';
 import 'package:arena_soccer/features/notifications/presentation/bloc/notifications_panel_cubit.dart';
 import 'package:arena_soccer/features/notifications/presentation/bloc/notifications_panel_state.dart';
-import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
 
 class _FakeTopics implements TopicClient {
   final log = <String>[];
@@ -54,9 +54,12 @@ class _FakeRepository implements INotificationsRepository {
   }
 }
 
-class _FakeRegions implements GetRegionsUseCase {
+class _FakeRegions implements GetRegionsCacheFirstUseCase {
   @override
-  Future<Either<Failure, List<String>>> call() async => const Right(['Floresta', 'Santo inacio']);
+  Future<Either<Failure, List<String>>> names({bool force = false}) async => const Right(['Floresta', 'Santo inacio']);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 void main() {

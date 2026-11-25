@@ -14,9 +14,9 @@ import 'package:arena_soccer/core/utils/share_links.dart';
 import 'package:arena_soccer/features/album/presentation/bloc/album_event_cubit.dart';
 import 'package:arena_soccer/features/event_polls/domain/event_poll.dart';
 import 'package:arena_soccer/features/matches/data/dtos/match_dto.dart';
-import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_usecase.dart';
+import 'package:arena_soccer/features/matches/domain/usecases/get_region_matches_cache_first_usecase.dart';
 import 'package:arena_soccer/features/news/data/dtos/news_dto.dart';
-import 'package:arena_soccer/features/news/domain/usecases/watch_news_by_tag_usecase.dart';
+import 'package:arena_soccer/features/news/domain/usecases/open_events_cache_usecases.dart';
 import 'package:arena_soccer/features/qr_codes/domain/now_feed.dart';
 import 'package:arena_soccer/features/qr_codes/domain/qr_target.dart';
 import 'package:arena_soccer/features/qr_codes/presentation/bloc/now_cubit.dart';
@@ -64,22 +64,30 @@ NewsDTO _event(String id, {String region = 'Floresta', bool closed = false}) => 
       ),
     );
 
-class _Matches implements GetRegionMatchesUseCase {
+class _Matches implements GetRegionMatchesCacheFirstUseCase {
   final List<MatchDTO> matches;
 
   _Matches(this.matches);
 
   @override
-  Future<Either<Failure, List<MatchDTO>>> call({required String region, String? season}) async => Right(matches);
+  Stream<Either<Failure, List<MatchDTO>>> call({required String region, String? season, bool force = false}) =>
+      Stream.value(Right(matches));
+
+  @override
+  Future<Either<Failure, List<MatchDTO>>> latest({required String region, String? season, bool force = false}) =>
+      call(region: region, season: season).last;
 }
 
-class _Events implements WatchNewsByTagUseCase {
+class _Events implements GetOpenEventsCacheFirstUseCase {
+  @override
+  Future<Either<Failure, List<NewsDTO>>> latest({bool force = false}) => call(force: force).last;
+
   final List<NewsDTO> news;
 
   _Events(this.news);
 
   @override
-  Stream<Either<Failure, List<NewsDTO>>> call(String tag) => Stream.value(Right(news));
+  Stream<Either<Failure, List<NewsDTO>>> call({bool force = false}) => Stream.value(Right(news));
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

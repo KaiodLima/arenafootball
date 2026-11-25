@@ -32,6 +32,10 @@ abstract class IChampionshipsRepository {
   /// Competições da temporada, de todas as regiões.
   Future<Either<Failure, List<ChampionshipDTO>>> getSeasonChampionships(String season);
 
+  Future<Either<Failure, CachedValue<List<ChampionshipDTO>>?>> getCachedSeasonChampionships(String season);
+
+  Future<Either<Failure, void>> saveSeasonChampionshipsCache(List<ChampionshipDTO> championships, String season);
+
   Stream<Either<Failure, List<GroupDTO>>> watchChampionshipGroups({required int championshipId, String? season});
 
   Future<Either<Failure, void>> saveGroup(GroupDTO group, {String? season});

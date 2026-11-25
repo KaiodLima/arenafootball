@@ -78,7 +78,8 @@ const list = (value: unknown): Doc[] =>
 
 /**
  * Quem participou (súmula): titulares da escalação, quem entrou nas
- * substituições e quem tem gol, assistência ou cartão. Reserva que não
+ * substituições e quem tem gol, assistência, cartão ou pênalti perdido
+ * (cobrador e o goleiro que defendeu). Reserva que não
  * entrou fica de fora. Time sem escalação: nulo (não dá para saber; vale o
  * elenco). Mesma regra do app (`MatchReport.participants`).
  */
@@ -100,6 +101,11 @@ export function participantNames(match: Doc): Participants {
       add(g.assistencia);
     }
     for (const c of list(match.cartoes)) if (text(c.lado) === lado) add(c.jogador);
+    // Pênalti perdido: o cobrador e, defendido, o goleiro do outro time.
+    for (const p of list(match.penaltisPerdidos)) {
+      if (text(p.lado) === lado) add(p.jogador);
+      else if (text(p.motivo) !== 'fora') add(p.goleiro);
+    }
     return names;
   };
   return { homeTeamId: text(match.idTimeC), awayTeamId: text(match.idTimeF), home: side('casa'), away: side('fora') };

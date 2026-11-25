@@ -18,14 +18,26 @@ class GetPlayerSeasonHistoryUseCase {
     required List<String> seasons,
   }) async {
     if (userId.isEmpty) return const Right([]);
-    final rows = await Future.wait(seasons.map((season) async {
-      final player = await _players.getPlayerByUser(userId: userId, season: season);
-      final found = player.fold((_) => null, (p) => p);
-      if (found == null) return null;
-      final awards = await _matches.countElectedMatches(playerId: found.id, season: season);
-      return PlayerSeasonSummary(season: season, player: found, awards: awards.fold((_) => 0, (n) => n));
-    }));
-    final list = rows.whereType<PlayerSeasonSummary>().toList()..sort((a, b) => b.season.compareTo(a.season));
-    return Right(list);
+    final rows = await Future.wait(
+      seasons.map((season) async => (await this.season(userId: userId, season: season)).fold((_) => null, (s) => s)),
+    );
+    return Right(sortHistory(rows));
   }
+
+  /// Uma temporada: o cadastro da conta nela e os troféus (nulo = sem
+  /// cadastro). Falha ao ler o cadastro ou os troféus = `Left` (não vai para
+  /// o cache).
+  Future<Either<Failure, PlayerSeasonSummary?>> season({required String userId, required String season}) async {
+    final player = await _players.getPlayerByUser(userId: userId, season: season);
+    if (player.isLeft) return Left(player.left);
+    final found = player.right;
+    if (found == null) return const Right(null);
+    final awards = await _matches.countElectedMatches(playerId: found.id, season: season);
+    if (awards.isLeft) return Left(awards.left);
+    return Right(PlayerSeasonSummary(season: season, player: found, awards: awards.right));
+  }
+
+  /// As temporadas com cadastro, a mais nova primeiro.
+  static List<PlayerSeasonSummary> sortHistory(Iterable<PlayerSeasonSummary?> rows) =>
+      rows.whereType<PlayerSeasonSummary>().toList()..sort((a, b) => b.season.compareTo(a.season));
 }

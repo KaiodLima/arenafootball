@@ -149,12 +149,10 @@ class OrganizerRequestsDataSource {
     required ChampionshipDTO championship,
   }) async {
     try {
-      final existing = await _championships.get();
-      final ids = existing.docs.map((doc) => ChampionshipDTO.fromFirestore(doc).championshipId);
       final ref = _championships.doc();
       final created = championship.copyWith(
         id: ref.id,
-        championshipId: ChampionshipsDataSource.nextChampionshipId(ids),
+        championshipId: await ChampionshipsDataSource.fetchNextChampionshipId(_championships),
       );
       final batch = _firestore.batch()
         ..set(ref, created.toMap())

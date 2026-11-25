@@ -113,12 +113,28 @@ class EnsureOrganizerIndexesUseCase {
 }
 
 /// Organizador: cria os índices `campeonatos_org` que faltam nos campeonatos
-/// dele (o elenco da competição só grava com o índice).
+/// dele (o elenco da competição só grava com o índice). Os já conferidos
+/// ficam no cache local por conta (sem validade: o índice não some), então
+/// abrir o app de novo não relê; falha não marca nada.
 class EnsureMyOrganizerIndexesUseCase {
   final IOrganizerRequestsRepository _repository;
 
   EnsureMyOrganizerIndexesUseCase(this._repository);
 
-  Future<Either<Failure, int>> call(String userId, List<ChampionshipDTO> championships) =>
-      _repository.ensureMyIndexes(userId, championships);
+  static String _keyOf(ChampionshipDTO championship) => 'c${championship.championshipId}:${championship.id}';
+
+  Future<Either<Failure, int>> call(String userId, List<ChampionshipDTO> championships) async {
+    final cached = await _repository.getCachedCheckedIndexes(userId);
+    final checked = cached.isRight ? (cached.right?.data ?? const <String>{}) : const <String>{};
+    final pending = [
+      for (final championship in championships)
+        if (!checked.contains(_keyOf(championship))) championship,
+    ];
+    if (pending.isEmpty) return const Right(0);
+    final response = await _repository.ensureMyIndexes(userId, pending);
+    if (response.isRight) {
+      await _repository.saveCheckedIndexesCache(userId, {...checked, ...pending.map(_keyOf)});
+    }
+    return response;
+  }
 }

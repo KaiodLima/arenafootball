@@ -78,3 +78,20 @@ test('craque: só quem participou da partida (súmula) recebe voto que conta', (
   assert.equal(electBestPlayer(ballots, [], rules)?.nome, 'Banco');
   assert.equal(electBestPlayer(ballots, [], rules, participants)?.nome, 'Rui');
 });
+
+test('participantes: cobrador do pênalti perdido e o goleiro que defendeu', () => {
+  const match = {
+    escalacao: {
+      casa: [{ idJogador: 'p1', jogador: 'Kaio', titular: true }],
+      fora: [{ idJogador: 'g1', jogador: 'Goleiro', titular: false }],
+    },
+    penaltisPerdidos: [
+      { lado: 'casa', jogador: 'Banco', motivo: 'fora' },
+      { lado: 'fora', jogador: 'Dudu', motivo: 'defendido', goleiro: 'Kaio' },
+      { lado: 'casa', jogador: 'Rui', motivo: 'defendido', goleiro: 'Goleiro' },
+    ],
+  };
+  const participants = participantNames(match);
+  assert.deepEqual([...(participants.home ?? [])].sort(), ['banco', 'kaio', 'rui']);
+  assert.deepEqual([...(participants.away ?? [])].sort(), ['dudu', 'goleiro']);
+});

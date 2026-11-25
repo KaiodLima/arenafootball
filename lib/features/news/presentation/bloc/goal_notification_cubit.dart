@@ -12,7 +12,7 @@ import 'package:arena_soccer/features/news/presentation/bloc/goal_notification_s
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/domain/usecases/add_player_stats_usecase.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
-import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 
@@ -21,7 +21,7 @@ import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_firs
 /// soma o gol/a assistência nos jogadores informados.
 class GoalNotificationCubit extends Cubit<GoalNotificationState> {
   final CreateNewsUseCase createNewsUseCase;
-  final GetRegionsUseCase getRegionsUseCase;
+  final GetRegionsCacheFirstUseCase getRegionsUseCase;
   final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
   final GetTodayMatchesUseCase getTodayMatchesUseCase;
   final UpdateMatchScoreUseCase updateMatchScoreUseCase;
@@ -129,7 +129,7 @@ class GoalNotificationCubit extends Cubit<GoalNotificationState> {
     _edit(state.form.copyWith(regions: [initialRegion], selectedRegion: initialRegion));
     final loadRegion = _loadRegionData(initialRegion);
 
-    final response = await getRegionsUseCase();
+    final response = await getRegionsUseCase.names();
     if (isClosed) return;
     final regions = response.fold((_) => <String>[], (list) => list);
     if (regions.isNotEmpty) {

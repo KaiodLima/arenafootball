@@ -223,3 +223,15 @@ export function perPackOf(event: Doc | undefined): number {
   const n = Number(event?.porPacote);
   return Number.isFinite(n) && n >= 1 ? Math.min(10, Math.floor(n)) : DEFAULT_PER_PACK;
 }
+
+/**
+ * O atleta trocou a foto ([oldUrl] → [newUrl]): a nova URL da figurinha de
+ * atleta [data] que ainda tem a foto antiga (ou nenhuma); `null` = não mexe
+ * (escudo, foto própria enviada pelo admin ou já atualizada).
+ */
+export function stickerPhotoUpdate(data: Doc, oldUrl: string, newUrl: string): string | null {
+  if (text(data.tipo) === 'escudo' || !newUrl) return null;
+  const current = text(data.urlImagem);
+  if (current === newUrl) return null;
+  return !current || current === oldUrl ? newUrl : null;
+}

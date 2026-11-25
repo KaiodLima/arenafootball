@@ -7,6 +7,7 @@ import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_enrollment.dart';
 import 'package:arena_soccer/features/players/domain/repositories/players_repository_interface.dart';
 import 'package:arena_soccer/features/players/domain/player_link.dart';
+import 'package:arena_soccer/features/players/domain/player_season_summary.dart';
 
 class PlayersRepositoryImpl implements IPlayersRepository {
   final PlayersDataSource _dataSource;
@@ -137,10 +138,12 @@ class PlayersRepositoryImpl implements IPlayersRepository {
         season: season,
       ));
 
-  /// Depois de mexer num jogador (números, time, elenco): os rankings do
-  /// cache local ficam velhos.
+  /// Depois de mexer num jogador (números, time, elenco): os rankings e o
+  /// histórico por temporada do cache local ficam velhos.
   Future<Either<Failure, void>> _invalidate(Either<Failure, void> response) async {
-    if (response.isRight) await _cache.deleteWhere(CacheKeys.isRankingKey);
+    if (response.isRight) {
+      await _cache.deleteWhere((key) => CacheKeys.isRankingKey(key) || CacheKeys.isPlayerSeasonKey(key));
+    }
     return response;
   }
 
@@ -159,6 +162,19 @@ class PlayersRepositoryImpl implements IPlayersRepository {
     required String teamId,
     required String team,
     String? season,
-  }) =>
-      _dataSource.linkToTeam(player, plan, teamId: teamId, team: team, season: season);
+  }) async =>
+      _invalidate(await _dataSource.linkToTeam(player, plan, teamId: teamId, team: team, season: season));
+
+  @override
+  Future<Either<Failure, CachedValue<PlayerSeasonSummary?>?>> getCachedSeasonSummary(
+          {required String userId, required String season}) =>
+      _cache.read<PlayerSeasonSummary?>(
+        CacheKeys.playerSeason(userId: userId, season: season),
+        (json) => json == null ? null : PlayerSeasonSummary.fromCache(Map<String, dynamic>.from(json as Map)),
+      );
+
+  @override
+  Future<Either<Failure, void>> saveSeasonSummaryCache(PlayerSeasonSummary? summary,
+          {required String userId, required String season}) =>
+      _cache.save(CacheKeys.playerSeason(userId: userId, season: season), summary?.toCache());
 }

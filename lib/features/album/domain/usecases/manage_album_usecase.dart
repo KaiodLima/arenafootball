@@ -72,6 +72,12 @@ class ManageAlbumUseCase {
     return _renumber(event);
   }
 
+  /// Troca só a foto das figurinhas ([photos]: id → URL).
+  Future<Either<Failure, void>> updateStickerPhotos(AlbumEventDTO event, Map<String, String> photos) async {
+    if (photos.isEmpty) return const Right(null);
+    return _repository.updateStickerPhotos(eventId: event.id, photos: photos);
+  }
+
   /// Números em sequência, página por página (só grava o que mudou).
   Future<Either<Failure, void>> _renumber(AlbumEventDTO event) async {
     final current = await _repository.watchStickers(event.id).first;

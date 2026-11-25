@@ -3,6 +3,10 @@ import 'package:arena_soccer/features/achievements/data/datasources/achievements
 import 'package:arena_soccer/features/achievements/data/repositories/achievements_repository_impl.dart';
 import 'package:arena_soccer/features/achievements/domain/repositories/achievements_repository_interface.dart';
 import 'package:arena_soccer/features/achievements/domain/usecases/watch_achievements_catalog_usecase.dart';
+import 'package:arena_soccer/features/achievements/domain/usecases/get_achievements_catalog_usecase.dart';
+import 'package:arena_soccer/features/achievements/domain/usecases/get_achievements_catalog_cache_first_usecase.dart';
+import 'package:arena_soccer/features/achievements/domain/usecases/get_cached_achievements_catalog_usecase.dart';
+import 'package:arena_soccer/features/achievements/domain/usecases/save_achievements_catalog_cache_usecase.dart';
 import 'package:arena_soccer/features/achievements/domain/usecases/watch_achievement_progress_usecase.dart';
 import 'package:arena_soccer/features/achievements/domain/usecases/watch_achievement_unlocks_usecase.dart';
 import 'package:arena_soccer/features/achievements/domain/usecases/save_achievement_usecase.dart';
@@ -19,7 +23,7 @@ void registerAchievementsDependencies() {
   _sl.registerLazySingleton<AchievementsDataSource>(() => AchievementsDataSource(_sl()));
 
   // Repository (interface -> impl)
-  _sl.registerLazySingleton<IAchievementsRepository>(() => AchievementsRepositoryImpl(_sl()));
+  _sl.registerLazySingleton<IAchievementsRepository>(() => AchievementsRepositoryImpl(_sl(), _sl()));
 
   // UseCases
   _sl.registerLazySingleton(() => WatchAchievementsCatalogUseCase(_sl()));
@@ -31,4 +35,10 @@ void registerAchievementsDependencies() {
   _sl.registerLazySingleton(() => RecordAchievementActionUseCase(_sl()));
   _sl.registerLazySingleton(() => RecordDailyVisitUseCase(_sl()));
   _sl.registerLazySingleton(() => MarkAchievementSeenUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetAchievementsCatalogUseCase(_sl()));
+
+  // Cache local (ver `cacheFirst`)
+  _sl.registerLazySingleton(() => GetCachedAchievementsCatalogUseCase(_sl()));
+  _sl.registerLazySingleton(() => SaveAchievementsCatalogCacheUseCase(_sl()));
+  _sl.registerLazySingleton(() => GetAchievementsCatalogCacheFirstUseCase(_sl(), _sl(), _sl()));
 }

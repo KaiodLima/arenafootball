@@ -7,9 +7,7 @@ import 'package:arena_soccer/features/auth/data/dtos/user_dto.dart';
 import 'package:arena_soccer/features/auth/domain/account_provider.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/clear_cache_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/delete_account_usecase.dart';
-import 'package:arena_soccer/features/auth/domain/usecases/delete_user_cache_usecase.dart';
-import 'package:arena_soccer/features/auth/domain/usecases/get_cached_user_usecase.dart';
-import 'package:arena_soccer/features/auth/domain/usecases/get_current_user_usecase.dart';
+import 'package:arena_soccer/features/auth/domain/usecases/get_current_user_cache_first_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/save_user_cache_usecase.dart';
 import 'package:arena_soccer/features/auth/domain/usecases/sign_out_usecase.dart';
 import 'package:arena_soccer/features/auth/presentation/bloc/session_state.dart';
@@ -23,12 +21,10 @@ class SessionCubit extends Cubit<SessionState> {
     TestContent.configure(visible: change.nextState.isAccountAdmin && !change.nextState.inFanMode);
   }
 
-  final GetCurrentUserUseCase getCurrentUserUseCase;
+  final GetCurrentUserCacheFirstUseCase getCurrentUserUseCase;
   final SignOutUseCase signOutUseCase;
   final DeleteAccountUseCase deleteAccountUseCase;
-  final GetCachedUserUseCase getCachedUserUseCase;
   final SaveUserCacheUseCase saveUserCacheUseCase;
-  final DeleteUserCacheUseCase deleteUserCacheUseCase;
   final ClearCacheUseCase clearCacheUseCase;
 
   /// Onde o modo jogador do admin fica guardado (nulo nos testes antigos).
@@ -38,9 +34,7 @@ class SessionCubit extends Cubit<SessionState> {
     this.getCurrentUserUseCase,
     this.signOutUseCase,
     this.deleteAccountUseCase,
-    this.getCachedUserUseCase,
     this.saveUserCacheUseCase,
-    this.deleteUserCacheUseCase,
     this.clearCacheUseCase, [
     this.preferences,
   ]) : super(const CheckingSessionState());
@@ -77,32 +71,25 @@ class SessionCubit extends Cubit<SessionState> {
 
   static const String _logName = 'SessionCubit';
 
-  /// Restaura a sessão do FirebaseAuth (auto-login). Com a conta salva no
-  /// cache, entra na hora (funciona sem rede) e revalida sempre em seguida:
-  /// mudou (admin, time, foto), atualiza; falhou, fica com a do cache.
-  Future<void> restore() async {
+  /// Restaura a sessão do FirebaseAuth (auto-login) pelo cache primeiro: com
+  /// a conta salva, entra na hora (funciona sem rede); dentro da validade
+  /// (`CacheTtl.user`) não relê o Firestore, vencido revalida em seguida
+  /// (mudou admin/time/foto, atualiza; falhou, fica com a do cache). [force]
+  /// relê sempre. O login explícito já chega com a conta lida do Firestore
+  /// ([signedIn]).
+  Future<void> restore({bool force = false}) async {
     emit(const CheckingSessionState());
-    final cachedResponse = await getCachedUserUseCase();
-    final cached = cachedResponse.isRight ? cachedResponse.right?.data : null;
-    if (cached != null) emit(await _authenticated(cached));
-
-    final response = await getCurrentUserUseCase();
-    if (response.isLeft) {
-      if (cached == null) {
+    await for (final response in getCurrentUserUseCase(force: force)) {
+      if (isClosed) return;
+      // `Left` só vem sem cache (com cache, a falha mantém a conta salva).
+      if (response.isLeft) {
+        AppLogger.d('restore falhou sem cache: ${response.left}', name: _logName);
         emit(const GuestSessionState());
-      } else {
-        AppLogger.d('restore falhou, mantendo o cache: ${response.left}', name: _logName);
+        continue;
       }
-      return;
+      final user = response.right;
+      emit(user == null ? const GuestSessionState() : await _authenticated(user));
     }
-    final user = response.right;
-    if (user == null) {
-      await deleteUserCacheUseCase();
-      emit(const GuestSessionState());
-      return;
-    }
-    await saveUserCacheUseCase(user);
-    if (user != cached) emit(await _authenticated(user));
   }
 
   Future<void> signedIn(UserDTO user) async {

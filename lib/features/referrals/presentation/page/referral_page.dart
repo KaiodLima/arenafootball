@@ -75,7 +75,7 @@ class _ReferralPageState extends State<ReferralPage> {
     super.initState();
     _cubit = BlocProvider.of<ReferralCubit>(context);
     final user = BlocProvider.of<SessionCubit>(context).state.user;
-    if (user != null) _cubit.load(user.id);
+    if (user != null) _cubit.load(user.id, referredBy: user.referredBy);
   }
 
   @override
@@ -133,6 +133,10 @@ class _ReferralPageState extends State<ReferralPage> {
             showSnackBar(context: context, message: _claimError(l10n, state.error), isSuccess: false);
           } else if (state is ClaimedReferralState) {
             showSnackBar(context: context, message: l10n.referralClaimSaved);
+            // A sessão (e o cache dela) passa a saber do convite usado.
+            final session = BlocProvider.of<SessionCubit>(context);
+            final user = session.state.user;
+            if (user != null) session.updateUser(user.copyWith(referredBy: state.claimedCode));
           }
         },
         builder: (context, state) {

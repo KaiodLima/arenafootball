@@ -13,7 +13,7 @@ import 'package:arena_soccer/features/achievements/domain/usecases/record_achiev
 import 'package:arena_soccer/features/achievements/domain/usecases/record_daily_visit_usecase.dart';
 import 'package:arena_soccer/features/achievements/domain/usecases/watch_achievement_progress_usecase.dart';
 import 'package:arena_soccer/features/achievements/domain/usecases/watch_achievement_unlocks_usecase.dart';
-import 'package:arena_soccer/features/achievements/domain/usecases/watch_achievements_catalog_usecase.dart';
+import 'package:arena_soccer/features/achievements/domain/usecases/get_achievements_catalog_cache_first_usecase.dart';
 
 class AchievementsState extends Equatable {
   final List<AchievementDTO> catalog;
@@ -62,10 +62,11 @@ class AchievementsState extends Equatable {
   List<Object?> get props => [catalog, progress, derived, unlocks, loading];
 }
 
-/// Conquistas da conta logada (global): catálogo, contadores e desbloqueios
-/// ao vivo, o registro do dia de uso e das ações contadas no app.
+/// Conquistas da conta logada (global): catálogo (cache primeiro, validade de
+/// 12 h), contadores e desbloqueios ao vivo, o registro do dia de uso e das
+/// ações contadas no app.
 class AchievementsCubit extends Cubit<AchievementsState> {
-  final WatchAchievementsCatalogUseCase watchCatalogUseCase;
+  final GetAchievementsCatalogCacheFirstUseCase catalogUseCase;
   final WatchAchievementProgressUseCase watchProgressUseCase;
   final WatchAchievementUnlocksUseCase watchUnlocksUseCase;
   final RecordAchievementActionUseCase recordActionUseCase;
@@ -77,7 +78,7 @@ class AchievementsCubit extends Cubit<AchievementsState> {
   bool _visitRecorded = false;
 
   AchievementsCubit(
-    this.watchCatalogUseCase,
+    this.catalogUseCase,
     this.watchProgressUseCase,
     this.watchUnlocksUseCase,
     this.recordActionUseCase,
@@ -101,7 +102,7 @@ class AchievementsCubit extends Cubit<AchievementsState> {
     }
 
     _subscriptions
-      ..add(watchCatalogUseCase().listen((response) {
+      ..add(catalogUseCase().listen((response) {
         if (isClosed || _uid != uidNow) return;
         response.fold(onError, (catalog) => emit(state.copyWith(catalog: catalog, loading: false)));
       }))

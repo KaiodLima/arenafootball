@@ -26,7 +26,7 @@ class TeamPlayersCubit extends Cubit<TeamPlayersState> {
   final WatchTeamPlayersUseCase watchTeamPlayersUseCase;
   final DeleteTeamUseCase deleteTeamUseCase;
   final GetRegionChampionshipsCacheFirstUseCase getRegionChampionshipsCacheFirstUseCase;
-  final GetSeasonChampionshipsUseCase? getSeasonChampionshipsUseCase;
+  final GetSeasonChampionshipsCacheFirstUseCase? getSeasonChampionshipsUseCase;
   final SetTeamChampionshipsUseCase? setTeamChampionshipsUseCase;
   final SetPlayerChampionshipsUseCase? setPlayerChampionshipsUseCase;
   final CreatePlayerUseCase? createPlayerUseCase;
@@ -92,7 +92,7 @@ class TeamPlayersCubit extends Cubit<TeamPlayersState> {
   Future<List<ChampionshipDTO>?> eligibleChampionships(TeamDTO team) async {
     final useCase = getSeasonChampionshipsUseCase;
     if (useCase == null || _season == null) return null;
-    final response = await useCase(_season!);
+    final response = await useCase.latest(_season!);
     if (response.isLeft) return null;
     return GetSeasonChampionshipsUseCase.eligibleFor(response.right, team);
   }

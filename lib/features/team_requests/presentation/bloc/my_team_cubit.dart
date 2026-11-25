@@ -23,7 +23,7 @@ import 'package:arena_soccer/features/teams/domain/usecases/update_team_details_
 /// para o time (aprovar/rejeitar), jogador novo e edição do escudo/descrição.
 /// O que o dono pode gravar é garantido pelas regras do Firestore.
 class MyTeamCubit extends Cubit<MyTeamState> {
-  final GetTeamUseCase getTeamUseCase;
+  final GetTeamCacheFirstUseCase getTeamUseCase;
   final UpdateTeamDetailsUseCase updateTeamDetailsUseCase;
   final WatchTeamPlayersUseCase watchTeamPlayersUseCase;
   final WatchTeamPlayerRequestsUseCase watchTeamPlayerRequestsUseCase;
@@ -67,7 +67,7 @@ class MyTeamCubit extends Cubit<MyTeamState> {
       );
     });
 
-    final team = await getTeamUseCase(teamId);
+    final team = await getTeamUseCase.latest(teamId);
     if (isClosed) return;
     final loaded = team.fold((_) => null, (t) => t) ?? fallback;
     emit(state.copyWith(team: loaded, loading: false));

@@ -1,4 +1,5 @@
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/organizer_requests/data/dtos/organizer_request_dto.dart';
@@ -28,4 +29,10 @@ abstract class IOrganizerRequestsRepository {
 
   /// Organizador: cria os índices que faltam nos campeonatos dele.
   Future<Either<Failure, int>> ensureMyIndexes(String userId, List<ChampionshipDTO> championships);
+
+  /// Campeonatos (`c<id_campeonato>:<id do doc>`) com o índice do organizador
+  /// [userId] já conferido neste aparelho.
+  Future<Either<Failure, CachedValue<Set<String>>?>> getCachedCheckedIndexes(String userId);
+
+  Future<Either<Failure, void>> saveCheckedIndexesCache(String userId, Set<String> checked);
 }

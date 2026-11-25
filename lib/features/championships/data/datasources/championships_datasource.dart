@@ -149,9 +149,7 @@ class ChampionshipsDataSource {
   /// Cria o campeonato com o próximo `id_campeonato` (maior existente + 1).
   Future<Either<Failure, ChampionshipDTO>> createChampionship(ChampionshipDTO championship) async {
     try {
-      final existing = await _championships.get();
-      final ids = existing.docs.map((doc) => ChampionshipDTO.fromFirestore(doc).championshipId);
-      final next = nextChampionshipId(ids);
+      final next = await fetchNextChampionshipId(_championships);
       final ref = _championships.doc();
       final created = championship.copyWith(id: ref.id, championshipId: next);
       await ref.set(created.toMap());
@@ -164,6 +162,27 @@ class ChampionshipsDataSource {
 
   /// Próximo número de campeonato: maior existente + 1 (1 se não houver).
   static int nextChampionshipId(Iterable<int> ids) => ids.fold(0, (max, id) => id > max ? id : max) + 1;
+
+  /// Próximo `id_campeonato` sem ler a coleção inteira: o maior número
+  /// (`orderBy` desc + `limit(1)`, índice de campo único) e, por segurança,
+  /// os docs antigos com o número gravado como texto (o filtro de intervalo
+  /// só devolve o mesmo tipo; normalmente nenhum). Lança no erro (quem chama
+  /// converte).
+  static Future<int> fetchNextChampionshipId(CollectionReference<Map<String, dynamic>> championships) async {
+    final results = await Future.wait([
+      championships
+          .where('id_campeonato', isGreaterThanOrEqualTo: 0)
+          .orderBy('id_campeonato', descending: true)
+          .limit(1)
+          .get(),
+      championships.where('id_campeonato', isGreaterThanOrEqualTo: '').get(),
+    ]);
+    final ids = [
+      for (final result in results)
+        for (final doc in result.docs) ChampionshipDTO.fromFirestore(doc).championshipId,
+    ];
+    return nextChampionshipId(ids);
+  }
 
   /// Regrava o campeonato mantendo o `id_campeonato` (as partidas apontam para ele).
   Future<Either<Failure, ChampionshipDTO>> updateChampionship(ChampionshipDTO championship) async {

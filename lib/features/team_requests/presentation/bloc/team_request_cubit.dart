@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:either_dart/either.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
-import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
 import 'package:arena_soccer/features/team_requests/data/dtos/team_request_dto.dart';
 import 'package:arena_soccer/features/team_requests/domain/usecases/cancel_team_request_usecase.dart';
 import 'package:arena_soccer/features/team_requests/domain/usecases/submit_team_request_usecase.dart';
@@ -18,7 +18,7 @@ class TeamRequestCubit extends Cubit<TeamRequestState> {
   final WatchMyTeamRequestUseCase watchMyTeamRequestUseCase;
   final SubmitTeamRequestUseCase submitTeamRequestUseCase;
   final CancelTeamRequestUseCase cancelTeamRequestUseCase;
-  final GetRegionsUseCase getRegionsUseCase;
+  final GetRegionsCacheFirstUseCase getRegionsUseCase;
   final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
 
   StreamSubscription<Either<Failure, TeamRequestDTO?>>? _subscription;
@@ -52,7 +52,7 @@ class TeamRequestCubit extends Cubit<TeamRequestState> {
 
   Future<void> _load() async {
     emit(const LoadingTeamRequestState());
-    final regions = await getRegionsUseCase();
+    final regions = await getRegionsUseCase.names();
     if (isClosed) return;
     if (regions.isLeft || regions.right.isEmpty) {
       emit(LoadErrorTeamRequestState(errorMessage: regions.isLeft ? regions.left.toString() : ''));

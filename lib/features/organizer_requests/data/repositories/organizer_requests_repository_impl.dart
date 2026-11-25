@@ -1,4 +1,6 @@
 import 'package:either_dart/either.dart';
+import 'package:arena_soccer/core/cache/cache_keys.dart';
+import 'package:arena_soccer/core/cache/cache_store.dart';
 import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/championships/data/dtos/championship_dto.dart';
 import 'package:arena_soccer/features/championships/domain/repositories/championships_repository_interface.dart';
@@ -9,8 +11,19 @@ import 'package:arena_soccer/features/organizer_requests/domain/repositories/org
 class OrganizerRequestsRepositoryImpl implements IOrganizerRequestsRepository {
   final OrganizerRequestsDataSource _dataSource;
   final IChampionshipsRepository _championships;
+  final CacheStore _cache;
 
-  OrganizerRequestsRepositoryImpl(this._dataSource, this._championships);
+  OrganizerRequestsRepositoryImpl(this._dataSource, this._championships, this._cache);
+
+  @override
+  Future<Either<Failure, CachedValue<Set<String>>?>> getCachedCheckedIndexes(String userId) => _cache.read(
+        CacheKeys.organizerIndexes(userId),
+        (json) => {for (final item in json as List) item.toString()},
+      );
+
+  @override
+  Future<Either<Failure, void>> saveCheckedIndexesCache(String userId, Set<String> checked) =>
+      _cache.save(CacheKeys.organizerIndexes(userId), checked.toList()..sort());
 
   @override
   Stream<Either<Failure, OrganizerRequestDTO?>> watchMyRequest(String userId) => _dataSource.watchMyRequest(userId);

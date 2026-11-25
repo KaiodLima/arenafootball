@@ -146,6 +146,10 @@ export default async function run(env, check) {
     substituicoes: [{ id: 's1', lado: 'casa', idSai: 'p7', sai: 'Ana', idEntra: 'p8', entra: 'Bia', minuto: 60 }],
     escalacao: { casa: [{ idJogador: 'p8', jogador: 'Bia', titular: false }], fora: [] },
   })));
+  await check('súmula: gol de pênalti e pênalti perdido', assertSucceeds(updateDoc(doc(org, 'partidas2026/m1'), {
+    gols: [{ id: 'g1', lado: 'casa', idJogador: 'p7', jogador: 'Ana', idAssistencia: '', assistencia: '', minuto: 12, penalti: true }],
+    penaltisPerdidos: [{ id: 'p1', lado: 'fora', idJogador: 'p9', jogador: 'Caio', minuto: 70, motivo: 'defendido', idGoleiro: 'p8', goleiro: 'Bia' }],
+  })));
   await check('súmula: abre a votação', assertSucceeds(updateDoc(doc(org, 'partidas2026/m1'), { votacao: 'true' })));
   await check('súmula: atrasou', assertSucceeds(updateDoc(doc(org, 'partidas2026/m1'),
     { horario: '16:20', horarioOriginal: '16:00', status: deleteField(), statusEm: deleteField(), inicioEm: deleteField() })));

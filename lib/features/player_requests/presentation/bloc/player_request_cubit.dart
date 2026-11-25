@@ -13,7 +13,7 @@ import 'package:arena_soccer/features/player_requests/domain/usecases/watch_my_p
 import 'package:arena_soccer/features/player_requests/presentation/bloc/player_request_state.dart';
 import 'package:arena_soccer/features/players/data/dtos/player_dto.dart';
 import 'package:arena_soccer/features/players/domain/usecases/watch_team_players_usecase.dart';
-import 'package:arena_soccer/features/regions/domain/usecases/get_regions_usecase.dart';
+import 'package:arena_soccer/features/regions/domain/usecases/get_regions_cache_first_usecase.dart';
 import 'package:arena_soccer/features/teams/domain/usecases/get_teams_cache_first_usecase.dart';
 import 'package:arena_soccer/features/player_requests/domain/player_claim_args.dart';
 
@@ -23,7 +23,7 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
   final WatchMyPlayerRequestUseCase watchMyPlayerRequestUseCase;
   final SubmitPlayerRequestUseCase submitPlayerRequestUseCase;
   final CancelPlayerRequestUseCase cancelPlayerRequestUseCase;
-  final GetRegionsUseCase getRegionsUseCase;
+  final GetRegionsCacheFirstUseCase getRegionsUseCase;
   final GetTeamsCacheFirstUseCase getTeamsCacheFirstUseCase;
   final WatchTeamPlayersUseCase watchTeamPlayersUseCase;
   final GetRegionChampionshipsCacheFirstUseCase getRegionChampionshipsCacheFirstUseCase;
@@ -93,7 +93,7 @@ class PlayerRequestCubit extends Cubit<PlayerRequestState> {
 
   Future<void> _load() async {
     emit(const LoadingPlayerRequestState());
-    final regions = await getRegionsUseCase();
+    final regions = await getRegionsUseCase.names();
     if (isClosed) return;
     if (regions.isLeft || regions.right.isEmpty) {
       emit(LoadErrorPlayerRequestState(errorMessage: regions.isLeft ? regions.left.toString() : ''));

@@ -63,6 +63,7 @@ Future<PickedEvent?> showPlayerGridSheet(
   int? minute,
   bool goal = false,
   bool substitution = false,
+  String? emptyLabel,
 }) {
   return showModalBottomSheet<PickedEvent>(
     context: context,
@@ -80,6 +81,7 @@ Future<PickedEvent?> showPlayerGridSheet(
       minute: minute,
       goal: goal,
       substitution: substitution,
+      emptyLabel: emptyLabel,
     )),
   );
 }
@@ -96,6 +98,9 @@ class _PlayerGridSheet extends StatefulWidget {
   final bool goal;
   final bool substitution;
 
+  /// Fora do gol: o botão largo que escolhe "ninguém" (ex.: "Sem goleiro").
+  final String? emptyLabel;
+
   const _PlayerGridSheet({
     required this.title,
     required this.icon,
@@ -107,6 +112,7 @@ class _PlayerGridSheet extends StatefulWidget {
     required this.minute,
     required this.goal,
     required this.substitution,
+    this.emptyLabel,
   });
 
   @override
@@ -176,8 +182,8 @@ class _PlayerGridSheetState extends State<_PlayerGridSheet> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final sections = groupedForPicking(_players, widget.lineup);
-    final showEmpty = widget.goal;
-    final emptyLabel = _secondStep ? l10n.reportNoAssist : l10n.reportGoalNoScorer;
+    final showEmpty = widget.goal || widget.emptyLabel != null;
+    final emptyLabel = widget.emptyLabel ?? (_secondStep ? l10n.reportNoAssist : l10n.reportGoalNoScorer);
     final subtitle = _secondStep && _first != null
         ? (widget.substitution ? l10n.reportLeaving(_first!.name) : l10n.reportGoalBy(_first!.name))
         : (widget.substitution ? widget.title : null);
@@ -215,9 +221,9 @@ class _PlayerGridSheetState extends State<_PlayerGridSheet> {
                     child: Column(
                       children: [
                         Text(l10n.matchReportNoSquad, textAlign: TextAlign.center, style: AppTypography.subtitle()),
-                        if (widget.goal) ...[
+                        if (showEmpty) ...[
                           const SizedBox(height: AppSizes.s16),
-                          _WideTile(label: l10n.reportGoalNoScorer, onTap: () => _pick(null)),
+                          _WideTile(label: emptyLabel, onTap: () => _pick(null)),
                         ],
                       ],
                     ),
