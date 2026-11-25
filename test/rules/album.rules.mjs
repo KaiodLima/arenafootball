@@ -43,6 +43,20 @@ export default async function run(env, check) {
   await check('lê o próprio pacote', assertSucceeds(getDoc(doc(u1, 'album_pacotes/ev1_u1_1'))));
   await check('não lê o pacote de outro', assertFails(getDoc(doc(u2, 'album_pacotes/ev1_u1_1'))));
 
+  // Troca de repetidas (ev4: 2 repetidas por pacote): fora das 24 h; tamanho e sem repetir.
+  await seed('album_eventos/ev4', { titulo: 'Troca', ativo: true, trocaQtd: 2, trocasPorDia: 1 });
+  await seed('usuarios/u2/album/ev4', { figurinhas: { f1: 3, f2: 2 }, pacotes: 1, ultimoPacote: hoursAgo(1) });
+  const trade = (troca, extra = {}) => pack({ uid: 'u2', idEvento: 'ev4', troca, ...extra });
+  await check('troca de 2 repetidas antes das 24 h', assertSucceeds(setDoc(doc(u2, 'album_pacotes/ev4_u2_2'), trade(['f1', 'f2']))));
+  await seed('usuarios/u2/album/ev4', { figurinhas: { f1: 3, f2: 2 }, pacotes: 2, ultimoPacote: hoursAgo(1) });
+  await check('troca com o tamanho errado recusada', assertFails(setDoc(doc(u2, 'album_pacotes/ev4_u2_3'), trade(['f1']))));
+  await check('troca com a mesma figurinha duas vezes recusada', assertFails(setDoc(doc(u2, 'album_pacotes/ev4_u2_3'), trade(['f1', 'f1']))));
+  await check('troca + extra recusada', assertFails(setDoc(doc(u2, 'album_pacotes/ev4_u2_3'), trade(['f1', 'f2'], { extra: true }))));
+  await check('troca que não é lista recusada', assertFails(setDoc(doc(u2, 'album_pacotes/ev4_u2_3'), trade('f1,f2'))));
+  await check('troca com o evento sem troca recusada', assertFails(setDoc(doc(u2, 'album_pacotes/ev1_u2_2'),
+    pack({ uid: 'u2', troca: ['f1', 'f2'] }))));
+  await check('troca fora da sequência recusada', assertFails(setDoc(doc(u2, 'album_pacotes/ev4_u2_5'), trade(['f1', 'f2']))));
+
   await seed('album_eventos/ev1/ranking/u2', { uid: 'u2', nome: 'Bia', coladas: 1 });
   await check('ranking público', assertSucceeds(getDoc(doc(anon, 'album_eventos/ev1/ranking/u2'))));
   await check('dono não mexe no ranking', assertFails(setDoc(doc(u2, 'album_eventos/ev1/ranking/u2'), { coladas: 99 })));

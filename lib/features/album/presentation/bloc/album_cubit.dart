@@ -7,6 +7,7 @@ import 'package:arena_soccer/core/errors/failure.dart';
 import 'package:arena_soccer/features/album/data/dtos/album_dtos.dart';
 import 'package:arena_soccer/features/album/domain/album_layout.dart';
 import 'package:arena_soccer/features/album/domain/album_pack_id.dart';
+import 'package:arena_soccer/features/album/domain/album_trade.dart';
 import 'package:arena_soccer/features/album/domain/usecases/album_usecase.dart';
 import 'package:arena_soccer/features/referrals/domain/usecases/referral_usecases.dart';
 import 'package:arena_soccer/features/teams/data/dtos/team_dto.dart';
@@ -115,6 +116,7 @@ class PackOpenedAlbumState extends AlbumState {
           album: from.album,
           todayPack: from.todayPack,
           packReady: from.packReady,
+          extraPacks: from.extraPacks,
           loading: false,
           teams: from.teams,
           ranking: from.ranking,
@@ -127,20 +129,24 @@ class PackOpenedAlbumState extends AlbumState {
 class ErrorAlbumState extends AlbumState {
   final String errorMessage;
 
-  ErrorAlbumState(AlbumState from, this.errorMessage)
+  /// Troca recusada pelo servidor: o motivo (`motivo` do pacote); vazio = outro erro.
+  final String refusal;
+
+  ErrorAlbumState(AlbumState from, this.errorMessage, {this.refusal = ''})
       : super(
           event: from.event,
           stickers: from.stickers,
           album: from.album,
           todayPack: from.todayPack,
           packReady: from.packReady,
+          extraPacks: from.extraPacks,
           loading: false,
           teams: from.teams,
           ranking: from.ranking,
         );
 
   @override
-  List<Object?> get props => [...super.props, errorMessage];
+  List<Object?> get props => [...super.props, errorMessage, refusal];
 }
 
 /// Tela do álbum: catálogo, figurinhas da conta e o pacote do dia (pedir e
@@ -212,7 +218,7 @@ class AlbumCubit extends Cubit<AlbumState> {
     if (wasOpening &&
         pack != null &&
         (pack.status == AlbumPackStatus.refused || pack.status == AlbumPackStatus.error)) {
-      emit(ErrorAlbumState(next, ''));
+      emit(ErrorAlbumState(next, '', refusal: pack.refusal));
       return;
     }
     emit(next);
@@ -243,6 +249,28 @@ class AlbumCubit extends Cubit<AlbumState> {
       eventId: event.id,
       opened: state.album.packs,
       extra: extra,
+    );
+    if (isClosed) return;
+    response.fold(
+      (failure) => emit(ErrorAlbumState(state.copyWith(opening: false), failure.toString())),
+      (packId) {
+        _pack?.cancel();
+        _pack = albumUseCase.watchPack(packId).listen(_onPack);
+      },
+    );
+  }
+
+  /// Troca as repetidas [ids] por um pacotinho (o mesmo sorteio e a mesma
+  /// animação do pacote do dia; não mexe no relógio das 24 h).
+  Future<void> tradeDuplicates(List<String> ids) async {
+    final event = state.event;
+    if (event == null || state.opening || !AlbumTrade.validSelection(event, state.album, ids)) return;
+    emit(state.copyWith(opening: true, todayPack: () => null));
+    final response = await albumUseCase.openPack(
+      userId: _userId,
+      eventId: event.id,
+      opened: state.album.packs,
+      trade: ids,
     );
     if (isClosed) return;
     response.fold(

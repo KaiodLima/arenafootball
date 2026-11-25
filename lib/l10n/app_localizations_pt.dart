@@ -9228,4 +9228,85 @@ class AppLocalizationsPt extends AppLocalizations {
   String fantasyFormationChanged(int count) {
     return 'O formato da escalação mudou para $count atletas. Sua escalação anterior continua valendo; ajuste o time e confirme para usar o novo formato.';
   }
+
+  @override
+  String albumTradeText(int count) {
+    return 'Troque $count repetidas diferentes por 1 pacotinho';
+  }
+
+  @override
+  String albumTradeLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Você tem $count trocas hoje',
+      one: 'Você tem 1 troca hoje',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get albumTradeNoneLeft => 'Trocas de hoje usadas. Volte amanhã!';
+
+  @override
+  String albumTradeNeedMore(int have, int need) {
+    return 'Você tem $have de $need repetidas diferentes.';
+  }
+
+  @override
+  String get albumTradeChoose => 'Escolher para trocar';
+
+  @override
+  String get albumTradeAuto => 'Escolher automático';
+
+  @override
+  String albumTradeSelected(int selected, int size) {
+    return '$selected de $size escolhidas';
+  }
+
+  @override
+  String get albumTradeAction => 'Trocar';
+
+  @override
+  String albumTradeConfirmTitle(int count) {
+    return 'Trocar $count repetidas?';
+  }
+
+  @override
+  String get albumTradeConfirmBody =>
+      'Cada figurinha escolhida perde 1 cópia e continua colada no álbum. Você ganha 1 pacotinho.';
+
+  @override
+  String albumTradeFull(int count) {
+    return 'Você já escolheu $count figurinhas.';
+  }
+
+  @override
+  String get albumTradeRefusedLimit => 'Você já usou as trocas de hoje.';
+
+  @override
+  String get albumTradeRefusedOff => 'A troca de repetidas foi desligada.';
+
+  @override
+  String get albumTradeRefused =>
+      'Não deu para trocar: confira as repetidas e tente de novo.';
+
+  @override
+  String get albumTradeSettings => 'Troca de repetidas';
+
+  @override
+  String get albumTradeSize => 'Repetidas por pacotinho';
+
+  @override
+  String get albumTradeSizeHint =>
+      'Repetidas diferentes que a pessoa entrega por 1 pacotinho (cada uma perde 1 cópia).';
+
+  @override
+  String get albumTradeOffValue => 'Desligada';
+
+  @override
+  String get albumTradesPerDay => 'Trocas por dia';
+
+  @override
+  String get albumTradesPerDayHint => 'Quantas trocas cada pessoa faz por dia.';
 }

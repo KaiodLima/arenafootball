@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:arena_soccer/app_routes.dart';
 import 'package:arena_soccer/features/album/data/dtos/album_dtos.dart';
+import 'package:arena_soccer/features/album/domain/album_trade.dart';
 import 'package:arena_soccer/features/album/presentation/bloc/album_cubit.dart';
 import 'package:arena_soccer/features/album/presentation/bloc/album_event_cubit.dart';
 import 'package:arena_soccer/features/album/presentation/widgets/album_cards.dart';
 import 'package:arena_soccer/features/album/presentation/widgets/album_ranking.dart';
+import 'package:arena_soccer/features/album/presentation/widgets/album_trade_widgets.dart';
 import 'package:arena_soccer/features/album/presentation/widgets/album_visuals.dart';
 import 'package:arena_soccer/features/album/presentation/widgets/pack_opening_dialog.dart';
 import 'package:arena_soccer/features/album/presentation/widgets/sticker_card.dart';
@@ -17,6 +19,7 @@ import 'package:arena_soccer/injection_container.dart';
 import 'package:arena_soccer/utils/components/tour/tour_step.dart';
 import 'package:arena_soccer/features/referrals/presentation/bloc/referral_config_cubit.dart';
 import 'package:arena_soccer/l10n/app_localizations.dart';
+import 'package:arena_soccer/utils/components/arena_alert_sheet.dart';
 import 'package:arena_soccer/utils/components/arena_choice_chip.dart';
 import 'package:arena_soccer/utils/components/arena_empty_state.dart';
 import 'package:arena_soccer/utils/components/show_snackbar.dart';
@@ -57,6 +60,50 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
   final _tourFirstTeam = GlobalKey();
   final _tourTabs = GlobalKey();
   bool _tourRequested = false;
+
+  /// Troca de repetidas: as marcadas (nulo = fora do modo de seleção).
+  Set<String>? _trade;
+
+  void _togglePick(String id, int size) {
+    final picked = _trade;
+    if (picked == null) return;
+    if (picked.contains(id)) {
+      setState(() => picked.remove(id));
+    } else if (picked.length < size) {
+      setState(() => picked.add(id));
+    } else {
+      showSnackBar(context: context, message: AppLocalizations.of(context).albumTradeFull(size), isSuccess: false);
+    }
+  }
+
+  /// Confirma e troca as marcadas (na ordem do álbum).
+  Future<void> _confirmTrade(AlbumState state) async {
+    final picked = _trade;
+    final event = state.event;
+    if (picked == null || event == null || picked.length != event.tradeSize) return;
+    final l10n = AppLocalizations.of(context);
+    final ok = await showArenaConfirm(
+      context,
+      title: l10n.albumTradeConfirmTitle(picked.length),
+      message: l10n.albumTradeConfirmBody,
+      confirmLabel: l10n.albumTradeAction,
+      icon: Icons.swap_horiz_rounded,
+    );
+    if (!ok || !mounted) return;
+    final ids = [
+      for (final s in state.stickers)
+        if (picked.contains(s.id)) s.id,
+    ];
+    setState(() => _trade = null);
+    await _cubit.tradeDuplicates(ids);
+  }
+
+  /// Texto da troca recusada pelo servidor.
+  String _refusalText(AppLocalizations l10n, String refusal) => switch (refusal) {
+        'limite_dia' => l10n.albumTradeRefusedLimit,
+        'desligada' => l10n.albumTradeRefusedOff,
+        _ => l10n.albumTradeRefused,
+      };
 
   /// Tour do álbum na 1ª visita (com a capa carregada).
   void _requestTour() {
@@ -133,7 +180,11 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
         if (state is ErrorAlbumState) {
           showSnackBar(
             context: context,
-            message: state.errorMessage.isEmpty ? l10n.albumPackFailed : state.errorMessage,
+            message: state.refusal.isNotEmpty
+                ? _refusalText(l10n, state.refusal)
+                : state.errorMessage.isEmpty
+                    ? l10n.albumPackFailed
+                    : state.errorMessage,
             isSuccess: false,
           );
         }
@@ -169,7 +220,17 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
           backgroundColor: AppColors.background,
           bottomNavigationBar: _tab == _CoverTab.ranking && ranking != null
               ? AlbumMyPositionBar(view: ranking, total: state.stickers.length)
-              : null,
+              : _tab == _CoverTab.duplicates && _trade != null && event.tradeOn
+                  ? AlbumTradeBar(
+                      selected: _trade!.length,
+                      size: event.tradeSize,
+                      opening: state.opening,
+                      onCancel: () => setState(() => _trade = null),
+                      onAuto: () => setState(
+                          () => _trade = AlbumTrade.autoPick(state.stickers, state.album, event.tradeSize).toSet()),
+                      onTrade: () => _confirmTrade(state),
+                    )
+                  : null,
           body: CustomScrollView(
             slivers: [
               SliverAppBar(
@@ -217,7 +278,10 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
                           label: l10n.albumTabTeams,
                           icon: Icons.grid_view_rounded,
                           selected: _tab == _CoverTab.teams,
-                          onTap: () => setState(() => _tab = _CoverTab.teams),
+                          onTap: () => setState(() {
+                            _tab = _CoverTab.teams;
+                            _trade = null;
+                          }),
                         ),
                         ArenaChoiceChip(
                           label: l10n.albumTabDuplicates(duplicates.length),
@@ -230,7 +294,10 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
                           icon: Icons.emoji_events_outlined,
                           selected: _tab == _CoverTab.ranking,
                           onTap: () {
-                            setState(() => _tab = _CoverTab.ranking);
+                            setState(() {
+                              _tab = _CoverTab.ranking;
+                              _trade = null;
+                            });
                             _cubit.loadRanking();
                           },
                         ),
@@ -238,6 +305,20 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
                     ),
                   ),
                 ),
+                // Troca de repetidas por pacotinho (com a troca ligada no evento).
+                if (_tab == _CoverTab.duplicates && event.tradeOn && _trade == null)
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(AppSizes.s16, 0, AppSizes.s16, AppSizes.s12),
+                    sliver: SliverToBoxAdapter(
+                      child: AlbumTradeCard(
+                        size: event.tradeSize,
+                        distinctDuplicates: duplicates.length,
+                        tradesLeft: AlbumTrade.tradesLeft(event, state.album, DateTime.now()),
+                        opening: state.opening,
+                        onStart: () => setState(() => _trade = <String>{}),
+                      ),
+                    ),
+                  ),
                 if (_tab == _CoverTab.teams && pages.isEmpty)
                   SliverToBoxAdapter(child: ArenaEmptyState(message: l10n.albumEmpty, icon: Icons.style_outlined))
                 else if (_tab == _CoverTab.teams)
@@ -280,7 +361,8 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
                   )
                 else
                   SliverPadding(
-                    padding: EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s6, AppSizes.s16, safeBottom(context, AppSizes.s32)),
+                    padding:
+                        EdgeInsets.fromLTRB(AppSizes.s16, AppSizes.s6, AppSizes.s16, safeBottom(context, AppSizes.s32)),
                     sliver: SliverGrid.builder(
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 3,
@@ -289,11 +371,21 @@ class _StickerAlbumPageState extends State<StickerAlbumPage> {
                         childAspectRatio: 3 / 4,
                       ),
                       itemCount: duplicates.length,
-                      itemBuilder: (context, i) => StickerCard(
-                        sticker: duplicates[i],
-                        style: albumStyleOf(state, duplicates[i].teamId),
-                        count: state.album.countOf(duplicates[i].id),
-                      ),
+                      itemBuilder: (context, i) {
+                        final card = StickerCard(
+                          sticker: duplicates[i],
+                          style: albumStyleOf(state, duplicates[i].teamId),
+                          count: state.album.countOf(duplicates[i].id),
+                        );
+                        final picked = _trade;
+                        if (picked == null) return card;
+                        return AlbumTradeSelectable(
+                          stickerId: duplicates[i].id,
+                          selected: picked.contains(duplicates[i].id),
+                          onTap: () => _togglePick(duplicates[i].id, event.tradeSize),
+                          child: card,
+                        );
+                      },
                     ),
                   ),
               ],

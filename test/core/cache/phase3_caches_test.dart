@@ -310,6 +310,7 @@ class _AlbumSource implements AlbumDataSource {
     required String userId,
     required String eventId,
     bool extra = false,
+    List<String> trade = const [],
   }) async =>
       const Right(null);
 

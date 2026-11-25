@@ -32,6 +32,7 @@ abstract class IAlbumRepository {
     required String userId,
     required String eventId,
     bool extra = false,
+    List<String> trade = const [],
   });
 
   Future<Either<Failure, String>> saveEvent(AlbumEventDTO event);

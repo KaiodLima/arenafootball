@@ -23,6 +23,10 @@ import {
   nextPackAt,
   parsePackId,
   perPackOf,
+  tradeConfig,
+  tradeRefusal,
+  applyTrade,
+  nextTradeDay,
   rankingEntry,
   stickerOf,
   stickerPhotoUpdate,
@@ -2228,17 +2232,35 @@ export const onAlbumPackRequested = onDocumentCreated('album_pacotes/{packId}', 
     const requestedAt = dateOf(event.data?.data()?.pedidoEm) ?? new Date();
     // Confere de novo a sequência e as 24 h, ou o saldo de pacotinhos extras
     // da indicação (as regras já barram). O extra não mexe no relógio do diário.
+    const tradeIds = event.data?.data()?.troca;
+    const trading = tradeIds !== undefined;
     const kind = packKind(albumSnap.data(), parsed.n, requestedAt, {
       requested: event.data?.data()?.extra === true,
       extraPacks: extraPacksOf(referralSnap.data()),
+      trade: trading,
     });
-    if (eventSnap.data()?.ativo !== true || catalog.empty || kind === null) {
-      await packRef.update({ status: 'recusado', abertoEm: FieldValue.serverTimestamp() });
+    // Troca de repetidas: as quantidades e o limite do dia (as regras só conferem o tamanho).
+    const refusal =
+      kind === 'troca'
+        ? tradeRefusal(
+            albumSnap.data(),
+            tradeIds,
+            tradeConfig(eventSnap.data()),
+            requestedAt,
+            new Set(catalog.docs.map((doc) => doc.id)),
+          )
+        : null;
+    if (eventSnap.data()?.ativo !== true || catalog.empty || kind === null || refusal !== null) {
+      await packRef.update({
+        status: 'recusado',
+        abertoEm: FieldValue.serverTimestamp(),
+        ...(refusal ? { motivo: refusal } : {}),
+      });
       return;
     }
     const stickers = catalog.docs.map((doc) => stickerOf(doc.id, doc.data()));
     const drawn = drawPack(stickers, perPackOf(eventSnap.data()));
-    const before = albumOf(albumSnap.data());
+    const before = kind === 'troca' ? applyTrade(albumOf(albumSnap.data()), tradeIds as string[]) : albumOf(albumSnap.data());
     const { album, novas, newPages, justCompleted } = applyPack(before, drawn, stickers);
     const batch = db.batch();
     batch.update(packRef, { status: 'aberto', figurinhas: drawn, novas, abertoEm: FieldValue.serverTimestamp() });
@@ -2246,7 +2268,9 @@ export const onAlbumPackRequested = onDocumentCreated('album_pacotes/{packId}', 
       albumRef,
       kind === 'extra'
         ? { ...album, pacotes: parsed.n }
-        : { ...album, pacotes: parsed.n, ultimoPacote: requestedAt, avisoEm: nextPackAt(requestedAt) },
+        : kind === 'troca'
+          ? { ...album, pacotes: parsed.n, trocasDia: nextTradeDay(albumSnap.data(), requestedAt) }
+          : { ...album, pacotes: parsed.n, ultimoPacote: requestedAt, avisoEm: nextPackAt(requestedAt) },
       { merge: true },
     );
     if (kind === 'extra') batch.update(referralRef, { pacotesExtras: FieldValue.increment(-1) });

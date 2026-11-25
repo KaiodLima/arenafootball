@@ -102,12 +102,14 @@ class AlbumDataSource {
   }
 
   /// Pede o pacote do dia (as functions sorteiam); [extra] = pacotinho extra
-  /// da indicação (antes das 24 h, gasta o saldo).
+  /// da indicação (antes das 24 h, gasta o saldo); [trade] = as repetidas
+  /// entregues na troca (fora das 24 h; a function confere e tira 1 de cada).
   Future<Either<Failure, void>> requestPack({
     required String packId,
     required String userId,
     required String eventId,
     bool extra = false,
+    List<String> trade = const [],
   }) async {
     try {
       await _firestore.collection('album_pacotes').doc(packId).set({
@@ -116,6 +118,7 @@ class AlbumDataSource {
         'status': AlbumPackStatus.requested.key,
         'pedidoEm': FieldValue.serverTimestamp(),
         if (extra) 'extra': true,
+        if (trade.isNotEmpty) 'troca': trade,
       });
       return const Right(null);
     } catch (e) {

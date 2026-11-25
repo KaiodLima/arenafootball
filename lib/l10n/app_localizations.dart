@@ -15212,6 +15212,126 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'O formato da escalação mudou para {count} atletas. Sua escalação anterior continua valendo; ajuste o time e confirme para usar o novo formato.'**
   String fantasyFormationChanged(int count);
+
+  /// No description provided for @albumTradeText.
+  ///
+  /// In pt, this message translates to:
+  /// **'Troque {count} repetidas diferentes por 1 pacotinho'**
+  String albumTradeText(int count);
+
+  /// No description provided for @albumTradeLeft.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{Você tem 1 troca hoje} other{Você tem {count} trocas hoje}}'**
+  String albumTradeLeft(int count);
+
+  /// No description provided for @albumTradeNoneLeft.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocas de hoje usadas. Volte amanhã!'**
+  String get albumTradeNoneLeft;
+
+  /// No description provided for @albumTradeNeedMore.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você tem {have} de {need} repetidas diferentes.'**
+  String albumTradeNeedMore(int have, int need);
+
+  /// No description provided for @albumTradeChoose.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolher para trocar'**
+  String get albumTradeChoose;
+
+  /// No description provided for @albumTradeAuto.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolher automático'**
+  String get albumTradeAuto;
+
+  /// No description provided for @albumTradeSelected.
+  ///
+  /// In pt, this message translates to:
+  /// **'{selected} de {size} escolhidas'**
+  String albumTradeSelected(int selected, int size);
+
+  /// No description provided for @albumTradeAction.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar'**
+  String get albumTradeAction;
+
+  /// No description provided for @albumTradeConfirmTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocar {count} repetidas?'**
+  String albumTradeConfirmTitle(int count);
+
+  /// No description provided for @albumTradeConfirmBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cada figurinha escolhida perde 1 cópia e continua colada no álbum. Você ganha 1 pacotinho.'**
+  String get albumTradeConfirmBody;
+
+  /// No description provided for @albumTradeFull.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você já escolheu {count} figurinhas.'**
+  String albumTradeFull(int count);
+
+  /// No description provided for @albumTradeRefusedLimit.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você já usou as trocas de hoje.'**
+  String get albumTradeRefusedLimit;
+
+  /// No description provided for @albumTradeRefusedOff.
+  ///
+  /// In pt, this message translates to:
+  /// **'A troca de repetidas foi desligada.'**
+  String get albumTradeRefusedOff;
+
+  /// No description provided for @albumTradeRefused.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não deu para trocar: confira as repetidas e tente de novo.'**
+  String get albumTradeRefused;
+
+  /// No description provided for @albumTradeSettings.
+  ///
+  /// In pt, this message translates to:
+  /// **'Troca de repetidas'**
+  String get albumTradeSettings;
+
+  /// No description provided for @albumTradeSize.
+  ///
+  /// In pt, this message translates to:
+  /// **'Repetidas por pacotinho'**
+  String get albumTradeSize;
+
+  /// No description provided for @albumTradeSizeHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Repetidas diferentes que a pessoa entrega por 1 pacotinho (cada uma perde 1 cópia).'**
+  String get albumTradeSizeHint;
+
+  /// No description provided for @albumTradeOffValue.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desligada'**
+  String get albumTradeOffValue;
+
+  /// No description provided for @albumTradesPerDay.
+  ///
+  /// In pt, this message translates to:
+  /// **'Trocas por dia'**
+  String get albumTradesPerDay;
+
+  /// No description provided for @albumTradesPerDayHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quantas trocas cada pessoa faz por dia.'**
+  String get albumTradesPerDayHint;
 }
 
 class _AppLocalizationsDelegate

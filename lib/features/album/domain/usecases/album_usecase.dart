@@ -37,7 +37,8 @@ class AlbumUseCase {
     if (top.isLeft) return Left(top.left);
     final index = top.right.indexWhere((e) => e.userId == userId);
     if (index >= 0) {
-      return Right((view: AlbumRankingView(top: top.right, me: top.right[index], myPosition: index + 1), complete: true));
+      return Right(
+          (view: AlbumRankingView(top: top.right, me: top.right[index], myPosition: index + 1), complete: true));
     }
     final me = await _repository.getCollector(eventId, userId);
     if (me.isLeft) return Right((view: AlbumRankingView(top: top.right), complete: false));
@@ -80,15 +81,23 @@ class AlbumUseCase {
   Stream<Either<Failure, AlbumPackDTO?>> watchPack(String packId) => _repository.watchPack(packId);
 
   /// Pede o próximo pacote da conta (que já abriu [opened]); devolve o id
-  /// para acompanhar o sorteio. [extra] = pacotinho extra da indicação.
+  /// para acompanhar o sorteio. [extra] = pacotinho extra da indicação;
+  /// [trade] = repetidas entregues na troca.
   Future<Either<Failure, String>> openPack({
     required String userId,
     required String eventId,
     required int opened,
     bool extra = false,
+    List<String> trade = const [],
   }) async {
     final packId = AlbumPackId.next(eventId: eventId, userId: userId, opened: opened);
-    final response = await _repository.requestPack(packId: packId, userId: userId, eventId: eventId, extra: extra);
+    final response = await _repository.requestPack(
+      packId: packId,
+      userId: userId,
+      eventId: eventId,
+      extra: extra,
+      trade: trade,
+    );
     return response.map((_) => packId);
   }
 }

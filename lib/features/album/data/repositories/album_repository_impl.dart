@@ -59,8 +59,10 @@ class AlbumRepositoryImpl implements IAlbumRepository {
     required String userId,
     required String eventId,
     bool extra = false,
+    List<String> trade = const [],
   }) async {
-    final response = await _dataSource.requestPack(packId: packId, userId: userId, eventId: eventId, extra: extra);
+    final response =
+        await _dataSource.requestPack(packId: packId, userId: userId, eventId: eventId, extra: extra, trade: trade);
     // As functions colam as figurinhas e mudam o ranking da conta.
     if (response.isRight) await _cache.deleteWhere((key) => CacheKeys.isAlbumRankingKey(key, eventId));
     return response;

@@ -4724,5 +4724,73 @@
         "type": "int"
       }
     }
-  }
+  },
+  "albumTradeText": "Troque {count} repetidas diferentes por 1 pacotinho",
+  "@albumTradeText": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "albumTradeLeft": "{count, plural, =1{Você tem 1 troca hoje} other{Você tem {count} trocas hoje}}",
+  "@albumTradeLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "albumTradeNoneLeft": "Trocas de hoje usadas. Volte amanhã!",
+  "albumTradeNeedMore": "Você tem {have} de {need} repetidas diferentes.",
+  "@albumTradeNeedMore": {
+    "placeholders": {
+      "have": {
+        "type": "int"
+      },
+      "need": {
+        "type": "int"
+      }
+    }
+  },
+  "albumTradeChoose": "Escolher para trocar",
+  "albumTradeAuto": "Escolher automático",
+  "albumTradeSelected": "{selected} de {size} escolhidas",
+  "@albumTradeSelected": {
+    "placeholders": {
+      "selected": {
+        "type": "int"
+      },
+      "size": {
+        "type": "int"
+      }
+    }
+  },
+  "albumTradeAction": "Trocar",
+  "albumTradeConfirmTitle": "Trocar {count} repetidas?",
+  "@albumTradeConfirmTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "albumTradeConfirmBody": "Cada figurinha escolhida perde 1 cópia e continua colada no álbum. Você ganha 1 pacotinho.",
+  "albumTradeFull": "Você já escolheu {count} figurinhas.",
+  "@albumTradeFull": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "albumTradeRefusedLimit": "Você já usou as trocas de hoje.",
+  "albumTradeRefusedOff": "A troca de repetidas foi desligada.",
+  "albumTradeRefused": "Não deu para trocar: confira as repetidas e tente de novo.",
+  "albumTradeSettings": "Troca de repetidas",
+  "albumTradeSize": "Repetidas por pacotinho",
+  "albumTradeSizeHint": "Repetidas diferentes que a pessoa entrega por 1 pacotinho (cada uma perde 1 cópia).",
+  "albumTradeOffValue": "Desligada",
+  "albumTradesPerDay": "Trocas por dia",
+  "albumTradesPerDayHint": "Quantas trocas cada pessoa faz por dia."
 }

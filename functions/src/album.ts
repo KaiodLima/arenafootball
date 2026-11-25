@@ -73,16 +73,20 @@ export function canOpenPack(album: Doc | undefined, n: number, requestedAt: Date
 /**
  * Que pacote abre: o do dia ('diario', 24 h depois do último), ou, antes
  * disso, um pacotinho extra da indicação ('extra', pedido com `extra` e
- * [extraPacks] > 0, que não mexe no relógio do diário); nulo = recusado.
+ * [extraPacks] > 0, que não mexe no relógio do diário), ou a troca de
+ * repetidas ('troca', pedido com `troca`; também fora do relógio); nulo =
+ * recusado.
  */
 export function packKind(
   album: Doc | undefined,
   n: number,
   requestedAt: Date,
-  extra: { requested: boolean; extraPacks: number } = { requested: false, extraPacks: 0 },
-): 'diario' | 'extra' | null {
+  extra: { requested: boolean; extraPacks: number; trade?: boolean } = { requested: false, extraPacks: 0 },
+): 'diario' | 'extra' | 'troca' | null {
   const opened = typeof album?.pacotes === 'number' ? album.pacotes : 0;
   if (n !== opened + 1) return null;
+  // Troca de repetidas: nunca vira o diário nem gasta o extra (o resto é o [tradeRefusal]).
+  if (extra.trade) return extra.requested ? null : 'troca';
   const last = dateOf(album?.ultimoPacote);
   if (last === null || requestedAt.getTime() >= nextPackAt(last).getTime()) return 'diario';
   return extra.requested && extra.extraPacks > 0 ? 'extra' : null;
@@ -216,6 +220,65 @@ export function applyPack(
 /** Figurinha do catálogo (doc de `album_eventos/{id}/figurinhas`). */
 export function stickerOf(id: string, data: Doc): Sticker {
   return { id, teamId: text(data.idTime), rare: data.rara === true };
+}
+
+/** Troca de repetidas do evento: [size] repetidas diferentes por pacote (0 = desligada) e [perDay] trocas por dia. */
+export interface TradeConfig {
+  size: number;
+  perDay: number;
+}
+
+export const TRADE_MIN = 2;
+export const TRADE_MAX = 30;
+export const TRADES_PER_DAY_MAX = 10;
+
+/** `trocaQtd` (2 a 30; fora disso/sem o campo = desligada) e `trocasPorDia` (1 a 10, padrão 1). */
+export function tradeConfig(event: Doc | undefined): TradeConfig {
+  const size = Number(event?.trocaQtd);
+  const perDay = Number(event?.trocasPorDia);
+  return {
+    size: Number.isInteger(size) && size >= TRADE_MIN && size <= TRADE_MAX ? size : 0,
+    perDay: Number.isInteger(perDay) && perDay >= 1 ? Math.min(TRADES_PER_DAY_MAX, perDay) : 1,
+  };
+}
+
+/** Trocas já feitas no dia [day] (Brasília) pelo `trocasDia` do álbum. */
+export function tradesOn(album: Doc | undefined, day: string): number {
+  const record = album?.trocasDia as Doc | undefined;
+  return record && text(record.dia) === day && typeof record.qtd === 'number' ? record.qtd : 0;
+}
+
+/** Por que a troca foi recusada. */
+export type TradeRefusal = 'desligada' | 'tamanho' | 'repetida' | 'sem_repetida' | 'limite_dia';
+
+/**
+ * Confere a troca dos [ids] (repetidas diferentes, cada uma com 2 ou mais no
+ * [album], exatamente o tamanho do evento e dentro do limite do dia de [now]
+ * em Brasília); nulo = vale.
+ */
+export function tradeRefusal(album: Doc | undefined, ids: unknown, config: TradeConfig, now: Date, catalog: Set<string>): TradeRefusal | null {
+  if (config.size === 0) return 'desligada';
+  if (!Array.isArray(ids) || ids.length !== config.size || ids.some((id) => typeof id !== 'string')) return 'tamanho';
+  if (new Set(ids).size !== ids.length) return 'repetida';
+  const counts = albumOf(album).figurinhas;
+  if (ids.some((id) => !catalog.has(id as string) || (counts[id as string] ?? 0) < 2)) return 'sem_repetida';
+  if (tradesOn(album, brasiliaDay(now)) >= config.perDay) return 'limite_dia';
+  return null;
+}
+
+/** Tira 1 de cada figurinha trocada (todas tinham 2 ou mais: seguem coladas). */
+export function applyTrade(before: AlbumProgress, ids: string[]): AlbumProgress {
+  const figurinhas = { ...before.figurinhas };
+  for (const id of ids) {
+    if ((figurinhas[id] ?? 0) > 1) figurinhas[id] -= 1;
+  }
+  return { ...before, figurinhas };
+}
+
+/** `trocasDia` depois de mais uma troca em [now] (dia novo recomeça do 1). */
+export function nextTradeDay(album: Doc | undefined, now: Date): { dia: string; qtd: number } {
+  const day = brasiliaDay(now);
+  return { dia: day, qtd: tradesOn(album, day) + 1 };
 }
 
 /** Figurinhas por pacote do evento (1 a 10; sem o campo, 5). */

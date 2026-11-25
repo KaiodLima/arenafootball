@@ -9181,4 +9181,87 @@ class AppLocalizationsEn extends AppLocalizations {
   String fantasyFormationChanged(int count) {
     return 'The lineup format changed to $count athletes. Your previous lineup still counts; adjust your team and confirm to use the new format.';
   }
+
+  @override
+  String albumTradeText(int count) {
+    return 'Trade $count different duplicates for 1 pack';
+  }
+
+  @override
+  String albumTradeLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'You have $count trades today',
+      one: 'You have 1 trade today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get albumTradeNoneLeft =>
+      'Today\'s trades are used. Come back tomorrow!';
+
+  @override
+  String albumTradeNeedMore(int have, int need) {
+    return 'You have $have of $need different duplicates.';
+  }
+
+  @override
+  String get albumTradeChoose => 'Pick to trade';
+
+  @override
+  String get albumTradeAuto => 'Pick automatically';
+
+  @override
+  String albumTradeSelected(int selected, int size) {
+    return '$selected of $size picked';
+  }
+
+  @override
+  String get albumTradeAction => 'Trade';
+
+  @override
+  String albumTradeConfirmTitle(int count) {
+    return 'Trade $count duplicates?';
+  }
+
+  @override
+  String get albumTradeConfirmBody =>
+      'Each picked sticker loses 1 copy and stays in the album. You get 1 pack.';
+
+  @override
+  String albumTradeFull(int count) {
+    return 'You already picked $count stickers.';
+  }
+
+  @override
+  String get albumTradeRefusedLimit => 'You already used today\'s trades.';
+
+  @override
+  String get albumTradeRefusedOff => 'Duplicate trading was turned off.';
+
+  @override
+  String get albumTradeRefused =>
+      'Could not trade: check your duplicates and try again.';
+
+  @override
+  String get albumTradeSettings => 'Duplicate trading';
+
+  @override
+  String get albumTradeSize => 'Duplicates per pack';
+
+  @override
+  String get albumTradeSizeHint =>
+      'Different duplicates a fan gives for 1 pack (each loses 1 copy).';
+
+  @override
+  String get albumTradeOffValue => 'Off';
+
+  @override
+  String get albumTradesPerDay => 'Trades per day';
+
+  @override
+  String get albumTradesPerDayHint =>
+      'How many trades each fan can make per day.';
 }

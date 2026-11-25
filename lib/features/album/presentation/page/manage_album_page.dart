@@ -367,6 +367,14 @@ class _EventEditorState extends State<_EventEditor> {
     );
   }
 
+  /// Repetidas por pacotinho: abaixo do mínimo = desligada (0); ligar começa no mínimo.
+  void _setTradeSize(int size) {
+    final next = size < AlbumEventDTO.minTradeSize
+        ? (size < _event.tradeSize ? 0 : AlbumEventDTO.minTradeSize)
+        : size.clamp(AlbumEventDTO.minTradeSize, AlbumEventDTO.maxTradeSize);
+    if (next != _event.tradeSize) widget.cubit.saveEvent(_event.copyWith(tradeSize: next));
+  }
+
   void _toggleTeam(String teamId, String teamName) {
     final ids = [..._event.teamIds];
     final names = [..._event.teams];
@@ -430,6 +438,36 @@ class _EventEditorState extends State<_EventEditor> {
                   label: Text(l10n.commonSave),
                 ),
               ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSizes.s16),
+        // Troca de repetidas: quantas por pacotinho (0 = desligada) e trocas por dia.
+        FormSection(
+          title: l10n.albumTradeSettings,
+          child: Column(
+            children: [
+              _TradeStepper(
+                keyName: 'album-trade-size',
+                title: l10n.albumTradeSize,
+                hint: l10n.albumTradeSizeHint,
+                value: _event.tradeOn ? '${_event.tradeSize}' : l10n.albumTradeOffValue,
+                onLess: state.busy ? null : () => _setTradeSize(_event.tradeSize - 1),
+                onMore: state.busy ? null : () => _setTradeSize(_event.tradeSize + 1),
+              ),
+              if (_event.tradeOn)
+                _TradeStepper(
+                  keyName: 'album-trades-day',
+                  title: l10n.albumTradesPerDay,
+                  hint: l10n.albumTradesPerDayHint,
+                  value: '${_event.tradesPerDay}',
+                  onLess: state.busy || _event.tradesPerDay <= 1
+                      ? null
+                      : () => widget.cubit.saveEvent(_event.copyWith(tradesPerDay: _event.tradesPerDay - 1)),
+                  onMore: state.busy || _event.tradesPerDay >= AlbumEventDTO.maxTradesPerDay
+                      ? null
+                      : () => widget.cubit.saveEvent(_event.copyWith(tradesPerDay: _event.tradesPerDay + 1)),
+                ),
             ],
           ),
         ),
@@ -878,3 +916,54 @@ class _SelectableSticker extends StatelessWidget {
 
 /// Folha acima da barra de navegação do sistema (Android de ponta a ponta).
 Widget _safeSheet(Widget child) => SafeArea(top: false, child: child);
+
+/// Linha −/+ da troca de repetidas.
+class _TradeStepper extends StatelessWidget {
+  final String keyName;
+  final String title;
+  final String hint;
+  final String value;
+  final VoidCallback? onLess;
+  final VoidCallback? onMore;
+
+  const _TradeStepper({
+    required this.keyName,
+    required this.title,
+    required this.hint,
+    required this.value,
+    required this.onLess,
+    required this.onMore,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSizes.s4),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: AppTypography.label(color: AppColors.textPrimary)),
+                const SizedBox(height: AppSizes.s2),
+                Text(hint, style: AppTypography.subtitle().copyWith(fontSize: AppSizes.s12)),
+              ],
+            ),
+          ),
+          IconButton(key: ValueKey('$keyName-less'), icon: const Icon(Icons.remove_rounded), onPressed: onLess),
+          SizedBox(
+            width: AppSizes.s80,
+            child: Text(
+              value,
+              key: ValueKey('$keyName-value'),
+              textAlign: TextAlign.center,
+              style: AppTypography.title().copyWith(fontSize: AppSizes.s16),
+            ),
+          ),
+          IconButton(key: ValueKey('$keyName-more'), icon: const Icon(Icons.add_rounded), onPressed: onMore),
+        ],
+      ),
+    );
+  }
+}

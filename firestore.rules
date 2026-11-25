@@ -1018,7 +1018,20 @@ service cloud.firestore {
         let album = exists(path) ? get(path).data : {};
         return packId == eventId + '_' + request.auth.uid + '_' + string(album.get('pacotes', 0) + 1)
           && (!('ultimoPacote' in album) || request.time >= album.ultimoPacote + duration.value(24, 'h')
-            || (request.resource.data.get('extra', false) == true && extraPacks() > 0));
+            || (request.resource.data.get('extra', false) == true && extraPacks() > 0)
+            // Troca de repetidas: fora do relógio das 24 h (conferida no tradeAllowed).
+            || 'troca' in request.resource.data);
+      }
+
+      // Troca de repetidas: só com a troca ligada no evento (`trocaQtd`), sem
+      // `extra`, lista do tamanho do evento e sem repetir. As quantidades e o
+      // limite do dia a function confere (as regras não percorrem a lista).
+      function tradeAllowed(d, event) {
+        return !('troca' in d)
+          || (d.get('extra', false) != true
+            && event.get('trocaQtd', 0) is int && event.get('trocaQtd', 0) >= 2
+            && d.troca is list && d.troca.size() == event.trocaQtd
+            && d.troca.toSet().size() == d.troca.size());
       }
 
       // Pacotinhos extras da indicação (`indicacoes/{uid}.pacotesExtras`).
@@ -1029,12 +1042,14 @@ service cloud.firestore {
 
       allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
       allow create: if signedIn()
-        && request.resource.data.keys().hasOnly(['uid', 'idEvento', 'status', 'pedidoEm', 'extra'])
+        && request.resource.data.keys().hasOnly(['uid', 'idEvento', 'status', 'pedidoEm', 'extra', 'troca'])
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.status == 'pedido'
         && request.resource.data.pedidoEm == request.time
         && packAllowed(request.resource.data.idEvento)
-        && albumOpenFor(get(/databases/$(database)/documents/album_eventos/$(request.resource.data.idEvento)).data);
+        && albumOpenFor(get(/databases/$(database)/documents/album_eventos/$(request.resource.data.idEvento)).data)
+        && tradeAllowed(request.resource.data,
+          get(/databases/$(database)/documents/album_eventos/$(request.resource.data.idEvento)).data);
       allow update, delete: if false;
 
       // Evento ligado; em teste (`somenteAdmin`), só o admin pede pacote.

@@ -14,6 +14,12 @@ import {
   perPackOf,
   rankingEntry,
   stickerOf,
+  packKind,
+  tradeConfig,
+  tradeRefusal,
+  applyTrade,
+  nextTradeDay,
+  tradesOn,
 } from '../album';
 
 const stickers = [
@@ -124,4 +130,46 @@ test('stickerPhotoUpdate: só a figurinha de atleta com a foto antiga ou vazia',
   assert.equal(stickerPhotoUpdate({ tipo: 'atleta', urlImagem: 'new' }, 'old', 'new'), null);
   assert.equal(stickerPhotoUpdate({ tipo: 'escudo', urlImagem: 'old' }, 'old', 'new'), null);
   assert.equal(stickerPhotoUpdate({ tipo: 'atleta', urlImagem: 'old' }, 'old', ''), null);
+});
+
+test('troca de repetidas: config do evento (desligada sem o campo; limites)', () => {
+  assert.deepEqual(tradeConfig(undefined), { size: 0, perDay: 1 });
+  assert.deepEqual(tradeConfig({ trocaQtd: 5, trocasPorDia: 2 }), { size: 5, perDay: 2 });
+  assert.deepEqual(tradeConfig({ trocaQtd: 1, trocasPorDia: 50 }), { size: 0, perDay: 10 });
+  assert.deepEqual(tradeConfig({ trocaQtd: 31 }), { size: 0, perDay: 1 });
+});
+
+test('troca de repetidas: tamanho, diferentes, cada uma com 2+, limite do dia em Brasília', () => {
+  const catalog = new Set(['a1', 'a2', 'b1']);
+  const album = { figurinhas: { a1: 3, a2: 2, b1: 1 }, pacotes: 4 };
+  const config = { size: 2, perDay: 1 };
+  const now = new Date(Date.UTC(2026, 10, 25, 15));
+  assert.equal(tradeRefusal(album, ['a1', 'a2'], config, now, catalog), null);
+  assert.equal(tradeRefusal(album, ['a1', 'a2'], { size: 0, perDay: 1 }, now, catalog), 'desligada');
+  assert.equal(tradeRefusal(album, ['a1'], config, now, catalog), 'tamanho');
+  assert.equal(tradeRefusal(album, 'a1', config, now, catalog), 'tamanho');
+  assert.equal(tradeRefusal(album, ['a1', 'a1'], config, now, catalog), 'repetida');
+  assert.equal(tradeRefusal(album, ['a1', 'b1'], config, now, catalog), 'sem_repetida');
+  assert.equal(tradeRefusal(album, ['a1', 'zz'], config, now, catalog), 'sem_repetida');
+  const traded = { ...album, trocasDia: { dia: '2026-11-25', qtd: 1 } };
+  assert.equal(tradeRefusal(traded, ['a1', 'a2'], config, now, catalog), 'limite_dia');
+  // 01:00 UTC do dia 26 = ainda dia 25 em Brasília; 04:00 UTC = dia 26.
+  assert.equal(tradeRefusal(traded, ['a1', 'a2'], config, new Date(Date.UTC(2026, 10, 26, 1)), catalog), 'limite_dia');
+  assert.equal(tradeRefusal(traded, ['a1', 'a2'], config, new Date(Date.UTC(2026, 10, 26, 4)), catalog), null);
+  assert.equal(tradesOn(traded, '2026-11-26'), 0);
+  assert.deepEqual(nextTradeDay(traded, now), { dia: '2026-11-25', qtd: 2 });
+  assert.deepEqual(nextTradeDay(traded, new Date(Date.UTC(2026, 10, 27, 12))), { dia: '2026-11-27', qtd: 1 });
+});
+
+test('troca: fora do relógio das 24 h, nunca vira diário nem extra; tira 1 de cada e mantém as coladas', () => {
+  const album = { pacotes: 2, ultimoPacote: new Date(Date.UTC(2026, 10, 25, 12)) };
+  const soon = new Date(Date.UTC(2026, 10, 25, 13));
+  assert.equal(packKind(album, 3, soon, { requested: false, extraPacks: 0, trade: true }), 'troca');
+  assert.equal(packKind(album, 3, soon, { requested: true, extraPacks: 3, trade: true }), null);
+  assert.equal(packKind(album, 2, soon, { requested: false, extraPacks: 0, trade: true }), null);
+  assert.equal(packKind(album, 3, soon), null, 'sem a troca, segue esperando as 24 h');
+  const before = albumOf({ figurinhas: { a1: 3, a2: 2, b1: 1 } });
+  const after = applyTrade(before, ['a1', 'a2']);
+  assert.deepEqual(after.figurinhas, { a1: 2, a2: 1, b1: 1 });
+  assert.equal(after.coladas, before.coladas);
 });

@@ -9,6 +9,13 @@ enum AlbumEventMode { off, test, all }
 class AlbumEventDTO extends Equatable {
   static const int defaultPerPack = 5;
 
+  /// Troca de repetidas: de [minTradeSize] a [maxTradeSize] repetidas por
+  /// pacote (0 = desligada) e até [maxTradesPerDay] trocas por dia (iguais às
+  /// functions, `tradeConfig`).
+  static const int minTradeSize = 2;
+  static const int maxTradeSize = 30;
+  static const int maxTradesPerDay = 10;
+
   final String id;
   final String title;
   final String description;
@@ -21,6 +28,11 @@ class AlbumEventDTO extends Equatable {
   final List<String> teamIds;
   final List<String> teams;
   final int perPack;
+
+  /// Repetidas diferentes por pacotinho na troca (`trocaQtd`; 0 = desligada)
+  /// e quantas trocas cada conta faz por dia (`trocasPorDia`, Brasília).
+  final int tradeSize;
+  final int tradesPerDay;
   final DateTime? createdAt;
 
   const AlbumEventDTO({
@@ -32,14 +44,21 @@ class AlbumEventDTO extends Equatable {
     this.teamIds = const [],
     this.teams = const [],
     this.perPack = defaultPerPack,
+    this.tradeSize = 0,
+    this.tradesPerDay = 1,
     this.createdAt,
   });
 
-  factory AlbumEventDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
-    final data = doc.data() ?? const {};
+  /// A troca de repetidas está ligada.
+  bool get tradeOn => tradeSize >= minTradeSize;
+
+  factory AlbumEventDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) =>
+      AlbumEventDTO.fromMap(doc.id, doc.data() ?? const {});
+
+  factory AlbumEventDTO.fromMap(String id, Map<String, dynamic> data) {
     List<String> list(String key) => (data[key] as List?)?.map((e) => e.toString()).toList() ?? const [];
     return AlbumEventDTO(
-      id: doc.id,
+      id: id,
       title: data['titulo']?.toString() ?? '',
       description: data['descricao']?.toString() ?? '',
       active: data['ativo'] == true,
@@ -47,8 +66,15 @@ class AlbumEventDTO extends Equatable {
       teamIds: list('idsTimes'),
       teams: list('times'),
       perPack: (data['porPacote'] as num?)?.toInt() ?? defaultPerPack,
+      tradeSize: _tradeSizeOf(data['trocaQtd']),
+      tradesPerDay: ((data['trocasPorDia'] as num?)?.toInt() ?? 1).clamp(1, maxTradesPerDay),
       createdAt: (data['criadoEm'] as Timestamp?)?.toDate(),
     );
+  }
+
+  static int _tradeSizeOf(Object? value) {
+    final size = value is num ? value.toInt() : 0;
+    return size >= minTradeSize && size <= maxTradeSize ? size : 0;
   }
 
   Map<String, dynamic> toMap() => {
@@ -59,6 +85,8 @@ class AlbumEventDTO extends Equatable {
         'idsTimes': teamIds,
         'times': teams,
         'porPacote': perPack,
+        'trocaQtd': tradeSize,
+        'trocasPorDia': tradesPerDay,
       };
 
   AlbumEventMode get mode => !active
@@ -81,6 +109,8 @@ class AlbumEventDTO extends Equatable {
     List<String>? teamIds,
     List<String>? teams,
     int? perPack,
+    int? tradeSize,
+    int? tradesPerDay,
   }) {
     return AlbumEventDTO(
       id: id ?? this.id,
@@ -91,12 +121,15 @@ class AlbumEventDTO extends Equatable {
       teamIds: teamIds ?? this.teamIds,
       teams: teams ?? this.teams,
       perPack: perPack ?? this.perPack,
+      tradeSize: tradeSize ?? this.tradeSize,
+      tradesPerDay: tradesPerDay ?? this.tradesPerDay,
       createdAt: createdAt,
     );
   }
 
   @override
-  List<Object?> get props => [id, title, description, active, adminOnly, teamIds, teams, perPack, createdAt];
+  List<Object?> get props =>
+      [id, title, description, active, adminOnly, teamIds, teams, perPack, tradeSize, tradesPerDay, createdAt];
 }
 
 /// Tipo da figurinha: o escudo do time ou um atleta.
@@ -203,12 +236,18 @@ class UserAlbumDTO extends Equatable {
   final int packs;
   final DateTime? lastPackAt;
 
+  /// Trocas de repetidas do dia (`trocasDia` {dia "AAAA-M-D" de Brasília, qtd}).
+  final String tradeDay;
+  final int tradeCount;
+
   const UserAlbumDTO({
     this.counts = const {},
     this.completedPages = const [],
     this.complete = false,
     this.packs = 0,
     this.lastPackAt,
+    this.tradeDay = '',
+    this.tradeCount = 0,
   });
 
   factory UserAlbumDTO.fromMap(Map<String, dynamic> data) {
@@ -223,8 +262,13 @@ class UserAlbumDTO extends Equatable {
       complete: data['completo'] == true,
       packs: (data['pacotes'] as num?)?.toInt() ?? 0,
       lastPackAt: (data['ultimoPacote'] as Timestamp?)?.toDate(),
+      tradeDay: (data['trocasDia'] as Map?)?['dia']?.toString() ?? '',
+      tradeCount: ((data['trocasDia'] as Map?)?['qtd'] as num?)?.toInt() ?? 0,
     );
   }
+
+  /// Trocas já feitas no dia [day] (Brasília).
+  int tradesOn(String day) => tradeDay == day ? tradeCount : 0;
 
   bool has(String stickerId) => (counts[stickerId] ?? 0) > 0;
 
@@ -238,7 +282,7 @@ class UserAlbumDTO extends Equatable {
       stickers.fold(0, (acc, s) => acc + (countOf(s.id) > 1 ? countOf(s.id) - 1 : 0));
 
   @override
-  List<Object?> get props => [counts, completedPages, complete, packs, lastPackAt];
+  List<Object?> get props => [counts, completedPages, complete, packs, lastPackAt, tradeDay, tradeCount];
 }
 
 /// Situação do pacote do dia (`status`).
@@ -270,11 +314,16 @@ class AlbumPackDTO extends Equatable {
   final List<String> stickers;
   final List<String> newOnes;
 
+  /// Motivo da recusa da troca (`motivo`: desligada, tamanho, repetida,
+  /// sem_repetida, limite_dia); vazio = sem motivo.
+  final String refusal;
+
   const AlbumPackDTO({
     this.id = '',
     this.status = AlbumPackStatus.requested,
     this.stickers = const [],
     this.newOnes = const [],
+    this.refusal = '',
   });
 
   factory AlbumPackDTO.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -285,13 +334,14 @@ class AlbumPackDTO extends Equatable {
       status: AlbumPackStatus.fromKey(data['status']?.toString()),
       stickers: list('figurinhas'),
       newOnes: list('novas'),
+      refusal: data['motivo']?.toString() ?? '',
     );
   }
 
   bool get isOpened => status == AlbumPackStatus.opened;
 
   @override
-  List<Object?> get props => [id, status, stickers, newOnes];
+  List<Object?> get props => [id, status, stickers, newOnes, refusal];
 }
 
 /// `album_eventos/{evento}/ranking/{uid}`: o colecionador no ranking do
@@ -360,9 +410,8 @@ class AlbumRankingEntryDTO extends Equatable {
         collected: (json['collected'] as num?)?.toInt() ?? 0,
         rares: (json['rares'] as num?)?.toInt() ?? 0,
         complete: json['complete'] == true,
-        reachedAt: json['reachedAt'] is num
-            ? DateTime.fromMillisecondsSinceEpoch((json['reachedAt'] as num).toInt())
-            : null,
+        reachedAt:
+            json['reachedAt'] is num ? DateTime.fromMillisecondsSinceEpoch((json['reachedAt'] as num).toInt()) : null,
       );
 
   @override
